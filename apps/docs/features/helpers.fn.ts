@@ -1,3 +1,5 @@
+import { extractMessageFromAnyError, MultiError } from '~/app/api/utils'
+
 const EMPTY_ARRAY = new Array(0)
 export function getEmptyArray() {
   return EMPTY_ARRAY
@@ -40,6 +42,30 @@ export class Result<Ok, Error> {
     return new Result<Ok, Error>({ data: null, error })
   }
 
+  static tryCatchSync<Ok, Error, Args extends Array<unknown>>(
+    fn: (...args: Args) => Ok,
+    onError: (error: unknown) => Error,
+    ...args: Args
+  ): Result<Ok, Error> {
+    try {
+      return Result.ok(fn(...args))
+    } catch (error: unknown) {
+      return Result.error(onError(error))
+    }
+  }
+
+  static async tryCatch<Ok, Error, Args extends Array<unknown>>(
+    fn: (...args: Args) => Promise<Ok>,
+    onError: (error: unknown) => Error,
+    ...args: Args
+  ): Promise<Result<Ok, Error>> {
+    try {
+      return Result.ok(await fn(...args))
+    } catch (error: unknown) {
+      return Result.error(onError(error))
+    }
+  }
+
   static async tryCatchFlat<
     Ok,
     Args extends Array<unknown> = [],
@@ -55,6 +81,27 @@ export class Result<Ok, Error> {
     } catch (error: unknown) {
       return Result.error(onError(error))
     }
+  }
+
+  static transposeArray<Ok, Error>(
+    array: Array<Result<Ok, Error>>
+  ): Result<Array<Ok>, MultiError<Error>> {
+    let data: Array<Ok> = new Array(array.length)
+    let error: MultiError | null = null
+
+    for (const result of array) {
+      if (result.isOk()) {
+        data.push(result.internal.data!)
+      } else {
+        ;(error ??= new MultiError('MultiError:')).appendError(
+          extractMessageFromAnyError(error),
+          result.internal.error
+        )
+      }
+    }
+
+    if (error) return Result.error(error)
+    return Result.ok(data)
   }
 
   isOk(): this is Result<Ok, never> {
