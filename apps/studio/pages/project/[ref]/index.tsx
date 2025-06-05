@@ -21,7 +21,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { toast } from 'sonner'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
@@ -98,20 +98,13 @@ const Home: NextPageWithLayout = () => {
       }
 
       const url = `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/oauth/authorize?client_id=${app.client_id!}&response_type=code&redirect_uri=${app.redirect_uris[0]}`
-      console.log(url)
+      console.log('Open this URL in another tab and copy the auth_id. ', url)
 
-      // const response = await fetch(
-      //   `${process.env.NEXT_PUBLIC_API_ADMIN_URL}/oauth/authorize?client_id=${app.app_id!}&response_type=code&redirect_uri=${app.redirect_uris[0]}`,
-      //   {
-      //     method: 'GET',
-      //     redirect: 'manual',
-      //   }
-      // )
-      // // get the redirect url from the OAuth app authorization
-      // const redirectUrl = response.headers.get('Location')
+      console.log(
+        'Use the auth_id and token in this URL',
+        `${BASE_PATH}/claim-project?auth_id=AUTH_ID&token=TOKEN`
+      )
 
-      // append the token to the authorization url
-      // await copyToClipboard(`${redirectUrl}&token=${data.token}`)
       toast.success('URL pasted in console')
     } catch (error: any) {
       toast.error('Failed to create claim token', error!.message)
