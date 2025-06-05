@@ -1,3 +1,4 @@
+import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { AlignLeft } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -8,7 +9,6 @@ import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Button, SidePanel, cn } from 'ui'
@@ -126,11 +126,11 @@ const JsonEdit = ({
         <div className="flex items-center justify-between">
           {view === 'edit' ? (
             <p>
-              {readOnly ? 'Viewing' : 'Editing'} JSON Field: <code>{column}</code>
+              {readOnly ? 'Viewing' : 'Editing'} value of: <code>{column}</code>
             </p>
           ) : (
             <p>
-              Viewing JSON Field: <code>{column}</code>
+              Viewing value of: <code>{column}</code>
             </p>
           )}
           {(!isTruncated || (isTruncated && isSuccess)) && (
