@@ -51,12 +51,12 @@ export const ContactSupportButton = ({
   }
 
   function getSupportUrl() {
-    const url = new URL('/support/new')
+    const url = new URL('/support/new', window.location.origin)
     url.searchParams.set('category', category)
     url.searchParams.set('subject', subject)
-    url.searchParams.set('message', encodeURI(message))
+    url.searchParams.set('message', message)
     if (projectRef) {
-      url.searchParams.set('ref', projectRef)
+      url.searchParams.set('projectRef', projectRef)
     }
     return url.toString()
   }
