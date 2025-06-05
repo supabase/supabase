@@ -46,6 +46,8 @@ jobs:
               });
               const fs = require('fs');
               fs.writeFileSync('${{ github.workspace }}/lint_results.zip', Buffer.from(download.data));
+            } else {
+              console.log('No matching artifact found')
             }
       - id: unzip_results
         name: Unzip results file

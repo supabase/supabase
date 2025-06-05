@@ -75,7 +75,6 @@ jobs:
             | reviewdog -f=rdjsonl -reporter=github-pr-review -tee
       - id: external_lint
         name: run linter (external)
-        if: steps.filter.outputs.docs == 'true' && github.event.pull_request.head.repo.full_name != github.repository
         env:
           BASE_REF: ${{ github.base_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -88,7 +87,9 @@ jobs:
           }
           set +e
           LINT_RESULTS=$(run_lints)
+          echo "$LINT_RESULTS"
           LINT_EXIT_CODE=$?
+          echo "$LINT_EXIT_CODE"
           set -e
           echo "LINT_EXIT_CODE=$LINT_EXIT_CODE" >> $GITHUB_OUTPUT
           if [[ $LINT_EXIT_CODE -ne 0 ]]; then
