@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { useReplicationSinksQuery } from 'data/replication/sinks-query'
+import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
 import { Plus } from 'lucide-react'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -29,12 +29,12 @@ const Destinations = () => {
   let sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
   const {
-    data: sinksData,
-    error: sinksError,
-    isLoading: isSinksLoading,
-    isError: isSinksError,
-    isSuccess: isSinksSuccess,
-  } = useReplicationSinksQuery({
+    data: destinationsData,
+    error: destinationsError,
+    isLoading: isDestinationsLoading,
+    isError: isDestinationsError,
+    isSuccess: isDestinationsSuccess,
+  } = useReplicationDestinationsQuery({
     projectRef,
   })
 
@@ -48,7 +48,7 @@ const Destinations = () => {
     projectRef,
   })
 
-  const anySinks = isSinksSuccess && sinksData.sinks.length > 0
+  const anyDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
 
   return (
     <>
@@ -59,16 +59,16 @@ const Destinations = () => {
             Add destination
           </Button>
         </div>
-        {(isSourcesLoading || isSinksLoading) && <GenericSkeletonLoader />}
+        {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
 
-        {(isSourcesError || isSinksError) && (
+        {(isSourcesError || isDestinationsError) && (
           <AlertError
-            error={sourcesError || sinksError}
+            error={sourcesError || destinationsError}
             subject="Failed to retrieve destinations"
           />
         )}
 
-        {anySinks ? (
+        {anyDestinations ? (
           <Table
             head={[
               <Table.th key="name">Name</Table.th>,
@@ -77,15 +77,17 @@ const Destinations = () => {
               <Table.th key="publication">Publication</Table.th>,
               <Table.th key="actions"></Table.th>,
             ]}
-            body={sinksData.sinks.map((sink) => {
-              const pipeline = pipelinesData?.pipelines.find((p) => p.sink_id === sink.id)
+            body={destinationsData.destinations.map((destination) => {
+              const pipeline = pipelinesData?.pipelines.find(
+                (p) => p.destination_id === destination.id
+              )
               return (
                 <DestinationRow
-                  key={sink.id}
+                  key={destination.id}
                   sourceId={sourceId}
-                  sinkId={sink.id}
-                  sinkName={sink.name}
-                  type={sink.config.big_query ? 'BigQuery' : 'Other'}
+                  destinationId={destination.id}
+                  destinationName={destination.name}
+                  type={destination.config.big_query ? 'BigQuery' : 'Other'}
                   pipeline={pipeline}
                   error={pipelinesError}
                   isLoading={isPipelinesLoading}
@@ -97,9 +99,9 @@ const Destinations = () => {
           ></Table>
         ) : (
           !isSourcesLoading &&
-          !isSinksLoading &&
+          !isDestinationsLoading &&
           !isSourcesError &&
-          !isSinksError && (
+          !isDestinationsError && (
             <div
               className={cn(
                 'w-full',

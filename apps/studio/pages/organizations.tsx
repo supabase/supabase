@@ -16,6 +16,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { NextPageWithLayout } from 'types'
 import { Button, Skeleton } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PrivacyUpdateBanner } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 
 const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -41,6 +42,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainerLegacy>
+      <PrivacyUpdateBanner />
       <ScaffoldTitle>Your Organizations</ScaffoldTitle>
 
       <div className="flex items-center gap-x-2 md:gap-x-3">

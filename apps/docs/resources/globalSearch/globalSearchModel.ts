@@ -4,13 +4,13 @@ import { Result } from '~/features/helpers.fn'
 import { openAI } from '~/lib/openAi'
 import { supabase, type DatabaseCorrected } from '~/lib/supabase'
 import { GuideModel } from '../guide/guideModel'
-import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
-import { SearchResultInterface } from './globalSearchInterface'
-import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
 import {
   DB_METADATA_TAG_PLATFORM_CLI,
   ReferenceCLICommandModel,
 } from '../reference/referenceCLIModel'
+import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
+import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
+import { SearchResultInterface } from './globalSearchInterface'
 
 export abstract class SearchResultModel {
   static async search(
@@ -26,10 +26,14 @@ export abstract class SearchResultModel {
         await supabase().rpc('search_content', {
           embedding,
           include_full_content: includeFullContent,
-          max_result: args.limit,
+          max_result: args.limit ?? undefined,
         })
       )
-        .map((matches) => matches.map(createModelFromMatch).filter(Boolean))
+        .map((matches) =>
+          matches
+            .map(createModelFromMatch)
+            .filter((item): item is SearchResultInterface => item !== null)
+        )
         .mapError(convertPostgrestToApiError)
 
       return matchResult
@@ -55,7 +59,7 @@ function createModelFromMatch({
       })
     case 'reference':
       const { language } = metadata
-      if (SDKLanguageValues.includes(language)) {
+      if (language && SDKLanguageValues.includes(language)) {
         return new ReferenceSDKFunctionModel({
           title: page_title,
           href,
@@ -71,7 +75,7 @@ function createModelFromMatch({
           subsections,
         })
       } else {
-        break
+        return null
       }
     case 'github-discussions':
       return new TroubleshootingModel({

@@ -32,6 +32,12 @@ export async function POST(req: NextRequest, props: { params: Promise<{ ref: str
   const ref = params.ref
   const { reason, email, captchaToken } = await req.json()
 
+  // Validate reason
+  const allowedReasons = ['phishing', 'advertisement', 'malware', 'scam', 'other']
+  if (!allowedReasons.includes(reason)) {
+    return NextResponse.json({ error: 'Bad Request: Invalid reason provided.' }, { status: 400 })
+  }
+
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   if (!ref) {

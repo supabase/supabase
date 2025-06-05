@@ -143,7 +143,7 @@ export const AdvisorWidget = () => {
                     <ButtonTooltip
                       type="text"
                       className="px-1 opacity-0 group-hover:opacity-100 w-7"
-                      icon={<AiIconAnimation className="w-5 h-5" />}
+                      icon={<AiIconAnimation size={16} />}
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()

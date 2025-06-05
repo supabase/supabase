@@ -14,7 +14,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Dashboards } from 'types'
@@ -26,8 +27,6 @@ import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
@@ -168,7 +167,6 @@ export const MarkdownPre = ({
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
   const snap = useAiAssistantStateSnapshot()
-  const supportSQLBlocks = useFlag('reportsV2')
   const project = useSelectedProject()
   const org = useSelectedOrganization()
 
@@ -209,8 +207,7 @@ export const MarkdownPre = ({
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
-  const isDraggableToReports =
-    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
 
   useEffect(() => {
     chartConfig.current = {

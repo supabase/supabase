@@ -25,6 +25,7 @@ jobs:
             apps/docs
             examples
             packages
+            supabase
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
