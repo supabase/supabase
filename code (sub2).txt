@@ -1,0 +1,6 @@
+{
+  "code": "42P01",
+  "details": null,
+  "hint": null,
+  "message": "relation \"public.bible_versions\" does not exist"
+}
