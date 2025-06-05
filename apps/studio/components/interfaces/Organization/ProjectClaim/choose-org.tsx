@@ -12,7 +12,7 @@ export interface ProjectClaimChooseOrgProps {
   onChoose: (org: Organization) => void
 }
 
-const MAX_ORGS_TO_SHOW = 3
+const MAX_ORGS_TO_SHOW = 5
 
 export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) {
   const {
@@ -74,14 +74,14 @@ export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) 
                   key={org.id}
                   className="hover:bg-surface-200 rounded-none first:rounded-t-lg last:rounded-b-lg -mb-px"
                 >
-                  <CardHeader className="flex flex-row justify-between border-none">
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="truncate" title={org.name}>
+                  <CardHeader className="flex flex-row justify-between border-none space-y-0 space-x-2">
+                    <CardTitle className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="truncate min-w-0" title={org.name}>
                         {org.name}
                       </span>
-                      <Badge>{org.plan?.name}</Badge>
+                      <Badge className="shrink-0">{org.plan?.name}</Badge>
                     </CardTitle>
-                    <Button size="small" onClick={() => onChoose(org)}>
+                    <Button size="small" onClick={() => onChoose(org)} className="shrink-0">
                       Choose
                     </Button>
                   </CardHeader>

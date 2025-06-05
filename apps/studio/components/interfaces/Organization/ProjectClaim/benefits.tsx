@@ -29,7 +29,7 @@ export const ProjectClaimBenefits = ({
       }
       description="Step 2 of 3"
     >
-      <div className="w-full space-y-8 text-sm">
+      <div className="w-full space-y-8 text-sm flex flex-col items-center">
         <div className="flex flex-col items-center mt-6">
           <div className="flex items-center">
             <div
@@ -77,7 +77,7 @@ export const ProjectClaimBenefits = ({
             Your backend will then be managed by Supabase.
           </p>
         </div>
-        <div className="w-full space-y-4">
+        <div className="space-y-4">
           <h3 className="">Why connect {requester.name} to Supabase?</h3>
           <ul className="space-y-3">
             <li className="flex space-x-2">
@@ -108,7 +108,7 @@ export const ProjectClaimBenefits = ({
           </ul>
         </div>
         <div className="flex justify-center sticky bottom-0">
-          <Button size="large" onClick={onContinue}>
+          <Button size="medium" onClick={onContinue}>
             Continue connection
           </Button>
         </div>

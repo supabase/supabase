@@ -13,7 +13,7 @@ type OrganizationProjectClaimVariables = {
 export type OrganizationProjectClaimResponse =
   components['schemas']['OrganizationProjectClaimResponse']
 
-export async function getOrganizationProjectClaim(
+async function getOrganizationProjectClaim(
   { slug, token }: OrganizationProjectClaimVariables,
   signal?: AbortSignal
 ) {
@@ -34,7 +34,6 @@ export type OrganizationProjectClaimError = ResponseError
 export const useOrganizationProjectClaimQuery = <TData = OrganizationProjectClaimData>(
   { slug, token }: OrganizationProjectClaimVariables,
   {
-    enabled = true,
     ...options
   }: UseQueryOptions<OrganizationProjectClaimData, OrganizationProjectClaimError, TData> = {}
 ) =>

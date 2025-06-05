@@ -191,7 +191,7 @@ export const ProjectClaimConfirm = ({
       </div>
       <div className="flex justify-center sticky bottom-0">
         <Button
-          size="large"
+          size="medium"
           loading={isLoading}
           disabled={isLoading}
           onClick={() =>
