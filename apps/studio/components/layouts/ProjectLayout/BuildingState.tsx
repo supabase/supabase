@@ -14,6 +14,7 @@ import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import { Badge, Button } from 'ui'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -113,9 +114,12 @@ const BuildingState = () => {
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
-                        <Button asChild type="default">
-                          <Link href="/support/new">Contact support team</Link>
-                        </Button>
+                        <ContactSupportButton
+                          category="DASHBOARD_BUG"
+                          subject="Dashboard not connecting"
+                          message="I'm unable to connect to the dashboard"
+                          projectRef={project?.ref}
+                        />
                       </>
                     }
                   />
