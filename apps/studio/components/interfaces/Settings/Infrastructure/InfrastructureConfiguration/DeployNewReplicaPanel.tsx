@@ -50,6 +50,7 @@ import {
   cn,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -271,15 +272,12 @@ const DeployNewReplicaPanel = ({
               If you'd like to use read replicas, please contact us via support
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-2">
-              <Button type="default">
-                <Link
-                  href={`/support/new?category=Sales&ref=${projectRef}&subject=Enquiry%20on%20read%20replicas&message=Project%20DB%20version:%20${project?.dbVersion}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Contact support
-                </Link>
-              </Button>
+              <ContactSupportButton
+                category="SALES_ENQUIRY"
+                subject="Enquiry on read replicas"
+                message={`Project DB version: ${project?.dbVersion}`}
+                projectRef={projectRef}
+              />
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : !isMinimallyOnSmallCompute ? (
