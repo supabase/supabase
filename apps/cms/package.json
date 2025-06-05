@@ -32,7 +32,7 @@
     "cross-env": "^7.0.3",
     "eslint-config-supabase": "workspace:*",
     "graphql": "^16.8.1",
-    "next": "~15.3.0",
+    "next": "catalog:",
     "payload": "3.33.0",
     "react": "catalog:",
     "react-dom": "catalog:",
