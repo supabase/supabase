@@ -1,8 +1,8 @@
 import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
-import Link from 'next/link'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -83,30 +83,26 @@ export const HelpPopover = () => {
               </ButtonGroupItem>
             )}
             <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
-              <Link
+              <a
                 href="https://supabase.com/docs/guides/platform/troubleshooting"
                 target="_blank"
                 rel="noreferrer"
               >
                 Troubleshooting
-              </Link>
+              </a>
             </ButtonGroupItem>
             <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
-              <Link href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
+              <a href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
                 Docs
-              </Link>
+              </a>
             </ButtonGroupItem>
             <ButtonGroupItem size="tiny" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
-              <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+              <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
                 Supabase Status
-              </Link>
+              </a>
             </ButtonGroupItem>
-            <ButtonGroupItem
-              size="tiny"
-              icon={<Mail strokeWidth={1.5} size={14} />}
-              onClick={() => router.push(supportUrl)}
-            >
-              Contact Support
+            <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
+              <Link href={supportUrl}>Contact Support</Link>
             </ButtonGroupItem>
           </ButtonGroup>
         </div>
