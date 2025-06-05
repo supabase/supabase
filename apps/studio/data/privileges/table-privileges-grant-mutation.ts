@@ -6,6 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { privilegeKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type TablePrivilegesGrant = Parameters<
   typeof pgMeta.tablePrivileges.grant
@@ -24,13 +25,15 @@ export async function grantTablePrivileges({
   connectionString,
   grants,
 }: TablePrivilegesGrantVariables) {
-  const sql = pgMeta.tablePrivileges.grant(grants).sql
+  const { sql } = pgMeta.tablePrivileges.grant(grants)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `grant_table_privilege`),
     queryKey: ['table-privileges', 'grant'],
   })
+
   return result
 }
 

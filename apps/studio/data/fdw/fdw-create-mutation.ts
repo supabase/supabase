@@ -8,10 +8,10 @@ import {
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
 import type { ResponseError } from 'types'
 import { fdwKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type FDWCreateVariables = {
   projectRef?: string
@@ -217,7 +217,10 @@ export async function createFDW({
   formState,
   tables,
 }: FDWCreateVariables) {
-  const sql = wrapWithTransaction(getCreateFDWSql({ wrapperMeta, formState, tables }))
+  const sql = applyAndTrackMigrations(
+    getCreateFDWSql({ wrapperMeta, formState, tables }),
+    `create_fdw_${wrapperMeta.name}`
+  )
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

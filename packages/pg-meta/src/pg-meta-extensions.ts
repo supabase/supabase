@@ -86,7 +86,7 @@ function update(
   const schemaSql =
     schema === undefined ? '' : `ALTER EXTENSION ${ident(name)} SET SCHEMA ${ident(schema)};`
 
-  const sql = `BEGIN; ${updateSql} ${schemaSql} COMMIT;`
+  const sql = `${updateSql} ${schemaSql}`
   return { sql }
 }
 

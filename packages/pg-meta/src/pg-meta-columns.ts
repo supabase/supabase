@@ -164,7 +164,6 @@ function create({
       : `COMMENT ON COLUMN ${ident(schema)}.${ident(table)}.${ident(name)} IS ${literal(comment)}`
 
   const sql = `
-BEGIN;
   ALTER TABLE ${ident(schema)}.${ident(table)} ADD COLUMN ${ident(name)} ${typeIdent(type)}
     ${defaultValueClause}
     ${isNullableClause}
@@ -172,7 +171,7 @@ BEGIN;
     ${isUniqueClause}
     ${checkSql};
   ${commentSql};
-COMMIT;`
+`
 
   return { sql }
 }
@@ -366,7 +365,6 @@ $$;
   // NOTE: nameSql must be last. defaultValueSql must be after typeSql.
   // identitySql must be after isNullableSql.
   const sql = `
-BEGIN;
   ${isNullableSql}
   ${typeSql}
   ${defaultValueSql}
@@ -375,7 +373,7 @@ BEGIN;
   ${commentSql}
   ${checkSql}
   ${nameSql}
-COMMIT;`
+`
 
   return { sql }
 }

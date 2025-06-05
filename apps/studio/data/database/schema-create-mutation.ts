@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type SchemaCreateVariables = {
   name: string
@@ -13,11 +14,11 @@ export type SchemaCreateVariables = {
 }
 
 export async function createSchema({ name, projectRef, connectionString }: SchemaCreateVariables) {
-  const sql = pgMeta.schemas.create({ name, owner: 'postgres' }).sql
+  const { sql } = pgMeta.schemas.create({ name, owner: 'postgres' })
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `create_schema_${name}`),
     queryKey: ['schema', 'create'],
   })
   return result

@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
+import { initialiseHistoryTable } from 'data/sql/utils/migrations'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
@@ -57,7 +58,7 @@ export async function createProject({
     name,
     db_pass: dbPass,
     db_region: dbRegion,
-    db_sql: dbSql,
+    db_sql: dbSql ?? initialiseHistoryTable,
     auth_site_url: authSiteUrl,
     ...(customSupabaseRequest !== undefined && {
       custom_supabase_internal_requests: customSupabaseRequest as any,

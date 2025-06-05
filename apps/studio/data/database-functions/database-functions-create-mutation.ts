@@ -6,6 +6,7 @@ import pgMeta from '@supabase/pg-meta'
 import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
@@ -23,7 +24,7 @@ export async function createDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `create_function_${payload.name}`),
     queryKey: ['functions', 'create'],
   })
 

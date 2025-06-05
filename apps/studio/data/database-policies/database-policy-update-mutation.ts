@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabasePolicyUpdateVariables = {
   projectRef: string
@@ -29,14 +30,12 @@ export async function updateDatabasePolicy({
   originalPolicy,
   payload,
 }: DatabasePolicyUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
   const { sql } = pgMeta.policies.update(originalPolicy, payload)
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `update_policy_${payload.name}`),
     queryKey: ['policy', 'update', originalPolicy.id],
   })
 

@@ -5,6 +5,7 @@ import type { ResponseError } from 'types'
 import pgMeta from '@supabase/pg-meta'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { privilegeKeys } from './keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type ColumnPrivilegesRevoke = components['schemas']['RevokeColumnPrivilegesBody']
 
@@ -30,7 +31,7 @@ export async function revokeColumnPrivileges({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `revoke_column_privilege`),
     queryKey: ['column-privileges', 'revoke'],
   })
 

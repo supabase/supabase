@@ -32,7 +32,7 @@ export const useExecuteSqlMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlVariables>(
-    (args) => executeSql(args),
+    (args) => executeSql<any[]>(args),
     {
       async onSuccess(data, variables, context) {
         const { contextualInvalidation, sql, projectRef } = variables

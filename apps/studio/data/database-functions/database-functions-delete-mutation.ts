@@ -7,6 +7,7 @@ import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { DatabaseFunction } from './database-functions-query'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
@@ -24,7 +25,7 @@ export async function deleteDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql,
+    sql: applyAndTrackMigrations(sql, `delete_function_${func.name}`),
     queryKey: ['functions', 'delete', func.id.toString()],
   })
 

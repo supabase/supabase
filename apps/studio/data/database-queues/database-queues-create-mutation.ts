@@ -5,6 +5,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
 import { tableKeys } from 'data/tables/keys'
+import { applyAndTrackMigrations } from 'data/sql/utils/migrations'
 
 export type DatabaseQueueCreateVariables = {
   projectRef: string
@@ -35,10 +36,13 @@ export async function createDatabaseQueue({
         ? `SELECT pgmq.create_unlogged('${name}');`
         : `SELECT pgmq.create('${name}');`
 
+  const sql =
+    `${query} ${enableRls ? `alter table pgmq."q_${name}" enable row level security;` : ''}`.trim()
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `${query} ${enableRls ? `alter table pgmq."q_${name}" enable row level security;` : ''}`.trim(),
+    sql: applyAndTrackMigrations(sql, `create_queue_${name}`),
     queryKey: databaseQueuesKeys.create(),
   })
 
