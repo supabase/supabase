@@ -1,11 +1,10 @@
 import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
-import { components } from 'api-types'
-import {
-  ProjectCreationPostgresVersion,
-  useProjectCreationPostgresVersionsQuery,
-} from 'data/config/project-creation-postgres-versions-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
+import { useProjectUnpausePostgresVersionsQuery } from 'data/config/project-unpause-postgres-versions-query'
+import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -18,9 +17,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-type ReleaseChannel = components['schemas']['ReleaseChannel']
-type PostgresEngine = components['schemas']['PostgresEngine']
-
 interface PostgresVersionDetails {
   postgresEngine: PostgresEngine | undefined
   releaseChannel: ReleaseChannel | undefined
@@ -32,10 +28,18 @@ interface PostgresVersionSelectorProps {
   organizationSlug: string | undefined
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
+  type?: 'create' | 'unpause'
   layout?: 'vertical' | 'horizontal'
+  label?: string
 }
 
-const formatValue = ({ postgres_engine, release_channel }: ProjectCreationPostgresVersion) => {
+const formatValue = ({
+  postgres_engine,
+  release_channel,
+}: {
+  postgres_engine: string
+  release_channel: string
+}) => {
   return `${postgres_engine}|${release_channel}`
 }
 
@@ -54,20 +58,36 @@ export const PostgresVersionSelector = ({
   organizationSlug,
   field,
   form,
+  type = 'create',
   layout = 'horizontal',
+  label = 'Postgres Version',
 }: PostgresVersionSelectorProps) => {
+  const { project } = useProjectContext()
+
   const {
-    data,
-    isLoading: isLoadingProjectVersions,
+    data: createVersions,
+    isLoading: isLoadingProjectCreateVersions,
     isSuccess,
-  } = useProjectCreationPostgresVersionsQuery({
-    cloudProvider,
-    dbRegion,
-    organizationSlug,
-  })
-  const availableVersions = (data?.available_versions ?? []).sort((a, b) =>
-    a.version.localeCompare(b.version)
+  } = useProjectCreationPostgresVersionsQuery(
+    {
+      cloudProvider,
+      dbRegion,
+      organizationSlug,
+    },
+    { enabled: type === 'create' }
   )
+
+  const { data: unpauseVersions, isLoading: isLoadingProjectUnpauseVersions } =
+    useProjectUnpausePostgresVersionsQuery(
+      { projectRef: project?.ref },
+      { enabled: type === 'unpause' }
+    )
+
+  const versions =
+    type === 'create'
+      ? createVersions?.available_versions ?? []
+      : unpauseVersions?.available_versions ?? []
+  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
   const { postgresVersionSelection } = form.watch()
 
   useEffect(() => {
@@ -76,14 +96,18 @@ export const PostgresVersionSelector = ({
       const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
       form.setValue('postgresVersionSelection', defaultValue)
     }
-  }, [isSuccess, form])
+  }, [isSuccess, availableVersions, form])
 
   return (
-    <FormItemLayout label="Postgres Version" layout={layout}>
+    <FormItemLayout label={label} layout={layout}>
       <Select_Shadcn_
         value={postgresVersionSelection}
         onValueChange={field.onChange}
-        disabled={availableVersions.length === 0 || isLoadingProjectVersions}
+        disabled={
+          availableVersions.length === 0 ||
+          (type === 'create' && isLoadingProjectCreateVersions) ||
+          (type === 'unpause' && isLoadingProjectUnpauseVersions)
+        }
       >
         <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
           <SelectValue_Shadcn_ placeholder="Select a Postgres version for your project" />

@@ -1,4 +1,4 @@
-import { literal } from './pg-format'
+import { ident, literal } from './pg-format'
 import { EXTENSIONS_SQL } from './sql/extensions'
 import { z } from 'zod'
 
@@ -60,26 +60,10 @@ function create({ name, schema, version, cascade = false }: ExtensionCreateParam
   sql: string
 } {
   const sql = `
-do $$
-begin
-  -- Check if extension exists
-  if exists (
-    select 1 from pg_extension where extname = ${literal(name)}
-  ) then
-    raise exception 'Extension % already exists', ${literal(name)};
-  end if;
-
-  execute(format('CREATE EXTENSION %I
-    %s
-    %s
-    %s',
-    ${literal(name)},
-    ${schema ? `'SCHEMA ' || quote_ident(${literal(schema)})` : `''`},
-    ${version ? `'VERSION ' || quote_ident(${literal(version)})` : `''`},
-    ${cascade ? `'CASCADE'` : `''`}
-));
-end
-$$;`
+CREATE EXTENSION ${ident(name)}
+  ${schema === undefined ? '' : `SCHEMA ${ident(schema)}`}
+  ${version === undefined ? '' : `VERSION ${literal(version)}`}
+  ${cascade ? 'CASCADE' : ''};`
   return { sql }
 }
 
@@ -93,36 +77,16 @@ function update(
   name: string,
   { update = false, version, schema }: ExtensionUpdateParams
 ): { sql: string } {
-  const sql = `
-do $$
-declare
-  ext record;
-begin
-  -- Check if extension exists
-  select * into ext from pg_extension where extname = ${literal(name)};
-  if ext is null then
-    raise exception 'Extension % does not exist', ${literal(name)};
-  end if;
-
-  ${
-    update
-      ? `execute(format('ALTER EXTENSION %I UPDATE %s',
-    ${literal(name)},
-    ${version ? `'TO ' || quote_ident(${literal(version)})` : `''`}
-  ));`
-      : ''
+  let updateSql = ''
+  if (update) {
+    updateSql = `ALTER EXTENSION ${ident(name)} UPDATE ${
+      version === undefined ? '' : `TO ${literal(version)}`
+    };`
   }
+  const schemaSql =
+    schema === undefined ? '' : `ALTER EXTENSION ${ident(name)} SET SCHEMA ${ident(schema)};`
 
-  ${
-    schema
-      ? `execute(format('ALTER EXTENSION %I SET SCHEMA %I',
-    ${literal(name)},
-    ${literal(schema)}
-  ));`
-      : ''
-  }
-end
-$$;`
+  const sql = `BEGIN; ${updateSql} ${schemaSql} COMMIT;`
   return { sql }
 }
 
@@ -131,17 +95,7 @@ type ExtensionRemoveParams = {
 }
 
 function remove(name: string, { cascade = false }: ExtensionRemoveParams = {}): { sql: string } {
-  const sql = `
-do $$
-declare
-  ext record;
-begin
-    execute(format('DROP EXTENSION %I %s',
-      ${literal(name)},
-      ${cascade ? `'CASCADE'` : `'RESTRICT'`}
-    ));
-end
-$$;`
+  const sql = `DROP EXTENSION ${ident(name)} ${cascade ? 'CASCADE' : 'RESTRICT'};`
   return { sql }
 }
 

@@ -10,7 +10,7 @@ export type DatabaseExtension = components['schemas']['PostgresExtension']
 
 export type DatabaseExtensionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseExtensions(

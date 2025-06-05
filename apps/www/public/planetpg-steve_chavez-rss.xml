@@ -5,9 +5,16 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Steve Chavez at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 16 Dec 2022 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Thu, 08 May 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-steve_chavez-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/event-triggers-wo-superuser</guid>
+  <title>PostgreSQL Event Triggers without superuser access</title>
+  <link>https://supabase.com/blog/event-triggers-wo-superuser</link>
+  <description>Using Postgres Hooks to allow regular users to create event triggers</description>
+  <pubDate>Thu, 08 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgrest-11-prerelease</guid>
   <title>PostgREST 11 pre-release</title>
   <link>https://supabase.com/blog/postgrest-11-prerelease</link>

@@ -10,13 +10,13 @@ import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { editorEntityTypes, getTabsStore } from 'state/tabs'
+import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const tabStore = getTabsStore(projectRef)
+  const tabStore = useTabsStateSnapshot()
   const appSnap = useAppStateSnapshot()
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 
@@ -25,8 +25,8 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
+    const lastOpenedTab = appSnap.dashboardHistory.editor
     if (isTableEditorTabsEnabled) {
-      const lastOpenedTab = appSnap.dashboardHistory.editor
       const lastTabId = tabStore.openTabs.find((id) =>
         editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
       )
@@ -37,6 +37,8 @@ const TableEditorPage: NextPageWithLayout = () => {
         const lastTab = tabStore.tabsMap[lastTabId]
         if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
       }
+    } else if (lastOpenedTab) {
+      router.push(`/project/${projectRef}/editor/${appSnap.dashboardHistory.editor}`)
     }
   }, [isTableEditorTabsEnabled])
 

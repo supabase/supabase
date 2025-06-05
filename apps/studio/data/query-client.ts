@@ -24,7 +24,9 @@ export function getQueryClient() {
               error instanceof ResponseError &&
               error.code !== undefined &&
               error.code >= 400 &&
-              error.code < 500
+              error.code < 500 &&
+              // Still retry on 429s (rate limit)
+              error.code !== 429
             ) {
               return false
             }
@@ -34,6 +36,14 @@ export function getQueryClient() {
             }
 
             return false
+          },
+          retryDelay(failureCount, error) {
+            if (error instanceof ResponseError && error.retryAfter) {
+              return error.retryAfter * 1000
+            }
+
+            // react-query default: doubles, starting at 1000ms, with each attempt, but will not exceed 30 seconds
+            return Math.min(1000 * 2 ** failureCount, 30000)
           },
         },
       },

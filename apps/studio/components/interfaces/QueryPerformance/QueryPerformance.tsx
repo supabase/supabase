@@ -1,17 +1,17 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { X } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
@@ -42,18 +42,21 @@ export const QueryPerformance = ({
   queryHitRate,
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
-  const router = useRouter()
-  const { ref, preset } = useParams()
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const state = useDatabaseSelectorStateSnapshot()
+
+  const [{ preset }, setSearchParams] = useQueryStates({
+    sort: parseAsString,
+    search: parseAsString,
+    order: parseAsString,
+    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+  })
 
   const { isLoading, isRefetching } = queryPerformanceQuery
   const isPrimaryDatabase = state.selectedDatabaseId === ref
   const formattedDatabaseId = formatDatabaseID(state.selectedDatabaseId ?? '')
 
-  const [page, setPage] = useState<QUERY_PERFORMANCE_REPORT_TYPES>(
-    (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
-  )
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
 
   const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
@@ -127,12 +130,9 @@ export const QueryPerformance = ({
   return (
     <>
       <Tabs_Shadcn_
-        defaultValue={page}
-        onValueChange={(value) => {
-          setPage(value as QUERY_PERFORMANCE_REPORT_TYPES)
-          const { sort, search, ...rest } = router.query
-          router.push({ ...router, query: { ...rest, preset: value } })
-        }}
+        value={preset}
+        defaultValue={preset}
+        onValueChange={(value) => setSearchParams({ preset: value })}
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
           {QUERY_PERFORMANCE_TABS.map((tab) => {
@@ -152,14 +152,14 @@ export const QueryPerformance = ({
                   'group relative',
                   'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
                   'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
-                  tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                  tab.id === preset ? '!bg-surface-200' : '!bg-surface-200/[33%]',
                   'hover:!bg-surface-100',
                   'data-[state=active]:!bg-surface-200',
                   'hover:text-foreground-light',
                   'transition'
                 )}
               >
-                {tab.id === page && (
+                {tab.id === preset && (
                   <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
                 )}
 
@@ -189,7 +189,7 @@ export const QueryPerformance = ({
                   </span>
                 )}
 
-                {tab.id === page && (
+                {tab.id === preset && (
                   <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
                 )}
               </TabsTrigger_Shadcn_>

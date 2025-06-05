@@ -211,7 +211,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Combine discussions and releases into a single array of entries
   const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean)
 
-  const sortedCombinedEntries = combinedEntries.sort((a, b) => {
+  const sortedCombinedEntries = combinedEntries.sort((a: any, b: any) => {
     const dateA = dayjs(a.created_at)
     const dateB = dayjs(b.created_at)
 

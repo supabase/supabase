@@ -15,7 +15,7 @@ import { getPrimaryKeys } from './utils'
 
 export type TableRowDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: Entity
   rows: SupaRow[]
   roleImpersonationState?: RoleImpersonationState

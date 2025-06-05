@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
-import { processMdx } from '../../helpers.mdx'
-import { BaseLoader, BaseSource } from './base'
+import { processMdx } from '../../helpers.mdx.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 export class MarkdownLoader extends BaseLoader {
   type = 'markdown' as const
@@ -46,6 +46,6 @@ export class MarkdownSource extends BaseSource {
     const sections = this.sections ?? []
     const sectionText = sections.map(({ content }) => content).join('\n\n')
 
-    return `# ${this.meta.title ?? ''}\n\n${this.meta.subtitle ?? ''}\n\n${sectionText}`
+    return `# ${this.meta?.title ?? ''}\n\n${this.meta?.subtitle ?? ''}\n\n${sectionText}`
   }
 }

@@ -3,16 +3,12 @@ import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import { ReactNode, useCallback, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import {
-  filtersToUrlParams,
-  saveTableEditorStateToLocalStorage,
-  sortsToUrlParams,
-} from 'components/grid/SupabaseGrid.utils'
-import type { Filter, Sort } from 'components/grid/types'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import GridHeaderActions from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -22,7 +18,6 @@ import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -40,8 +35,8 @@ import {
   Separator,
   SonnerProgress,
 } from 'ui'
-import FilterPopover from './filter/FilterPopover'
-import { SortPopover } from './sort'
+import { FilterPopover } from './filter/FilterPopover'
+import { SortPopover } from './sort/SortPopover'
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
@@ -58,27 +53,21 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
 )
 
 export type HeaderProps = {
-  sorts: Sort[]
-  filters: Filter[]
   customHeader: ReactNode
 }
 
-const Header = ({ sorts, filters, customHeader }: HeaderProps) => {
+const Header = ({ customHeader }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
 
   return (
     <div>
       <div className="flex h-10 items-center justify-between bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2 overflow-x-auto ">
         {customHeader ? (
-          <>{customHeader}</>
+          customHeader
+        ) : snap.selectedRows.size > 0 ? (
+          <RowHeader />
         ) : (
-          <>
-            {snap.selectedRows.size > 0 ? (
-              <RowHeader sorts={sorts} filters={filters} />
-            ) : (
-              <DefaultHeader />
-            )}
-          </>
+          <DefaultHeader />
         )}
         <GridHeaderActions table={snap.originalTable} />
       </div>
@@ -93,6 +82,8 @@ const DefaultHeader = () => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const org = useSelectedOrganization()
+  const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const onAddRow =
     snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
@@ -101,68 +92,11 @@ const DefaultHeader = () => {
 
   const canAddNew = onAddRow !== undefined || onAddColumn !== undefined
 
-  // [Joshen] Using this logic to block both column and row creation/update/delete
-  const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-
-  const { filters, sorts, setParams } = useTableEditorFiltersSort()
-
-  const onApplyFilters = useCallback(
-    (appliedFilters: Filter[]) => {
-      snap.setEnforceExactCount(false)
-      // Reset page to 1 when filters change
-      snap.setPage(1)
-
-      const newFilters = filtersToUrlParams(appliedFilters)
-
-      setParams((prevParams) => {
-        return {
-          filter: newFilters,
-          sort: prevParams.sort,
-        }
-      })
-
-      if (projectRef) {
-        saveTableEditorStateToLocalStorage({
-          projectRef,
-          tableName: snap.table.name,
-          schema: snap.table.schema,
-          filters: newFilters,
-        })
-      }
-    },
-    [projectRef, snap.table.name, snap.table.schema, setParams]
-  )
-
-  const onApplySorts = useCallback(
-    (appliedSorts: Sort[]) => {
-      const newSorts = sortsToUrlParams(appliedSorts)
-
-      setParams((prevParams) => {
-        return {
-          filter: prevParams.filter,
-          sort: newSorts,
-        }
-      })
-
-      if (projectRef) {
-        saveTableEditorStateToLocalStorage({
-          projectRef,
-          tableName: snap.table.name,
-          schema: snap.table.schema,
-          sorts: newSorts,
-        })
-      }
-    },
-    [projectRef, snap.table.name, snap.table.schema, setParams]
-  )
-
-  const { mutate: sendEvent } = useSendEventMutation()
-
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <FilterPopover filters={filters} onApplyFilters={onApplyFilters} />
-        <SortPopover sorts={sorts} onApplySorts={onApplySorts} />
+        <FilterPopover />
+        <SortPopover />
       </div>
       {canAddNew && (
         <>
@@ -284,17 +218,16 @@ const DefaultHeader = () => {
   )
 }
 
-type RowHeaderProps = {
-  sorts: Sort[]
-  filters: Filter[]
-}
-const RowHeader = ({ sorts, filters }: RowHeaderProps) => {
+const RowHeader = () => {
   const { project } = useProjectContext()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
+
+  const { filters } = useTableFilter()
+  const { sorts } = useTableSort()
 
   const [isExporting, setIsExporting] = useState(false)
 

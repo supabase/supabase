@@ -15,7 +15,7 @@ import { fdwKeys } from './keys'
 
 export type FDWCreateVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   wrapperMeta: WrapperMeta
   formState: {
     [k: string]: string

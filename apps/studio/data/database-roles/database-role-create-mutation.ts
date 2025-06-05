@@ -10,7 +10,7 @@ type CreateRoleBody = Parameters<typeof pgMeta.roles.create>[0]
 
 export type DatabaseRoleCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: CreateRoleBody
 }
 

@@ -1,3 +1,5 @@
+'use client'
+
 import { OpenInV0Button } from '@/components/open-in-v0-button'
 
 import dynamic from 'next/dynamic'

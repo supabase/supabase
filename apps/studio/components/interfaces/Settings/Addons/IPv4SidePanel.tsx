@@ -182,7 +182,9 @@ const IPv4SidePanel = () => {
                         Allow direct database connections via IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                        <p className="text-foreground text-sm" translate="no">
+                          {formatCurrency(option.price)}
+                        </p>
                         <p className="text-foreground-light translate-y-[1px]">
                           / month / database
                         </p>

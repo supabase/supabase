@@ -32,7 +32,7 @@ import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 
-const Connect = () => {
+export const Connect = () => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -293,5 +293,3 @@ const Connect = () => {
     </Dialog>
   )
 }
-
-export default Connect

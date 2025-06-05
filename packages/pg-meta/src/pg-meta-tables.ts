@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { coalesceRowsToArray, exceptionIdentifierNotFound, filterByList } from './helpers'
+import { coalesceRowsToArray, filterByList } from './helpers'
 import { TABLES_SQL } from './sql/tables'
 import { COLUMNS_SQL } from './sql/columns'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
@@ -107,37 +107,24 @@ function list<T extends boolean | undefined = true>(
 
 function retrieve(identifier: TableIdentifier): {
   sql: string
-  zod: z.ZodType<PGTable | undefined>
+  zod: z.ZodType<TableWithColumns>
 } {
   let whereClause = getIdentifierWhereClause(identifier)
 
   const sql = `${generateEnrichedTablesSql({ includeColumns: true })} where ${whereClause};`
   return {
     sql,
-    zod: pgTableZod.optional(),
+    zod: pgTableZod,
   }
 }
 
-type TableRemoveParams = { cascade: boolean }
 function remove(
-  identifier: TableIdentifier,
-  params: TableRemoveParams = { cascade: false }
+  table: Pick<PGTable, 'name' | 'schema'>,
+  { cascade = false } = {}
 ): { sql: string } {
-  const whereClause = getIdentifierWhereClause(identifier)
-  const sql = `
-    do $$
-    declare
-        old record;
-    begin
-        with tables as (${generateEnrichedTablesSql({ includeColumns: false })})
-        select * into old from tables where ${whereClause};
-        if old is null then
-           ${exceptionIdentifierNotFound('table', whereClause)}
-        end if;
-        execute format('drop table %I.%I ${params.cascade ? 'cascade' : 'restrict'}', old.schema, old.name);
-    end
-    $$;
-    `
+  const sql = `DROP TABLE ${ident(table.schema)}.${ident(table.name)} ${
+    cascade ? 'CASCADE' : 'RESTRICT'
+  };`
   return { sql }
 }
 
@@ -156,19 +143,12 @@ type TableCreateParams = {
 }
 
 function create({ name, schema = 'public', comment }: TableCreateParams): { sql: string } {
-  const sql = `
-do $$
-begin
-  execute format('create table %I.%I ()', ${literal(schema)}, ${literal(name)});
-  ${
+  const tableSql = `CREATE TABLE ${ident(schema)}.${ident(name)} ();`
+  const commentSql =
     comment === undefined
       ? ''
-      : `
-  execute format('comment on table %I.%I is %L', ${literal(schema)}, ${literal(name)}, ${literal(comment)});`
-  }
-end
-$$;`
-
+      : `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
+  const sql = `BEGIN; ${tableSql} ${commentSql} COMMIT;`
   return { sql }
 }
 
@@ -184,7 +164,7 @@ type TableUpdateParams = {
 }
 
 function update(
-  identifier: TableIdentifier,
+  old: Pick<PGTable, 'id' | 'name' | 'schema'>,
   {
     name,
     schema,
@@ -196,103 +176,76 @@ function update(
     comment,
   }: TableUpdateParams
 ): { sql: string } {
-  const sql = `
+  const alter = `ALTER TABLE ${ident(old.schema)}.${ident(old.name)}`
+  const schemaSql = schema === undefined ? '' : `${alter} SET SCHEMA ${ident(schema)};`
+  let nameSql = ''
+  if (name !== undefined && name !== old.name) {
+    const currentSchema = schema === undefined ? old.schema : schema
+    nameSql = `ALTER TABLE ${ident(currentSchema)}.${ident(old.name)} RENAME TO ${ident(name)};`
+  }
+  let enableRls = ''
+  if (rls_enabled !== undefined) {
+    const enable = `${alter} ENABLE ROW LEVEL SECURITY;`
+    const disable = `${alter} DISABLE ROW LEVEL SECURITY;`
+    enableRls = rls_enabled ? enable : disable
+  }
+  let forceRls = ''
+  if (rls_forced !== undefined) {
+    const enable = `${alter} FORCE ROW LEVEL SECURITY;`
+    const disable = `${alter} NO FORCE ROW LEVEL SECURITY;`
+    forceRls = rls_forced ? enable : disable
+  }
+  let replicaSql = ''
+  if (replica_identity === undefined) {
+    // skip
+  } else if (replica_identity === 'INDEX') {
+    replicaSql = `${alter} REPLICA IDENTITY USING INDEX ${replica_identity_index};`
+  } else {
+    replicaSql = `${alter} REPLICA IDENTITY ${replica_identity};`
+  }
+  let primaryKeysSql = ''
+  if (primary_keys === undefined) {
+    // skip
+  } else {
+    primaryKeysSql += `
 DO $$
 DECLARE
-  v_table record;
   r record;
 BEGIN
-  WITH tables AS (
-    ${generateEnrichedTablesSql({ includeColumns: false })}
-  )
-  SELECT *
-  INTO v_table
-  FROM tables
-  WHERE ${getIdentifierWhereClause(identifier)};
-
-  IF v_table IS NULL THEN
-    ${exceptionIdentifierNotFound('table', getIdentifierWhereClause(identifier))}
+  SELECT conname
+    INTO r
+    FROM pg_constraint
+    WHERE contype = 'p' AND conrelid = ${literal(old.id)};
+  IF r IS NOT NULL THEN
+    EXECUTE ${literal(`${alter} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END IF;
+END
+$$;
+`
 
-  ${
-    rls_enabled !== undefined
-      ? `execute format('ALTER TABLE %I.%I %s ROW LEVEL SECURITY',
-          v_table.schema, v_table.name,
-          CASE WHEN ${literal(rls_enabled)} THEN 'ENABLE' ELSE 'DISABLE' END);`
-      : ''
+    if (primary_keys.length === 0) {
+      // skip
+    } else {
+      primaryKeysSql += `${alter} ADD PRIMARY KEY (${primary_keys
+        .map((x) => ident(x.name))
+        .join(',')});`
+    }
   }
-
-  ${
-    rls_forced !== undefined
-      ? `execute format('ALTER TABLE %I.%I %s FORCE ROW LEVEL SECURITY',
-          v_table.schema, v_table.name,
-          CASE WHEN ${literal(rls_forced)} THEN '' ELSE 'NO' END);`
-      : ''
-  }
-
-  ${
-    replica_identity !== undefined
-      ? `execute format('ALTER TABLE %I.%I REPLICA IDENTITY %s%s',
-          v_table.schema, v_table.name,
-          ${literal(replica_identity)},
-          CASE WHEN ${literal(replica_identity)} = 'INDEX' 
-            THEN format(' USING INDEX %I', ${literal(replica_identity_index!)})
-            ELSE '' END);`
-      : ''
-  }
-
-  ${
-    primary_keys !== undefined
-      ? `
-    -- Drop existing primary key if any
-    FOR r IN (
-      SELECT conname
-      FROM pg_constraint
-      WHERE conrelid = format('%I.%I', v_table.schema, v_table.name)::regclass
-      AND contype = 'p'
-    ) LOOP
-      execute format('ALTER TABLE %I.%I DROP CONSTRAINT %I',
-        v_table.schema, v_table.name, r.conname);
-    END LOOP;
-
-    ${
-      primary_keys.length > 0
-        ? `execute format('ALTER TABLE %I.%I ADD PRIMARY KEY (%s)',
-            v_table.schema, v_table.name,
-            ${literal(primary_keys.map((pk) => pk.name).join(', '))});`
-        : ''
-    }`
-      : ''
-  }
-
-  ${
-    comment !== undefined
-      ? `execute format('COMMENT ON TABLE %I.%I IS %L',
-          v_table.schema, v_table.name,
-          ${literal(comment)});`
-      : ''
-  }
-
-  ${
-    schema !== undefined
-      ? `execute format('ALTER TABLE %I.%I SET SCHEMA %I',
-          v_table.schema, v_table.name,
-          ${literal(schema)});`
-      : ''
-  }
-
-  ${
-    name !== undefined
-      ? `
-      if ${literal(name)} != v_table.name then
-        execute format('ALTER TABLE %I.%I RENAME TO %I',
-            ${schema !== undefined ? literal(schema) : 'v_table.schema'},
-            v_table.name,
-            ${literal(name)});
-      end if;`
-      : ''
-  }
-END $$;`
+  const commentSql =
+    comment === undefined
+      ? ''
+      : `COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
+  // nameSql must be last, right below schemaSql
+  const sql = `
+BEGIN;
+  ${enableRls}
+  ${forceRls}
+  ${replicaSql}
+  ${primaryKeysSql}
+  ${commentSql}
+  ${schemaSql}
+  ${nameSql}
+COMMIT;`
 
   return { sql }
 }

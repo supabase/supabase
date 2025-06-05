@@ -31,7 +31,7 @@ export const getViewDefinitionSql = ({ id }: GetViewDefinitionArgs) => {
 
 export type ViewDefinitionVariables = GetViewDefinitionArgs & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getViewDefinition(

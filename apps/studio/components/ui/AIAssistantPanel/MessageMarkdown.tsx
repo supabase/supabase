@@ -14,7 +14,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Dashboards } from 'types'
@@ -166,7 +167,8 @@ export const MarkdownPre = ({
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
   const snap = useAiAssistantStateSnapshot()
-  const supportSQLBlocks = useFlag('reportsV2')
+  const project = useSelectedProject()
+  const org = useSelectedOrganization()
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -205,8 +207,7 @@ export const MarkdownPre = ({
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
-  const isDraggableToReports =
-    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
 
   useEffect(() => {
     chartConfig.current = {
@@ -233,6 +234,10 @@ export const MarkdownPre = ({
         ...(queryType === 'mutation'
           ? { category: identifyQueryType(cleanContent) ?? 'unknown' }
           : {}),
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
       },
     })
   }

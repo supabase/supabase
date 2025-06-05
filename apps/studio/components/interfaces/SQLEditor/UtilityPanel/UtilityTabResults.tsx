@@ -151,11 +151,11 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
               )}
               {!hasHipaaAddon && (
                 <Button
-                  icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugging} />}
+                  icon={<AiIconAnimation size={16} loading={isDebugging} />}
                   disabled={!!isDisabled || isDebugging}
                   onClick={onDebug}
                 >
-                  Debug with Supabase AI
+                  Debug with Assistant
                 </Button>
               )}
             </div>

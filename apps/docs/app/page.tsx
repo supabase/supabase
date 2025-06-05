@@ -15,8 +15,12 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
 
   return {
     alternates: {
-      ...parentAlternates,
       canonical: `${BASE_PATH}`,
+      ...(parentAlternates && {
+        languages: parentAlternates.languages || undefined,
+        media: parentAlternates.media || undefined,
+        types: parentAlternates.types || undefined,
+      }),
     },
   }
 }
@@ -251,15 +255,17 @@ const HomePage = () => (
         </div>
 
         <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-          {MIGRATION_PAGES.sort((a, b) => a.name.localeCompare(b.name)).map((guide) => {
-            return (
-              <li key={guide.name} className="col-span-6 md:col-span-4">
-                <Link href={guide.url} passHref>
-                  <IconPanel {...guide} title={guide.name} background={true} showLink={false} />
-                </Link>
-              </li>
-            )
-          })}
+          {MIGRATION_PAGES.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(
+            (guide) => {
+              return (
+                <li key={guide.name} className="col-span-6 md:col-span-4">
+                  <Link href={guide.url || '#'} passHref>
+                    <IconPanel {...guide} title={guide.name} background={true} showLink={false} />
+                  </Link>
+                </li>
+              )
+            }
+          )}
         </ul>
       </div>
 

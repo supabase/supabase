@@ -15,7 +15,7 @@ export type TablePrivilegesGrant = Parameters<
 
 export type TablePrivilegesGrantVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   grants: TablePrivilegesGrant[]
 }
 

@@ -1,8 +1,9 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
@@ -10,7 +11,7 @@ type CreatePolicyBody = components['schemas']['CreatePolicyBody']
 
 export type DatabasePolicyCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: CreatePolicyBody
 }
 
@@ -22,17 +23,15 @@ export async function createDatabasePolicy({
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await post('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    body: payload,
-    headers,
+  const { sql } = pgMeta.policies.create(payload)
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['policy', 'create'],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type DatabasePolicyCreateData = Awaited<ReturnType<typeof createDatabasePolicy>>

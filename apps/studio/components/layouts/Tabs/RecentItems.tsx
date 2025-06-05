@@ -2,30 +2,26 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import { useSnapshot } from 'valtio'
 
 import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { RecentItem } from 'state/recent-items'
-import { getRecentItemsStore } from 'state/recent-items'
-import { editorEntityTypes } from 'state/tabs'
+import { editorEntityTypes, useTabsStateSnapshot } from 'state/tabs'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 
 dayjs.extend(relativeTime)
 
 export function RecentItems() {
   const { ref } = useParams()
-  const store = getRecentItemsStore(ref)
-  const recentItemsSnap = useSnapshot(store)
+  const tabs = useTabsStateSnapshot()
   const editor = useEditorType()
 
-  if (!recentItemsSnap?.items || !ref) return null
+  if (!tabs?.recentItems || !ref) return null
 
   // Filter items based on editor type
   const filteredItems = !editor
-    ? [...recentItemsSnap.items]
-    : recentItemsSnap.items.filter((item) => editorEntityTypes[editor].includes(item.type))
+    ? [...tabs.recentItems]
+    : tabs.recentItems.filter((item) => editorEntityTypes[editor].includes(item.type))
 
   const sortedItems = filteredItems.sort((a, b) => b.timestamp - a.timestamp)
 
@@ -50,7 +46,7 @@ export function RecentItems() {
         ) : (
           <AnimatePresence>
             <div className="grid grid-cols-1 gap-12 gap-y-0">
-              {sortedItems.map((item: RecentItem, index: number) => (
+              {sortedItems.map((item, index: number) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0 }}

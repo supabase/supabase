@@ -121,14 +121,14 @@ export function create({
 } {
   const qualifiedTableName = `${ident(schema)}.${ident(table)}`
   const qualifiedFunctionName = `${ident(function_schema)}.${ident(function_name)}`
-  const triggerEvents = events.join(' OR ')
-  const triggerOrientation = orientation ? `FOR EACH ${orientation}` : ''
-  const triggerCondition = condition ? `WHEN (${condition})` : ''
+  const triggerEvents = events.join(' or ')
+  const triggerOrientation = orientation ? `for each ${orientation}` : ''
+  const triggerCondition = condition ? `when (${condition})` : ''
   const functionArgsStr = function_args.map(literal).join(',')
 
-  const sql = `CREATE TRIGGER ${ident(
+  const sql = `create trigger ${ident(
     name
-  )} ${activation} ${triggerEvents} ON ${qualifiedTableName} ${triggerOrientation} ${triggerCondition} EXECUTE FUNCTION ${qualifiedFunctionName}(${functionArgsStr});`
+  )} ${activation} ${triggerEvents} on ${qualifiedTableName} ${triggerOrientation} ${triggerCondition} execute function ${qualifiedFunctionName}(${functionArgsStr});`
 
   return {
     sql,
@@ -144,82 +144,55 @@ export const pgTriggerUpdateZod = z.object({
 export type PGTriggerUpdate = z.infer<typeof pgTriggerUpdateZod>
 
 export function update(
-  identifier: TriggerIdentifier,
+  id: { name: string; schema: string; table: string },
   params: PGTriggerUpdate
 ): {
   sql: string
+  zod: z.ZodType<void>
 } {
-  const whereIdentifierCondition = getIdentifierWhereClause(identifier)
+  const qualifiedTableName = `${ident(id.schema)}.${ident(id.table)}`
 
-  const sql = `
-do $$
-declare
-  old record;
-begin
-  with triggers as (${TRIGGERS_SQL})
-  select * into old from triggers where ${whereIdentifierCondition};
-  
-  if old is null then
-    raise exception 'Cannot find trigger: %', ${literal(whereIdentifierCondition)};
-  end if;
+  let enabledModeSql = ''
 
-  ${
-    params.enabled_mode
-      ? `
-  execute(format('alter table %I.%I ${
-    params.enabled_mode === 'DISABLED'
-      ? 'DISABLE'
-      : 'ENABLE' +
-        (params.enabled_mode === 'ALWAYS' || params.enabled_mode === 'REPLICA'
-          ? ' ' + params.enabled_mode
-          : '')
-  } TRIGGER %I', 
-    old.schema, old.table, old.name));`
-      : ''
+  switch (params.enabled_mode) {
+    case 'ORIGIN':
+      enabledModeSql = `alter table ${qualifiedTableName} enable trigger ${ident(id.name)};`
+      break
+    case 'DISABLED':
+      enabledModeSql = `alter table ${qualifiedTableName} disable trigger ${ident(id.name)};`
+      break
+    case 'REPLICA':
+    case 'ALWAYS':
+      enabledModeSql = `alter table ${qualifiedTableName} enable ${params.enabled_mode} trigger ${ident(id.name)};`
+      break
+    default:
+      break
   }
 
-  ${
-    params.name
-      ? `
-    -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
-  if ${literal(params.name)} != old.name then
-    execute(format('alter trigger %I on %I.%I rename to %I;', old.name, old.schema, old.table, ${literal(params.name)}));
-  end if;`
+  const updateNameSql =
+    params.name && params.name !== id.name
+      ? `alter trigger ${ident(id.name)} on ${qualifiedTableName} rename to ${ident(params.name)};`
       : ''
-  }
-end
-$$;`
+
+  // updateNameSql must be last
+  const sql = `begin; ${enabledModeSql}; ${updateNameSql}; commit;`
 
   return {
     sql,
+    zod: z.void(),
   }
 }
 
 export function remove(
-  identifier: TriggerIdentifier,
+  id: { name: string; schema: string; table: string },
   { cascade = false } = {}
 ): {
   sql: string
   zod: z.ZodType<void>
 } {
-  const whereIdentifierCondition = getIdentifierWhereClause(identifier)
+  const qualifiedTableName = `${ident(id.schema)}.${ident(id.table)}`
 
-  const sql = `
-do $$
-declare
-  old record;
-begin
-  with triggers as (${TRIGGERS_SQL})
-  select * into old from triggers where ${whereIdentifierCondition};
-  
-  if old is null then
-    raise exception 'Cannot find trigger';
-  end if;
-
-  execute(format('DROP TRIGGER %I ON %I.%I ${cascade ? 'CASCADE' : ''}',
-    old.name, old.schema, old.table));
-end
-$$;`
+  const sql = `drop trigger ${ident(id.name)} on ${qualifiedTableName} ${cascade ? 'cascade' : ''};`
 
   return {
     sql,

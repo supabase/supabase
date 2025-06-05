@@ -31,10 +31,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: e5609278486869b545fda23b5732727b6e70a1c1
+          key: b848086c298be920a40aa9b26c65c7575ae8deca
       - name: install linter
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev e5609278486869b545fda23b5732727b6e70a1c1
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev b848086c298be920a40aa9b26c65c7575ae8deca
       - name: run linter
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,18 +45,15 @@ jobs:
             git config --global user.email 'github-docs-bot@supabase.com'
             BRANCH_NAME="bot/docs-lint-fixes"
             EXISTING_BRANCH=$(git ls-remote --heads origin $BRANCH_NAME)
-            if [ -n "$EXISTING_BRANCH" ]; then
-              git checkout $BRANCH_NAME
-            else
-              git checkout -b $BRANCH_NAME
+            if [[ -n "$EXISTING_BRANCH" ]]; then
+                git push origin --delete $BRANCH_NAME
             fi
+            git checkout -b $BRANCH_NAME
             supa-mdx-lint apps/docs/content --fix || FIX_FAILED=1
             git add .
             git commit -m '[bot] fix lint errors' || true
             git push origin $BRANCH_NAME
-            if [ -z "$EXISTING_BRANCH" ]; then
-              gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
-            fi
+            gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
             if [ "${FIX_FAILED:-0}" -eq 1 ]; then
               echo "Fix did not correct all errors."
               exit 1

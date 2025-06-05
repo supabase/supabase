@@ -10,7 +10,7 @@ import { tableRowKeys } from './keys'
 
 export type TableRowUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { id: number; name: string; schema?: string }
   configuration: { identifiers: any }
   payload: any

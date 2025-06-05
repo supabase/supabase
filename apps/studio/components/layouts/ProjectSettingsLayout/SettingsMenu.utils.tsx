@@ -14,7 +14,6 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    newApiKeys?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -58,17 +57,13 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
-              ...(features?.newApiKeys
-                ? [
-                    {
-                      name: 'API Keys',
-                      key: 'api-keys',
-                      url: `/project/${ref}/settings/api-keys`,
-                      items: [],
-                      label: 'NEW',
-                    },
-                  ]
-                : []),
+              {
+                name: 'API Keys',
+                key: 'api-keys',
+                url: `/project/${ref}/settings/api-keys`,
+                items: [],
+                label: 'NEW',
+              },
             ]
           : []),
         {

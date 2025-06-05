@@ -13,7 +13,6 @@ import { Button } from 'ui'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const searchParams = new URLSearchParams(router.query as Record<string, string>).toString()
 
   useEffect(() => {
     if (!IS_PLATFORM) {
@@ -31,7 +30,7 @@ const SignInPage: NextPageWithLayout = () => {
             <Link
               href={{
                 pathname: '/sign-in-sso',
-                query: searchParams,
+                query: router.query,
               }}
             >
               Continue with SSO
@@ -55,7 +54,10 @@ const SignInPage: NextPageWithLayout = () => {
         <div>
           <span className="text-foreground-light">Don't have an account?</span>{' '}
           <Link
-            href="/sign-up"
+            href={{
+              pathname: '/sign-up',
+              query: router.query,
+            }}
             className="underline transition text-foreground hover:text-foreground-light"
           >
             Sign Up Now

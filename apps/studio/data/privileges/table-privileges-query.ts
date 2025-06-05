@@ -7,7 +7,7 @@ import { privilegeKeys } from './keys'
 
 export type TablePrivilegesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type PgTablePrivileges = z.infer<typeof pgMeta.tablePrivileges.zod>

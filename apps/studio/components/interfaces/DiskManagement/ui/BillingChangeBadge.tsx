@@ -41,7 +41,7 @@ const BillingChangeBadge = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs font-mono text-foreground-muted">
+                  <span className="text-xs font-mono text-foreground-muted" translate="no">
                     {formatCurrency(beforePrice)}
                   </span>
                   <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
@@ -53,6 +53,7 @@ const BillingChangeBadge = ({
                     )}
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 0.12 }}
+                    translate="no"
                   >
                     {`${formatCurrency(afterPrice)}/month`}
                   </motion.span>

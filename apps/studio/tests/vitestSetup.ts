@@ -1,14 +1,11 @@
-/// <reference types="@testing-library/jest-dom" />
-
 import '@testing-library/jest-dom/vitest'
-import { cleanup } from '@testing-library/react'
-import { setupServer } from 'msw/node'
+import { cleanup, configure } from '@testing-library/react'
 import { createDynamicRouteParser } from 'next-router-mock/dist/dynamic-routes'
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
-import { APIMock } from './mocks/api'
-import { routerMock } from './mocks/router'
+import { routerMock } from './lib/route-mock'
+import { mswServer } from './lib/msw'
 
-export const mswServer = setupServer(...APIMock)
+mswServer.listen({ onUnhandledRequest: 'error' })
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -24,10 +21,17 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-beforeAll(() => {
-  console.log('🤖 Starting MSW Server')
+// Uncomment this if HTML in errors are being annoying.
+//
+// configure({
+//   getElementError: (message, container) => {
+//     const error = new Error(message ?? 'Element not found')
+//     error.name = 'ElementNotFoundError'
+//     return error
+//   },
+// })
 
-  mswServer.listen({ onUnhandledRequest: 'error' })
+beforeAll(() => {
   vi.mock('next/router', () => require('next-router-mock'))
   vi.mock('next/navigation', async () => {
     const actual = await vi.importActual('next/navigation')

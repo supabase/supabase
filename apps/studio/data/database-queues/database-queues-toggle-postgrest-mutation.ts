@@ -9,7 +9,7 @@ import { databaseKeys } from 'data/database/keys'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   enable: boolean
 }
 

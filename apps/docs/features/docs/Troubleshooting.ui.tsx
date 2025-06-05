@@ -49,15 +49,15 @@ export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootin
             {entry.data.title}
           </h3>
         </Link>
-        {entry.data.errors?.length > 0 && (
+        {entry.data.errors?.length && entry.data.errors.length > 0 && (
           <span className="text-xs text-foreground-lighter ml-1 @4xl/troubleshooting:ml-0">
-            {entry.data.errors
+            {(entry.data.errors || [])
               .map(formatError)
               .filter(Boolean)
               .map((error, index) => (
                 <>
                   <code key={index}>{error}</code>
-                  {index < entry.data.errors.length - 1 ? ', ' : ''}
+                  {index < (entry.data.errors?.length || 0) - 1 ? ', ' : ''}
                 </>
               ))}
           </span>

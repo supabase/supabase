@@ -97,7 +97,7 @@ functions:
           url: str = os.environ.get("SUPABASE_URL")
           key: str = os.environ.get("SUPABASE_KEY")
           supabase: Client = create_client(
-              url, 
+              url,
               key,
               options=ClientOptions(
                   postgrest_client_timeout=10,
@@ -173,7 +173,7 @@ functions:
           ```python
           response = supabase.auth.sign_up(
               {
-                  "email": "email@example.com", 
+                  "email": "email@example.com",
                   "password": "password",
               }
           )
@@ -281,7 +281,7 @@ functions:
           ```python
           response = supabase.auth.sign_up(
               {
-                  "phone": "123456789", 
+                  "phone": "123456789",
                   "password": "password",
               }
           )
@@ -467,7 +467,7 @@ functions:
           ```python
           response = supabase.auth.sign_in_with_password(
               {
-                  "email": "email@example.com", 
+                  "email": "email@example.com",
                   "password": "example-password",
               }
           )
@@ -551,7 +551,7 @@ functions:
           ```python
           response = supabase.auth.sign_in_with_password(
               {
-                  "phone": "+13334445555", 
+                  "phone": "+13334445555",
                   "password": "some-password",
               }
           )
@@ -776,7 +776,7 @@ functions:
           ```python
           response = supabase.auth.sign_in_with_id_token(
               {
-                  "provider": "google", 
+                  "provider": "google",
                   "token": "your-id-token",
               }
           )
@@ -1000,8 +1000,8 @@ functions:
           ```python
           response = supabase.auth.verify_otp(
               {
-                  "email": "email@example.com", 
-                  "token": "123456", 
+                  "email": "email@example.com",
+                  "token": "123456",
                   "type": "email",
               }
           )
@@ -1081,8 +1081,8 @@ functions:
           ```python
           response = supabase.auth.verify_otp(
               {
-                  "phone": "+13334445555", 
-                  "token": "123456", 
+                  "phone": "+13334445555",
+                  "token": "123456",
                   "type": "sms",
               }
           )
@@ -1094,8 +1094,8 @@ functions:
           ```python
           response = supabase.auth.verify_otp(
               {
-                  "email": "email@example.com", 
-                  "token_hash": "<token-hash>", 
+                  "email": "email@example.com",
+                  "token_hash": "<token-hash>",
                   "type": "email",
               }
           )
@@ -5531,8 +5531,8 @@ functions:
               supabase.table("texts")
               .select("content")
               .text_search(
-                  "content", 
-                  "'eggs' & 'ham'", 
+                  "content",
+                  "'eggs' & 'ham'",
                   options={"config": "english"},
               )
               .execute()
@@ -6650,7 +6650,7 @@ functions:
         code: |
           ```python
           response = supabase.functions.invoke(
-              "hello-world", 
+              "hello-world",
               invoke_options={
                   "body": {"name": "Functions"},
               },
@@ -6703,6 +6703,32 @@ functions:
           )
           ```
 
+  - id: realtime-api
+    title: 'Overview'
+    description: |
+      Realtime in Python only works with the asynchronous client.
+      You can initialize a new Supabase client using the `acreate_client()` method.
+
+      - Some Realtime methods are asynchronous and must be awaited. Ensure these methods are called within an `async` function.
+      - In the following Realtime examples, certain methods are awaited. These should be enclosed within an `async` function.
+      - When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the `acreate_client` example includes an import of `asyncio`.
+    examples:
+      - id: acreate-client
+        name: acreate_client()
+        code: |
+          ```python
+          import os
+          import asyncio
+          from supabase import acreate_client, AsyncClient
+
+          url: str = os.environ.get("SUPABASE_URL")
+          key: str = os.environ.get("SUPABASE_KEY")
+
+          async def create_supabase():
+            supabase: AsyncClient = await acreate_client(url, key)
+            return supabase
+          ```
+
   - id: subscribe
     title: on().subscribe()
     notes: |
@@ -6720,15 +6746,15 @@ functions:
 
           def on_subscribe(status, err):
               if status == RealtimeSubscribeStates.SUBSCRIBED:
-                  channel.send_broadcast(
-                      "cursor-pos", 
+                  asyncio.create_task(channel.send_broadcast(
+                      "cursor-pos",
                       {"x": random.random(), "y": random.random()}
-                  )
+                  ))
 
           def handle_broadcast(payload):
               print("Cursor position received!", payload)
 
-          channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
+          await channel.on_broadcast(event="cursor-pos", callback=handle_broadcast).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-sync
         name: Listen to presence sync
@@ -6739,12 +6765,12 @@ functions:
 
           def on_subscribe(status, err):
               if status == RealtimeSubscribeStates.SUBSCRIBED:
-                  channel.track({"online_at": datetime.datetime.now().isoformat()})
+                  asyncio.create_task(channel.track({"online_at": datetime.datetime.now().isoformat()}))
 
           def handle_presence_sync():
               print("Synced presence state: ", channel.presence.state)
 
-          channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
+          await channel.on_presence_sync(callback=handle_presence_sync).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-join
         name: Listen to presence join
@@ -6758,9 +6784,9 @@ functions:
 
           def on_subscribe(status, err):
               if status == RealtimeSubscribeStates.SUBSCRIBED:
-                  channel.track({"online_at": datetime.datetime.now().isoformat()})
+                  asyncio.create_task(channel.track({"online_at": datetime.datetime.now().isoformat()}))
 
-          channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
+          await channel.on_presence_join(callback=handle_presence_join).subscribe(on_subscribe)
           ```
       - id: listen-to-presence-leave
         name: Listen to presence leave
@@ -6774,10 +6800,10 @@ functions:
 
           def on_subscribe(status, err):
               if status == RealtimeSubscribeStates.SUBSCRIBED:
-                  channel.track({"online_at": datetime.datetime.now().isoformat()})
-                  channel.untrack()
+                  asyncio.create_task(channel.track({"online_at": datetime.datetime.now().isoformat()}))
+                  asyncio.create_task(channel.untrack())
 
-          channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
+          await channel.on_presence_leave(callback=handle_presence_leave).subscribe(on_subscribe)
           ```
       - id: listen-to-all-database-changes
         name: Listen to all database changes
@@ -6785,7 +6811,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.channel("room1")
+              await supabase.channel("room1")
               .on_postgres_changes("*", schema="*", callback=handle_record_updated)
               .subscribe()
           )
@@ -6795,7 +6821,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.channel("room1")
+              await supabase.channel("room1")
               .on_postgres_changes("*", schema="public", table="countries", callback=handle_record_updated)
               .subscribe()
           )
@@ -6805,7 +6831,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.channel("room1")
+              await supabase.channel("room1")
               .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
               .subscribe()
           )
@@ -6822,7 +6848,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.channel("room1")
+              await supabase.channel("room1")
               .on_postgres_changes("UPDATE", schema="public", table="countries", callback=handle_record_updated)
               .subscribe()
           )
@@ -6839,7 +6865,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.channel("room1")
+              await supabase.channel("room1")
               .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
               .subscribe()
           )
@@ -6850,7 +6876,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.channel("room1")
+              await supabase.channel("room1")
               .on_postgres_changes("INSERT", schema="public", table="countries", callback=handle_record_inserted)
               .on_postgres_changes("DELETE", schema="public", table="countries", callback=handle_record_deleted)
               .subscribe()
@@ -6864,7 +6890,7 @@ functions:
         code: |
           ```python
           response = (
-              supabase.channel("room1")
+              await supabase.channel("room1")
               .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
               .subscribe()
           )
@@ -6883,9 +6909,9 @@ functions:
 
           def on_subscribe(status, err):
               if status == RealtimeSubscribeStates.SUBSCRIBED:
-                  channel.send_broadcast('cursor-pos', {"x": random.random(), "y": random.random()})
+                  asyncio.create_task(channel.send_broadcast('cursor-pos', {"x": random.random(), "y": random.random()}))
 
-          channel.subscribe(on_subscribe)
+          await channel.subscribe(on_subscribe)
           ```
         response: |
           ```
@@ -6912,7 +6938,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          supabase.remove_channel(myChannel)
+          await supabase.remove_channel(myChannel)
           ```
 
   - id: remove-all-channels
@@ -6925,7 +6951,7 @@ functions:
         isSpotlight: true
         code: |
           ```python
-          supabase.remove_all_channels()
+          await supabase.remove_all_channels()
           ```
 
   - id: list-buckets
@@ -7305,7 +7331,7 @@ functions:
               supabase.storage
               .from_("avatars")
               .move(
-                  "public/avatar1.png", 
+                  "public/avatar1.png",
                   "private/avatar2.png"
               )
           )
@@ -7342,7 +7368,7 @@ functions:
               supabase.storage
               .from_("avatars")
               .copy(
-                  "public/avatar1.png", 
+                  "public/avatar1.png",
                   "private/avatar2.png"
               )
           )
@@ -7391,7 +7417,7 @@ functions:
               supabase.storage
               .from_("avatars")
               .create_signed_urls(
-                  ["folder/avatar1.png", "folder/avatar2.png"], 
+                  ["folder/avatar1.png", "folder/avatar2.png"],
                   60
               )
           )
@@ -7475,7 +7501,7 @@ functions:
               supabase.storage
               .from_("avatars")
               .create_signed_url(
-                  "folder/avatar1.png", 
+                  "folder/avatar1.png",
                   60
               )
           )
@@ -7495,8 +7521,8 @@ functions:
               supabase.storage
               .from_("avatars")
               .create_signed_url(
-                  "folder/avatar1.png", 
-                  60, 
+                  "folder/avatar1.png",
+                  60,
                   {"transform": {"width": 100, "height": 100}}
               )
           )
@@ -7510,8 +7536,8 @@ functions:
               supabase.storage
               .from_("avatars")
               .create_signed_url(
-                  "folder/avatar1.png", 
-                  60, 
+                  "folder/avatar1.png",
+                  60,
                   {"download": True}
               )
           )
@@ -7691,7 +7717,7 @@ functions:
               supabase.storage
               .from_("avatars")
               .get_public_url(
-                  "folder/avatar1.jpg", 
+                  "folder/avatar1.jpg",
                   {"transform": {"width": 100, "height": 100}}
               )
           )
@@ -7705,7 +7731,7 @@ functions:
               supabase.storage
               .from_("avatars")
               .get_public_url(
-                  "folder/avatar1.jpg", 
+                  "folder/avatar1.jpg",
                   {"download": True}
               )
           )

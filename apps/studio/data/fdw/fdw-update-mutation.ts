@@ -15,7 +15,7 @@ import { fdwKeys } from './keys'
 
 export type FDWUpdateVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   wrapper: FDW
   wrapperMeta: WrapperMeta
   formState: {

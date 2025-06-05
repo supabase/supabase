@@ -1,5 +1,6 @@
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
+import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
@@ -93,7 +94,7 @@ export const getContextualInvalidationKeys = ({
         'database/triggers': [databaseTriggerKeys.list(ref)],
         'database/types': [enumeratedTypesKeys.list(ref)],
         'database/extensions': [databaseExtensionsKeys.list(ref)],
-        'database/indexes': [databaseKeys.indexes(ref, schema)],
+        'database/indexes': [databaseIndexesKeys.list(ref, schema)],
       } as const
     )[key] ?? []
   )

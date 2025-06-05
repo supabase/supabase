@@ -3,8 +3,7 @@ import type { Message as MessageType } from 'ai/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { debounce } from 'lodash'
-
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 type SuggestionsType = {
   title: string

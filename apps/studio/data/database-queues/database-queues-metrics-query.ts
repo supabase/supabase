@@ -5,7 +5,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesMetricsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
 }
 

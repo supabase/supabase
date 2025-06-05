@@ -55,7 +55,6 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
 
 export interface FileExplorerColumnProps {
   index: number
-  view: STORAGE_VIEWS
   column: StorageColumn
   fullWidth?: boolean
   openedFolders?: StorageItem[]
@@ -69,7 +68,6 @@ export interface FileExplorerColumnProps {
 
 const FileExplorerColumn = ({
   index = 0,
-  view = STORAGE_VIEWS.COLUMNS,
   column,
   fullWidth = false,
   openedFolders = [],
@@ -146,7 +144,7 @@ const FileExplorerColumn = ({
       ref={fileExplorerColumnRef}
       className={cn(
         fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
-        view === STORAGE_VIEWS.LIST && 'h-full',
+        snap.view === STORAGE_VIEWS.LIST && 'h-full',
         'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
       )}
       onContextMenu={displayMenu}
@@ -159,7 +157,7 @@ const FileExplorerColumn = ({
       }}
     >
       {/* Checkbox selection for select all */}
-      {view === STORAGE_VIEWS.COLUMNS && (
+      {snap.view === STORAGE_VIEWS.COLUMNS && (
         <div
           className={cn(
             'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark',
@@ -180,7 +178,7 @@ const FileExplorerColumn = ({
       )}
 
       {/* List Interface Header */}
-      {view === STORAGE_VIEWS.LIST && (
+      {snap.view === STORAGE_VIEWS.LIST && (
         <div className="sticky top-0 py-2 z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5">
           <div className="flex w-[40%] min-w-[250px] items-center">
             <SelectAllCheckbox />
@@ -211,7 +209,7 @@ const FileExplorerColumn = ({
       <InfiniteList
         items={columnItems}
         itemProps={{
-          view,
+          view: snap.view,
           columnIndex: index,
           selectedItems,
           openedFolders,
@@ -261,7 +259,7 @@ const FileExplorerColumn = ({
       />
 
       {/* List interface footer */}
-      {view === STORAGE_VIEWS.LIST && (
+      {snap.view === STORAGE_VIEWS.LIST && (
         <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full">
           <p className="text-sm">
             {formatBytes(columnItemsSize)} for {columnItems.length} items

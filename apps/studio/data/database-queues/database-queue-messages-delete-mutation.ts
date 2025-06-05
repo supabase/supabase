@@ -7,7 +7,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
   messageId: number
 }

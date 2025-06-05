@@ -10,7 +10,7 @@ type DropRoleBody = Parameters<typeof pgMeta.roles.remove>[1]
 
 export type DatabaseRoleDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   payload?: DropRoleBody
 }

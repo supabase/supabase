@@ -1,0 +1,180 @@
+---
+id: 'auth-web3'
+title: 'Sign in with Web3'
+subtitle: 'Use your Web3 wallet to authenticate users with Supabase'
+---
+
+[Enable Sign In with Web3](/dashboard/project/_/auth/providers) to allow users to sign in to your application using only their Web3 wallet.
+
+Supported Web3 wallets:
+
+- All Solana wallets
+- Coming soon: All Ethereum wallets
+
+## How does it work?
+
+Sign in with Web3 utilizes the [EIP 4361](https://eips.ethereum.org/EIPS/eip-4361) standard to authenticate wallet addresses off-chain. This standard is adopted by the Solana ecosystem with some minor differences from Ethereum.
+
+Authentication works by asking the Web3 wallet application to sign a predefined message with the user's wallet. This message is parsed both by the Web3 wallet application and Supabase Auth to verify its validity and purpose, before creating a user account or session.
+
+The Web3 wallet application uses the information contained in the message to provide the user with a confirmation dialog, asking whether they want to allow sign in with your project.
+
+Not all Web3 wallet applications show a dedicated confirmation dialog for these sign in messages. In that case the Web3 wallet shows a traditional message signature confirmation dialog.
+
+## Enable the Web3 provider
+
+In the dashboard navigate to your project's [Authentication Providers](/dashboard/project/_/auth/providers) section and enable the Web3 Wallet provider.
+
+In the CLI add the following config to your `supabase/config.toml` file:
+
+```toml
+[auth.web3.solana]
+enabled = true
+```
+
+### Potential for abuse
+
+User accounts that sign in with their Web3 wallet will not have an email address or phone number associated with them. This can open your project to abuse as creating a Web3 wallet account is free and easy to automate and difficult to correlate with a real person's identity.
+
+Control your project's exposure by configuring in the dashboard:
+
+- [Rate Limits for Web3](/dashboard/project/_/auth/rate-limits)
+- [Enable CAPTCHA protection](/docs/guides/auth/auth-captcha)
+
+Or in the CLI:
+
+```toml
+[auth.rate_limit]
+# Number of Web3 logins that can be made in a 5 minute interval per IP address.
+web3 = 30
+
+[auth.captcha]
+enabled = true
+provider = "hcaptcha" # or other supported providers
+secret = "0x0000000000000000000000000000000000000000"
+```
+
+Many wallet applications will warn the user if the message sent for signing is not coming from the page they are currently visiting. To further prevent your Supabase project from receiving signed messages destined for other applications, you must register your application's URL using the [Redirect URL settings](/docs/guides/auth/redirect-urls).
+
+For example if the user is signing in to the page `https://example.com/sign-in` you should add the following configurations in the Redirect URL settings:
+
+- `https://example.com/sign-in/` (last slash is important)
+- Alternatively set up a glob pattern such as `https://example.com/**`
+
+## Sign in with Ethereum
+
+Sign in with Ethereum wallets is coming soon.
+
+## Sign in with Solana
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="window"
+  queryGroup="solanaWallet"
+>
+
+<TabPanel id="window" label="Solana Window API">
+
+Most Solana wallet applications expose their API via the `window.solana` global scope object in your web application.
+
+Supabase's JavaScript Client Library provides built-in support for this API.
+
+To sign in a user make sure that:
+
+1. The user has installed a wallet application (by checking that the `window.solana` object is defined)
+2. The wallet application is connected to your application by using the [`window.solana.connect()` API](https://docs.phantom.com/solana/establishing-a-connection)
+
+Use the following code to authenticate a user:
+
+```typescript
+const { data, error } = await supabase.auth.signInWithWeb3({
+  chain: 'solana',
+  statement: 'I accept the Terms of Service at https://example.com/tos',
+})
+```
+
+Providing a `statement` is required for most Solana wallets and this message will be shown to the user on the consent dialog. It will also be added to the identity data for your users.
+
+If you are using a non-standard Solana wallet that does not register the `window.solana` object, or your user has multiple Solana wallets attached to the page you can disambiguate by providing the wallet object like so:
+
+- To use [Brave Wallet with Solana](https://wallet-docs.brave.com/solana):
+  ```typescript
+  const { data, error } = await supabase.auth.signInWithWeb3({
+    chain: 'solana',
+    statement: 'I accept the Terms of Service at https://example.com/tos',
+    wallet: window.braveSolana,
+  })
+  ```
+- To use [Phantom with Solana](https://docs.phantom.com/solana/detecting-the-provider):
+  ```typescript
+  const { data, error } = await supabase.auth.signInWithWeb3({
+    chain: 'solana',
+    statement: 'I accept the Terms of Service at https://example.com/tos',
+    wallet: window.phantom,
+  })
+  ```
+
+</TabPanel>
+
+<TabPanel id="adapter" label="Solana Wallet Adapter">
+
+Although the `window.solana` global scope JavaScript API is an unofficial standard, there still are subtle differences between wallet applications. The Solana ecosystem has provided the [Solana Wallet Adapter](https://solana.com/developers/courses/intro-to-solana/interact-with-wallets#solanas-wallet-adapter) system based on the [Wallet Standard](https://github.com/wallet-standard/wallet-standard) to simplify ease of development.
+
+The Supabase JavaScript Client Library supports signing in with this approach too. Follow the [Solana Interact with Wallets](https://solana.com/developers/courses/intro-to-solana/interact-with-wallets) guide on how to install and configure your application.
+
+Below is a short example on using a `<SignInButton />` component that uses the `useWallet()` React hook to obtain the connected wallet and sign the user in with it:
+
+```tsx
+function SignInButton() {
+  const wallet = useWallet()
+
+  return (
+    <>
+      {wallet.connected ? (
+        <button
+          onClick={() => {
+            supabase.auth.signInWithWeb3({
+              chain: 'solana',
+              statement: 'I accept the Terms of Service at https://example.com/tos',
+              wallet,
+            })
+          }}
+        >
+          Sign in with Solana
+        </button>
+      ) : (
+        <WalletMultiButton />
+      )}
+    </>
+  )
+}
+
+function App() {
+  const endpoint = clusterApiUrl('devnet')
+  const wallets = useMemo(() => [], [])
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets}>
+        <WalletModalProvider>
+          <SignInButton />
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  )
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Frequently asked questions
+
+### How to associate an email address, phone number or social login to a user signing in with Web3?
+
+Web3 wallets don't expose any identifying information about the user other than their wallet address (public key). This is why accounts that were created using Sign in with Web3 don't have any email address or phone number associated.
+
+To associate an email address, phone number or other social login with their account you can use the `supabase.auth.updateUser()` or `supabase.auth.linkIdentity()` APIs.

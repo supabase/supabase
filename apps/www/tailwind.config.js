@@ -9,8 +9,7 @@ module.exports = config({
     './lib/mdx/mdxComponents.tsx',
     './pages/**/*.{tsx,mdx}',
     './../../packages/ui/src/**/*.{tsx,ts,js}',
-    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
-    '!./../../packages/ui-patterns/node_modules/**/*', // ignore node_modules rule
+    './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {

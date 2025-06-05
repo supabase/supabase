@@ -19,7 +19,7 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
         ...(IS_PLATFORM
           ? [
               {
-                name: 'Sign In / Up',
+                name: 'Sign In / Providers',
                 key: 'sign-in-up',
                 pages: ['providers', 'third-party'],
                 url: `/project/${ref}/auth/providers`,

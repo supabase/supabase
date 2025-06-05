@@ -8,7 +8,7 @@ import { tableRowKeys } from './keys'
 
 export type TableRowTruncateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { id: number; name: string; schema?: string }
 }
 

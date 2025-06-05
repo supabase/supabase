@@ -24,9 +24,12 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  test:
     # Uses larger hosted runner as it significantly decreases build times
     runs-on: [larger-runner-4cpu]
+    strategy:
+      matrix:
+        test_number: [1]
 
     steps:
       - uses: actions/checkout@v4
@@ -50,5 +53,25 @@ jobs:
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
-        run: pnpm run test:studio
-        working-directory: ./
+        run: pnpm run test:ci
+        working-directory: ./apps/studio
+
+      - name: Upload coverage results to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          parallel: true
+          flag-name: studio-tests
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./apps/studio/coverage/lcov.info
+          base-path: './apps/studio'
+
+  finish:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          parallel-finished: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}

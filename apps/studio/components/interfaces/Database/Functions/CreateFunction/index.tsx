@@ -202,6 +202,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
+                          portal={false}
                           selectedSchemaName={field.value}
                           excludedSchemas={PROTECTED_SCHEMAS}
                           size="small"

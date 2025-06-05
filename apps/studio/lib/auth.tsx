@@ -1,10 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { AuthProvider as AuthProviderInternal, gotrueClient } from 'common'
+import { AuthProvider as AuthProviderInternal, clearLocalStorage, gotrueClient } from 'common'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
 
 import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
-import { clearLocalStorage } from './local-storage'
 
 export const AuthProvider = ({ children }: PropsWithChildren<{}>) => {
   // Check for unverified GitHub users after a GitHub sign in

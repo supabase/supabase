@@ -4,7 +4,6 @@ import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Code, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -28,7 +27,6 @@ export const FunctionsEmptyState = () => {
   const { ref } = useParams()
   const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
 
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
@@ -41,30 +39,28 @@ export const FunctionsEmptyState = () => {
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* Editor Option */}
-          {edgeFunctionCreate && (
-            <div className="p-8">
-              <div className="flex items-center gap-2">
-                <Code strokeWidth={1.5} size={20} />
-                <h4 className="text-base text-foreground">Via Editor</h4>
-              </div>
-              <p className="text-sm text-foreground-light mb-4 mt-1">
-                Create and edit functions directly in the browser. Download to local at any time.
-              </p>
-              <Button
-                type="default"
-                onClick={() => {
-                  router.push(`/project/${ref}/functions/new`)
-                  sendEvent({
-                    action: 'edge_function_via_editor_button_clicked',
-                    properties: { origin: 'no_functions_block' },
-                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                  })
-                }}
-              >
-                Open Editor
-              </Button>
+          <div className="p-8">
+            <div className="flex items-center gap-2">
+              <Code strokeWidth={1.5} size={20} />
+              <h4 className="text-base text-foreground">Via Editor</h4>
             </div>
-          )}
+            <p className="text-sm text-foreground-light mb-4 mt-1">
+              Create and edit functions directly in the browser. Download to local at any time.
+            </p>
+            <Button
+              type="default"
+              onClick={() => {
+                router.push(`/project/${ref}/functions/new`)
+                sendEvent({
+                  action: 'edge_function_via_editor_button_clicked',
+                  properties: { origin: 'no_functions_block' },
+                  groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+                })
+              }}
+            >
+              Open Editor
+            </Button>
+          </div>
 
           {/* AI Assistant Option */}
           <div className="p-8">
@@ -138,33 +134,29 @@ export const FunctionsEmptyState = () => {
           </div>
         </CardContent>
       </Card>
-      {edgeFunctionCreate && (
-        <>
-          <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
-            Start with a template
-          </ScaffoldSectionTitle>
-          <ResourceList>
-            {EDGE_FUNCTION_TEMPLATES.map((template) => (
-              <ResourceItem
-                key={template.name}
-                media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
-                onClick={() => {
-                  sendEvent({
-                    action: 'edge_function_template_clicked',
-                    properties: { templateName: template.name, origin: 'functions_page' },
-                    groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-                  })
-                }}
-              >
-                <Link href={`/project/${ref}/functions/new?template=${template.value}`}>
-                  <p>{template.name}</p>
-                  <p className="text-sm text-foreground-lighter">{template.description}</p>
-                </Link>
-              </ResourceItem>
-            ))}
-          </ResourceList>
-        </>
-      )}
+      <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
+        Start with a template
+      </ScaffoldSectionTitle>
+      <ResourceList>
+        {EDGE_FUNCTION_TEMPLATES.map((template) => (
+          <ResourceItem
+            key={template.name}
+            media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
+            onClick={() => {
+              sendEvent({
+                action: 'edge_function_template_clicked',
+                properties: { templateName: template.name, origin: 'functions_page' },
+                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+              })
+            }}
+          >
+            <Link href={`/project/${ref}/functions/new?template=${template.value}`}>
+              <p>{template.name}</p>
+              <p className="text-sm text-foreground-lighter">{template.description}</p>
+            </Link>
+          </ResourceItem>
+        ))}
+      </ResourceList>
     </>
   )
 }

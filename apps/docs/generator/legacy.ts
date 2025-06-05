@@ -8,15 +8,15 @@
  *    tsx ReferenceGenerator.ts -o docs/client spec/supabase.yml
  */
 
+import * as fs from 'fs'
+import * as yaml from 'js-yaml'
+import { uniqBy } from 'lodash-es'
+import { flattenSections } from '../lib/helpers'
 import Example from './legacy/components/Example'
 import Page from './legacy/components/Page'
 import Tab from './legacy/components/Tab'
+import { OpenRef, TsDoc } from './legacy/definitions'
 import { slugify, tsDocCommentToMdComment, writeToDisk } from './legacy/lib/helpers'
-import { TsDoc, OpenRef } from './legacy/definitions'
-import { uniqBy } from 'lodash'
-import * as fs from 'fs'
-import * as yaml from 'js-yaml'
-import { flattenSections } from '../lib/helpers'
 
 const commonDocSpecJson = JSON.parse(
   fs.readFileSync('spec/common-client-libs-sections.json', 'utf8')

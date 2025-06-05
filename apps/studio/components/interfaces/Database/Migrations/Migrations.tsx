@@ -46,8 +46,8 @@ const Migrations = () => {
             description={
               <>
                 <p className="mb-1">
-                  Try refreshing your browser, but if the issue persists, please reach out to us via
-                  support.
+                  Try refreshing your browser, but if the issue persists for more than a few
+                  minutes, please reach out to us via support.
                 </p>
                 <p className="mb-4">Error: {(error as any)?.message ?? 'Unknown'}</p>
               </>

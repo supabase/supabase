@@ -1,6 +1,6 @@
 ---
 id: 'build-a-supabase-integration'
-title: 'Build a Supabase Integration (Beta)'
+title: 'Build a Supabase Integration'
 subtitle: "This guide steps through building a Supabase Integration using OAuth2 and the management API, allowing you to manage users' organizations and projects on their behalf."
 description: 'Build a Supabase Integration using OAuth2 and the Management API.'
 ---
@@ -27,7 +27,7 @@ You can use your preferred OAuth2 client or follow the steps below. You can see 
 
 ### Redirecting to the authorize URL
 
-Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](<https://api.supabase.com/api/v1#/oauth%20(beta)/authorize>). Make sure to include all required query parameters such as:
+Within your app's UI, redirect the user to [`https://api.supabase.com/v1/oauth/authorize`](https://api.supabase.com/api/v1#tag/oauth/GET/v1/oauth/authorize). Make sure to include all required query parameters such as:
 
 - `client_id`: Your client id from the app creation above.
 - `redirect_uri`: The URL where Supabase will redirect the user to after providing consent.
@@ -60,7 +60,7 @@ Once the user consents to providing API access to your OAuth App, Supabase will 
 - `code`: An authorization code you should exchange with Supabase to get the access and refresh token.
 - `state`: The value you provided in the previous step, to help you associate the request with the user. The `state` property returned here should be compared to the `state` you sent previously.
 
-Exchange the authorization code for an access and refresh token by calling [`POST https://api.supabase.com/v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) with the following query parameters as content-type `application/x-www-form-urlencoded`:
+Exchange the authorization code for an access and refresh token by calling [`POST https://api.supabase.com/v1/oauth/token`](https://api.supabase.com/api/v1#tag/oauth/POST/v1/oauth/token) with the following query parameters as content-type `application/x-www-form-urlencoded`:
 
 - `grant_type`: The value `authorization_code`.
 - `code`: The `code` returned in the previous step.
@@ -111,7 +111,7 @@ Find the full example on [GitHub](https://github.com/supabase/supabase/tree/mast
 
 ## Refreshing an access token
 
-You can use the [`POST /v1/oauth/token`](<https://api.supabase.com/api/v1#/oauth%20(beta)/token>) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
+You can use the [`POST /v1/oauth/token`](https://api.supabase.com/api/v1#tag/oauth/POST/v1/oauth/token) endpoint to refresh an access token using the refresh token returned at the end of the previous section.
 
 If the user has revoked access to your application, you will not be able to refresh a token. Furthermore, access tokens will stop working. Make sure you handle HTTP Unauthorized errors when calling any Supabase API.
 

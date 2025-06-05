@@ -39,7 +39,7 @@ export function deleteQuery(
   }
 ) {
   if (!filters || filters.length === 0) {
-    throw { message: 'no filters for this delete query' }
+    throw new Error('no filters for this delete query')
   }
   let query = `delete from ${queryTable(table)}`
   const { returning, enumArrayColumns } = options ?? {}
@@ -64,7 +64,7 @@ export function insertQuery(
   }
 ) {
   if (!values || values.length === 0) {
-    throw { message: 'no value to insert' }
+    throw new Error('no value to insert')
   }
   const { returning, enumArrayColumns } = options ?? {}
   const queryColumns = Object.keys(values[0])
@@ -134,7 +134,7 @@ export function updateQuery(
 ) {
   const { filters, returning, enumArrayColumns } = options ?? {}
   if (!filters || filters.length === 0) {
-    throw { message: 'no filters for this update query' }
+    throw new Error('no filters for this update query')
   }
   const queryColumns = Object.keys(value)
     .map((x) => ident(x))

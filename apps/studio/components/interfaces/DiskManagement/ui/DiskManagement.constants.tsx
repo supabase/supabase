@@ -1,4 +1,4 @@
-import { PlanType } from 'data/subscriptions/org-subscription-query'
+import { PlanId } from 'data/subscriptions/types'
 
 // Disk Storage expands automatically when the database reaches 90% of the disk size
 export const AUTOSCALING_THRESHOLD = 0.9
@@ -52,7 +52,7 @@ interface PlanDetails {
   includedDiskGB: { gp3: number; io2: number }
 }
 
-export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
+export const PLAN_DETAILS: Record<PlanId, PlanDetails> = {
   free: { includedDiskGB: { gp3: 1, io2: 0 } },
   pro: { includedDiskGB: { gp3: 8, io2: 0 } },
   team: { includedDiskGB: { gp3: 8, io2: 0 } },
@@ -71,6 +71,14 @@ export const COMPUTE_BASELINE_IOPS = {
   ci_8xlarge: 40000,
   ci_12xlarge: 50000,
   ci_16xlarge: 80000,
+  ci_24xlarge: 120000,
+  ci_24xlarge_optimized_cpu: 120000,
+  ci_24xlarge_optimized_memory: 120000,
+  ci_24xlarge_high_memory: 120000,
+  ci_48xlarge: 240000,
+  ci_48xlarge_optimized_cpu: 240000,
+  ci_48xlarge_optimized_memory: 240000,
+  ci_48xlarge_high_memory: 240000,
 }
 export const COMPUTE_MAX_IOPS = {
   ci_nano: 11800,
@@ -84,7 +92,16 @@ export const COMPUTE_MAX_IOPS = {
   ci_8xlarge: 40000,
   ci_12xlarge: 50000,
   ci_16xlarge: 80000,
+  ci_24xlarge: 120000,
+  ci_24xlarge_optimized_cpu: 120000,
+  ci_24xlarge_optimized_memory: 120000,
+  ci_24xlarge_high_memory: 120000,
+  ci_48xlarge: 240000,
+  ci_48xlarge_optimized_cpu: 240000,
+  ci_48xlarge_optimized_memory: 240000,
+  ci_48xlarge_high_memory: 240000,
 }
+
 export const COMPUTE_BASELINE_THROUGHPUT = {
   ci_nano: 43,
   ci_micro: 87,
@@ -97,7 +114,16 @@ export const COMPUTE_BASELINE_THROUGHPUT = {
   ci_8xlarge: 9500,
   ci_12xlarge: 14250,
   ci_16xlarge: 19000,
+  ci_24xlarge: 30000,
+  ci_24xlarge_optimized_cpu: 30000,
+  ci_24xlarge_optimized_memory: 30000,
+  ci_24xlarge_high_memory: 30000,
+  ci_48xlarge: 40000,
+  ci_48xlarge_optimized_cpu: 40000,
+  ci_48xlarge_optimized_memory: 40000,
+  ci_48xlarge_high_memory: 40000,
 }
+
 export const COMPUTE_MAX_THROUGHPUT = {
   ci_nano: 2085,
   ci_micro: 2085,
@@ -110,6 +136,14 @@ export const COMPUTE_MAX_THROUGHPUT = {
   ci_8xlarge: 9500,
   ci_12xlarge: 14250,
   ci_16xlarge: 19000,
+  ci_24xlarge: 30000,
+  ci_24xlarge_optimized_cpu: 30000,
+  ci_24xlarge_optimized_memory: 30000,
+  ci_24xlarge_high_memory: 30000,
+  ci_48xlarge: 40000,
+  ci_48xlarge_optimized_cpu: 40000,
+  ci_48xlarge_optimized_memory: 40000,
+  ci_48xlarge_high_memory: 40000,
 }
 
 export const RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 = ['ci_nano', 'ci_micro', 'ci_small', 'ci_medium']

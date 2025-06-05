@@ -1,7 +1,7 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText } from 'ai'
+import { streamText, tool } from 'ai'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { tool } from 'ai'
 import { z } from 'zod'
 
 const openAiKey = process.env.OPENAI_API_KEY
@@ -46,7 +46,7 @@ const getTools = () => {
   }
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
     return res.status(400).json({
       error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
@@ -63,6 +63,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages } = req.body

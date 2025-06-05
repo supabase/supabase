@@ -5,12 +5,10 @@ import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { Link } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
-import QuickKeyCopyWrapper from './QuickKeyCopy'
 // to add in later with follow up PR
-// import CreatePublishableAPIKeyModal from './CreatePublishableAPIKeyModal'
+// import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
 // to add in later with follow up PR
 // import ShowPublicJWTsDialogComposer from '../JwtSecrets/ShowPublicJWTsDialogComposer'
 
@@ -37,12 +35,12 @@ export const PublishableAPIKeys = () => {
     <div>
       <FormHeader
         title="Publishable key"
-        description="Use these API keys on the web, in mobile or desktop apps, CLIs or other public components of your app. It's safe to publish these."
+        description="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
       />
       <div className="flex flex-col gap-8">
         <div className="-space-y-px w-content w-fit">
           <div className="bg-surface-100 px-5 py-2 flex items-center gap-5 first:rounded-t-md border">
-            <span className="text-sm">Default publishable key</span>
+            <span className="text-sm">Publishable key</span>
             <div className="flex items-center gap-2">
               <ApiKeyInput />
               <CopyButton
@@ -66,17 +64,12 @@ export const PublishableAPIKeys = () => {
           )}
         </div>
         <div className="flex flex-col gap-2 max-w-64">
-          <div className="flex items-center gap-2 text-xs text-foreground-light hover:text-foreground cursor-pointer">
-            <Link size={14} className="text-foreground-light" /> Show Supabase Url
-          </div>
           {/* <Separator /> */}
           {/* @mildtomato - To add in later with follow up PR */}
           {/* <ShowPublicJWTsDialogComposer /> */}
         </div>
 
         {/* <CreatePublishableAPIKeyModal /> */}
-
-        <QuickKeyCopyWrapper />
       </div>
     </div>
   )
@@ -98,7 +91,7 @@ function ApiKeyInput() {
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
 
-  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-[300px] truncate'
+  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-[32em]'
   const size = 'tiny'
 
   if (isApiKeysLoading || isPermissionsLoading) {

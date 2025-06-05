@@ -1,6 +1,7 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import _ from 'lodash'
 import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -9,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
@@ -16,6 +18,8 @@ import {
   invalidateOrganizationsQuery,
   useOrganizationsQuery,
 } from 'data/organizations/organizations-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -34,9 +38,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import _ from 'lodash'
+import { BillingCustomerDataNewOrgDialog } from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
+import { FormCustomerData } from '../BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -92,6 +96,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const elements = useElements()
   const queryClient = useQueryClient()
 
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
   const projectsByOrg = useMemo(() => {
@@ -100,6 +109,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
   const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
     useState(false)
+
+  const [customerData, setCustomerData] = useState<FormCustomerData | null>(null)
 
   const [formState, setFormState] = useState<FormState>({
     plan: 'FREE',
@@ -157,7 +168,8 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
       }
     },
-    onError: () => {
+    onError: (data) => {
+      toast.error(`Failed to create organization: ${data.message}`)
       resetPaymentMethod()
       setNewOrgLoading(false)
     },
@@ -182,6 +194,9 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         | 'tier_enterprise',
       ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
       payment_method: paymentMethodId,
+      billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
+      address: dbTier === 'FREE' ? undefined : customerData?.address,
+      tax_id: dbTier === 'FREE' ? undefined : customerData?.tax_id ?? undefined,
     })
   }
 
@@ -254,7 +269,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             <Button
               type="default"
               disabled={newOrgLoading}
-              onClick={() => router.push('/projects')}
+              onClick={() => {
+                if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+                else router.push('/organizations')
+              }}
             >
               Cancel
             </Button>
@@ -405,7 +423,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
                 <SelectContent_Shadcn_>
                   {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                    <SelectItem_Shadcn_ key={k} value={k}>
+                    <SelectItem_Shadcn_ key={k} value={k} translate="no">
                       {v}
                     </SelectItem_Shadcn_>
                   ))}
@@ -460,6 +478,21 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               onHide={() => setShowSpendCapHelperModal(false)}
             />
           </>
+        )}
+
+        {formState.plan !== 'FREE' && (
+          <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+            <div className="grid grid-cols-3">
+              <div className="col-span-1 flex space-x-2 text-sm items-center">
+                <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
+                  Billing Address
+                </Label_Shadcn_>
+              </div>
+              <div className="col-span-2">
+                <BillingCustomerDataNewOrgDialog onCustomerDataChange={setCustomerData} />
+              </div>
+            </div>
+          </Panel.Content>
         )}
 
         {formState.plan !== 'FREE' && (

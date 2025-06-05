@@ -5,7 +5,7 @@ import { databaseTriggerKeys } from './keys'
 
 export type DatabaseTriggersVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseTriggers(

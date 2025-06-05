@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash'
+import { isEqual } from 'lodash-es'
 import { ChevronRight, XCircle } from 'lucide-react'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -31,7 +31,7 @@ function Section({ slug, link, columns = 'single', children }: SectionProps) {
 
   return (
     <ReferenceSectionWrapper
-      id={slug}
+      id={slug || ''}
       link={link}
       className={cn(
         'grid grid-cols-[1fr] gap-x-16 gap-y-8',
@@ -61,7 +61,7 @@ function Examples({ children }: PropsWithChildren) {
 
 function EducationSection({ children, slug, ...props }: SectionProps) {
   return (
-    <ReferenceSectionWrapper id={slug} className={'prose max-w-none'} {...props}>
+    <ReferenceSectionWrapper id={slug || ''} className={'prose max-w-none'} {...props}>
       {children}
     </ReferenceSectionWrapper>
   )
@@ -231,7 +231,7 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
         </div>
       )}
       {subContent && subContent.length > 0 && (
-        <TypeSubDetails details={subContent} defaultOpen={defaultOpen} />
+        <TypeSubDetails details={subContent} defaultOpen={defaultOpen || false} />
       )}
     </>
   )
@@ -240,27 +240,29 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
 export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret'] }) {
   // These custom names that aren't defined aren't particularly meaningful, so
   // just don't display them.
-  const isNameOnlyType = returnType.type.type === 'nameOnly'
+  const isNameOnlyType = returnType?.type?.type === 'nameOnly'
   if (isNameOnlyType) return
 
   const subContent = getSubDetails(returnType)
-  const isDefaultOpen = isDefaultExpanded(returnType)
+  const isDefaultOpen = returnType ? isDefaultExpanded(returnType) : false
 
   return (
     <div>
       <h3 className="mb-3 text-base text-foreground">Return Type</h3>
       <div className="border-t border-b py-5 flex flex-col gap-3">
-        <div className="text-xs text-foreground-muted">{getTypeName(returnType)}</div>
-        {returnType.comment?.shortText && (
+        <div className="text-xs text-foreground-muted">
+          {returnType ? getTypeName(returnType) : ''}
+        </div>
+        {returnType?.comment?.shortText && (
           <div className="prose text-sm">
             <MDXRemoteBase
-              source={returnType.comment?.shortText}
+              source={returnType?.comment?.shortText}
               customPreprocess={normalizeMarkdown}
             />
           </div>
         )}
         {subContent && subContent.length > 0 && (
-          <TypeSubDetails defaultOpen={isDefaultOpen} details={subContent} />
+          <TypeSubDetails defaultOpen={isDefaultOpen || false} details={subContent} />
         )}
       </div>
     </div>
@@ -371,7 +373,7 @@ export function ApiOperationRequestBodyDetails({
 }: {
   requestBody: IApiEndPoint['requestBody']
 }) {
-  const availableSchemes = Object.keys(requestBody.content) as Array<
+  const availableSchemes = Object.keys(requestBody?.content || {}) as Array<
     'application/json' | 'application/x-www-form-urlencoded'
   >
 
@@ -380,7 +382,7 @@ export function ApiOperationRequestBodyDetails({
       {availableSchemes.map((scheme, index) => (
         <ApiOperationRequestBodyDetailsInternal
           key={index}
-          schema={requestBody.content[scheme].schema}
+          schema={requestBody?.content?.[scheme]?.schema || ({} as ISchema)}
           hidden={index > 0}
           {...{
             [API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY]: scheme,
@@ -452,12 +454,12 @@ function ApiOperationRequestBodyDetailsInternal({
   } else if (schema.type === 'object') {
     return (
       <ul {...props}>
-        {Object.keys(schema.properties)
+        {Object.keys(schema.properties || {})
           .map((property) => ({
             name: property,
-            required: schema.required?.includes(property),
+            required: schema.required?.includes(property) || false,
             in: 'body' as const,
-            schema: schema.properties[property],
+            schema: schema.properties?.[property] || ({} as ISchema),
           }))
           .map((property, index) => (
             <ApiSchemaParamDetails key={index} param={property} />
@@ -599,7 +601,11 @@ function getTypeName(parameter: object): string {
     return parameter.type
   }
 
-  if (typeof parameter.type !== 'object' || !('type' in parameter.type)) {
+  if (
+    typeof parameter.type !== 'object' ||
+    parameter.type === null ||
+    !('type' in parameter.type)
+  ) {
     return ''
   }
 
@@ -645,28 +651,28 @@ function nameOrDefault(node: object, fallback: string) {
 }
 
 function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['ret']) {
-  let subDetails: Array<any>
+  let subDetails: Array<any> = []
 
-  switch (parentType.type?.type) {
+  switch (parentType?.type?.type) {
     case 'object':
-      subDetails = parentType.type.properties
+      subDetails = parentType?.type?.properties
       break
     case 'function':
       subDetails = [
-        ...(parentType.type.params.length === 0
+        ...(parentType?.type?.params?.length === 0
           ? []
           : [
               {
                 name: 'Parameters',
                 type: 'callback parameters',
                 isOptional: 'NA',
-                params: parentType.type.params.map((param) => ({
+                params: parentType?.type?.params?.map((param) => ({
                   ...param,
                   isOptional: 'NA',
                 })),
               },
             ]),
-        { name: 'Return', type: parentType.type.ret.type, isOptional: 'NA' },
+        { name: 'Return', type: parentType?.type?.ret?.type, isOptional: 'NA' },
       ]
       break
     // @ts-ignore -- Adding these fake types to take advantage of existing recursion
@@ -675,27 +681,34 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
       subDetails = parentType.params
       break
     case 'union':
-      subDetails = parentType.type.subTypes.map((subType, index) => ({
+      subDetails = parentType?.type?.subTypes?.map((subType, index) => ({
         name: `Option ${index + 1}`,
         type: { ...subType },
         isOptional: 'NA',
       }))
       break
     case 'promise':
-      if (parentType.type.awaited.type === 'union') {
-        subDetails = parentType.type.awaited.subTypes.map((subType, index) => ({
+      if (parentType?.type?.awaited?.type === 'union') {
+        subDetails = parentType?.type?.awaited?.subTypes?.map((subType, index) => ({
           name: `Option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
-      } else if (parentType.type.awaited.type === 'object') {
-        subDetails = parentType.type.awaited.properties.map((property) => ({
+      } else if (
+        parentType?.type?.awaited?.type === 'object' &&
+        'properties' in parentType.type.awaited
+      ) {
+        subDetails = (parentType.type.awaited as any).properties?.map((property) => ({
           ...property,
           isOptional: 'NA',
         }))
-      } else if (parentType.type.awaited.type === 'array') {
+      } else if (parentType?.type?.awaited?.type === 'array') {
         subDetails = [
-          { name: 'array element', type: parentType.type.awaited.elemType, isOptional: 'NA' },
+          {
+            name: 'array element',
+            type: (parentType?.type?.awaited as any)?.elemType,
+            isOptional: 'NA',
+          },
         ]
       }
       break
@@ -836,7 +849,7 @@ function applyParameterMergeStrategy(
           if (clonedParametersByName.has(key)) {
             clonedParametersByName.set(
               key,
-              applyParameterMergeStrategy(clonedParametersByName.get(key), alternateValue)
+              applyParameterMergeStrategy(clonedParametersByName.get(key)!, alternateValue)
             )
           } else {
             clonedParametersByName.set(key, alternateValue)
@@ -856,7 +869,7 @@ function applyParameterMergeStrategy(
    *********/
 
   function mergeIntoUnion() {
-    if (alternateParameter.type.type === 'union') {
+    if (alternateParameter.type?.type === 'union') {
       const originalType = clonedParameter.type
 
       if (
@@ -866,7 +879,7 @@ function applyParameterMergeStrategy(
       } else {
         clonedParameter.type = {
           type: 'union',
-          subTypes: [originalType, ...alternateParameter.type.subTypes],
+          subTypes: [originalType as TypeDetails, ...(alternateParameter.type?.subTypes || [])],
         }
       }
     } else {
@@ -874,7 +887,7 @@ function applyParameterMergeStrategy(
       if (!isEqual(originalType, alternateParameter.type)) {
         clonedParameter.type = {
           type: 'union',
-          subTypes: [originalType, alternateParameter.type],
+          subTypes: [originalType as TypeDetails, alternateParameter.type!],
         }
       }
     }
@@ -885,11 +898,13 @@ function isDefaultExpanded(meta: object) {
   return (
     'type' in meta &&
     typeof meta.type === 'object' &&
+    meta.type &&
     'type' in meta.type &&
     (meta.type.type == 'union' ||
       (meta.type.type === 'promise' &&
         'awaited' in meta.type &&
         typeof meta.type.awaited === 'object' &&
+        meta.type.awaited &&
         'type' in meta.type.awaited &&
         meta.type.awaited.type === 'union'))
   )

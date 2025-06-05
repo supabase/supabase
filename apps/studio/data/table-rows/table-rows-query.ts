@@ -1,3 +1,5 @@
+import { Query } from '@supabase/pg-meta/src/query'
+import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import {
   useQuery,
   useQueryClient,
@@ -5,8 +7,6 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query'
 
-import { Query } from '@supabase/pg-meta/src/query'
-import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
@@ -45,11 +45,11 @@ async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-async function executeWithRetry(
-  fn: () => Promise<any>,
+export async function executeWithRetry<T>(
+  fn: () => Promise<T>,
   maxRetries: number = 3,
   baseDelay: number = 500
-): Promise<any> {
+): Promise<T> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn()
@@ -64,6 +64,7 @@ async function executeWithRetry(
       throw error
     }
   }
+  throw new Error('Max retries reached without success')
 }
 
 // TODO: fetchAllTableRows is used for CSV export, but since it doesn't actually truncate anything, (compare to getTableRows)
@@ -82,7 +83,7 @@ export const fetchAllTableRows = async ({
   progressCallback,
 }: {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
@@ -119,7 +120,7 @@ export const fetchAllTableRows = async ({
     const primaryKeys = getDefaultOrderByColumns(table)
     if (primaryKeys.length > 0) {
       primaryKeys.forEach((col) => {
-        queryChains = queryChains.order(table.name, col, true, true)
+        queryChains = queryChains.order(table.name, col)
       })
     }
   } else {
@@ -153,7 +154,7 @@ export const fetchAllTableRows = async ({
       await sleep(THROTTLE_DELAY)
     } catch (error) {
       throw new Error(
-        `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Error fetching all table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
       )
     }
   }
@@ -166,7 +167,7 @@ export type TableRows = { rows: SupaRow[] }
 export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
   queryClient: QueryClient
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   tableId?: number
 }
 
@@ -202,23 +203,28 @@ export async function getTableRows(
     getTableRowsSql({ table: entity, filters, sorts, limit, page }),
     roleImpersonationState
   )
-  const { result } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sql,
-      queryKey: ['table-rows', table?.id],
-      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-    },
-    signal
-  )
 
-  const rows = result.map((x: any, index: number) => {
-    return { idx: index, ...x }
-  }) as SupaRow[]
+  try {
+    const { result } = await executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql,
+        queryKey: ['table-rows', table?.id],
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      },
+      signal
+    )
 
-  return {
-    rows,
+    const rows = result.map((x: any, index: number) => {
+      return { idx: index, ...x }
+    }) as SupaRow[]
+
+    return { rows }
+  } catch (error) {
+    throw new Error(
+      `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 

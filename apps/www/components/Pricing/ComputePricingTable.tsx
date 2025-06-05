@@ -44,7 +44,11 @@ const ComputePricingTable = () => {
                   )}
                 >
                   {row.columns.map((column) => (
-                    <td key={column.key} className="p-3">
+                    <td
+                      key={column.key}
+                      className="p-3"
+                      translate={column.key === 'pricing' ? 'no' : undefined}
+                    >
                       {column.key === 'dedicated' ? (
                         column.value ? (
                           <IconPricingIncludedCheck plan="Pro Plan" />
@@ -96,7 +100,7 @@ const ComputePricingTable = () => {
                         <IconPricingMinus plan="Free Plan" />
                       )
                     ) : (
-                      column.value
+                      column.value + 'asd'
                     )}
                   </td>
                 </tr>

@@ -11,7 +11,7 @@ type TableEditorArgs = {
 
 export type TableEditorVariables = TableEditorArgs & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getTableEditor(

@@ -225,9 +225,9 @@ export const PolicyEditorPanel = memo(function ({
       if (Object.keys(payload).length === 0) return onSelectCancel()
 
       updatePolicy({
-        id: selectedPolicy.id,
         projectRef: selectedProject.ref,
         connectionString: selectedProject?.connectionString,
+        originalPolicy: selectedPolicy,
         payload,
       })
     }

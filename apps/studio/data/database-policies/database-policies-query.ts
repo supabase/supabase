@@ -8,7 +8,7 @@ import { databasePoliciesKeys } from './keys'
 
 export type DatabasePoliciesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 

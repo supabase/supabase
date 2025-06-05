@@ -2,10 +2,10 @@ import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -47,11 +47,11 @@ const FeaturePreviewModal = () => {
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
 
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
-      removeTabsByEditor(ref as string | undefined, 'table')
+    if (ref && selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
+      removeTabsByEditor(ref, 'table')
     }
-    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
-      removeTabsByEditor(ref as string | undefined, 'sql')
+    if (ref && selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref, 'sql')
     }
   }
 

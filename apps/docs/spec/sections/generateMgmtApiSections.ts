@@ -23,8 +23,19 @@ function extractSectionsFromOpenApi(filePath, outputPath) {
 
     try {
       const openApiJson = JSON.parse(data)
-      const categories = []
-      const sections = []
+      const categories: string[] = []
+      const sections: Array<{
+        type: string
+        title: string
+        id?: string
+        slug?: string
+        items: Array<{
+          type: string
+          title: string
+          id: string
+          slug: string
+        }>
+      }> = []
 
       if (openApiJson.paths) {
         for (const route in openApiJson.paths) {
@@ -47,7 +58,7 @@ function extractSectionsFromOpenApi(filePath, outputPath) {
             }
 
             const sectionCate = sections.find((i) => i.title === tag)
-            sectionCate.items.push({
+            sectionCate?.items.push({
               id: operationId,
               title: slugToTitle(operationId),
               slug: operationId,
@@ -65,6 +76,7 @@ function extractSectionsFromOpenApi(filePath, outputPath) {
         id: 'introduction',
         slug: 'introduction',
         type: 'markdown',
+        items: [],
       })
 
       fs.writeFile(outputPath, JSON.stringify(sections, null, 2), 'utf8', (err) => {

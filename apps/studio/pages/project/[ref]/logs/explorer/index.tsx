@@ -6,7 +6,8 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+
 import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LOGS_TABLES,
@@ -41,7 +42,6 @@ import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
@@ -338,7 +338,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         text: 'Querying large date ranges can be slow. Consider selecting a smaller date range.',
       })
     }
-    if (editorValue && !editorValue.includes('limit')) {
+    if (editorValue && !editorValue.toLowerCase().includes('limit')) {
       newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
     }
     setWarnings(newWarnings)

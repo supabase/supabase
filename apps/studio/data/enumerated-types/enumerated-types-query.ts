@@ -7,7 +7,7 @@ import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type EnumeratedType = components['schemas']['PostgresType']

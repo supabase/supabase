@@ -1,23 +1,25 @@
 import { useParams } from 'common'
 import { find } from 'lodash'
 
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
 import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref, bucketId } = useParams()
   const { project } = useProjectContext()
+  const { projectRef } = useStorageExplorerStateSnapshot()
 
   const { data, isSuccess, isError, error } = useBucketsQuery({ projectRef: ref })
   const buckets = data ?? []
   const bucket = find(buckets, { id: bucketId })
 
-  if (!project) return null
+  if (!project || !projectRef) return null
 
   return (
     <div className="storage-container flex flex-grow p-4">

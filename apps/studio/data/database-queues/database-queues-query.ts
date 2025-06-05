@@ -5,7 +5,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type PostgresQueue = {

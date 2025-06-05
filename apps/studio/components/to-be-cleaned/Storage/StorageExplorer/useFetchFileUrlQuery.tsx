@@ -2,7 +2,7 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { getPublicUrlForBucketObject } from 'data/storage/bucket-object-get-public-url-mutation'
 import { signBucketObject } from 'data/storage/bucket-object-sign-mutation'
 import { Bucket } from 'data/storage/buckets-query'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { ResponseError } from 'types'
 import { StorageItem } from '../Storage.types'
 
@@ -43,7 +43,7 @@ export const useFetchFileUrlQuery = (
   { file, projectRef, bucket }: UseFileUrlQueryVariables,
   { ...options }: UseQueryOptions<string, ResponseError> = {}
 ) => {
-  const { getPathAlongOpenedFolders } = useStorageStore()
+  const { getPathAlongOpenedFolders } = useStorageExplorerStateSnapshot()
   const pathToFile = getPathAlongOpenedFolders(false)
   const formattedPathToFile = [pathToFile, file?.name].join('/')
 

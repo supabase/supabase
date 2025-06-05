@@ -10,6 +10,7 @@
  *   path="/path/to/file.ts"
  *   lines={[1, 2], [5, 7]} // -1 may be used in end position as an alias for the last line, e.g., [1, -1]
  *   meta="utils/client.ts" // Optional, for displaying a file path on the code block
+ *   hideElidedLines={true} // Optional, for hiding elided lines in the code block
  * />
  * ```
  *
@@ -24,6 +25,7 @@
  *   path="/path/to/file.ts"
  *   lines={[1, 2], [5, 7]} // -1 may be used in end position as an alias for the last line, e.g., [1, -1]
  *   meta="utils/client.ts" // Optional, for displaying a file path on the code block
+ *   hideElidedLines={true} // Optional, for hiding elided lines in the code block
  * />
  */
 
@@ -77,6 +79,7 @@ const codeSampleExternalSchema = z.object({
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
+  hideElidedLines: z.coerce.boolean().default(false),
 })
 type ICodeSampleExternal = z.infer<typeof codeSampleExternalSchema> & AdditionalMeta
 
@@ -88,6 +91,7 @@ const codeSampleInternalSchema = z.object({
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
+  hideElidedLines: z.coerce.boolean().default(false),
 })
 type ICodeSampleInternal = z.infer<typeof codeSampleInternalSchema> & AdditionalMeta
 
@@ -147,6 +151,9 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
       const path = getAttributeValue(node, 'path')
       const lines = getAttributeValueExpression(getAttributeValue(node, 'lines'))
       const meta = getAttributeValue(node, 'meta')
+      const hideElidedLines = getAttributeValueExpression(
+        getAttributeValue(node, 'hideElidedLines')
+      )
 
       const result = codeSampleExternalSchema.safeParse({
         external: isExternal,
@@ -156,6 +163,7 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
         path,
         lines,
         meta,
+        hideElidedLines,
       })
 
       if (!result.success) {
@@ -186,12 +194,16 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
       const path = getAttributeValue(node, 'path')
       const lines = getAttributeValueExpression(getAttributeValue(node, 'lines'))
       const meta = getAttributeValue(node, 'meta')
+      const hideElidedLines = getAttributeValueExpression(
+        getAttributeValue(node, 'hideElidedLines')
+      )
 
       const result = codeSampleInternalSchema.safeParse({
         external: isExternal,
         path,
         lines,
         meta,
+        hideElidedLines,
       })
 
       if (!result.success) {
@@ -224,13 +236,13 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
 
 function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string]>) {
   for (const [node, [meta, content]] of contentMap) {
-    const lang = matchLang(meta.path.split('.').pop())
+    const lang = matchLang(meta.path.split('.').pop() || '')
 
     const source = isExternalSource(meta)
       ? `https://github.com/${meta.org}/${meta.repo}/blob/${meta.commit}${meta.path}`
       : `https://github.com/supabase/supabase/blob/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ?? 'master'}/examples${meta.path}`
 
-    const elidedContent = redactLines(content, meta.lines, lang)
+    const elidedContent = redactLines(content, meta.lines, lang, meta.hideElidedLines)
 
     const replacementContent: MdxJsxFlowElement | Code = meta.codeHikeAncestor
       ? {
@@ -274,6 +286,7 @@ function rewriteNodes(contentMap: Map<MdxJsxFlowElement, [CodeSampleMeta, string
           existingWrapper.attributes[0].value = newSource
         } else if (
           typeof existingSource !== 'string' &&
+          existingSource &&
           existingSource.type === 'mdxJsxAttributeValueExpression'
         ) {
           const existingSourceArray =
@@ -339,18 +352,19 @@ function matchLang(lang: string) {
 function redactLines(
   content: string,
   lines: [number, number, ...unknown[]][],
-  lang: string | null
+  lang: string | null,
+  hideElidedLines: boolean = false
 ) {
   const contentLines = content.split('\n')
   const preservedLines = lines.reduce((acc, [start, end], index, arr) => {
-    if (index !== 0 || start !== 1) {
+    if (!hideElidedLines && (index !== 0 || start !== 1)) {
       acc.push(_createElidedLine(lang, contentLines, start, end))
     }
 
     // Start and end are 1-indexed and inclusive
     acc.push(...contentLines.slice(start - 1, end === -1 ? contentLines.length : end))
 
-    if (index === arr.length - 1 && end !== -1 && end !== contentLines.length) {
+    if (!hideElidedLines && index === arr.length - 1 && end !== -1 && end !== contentLines.length) {
       acc.push(_createElidedLine(lang, contentLines, start, end))
     }
 
@@ -392,7 +406,10 @@ export function _createElidedLine(
 
 function isContainedInJsx(tree: acorn.Node, line: number) {
   const acornNodeContainsLine = (node: acorn.Node, line) =>
-    node.loc?.start.line <= line && node.loc?.end.line >= line
+    node.loc?.start?.line != null &&
+    node.loc?.end?.line != null &&
+    node.loc.start.line <= line &&
+    node.loc.end.line >= line
   if (!acornNodeContainsLine(tree, line)) {
     return false
   }
@@ -417,10 +434,18 @@ function isContainedInJsx(tree: acorn.Node, line: number) {
             continue
           } else {
             if (
-              child.loc?.start?.line > candidateNarrowestContainingNode.loc?.start?.line ||
-              child.loc.end.line < candidateNarrowestContainingNode.loc?.end?.line ||
-              child.loc.start.column > candidateNarrowestContainingNode.loc?.start.column ||
-              child.loc.end.column < candidateNarrowestContainingNode.loc?.end.column
+              (child.loc?.start?.line != null &&
+                candidateNarrowestContainingNode.loc?.start?.line != null &&
+                child.loc.start.line > candidateNarrowestContainingNode.loc.start.line) ||
+              (child.loc?.end?.line != null &&
+                candidateNarrowestContainingNode.loc?.end?.line != null &&
+                child.loc.end.line < candidateNarrowestContainingNode.loc.end.line) ||
+              (child.loc?.start?.column != null &&
+                candidateNarrowestContainingNode.loc?.start?.column != null &&
+                child.loc.start.column > candidateNarrowestContainingNode.loc.start.column) ||
+              (child.loc?.end?.column != null &&
+                candidateNarrowestContainingNode.loc?.end?.column != null &&
+                child.loc.end.column < candidateNarrowestContainingNode.loc.end.column)
             ) {
               candidateNarrowestContainingNode = child
               getNarrowestContainingNode(child, line)

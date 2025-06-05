@@ -5,7 +5,7 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type CronJob = {
@@ -17,7 +17,7 @@ export type CronJob = {
   database: string
   username: string
   active: boolean
-  jobname: string
+  jobname: string | null
 }
 
 const cronJobSqlQuery = `select * from cron.job order by jobid;`

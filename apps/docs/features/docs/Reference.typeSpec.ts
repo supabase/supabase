@@ -194,7 +194,7 @@ interface CommentBlockTag {
   content: CommentKind[]
 }
 
-function normalizeComment(original: TypedocComment | Comment): Comment {
+function normalizeComment(original: TypedocComment | Comment | undefined): Comment | undefined {
   if (!original) return
 
   if ('shortText' in original || 'text' in original) {
@@ -299,7 +299,7 @@ function parseModInternal(
     case 'property':
     case 'reference':
     default:
-      return undefined
+      return
   }
 }
 
@@ -379,7 +379,7 @@ function parseSignature(
   map: Map<number, any>
 ): {
   params: Array<FunctionParameterType>
-  ret: ReturnType
+  ret: ReturnType | undefined
   comment?: Comment
 } {
   const params: Array<FunctionParameterType> = (signature.parameters ?? []).map((param: any) => {
@@ -401,7 +401,7 @@ function parseSignature(
     return res
   })
 
-  let ret: ReturnType
+  let ret: ReturnType | undefined
   if ('type' in signature) {
     const retType = parseType(signature.type, map)
     if (retType) {
@@ -643,10 +643,10 @@ function parsePickType(type: any, map: Map<number, any>) {
   return undefined
 }
 
-function parseReflectionType(type: any, map: Map<number, any>) {
+function parseReflectionType(type: any, map: Map<number, any>): TypeDetails | undefined {
   if (!type.declaration) return undefined
 
-  let res: TypeDetails
+  let res: TypeDetails | undefined
   switch ((type.declaration.kindString ?? type.declaration.variant).toLowerCase()) {
     case 'type literal':
       res = parseTypeLiteral(type, map)
@@ -662,7 +662,7 @@ function parseReflectionType(type: any, map: Map<number, any>) {
   return res
 }
 
-function parseTypeLiteral(type: any, map: Map<number, any>): TypeDetails {
+function parseTypeLiteral(type: any, map: Map<number, any>): TypeDetails | undefined {
   const name = nameOrAnonymous(type)
 
   if ('children' in type.declaration) {

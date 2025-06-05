@@ -15,8 +15,11 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_number: [1]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,4 +42,25 @@ jobs:
         run: pnpm i
 
       - name: Run tests
-        run: pnpm run test:ui
+        run: pnpm run test:ci
+        working-directory: ./packages/ui
+
+      - name: Upload coverage results to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          parallel: true
+          flag-name: ui-tests
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./packages/ui/coverage/lcov.info
+          base-path: './packages/ui'
+
+  finish:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          parallel-finished: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}

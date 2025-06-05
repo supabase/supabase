@@ -29,7 +29,7 @@ const SignInFlyTos = () => {
   })
   const { mutateAsync: getOrgByFlyOrgId } = useOrganizationByFlyOrgIdMutation({
     onSuccess: () => {
-      router.replace('/projects')
+      router.replace('/organizations')
     },
     onError: () => {
       setLoading(false)

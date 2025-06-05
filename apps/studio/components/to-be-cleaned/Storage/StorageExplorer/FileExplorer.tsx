@@ -1,7 +1,7 @@
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
 import { CONTEXT_MENU_KEYS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItem, StorageItemWithColumn } from '../Storage.types'
@@ -11,7 +11,6 @@ import FolderContextMenu from './FolderContextMenu'
 import ItemContextMenu from './ItemContextMenu'
 
 export interface FileExplorerProps {
-  view: string
   columns: StorageColumn[]
   openedFolders: StorageItem[]
   selectedItems: StorageItemWithColumn[]
@@ -23,7 +22,6 @@ export interface FileExplorerProps {
 }
 
 const FileExplorer = ({
-  view = STORAGE_VIEWS.COLUMNS,
   columns = [],
   openedFolders = [],
   selectedItems = [],
@@ -34,6 +32,7 @@ const FileExplorer = ({
   onColumnLoadMore = noop,
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
+  const snap = useStorageExplorerStateSnapshot()
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -49,19 +48,18 @@ const FileExplorer = ({
       ref={fileExplorerRef}
       className={cn(
         'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
-        view === STORAGE_VIEWS.LIST && 'flex-col'
+        snap.view === STORAGE_VIEWS.LIST && 'flex-col'
       )}
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
       <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
       <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
-      {view === STORAGE_VIEWS.COLUMNS ? (
+      {snap.view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
           {columns.map((column, index) => (
             <FileExplorerColumn
               key={`column-${index}`}
               index={index}
-              view={view}
               column={column}
               openedFolders={openedFolders}
               selectedItems={selectedItems}
@@ -73,13 +71,12 @@ const FileExplorer = ({
             />
           ))}
         </div>
-      ) : view === STORAGE_VIEWS.LIST ? (
+      ) : snap.view === STORAGE_VIEWS.LIST ? (
         <>
           {columns.length > 0 && (
             <FileExplorerColumn
               fullWidth
               index={columns.length - 1}
-              view={view}
               column={columns[columns.length - 1]}
               selectedItems={selectedItems}
               itemSearchString={itemSearchString}
@@ -91,10 +88,10 @@ const FileExplorer = ({
           )}
         </>
       ) : (
-        <div>Unknown view: {view}</div>
+        <div>Unknown view: {snap.view}</div>
       )}
     </div>
   )
 }
 
-export default observer(FileExplorer)
+export default FileExplorer

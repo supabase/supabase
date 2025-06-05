@@ -4,17 +4,10 @@ import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { useParams } from 'common'
-import {
-  filtersToUrlParams,
-  formatFilterURLParams,
-  formatSortURLParams,
-  sortsToUrlParams,
-} from 'components/grid/SupabaseGrid.utils'
 import RefreshButton from 'components/grid/components/header/RefreshButton'
-import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
-import { SortPopover } from 'components/grid/components/header/sort'
-import type { Filter } from 'components/grid/types'
-import { Sort } from 'components/grid/types'
+import { FilterPopoverPrimitive } from 'components/grid/components/header/filter/FilterPopoverPrimitive'
+import { SortPopoverPrimitive } from 'components/grid/components/header/sort/SortPopoverPrimitive'
+import type { Filter, Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
@@ -65,9 +58,9 @@ const ForeignRowSelector = ({
     id: tableId,
   })
 
-  const [{ sort: sorts, filter: filters }, setParams] = useState<{
-    filter: string[]
-    sort: string[]
+  const [{ sort: sorts, filter: filters }, setFiltersAndSorts] = useState<{
+    filter: Filter[]
+    sort: Sort[]
   }>({ filter: [], sort: [] })
 
   const onApplyFilters = (appliedFilters: Filter[]) => {
@@ -76,19 +69,19 @@ const ForeignRowSelector = ({
       setPage(1)
     }
 
-    setParams((prevParams) => {
+    setFiltersAndSorts((prevParams) => {
       return {
         ...prevParams,
-        filter: filtersToUrlParams(appliedFilters),
+        filter: appliedFilters,
       }
     })
   }
 
   const onApplySorts = (appliedSorts: Sort[]) => {
-    setParams((prevParams) => {
+    setFiltersAndSorts((prevParams) => {
       return {
         ...prevParams,
-        sort: sortsToUrlParams(appliedSorts),
+        sort: appliedSorts,
       }
     })
   }
@@ -103,8 +96,8 @@ const ForeignRowSelector = ({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       tableId: table?.id,
-      sorts: formatSortURLParams(table?.name || '', sorts),
-      filters: formatFilterURLParams(filters),
+      sorts,
+      filters,
       page,
       limit: rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
@@ -160,13 +153,17 @@ const ForeignRowSelector = ({
                 <div className="flex items-center justify-between my-2 mx-3">
                   <div className="flex items-center">
                     <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
-                    <FilterPopover
+                    <FilterPopoverPrimitive
                       portal={false}
                       filters={filters}
                       onApplyFilters={onApplyFilters}
                     />
                     <DndProvider backend={HTML5Backend} context={window}>
-                      <SortPopover portal={false} sorts={sorts} onApplySorts={onApplySorts} />
+                      <SortPopoverPrimitive
+                        portal={false}
+                        sorts={sorts}
+                        onApplySorts={onApplySorts}
+                      />
                     </DndProvider>
                   </div>
 

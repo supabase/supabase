@@ -30,7 +30,6 @@ const DatabaseProductMenu = () => {
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
-  const enablePgReplicate = useFlag('enablePgReplicate')
 
   return (
     <>
@@ -40,7 +39,6 @@ const DatabaseProductMenu = () => {
           pgNetExtensionExists,
           pitrEnabled,
           columnLevelPrivileges,
-          enablePgReplicate,
         })}
       />
     </>

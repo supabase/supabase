@@ -7,7 +7,7 @@ import { viewKeys } from './keys'
 
 export type ViewsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 

@@ -1,9 +1,8 @@
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
 import { Button, Form, Input, Listbox, Modal } from 'ui'
 
 import { DATETIME_FORMAT } from 'lib/constants'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { useCopyUrl } from './useCopyUrl'
 
 const unitMap = {
@@ -14,9 +13,9 @@ const unitMap = {
 }
 
 const CustomExpiryModal = () => {
-  const storageExplorerStore = useStorageStore()
   const { onCopyUrl } = useCopyUrl()
-  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
+  const snap = useStorageExplorerStateSnapshot()
+  const { selectedFileCustomExpiry, setSelectedFileCustomExpiry } = snap
 
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
@@ -102,4 +101,4 @@ const CustomExpiryModal = () => {
   )
 }
 
-export default observer(CustomExpiryModal)
+export default CustomExpiryModal

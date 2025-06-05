@@ -3,8 +3,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { useIsNewLayoutEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -22,7 +21,6 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -30,8 +28,7 @@ import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-const TeamSettings = () => {
-  const newLayoutPreview = useIsNewLayoutEnabled()
+export const TeamSettings = () => {
   const [_, setLastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -75,12 +72,8 @@ const TeamSettings = () => {
       await refetchOrganizations()
       toast.success(`Successfully left ${selectedOrganization?.name}`)
 
-      if (newLayoutPreview) {
-        setLastVisitedOrganization('')
-        router.push('/organizations')
-      } else {
-        router.push('/projects')
-      }
+      setLastVisitedOrganization('')
+      router.push('/organizations')
     },
     onError: (error) => {
       setIsLeaving(false)
@@ -100,7 +93,7 @@ const TeamSettings = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
-        {newLayoutPreview && <ScaffoldTitle>Team</ScaffoldTitle>}
+        <ScaffoldTitle>Team</ScaffoldTitle>
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
@@ -179,5 +172,3 @@ const TeamSettings = () => {
     </>
   )
 }
-
-export default TeamSettings

@@ -11,7 +11,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Route } from 'components/ui/ui.types'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route

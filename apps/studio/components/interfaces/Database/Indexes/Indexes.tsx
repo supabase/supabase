@@ -1,4 +1,5 @@
 import { partition, sortBy } from 'lodash'
+import { AlertCircle, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -9,12 +10,11 @@ import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
+import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
+import { DatabaseIndex, useIndexesQuery } from 'data/database-indexes/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { AlertCircle, Search, Trash } from 'lucide-react'
 import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
@@ -32,7 +32,6 @@ const Indexes = () => {
 
   const {
     data: allIndexes,
-    refetch: refetchIndexes,
     error: indexesError,
     isLoading: isLoadingIndexes,
     isSuccess: isSuccessIndexes,
@@ -52,14 +51,10 @@ const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+  const { mutate: deleteIndex, isLoading: isExecuting } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      await refetchIndexes()
       setSelectedIndexToDelete(undefined)
       toast.success('Successfully deleted index')
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete index: ${error.message}`)
     },
   })
 
@@ -77,10 +72,11 @@ const Indexes = () => {
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
     if (!project) return console.error('Project is required')
-    execute({
+
+    deleteIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      sql: `drop index if exists "${index.name}"`,
+      name: index.name,
     })
   }
 

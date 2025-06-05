@@ -333,7 +333,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className={`max-h-72 shrink-0 flex flex-col`}>
+          <div className={`max-h-72 shrink-0 flex flex-col ${showResults && 'h-full'}`}>
             {showResults && (
               <div className="border-t flex-1 overflow-auto">
                 <Results rows={results} />

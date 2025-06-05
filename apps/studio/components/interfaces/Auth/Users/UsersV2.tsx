@@ -5,7 +5,7 @@ import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -18,7 +18,6 @@ import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUsersCountQuery } from 'data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   cn,

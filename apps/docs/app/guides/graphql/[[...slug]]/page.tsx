@@ -1,15 +1,15 @@
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { notFound } from 'next/navigation'
 import { isAbsolute, relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 export const dynamicParams = false
 
@@ -108,7 +108,8 @@ interface Params {
   slug?: string[]
 }
 
-const PGGraphQLDocs = async ({ params }: { params: Params }) => {
+const PGGraphQLDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const { meta, ...data } = await getContent(params)
 
   const options = {
@@ -137,7 +138,7 @@ const getContent = async ({ slug }: Params) => {
 
   const response = await fetch(
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`,
-    { next: { tags: [REVALIDATION_TAGS.GRAPHQL] } }
+    { cache: 'force-cache', next: { tags: [REVALIDATION_TAGS.GRAPHQL] } }
   )
 
   const content = await response.text()
@@ -178,7 +179,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 
     // If we have a mapping for this page, use the mapped path
     if (page) {
-      return 'graphql/' + page.slug + hash
+      return '/docs/guides/graphql/' + page.slug + hash
     }
 
     // If we don't have this page in our docs, link to original docs
@@ -193,4 +194,4 @@ const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug
 const generateMetadata = genGuideMeta(getContent)
 
 export default PGGraphQLDocs
-export { generateStaticParams, generateMetadata }
+export { generateMetadata, generateStaticParams }

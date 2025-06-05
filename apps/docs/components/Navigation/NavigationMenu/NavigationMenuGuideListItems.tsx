@@ -169,9 +169,9 @@ const Content = (props) => {
                   )
                 })}
               </div>
-            ) : (
+            ) : x.url ? (
               <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
-            )}
+            ) : null}
           </div>
         )
       })}

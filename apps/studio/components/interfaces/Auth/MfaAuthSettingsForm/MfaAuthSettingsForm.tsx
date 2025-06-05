@@ -419,9 +419,10 @@ const MfaAuthSettingsForm = () => {
                   <Alert_Shadcn_ variant="warning">
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
-                      Enabling advanced MFA with phone will result in an additional charge of $75
-                      per month for the first project in the organization and an additional $10 per
-                      month for additional projects.
+                      Enabling advanced MFA with phone will result in an additional charge of{' '}
+                      <span translate="no">$75</span>
+                      per month for the first project in the organization and an additional{' '}
+                      <span translate="no">$10</span> per month for additional projects.
                     </AlertTitle_Shadcn_>
                   </Alert_Shadcn_>
                 </CardContent>

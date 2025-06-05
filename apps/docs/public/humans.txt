@@ -32,10 +32,12 @@ David A. Ventimiglia
 Deji I
 Div Arora
 Divit D
+Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
 Etienne Stalmans
 Fabrizio Fenoglio
+Felipe Stival
 Francesco Sansalvadore
 Greg P
 Greg Richardson
@@ -76,9 +78,11 @@ Paul Caselton
 Paul Cioanca
 Paul Copplestone
 Pavel Borisov
+Paweł Gulbinowicz
 Peter Lyn
 Qiao Han
 Raminder Singh
+Riccardo Busetti
 Rodrigo Mansueli
 Rory Wilding
 Sam Rose

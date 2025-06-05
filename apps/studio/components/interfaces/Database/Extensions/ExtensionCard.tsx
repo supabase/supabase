@@ -1,10 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Book, Github, Loader2, Settings } from 'lucide-react'
+import { AlertTriangle, Book, Github, Loader2, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -134,6 +135,20 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                   Docs
                 </a>
               </Button>
+            )}
+            {extensionMeta?.deprecated && extensionMeta?.deprecated.length > 0 && (
+              <ButtonTooltip
+                type="warning"
+                icon={<AlertTriangle />}
+                className="rounded-full"
+                tooltip={{
+                  content: {
+                    text: `The extension is deprecated and will be removed in ${extensionMeta.deprecated.join(', ')}.`,
+                  },
+                }}
+              >
+                Deprecated
+              </ButtonTooltip>
             )}
           </div>
         </div>

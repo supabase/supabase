@@ -83,6 +83,8 @@ Then, set up the function that will be called whenever a Database change is dete
 ```sql
 create or replace function public.your_table_changes()
 returns trigger
+security definer
+language plpgsql
 as $$
 begin
     perform realtime.broadcast_changes(
@@ -96,7 +98,7 @@ begin
 		);
     return null;
 end;
-$$ language plpgsql;
+$$;
 ```
 
 Then, set up the trigger conditions under which you will execute the function:

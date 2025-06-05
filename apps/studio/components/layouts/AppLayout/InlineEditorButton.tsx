@@ -3,7 +3,7 @@ import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Button } from 'ui'
 
-const InlineEditorButton = () => {
+export const InlineEditorButton = () => {
   const { closeAssistant } = useAiAssistantStateSnapshot()
   const { setEditorPanel, editorPanel } = useAppStateSnapshot()
 
@@ -22,5 +22,3 @@ const InlineEditorButton = () => {
     </Button>
   )
 }
-
-export default InlineEditorButton

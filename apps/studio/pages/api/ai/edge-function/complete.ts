@@ -1,7 +1,10 @@
 import { openai } from '@ai-sdk/openai'
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
+import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
+import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 
@@ -9,7 +12,7 @@ export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
 const pgMetaSchemasList = pgMeta.schemas.list()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
     return new Response(
       JSON.stringify({
@@ -35,6 +38,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
+
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { completionMetadata, projectRef, connectionString, includeSchemaMetadata } = req.body
@@ -59,7 +67,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           {
             'Content-Type': 'application/json',
             ...(authorization && { Authorization: authorization }),
-          }
+          },
+          IS_PLATFORM ? undefined : queryPgMetaSelfHosted
         )
       : { result: [] }
 

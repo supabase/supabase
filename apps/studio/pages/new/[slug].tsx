@@ -10,7 +10,8 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
-import { useParams } from 'common'
+import { components } from 'api-types'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -27,12 +28,14 @@ import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/Spe
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
+import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
@@ -43,6 +46,8 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
@@ -83,9 +88,6 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { components } from 'api-types'
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -139,12 +141,16 @@ const Wizard: NextPageWithLayout = () => {
   const currentOrg = useSelectedOrganization()
   const isFreePlan = currentOrg?.plan?.id === 'free'
 
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const allowOrioleDB = useFlag('allowOrioleDb')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
@@ -186,6 +192,10 @@ const Wizard: NextPageWithLayout = () => {
         action: 'project_creation_simple_version_submitted',
         properties: {
           instanceSize: form.getValues('instanceSize'),
+        },
+        groups: {
+          project: res.ref,
+          organization: res.organization_slug,
         },
       })
       router.push(`/project/${res.ref}/building`)
@@ -320,6 +330,9 @@ const Wizard: NextPageWithLayout = () => {
         properties: {
           instanceSize: values.instanceSize,
         },
+        groups: {
+          organization: currentOrg?.slug ?? 'Unknown',
+        },
       })
       setIsComputeCostsConfirmationModalVisible(true)
     } else {
@@ -453,13 +466,9 @@ const Wizard: NextPageWithLayout = () => {
                             <p>
                               Each project includes a dedicated Postgres instance running on its own
                               server. You are charged for the{' '}
-                              <Link
-                                className="underline"
-                                href={`/docs/guides/platform/billing-on-supabase`}
-                                target="_blank"
-                              >
-                                Compute resourcse
-                              </Link>{' '}
+                              <InlineLink href="https://supabase.com/docs/guides/platform/billing-on-supabase">
+                                Compute resource
+                              </InlineLink>{' '}
                               of that server, independent of your database usage.
                             </p>
                             {monthlyComputeCosts > 0 && (
@@ -553,7 +562,10 @@ const Wizard: NextPageWithLayout = () => {
                 <Button
                   type="default"
                   disabled={isCreatingNewProject || isSuccessNewProject}
-                  onClick={() => router.push('/projects')}
+                  onClick={() => {
+                    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+                    else router.push('/organizations')
+                  }}
                 >
                   Cancel
                 </Button>
@@ -757,7 +769,10 @@ const Wizard: NextPageWithLayout = () => {
                                                   )}{' '}
                                                   CPU
                                                 </span>
-                                                <p className="text-xs text-muted instance-details">
+                                                <p
+                                                  className="text-xs text-muted instance-details"
+                                                  translate="no"
+                                                >
                                                   ${instanceSizeSpecs[option].priceHourly}/hour (~$
                                                   {instanceSizeSpecs[option].priceMonthly}/month)
                                                 </p>
@@ -839,7 +854,7 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {!projectVersionSelectionDisabled && (
+                    {showPostgresVersionSelector && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
@@ -882,9 +897,7 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     <SecurityOptions form={form} />
-                    {allowOrioleDB && !!availableOrioleVersion && (
-                      <AdvancedConfiguration form={form} />
-                    )}
+                    {!!availableOrioleVersion && <AdvancedConfiguration form={form} />}
                   </>
                 )}
 
@@ -986,16 +999,7 @@ const instanceLabel = (instance: string | undefined): string => {
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {
-  const { slug } = useParams()
-
-  const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o) => o.slug === slug)
-
-  return (
-    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
-      {children}
-    </WizardLayoutWithoutAuth>
-  )
+  return <WizardLayoutWithoutAuth>{children}</WizardLayoutWithoutAuth>
 })
 
 Wizard.getLayout = (page) => (

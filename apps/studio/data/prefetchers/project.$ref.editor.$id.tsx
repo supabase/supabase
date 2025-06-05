@@ -20,7 +20,7 @@ import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 interface PrefetchEditorTablePageArgs {
   queryClient: QueryClient
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   sorts?: Sort[]
   filters?: Filter[]

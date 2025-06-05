@@ -18,6 +18,8 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
+import { hasIndexRecommendations } from './index-advisor.utils'
+import { IndexSuggestionIcon } from './IndexSuggestionIcon'
 import { QueryDetail } from './QueryDetail'
 import { QueryIndexes } from './QueryIndexes'
 import {
@@ -33,7 +35,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
   const { preset, sort: urlSort, order, roles, search } = useParams()
-  const { isLoading } = queryPerformanceQuery
+  const { isLoading, data } = queryPerformanceQuery
 
   const defaultSortValue = router.query.sort
     ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
@@ -70,8 +72,30 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       },
       renderCell: (props) => {
         const value = props.row?.[col.id]
+        if (col.id === 'query') {
+          return (
+            <div className="w-full flex items-center gap-x-2">
+              {hasIndexRecommendations(props.row.index_advisor_result, true) && (
+                <IndexSuggestionIcon
+                  indexAdvisorResult={props.row.index_advisor_result}
+                  onClickIcon={() => {
+                    setSelectedRow(props.rowIdx)
+                    setView('suggestion')
+                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: props.rowIdx })
+                  }}
+                />
+              )}
+              <div className="font-mono text-xs">{value}</div>
+            </div>
+          )
+        }
+
         const isTime = col.name.includes('time')
-        const formattedValue = isTime ? `${value.toFixed(0)}ms` : value.toLocaleString()
+        const formattedValue = !!value
+          ? isTime
+            ? `${value.toFixed(0)}ms`
+            : value.toLocaleString()
+          : ''
         return (
           <div
             className={cn(
@@ -88,13 +112,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     return result
   })
 
-  const selectedQuery =
-    selectedRow !== undefined ? queryPerformanceQuery.data?.[selectedRow]?.['query'] : undefined
+  const reportData = data ?? []
+  const selectedQuery = selectedRow !== undefined ? reportData[selectedRow]?.query : undefined
   const query = (selectedQuery ?? '').trim().toLowerCase()
   const showIndexSuggestions =
-    query.startsWith('select') ||
-    query.startsWith('with pgrst_source') ||
-    query.startsWith('with pgrst_payload')
+    (query.startsWith('select') ||
+      query.startsWith('with pgrst_source') ||
+      query.startsWith('with pgrst_payload')) &&
+    hasIndexRecommendations(reportData[selectedRow!]?.index_advisor_result, true)
 
   const onSortChange = (column: string) => {
     let updatedSort = undefined
@@ -140,7 +165,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
-          rows={queryPerformanceQuery?.data ?? []}
+          rows={reportData}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             return [
@@ -161,8 +186,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                       setSelectedRow(idx)
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
 
-                      const selectedQuery = queryPerformanceQuery.data[idx]['query']
-                      if (!(selectedQuery ?? '').trim().toLowerCase().startsWith('select')) {
+                      const rowQuery = reportData[idx]?.query ?? ''
+                      if (!rowQuery.trim().toLowerCase().startsWith('select')) {
                         setView('details')
                       }
                     }
@@ -225,7 +250,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               >
                 <QueryDetail
                   reportType={reportType}
-                  selectedRow={queryPerformanceQuery.data?.[selectedRow]}
+                  selectedRow={reportData[selectedRow]}
                   onClickViewSuggestion={() => setView('suggestion')}
                 />
               </TabsContent_Shadcn_>
@@ -233,7 +258,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 value="suggestion"
                 className="mt-0 flex-grow min-h-0 overflow-y-auto"
               >
-                <QueryIndexes selectedRow={queryPerformanceQuery.data?.[selectedRow]} />
+                <QueryIndexes selectedRow={reportData[selectedRow]} />
               </TabsContent_Shadcn_>
             </Tabs_Shadcn_>
           </ResizablePanel>

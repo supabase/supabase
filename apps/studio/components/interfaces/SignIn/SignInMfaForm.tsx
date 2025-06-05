@@ -147,6 +147,9 @@ const SignInMfaForm = () => {
             </li>
           )}
           <li>
+            <Link href="/logout">Force sign out and clear cookies</Link>
+          </li>
+          <li>
             <Link
               target="_blank"
               rel="noreferrer"

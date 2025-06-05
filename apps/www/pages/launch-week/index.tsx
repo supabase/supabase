@@ -1,6 +1,5 @@
 import { NextSeo } from 'next-seo'
 import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
-import { LwView } from '~/components/LaunchWeek/14/LwView'
 import { useRouter } from 'next/router'
 import { Lw14ConfDataProvider } from '~/components/LaunchWeek/14/hooks/use-conf-data'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -52,7 +51,6 @@ const Lw14Page = () => {
             <LWHeader />
             <MainStage className="relative z-10" />
             <BuildStage />
-            <LwView />
           </div>
         </DefaultLayout>
       </Lw14ConfDataProvider>

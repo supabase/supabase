@@ -1,22 +1,24 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, Move, Trash2, X } from 'lucide-react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { Button } from 'ui'
+import { downloadFile } from './StorageExplorer.utils'
 
 const FileExplorerHeaderSelection = () => {
+  const { ref: projectRef, bucketId } = useParams()
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-  const storageExplorerStore = useStorageStore()
+
   const {
     selectedItems,
-    downloadFile,
     downloadSelectedFiles,
     clearSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemsToMove,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
 
   return (
     <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow [[data-theme*=dark]_&]:bg-brand-500">
@@ -35,7 +37,7 @@ const FileExplorerHeaderSelection = () => {
           type="primary"
           onClick={async () => {
             if (selectedItems.length === 1) {
-              await downloadFile(selectedItems[0])
+              await downloadFile({ projectRef, bucketId, file: selectedItems[0] })
             } else {
               await downloadSelectedFiles(selectedItems)
             }

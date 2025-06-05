@@ -87,7 +87,7 @@ export const getTableColumnsSql = ({ table, schema }: { table?: string; schema?:
 
 export type TableColumnsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   table?: string
   schema?: string
 }

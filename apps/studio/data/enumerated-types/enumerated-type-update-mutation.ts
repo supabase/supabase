@@ -8,7 +8,7 @@ import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
-  connectionString: string
+  connectionString?: string | null
   schema: string
   name: { original: string; updated: string }
   description?: string
