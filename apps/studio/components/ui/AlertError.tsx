@@ -1,13 +1,7 @@
-import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
+import { ContactSupportButton } from './ContactSupportButton'
 
 export interface AlertErrorProps {
   projectRef?: string
@@ -27,13 +21,6 @@ const AlertError = ({
   showIcon = true,
   children,
 }: PropsWithChildren<AlertErrorProps>) => {
-  const subjectString = subject?.replace(/ /g, '%20')
-  let href = `/support/new?category=dashboard_bug`
-
-  if (projectRef) href += `&ref=${projectRef}`
-  if (subjectString) href += `&subject=${subjectString}`
-  if (error) href += `&error=${error.message}`
-
   const formattedErrorMessage = error?.message?.includes('503')
     ? '503 Service Temporarily Unavailable'
     : error?.message
@@ -51,9 +38,15 @@ const AlertError = ({
           </p>
         </div>
         {children}
-        <Button asChild type="warning" className="w-min">
-          <Link href={href}>Contact support</Link>
-        </Button>
+        <ContactSupportButton
+          category="DASHBOARD_BUG"
+          subject={subject ?? ''}
+          message={error?.message ?? ''}
+          projectRef={projectRef}
+          errorContext={{
+            error: error?.message,
+          }}
+        />
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )
