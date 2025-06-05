@@ -176,7 +176,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                       What is Supabase
                     </h2>
                     <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
-                      Supabase is an open source Firebase alternative, built by developers for
+                      Supabase is the Postgres development platform, built by developers for
                       developers. Supabase adds auth, realtime, storage, restful APIs, and edge
                       functions to Postgres without a single line of code. Supabase was born-remote.
                       Having a globally distributed, open source company is our secret weapon to
