@@ -23,6 +23,7 @@ import {
   WarningIcon,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean
@@ -116,13 +117,12 @@ const DiskSizeConfigurationModal = ({
                     You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
                     need more than this, contact us via support for help.
                   </p>
-                  <Button asChild type="default" className="mt-3">
-                    <Link
-                      href={`/support/new?projectRef=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
-                    >
-                      Contact support
-                    </Link>
-                  </Button>
+                  <ContactSupportButton
+                    category="PERFORMANCE_ISSUES"
+                    subject="Increase disk size beyond 200GB"
+                    message="I'm unable to increase the disk size beyond 200GB"
+                    projectRef={projectRef}
+                  />
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             ) : (
