@@ -5,18 +5,15 @@ description: 'Use Supabase as a Platform for your own business and tools.'
 subtitle: 'Use Supabase as a platform for your own business and tools.'
 ---
 
-
 Supabase is a [Platform as a Service](https://en.wikipedia.org/wiki/Platform_as_a_service) that can be managed programmatically. You can use it to offer services to your own users. Supabase is commonly used as a platform for AI Tools, agents, and vibe-coding companies.
 
 This document will guide you on best practices when using Supabase as a PaaS.
 
 ![Platform as a Service](/docs/img/integrations/paas-intro.png)
 
-
 ## Getting started
 
 All features of Supabase can be managed through the [Management API](/docs/reference/api/introduction) or the [MCP Server](/docs/guides/getting-started/mcp).
-
 
 ### Launching projects
 
@@ -27,53 +24,58 @@ You can launch a new project using `POST /projects`. Use a _very_ secure databas
 ```sh
 curl https://api.supabase.com/v1/projects \
   --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
   --header 'Content-Type: application/json' \
   --data '{
         "name": "Todo App",
-        "organization_id": "{ref}",
+        "organization_id": "{slug}",
         "region": "us-east-1",
         "desired_instance_size": "pico",
-        "db_pass": ""
+        "db_pass": "SUPER_SECURE_PASSWORD"
     }'
 ```
 
 - Pico instances are available for Partners. Pico databases scale down when they are not used.
-- You can use your own organization ID if you are managing databases on behalf of the users. If you are launching a database in their account you will need your users to provide you with an API token which has the appropriate [OAuth Scopes](/docs/guides/integrations/build-a-supabase-integration/oauth-scopes).
-
+- You can pass in your Organization's slug if you are owning and managing databases on behalf of your users. If you are launching a database in your user's Supabase account you will need them to approve your OAuth app to provide you with an API token which has the appropriate [OAuth Scopes](/docs/guides/integrations/build-a-supabase-integration/oauth-scopes). Navigate to [Build a Supabase integration](/docs/guides/integrations/build-a-supabase-integration) to learn how to create a Supabase OAuth app.
 
 ## Development workflow
 
-Supabase is a _stateful_ service: we store data. If anything breaks in production, you can't  "roll back" to a point in time because doing so might cause your users to lose any data that their production enviroment received since the last checkpoint.
+Supabase is a _stateful_ service: we store data. If anything breaks in production, you can't "roll back" to a point in time because doing so might cause your users to lose any data that their production enviroment received since the last checkpoint.
 
 Because of this, it's important that you adopt a development workflow on behalf of your users:
 
 ![Change flow](/docs/img/integrations/change-flow.png)
 
-
 ### Creating a `DEV` branch
 
 https://api.supabase.com/api/v1#tag/environments/POST/v1/projects/{ref}/branches
 
-
-After launching a Project, it's important that all changes happen on a branch. Branches can be treated like ephemeral servers: if anything goes wrong you can either revert the changes or destroy the branch and create a new one from production.
+After launching a Project, it's important that all changes happen on a development branch. Branches can be treated like ephemeral servers: if anything goes wrong you can either revert the changes or destroy the branch and create a new one from production.
 
 ```sh
-curl https://api.supabase.com/v1/projects/branches \
+curl https://api.supabase.com/v1/projects/{ref}/branches \
   --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
   --header 'Content-Type: application/json' \
   --data '{
   "branch_name": "DEV",
   "persistent": true,
-  "region": "",
+  "region": "us-east-1",
   "desired_instance_size": "pico",
   "release_channel": "internal",
   "postgres_engine": "15"
 }'
 ```
 
-### Make a change
+### Make database changes
 
 https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/migrations
+
+<Admonition type="note" title="Remember to pass in the ref of the DEV branch!">
+
+The ref of the `DEV` branch should be passed to all of the following requests during development.
+
+</Admonition>
 
 For this example we will create a todos table using the `POST /database/migrations` endpoint.
 
@@ -90,14 +92,21 @@ enable row level security;
 This endpoint will automatically create a migration inside the `supabase_migrations` schema. If the schema migration fails, the changes will be rolled back.
 
 ```sh
-curl https://api.supabase.com/v1/projects/{ref}/database/migrations \
+curl https://api.supabase.com/v1/projects/{branch_ref}/database/migrations \
   --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
   --header 'Content-Type: application/json' \
   --data '{
   "query": "create table public.todos (id serial primary key, task text not null); alter table public.todos enable row level security;",
   "name": "Create a todos table"
 }'
 ```
+
+<Admonition type="note" title="DRAFT PR NOTE (WILL REMOVE)">
+
+We are working on automatically creating a restore point for each migration so it's easier to roll back using PITR on `DEV` branches.
+
+</Admonition>
 
 ### Add seed data
 
@@ -107,66 +116,33 @@ It's important that the data in development branches is NOT production data, esp
 
 </Admonition>
 
-It's common in `DEV` branches to "seed" data. This is basic test data for users. Let's insert the following seed to our new todos table:
+It's common in `DEV` branches to "seed" data. This is basically test data for users. Let's insert the following seed to our new todos table:
 
 ```sql
 insert into todos (task)
 values
-    ('Task 1'),
-    ('Task 2'),
-    ('Task 3');
+  ('Task 1'),
+  ('Task 2'),
+  ('Task 3');
 ```
 
 You can use the `POST /database/query` endpoint to add data:
 
 ```sh
-curl https://api.supabase.com/v1/projects/{ref}/database/query \
+curl https://api.supabase.com/v1/projects/{branch_ref}/database/query \
   --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
   --header 'Content-Type: application/json' \
-  --data @- <<EOF
-  {
-    "query": "insert into todos (task) values ('Task 1'), ('Task 2'), ('Task 3');"
-  }
-  EOF
+  --data-binary @- <<EOF
+{
+  "query": "insert into todos (task) values ('Task 1'), ('Task 2'), ('Task 3');"
+}
+EOF
 ```
 
+### Deploying Edge Functions
 
-### Merge all changes
-
-https://api.supabase.com/api/v1#tag/environments/POST/v1/branches/{branch_id}/merge
-
-Once the changes have been made, you can merge the changes into production
-
-```sh
-curl https://api.supabase.com/v1/branches/merge \
-  --request POST \
-  --header 'Content-Type: application/json' \
-  --data '{
-  "migration_version": ""
-}'
-```
-
-Merging changes will automatically merge:
-
-* Database changes
-* Edge Functions
-
-The following changes are _not_ automatically merged right now and need to be run manually on your production branch:
-
-*
-
-
-## Making changes
-
-
-### Database changes
-
-Database changes are handled through migrations.
-
-
-### Edge Functions changes
-
-You can develop Edge Functions on a branch and then merge them into Production.
+You can create and deploy Edge Functions on a branch and then merge them into Production.
 
 ![Deploy Edge Functions](/docs/img/integrations/change-functions.png)
 
@@ -178,9 +154,32 @@ curl https://api.supabase.com/v1/projects/functions/deploy \
   --form 'metadata={"entrypoint_path":"","import_map_path":"","static_patterns":[""],"verify_jwt":true,"name":""}'
 ```
 
-### Configuration changes
+### Merge all changes
 
-You can manage the configuration of all services using the Management API. This includes Auth configuration like enabling and disabling SSO Pro
+https://api.supabase.com/api/v1#tag/environments/POST/v1/branches/{branch_id}/merge
+
+Once the changes have been made, you can merge the changes into the production project:
+
+```sh
+curl https://api.supabase.com/v1/branches/{branch_ref}/merge \
+  --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "migration_version": ""
+}'
+```
+
+Merging changes will automatically merge:
+
+- Database changes
+- Deployed Edge Functions
+
+Any changes to the branch's configurations are _not_ automatically merged right now and need to be set manually on your production branch.
+
+## Configuration changes
+
+You can manage the configuration of all services using the Management API. This includes Auth configuration like enabling and disabling SSO.
 
 - Auth: https://api.supabase.com/api/v1#tag/auth/PATCH/v1/projects/{ref}/config/auth
 - Data APIs: https://api.supabase.com/api/v1#tag/rest/PATCH/v1/projects/{ref}/postgrest
@@ -207,6 +206,7 @@ You call roll back your database to a timestamp in the past:
 ```sh
 curl https://api.supabase.com/v1/projects/{ref}/database/backups/restore-pitr \
   --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
   --header 'Content-Type: application/json' \
   --data '{
   "recovery_time_target_unix": 1
@@ -215,39 +215,50 @@ curl https://api.supabase.com/v1/projects/{ref}/database/backups/restore-pitr \
 
 When you revert the database, you are undo-ing all database changes since the specified point in time, including:
 
-* Schema changes
-* Any seed data that you inserted
-* Any test users who have signed up (and auth tokens for sign ins)
-* Pointers to files in Supabase Storage.
+- Schema changes
+- Any seed data that you inserted
+- Any test users who have signed up (and auth tokens for sign ins)
+- Pointers to files in Supabase Storage.
 
 It will not affect:
 
-* Configuration changes
-* Any secrets that have been added
+- Configuration changes
+- Any secrets that have been added
 
 ### Reverting Edge Functions
 
 - `TODO`: how to roll back an edge function to a previous version
 
-
 ### Reverting configuration
 
 - `TODO`: how to roll back config
 
+## Security checks for production
+
+https://api.supabase.com/api/v1#tag/projects-advisors/GET/v1/projects/{ref}/advisors/security
+
+Prior to deploying to production we strongly recommend running the security advisor on the project to make sure the latest changes are secure.
+
+```sh
+curl https://api.supabase.com/v1/projects/{ref}/advisors/security \
+  --request GET \
+  --header  'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
+  --header 'Content-Type: application/json'
+```
 
 ## Disaster recovery
 
-- Rollbacks can cause data loss. Only use in in `PROD` when absolutely necessary
-- Only available in prod when a user has explicitly enabled PITR
+- Rollbacks can cause data loss. Only use it in `PROD` when absolutely necessary.
+- Only available in prod when a user has explicitly enabled PITR.
 
 ![Rollback](/docs/img/integrations/rollback.png)
-
 
 Supabase creates continuous backups of production branches. To rollback you can use the [Restore API](https://api.supabase.com/api/v1#tag/database/POST/v1/projects/{ref}/database/backups/restore-pitr):
 
 ```sh
 curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
   --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
   --header 'Content-Type: application/json' \
   --data '{
   "recovery_time_target_unix": 1
@@ -259,6 +270,12 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
 If you’re building Supabase Projects under your Supabase Organization on behalf of your users, they might eventually want to transfer those Projects to their own Organizations.
 
 You can transfer a Project under your Organization to your user's Organization while gaining permission to continue interacting with the Project by following these steps:
+
+<Admonition type="note" title="DRAFT PR NOTE (WILL REMOVE)">
+
+We are in the process of consolidating the API requests below into a single endpoint.
+
+</Admonition>
 
 1. **Generate a project transfer token** to begin the transfer process. You must be an `Owner` of the Project in order to initiate the transfer.
 
