@@ -19,6 +19,7 @@ import { Admonition } from 'ui-patterns'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -109,13 +110,11 @@ const Subscription = () => {
                           title={`Unable to update plan from ${planName}`}
                           actions={[
                             <div key="contact-support">
-                              <Button asChild type="default">
-                                <Link
-                                  href={`/support/new?category=sales&subject=Change%20plan%20away%20from%20${planName}`}
-                                >
-                                  Contact support
-                                </Link>
-                              </Button>
+                              <ContactSupportButton
+                                category="SALES_ENQUIRY"
+                                subject={`Change plan away from ${planName}`}
+                                message="I'd like to change my plan"
+                              />
                             </div>,
                           ]}
                         >
