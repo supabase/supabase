@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Check, ExternalLink, Github, GitBranch, Loader2, DollarSign } from 'lucide-react'
+import { Check, DollarSign, Github, Loader2 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -16,41 +17,38 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useAppStateSnapshot } from 'state/app-state'
+import { BASE_PATH } from 'lib/constants'
 import { sidePanelsState } from 'state/side-panels'
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
-  Label_Shadcn_ as Label,
   Form_Shadcn_,
   Input_Shadcn_,
-  DialogSection,
-  DialogSectionSeparator,
+  Label_Shadcn_ as Label,
   cn,
-  Badge,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import Image from 'next/image'
-import { BASE_PATH } from 'lib/constants'
 
 interface CreateBranchModalProps {
   visible: boolean
   onClose: () => void
 }
 
-const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
+export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const snap = useAppStateSnapshot()
   const gitlessBranching = useFlag('gitlessBranching')
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
@@ -306,5 +304,3 @@ const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
     </Dialog>
   )
 }
-
-export default CreateBranchModal

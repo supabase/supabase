@@ -1,12 +1,12 @@
-import React from 'react'
-import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { Badge, Button, cn } from 'ui'
-import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
-import { Github } from 'lucide-react' // Import Github icon
+import { Github } from 'lucide-react'
 import Image from 'next/image'
+
+import Panel from 'components/ui/Panel'
+import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { BASE_PATH } from 'lib/constants'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
+import { Badge, Button, cn } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const AccountConnections = () => {
   const {
@@ -16,8 +16,6 @@ const AccountConnections = () => {
     isError,
     error,
   } = useGitHubAuthorizationQuery()
-
-  console.log('gitHubAuthorization', gitHubAuthorization)
 
   const isConnected = gitHubAuthorization !== null
 

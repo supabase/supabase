@@ -40,8 +40,8 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
+import { EditBranchModal } from './EditBranchModal'
 import WorkflowLogs from './WorkflowLogs'
-import EditBranchModal from './EditBranchModal'
 
 interface BranchManagementSectionProps {
   header: string

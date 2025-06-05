@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { last } from 'lodash'
+import { Check, DollarSign, ExternalLink, FileText, GitBranch, Github, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
-import Link from 'next/link'
 
+import { useParams } from 'common'
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -20,32 +20,31 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { DollarSign, ExternalLink, FileText, GitBranch, Github, Loader2, Check } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { sidePanelsState } from 'state/side-panels'
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  Label_Shadcn_ as Label,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  DialogSection,
-  DialogSectionSeparator,
-  Form_Shadcn_,
-  Badge,
+  Label_Shadcn_ as Label,
 } from 'ui'
-import BranchingPITRNotice from './BranchingPITRNotice'
-import BranchingPlanNotice from './BranchingPlanNotice'
-import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { BranchingPITRNotice } from './BranchingPITRNotice'
+import { BranchingPlanNotice } from './BranchingPlanNotice'
+import { BranchingPostgresVersionNotice } from './BranchingPostgresVersionNotice'
 
 const EnableBranchingModal = () => {
   const { ref } = useParams()

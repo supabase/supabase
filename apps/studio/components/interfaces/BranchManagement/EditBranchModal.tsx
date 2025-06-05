@@ -1,20 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
-import { Check, ExternalLink, Github, GithubIcon, Loader2 } from 'lucide-react'
+import { Check, Github, Loader2 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation' // Import update mutation
-import { Branch, useBranchesQuery } from 'data/branches/branches-query' // Import Branch type
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH } from 'lib/constants'
 import { sidePanelsState } from 'state/side-panels'
 import {
   Button,
@@ -22,29 +24,27 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
-  Label_Shadcn_ as Label,
   Form_Shadcn_,
   Input_Shadcn_,
-  DialogSection,
-  DialogSectionSeparator,
+  Label_Shadcn_ as Label,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import Image from 'next/image'
-import { BASE_PATH } from 'lib/constants'
 
 interface EditBranchModalProps {
-  branch?: Branch // Accept the branch to edit
+  branch?: Branch
   visible: boolean
   onClose: () => void
 }
 
-const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
+export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -71,7 +71,6 @@ const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => 
       onError: () => {},
     })
 
-  // Use update mutation
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess: (data) => {
       toast.success(`Successfully updated branch "${data.name}"`)
@@ -140,7 +139,6 @@ const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => 
     if (!projectRef) return console.error('Project ref is required')
     if (!branch?.id) return console.error('Branch ID is required')
 
-    // Type conforms to BranchUpdateVariables (string | undefined for gitBranch)
     const payload: {
       projectRef: string
       id: string
@@ -150,14 +148,13 @@ const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => 
       projectRef,
       id: branch.id,
       branchName: data.branchName,
-      // gitBranch is initially undefined
     }
 
     // Only add gitBranch to the payload if it is present and valid
+    // If gitBranchName is empty or invalid, gitBranch remains undefined in the payload
     if (data.gitBranchName && isGitBranchValid) {
       payload.gitBranch = data.gitBranchName
     }
-    // If gitBranchName is empty or invalid, gitBranch remains undefined in the payload
 
     updateBranch(payload)
   }
@@ -271,29 +268,23 @@ const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => 
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
-              {isSuccessConnections && (
-                <>
-                  {!githubConnection && (
-                    <div className="flex items-center gap-2 justify-between">
-                      <div>
-                        <Label>GitHub Repository</Label>
-                        <p className="text-sm text-foreground-light">
-                          Optionally connect to a GitHub repository to manage migrations
-                          automatically for this branch.
-                        </p>
-                      </div>
-                      <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
-                        Connect to GitHub
-                      </Button>
-                    </div>
-                  )}
-                </>
+              {isSuccessConnections && !githubConnection && (
+                <div className="flex items-center gap-2 justify-between">
+                  <div>
+                    <Label>GitHub Repository</Label>
+                    <p className="text-sm text-foreground-light">
+                      Optionally connect to a GitHub repository to manage migrations automatically
+                      for this branch.
+                    </p>
+                  </div>
+                  <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
+                    Connect to GitHub
+                  </Button>
+                </div>
               )}
             </DialogSection>
 
             <DialogFooter padding="medium">
-              {' '}
-              {/* Remove billing notice */}
               <Button disabled={isUpdating} type="default" onClick={onClose}>
                 Cancel
               </Button>
@@ -304,7 +295,7 @@ const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => 
                 type="primary"
                 htmlType="submit"
               >
-                Update branch {/* Update button text */}
+                Update branch
               </Button>
             </DialogFooter>
           </form>
@@ -313,5 +304,3 @@ const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => 
     </Dialog>
   )
 }
-
-export default EditBranchModal
