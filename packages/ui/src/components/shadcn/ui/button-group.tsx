@@ -11,6 +11,7 @@ interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 interface ButtonGroupItemProps extends Omit<ButtonProps, 'variant'> {
   children: React.ReactNode
   icon?: React.ReactNode
+  asChild?: boolean
 }
 
 const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonGroupProps>(
@@ -32,12 +33,13 @@ const ButtonGroup = React.forwardRef<HTMLDivElement, ButtonGroupProps>(
 ButtonGroup.displayName = 'ButtonGroup'
 
 const ButtonGroupItem = React.forwardRef<HTMLButtonElement, ButtonGroupItemProps>(
-  ({ className, children, icon, ...props }, ref) => {
+  ({ className, children, icon, asChild, ...props }, ref) => {
     return (
       <Button
         ref={ref}
         type="text"
         icon={icon}
+        asChild={asChild}
         className={cn(
           'h-auto py-2 rounded-none justify-start border-0 border-b border-border last:border-b-0',
           className

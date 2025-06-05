@@ -2,6 +2,7 @@ import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'luc
 import Image from 'next/legacy/image'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
+import Link from 'next/link'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -81,28 +82,24 @@ export const HelpPopover = () => {
                 Supabase Assistant
               </ButtonGroupItem>
             )}
-            <ButtonGroupItem
-              size="tiny"
-              icon={<Wrench strokeWidth={1.5} size={14} />}
-              onClick={() =>
-                window.open('https://supabase.com/docs/guides/platform/troubleshooting', '_blank')
-              }
-            >
-              Troubleshooting
+            <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
+              <Link
+                href="https://supabase.com/docs/guides/platform/troubleshooting"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Troubleshooting
+              </Link>
             </ButtonGroupItem>
-            <ButtonGroupItem
-              size="tiny"
-              icon={<BookOpen strokeWidth={1.5} size={14} />}
-              onClick={() => window.open('https://supabase.com/docs/', '_blank')}
-            >
-              Docs
+            <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
+              <Link href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
+                Docs
+              </Link>
             </ButtonGroupItem>
-            <ButtonGroupItem
-              size="tiny"
-              icon={<Activity strokeWidth={1.5} size={14} />}
-              onClick={() => window.open('https://status.supabase.com/', '_blank')}
-            >
-              Supabase Status
+            <ButtonGroupItem size="tiny" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
+              <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                Supabase Status
+              </Link>
             </ButtonGroupItem>
             <ButtonGroupItem
               size="tiny"
