@@ -149,6 +149,15 @@ export const SupportFormV2 = ({
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (res, variables) => {
+      Sentry.addBreadcrumb({
+        category: 'support-request-sent',
+        message: 'Support request sent',
+        data: {
+          result: res.result,
+          ...variables,
+        },
+        level: 'info',
+      })
       toast.success('Support request sent. Thank you!')
       setSentCategory(variables.category)
       sendEvent({
