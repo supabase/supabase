@@ -24,19 +24,34 @@ export async function classifyFeedback(prompt: string) {
     Only output a JSON object in this format: { "feedback_category": "support|feedback|unknown" }
 
     Examples:
-    Feedback: "My log is shutdown.  2. for a week now, the scanner has not been able to send trade alert signals successfully to my telegram. 3. countless numbers of troubleshooting have been done but no result."
+    Feedback: "Whenever I try to invite a team member, the invite email doesn't get sent."
     Response: { "feedback_category": "support" }
 
     Feedback:  "I have reached the storage limit for my project and my plan. I cannot understand how I can expand the storage space in my project."
     Response: { "feedback_category": "support" }
 
     Feedback: "Please delete the project x in my account"
-    Response: { "feedback_category": "unknown" }
+    Response: { "feedback_category": "support" }
 
     Feedback: "My billing page is broken"
     Response: { "feedback_category": "support" }
 
+    Feedback: "I accidentally deleted my database—can it be recovered?"
+    Response: { "feedback_category": "support" }
+
+    Feedback: "My login tokens are expiring too quickly, even though I didn't change any settings."
+    Response: { "feedback_category": "support" }
+
     Feedback: "Can you add more integrations?"
+    Response: { "feedback_category": "feedback" }
+
+    Feedback: "I'm getting charged for a project I thought I deleted. Can you help me stop billing?"
+    Response: { "feedback_category": "support" }
+
+    Feedback: "Could you support OAuth login for more providers like Apple or LinkedIn?"
+    Response: { "feedback_category": "feedback" }
+
+    Feedback: "It's unclear in the docs how to set up row-level security with multiple roles."
     Response: { "feedback_category": "feedback" }
 
     Feedback: "I am trying to pause my Pro project"
