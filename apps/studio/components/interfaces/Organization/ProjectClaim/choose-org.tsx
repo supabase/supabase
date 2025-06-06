@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { parseAsString, useQueryState } from 'nuqs'
 import { Organization } from 'types'
 import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
 import { ProjectClaimLayout } from './layout'
@@ -22,7 +23,10 @@ export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) 
     isError: isErrorOrgs,
   } = useOrganizationsQuery()
 
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useQueryState(
+    'org',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
+  )
   const [showAll, setShowAll] = useState(false)
 
   const filteredOrgs = useMemo(() => {
@@ -43,7 +47,7 @@ export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) 
 
   return (
     <ProjectClaimLayout title="Choose a Supabase Organisation" description="Step 1 of 3">
-      <div className="w-full max-w-md mx-auto gap-y-4 py-6 flex flex-col">
+      <div className="mx-auto gap-y-4 py-6 flex flex-col">
         <p className="text-sm text-foreground-light">
           The chosen organization will be used to claim the project.
         </p>

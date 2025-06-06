@@ -8,11 +8,9 @@ export const ProjectClaimLayout = ({
   children,
   title,
   description,
-  footer,
 }: PropsWithChildren<{
   title: React.ReactNode
   description?: string
-  footer?: React.ReactNode
 }>) => {
   return (
     <>
@@ -31,9 +29,8 @@ export const ProjectClaimLayout = ({
       </div>
       <Separator />
       <div className="overflow-y-auto max-h-[calc(100vh-70px)] flex justify-center">
-        <div className="w-full max-w-md">{children}</div>
+        <div className="w-full max-w-lg">{children}</div>
       </div>
-      {footer && <div className="flex justify-center">{footer}</div>}
     </>
   )
 }

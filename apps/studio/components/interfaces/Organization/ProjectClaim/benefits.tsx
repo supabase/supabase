@@ -29,7 +29,7 @@ export const ProjectClaimBenefits = ({
       }
       description="Step 2 of 3"
     >
-      <div className="w-full space-y-8 text-sm flex flex-col items-center">
+      <div className="space-y-8 text-sm flex flex-col items-center">
         <div className="flex flex-col items-center mt-6">
           <div className="flex items-center">
             <div
@@ -78,14 +78,25 @@ export const ProjectClaimBenefits = ({
           </p>
         </div>
         <div className="space-y-4">
-          <h3 className="">Why connect {requester.name} to Supabase?</h3>
+          <h3 className="">Why manage your backend on Supabase?</h3>
           <ul className="space-y-3">
             <li className="flex space-x-2">
               <CheckCircle2 className="text-brand w-5 h-5" />
               <span>
-                <span className="text-foreground-light">Technical Support</span>
+                <span className="text-foreground-light">Excellent Technical Support</span>
                 <span className="block text-foreground-lighter">
-                  We're ready to answer your questions.
+                  Get expert help when you need it, with support ready to assist your development
+                  process.
+                </span>
+              </span>
+            </li>
+            <li className="flex space-x-2">
+              <CheckCircle2 className="text-brand w-5 h-5" />
+              <span>
+                <span className="text-foreground-light">Unrestricted usage.</span>
+                <span className="block text-foreground-lighter">
+                  Grow your application without hitting arbitrary usage caps—built to scale with
+                  you.
                 </span>
               </span>
             </li>
@@ -105,6 +116,20 @@ export const ProjectClaimBenefits = ({
                 <span className="block text-foreground-lighter">Handle larger database loads</span>
               </span>
             </li>
+            ✅ Open Source Use and contribute to a fully open-source platform with the flexibility
+            to self-host for greater control and transparency. ✅ PostgreSQL Foundation Build on top
+            of a battle-tested relational database with rich querying capabilities and full SQL
+            support. ✅ Real-time Updates Get instant data synchronization across clients using
+            PostgreSQL's replication features—ideal for collaborative and live apps. ✅
+            Authentication Built-in Manage users securely with built-in authentication, including
+            social logins, passwordless, and row-level security. ✅ Auto-generated APIs Skip
+            boilerplate. Supabase creates REST and GraphQL APIs for your database automatically. ✅
+            Scalable Storage Store and serve images, videos, and other assets with a simple,
+            integrated object storage system. ✅ Easy Compute Scaling Upgrade compute resources to
+            handle increased traffic and larger database operations smoothly. ✅ Unrestricted Usage
+            Grow your application without hitting arbitrary usage caps—built to scale with you.
+            ✅Technical Support Get expert help when you need it, with support ready to assist your
+            development process.
           </ul>
         </div>
         <div className="flex justify-center sticky bottom-0">

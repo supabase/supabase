@@ -164,7 +164,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       if (searchParams.returnTo && searchParams.auth_id) {
         router.push(
           `${searchParams.returnTo}?auth_id=${searchParams.auth_id}${
-            searchParams.token && `&token=${searchParams.token}`
+            searchParams.token && `&token=${searchParams.token}&org=${org.name}`
           }`,
           undefined,
           {
