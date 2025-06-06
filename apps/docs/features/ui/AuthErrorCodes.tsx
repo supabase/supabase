@@ -1,11 +1,7 @@
 import Link from 'next/link'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import _errorCodes from '~/content/errorCodes/authErrorCodes.toml'
-
-interface ErrorCodeDefinition {
-  description: string
-  references: Array<{ href: string; description: string }>
-}
+import { type ErrorCodeDefinition } from '~/resources/error/errorTypes'
 
 const errorCodes: Record<string, ErrorCodeDefinition> = _errorCodes
 

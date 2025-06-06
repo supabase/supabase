@@ -9,10 +9,15 @@ import { Button } from 'ui'
 interface AIAssistantOptionProps {
   projectRef: string
   organizationSlug: string
+  isCondensed?: boolean
 }
 
-export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
-  const [isVisible, setIsVisible] = useState(false)
+export const AIAssistantOption = ({
+  projectRef,
+  organizationSlug,
+  isCondensed = false,
+}: AIAssistantOptionProps) => {
+  const [isVisible, setIsVisible] = useState(isCondensed ? true : false)
   const { data: projects } = useProjectsQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -55,15 +60,8 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
           exit={{ height: 0, opacity: 0 }}
           className="w-full overflow-hidden border rounded-md relative"
         >
-          <div className="flex flex-col xl:flex-row py-8 px-10">
-            <Button
-              type="text"
-              size="tiny"
-              className="absolute top-3 right-3 hover:bg-background-surface-300 z-[2] px-1"
-              icon={<X size={14} strokeWidth={2} />}
-              onClick={() => setIsVisible(false)}
-            />
-            <div className="flex flex-col gap-3 z-[2] flex-shrink-0">
+          <div className={`flex flex-col xl:flex-row ${isCondensed ? 'py-4 px-5' : 'py-8 px-10'}`}>
+            <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
               <div>
                 <p className="text-sm text-foreground">Try the AI Assistant</p>
                 <p className="text-sm text-foreground-lighter">
@@ -78,29 +76,31 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                 </Link>
               </div>
             </div>
-            <div className="absolute z-[1] scale-75 -right-24 top-0">
-              <div className="relative grow flex flex-col gap-3 w-[400px]">
-                <div className="flex items-start gap-3 pl-12">
-                  <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
-                    <MessageSquare size={16} className="text-foreground-lighter" />
+            {!isCondensed && (
+              <div className="absolute z-[1] scale-75 -right-24 top-0">
+                <div className="relative grow flex flex-col gap-3 w-[400px]">
+                  <div className="flex items-start gap-3 pl-12">
+                    <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
+                      <MessageSquare size={16} className="text-foreground-lighter" />
+                    </div>
+                    <div className="flex-1 bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
+                      <p className="text-sm text-foreground-lighter">
+                        Hi! I'm your AI assistant. How can I help you today?
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
-                    <p className="text-sm text-foreground-lighter">
-                      Hi! I'm your AI assistant. How can I help you today?
-                    </p>
+                  <div className="flex items-start justify-end gap-3 pr-10">
+                    <div className="bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
+                      <p className="text-sm text-foreground-lighter">
+                        I can help you with database queries, API endpoints, or any other technical
+                        questions you might have.
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-start justify-end gap-3 pr-10">
-                  <div className="bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
-                    <p className="text-sm text-foreground-lighter">
-                      I can help you with database queries, API endpoints, or any other technical
-                      questions you might have.
-                    </p>
-                  </div>
-                </div>
+                <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[95%] to-background-200 to-[100%] z-[1]" />
               </div>
-              <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[95%] to-background-200 to-[100%] z-[1]" />
-            </div>
+            )}
           </div>
         </motion.div>
       )}

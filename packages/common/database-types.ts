@@ -10,6 +10,7 @@ export type Database = {
           deleted_at: string | null
           http_status_code: number | null
           message: string | null
+          metadata: Json | null
           service: string
           updated_at: string | null
         }
@@ -19,6 +20,7 @@ export type Database = {
           deleted_at?: string | null
           http_status_code?: number | null
           message?: string | null
+          metadata?: Json | null
           service: string
           updated_at?: string | null
         }
@@ -28,6 +30,7 @@ export type Database = {
           deleted_at?: string | null
           http_status_code?: number | null
           message?: string | null
+          metadata?: Json | null
           service?: string
           updated_at?: string | null
         }
@@ -74,7 +77,7 @@ export type Database = {
         Args: {
           skip_codes: Json
         }
-        Returns: undefined
+        Returns: number
       }
       update_error_code: {
         Args: {
@@ -82,6 +85,7 @@ export type Database = {
           service: string
           http_status_code?: number
           message?: string
+          metadata?: Json
         }
         Returns: boolean
       }
