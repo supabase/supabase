@@ -1959,7 +1959,7 @@ This feature is essential for organizations aiming to maintain high security sta
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/security-and-performance-advisor.png',
     heroImageLight: '/images/features/security-and-performance-advisor-light.png',
-    docsUrl: 'https://supabase.com/blog/security-and-performance-advisor',
+    docsUrl: 'https://supabase.com/blog/security-performance-advisor',
     slug: 'security-and-performance-advisor',
     status: {
       stage: PRODUCT_STAGES.BETA,

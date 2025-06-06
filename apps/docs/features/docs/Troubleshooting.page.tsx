@@ -58,7 +58,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.errors?.length > 0 && (
+              {entry.data.errors?.length && entry.data.errors.length > 0 && (
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Related error codes</h3>
                   <div className="flex flex-wrap gap-0.5">
@@ -76,9 +76,9 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.keywords?.length > 0 && (
+              {entry.data.keywords?.length && entry.data.keywords.length > 0 && (
                 <>
-                  <h3 className="text-sm text-foreground-lighter mb-3">Tags</h3>
+                  <h3 className="text-sm text-foreground-lighter mb-3">Keywords</h3>
                   <div className="flex flex-wrap gap-0.5">
                     {entry.data.keywords.map((keyword) => (
                       <Link
