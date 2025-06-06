@@ -30,8 +30,6 @@ const ClaimProjectPage: NextPageWithLayout = () => {
     return (organizations || []).find((org) => org.slug === selectedOrgSlug)
   }, [selectedOrgSlug, organizations])
 
-  // console.log(claimToken, selectedOrgSlug, !!claimToken && !!selectedOrgSlug)
-
   const {
     data: projectClaim,
     error: errorProjectClaim,

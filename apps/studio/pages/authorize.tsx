@@ -1,11 +1,3 @@
-import { useParams } from 'common'
-
-import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { withAuth } from 'hooks/misc/withAuth'
-
-// Need to handle if no organizations in account
-// Need to handle if not logged in yet state
-
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -13,13 +5,17 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
+import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { withAuth } from 'hooks/misc/withAuth'
+import { NextPageWithLayout } from 'types'
 import {
   Alert,
   Alert_Shadcn_,
@@ -28,7 +24,6 @@ import {
   Button,
   Listbox,
 } from 'ui'
-import { NextPageWithLayout } from 'types'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
