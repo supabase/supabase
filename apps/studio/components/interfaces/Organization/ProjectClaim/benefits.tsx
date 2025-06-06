@@ -22,7 +22,6 @@ export const ProjectClaimBenefits = ({
           <span className="text-brand">{requester?.name}</span>
         </>
       }
-      description="Step 2 of 3"
     >
       <div className="space-y-8 text-sm flex flex-col items-center">
         <div className="space-y-4 mt-6">

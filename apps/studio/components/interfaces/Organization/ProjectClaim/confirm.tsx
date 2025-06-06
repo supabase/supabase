@@ -52,7 +52,6 @@ export const ProjectClaimConfirm = ({
           <span className="text-brand">{requester?.name}</span>
         </>
       }
-      description="Step 3 of 3"
     >
       <div className="py-6 space-y-8 text-sm">
         <div className="flex flex-col items-center mt-6">

@@ -10,7 +10,7 @@ const MAX_ORGS_TO_SHOW = 5
 
 export function ProjectClaimChooseOrg({ onChoose }: ProjectClaimChooseOrgProps) {
   return (
-    <ProjectClaimLayout title="Choose a Supabase Organization" description="Step 1 of 3">
+    <ProjectClaimLayout title="Claim a project">
       <div className="mx-auto gap-y-4 py-6 flex flex-col">
         <p className="text-sm text-foreground-light">
           This is the first step in claiming your Supabase project. Once you're finished, the
