@@ -28,7 +28,7 @@ export async function createBucket({
 
   const payload: Partial<CreateStorageBucketBody> = { id, public: isPublic }
   if (file_size_limit) payload.file_size_limit = file_size_limit
-  if (allowed_mime_types) payload.allowed_mime_types
+  if (allowed_mime_types) payload.allowed_mime_types = allowed_mime_types
 
   const { data, error } = await post('/platform/storage/{ref}/buckets', {
     params: { path: { ref: projectRef } },

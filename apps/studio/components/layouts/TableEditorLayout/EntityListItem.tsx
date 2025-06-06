@@ -17,6 +17,7 @@ import {
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
@@ -25,6 +26,7 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { formatSql } from 'lib/formatSql'
 import { copyToClipboard } from 'lib/helpers'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
@@ -44,8 +46,6 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { useTableDefinitionQuery } from 'data/database/table-definition-query'
-import { formatSql } from 'lib/formatSql'
 
 export interface EntityListItemProps {
   id: number | string
@@ -69,15 +69,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
-
-  const { data: tableDefinition, isLoading: isTableDefinitionLoading } = useTableDefinitionQuery(
-    {
-      id: entity.id,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: isTableLikeEntityListItem(entity) }
-  )
 
   // For tabs preview flag logic
   const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
@@ -307,17 +298,26 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 <DropdownMenuItem
                   key="copy-schema"
                   className="space-x-2"
-                  disabled={isTableDefinitionLoading || !tableDefinition}
                   onClick={async (e) => {
                     e.stopPropagation()
-                    if (!tableDefinition) return
+                    const toastId = toast.loading('Getting table schema...')
+
+                    const tableDefinition = await getTableDefinition({
+                      id: entity.id,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                    })
+                    if (!tableDefinition) {
+                      return toast.error('Failed to get table schema', { id: toastId })
+                    }
+
                     try {
                       const formatted = formatSql(tableDefinition)
                       await copyToClipboard(formatted)
-                      toast.success('Table schema copied to clipboard', { id: 'copy-schema' })
+                      toast.success('Table schema copied to clipboard', { id: toastId })
                     } catch (err: any) {
                       toast.error('Failed to copy schema: ' + (err.message || err), {
-                        id: 'copy-schema',
+                        id: toastId,
                       })
                     }
                   }}

@@ -45,18 +45,15 @@ jobs:
             git config --global user.email 'github-docs-bot@supabase.com'
             BRANCH_NAME="bot/docs-lint-fixes"
             EXISTING_BRANCH=$(git ls-remote --heads origin $BRANCH_NAME)
-            if [ -n "$EXISTING_BRANCH" ]; then
-              git checkout $BRANCH_NAME
-            else
-              git checkout -b $BRANCH_NAME
+            if [[ -n "$EXISTING_BRANCH" ]]; then
+                git push origin --delete $BRANCH_NAME
             fi
+            git checkout -b $BRANCH_NAME
             supa-mdx-lint apps/docs/content --fix || FIX_FAILED=1
             git add .
             git commit -m '[bot] fix lint errors' || true
             git push origin $BRANCH_NAME
-            if [ -z "$EXISTING_BRANCH" ]; then
-              gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
-            fi
+            gh pr create --title '[bot] fix lint errors' --body 'This PR fixes lint errors in the documentation.' --head $BRANCH_NAME
             if [ "${FIX_FAILED:-0}" -eq 1 ]; then
               echo "Fix did not correct all errors."
               exit 1

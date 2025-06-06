@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import {
   generateAiPromptMetadata,
@@ -12,7 +13,12 @@ export default async function AiPromptsPage(props: { params: Promise<{ slug: str
 
   const { slug } = params
 
-  let { heading, content } = await getAiPrompt(slug)
+  const prompt = await getAiPrompt(slug)
+  if (!prompt) {
+    notFound()
+  }
+
+  let { heading, content } = prompt
   content = `
 ## How to use
 
