@@ -47,7 +47,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
 
     return res.status(500).json({
-      error: 'There was an unkgenerwtor classcron syntgxhe feedback. Please try again.',
+      error: 'There was an unknown error classifying the feedback. Please try again.',
     })
   }
 }
