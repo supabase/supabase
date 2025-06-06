@@ -1,13 +1,23 @@
 import { DiffEditor } from '@monaco-editor/react'
+import { Wind } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'
+import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 interface DatabaseDiffPanelProps {
   diffContent?: string
   isLoading: boolean
   error?: any
+  showRefreshButton?: boolean
+  onRefresh?: () => void
 }
 
-const DatabaseDiffPanel = ({ diffContent, isLoading, error }: DatabaseDiffPanelProps) => {
+const DatabaseDiffPanel = ({
+  diffContent,
+  isLoading,
+  error,
+  showRefreshButton = false,
+  onRefresh,
+}: DatabaseDiffPanelProps) => {
   // Monaco editor options for diff display
   const defaultOptions: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
     readOnly: true,
@@ -56,25 +66,35 @@ const DatabaseDiffPanel = ({ diffContent, isLoading, error }: DatabaseDiffPanelP
     )
   }
 
+  // Handle empty diff content
   if (!diffContent || diffContent.trim() === '') {
     return (
       <div className="p-6 text-center">
-        <p>No changes detected between branches</p>
+        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <h3 className="mb-1">No changes detected between branches</h3>
+        <p className="text-sm text-foreground-light">
+          Any changes to your database schema will be shown here for review
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="h-96 border rounded-lg overflow-hidden">
-      <DiffEditor
-        theme="supabase"
-        language="sql"
-        height="100%"
-        original=""
-        modified={diffContent}
-        options={defaultOptions}
-      />
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Changes</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0 h-96">
+        <DiffEditor
+          theme="supabase"
+          language="sql"
+          height="100%"
+          original=""
+          modified={diffContent}
+          options={defaultOptions}
+        />
+      </CardContent>
+    </Card>
   )
 }
 

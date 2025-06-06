@@ -30,7 +30,14 @@ export async function getBranchDiff({
       handleError(response.error)
     }
 
-    return response.data as string
+    const diffData = response.data as string
+
+    // Handle empty object responses (when no diff exists)
+    if (typeof diffData === 'object' && Object.keys(diffData).length === 0) {
+      return ''
+    }
+
+    return diffData || ''
   } catch (error) {
     handleError(error)
     throw error
