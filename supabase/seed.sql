@@ -15,4 +15,11 @@ values
     (select id from content.service where name = 'AUTH'),
     500,
     'This is a test error message'
+  ),
+  ('test_code2', (select id from content.service where name = 'AUTH'), 429, 'Too many requests'),
+  (
+    'test_code3',
+    (select id from content.service where name = 'REALTIME'),
+    500,
+    'A realtime error message'
   );

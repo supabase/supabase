@@ -32,7 +32,8 @@ async function resolveSearch(
       info
     )
   ).match(
-    (data) => GraphQLCollectionBuilder.create({ items: data }),
+    // Building a collection from an array is infallible
+    async (data) => (await GraphQLCollectionBuilder.create({ items: data })).unwrap(),
     (error) => {
       console.error(`Error resolving ${GRAPHQL_FIELD_SEARCH_GLOBAL}:`, error)
       return new GraphQLError(error.isPrivate() ? 'Internal Server Error' : error.message)

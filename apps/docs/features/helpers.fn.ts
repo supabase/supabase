@@ -137,4 +137,24 @@ export class Result<Ok, Error> {
     if (this.isOk()) return onOk(this.internal.data!)
     return onError(this.internal.error!)
   }
+
+  unwrap(): Ok {
+    if (!this.isOk()) {
+      throw new Error(`Unwrap called on Err: ${this.internal.error}`, {
+        cause: this.internal.error,
+      })
+    }
+    return this.internal.data!
+  }
+
+  join<OtherOk, OtherError>(
+    other: Result<OtherOk, OtherError>
+  ): Result<[Ok, OtherOk], [Error, OtherError]> {
+    if (!this.isOk() || !other.isOk())
+      return Result.error([this.internal.error, other.internal.error]) as Result<
+        [Ok, OtherOk],
+        [Error, OtherError]
+      >
+    return Result.ok([this.internal.data!, other.internal.data!])
+  }
 }

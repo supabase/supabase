@@ -8,6 +8,7 @@ import {
 import { SERVICES } from './errorModel'
 
 export const GRAPHQL_FIELD_ERROR_GLOBAL = 'error' as const
+export const GRAPHQL_FIELD_ERRORS_GLOBAL = 'errors' as const
 
 export const GraphQLEnumTypeService = new GraphQLEnumType({
   name: 'Service',
