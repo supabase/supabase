@@ -6,7 +6,7 @@ import Layout from '~/components/Layouts/Default'
 import content from '~/data/solutions/neon'
 
 const ProductHeader = dynamic(() => import('~/components/Sections/ProductHeader2'))
-const SingleQuote = dynamic(() => import('~/components/Enterprise/SingleQuote'))
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 const FeaturesSection = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('~/components/Solutions/PlatformSection'))
 const DXSection = dynamic(() => import('~/components/Solutions/DeveloperExperienceSection'))

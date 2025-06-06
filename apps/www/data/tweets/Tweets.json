@@ -108,12 +108,6 @@
     "img_url": "/images/twitter-profiles/nc2Ms5hH_400x400.jpg"
   },
   {
-    "text": "I'm trying @supabase, Firebase alternative that uses PostgreSQL (and you can use GraphQL too) in the cloud. It's incredible 😍",
-    "url": "https://twitter.com/JP__Gallegos/status/1365699468109242374",
-    "handle": "JP__Gallegos",
-    "img_url": "/images/twitter-profiles/1PH2mt6v_400x400.jpg"
-  },
-  {
     "text": "Check out this amazing product @supabase. A must give try #newidea #opportunity",
     "url": "https://twitter.com/digitaldaswani/status/1364447219642814464",
     "handle": "digitaldaswani",
@@ -160,12 +154,6 @@
     "url": "https://twitter.com/Elsolo244/status/1360257201911320579",
     "handle": "Elsolo244",
     "img_url": "/images/twitter-profiles/v6citnk33y2wpeyzrq05_400x400.jpeg"
-  },
-  {
-    "text": "Honestly Supabase is such a killer Firebase alternative.",
-    "url": "https://twitter.com/XPCheese/status/1360229397735895043",
-    "handle": "XPCheese",
-    "img_url": "/images/twitter-profiles/eYP6YXr7_400x400.jpg"
   },
   {
     "text": "I think you'll love @supabase :-) Open-source, PostgreSQL-based & zero magic.",
@@ -238,11 +226,5 @@
     "url": "https://twitter.com/jasonbarone/status/1356765411832922115?s=20",
     "handle": "jasonbarone",
     "img_url": "/images/twitter-profiles/6zCnwpvi_400x400.jpg"
-  },
-  {
-    "text": "I just learned about @supabase and im in love 😍 Supabase is an open source Firebase alternative! EarListen (& react) to database changes 💁 Manage users & permissions 🔧 Simple UI for database interaction",
-    "url": "https://twitter.com/0xBanana/status/1373677301905362948",
-    "handle": "0xBanana",
-    "img_url": "/images/twitter-profiles/pgHIGqZ0_400x400.jpg"
   }
 ]

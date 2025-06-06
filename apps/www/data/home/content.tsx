@@ -16,7 +16,7 @@ export default {
     ),
     subheading: (
       <>
-        Supabase is an open source Firebase alternative. <br className="hidden md:block" />
+        Supabase is the Postgres development platform. <br className="hidden md:block" />
         Start your project with a Postgres database, Authentication, instant APIs, Edge Functions,
         Realtime subscriptions, Storage, and Vector embeddings.
       </>

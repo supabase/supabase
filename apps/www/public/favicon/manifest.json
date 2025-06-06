@@ -1,7 +1,7 @@
 {
   "name": "Supabase",
   "short_name": "Supabase",
-  "description": "The open source Firebase alternative.",
+  "description": "The Postgres development platform.",
   "display": "standalone",
   "theme_color": "#1C1C1C",
   "background_color": "#1C1C1C",

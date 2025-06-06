@@ -1,6 +1,6 @@
 {
   "name": "supabase",
-  "description": "The open source Firebase alternative.",
+  "description": "The Postgres Development Platform.",
   "version": "0.0.0",
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
