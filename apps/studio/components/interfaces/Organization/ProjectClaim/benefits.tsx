@@ -72,7 +72,7 @@ export const ProjectClaimBenefits = ({
                 <CheckCircle2 className="text-brand w-5 h-5" />
               </div>
               <span>
-                <span className="text-foreground-light">Easy Compute Scaling</span>
+                <span className="text-foreground-light">Easy Compute Scaling.</span>
                 <span className="block text-foreground-lighter">
                   Upgrade compute resources to handle increased traffic and larger database
                   operations smoothly.
