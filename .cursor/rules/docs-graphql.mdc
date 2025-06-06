@@ -211,7 +211,7 @@ export const rootGraphQLSchema = new GraphQLSchema({
 ### 6. Update TypeScript Types
 Run the GraphQL codegen to update TypeScript types:
 ```bash
-pnpm run generate:types
+pnpm run -F docs codegen:graphql
 ```
 
 ## Best Practices
