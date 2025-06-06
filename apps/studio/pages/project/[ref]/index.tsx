@@ -102,7 +102,7 @@ const Home: NextPageWithLayout = () => {
 
       console.log(
         'Use the auth_id and token in this URL',
-        `${BASE_PATH}/claim-project?auth_id=AUTH_ID&token=TOKEN`
+        `http://localhost:8082${BASE_PATH}/claim-project?auth_id=AUTH_ID&token=TOKEN`
       )
 
       toast.success('URL pasted in console')
