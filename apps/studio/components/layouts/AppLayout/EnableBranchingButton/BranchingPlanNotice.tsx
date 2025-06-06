@@ -5,7 +5,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-const BranchingPlanNotice = () => {
+export const BranchingPlanNotice = () => {
   const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
 
@@ -32,5 +32,3 @@ const BranchingPlanNotice = () => {
     </Alert_Shadcn_>
   )
 }
-
-export default BranchingPlanNotice

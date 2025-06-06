@@ -1,12 +1,12 @@
-import React from 'react'
-import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { Badge, Button, cn } from 'ui'
-import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
-import { Github } from 'lucide-react' // Import Github icon
+import { Github } from 'lucide-react'
 import Image from 'next/image'
+
+import Panel from 'components/ui/Panel'
+import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { BASE_PATH } from 'lib/constants'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
+import { Badge, Button, cn } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const AccountConnections = () => {
   const {
@@ -16,8 +16,6 @@ const AccountConnections = () => {
     isError,
     error,
   } = useGitHubAuthorizationQuery()
-
-  console.log('gitHubAuthorization', gitHubAuthorization)
 
   const isConnected = gitHubAuthorization !== null
 
@@ -52,20 +50,17 @@ const AccountConnections = () => {
       {isSuccess && (
         <Panel.Content className="flex justify-between items-center">
           <div className="flex gap-x-4 items-center">
-            <div className="w-[30px] h-[30px] bg-alternative rounded flex items-center justify-center border">
-              <Github size={18} strokeWidth={1.5} />
-              <Image
-                className={cn('dark:invert')}
-                src={`${BASE_PATH}/img/icons/github-icon.svg`}
-                width={30}
-                height={30}
-                alt={`GitHub icon`}
-              />
-            </div>
+            <Image
+              className={cn('dark:invert')}
+              src={`${BASE_PATH}/img/icons/github-icon.svg`}
+              width={30}
+              height={30}
+              alt={`GitHub icon`}
+            />
             <div>
               <p className="text-sm">GitHub</p>
               <p className="text-sm text-foreground-lighter">
-                Sync GitHub repos to Supabase projects
+                Sync GitHub repos to Supabase projects for automatic branch creation and merging
               </p>
             </div>
           </div>

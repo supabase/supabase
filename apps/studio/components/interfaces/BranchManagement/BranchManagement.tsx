@@ -19,19 +19,19 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
-import CreateBranchModal from './CreateBranchModal'
+import { CreateBranchModal } from './CreateBranchModal'
 import {
   BranchingEmptyState,
   PreviewBranchesEmptyState,
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
-import { useFlag } from 'hooks/ui/useFlag'
 
 type Tab = 'overview' | 'prs' | 'branches'
 
@@ -40,6 +40,7 @@ const BranchManagement = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const hasBranchEnabled = project?.is_branch_enabled
 
@@ -62,7 +63,6 @@ const BranchManagement = () => {
   const canDisableBranching = useCheckPermissions(PermissionAction.DELETE, 'preview_branches', {
     resource: { is_default: true },
   })
-  const gitlessBranching = useFlag('gitlessBranching')
 
   const {
     data: connections,

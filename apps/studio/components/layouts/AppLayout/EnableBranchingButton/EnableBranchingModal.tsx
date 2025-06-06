@@ -1,13 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
 import { last } from 'lodash'
+import { Check, DollarSign, ExternalLink, FileText, GitBranch, Github, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
-import Link from 'next/link'
 
+import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -20,35 +21,35 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { DollarSign, ExternalLink, FileText, GitBranch, Github, Loader2, Check } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { sidePanelsState } from 'state/side-panels'
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  Label_Shadcn_ as Label,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  DialogSection,
-  DialogSectionSeparator,
-  Form_Shadcn_,
-  Badge,
+  Label_Shadcn_ as Label,
 } from 'ui'
-import BranchingPITRNotice from './BranchingPITRNotice'
-import BranchingPlanNotice from './BranchingPlanNotice'
-import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { BranchingPITRNotice } from './BranchingPITRNotice'
+import { BranchingPlanNotice } from './BranchingPlanNotice'
+import { BranchingPostgresVersionNotice } from './BranchingPostgresVersionNotice'
 
 const EnableBranchingModal = () => {
   const { ref } = useParams()
+  const router = useRouter()
   const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
   const project = useSelectedProject()
@@ -89,7 +90,7 @@ const EnableBranchingModal = () => {
     onSuccess: () => {
       toast.success(`Successfully enabled branching`)
       snap.setShowEnableBranchingModal(false)
-      // [TODO] Add navigation to branches page: router.push(`/project/${ref}/branches`)
+      router.push(`/project/${ref}/branches`)
     },
     onError: (error) => {
       toast.error(`Failed to enable branching: ${error.message}`)
@@ -99,7 +100,13 @@ const EnableBranchingModal = () => {
   const formId = 'enable-branching-form'
   const FormSchema = z
     .object({
-      productionBranchName: z.string().min(1, 'Production branch name cannot be empty'),
+      productionBranchName: z
+        .string()
+        .min(1, 'Production branch name cannot be empty')
+        .refine(
+          (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
+          'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
+        ),
       branchName: z.string().optional(),
     })
     .superRefine(async (val, ctx) => {
@@ -179,7 +186,7 @@ const EnableBranchingModal = () => {
         open={snap.showEnableBranchingModal}
         onOpenChange={(open) => !open && snap.setShowEnableBranchingModal(false)}
       >
-        <DialogContent size="large">
+        <DialogContent size="large" hideClose>
           <Form_Shadcn_ {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <DialogHeader padding="small">
