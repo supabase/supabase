@@ -22,7 +22,7 @@ export const SERVICES = {
 } as const
 
 type Service = keyof typeof SERVICES
-type ErrorCollectionFetch = CollectionFetch<ErrorModel, never>['fetch']
+type ErrorCollectionFetch = CollectionFetch<ErrorModel, { service?: Service }>['fetch']
 
 export class ErrorModel {
   public id: string
@@ -95,14 +95,16 @@ export class ErrorModel {
   ): ReturnType<ErrorCollectionFetch> {
     const PAGE_SIZE = 20
     const limit = args?.first ?? args?.last ?? PAGE_SIZE
+    const service = args?.additionalArgs?.service as Service | undefined
 
     const [countResult, errorCodesResult] = await Promise.all([
-      fetchTotalErrorCount(),
+      fetchTotalErrorCount(service),
       fetchErrorDescriptions({
         after: args?.after ?? undefined,
         before: args?.before ?? undefined,
         reverse: !!args?.last,
         limit: limit + 1,
+        service,
       }),
     ])
 
@@ -125,12 +127,18 @@ export class ErrorModel {
   }
 }
 
-async function fetchTotalErrorCount(): Promise<Result<number, PostgrestError>> {
-  const { count, error } = await supabase()
+async function fetchTotalErrorCount(service?: Service): Promise<Result<number, PostgrestError>> {
+  const query = supabase()
     .schema('content')
     .from('error')
-    .select('id', { count: 'exact', head: true })
+    .select('id, service!inner(name)', { count: 'exact', head: true })
     .is('deleted_at', null)
+
+  if (service) {
+    query.eq('service.name', service)
+  }
+
+  const { count, error } = await query
   if (error) {
     return Result.error(error)
   }
@@ -150,19 +158,24 @@ async function fetchErrorDescriptions({
   before,
   reverse,
   limit,
+  service,
 }: {
   after?: string
   before?: string
   reverse: boolean
   limit: number
+  service?: Service
 }): Promise<Result<ErrorDescription[], PostgrestError>> {
   const query = supabase()
     .schema('content')
     .from('error')
-    .select('id, code, service(name), httpStatusCode: http_status_code, message')
+    .select('id, code, service!inner(name), httpStatusCode: http_status_code, message')
     .is('deleted_at', null)
     .order('id', { ascending: reverse ? false : true })
 
+  if (service) {
+    query.eq('service.name', service)
+  }
   if (after != undefined) {
     query.gt('id', after)
   }

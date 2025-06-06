@@ -237,4 +237,116 @@ describe('/api/graphql errors collection', () => {
       lastJson.data.errors.edges[0].node.code
     )
   })
+
+  it('filters by service when service argument is provided', async () => {
+    // First, get all errors to check we have errors from different services
+    const allErrorsQuery = `
+      query {
+        errors {
+          nodes {
+            service
+          }
+        }
+      }
+    `
+    const allRequest = new Request('http://localhost/api/graphql', {
+      method: 'POST',
+      body: JSON.stringify({ query: allErrorsQuery }),
+    })
+    const allResult = await POST(allRequest)
+    const allJson = await allResult.json()
+    expect(allJson.errors).toBeUndefined()
+
+    // Verify we have errors from multiple services
+    const services = new Set(allJson.data.errors.nodes.map((e: any) => e.service))
+    expect(services.size).toBeGreaterThan(1)
+
+    // Test filtering by AUTH service
+    const authErrorsQuery = `
+      query {
+        errors(service: AUTH) {
+          totalCount
+          nodes {
+            code
+            service
+          }
+        }
+      }
+    `
+    const authRequest = new Request('http://localhost/api/graphql', {
+      method: 'POST',
+      body: JSON.stringify({ query: authErrorsQuery }),
+    })
+
+    const authResult = await POST(authRequest)
+    const authJson = await authResult.json()
+    expect(authJson.errors).toBeUndefined()
+
+    // Verify all returned errors are from AUTH service
+    expect(authJson.data.errors.nodes.length).toBeGreaterThan(0)
+    expect(authJson.data.errors.nodes.every((e: any) => e.service === 'AUTH')).toBe(true)
+  })
+
+  it('supports service filtering with pagination', async () => {
+    const firstPageQuery = `
+      query {
+        errors(service: AUTH, first: 1) {
+          edges {
+            cursor
+            node {
+              code
+              service
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    `
+    const firstRequest = new Request('http://localhost/api/graphql', {
+      method: 'POST',
+      body: JSON.stringify({ query: firstPageQuery }),
+    })
+
+    const firstResult = await POST(firstRequest)
+    const firstJson = await firstResult.json()
+    expect(firstJson.errors).toBeUndefined()
+
+    // Verify the returned error is from AUTH service
+    expect(firstJson.data.errors.edges[0].node.service).toBe('AUTH')
+
+    // If there are more AUTH errors, test pagination
+    if (firstJson.data.errors.pageInfo.hasNextPage) {
+      const cursor = firstJson.data.errors.pageInfo.endCursor
+      const secondPageQuery = `
+        query {
+          errors(service: AUTH, first: 1, after: "${cursor}") {
+            edges {
+              node {
+                code
+                service
+              }
+            }
+          }
+        }
+      `
+      const secondRequest = new Request('http://localhost/api/graphql', {
+        method: 'POST',
+        body: JSON.stringify({ query: secondPageQuery }),
+      })
+
+      const secondResult = await POST(secondRequest)
+      const secondJson = await secondResult.json()
+      expect(secondJson.errors).toBeUndefined()
+
+      // Verify the second page also returns AUTH errors
+      expect(secondJson.data.errors.edges[0].node.service).toBe('AUTH')
+      // And it's a different error
+      expect(secondJson.data.errors.edges[0].node.code).not.toBe(
+        firstJson.data.errors.edges[0].node.code
+      )
+    }
+  })
 })

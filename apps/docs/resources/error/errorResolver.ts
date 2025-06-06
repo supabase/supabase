@@ -3,6 +3,7 @@ import type {
   ErrorCollection,
   RootQueryTypeErrorArgs,
   RootQueryTypeErrorsArgs,
+  Service,
 } from '~/__generated__/graphql'
 import { ApiError, convertUnknownToApiError } from '~/app/api/utils'
 import { Result } from '~/features/helpers.fn'
@@ -46,11 +47,18 @@ async function resolveErrors(
   return (
     await Result.tryCatchFlat(
       async (...args) => {
-        const fetch: CollectionFetch<ErrorModel, never, ApiError>['fetch'] = async (fetchArgs) => {
-          const result = await ErrorModel.loadErrors(fetchArgs ?? {})
+        const fetch: CollectionFetch<ErrorModel, { service?: Service }, ApiError>['fetch'] = async (
+          fetchArgs
+        ) => {
+          const result = await ErrorModel.loadErrors({
+            ...fetchArgs,
+            additionalArgs: {
+              service: args[0].service ?? undefined,
+            },
+          })
           return result.mapError((error) => new ApiError('Failed to resolve error codes', error))
         }
-        return await GraphQLCollectionBuilder.create<ErrorModel, never, ApiError>({
+        return await GraphQLCollectionBuilder.create<ErrorModel, { service?: Service }, ApiError>({
           fetch,
           args: args[0],
           getCursor: (item) => item.id,
@@ -89,7 +97,13 @@ export const errorRoot = {
 export const errorsRoot = {
   [GRAPHQL_FIELD_ERRORS_GLOBAL]: {
     description: 'Get error codes that can potentially be returned by Supabase services',
-    args: paginationArgs,
+    args: {
+      ...paginationArgs,
+      service: {
+        type: GraphQLEnumTypeService,
+        description: 'Filter errors by a specific Supabase service',
+      },
+    },
     type: createCollectionType(GraphQLObjectTypeError),
     resolve: resolveErrors,
   },
