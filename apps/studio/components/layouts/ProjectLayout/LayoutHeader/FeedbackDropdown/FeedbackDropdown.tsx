@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
+import { Lightbulb, TriangleAlert } from 'lucide-react'
+import Link from 'next/link'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 import FeedbackWidget from './FeedbackWidget'
-import { Lightbulb, MessageCircleQuestion, TriangleAlert } from 'lucide-react'
-import Link from 'next/link'
 
 const FeedbackDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -36,7 +36,7 @@ const FeedbackDropdown = () => {
       <PopoverContent_Shadcn_
         side="bottom"
         align="end"
-        className="px-0 flex flex-col pt-1 pb-3 gap-3 w-96"
+        className="px-0 flex flex-col pt-1 pb-3 w-96"
         id="feedback-widget"
       >
         {stage === 'select' && (
