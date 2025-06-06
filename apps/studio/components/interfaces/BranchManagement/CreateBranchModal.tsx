@@ -95,7 +95,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
         .string()
         .min(1, 'Branch name cannot be empty')
         .refine(
-          (val) => /^[a-zA-Z0-9\-\_]+$/.test(val),
+          (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
           'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
         )
         .refine(
@@ -170,7 +170,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent size="large">
+      <DialogContent size="large" hideClose>
         <DialogHeader padding="small">
           <DialogTitle>Create a new preview branch</DialogTitle>
         </DialogHeader>

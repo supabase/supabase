@@ -91,7 +91,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
         .string()
         .min(1, 'Branch name cannot be empty')
         .refine(
-          (val) => /^[a-zA-Z0-9\\-\\_]+$/.test(val),
+          (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
           'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
         )
         .refine(
@@ -188,7 +188,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent size="large">
+      <DialogContent size="large" hideClose>
         <DialogHeader padding="small">
           <DialogTitle>Edit branch "{branch?.name}"</DialogTitle> {/* Update title */}
         </DialogHeader>

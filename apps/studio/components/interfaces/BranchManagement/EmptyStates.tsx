@@ -71,8 +71,7 @@ export const PullRequestsEmptyState = ({
         <div>
           <h3 className="mb-1">Connect to GitHub for seamless branching</h3>
           <p className="text-sm text-foreground-light mb-4">
-            Connect your GitHub repository to create preview branches that automatically track pull
-            requests.
+            Sync GitHub repos to Supabase projects for automatic branch creation and merging
           </p>
         </div>
         <Button
