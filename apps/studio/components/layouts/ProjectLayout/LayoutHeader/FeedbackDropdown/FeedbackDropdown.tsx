@@ -1,9 +1,9 @@
-import { useState } from 'react'
-
 import { Lightbulb, TriangleAlert } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
+
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
-import FeedbackWidget from './FeedbackWidget'
+import { FeedbackWidget } from './FeedbackWidget'
 
 const FeedbackDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)

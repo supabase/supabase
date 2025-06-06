@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { useDebounce } from 'use-debounce'
 
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
@@ -21,10 +21,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  PopoverSeparator_Shadcn_,
   TextArea_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { useDebounce } from 'use-debounce'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface FeedbackWidgetProps {
@@ -35,7 +35,7 @@ interface FeedbackWidgetProps {
   setScreenshot: (value: string | undefined) => void
 }
 
-const FeedbackWidget = ({
+export const FeedbackWidget = ({
   feedback,
   screenshot,
   onClose,
@@ -223,7 +223,7 @@ const FeedbackWidget = ({
         </AnimatePresence>
       </div>
 
-      <PopoverSeparator />
+      <PopoverSeparator_Shadcn_ />
 
       <div className="px-5 flex flex-row justify-between items-start mt-4">
         <div>
@@ -329,8 +329,6 @@ const FeedbackWidget = ({
   )
 }
 
-export default FeedbackWidget
-
 const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
   return (
     <div className="px-0 pt-3 pb-0">
@@ -343,7 +341,7 @@ const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
             instead.
           </p>
         </div>
-        <PopoverSeparator />
+        <PopoverSeparator_Shadcn_ />
         <div className="flex items-center justify-between px-4">
           <p className="text-xs text-foreground-light">
             <Link href="/support/new">
