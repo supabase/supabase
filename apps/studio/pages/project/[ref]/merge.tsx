@@ -29,7 +29,8 @@ import {
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { CheckCircle2, CircleDotDashed, Link } from 'lucide-react'
+import { CheckCircle2, CircleDotDashed } from 'lucide-react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
