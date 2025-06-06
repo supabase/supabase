@@ -78,9 +78,7 @@ const CustomTooltip = ({
     const isDiskSpaceChart = payload?.some((p: any) =>
       p.dataKey.toLowerCase().includes('disk_space_')
     )
-    const isDBSizeChart = payload?.some((p: any) =>
-      p.dataKey.toLowerCase().includes('pg_database_size')
-    )
+    const isDBSizeChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
     const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
 

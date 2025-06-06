@@ -46,7 +46,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       syncId: 'database-reports',
       valuePrecision: 2,
       YAxisProps: {
-        width: 60,
+        width: 75,
         tickFormatter: (value: any) => formatBytes(value, 2),
       },
       attributes: [
@@ -217,8 +217,8 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       ],
     },
     {
-      id: 'db-size',
-      label: 'Database Size',
+      id: 'disk-size',
+      label: 'Disk Size',
       syncId: 'database-reports',
       valuePrecision: 2,
       hide: false,
@@ -232,18 +232,27 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
       attributes: [
         {
-          attribute: 'pg_database_size',
+          attribute: 'disk_fs_used',
           provider: 'infra-monitoring',
+          format: 'bytes',
           label: 'Database',
           tooltip: 'Total space on disk used by your database (tables, indexes, data, ...).',
         },
         {
-          attribute: 'max_pg_database_size',
-          provider: 'reference-line',
-          label: 'Disk size',
-          value: (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
-          tooltip: 'Disk Size refers to the total space your project occupies on disk',
+          attribute: 'disk_fs_used_wal',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'WAL',
+          tooltip:
+            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.',
+        },
+        {
+          attribute: 'disk_fs_size',
+          provider: 'infra-monitoring',
           isMaxValue: true,
+          format: 'bytes',
+          label: 'Disk Size',
+          tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
         !isFreePlan &&
           (isSpendCapEnabled
@@ -289,20 +298,20 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showTotal: false,
       attributes: [
         {
-          attribute: 'network_transmit_bytes',
-          provider: 'infra-monitoring',
-          label: 'Transmit',
-          tooltip:
-            'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
-          stackId: '2',
-        },
-        {
           attribute: 'network_receive_bytes',
           provider: 'infra-monitoring',
-          label: 'Receive',
+          label: 'Ingress',
           tooltip:
             'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
           stackId: '1',
+        },
+        {
+          attribute: 'network_transmit_bytes',
+          provider: 'infra-monitoring',
+          label: 'Egress',
+          tooltip:
+            'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
+          stackId: '2',
         },
       ],
     },
@@ -322,12 +331,37 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#limits-and-constraints',
       attributes: [
         {
-          attribute: 'pg_stat_database_num_backends',
+          attribute: 'client_connections_postgres',
           provider: 'infra-monitoring',
-          label: 'Active connections',
+          label: 'Postgres',
         },
         {
-          attribute: 'pg_database_max_connections',
+          attribute: 'client_connections_authenticator',
+          provider: 'infra-monitoring',
+          label: 'Authenticator',
+        },
+        {
+          attribute: 'client_connections_supabase_auth_admin',
+          provider: 'infra-monitoring',
+          label: 'Auth Admin',
+        },
+        {
+          attribute: 'client_connections_supabase_storage_admin',
+          provider: 'infra-monitoring',
+          label: 'Storage Admin',
+        },
+        {
+          attribute: 'client_connections_supabase_admin',
+          provider: 'infra-monitoring',
+          label: 'Admin',
+        },
+        {
+          attribute: 'client_connections_other',
+          provider: 'infra-monitoring',
+          label: 'Other',
+        },
+        {
+          attribute: 'max_db_connections',
           provider: 'reference-line',
           label: 'Max connections',
           value: getConnectionLimits(computeSize).direct,
