@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
@@ -39,7 +40,7 @@ const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
-  const { enableBranching } = useParams()
+  const { ref, enableBranching } = useParams()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -70,9 +71,10 @@ const Home: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  const tablesCount = tablesData?.length ?? 0
-  const functionsCount = functionsData?.length ?? 0
-  const replicasCount = (replicasData?.length ?? 1) - 1
+  const tablesCount = Math.max(0, tablesData?.length ?? 0)
+  const functionsCount = Math.max(0, functionsData?.length ?? 0)
+  // [Joshen] JFYI minus 1 as the replicas endpoint returns the primary DB minimally
+  const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
   return (
     <div className="w-full">
@@ -108,44 +110,53 @@ const Home: NextPageWithLayout = () => {
             <div className="flex items-center">
               {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && (
                 <div className="flex items-center gap-x-6">
-                  <div>
-                    <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
+                  <div className="flex flex-col gap-y-1">
+                    <Link
+                      href={`/project/${ref}/editor`}
+                      className="transition text-foreground-light hover:text-foreground text-sm"
+                    >
                       Tables
-                    </div>
-                    <span className="text-2xl tabular-nums">
+                    </Link>
+                    <p className="text-2xl tabular-nums">
                       {isLoadingTables ? (
                         <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                       ) : (
                         tablesCount
                       )}
-                    </span>
+                    </p>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
+                  <div className="flex flex-col gap-y-1">
+                    <Link
+                      href={`/project/${ref}/functions`}
+                      className="transition text-foreground-light hover:text-foreground text-sm"
+                    >
                       Functions
-                    </div>
-                    <span className="text-2xl tabular-nums">
+                    </Link>
+                    <p className="text-2xl tabular-nums">
                       {isLoadingFunctions ? (
                         <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                       ) : (
                         functionsCount
                       )}
-                    </span>
+                    </p>
                   </div>
 
                   {IS_PLATFORM && (
-                    <div>
-                      <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
+                    <div className="flex flex-col gap-y-1">
+                      <Link
+                        href={`/project/${ref}/settings/infrastructure`}
+                        className="transition text-foreground-light hover:text-foreground text-sm"
+                      >
                         Replicas
-                      </div>
-                      <span className="text-2xl tabular-nums">
+                      </Link>
+                      <p className="text-2xl tabular-nums">
                         {isLoadingReplicas ? (
                           <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                         ) : (
                           replicasCount
                         )}
-                      </span>
+                      </p>
                     </div>
                   )}
                 </div>
