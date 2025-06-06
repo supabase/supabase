@@ -76,6 +76,7 @@ const ClaimProjectPage: NextPageWithLayout = () => {
             {errorRequester != undefined && (
               <p className="mt-2">Error: {errorRequester?.message}</p>
             )}
+            <p>Please go back to the requesting app and try again.</p>
           </Alert>
         </div>
       </ProjectClaimLayout>

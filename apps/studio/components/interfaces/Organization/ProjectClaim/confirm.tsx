@@ -1,5 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { CheckCircle2, ChevronRight } from 'lucide-react'
+import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
@@ -7,6 +8,7 @@ import { useParams } from 'common'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
+import { BASE_PATH } from 'lib/constants'
 import { Organization } from 'types'
 import {
   Button,
@@ -52,15 +54,40 @@ export const ProjectClaimConfirm = ({
       }
       description="Step 3 of 3"
     >
-      <div className="px-8 py-6 space-y-8 text-sm">
-        <div>
-          <h2 className="text-center text-base text-foreground-light">
-            Supabase will become the backend for{' '}
-            <span className="text-foreground">{projectClaim?.project?.name}</span>.
-          </h2>
-          <p className="text-center text-foreground-lighter">
-            Your backend will then be managed by Supabase.
-          </p>
+      <div className="py-6 space-y-8 text-sm">
+        <div className="flex flex-col items-center mt-6">
+          <div className="flex items-center">
+            <div
+              className={cn(
+                'w-8 h-8 bg-center bg-no-repeat bg-cover flex items-center justify-center rounded-md'
+              )}
+              style={{
+                backgroundImage: !!requester.icon ? `url('${requester.icon}')` : 'none',
+              }}
+            >
+              {!requester.icon && (
+                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-center w-28 relative">
+              <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
+              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-sm">
+                <ChevronsLeftRight className="text-muted-foreground" size={24} />
+              </div>
+              <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />
+            </div>
+
+            <div className="w-8 h-8">
+              <Image
+                src={`${BASE_PATH}/img/supabase-logo.svg`}
+                alt="Supabase Logo"
+                className="w-full h-full"
+                width={100}
+                height={100}
+              />
+            </div>
+          </div>
         </div>
         <div className="space-y-4 text-foreground-light">
           <p>
@@ -91,7 +118,8 @@ export const ProjectClaimConfirm = ({
               </span>
               <span>
                 <span className="text-foreground">{requester?.name}</span> will receive API access
-                to all projects within your organization to continue providing its functionality.
+                to all projects within your organization to continue providing its functionality to
+                the application you've built.
               </span>
             </li>
             <li className="flex space-x-2">
