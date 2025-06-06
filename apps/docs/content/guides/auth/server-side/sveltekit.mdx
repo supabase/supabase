@@ -464,9 +464,9 @@ export const actions: Actions = {
 
 <StepHikeCompact.Step step={10}>
 
-<StepHikeCompact.Details title="Create the signup confirmation route">
+<StepHikeCompact.Details title="Handle OAuth redirect callbacks">
 
-Finish the signup flow by creating the API route to handle email verification.
+When using OAuth providers, you can handle the redirect callback in your server actions. Here's an example of how to handle errors and redirect to the original URL (`data.url`) after successful authentication:
 
 </StepHikeCompact.Details>
 
@@ -474,168 +474,24 @@ Finish the signup flow by creating the API route to handle email verification.
 
 <$CodeTabs>
 
-```ts name=src/routes/auth/confirm/+server.ts
-import type { EmailOtpType } from '@supabase/supabase-js'
+```ts name=src/routes/auth/+page.server.ts
 import { redirect } from '@sveltejs/kit'
 
-import type { RequestHandler } from './$types'
+import type { Actions } from './$types'
 
-export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
-  const token_hash = url.searchParams.get('token_hash')
-  const type = url.searchParams.get('type') as EmailOtpType | null
-  const next = url.searchParams.get('next') ?? '/'
+export const actions: Actions = {
+  oauthCallback: async ({ locals: { supabase }, url }) => {
+    const { error, data } = await supabase.auth.getSessionFromUrl({ url: url.toString() })
 
-  /**
-   * Clean up the redirect URL by deleting the Auth flow parameters.
-   *
-   * `next` is preserved for now, because it's needed in the error case.
-   */
-  const redirectTo = new URL(url)
-  redirectTo.pathname = next
-  redirectTo.searchParams.delete('token_hash')
-  redirectTo.searchParams.delete('type')
-
-  if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({ type, token_hash })
-    if (!error) {
-      redirectTo.searchParams.delete('next')
-      redirect(303, redirectTo)
-    }
-  }
-
-  redirectTo.pathname = '/auth/error'
-  redirect(303, redirectTo)
-}
-```
-
-</$CodeTabs>
-
-</StepHikeCompact.Code>
-
-</StepHikeCompact.Step>
-
-<StepHikeCompact.Step step={11}>
-
-<StepHikeCompact.Details title="Create private routes">
-
-Create private routes that can only be accessed by authenticated users. The routes in the `private` directory are protected by the route guard in `hooks.server.ts`.
-
-To ensure that `hooks.server.ts` runs for every nested path, put a `+layout.server.ts` file in the `private` directory. This file can be empty, but must exist to protect routes that don't have their own `+layout|page.server.ts`.
-
-</StepHikeCompact.Details>
-
-<StepHikeCompact.Code>
-
-<$CodeTabs>
-
-```ts name=src/routes/private/+layout.server.ts
-/**
- * This file is necessary to ensure protection of all routes in the `private`
- * directory. It makes the routes in this directory _dynamic_ routes, which
- * send a server request, and thus trigger `hooks.server.ts`.
- **/
-```
-
-```svelte name=src/routes/private/+layout.svelte
-<script>
-  let { data, children } = $props()
-  let { supabase } = $derived(data)
-
-  const logout = async () => {
-    const { error } = await supabase.auth.signOut()
     if (error) {
       console.error(error)
+      throw redirect(303, '/auth/error')
+    } else {
+      // Redirect to the original URL after successful OAuth login
+      throw redirect(303, data.url)
     }
-  }
-</script>
-
-<header>
-  <nav>
-    <a href="/">Home</a>
-  </nav>
-  <button onclick={logout}>Logout</button>
-</header>
-<main>
-  {@render children()}
-</main>
-```
-
-```sql name=SQL
--- Run this SQL against your database to create a `notes` table.
-
-create table notes (
-  id bigint primary key generated always as identity,
-  created_at timestamp with time zone not null default now(),
-  user_id uuid references auth.users on delete cascade not null default auth.uid(),
-  note text not null
-);
-
-alter table notes enable row level security;
-
-revoke all on table notes from authenticated;
-revoke all on table notes from anon;
-
-grant all (note) on table notes to authenticated;
-grant select (id) on table notes to authenticated;
-grant delete on table notes to authenticated;
-
-create policy "Users can access and modify their own notes"
-on notes
-for all
-to authenticated
-using ((select auth.uid()) = user_id);
-```
-
-```svelte name=src/routes/private/+page.server.ts
-import type { PageServerLoad } from './$types'
-
-export const load: PageServerLoad = async ({ depends, locals: { supabase } }) => {
-  depends('supabase:db:notes')
-  const { data: notes } = await supabase.from('notes').select('id,note').order('id')
-  return { notes: notes ?? [] }
+  },
 }
-```
-
-```svelte name=src/routes/private/+page.svelte
-<script lang="ts">
-  import { invalidate } from '$app/navigation'
-  import type { EventHandler } from 'svelte/elements'
-
-  import type { PageData } from './$types'
-
-  let { data } = $props()
-  let { notes, supabase, user } = $derived(data)
-
-  const handleSubmit: EventHandler<SubmitEvent, HTMLFormElement> = async (evt) => {
-    evt.preventDefault()
-    if (!evt.target) return
-
-    const form = evt.target as HTMLFormElement
-
-    const note = (new FormData(form).get('note') ?? '') as string
-    if (!note) return
-
-    const { error } = await supabase.from('notes').insert({ note })
-    if (error) console.error(error)
-
-    invalidate('supabase:db:notes')
-    form.reset()
-  }
-</script>
-
-<h1>Private page for user: {user?.email}</h1>
-<h2>Notes</h2>
-<ul>
-  {#each notes as note}
-    <li>{note.note}</li>
-  {/each}
-</ul>
-<form onsubmit={handleSubmit}>
-  <label>
-    Add a note
-    <input name="note" type="text" />
-  </label>
-</form>
 ```
 
 </$CodeTabs>
