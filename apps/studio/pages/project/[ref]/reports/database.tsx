@@ -33,12 +33,11 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
 import type { NextPageWithLayout } from 'types'
-import { useOrganizationQuery } from '../../../../data/organizations/organization-query'
-import { useSelectedOrganization } from '../../../../hooks/misc/useSelectedOrganization'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -64,6 +63,9 @@ const DatabaseUsage = () => {
   const org = useSelectedOrganization()
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  const isTeamsOrEnterprisePlan =
+    !isOrgPlanLoading && !(orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
+  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(1, 'day').toISOString()
@@ -126,7 +128,7 @@ const DatabaseUsage = () => {
         })
       )
     })
-    if (isReportsV2) {
+    if (showChartsV2) {
       REPORT_ATTRIBUTES_V2.forEach((chart: any) => {
         chart.attributes.forEach((attr: any) => {
           queryClient.invalidateQueries(
@@ -252,7 +254,7 @@ const DatabaseUsage = () => {
             </div>
           </div>
         </div>
-        {isReportsV2 ? (
+        {showChartsV2 ? (
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
               REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
