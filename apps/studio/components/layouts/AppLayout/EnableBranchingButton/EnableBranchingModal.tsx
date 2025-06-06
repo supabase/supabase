@@ -391,7 +391,7 @@ export const EnableBranchingModal = () => {
                   block
                   size="medium"
                   form={formId}
-                  disabled={!isSuccess || isCreating || !canSubmit || isChecking}
+                  disabled={!isSuccess || isCreating || !canSubmit || isChecking || isFreePlan}
                   loading={isCreating}
                   type="primary"
                   htmlType="submit"
