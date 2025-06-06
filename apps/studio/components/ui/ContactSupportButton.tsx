@@ -3,6 +3,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import { MailIcon } from 'lucide-react'
+import { BASE_PATH } from 'lib/constants'
 
 // [Jordi] Map so we dont have to import the enum every time we want to pass it to this component
 const SUPPORT_CATEGORY_VALUES = {
@@ -51,7 +52,7 @@ export const ContactSupportButton = ({
   }
 
   function getSupportUrl() {
-    const url = new URL('/support/new', window.location.origin)
+    const url = new URL(`${BASE_PATH}/support/new`, window.location.origin)
     url.searchParams.set('category', category)
     url.searchParams.set('subject', subject)
     url.searchParams.set('message', message)
