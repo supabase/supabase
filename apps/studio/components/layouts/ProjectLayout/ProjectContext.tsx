@@ -43,19 +43,12 @@ export const ProjectContextProvider = ({
   return (
     <ProjectContext.Provider value={value}>
       <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
-        <TabsStateContextProvider key={`tabs-state-${projectRef}`} projectRef={projectRef}>
-          <AiAssistantStateContextProvider
-            key={`ai-assistant-state-${projectRef}`}
-            projectRef={projectRef}
-          >
-            <StorageExplorerStateContextProvider
-              key={`storage-explorer-state-${projectRef}`}
-              project={selectedProject}
-            >
+        <TabsStateContextProvider key={`tabs-state-${projectRef}`}>
+          <AiAssistantStateContextProvider key={`ai-assistant-state-${projectRef}`}>
+            <StorageExplorerStateContextProvider key={`storage-explorer-state-${projectRef}`}>
               <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
                 <RoleImpersonationStateContextProvider
                   key={`role-impersonation-state-${projectRef}`}
-                  project={selectedProject}
                 >
                   {children}
                 </RoleImpersonationStateContextProvider>
