@@ -284,4 +284,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Turkish / Türkçe](/i18n/README.tr.md)
 - [Ukrainian / Українська](/i18n/README.uk.md)
 - [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
+- [Malayalam / മലയാളം]
+- [Tamil / தமிழ்]
+- [Telugu / తెలుగు]
 - [List of translations](/i18n/languages.md) <!--- Keep only this -->
