@@ -1,15 +1,9 @@
-import { useRouter } from 'next/router'
+import { UnifiedLogsTable } from 'components/interfaces/UnifiedLogs/client'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import UnifiedLogsPreviewer from 'components/interfaces/UnifiedLogs/UnifiedLogsPreviewer'
 
-export const LogPage: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  return <UnifiedLogsPreviewer condensedLayout projectRef={ref as string} />
-}
+export const LogPage: NextPageWithLayout = () => <UnifiedLogsTable />
 
 LogPage.getLayout = (page) => (
   <DefaultLayout>

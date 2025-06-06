@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/interfaces/DataTableDemo/lib/delimiters'
-import { post } from 'data/fetchers'
 import dayjs from 'dayjs'
+
+import { post } from 'data/fetchers'
 import { getLogsChartQuery, getLogsCountQuery, getUnifiedLogsQuery } from './logs.queries'
-import type { BaseChartSchema, FacetMetadataSchema } from './schema'
-import { ColumnSchema } from './schema'
-import type { SearchParamsType } from './search-params'
+import { ARRAY_DELIMITER, SORT_DELIMITER } from './UnifiedLogs.constants'
+import { ColumnSchema, type BaseChartSchema, type FacetMetadataSchema } from './UnifiedLogs.schema'
+import type { SearchParamsType, UnifiedLogsMeta } from './UnifiedLogs.types'
 
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_MODE = false
@@ -21,11 +21,6 @@ export type UnifiedLogSchema = {
   method: string
   api_role: string
   auth_user: string | null
-}
-
-export type UnifiedLogsMeta = {
-  logTypeCounts: Record<string, number>
-  currentPercentiles: Record<string, number>
 }
 
 // Extended column schema to include raw timestamp
@@ -279,15 +274,15 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
   )
 
   // Calculate the appropriate initial cursor based on the selected date range
-  const getInitialCursor = () => {
-    if (search.date && search.date.length === 2) {
-      // Use the end of the selected date range
-      return new Date(search.date[1]).getTime()
-    } else {
-      // Default to current time if no date range is selected
-      return new Date().getTime()
-    }
-  }
+  // const getInitialCursor = () => {
+  //   if (search.date && search.date.length === 2) {
+  //     // Use the end of the selected date range
+  //     return new Date(search.date[1]).getTime()
+  //   } else {
+  //     // Default to current time if no date range is selected
+  //     return new Date().getTime()
+  //   }
+  // }
 
   // Simply return the options object
   return {

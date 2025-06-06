@@ -2,15 +2,10 @@ import type { Percentile } from 'components/interfaces/DataTableDemo/lib/request
 // Removed keepPreviousData import as it causes persistent lint errors
 // import { keepPreviousData } from '@tanstack/react-query'
 import SuperJSON from 'superjson'
-import type { BaseChartSchema, ColumnSchema, FacetMetadataSchema } from './schema'
-import type { SearchParamsType } from './search-params'
+import type { BaseChartSchema, ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 // Removed: import { searchParamsSerializer } from './search-params'
-import {
-  ARRAY_DELIMITER,
-  RANGE_DELIMITER,
-  SLIDER_DELIMITER,
-  SORT_DELIMITER,
-} from 'components/interfaces/DataTableDemo/lib/delimiters'
+import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/interfaces/DataTableDemo/lib/delimiters'
+import { SearchParamsType } from './UnifiedLogs.types'
 
 // Restore the helper function to create query params string
 const createApiQueryString = (params: Record<string, any>): string => {

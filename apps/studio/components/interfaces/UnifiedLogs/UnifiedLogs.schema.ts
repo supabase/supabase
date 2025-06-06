@@ -1,34 +1,9 @@
-import {
-  ARRAY_DELIMITER,
-  RANGE_DELIMITER,
-  SLIDER_DELIMITER,
-} from 'components/interfaces/DataTableDemo/lib/delimiters'
+import { z } from 'zod'
+
+import { LEVELS } from './constants/levels'
 import { METHODS } from './constants/method'
 import { REGIONS } from './constants/region'
-import { z } from 'zod'
-import { LEVELS } from './constants/levels'
-
-// https://github.com/colinhacks/zod/issues/2985#issue-2008642190
-const stringToBoolean = z
-  .string()
-  .toLowerCase()
-  .transform((val) => {
-    try {
-      return JSON.parse(val)
-    } catch (e) {
-      console.log(e)
-      return undefined
-    }
-  })
-  .pipe(z.boolean().optional())
-
-// export const timingSchema = z.object({
-//   'timing.dns': z.number(),
-//   'timing.connection': z.number(),
-//   'timing.tls': z.number(),
-//   'timing.ttfb': z.number(),
-//   'timing.transfer': z.number(),
-// })
+import { ARRAY_DELIMITER, RANGE_DELIMITER } from './UnifiedLogs.constants'
 
 export const LOG_TYPES = [
   'edge',
@@ -50,26 +25,18 @@ export const columnSchema = z.object({
   host: z.string(),
   pathname: z.string(),
   level: z.enum(LEVELS),
-  // latency: z.number(),
   status: z.number(),
-  // regions: z.enum(REGIONS).array(),
   date: z.date(),
-  // headers: z.record(z.string()),
-  // message: z.string().optional(),
   timestamp: z.number(),
   event_message: z.string().optional(),
   log_count: z.number().optional(), // used to count function logs for a given execution_id
-  // percentile: z.number().optional(),
   has_trace: z.boolean().optional(),
   logs: z.array(z.any()).optional(), // array of function logs
   auth_user: z.string().optional(),
 })
-// .merge(timingSchema)
 
 export type ColumnSchema = z.infer<typeof columnSchema>
-// export type TimingSchema = z.infer<typeof timingSchema>
 
-// TODO: can we get rid of this in favor of nuqs search-params?
 export const columnFilterSchema = z.object({
   level: z
     .string()
@@ -83,36 +50,6 @@ export const columnFilterSchema = z.object({
     .optional(),
   host: z.string().optional(),
   pathname: z.string().optional(),
-  // latency: z
-  //   .string()
-  //   .transform((val) => val.split(SLIDER_DELIMITER))
-  //   .pipe(z.coerce.number().array().max(2))
-  //   .optional(),
-  // 'timing.dns': z
-  //   .string()
-  //   .transform((val) => val.split(SLIDER_DELIMITER))
-  //   .pipe(z.coerce.number().array().max(2))
-  //   .optional(),
-  // 'timing.connection': z
-  //   .string()
-  //   .transform((val) => val.split(SLIDER_DELIMITER))
-  //   .pipe(z.coerce.number().array().max(2))
-  //   .optional(),
-  // 'timing.tls': z
-  //   .string()
-  //   .transform((val) => val.split(SLIDER_DELIMITER))
-  //   .pipe(z.coerce.number().array().max(2))
-  //   .optional(),
-  // 'timing.ttfb': z
-  //   .string()
-  //   .transform((val) => val.split(SLIDER_DELIMITER))
-  //   .pipe(z.coerce.number().array().max(2))
-  //   .optional(),
-  // 'timing.transfer': z
-  //   .string()
-  //   .transform((val) => val.split(SLIDER_DELIMITER))
-  //   .pipe(z.coerce.number().array().max(2))
-  //   .optional(),
   status: z
     .string()
     .transform((val) => val.split(ARRAY_DELIMITER))

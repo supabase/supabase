@@ -1,30 +1,42 @@
 import {
   createParser,
-  // createSearchParamsCache, // Removed for Pages Router compatibility
-  createSerializer, // Uncommented for Pages Router compatibility
   parseAsArrayOf,
   parseAsBoolean,
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
   parseAsTimestamp,
-  type inferParserType,
-  useQueryStates, // Added for potential hook usage
 } from 'nuqs'
-// Note: import from 'nuqs/server' comment removed
-import {
-  ARRAY_DELIMITER,
-  RANGE_DELIMITER,
-  SLIDER_DELIMITER,
-  SORT_DELIMITER,
-} from 'components/interfaces/DataTableDemo/lib/delimiters'
-import { REGIONS } from 'components/interfaces/DataTableDemo/constants/region'
-import { METHODS } from 'components/interfaces/DataTableDemo/constants/method'
-import { LEVELS } from 'components/interfaces/DataTableDemo/constants/levels'
 
-// https://logs.run/i?sort=latency.desc
+import { ChartConfig } from 'ui'
+import { TooltipLabel } from './TooltipLabel'
 
-export const parseAsSort = createParser({
+export const CHART_CONFIG = {
+  success: {
+    label: <TooltipLabel level="success" />,
+    color: 'hsl(var(--foreground-muted))',
+  },
+  warning: {
+    label: <TooltipLabel level="warning" />,
+    color: 'hsl(var(--warning-default))',
+  },
+  error: {
+    label: <TooltipLabel level="error" />,
+    color: 'hsl(var(--destructive-default))',
+  },
+} satisfies ChartConfig
+
+export const ARRAY_DELIMITER = ','
+const SLIDER_DELIMITER = '-'
+const SPACE_DELIMITER = '_'
+export const RANGE_DELIMITER = '-'
+export const SORT_DELIMITER = '.'
+
+const LEVELS = ['success', 'warning', 'error'] as const
+const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
+const METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const
+
+const parseAsSort = createParser({
   parse(queryValue) {
     const [id, desc] = queryValue.split(SORT_DELIMITER)
     if (!id && !desc) return null
@@ -35,7 +47,7 @@ export const parseAsSort = createParser({
   },
 })
 
-export const searchParamsParser = {
+export const SEARCH_PARAMS_PARSER = {
   // CUSTOM FILTERS
   level: parseAsArrayOf(parseAsStringLiteral(LEVELS), ARRAY_DELIMITER),
   log_type: parseAsArrayOf(parseAsString, ARRAY_DELIMITER),
@@ -62,14 +74,3 @@ export const searchParamsParser = {
   // REQUIRED FOR SELECTION
   uuid: parseAsString,
 }
-
-// Removed for Pages Router compatibility
-// export const searchParamsCache = createSearchParamsCache(searchParamsParser)
-export const searchParamsSerializer = createSerializer(searchParamsParser) // Uncommented
-
-export type SearchParamsType = inferParserType<typeof searchParamsParser>
-
-// Optional: Add a hook similar to the default demo if needed elsewhere
-// export function useInfiniteSearchParams() {
-//   return useQueryStates(searchParamsParser)
-// }

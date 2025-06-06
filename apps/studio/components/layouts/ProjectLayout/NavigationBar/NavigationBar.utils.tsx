@@ -156,12 +156,6 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/unified-logs`),
     },
     {
-      key: 'unified-log-2',
-      label: 'Unified Logs Open Status',
-      icon: <Logs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs-new`),
-    },
-    {
       key: 'api',
       label: 'API Docs',
       icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,

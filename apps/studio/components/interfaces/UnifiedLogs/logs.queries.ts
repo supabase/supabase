@@ -4,7 +4,7 @@
 
 import dayjs from 'dayjs'
 import { BASE_CONDITIONS_EXCLUDED_PARAMS, EXCLUDED_QUERY_PARAMS } from './constants/query-params'
-import { SearchParamsType } from './search-params'
+import { SearchParamsType } from './UnifiedLogs.types'
 
 // Types for plan IDs - import actual type if available
 type PlanId = 'free' | 'pro' | 'team' | 'enterprise'

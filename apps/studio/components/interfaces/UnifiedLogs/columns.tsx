@@ -1,35 +1,15 @@
-'use client'
+import type { ColumnDef } from '@tanstack/react-table'
+import { Bolt } from 'lucide-react'
 
 import { TextWithTooltip } from 'components/interfaces/DataTableDemo/components/custom/text-with-tooltip'
 import { DataTableColumnHeader } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column-header'
-import { DataTableColumnLatency } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-latency'
 import { DataTableColumnLevelIndicator } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-level-indicator'
-import { DataTableColumnRegion } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-region'
 import { DataTableColumnStatusCode } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-status-code'
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-  TooltipTrigger,
-  Tooltip,
-  TooltipContent,
-} from 'ui'
-import {
-  getTimingColor,
-  getTimingLabel,
-  getTimingPercentage,
-  timingPhases,
-} from 'components/interfaces/DataTableDemo/lib/request/timing'
-import { cn } from 'ui'
-import { HoverCardPortal } from '@radix-ui/react-hover-card'
-import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import { Bolt, Minus, Pyramid, User, Zap } from 'lucide-react'
 import { HoverCardTimestamp } from 'components/interfaces/DataTableDemo/infinite/_components/hover-card-timestamp'
-
-// custom imports
-import type { ColumnSchema } from './schema'
-import { LogTypeIcon } from './LogTypeIcon'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { AuthUserHoverCard } from './components/auth-user-hover-card'
+import { LogTypeIcon } from './LogTypeIcon'
+import type { ColumnSchema } from './UnifiedLogs.schema'
 
 // Event broadcaster for selecting the trace tab
 // This will be used to communicate between the columns and the client component
@@ -88,39 +68,6 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         'font-mono w-[--col-date-size] max-w-[--col-date-size] min-w-[--col-date-size]',
     },
   },
-  // {
-  //   accessorKey: 'id',
-  //   header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
-  //   cell: ({ row }) => {
-  //     const value = row.getValue<ColumnSchema['id']>('id')
-  //     return <TextWithTooltip text={value} />
-  //   },
-  //   size: 130,
-  //   minSize: 130,
-  //   meta: {
-  //     headerClassName: 'w-[--header-id-size] max-w-[--header-id-size] min-w-[--header-id-size]',
-  //     cellClassName: 'w-[--col-id-size] max-w-[--col-id-size] min-w-[--col-id-size]',
-  //   },
-  // },
-  // {
-  //   id: 'uuid',
-  //   accessorKey: 'uuid',
-  //   header: 'Request Id',
-  //   cell: ({ row }) => {
-  //     const value = row.getValue<ColumnSchema['uuid']>('uuid')
-  //     return <TextWithTooltip text={value} />
-  //   },
-  //   enableResizing: false,
-  //   size: 130,
-  //   minSize: 130,
-  //   meta: {
-  //     label: 'Request Id',
-  //     cellClassName:
-  //       'font-mono w-[--col-uuid-size] max-w-[--col-uuid-size] min-w-[--col-uuid-size]',
-  //     headerClassName:
-  //       'min-w-[--header-uuid-size] w-[--header-uuid-size] max-w-[--header-uuid-size]',
-  //   },
-  // },
   {
     accessorKey: 'log_type',
     header: '',
@@ -238,57 +185,6 @@ export const columns: ColumnDef<ColumnSchema>[] = [
       headerClassName: 'min-w-[--header-pathname-size] w-[--header-pathname-size]',
     },
   },
-  // {
-  //   accessorKey: 'latency',
-  //   // TODO: check if we can right align the table header/cell (makes is easier to read)
-  //   header: ({ column }) => <DataTableColumnHeader column={column} title="Latency" />,
-  //   cell: ({ row }) => {
-  //     const value = row.getValue<ColumnSchema['latency']>('latency')
-  //     return <DataTableColumnLatency value={value} />
-  //   },
-  //   filterFn: 'inNumberRange',
-  //   enableResizing: false,
-  //   size: 110,
-  //   minSize: 110,
-  //   meta: {
-  //     headerClassName:
-  //       'w-[--header-latency-size] max-w-[--header-latency-size] min-w-[--header-latency-size]',
-  //     cellClassName:
-  //       'font-mono w-[--col-latency-size] max-w-[--col-latency-size] min-w-[--col-latency-size]',
-  //   },
-  // },
-  // {
-  //   accessorKey: 'regions',
-  //   header: 'Region',
-  //   cell: ({ row }) => {
-  //     const value = row.getValue<ColumnSchema['regions']>('regions')
-  //     if (Array.isArray(value)) {
-  //       if (value.length > 1) {
-  //         return <div className="text-muted-foreground">{value.join(', ')}</div>
-  //       } else {
-  //         return (
-  //           <div className="whitespace-nowrap">
-  //             <DataTableColumnRegion value={value[0]} />
-  //           </div>
-  //         )
-  //       }
-  //     }
-  //     if (typeof value === 'string') {
-  //       return <DataTableColumnRegion value={value} />
-  //     }
-  //     return <Minus className="h-4 w-4 text-muted-foreground/50" />
-  //   },
-  //   filterFn: 'arrIncludesSome',
-  //   enableResizing: false,
-  //   size: 163,
-  //   minSize: 163,
-  //   meta: {
-  //     headerClassName:
-  //       'w-[--header-regions-size] max-w-[--header-regions-size] min-w-[--header-regions-size]',
-  //     cellClassName:
-  //       'font-mono w-[--col-regions-size] max-w-[--col-regions-size] min-w-[--col-regions-size]',
-  //   },
-  // },
   {
     accessorKey: 'event_message',
     header: ({ column }) => <DataTableColumnHeader column={column} title="event_message" />,
@@ -318,10 +214,9 @@ export const columns: ColumnDef<ColumnSchema>[] = [
         </div>
       )
     },
-    enableResizing: true, // allow manual resizing
+    enableResizing: true,
     size: 400,
     minSize: 400,
-    // ❌ don't set maxSize — let it grow
     meta: {
       headerClassName:
         'w-[--header-event_message-size] max-w-[--header-event_message-size] min-w-[--header-event_message-size]',

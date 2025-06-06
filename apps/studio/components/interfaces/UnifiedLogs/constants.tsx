@@ -1,8 +1,6 @@
-'use client'
+import { format } from 'date-fns'
+import { User } from 'lucide-react'
 
-import { CopyToClipboardContainer } from 'components/interfaces/DataTableDemo/components/custom/copy-to-clipboard-container'
-import { KVTabs } from 'components/interfaces/DataTableDemo/components/custom/kv-tabs'
-import { DataTableColumnRegion } from 'components/interfaces/DataTableDemo/components/data-table/data-table-column/data-table-column-region'
 import type {
   DataTableFilterField,
   Option,
@@ -10,20 +8,14 @@ import type {
 } from 'components/interfaces/DataTableDemo/components/data-table/types'
 import { LEVELS } from 'components/interfaces/DataTableDemo/constants/levels'
 import { METHODS } from 'components/interfaces/DataTableDemo/constants/method'
-import { REGIONS } from 'components/interfaces/DataTableDemo/constants/region'
-import { formatMilliseconds } from 'components/interfaces/DataTableDemo/lib/format'
 import { getLevelColor, getLevelLabel } from 'components/interfaces/DataTableDemo/lib/request/level'
 import { getStatusColor } from 'components/interfaces/DataTableDemo/lib/request/status-code'
 import { cn } from 'ui'
-import { format } from 'date-fns'
-import { PopoverPercentile } from 'components/interfaces/DataTableDemo/infinite/_components/popover-percentile'
-import { SheetTimingPhases } from 'components/interfaces/DataTableDemo/infinite/_components/sheet-timing-phases'
-import { User } from 'lucide-react'
 
 // custom imports
-import type { LogsMeta } from './query-options'
-import { type ColumnSchema, LOG_TYPES } from './schema'
 import { TraceButton } from './components/trace-button'
+import type { LogsMeta } from './query-options'
+import { type ColumnSchema, LOG_TYPES } from './UnifiedLogs.schema'
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
