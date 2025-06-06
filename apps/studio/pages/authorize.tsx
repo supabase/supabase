@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -6,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
@@ -15,7 +15,7 @@ import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-a
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
-import type { NextPageWithLayout } from 'types'
+import { NextPageWithLayout } from 'types'
 import {
   Alert,
   Alert_Shadcn_,

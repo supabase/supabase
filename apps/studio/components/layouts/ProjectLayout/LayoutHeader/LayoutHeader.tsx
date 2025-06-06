@@ -187,7 +187,7 @@ const LayoutHeader = ({
           {customHeaderComponents && customHeaderComponents}
           {IS_PLATFORM ? (
             <>
-              <FeedbackDropdown />
+              <FeedbackDropdown className="hidden md:flex" />
               <NotificationsPopoverV2 />
               <HelpPopover />
               <UserDropdown />

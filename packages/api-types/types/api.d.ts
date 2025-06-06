@@ -1627,7 +1627,13 @@ export interface components {
       mfa_web_authn_verify_enabled: boolean | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
-      password_required_characters: string | null
+      /** @enum {string|null} */
+      password_required_characters:
+        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
+        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\\\:"|<>?,./`~'
+        | ''
+        | null
       rate_limit_anonymous_users: number | null
       rate_limit_email_sent: number | null
       rate_limit_otp: number | null
@@ -1640,7 +1646,8 @@ export interface components {
       saml_enabled: boolean | null
       saml_external_url: string | null
       security_captcha_enabled: boolean | null
-      security_captcha_provider: string | null
+      /** @enum {string|null} */
+      security_captcha_provider: 'turnstile' | 'hcaptcha' | null
       security_captcha_secret: string | null
       security_manual_linking_enabled: boolean | null
       security_refresh_token_reuse_interval: number | null
@@ -1656,9 +1663,11 @@ export interface components {
       sms_messagebird_originator: string | null
       sms_otp_exp: number | null
       sms_otp_length: number
-      sms_provider: string | null
+      /** @enum {string|null} */
+      sms_provider: 'messagebird' | 'textlocal' | 'twilio' | 'twilio_verify' | 'vonage' | null
       sms_template: string | null
       sms_test_otp: string | null
+      /** Format: date-time */
       sms_test_otp_valid_until: string | null
       sms_textlocal_api_key: string | null
       sms_textlocal_sender: string | null
@@ -2919,6 +2928,12 @@ export interface components {
       pitr_enabled: boolean
       region: string
       walg_enabled: boolean
+    }
+    V1CreateFunctionBody: {
+      body: string
+      name: string
+      slug: string
+      verify_jwt?: boolean
     }
     V1CreateMigrationBody: {
       name?: string
@@ -5663,7 +5678,12 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1CreateFunctionBody']
+        'application/vnd.denoland.eszip': string
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -5784,7 +5804,7 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['V1UpdateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
+        'application/vnd.denoland.eszip': string
       }
     }
     responses: {

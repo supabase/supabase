@@ -8,7 +8,7 @@ export interface AuthorizeRequesterDetailsProps {
   scopes: OAuthScope[]
 }
 
-const ScopeSection = ({
+export const ScopeSection = ({
   description,
   hasReadScope,
   hasWriteScope,

@@ -69,6 +69,7 @@
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
+        "NEXT_PUBLIC_API_ADMIN_URL",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
