@@ -148,6 +148,9 @@ type RootQueryType {
 
     """Returns elements that come before the specified cursor"""
     before: String
+
+    """Filter errors by a specific Supabase service"""
+    service: Service
   ): ErrorCollection
 }
 

@@ -142,9 +142,13 @@ describe('/api/graphql errors collection', () => {
   })
 
   it('returns empty list when paginating past available results', async () => {
+    // Base64 encode the UUID that's guaranteed to be after any real data
+    const afterCursor = Buffer.from('ffffffff-ffff-ffff-ffff-ffffffffffff', 'utf8').toString(
+      'base64'
+    )
     const query = `
       query {
-        errors(first: 1, after: "ffffffff-ffff-ffff-ffff-ffffffffffff") {
+        errors(first: 1, after: "${afterCursor}") {
           edges {
             cursor
             node {

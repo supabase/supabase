@@ -21,6 +21,20 @@ import {
   GraphQLObjectTypeError,
 } from './errorSchema'
 
+/**
+ * Encodes a string to base64
+ */
+function encodeBase64(str: string): string {
+  return Buffer.from(str, 'utf8').toString('base64')
+}
+
+/**
+ * Decodes a base64 string back to the original string
+ */
+function decodeBase64(base64: string): string {
+  return Buffer.from(base64, 'base64').toString('utf8')
+}
+
 async function resolveSingleError(
   _parent: unknown,
   args: RootQueryTypeErrorArgs,
@@ -60,8 +74,13 @@ async function resolveErrors(
         }
         return await GraphQLCollectionBuilder.create<ErrorModel, { service?: Service }, ApiError>({
           fetch,
-          args: args[0],
-          getCursor: (item) => item.id,
+          args: {
+            ...args[0],
+            // Decode base64 cursors before passing to fetch function
+            after: args[0].after ? decodeBase64(args[0].after) : undefined,
+            before: args[0].before ? decodeBase64(args[0].before) : undefined,
+          },
+          getCursor: (item) => encodeBase64(item.id),
         })
       },
       convertUnknownToApiError,
