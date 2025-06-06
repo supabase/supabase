@@ -7,8 +7,8 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -16,11 +16,13 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { projectKeys } from 'data/projects/keys'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import { sidePanelsState } from 'state/side-panels'
 import {
@@ -47,12 +49,13 @@ import { BranchingPITRNotice } from './BranchingPITRNotice'
 import { BranchingPlanNotice } from './BranchingPlanNotice'
 import { BranchingPostgresVersionNotice } from './BranchingPostgresVersionNotice'
 
-const EnableBranchingModal = () => {
-  const { ref } = useParams()
+export const EnableBranchingModal = () => {
   const router = useRouter()
+  const { ref } = useParams()
   const snap = useAppStateSnapshot()
-  const selectedOrg = useSelectedOrganization()
+  const queryClient = useQueryClient()
   const project = useSelectedProject()
+  const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useFlag('gitlessBranching')
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
@@ -87,7 +90,11 @@ const EnableBranchingModal = () => {
     useCheckGithubBranchValidity({ onError: () => {} })
 
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries(projectKeys.detail(ref)),
+        queryClient.invalidateQueries(projectKeys.list()),
+      ])
       toast.success(`Successfully enabled branching`)
       snap.setShowEnableBranchingModal(false)
       router.push(`/project/${ref}/branches`)
@@ -164,6 +171,11 @@ const EnableBranchingModal = () => {
     })
   }
 
+  const openLinkerPanel = () => {
+    snap.setShowEnableBranchingModal(false)
+    sidePanelsState.setGithubConnectionsOpen(true)
+  }
+
   useEffect(() => {
     if (snap.showEnableBranchingModal) {
       form.reset({ productionBranchName: 'main', branchName: '' })
@@ -174,11 +186,6 @@ const EnableBranchingModal = () => {
   useEffect(() => {
     setIsGitBranchValid(!form.getValues('branchName') || form.getValues('branchName')?.length === 0)
   }, [githubConnection?.id, form.getValues('branchName')])
-
-  const openLinkerPanel = () => {
-    snap.setShowEnableBranchingModal(false)
-    sidePanelsState.setGithubConnectionsOpen(true)
-  }
 
   return (
     <>
@@ -223,7 +230,7 @@ const EnableBranchingModal = () => {
               {isSuccess && (
                 <>
                   {isFreePlan ? (
-                    <DialogSection padding="medium">
+                    <DialogSection className="!p-0">
                       <BranchingPlanNotice />
                     </DialogSection>
                   ) : !hasMinimumPgVersion ? (
@@ -401,5 +408,3 @@ const EnableBranchingModal = () => {
     </>
   )
 }
-
-export default EnableBranchingModal
