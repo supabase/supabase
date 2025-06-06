@@ -44,16 +44,10 @@ const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 // This is a custom domain for Stape, which isused for GTM servers
 const STAPE_URL = 'https://ss.supabase.com'
 
-// Google Analytics v4 URLs
+// Google Analytics v4 URLs - Updated to use specific GA4 domains
 const GOOGLE_TAG_MANAGER_URL = 'https://*.googletagmanager.com'
-const GOOGLE_TAG_MANAGER_IMG_URL = `${GOOGLE_TAG_MANAGER_URL} https://*.google-analytics.com`
-const GOOGLE_ADS_URLS = 'https://googleads.g.doubleclick.net https://www.googleadservices.com'
 const GOOGLE_ANALYTICS_URL = 'https://*.google-analytics.com'
-const GOOGLE_DOUBLECLICK_URL = 'https://*.g.doubleclick.net'
-const GOOGLE_URL = 'https://*.google.com'
-const GOOGLE_PAGEAD_URL = 'https://pagead2.googlesyndication.com'
-const GOOGLE_TD_DOUBLECLICK_URL = 'https://td.doubleclick.net'
-const GOOGLE_WWW_TAG_MANAGER_URL = 'https://www.googletagmanager.com'
+const ANALYTICS_GOOGLE_URL = 'https://*.analytics.google.com'
 
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
@@ -70,18 +64,7 @@ const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
-async function getGoogleDomains() {
-  const response = await fetch('https://www.google.com/supported_domains')
-  const data = await response.text()
-  return data
-    .split('\n')
-    .map((domain) => `https://*${domain.trim()}`)
-    .join(' ')
-}
-
-exports.getCSP = async () => {
-  const googleDomains = await getGoogleDomains()
-
+exports.getCSP = () => {
   const DEFAULT_SRC_URLS = [
     API_URL,
     SUPABASE_URL,
@@ -101,10 +84,8 @@ exports.getCSP = async () => {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_URLS,
     GOOGLE_ANALYTICS_URL,
+    ANALYTICS_GOOGLE_URL,
     GOOGLE_TAG_MANAGER_URL,
-    GOOGLE_DOUBLECLICK_URL,
-    GOOGLE_URL,
-    GOOGLE_PAGEAD_URL,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -113,14 +94,7 @@ exports.getCSP = async () => {
     SUPABASE_ASSETS_URL,
     GOOGLE_TAG_MANAGER_URL,
   ]
-  const FRAME_SRC_URLS = [
-    HCAPTCHA_ASSET_URL,
-    STRIPE_JS_URL,
-    STAPE_URL,
-    // Google Analytics v4 frame-src URLs
-    GOOGLE_TD_DOUBLECLICK_URL,
-    GOOGLE_WWW_TAG_MANAGER_URL,
-  ]
+  const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
   const IMG_SRC_URLS = [
     SUPABASE_URL,
     SUPABASE_COM_URL,
@@ -129,14 +103,9 @@ exports.getCSP = async () => {
     GOOGLE_USER_AVATAR_URL,
     SUPABASE_ASSETS_URL,
     USERCENTRICS_APP_URL,
-    GOOGLE_TAG_MANAGER_IMG_URL,
     STAPE_URL,
-    GOOGLE_ADS_URLS,
-    // Google Analytics v4 img-src URLs
     GOOGLE_ANALYTICS_URL,
     GOOGLE_TAG_MANAGER_URL,
-    GOOGLE_DOUBLECLICK_URL,
-    GOOGLE_URL,
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
@@ -159,7 +128,6 @@ exports.getCSP = async () => {
       : []),
     PUSHER_URL_WS,
     SENTRY_URL,
-    googleDomains,
   ].join(' ')
 
   const imgSrcDirective = [
@@ -168,7 +136,6 @@ exports.getCSP = async () => {
     `data:`,
     ...IMG_SRC_URLS,
     ...(isDevOrStaging ? [SUPABASE_STAGING_PROJECTS_URL, VERCEL_URL] : []),
-    googleDomains,
   ].join(' ')
 
   const scriptSrcDirective = [
