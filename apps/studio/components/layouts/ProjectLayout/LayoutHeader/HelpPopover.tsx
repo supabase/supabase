@@ -15,6 +15,7 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 export const HelpPopover = () => {
   const router = useRouter()
@@ -24,7 +25,6 @@ export const HelpPopover = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectRef = project?.parent_project_ref ?? router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?projectRef=${projectRef}` : ''}`
 
   return (
     <Popover_Shadcn_>
@@ -76,9 +76,12 @@ export const HelpPopover = () => {
             prioritized.
           </p>
           <div>
-            <Button asChild type="default" icon={<Mail />}>
-              <Link href={supportUrl}>Contact Support</Link>
-            </Button>
+            <ContactSupportButton
+              category="PROBLEM"
+              subject="Help with project"
+              message="I'm unable to..."
+              projectRef={project?.ref}
+            />
           </div>
         </div>
         <Popover.Separator />

@@ -22,6 +22,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const UpgradingState = () => {
   const { ref } = useParams()
@@ -64,8 +65,11 @@ const UpgradingState = () => {
     if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 
-  const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Target Version: ${target_version}%0A• Error: ${error}`
+  const subject = 'Upgrade failed for project'
+  const message = `Upgrade information:
+  • Initiated at: ${initiated_at}
+  • Target Version: ${target_version}
+  • Error: ${error}`
 
   return (
     <div className="w-full mx-auto my-16 space-y-16 max-w-7xl">
@@ -106,15 +110,12 @@ const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Button asChild type="default">
-                    <Link
-                      href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Contact support
-                    </Link>
-                  </Button>
+                  <ContactSupportButton
+                    category="DATABASE_UNRESPONSIVE"
+                    subject={subject}
+                    message={message}
+                    projectRef={ref}
+                  />
                   <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
                     Return to project
                   </Button>

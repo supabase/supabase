@@ -43,6 +43,7 @@ import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -437,9 +438,11 @@ const Addons = () => {
                       HIPAA enabled. Contact support for further assistance.
                     </AlertDescription_Shadcn_>
                     <div className="mt-4">
-                      <Button type="default" asChild>
-                        <Link href="/support/new">Contact support</Link>
-                      </Button>
+                      <ContactSupportButton
+                        category="PROBLEM"
+                        subject="PITR cannot be changed with HIPAA"
+                        message="I'm unable to change PITR with HIPAA enabled"
+                      />
                     </div>
                   </Alert_Shadcn_>
                 )}
@@ -478,13 +481,11 @@ const Addons = () => {
                           <p className="text-sm leading-normal mb-2">
                             Reach out to us via support if you're interested
                           </p>
-                          <Button asChild type="default">
-                            <Link
-                              href={`/support/new?projectRef=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
-                            >
-                              <a>Contact support</a>
-                            </Link>
-                          </Button>
+                          <ContactSupportButton
+                            category="SALES_ENQUIRY"
+                            subject="Project too old for PITR"
+                            message="I'm interested in enabling PITR for my project"
+                          />
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     ) : isOrioleDbInAws ? (

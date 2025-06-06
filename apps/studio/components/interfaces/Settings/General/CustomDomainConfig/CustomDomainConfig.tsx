@@ -14,6 +14,7 @@ import CustomDomainDelete from './CustomDomainDelete'
 import CustomDomainVerify from './CustomDomainVerify'
 import CustomDomainsConfigureHostname from './CustomDomainsConfigureHostname'
 import CustomDomainsShimmerLoader from './CustomDomainsShimmerLoader'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const CustomDomainConfig = () => {
   const { ref } = useParams()
@@ -86,9 +87,12 @@ const CustomDomainConfig = () => {
               <AlertCircle size={16} strokeWidth={1.5} />
               <p className="text-sm text-foreground-light">
                 Failed to retrieve custom domain configuration. Please try again later or{' '}
-                <Link href={`/support/new?projectRef=${ref}&category=sales`} className="underline">
-                  contact support
-                </Link>
+                <ContactSupportButton
+                  category="SALES_ENQUIRY"
+                  subject="Failed to retrieve custom domain configuration"
+                  message="I'm unable to retrieve the custom domain configuration"
+                  projectRef={ref}
+                />
                 .
               </p>
             </div>

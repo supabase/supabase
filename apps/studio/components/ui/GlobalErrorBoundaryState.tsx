@@ -14,6 +14,7 @@ import {
   cn,
 } from 'ui'
 import { InlineLinkClassName } from './InlineLink'
+import { ContactSupportButton } from './ContactSupportButton'
 
 // More correct version of FallbackProps from react-error-boundary
 export type FallbackProps = {
@@ -132,14 +133,14 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
         )}
 
         <div className="w-full sm:w-1/2 mx-auto grid grid-cols-2 gap-2">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href={`/support/new?category=dashboard_bug&subject=Client%20side%20exception%20occurred%20on%20dashboard&message=${encodeURI(urlMessage)}`}
-              target="_blank"
-            >
-              Contact support
-            </Link>
-          </Button>
+          <ContactSupportButton
+            category="DASHBOARD_BUG"
+            subject="Client side exception occurred on dashboard"
+            message={urlMessage}
+            errorContext={{
+              error: errorMessage,
+            }}
+          />
           {/* [Joshen] For local and staging, allow us to escape the error boundary */}
           {/* We could actually investigate how to make this available on prod, but without being able to reliably test this, I'm not keen to do it now */}
           {process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? (

@@ -29,6 +29,7 @@ import { Alert, Button } from 'ui'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const PaymentMethods = () => {
   const { slug } = useParams()
@@ -98,16 +99,14 @@ const PaymentMethods = () => {
                       variant="info"
                       title="Payment is currently by invoice"
                       actions={[
-                        <Button key="payment-method-support" asChild type="default">
-                          <Link
-                            href={`/support/new?category=billing&subject=Request%20to%20change%20payment%20method`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="ml-3"
-                          >
-                            Contact support
-                          </Link>
-                        </Button>,
+                        <ContactSupportButton
+                          category="BILLING"
+                          subject="Request to change payment method"
+                          message="I would like to change my payment method"
+                          errorContext={{
+                            organizationSlug: slug,
+                          }}
+                        />,
                       ]}
                     >
                       You get a monthly invoice and payment link via email. To change your payment

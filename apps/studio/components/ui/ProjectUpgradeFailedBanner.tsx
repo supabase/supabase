@@ -1,7 +1,6 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import dayjs from 'dayjs'
 import { X } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -9,6 +8,7 @@ import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-stat
 import { IS_PLATFORM } from 'lib/constants'
 import { Alert, Button } from 'ui'
 import { InlineLink } from './InlineLink'
+import { ContactSupportButton } from './ContactSupportButton'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
@@ -57,15 +57,13 @@ export const ProjectUpgradeFailedBanner = () => {
         title={`Postgres version upgrade was not successful (Initiated at ${initiatedAt})`}
         actions={
           <div className="flex items-center h-full space-x-4">
-            <Button asChild type="default">
-              <Link
-                href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Contact support
-              </Link>
-            </Button>
+            <ContactSupportButton
+              category="DATABASE_UNRESPONSIVE"
+              subject={subject}
+              message={message}
+              projectRef={ref}
+            />
+
             <Button
               type="text"
               className="px-1"

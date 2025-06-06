@@ -32,6 +32,7 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
+import { ContactSupportButton } from 'components/ui/ContactSupportButton'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -255,9 +256,12 @@ const PITRSidePanel = () => {
                 support for further assistance.
               </AlertDescription_Shadcn_>
               <div className="mt-4">
-                <Button type="default" asChild>
-                  <Link href="/support/new">Contact support</Link>
-                </Button>
+                <ContactSupportButton
+                  category="PROBLEM"
+                  subject="PITR cannot be disabled on HIPAA projects"
+                  message="I'm unable to disable PITR on a HIPAA project"
+                  projectRef={projectRef}
+                />
               </div>
             </Alert_Shadcn_>
           ) : null}
