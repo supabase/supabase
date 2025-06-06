@@ -65,7 +65,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@supabase/supabase-js>@supabase/auth-js": "2.71.0-rc.2",
+      "@supabase/supabase-js>@supabase/auth-js": "2.71.0-rc.4",
       "vinxi>esbuild": "0.25.2",
       "@tanstack/directive-functions-plugin>vite": "6.2.6",
       "@tanstack/react-start-plugin>vite": "6.2.6"
