@@ -353,6 +353,23 @@ function createTabsState(projectRef: string) {
 
       onClose?.(id)
     },
+    handleTabCloseAll: ({
+      editor,
+      router,
+      onClearDashboardHistory,
+    }: {
+      editor: 'sql' | 'table'
+      router: NextRouter
+      onClearDashboardHistory: () => void
+    }) => {
+      const tabsToClose =
+        editor === 'table'
+          ? store.openTabs.filter((x) => !x.startsWith('sql'))
+          : store.openTabs.filter((x) => x.startsWith('sql'))
+      store.removeTabs(tabsToClose)
+      onClearDashboardHistory()
+      router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+    },
     handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: any) => {
       // Make permanent if needed
       const draggedTab = store.tabsMap[tabId]
