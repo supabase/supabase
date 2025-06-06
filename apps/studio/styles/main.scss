@@ -193,6 +193,13 @@ a {
   }
 }
 
+.input-sm {
+  input,
+  textarea {
+    @apply text-sm;
+  }
+}
+
 .input-xs {
   input,
   textarea {
