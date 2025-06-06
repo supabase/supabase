@@ -13,17 +13,17 @@ import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-q
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
+import { getMockDataForAttribute } from 'data/reports/auth-charts'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line'
+type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line'
 
 export type MultiAttribute = {
   attribute: string
   provider: Provider
   label?: string
-  color?: string
   stackId?: string
   format?: 'percent' | 'number'
   description?: string
@@ -32,6 +32,11 @@ export type MultiAttribute = {
   type?: 'line' | 'area-bar'
   omitFromTotal?: boolean
   tooltip?: string
+  enabled?: boolean
+  color?: {
+    light: string
+    dark: string
+  }
   customValue?: number
   id?: string
   value?: number
@@ -62,6 +67,7 @@ interface ComposedChartHandlerProps {
   updateDateRange: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
+  titleTooltip?: string
   docsUrl?: string
 }
 
@@ -132,6 +138,7 @@ const ComposedChartHandler = ({
   updateDateRange,
   valuePrecision,
   isVisible = true,
+  titleTooltip,
   id,
   ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
@@ -301,6 +308,7 @@ const ComposedChartHandler = ({
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
+          titleTooltip={titleTooltip}
           {...otherProps}
         />
       </Panel.Content>
@@ -324,6 +332,7 @@ const useAttributeQueries = (
   const dailyStatsAttributes = attributes
     .filter((attr) => attr?.provider === 'daily-stats')
     .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
+  const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
   const referenceLines = attributes.filter((attr) => attr?.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
@@ -347,6 +356,22 @@ const useAttributeQueries = (
     isVisible
   )
 
+  // Handle mock data queries
+  const mockQueries = useMemo(() => {
+    return mockAttributes
+      .filter((attr) => attr.enabled !== false)
+      .map((attr) => {
+        // Use the attribute value to determine which mock data to fetch
+        const mockData = getMockDataForAttribute(attr.attribute)
+
+        // The mock data is already in the correct format
+        return {
+          isLoading: false,
+          data: mockData,
+        }
+      })
+  }, [])
+
   const referenceLineQueries = referenceLines.map((line) => {
     let value = line.value || 0
 
@@ -363,7 +388,7 @@ const useAttributeQueries = (
     }
   })
 
-  return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries]
+  return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries, ...mockQueries]
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
