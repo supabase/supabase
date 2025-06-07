@@ -211,6 +211,8 @@ export const UsersV2 = () => {
       if (userIds.includes(selectedUser)) setSelectedUser(undefined)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
+    }
+    finally {
       setIsDeletingUsers(false)
     }
   }
