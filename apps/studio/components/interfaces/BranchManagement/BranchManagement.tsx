@@ -19,12 +19,13 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
-import CreateBranchModal from './CreateBranchModal'
+import { CreateBranchModal } from './CreateBranchModal'
 import {
   BranchingEmptyState,
   PreviewBranchesEmptyState,
@@ -39,6 +40,7 @@ const BranchManagement = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const hasBranchEnabled = project?.is_branch_enabled
 
@@ -217,7 +219,7 @@ const BranchManagement = () => {
                     />
                   )}
 
-                  {isSuccessConnections && (
+                  {isSuccessConnections && !gitlessBranching && (
                     <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
                       <div className="flex items-center gap-x-4">
                         <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
@@ -305,6 +307,8 @@ const BranchManagement = () => {
                             <PullRequestsEmptyState
                               url={generateCreatePullRequestURL()}
                               hasBranches={previewBranches.length > 0}
+                              githubConnection={githubConnection}
+                              gitlessBranching={gitlessBranching}
                             />
                           )}
                         </BranchManagementSection>

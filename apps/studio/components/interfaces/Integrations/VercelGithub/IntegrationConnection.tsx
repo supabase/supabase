@@ -154,18 +154,10 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           onCancel={onCancel}
           onConfirm={onConfirm}
           loading={isDeleting}
-          alert={
-            type === 'GitHub' && isBranchingEnabled
-              ? {
-                  title: 'Branching will be disabled for this project',
-                  description: ` Deleting this GitHub connection will remove all preview branches on this project,
-                and also disable branching for ${project.name}`,
-                }
-              : undefined
-          }
         >
           <p className="text-sm text-foreground-light">
-            This action cannot be undone. Are you sure you want to delete this {type} connection?
+            Deleting this GitHub connection will stop automatic creation and merging of preview
+            branches. Existing preview branches will remain unchanged.
           </p>
         </ConfirmationModal>
       </>
