@@ -8,7 +8,6 @@ import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identi
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useAppStateSnapshot } from 'state/app-state'
 import { IS_PLATFORM } from 'lib/constants'
 
 const getAnonId = async (id: string) => {
