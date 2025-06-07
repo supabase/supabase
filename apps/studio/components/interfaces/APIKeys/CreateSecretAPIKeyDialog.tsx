@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
@@ -14,8 +14,10 @@ import {
   DialogTrigger,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormLabel_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
+  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -28,6 +30,7 @@ const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({
   name: z.string(),
   description: z.string().trim(),
+  expose_as_env: z.boolean(),
 })
 
 const CreateSecretAPIKeyDialog = () => {
@@ -43,6 +46,7 @@ const CreateSecretAPIKeyDialog = () => {
     defaultValues: {
       name: '',
       description: '',
+      expose_as_env: true,
     },
   })
 
@@ -55,6 +59,7 @@ const CreateSecretAPIKeyDialog = () => {
         type: 'secret',
         name: values.name,
         description: values.description,
+        expose_as_env: values.expose_as_env,
       },
       {
         onSuccess: () => {
@@ -122,6 +127,30 @@ const CreateSecretAPIKeyDialog = () => {
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
+              />
+              <FormField_Shadcn_
+                key="expose_as_env"
+                name="expose_as_env"
+                className="flex-row"
+                control={form.control}
+                render={({ field }) => {
+                  const name = form.watch('name').toUpperCase()
+
+                  return (
+                    <FormItemLayout
+                      label="Expose as environment variable"
+                      description={`Will be available as SUPABASE_SECRET_KEY_${name || '<NAME>'} in Edge Functions and other integrations that support them.`}
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          key="expose_as_env"
+                          checked={field.value}
+                          onCheckedChange={(value) => field.onChange(value)}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )
+                }}
               />
             </form>
           </Form_Shadcn_>
