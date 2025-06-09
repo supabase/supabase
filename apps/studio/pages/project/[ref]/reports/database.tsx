@@ -21,7 +21,7 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
+import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
@@ -38,6 +38,7 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
 import type { NextPageWithLayout } from 'types'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (

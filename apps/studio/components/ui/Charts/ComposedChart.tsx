@@ -28,8 +28,12 @@ import {
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import { calculateTotalChartAggregate, CustomLabel, CustomTooltip } from './ComposedChart.utils'
-import { MultiAttribute } from './ComposedChartHandler'
+import {
+  calculateTotalChartAggregate,
+  CustomLabel,
+  CustomTooltip,
+  type MultiAttribute,
+} from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { formatBytes } from 'lib/helpers'

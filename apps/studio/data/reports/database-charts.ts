@@ -1,7 +1,8 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { formatBytes } from 'lib/helpers'
-import { Organization } from '../../types'
+import { Organization } from 'types'
 import { Project } from '../projects/project-detail-query'
+import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getReportAttributes = (isFreePlan: boolean) => [
   { id: 'ram_usage', label: 'Memory usage', hide: false },
@@ -26,7 +27,10 @@ export const getReportAttributes = (isFreePlan: boolean) => [
   },
 ]
 
-export const getReportAttributesV2 = (org: Organization, project: Project) => {
+export const getReportAttributesV2: (org: Organization, project: Project) => ReportAttributes[] = (
+  org,
+  project
+) => {
   const isFreePlan = org?.plan?.id === 'free'
   const computeSize = project?.infra_compute_size || 'medium'
   const isSpendCapEnabled =
@@ -232,7 +236,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
       attributes: [
         {
-          attribute: 'disk_fs_used',
+          attribute: 'pg_database_size',
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'Database',
@@ -245,6 +249,14 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           label: 'WAL',
           tooltip:
             'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.',
+        },
+        {
+          attribute: 'disk_fs_used_system',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'System',
+          tooltip:
+            'Reserved space for the system to ensure your database runs smoothly. You cannot modify this.',
         },
         {
           attribute: 'disk_fs_size',
@@ -301,6 +313,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           attribute: 'network_receive_bytes',
           provider: 'infra-monitoring',
           label: 'Ingress',
+          manipulateValue: (value: number) => value * -1,
           tooltip:
             'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
           stackId: '1',
