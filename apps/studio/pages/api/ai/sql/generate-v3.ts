@@ -313,6 +313,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       system,
       messages,
       tools,
+      onError: (error) => {
+        console.error('Error in AI response:', error)
+      },
     })
 
     result.pipeDataStreamToResponse(res)

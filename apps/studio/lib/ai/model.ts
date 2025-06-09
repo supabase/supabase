@@ -33,12 +33,16 @@ export async function getModel(): Promise<ModelResponse> {
       }
     }
 
+    console.log('Using Bedrock model:', modelsByProvider.bedrock)
+
     return {
       model: bedrock(modelsByProvider.bedrock),
     }
   }
 
   if (hasOpenAIKey) {
+    console.log('Using OpenAI model:', modelsByProvider.openai)
+
     return {
       model: openai(modelsByProvider.openai),
     }
