@@ -1,4 +1,5 @@
 import * as configcat from 'configcat-js'
+import { fetchHandler } from 'data/fetchers'
 
 let client: configcat.IConfigCatClient
 
@@ -9,9 +10,8 @@ async function getClient() {
     return client
   }
 
-  const response = await fetch(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
+  const response = await fetchHandler(process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL + endpoint)
   const options = { pollIntervalSeconds: 7 * 60 } // 7 minutes
-  console.log('response', response.status)
   if (response.status !== 200) {
     // proxy is down, use default client
     client = configcat.getClient(
