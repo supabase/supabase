@@ -8,8 +8,15 @@ import {
   parseAsTimestamp,
 } from 'nuqs'
 
+import {
+  ARRAY_DELIMITER,
+  LEVELS,
+  RANGE_DELIMITER,
+  SLIDER_DELIMITER,
+  SORT_DELIMITER,
+} from 'components/ui/DataTable/DataTable.constants'
 import { ChartConfig } from 'ui'
-import { TooltipLabel } from './TooltipLabel'
+import { TooltipLabel } from './components/TooltipLabel'
 
 export const CHART_CONFIG = {
   success: {
@@ -26,15 +33,8 @@ export const CHART_CONFIG = {
   },
 } satisfies ChartConfig
 
-export const ARRAY_DELIMITER = ','
-const SLIDER_DELIMITER = '-'
-const SPACE_DELIMITER = '_'
-export const RANGE_DELIMITER = '-'
-export const SORT_DELIMITER = '.'
-
-const LEVELS = ['success', 'warning', 'error'] as const
-const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
-const METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const
+export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
+export const METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const
 
 const parseAsSort = createParser({
   parse(queryValue) {
@@ -63,14 +63,47 @@ export const SEARCH_PARAMS_PARSER = {
   host: parseAsString,
   pathname: parseAsString,
   date: parseAsArrayOf(parseAsTimestamp, RANGE_DELIMITER),
+
   // REQUIRED FOR SORTING & PAGINATION
   sort: parseAsSort,
   size: parseAsInteger.withDefault(40),
   start: parseAsInteger.withDefault(0),
+
   // REQUIRED FOR INFINITE SCROLLING (Live Mode and Load More)
   direction: parseAsStringLiteral(['prev', 'next']).withDefault('next'),
   cursor: parseAsTimestamp.withDefault(new Date()),
   live: parseAsBoolean.withDefault(false),
+
   // REQUIRED FOR SELECTION
   uuid: parseAsString,
 }
+
+/** UNUSED */
+
+// export const regions: Record<string, { label: string; flag: string }> = {
+//   // REGIONS
+//   ams: { label: 'Amsterdam', flag: '🇳🇱' },
+//   fra: { label: 'Frankfurt', flag: '🇩🇪' },
+//   gru: { label: 'Sao Paulo', flag: '🇧🇷' },
+//   hkg: { label: 'Hong Kong', flag: '🇭🇰' },
+//   iad: { label: 'Washington D.C.', flag: '🇺🇸' },
+//   syd: { label: 'Sydney', flag: '🇦🇺' },
+//   // VERCEL EDGE REGIONS
+//   hnd1: { label: 'Tokyo', flag: '🇯🇵' },
+//   sin1: { label: 'Singapore', flag: '🇸🇬' },
+//   cpt1: { label: 'Cape Town', flag: '🇿🇦' },
+//   fra1: { label: 'Paris', flag: '🇫🇷' },
+//   hkg1: { label: 'Hong Kong', flag: '🇭🇰' },
+//   syd1: { label: 'Sydney', flag: '🇦🇺' },
+//   gru1: { label: 'Sao Paulo', flag: '🇧🇷' },
+//   dub1: { label: 'Dublin', flag: '🇮🇪' },
+//   sfo1: { label: 'San Francisco', flag: '🇺🇸' },
+//   cdg1: { label: 'Paris', flag: '🇫🇷' },
+//   icn1: { label: 'Seoul', flag: '🇰🇷' },
+//   kix1: { label: 'Osaka', flag: '🇯🇵' },
+//   iad1: { label: 'Washington D.C.', flag: '🇺🇸' },
+//   arn1: { label: 'Stockholm', flag: '🇸🇪' },
+//   bom1: { label: 'Mumbai', flag: '🇮🇳' },
+//   lhr1: { label: 'London', flag: '🇬🇧' },
+//   cle1: { label: 'Cleveland', flag: '🇺🇸' },
+// }

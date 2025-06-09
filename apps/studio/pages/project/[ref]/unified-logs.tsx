@@ -1,4 +1,4 @@
-import { UnifiedLogsTable } from 'components/interfaces/UnifiedLogs/client'
+import { UnifiedLogsTable } from 'components/interfaces/UnifiedLogs/UnifiedLogs'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'

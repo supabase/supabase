@@ -1,9 +1,11 @@
 import { z } from 'zod'
 
-import { LEVELS } from './constants/levels'
-import { METHODS } from './constants/method'
-import { REGIONS } from './constants/region'
-import { ARRAY_DELIMITER, RANGE_DELIMITER } from './UnifiedLogs.constants'
+import {
+  ARRAY_DELIMITER,
+  LEVELS,
+  RANGE_DELIMITER,
+} from 'components/ui/DataTable/DataTable.constants'
+import { METHODS, REGIONS } from './UnifiedLogs.constants'
 
 export const LOG_TYPES = [
   'edge',

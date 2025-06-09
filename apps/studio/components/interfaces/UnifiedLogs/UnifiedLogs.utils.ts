@@ -1,52 +1,23 @@
-// @ts-ignore
-import { _LEVELS } from '@/constants/levels'
 import { type Table as TTable } from '@tanstack/react-table'
-import { useQueryState } from 'nuqs'
 
-import { useHotKey } from 'hooks/ui/useHotKey'
-import { useEffect, useMemo, useRef } from 'react'
+import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { cn } from 'ui'
-import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 
-export const useResetFocus = () => {
-  useHotKey(() => {
-    // FIXME: some dedicated div[tabindex="0"] do not auto-unblur (e.g. the DataTableFilterResetButton)
-    // REMINDER: we cannot just document.activeElement?.blur(); as the next tab will focus the next element in line,
-    // which is not what we want. We want to reset entirely.
-    document.body.setAttribute('tabindex', '0')
-    document.body.focus()
-    document.body.removeAttribute('tabindex')
-  }, '.')
-}
+export const logEventBus = {
+  listeners: new Map<string, Set<(...args: any[]) => void>>(),
 
-// TODO: make a BaseObject (incl. date and uuid e.g. for every upcoming branch of infinite table)
-export const useLiveMode = <TData extends { date: Date }>(data: TData[]) => {
-  const [live] = useQueryState('live', SEARCH_PARAMS_PARSER.live)
-  // REMINDER: used to capture the live mode on timestamp
-  const liveTimestamp = useRef<number | undefined>(live ? new Date().getTime() : undefined)
+  on(event: 'selectTraceTab', callback: (rowId: string) => void) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, new Set())
+    }
+    this.listeners.get(event)?.add(callback)
+    return () => this.listeners.get(event)?.delete(callback)
+  },
 
-  useEffect(() => {
-    if (live) liveTimestamp.current = new Date().getTime()
-    else liveTimestamp.current = undefined
-  }, [live])
-
-  const anchorRow = useMemo(() => {
-    if (!live) return undefined
-
-    const item = data.find((item) => {
-      // return first item that is there if not liveTimestamp
-      if (!liveTimestamp.current) return true
-      // return first item that is after the liveTimestamp
-      if (item.date.getTime() > liveTimestamp.current) return false
-      return true
-      // return first item if no liveTimestamp
-    })
-
-    return item
-  }, [live, data])
-
-  return { row: anchorRow, timestamp: liveTimestamp.current }
+  emit(event: 'selectTraceTab', rowId: string) {
+    this.listeners.get(event)?.forEach((callback) => callback(rowId))
+  },
 }
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
@@ -66,7 +37,7 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
   }
 }
 
-export const getLevelLabel = (value: (typeof _LEVELS)[number]): string => {
+export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
   switch (value) {
     case 'success':
       return '2xx'
@@ -79,7 +50,7 @@ export const getLevelLabel = (value: (typeof _LEVELS)[number]): string => {
   }
 }
 
-export function getLevelRowClassName(value: (typeof _LEVELS)[number]): string {
+export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
   switch (value) {
     case 'success':
       return ''
