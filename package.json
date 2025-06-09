@@ -68,7 +68,8 @@
       "@supabase/supabase-js>@supabase/auth-js": "2.71.0-rc.4",
       "@tanstack/directive-functions-plugin>vite": "catalog:",
       "@tanstack/react-start-plugin>vite": "catalog:",
-      "esbuild": "^0.25.2"
+      "esbuild": "^0.25.2",
+      "payload>image-size": "1.2.1"
     },
     "neverBuiltDependencies": ["libpg-query"]
   },
