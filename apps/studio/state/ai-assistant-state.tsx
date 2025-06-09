@@ -1,9 +1,11 @@
-import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import type { Message as MessageType } from 'ai/react'
+import { DBSchema, IDBPDatabase, openDB } from 'idb'
+import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
-import { debounce } from 'lodash'
+
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 type SuggestionsType = {
   title: string
@@ -411,12 +413,8 @@ export type AiAssistantState = AiAssistantData & {
 
 export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())
 
-export const AiAssistantStateContextProvider = ({
-  projectRef,
-  children,
-}: PropsWithChildren<{
-  projectRef: string | undefined
-}>) => {
+export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren) => {
+  const project = useSelectedProject()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
 
@@ -425,8 +423,8 @@ export const AiAssistantStateContextProvider = ({
     let isMounted = true
 
     async function loadAndInitializeState() {
-      if (!projectRef || typeof window === 'undefined') {
-        if (projectRef === undefined) {
+      if (!project?.ref || typeof window === 'undefined') {
+        if (project?.ref === undefined) {
           state.resetAiAssistantPanel()
         }
         return // Don't load if no projectRef or not in browser
@@ -435,11 +433,11 @@ export const AiAssistantStateContextProvider = ({
       let loadedState: StoredAiAssistantState | null = null
 
       // 1. Try loading from IndexedDB
-      loadedState = await loadFromIndexedDB(projectRef)
+      loadedState = await loadFromIndexedDB(project?.ref)
 
       // 2. If not in IndexedDB, try migrating from localStorage
       if (!loadedState) {
-        loadedState = await tryMigrateFromLocalStorage(projectRef)
+        loadedState = await tryMigrateFromLocalStorage(project?.ref)
       }
 
       if (!isMounted) return // Component unmounted during async operations
@@ -458,11 +456,11 @@ export const AiAssistantStateContextProvider = ({
     return () => {
       isMounted = false
     }
-  }, [projectRef, state])
+  }, [project?.ref, state])
 
   // Effect to save state to IndexedDB on changes
   useEffect(() => {
-    if (typeof window !== 'undefined' && projectRef) {
+    if (typeof window !== 'undefined' && project?.ref) {
       // Create a debounced version of saveAiState
       const debouncedSaveAiState = debounce(saveAiState, 500)
 
@@ -470,7 +468,7 @@ export const AiAssistantStateContextProvider = ({
         const snap = snapshot(state)
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
-          projectRef: projectRef,
+          projectRef: project?.ref,
           open: snap.open,
           activeChatId: snap.activeChatId,
           chats: snap.chats
@@ -495,7 +493,7 @@ export const AiAssistantStateContextProvider = ({
       }
     }
     return undefined
-  }, [state, projectRef])
+  }, [state, project?.ref])
 
   return (
     <AiAssistantStateContext.Provider value={state}>{children}</AiAssistantStateContext.Provider>
