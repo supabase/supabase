@@ -26,6 +26,7 @@ import {
 } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -96,7 +97,12 @@ export const NotificationsPopoverV2 = () => {
       }}
     >
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
+        <ButtonTooltip
+          tooltip={{
+            content: {
+              text: 'Notifications',
+            },
+          }}
           type={hasNewNotifications ? 'outline' : 'text'}
           className={cn(
             'h-[26px]',

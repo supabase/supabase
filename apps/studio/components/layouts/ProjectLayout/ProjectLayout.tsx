@@ -91,7 +91,14 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { editorPanel, mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+    const {
+      editorPanel,
+      mobileMenuOpen,
+      showSidebar,
+      setMobileMenuOpen,
+      toggleEditorPanel,
+      setEditorPanel,
+    } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
     const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
@@ -124,8 +131,17 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
+        // Cmd+I: Open AI Assistant, close Editor Panel
         if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
+          setEditorPanel({ open: false })
           aiSnap.toggleAssistant()
+          e.preventDefault()
+          e.stopPropagation()
+        }
+        // Cmd+E: Toggle Editor Panel, always close AI Assistant
+        if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
+          aiSnap.closeAssistant()
+          toggleEditorPanel()
           e.preventDefault()
           e.stopPropagation()
         }
@@ -133,7 +149,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       window.addEventListener('keydown', handler)
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [aiSnap.open])
+    }, [setEditorPanel, aiSnap, editorPanel.open])
 
     return (
       <>
