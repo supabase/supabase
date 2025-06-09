@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams } from 'common'
-import { Check, DollarSign, Github, Loader2 } from 'lucide-react'
+import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -8,19 +7,18 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { sidePanelsState } from 'state/side-panels'
 import {
-  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -40,16 +38,16 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-interface CreateBranchModalProps {
+interface EditBranchModalProps {
+  branch?: Branch
   visible: boolean
   onClose: () => void
 }
 
-export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
+export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const gitlessBranching = useFlag('gitlessBranching')
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
@@ -73,22 +71,20 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
       onError: () => {},
     })
 
-  const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
+  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess: (data) => {
-      toast.success(`Successfully created preview branch "${data.name}"`)
+      toast.success(`Successfully updated branch "${data.name}"`)
       onClose()
     },
     onError: (error) => {
-      toast.error(`Failed to create branch: ${error.message}`)
+      toast.error(`Failed to update branch: ${error.message}`)
     },
   })
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
-  const isBranchingEnabled = gitlessBranching || !!githubConnection
-
-  const formId = 'create-branch-form'
+  const formId = 'edit-branch-form'
   const FormSchema = z
     .object({
       branchName: z
@@ -99,15 +95,12 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
           'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
         )
         .refine(
-          (val) => (branches ?? []).every((branch) => branch.name !== val),
+          (val) =>
+            // Allow the current branch name during edit
+            val === branch?.name || (branches ?? []).every((b) => b.name !== val),
           'A branch with this name already exists'
         ),
-      gitBranchName: z
-        .string()
-        .refine(
-          (val) => !githubConnection?.id || (val && val.length > 0),
-          'Git branch name is required when Git is connected'
-        ),
+      gitBranchName: z.string().optional(),
     })
     .superRefine(async (val, ctx) => {
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.id) {
@@ -126,6 +119,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
           })
         }
       } else {
+        // If git branch is empty or removed, it's valid
         setIsGitBranchValid(!val.gitBranchName || val.gitBranchName.length === 0)
       }
     })
@@ -139,29 +133,53 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
 
   const isFormValid =
     form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
-  const canSubmit = isFormValid && !isCreating && !isChecking && isBranchingEnabled
+  const canSubmit = isFormValid && !isUpdating && !isChecking
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    createBranch({
+    if (!branch?.id) return console.error('Branch ID is required')
+
+    const payload: {
+      projectRef: string
+      id: string
+      branchName: string
+      gitBranch?: string
+    } = {
       projectRef,
+      id: branch.id,
       branchName: data.branchName,
-      ...(data.gitBranchName && isGitBranchValid ? { gitBranch: data.gitBranchName } : {}),
-    })
+    }
+
+    // Only add gitBranch to the payload if it is present and valid
+    // If gitBranchName is empty or invalid, gitBranch remains undefined in the payload
+    if (data.gitBranchName && isGitBranchValid) {
+      payload.gitBranch = data.gitBranchName
+    }
+
+    updateBranch(payload)
   }
 
+  // Pre-fill form when the modal becomes visible and branch data is available
   useEffect(() => {
-    if (form && visible) {
-      setIsGitBranchValid(false)
-      form.reset()
+    if (visible && branch) {
+      setIsGitBranchValid(!!branch.git_branch) // Initial validity based on existing link
+      form.reset({
+        branchName: branch.name ?? '',
+        gitBranchName: branch.git_branch ?? '',
+      })
     }
-  }, [form, visible])
+  }, [branch, visible, form])
 
+  // Handle initial state and changes for git branch validity
   useEffect(() => {
     setIsGitBranchValid(
       !form.getValues('gitBranchName') || form.getValues('gitBranchName')?.length === 0
     )
-  }, [githubConnection?.id, form.getValues('gitBranchName')])
+    // Trigger validation if a git branch name exists initially or is entered
+    if (form.getValues('gitBranchName')) {
+      form.trigger('gitBranchName')
+    }
+  }, [githubConnection?.id, form.getValues('gitBranchName'), form.trigger, visible, branch])
 
   const openLinkerPanel = () => {
     onClose()
@@ -172,7 +190,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
       <DialogContent size="large" hideClose>
         <DialogHeader padding="small">
-          <DialogTitle>Create a new preview branch</DialogTitle>
+          <DialogTitle>Edit branch "{branch?.name}"</DialogTitle> {/* Update title */}
         </DialogHeader>
         <DialogSectionSeparator />
         <Form_Shadcn_ {...form}>
@@ -201,7 +219,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                   render={({ field }) => (
                     <FormItem_Shadcn_>
                       <div className="flex items-center justify-between mb-2">
-                        <Label>Link to Git Branch {gitlessBranching ? '(Optional)' : ''}</Label>
+                        <Label>Link to Git Branch (Optional)</Label>
                         <div className="flex items-center gap-2 text-sm">
                           <Image
                             className={cn('dark:invert')}
@@ -250,53 +268,35 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
-              {isSuccessConnections && (
-                <>
-                  {!githubConnection && (
-                    <div className="flex items-center gap-2 justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Label>GitHub Repository</Label>
-                          {!gitlessBranching && (
-                            <Badge variant="warning" size="small">
-                              Required
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-foreground-light">
-                          {gitlessBranching
-                            ? 'Optionally connect to a GitHub repository to manage migrations automatically for this branch.'
-                            : 'Connect to a GitHub repository to enable branch creation. This allows you to manage migrations automatically for this branch.'}
-                        </p>
-                      </div>
-                      <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
-                        Connect to GitHub
-                      </Button>
-                    </div>
-                  )}
-                </>
+              {isSuccessConnections && !githubConnection && (
+                <div className="flex items-center gap-2 justify-between">
+                  <div>
+                    <Label>GitHub Repository</Label>
+                    <p className="text-sm text-foreground-light">
+                      Optionally connect to a GitHub repository to manage migrations automatically
+                      for this branch.
+                    </p>
+                  </div>
+                  <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
+                    Connect to GitHub
+                  </Button>
+                </div>
               )}
             </DialogSection>
 
-            <DialogFooter className="sm:justify-between gap-2" padding="medium">
-              <p className="flex items-center gap-2 text-sm text-foreground">
-                <DollarSign size={16} strokeWidth={1.5} />
-                Each preview branch costs $0.32 per day
-              </p>
-              <div className="flex items-center gap-2">
-                <Button disabled={isCreating} type="default" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  form={formId}
-                  disabled={!isSuccessConnections || isCreating || !canSubmit || isChecking}
-                  loading={isCreating}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  Create branch
-                </Button>
-              </div>
+            <DialogFooter padding="medium">
+              <Button disabled={isUpdating} type="default" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                form={formId}
+                disabled={!isSuccessConnections || isUpdating || !canSubmit || isChecking}
+                loading={isUpdating}
+                type="primary"
+                htmlType="submit"
+              >
+                Update branch
+              </Button>
             </DialogFooter>
           </form>
         </Form_Shadcn_>
