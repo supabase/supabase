@@ -136,7 +136,7 @@ export const NotificationsPopoverV2 = () => {
             <InboxIcon
               size={18}
               strokeWidth={1.5}
-              className="!h-[18] !w-[18] transition group-hover:text-foreground text-foreground-light"
+              className="!h-[18px] !w-[18px] transition group-hover:text-foreground text-foreground-light"
             />
           }
         />
