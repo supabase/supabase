@@ -33,6 +33,11 @@ export const CreateNewAPIKeysButton = () => {
         name: 'default',
       })
 
+      // sleep 1 second to allow functions secret creation to settle
+      await new Promise((accept) => {
+        setTimeout(accept, 1000)
+      })
+
       // Create secret key
       await createAPIKey({
         projectRef,

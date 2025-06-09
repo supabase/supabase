@@ -16,7 +16,10 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
   const canUpdateSecrets = useCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
   // [Joshen] Following API's validation:
   // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
-  const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
+  const isReservedSecret = !!(
+    secret.name.match(/^(SUPABASE_).*/) &&
+    !secret.name.match(/^SUPABASE_(PUBLISHABLE|SECRET)_[A-Z0-9_]+$/)
+  )
 
   return (
     <Table.tr>

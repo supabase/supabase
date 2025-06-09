@@ -9,6 +9,7 @@ export type APIKeyCreateVariables = {
   projectRef?: string
   name: string
   description?: string
+  expose_as_env?: boolean
 } & (
   | {
       type: 'publishable'
@@ -44,6 +45,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
       type: payload.type,
       name: payload.name,
       description: payload.description || null,
+      expose_as_env: payload.expose_as_env,
     },
   })
 
