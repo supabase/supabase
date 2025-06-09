@@ -13,7 +13,7 @@ export const InlineEditorButton = () => {
       type="text"
       size="tiny"
       id="editor-trigger"
-      className="w-[24px] h-[24px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
+      className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground"
       onClick={() => {
         closeAssistant()
         setEditorPanel({ open: !editorPanel.open })
@@ -29,7 +29,7 @@ export const InlineEditorButton = () => {
         },
       }}
     >
-      <SqlEditor size={16} strokeWidth={1.5} />
+      <SqlEditor size={18} strokeWidth={1.5} />
     </ButtonTooltip>
   )
 }

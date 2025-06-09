@@ -29,6 +29,7 @@ const FeedbackDropdown = () => {
             setStage('select')
           }}
           type="outline"
+          className="rounded-full h-[32px] border-border"
         >
           <span className="hidden md:flex">Feedback</span>
         </Button>
