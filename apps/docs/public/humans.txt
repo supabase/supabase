@@ -37,6 +37,7 @@ Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
 Etienne Stalmans
+Fabrizio Cataldo
 Fabrizio Fenoglio
 Felipe Stival
 Francesco Sansalvadore
