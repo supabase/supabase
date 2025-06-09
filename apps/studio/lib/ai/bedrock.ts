@@ -1,11 +1,14 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
+import { awsCredentialsProvider } from '@vercel/functions/oidc'
 
 const credentialProvider = createCredentialChain(
-  // Env vars will be used for staging and production
-  fromCustomEnv(),
+  // Vercel OIDC provider will be used for staging/production
+  awsCredentialsProvider({
+    roleArn: process.env.AWS_BEDROCK_ROLE_ARN!,
+  }),
 
-  // Profile will be used for local development
+  // AWS profile will be used for local development
   fromNodeProviderChain({
     profile: process.env.AWS_BEDROCK_PROFILE,
   })
@@ -19,26 +22,5 @@ export async function checkAwsCredentials() {
     return !!credentials
   } catch (error) {
     return false
-  }
-}
-
-/**
- * AWS credential provider that checks for custom Bedrock environment variables.
- */
-function fromCustomEnv() {
-  return async () => {
-    const accessKeyId = process.env.AWS_BEDROCK_ACCESS_KEY_ID
-    const secretAccessKey = process.env.AWS_BEDROCK_SECRET_ACCESS_KEY
-
-    if (accessKeyId && secretAccessKey) {
-      return {
-        accessKeyId,
-        secretAccessKey,
-      }
-    }
-
-    throw new Error(
-      'No AWS_BEDROCK_ACCESS_KEY_ID and AWS_BEDROCK_SECRET_ACCESS_KEY environment variables found.'
-    )
   }
 }

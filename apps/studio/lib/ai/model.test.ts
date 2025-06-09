@@ -4,7 +4,6 @@ import * as bedrockModule from './bedrock'
 import { bedrock } from './bedrock'
 import { getModel, modelsByProvider } from './model'
 
-// Mock dependencies
 vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
 }))
@@ -25,26 +24,24 @@ describe('getModel', () => {
     process.env = { ...originalEnv }
   })
 
-  it('should return bedrock model when AWS credentials are available and AWS_REGION is set', async () => {
+  it('should return bedrock model when AWS credentials are available and AWS_BEDROCK_REGION is set', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
-    process.env.AWS_REGION = 'us-east-1'
+    process.env.AWS_BEDROCK_REGION = 'us-east-1'
 
     const { model, error } = await getModel()
-
-    console.log('Model:', model, 'Error:', error)
 
     expect(model).toEqual('bedrock-model')
     expect(bedrock).toHaveBeenCalledWith(modelsByProvider.bedrock)
     expect(error).toBeUndefined()
   })
 
-  it('should return error when AWS credentials are available but AWS_REGION is not set', async () => {
+  it('should return error when AWS credentials are available but AWS_BEDROCK_REGION is not set', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
-    delete process.env.AWS_REGION
+    delete process.env.AWS_BEDROCK_REGION
 
     const { error } = await getModel()
 
-    expect(error).toEqual(new Error('AWS_REGION is not set'))
+    expect(error).toEqual(new Error('AWS_BEDROCK_REGION is not set'))
   })
 
   it('should return OpenAI model when AWS credentials are not available but OPENAI_API_KEY is set', async () => {
