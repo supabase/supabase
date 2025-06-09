@@ -66,9 +66,9 @@
   "pnpm": {
     "overrides": {
       "@supabase/supabase-js>@supabase/auth-js": "2.71.0-rc.4",
-      "vinxi>esbuild": "0.25.2",
       "@tanstack/directive-functions-plugin>vite": "catalog:",
-      "@tanstack/react-start-plugin>vite": "catalog:"
+      "@tanstack/react-start-plugin>vite": "catalog:",
+      "esbuild": "^0.25.2"
     },
     "neverBuiltDependencies": ["libpg-query"]
   },
