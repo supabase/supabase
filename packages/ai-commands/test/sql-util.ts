@@ -1,4 +1,7 @@
-import { A_Const, A_Expr, ColumnRef, CreatePolicyStmt, Node, parseQuery } from 'libpg-query/wasm'
+import { PgParser, unwrapParseResult } from '@supabase/pg-parser'
+import { A_Const, A_Expr, ColumnRef, CreatePolicyStmt, Node } from '@supabase/pg-parser/17/types'
+
+const parser = new PgParser()
 
 export type PolicyInfo = {
   name: string
@@ -187,7 +190,7 @@ export function assertEachSideOfExpression<U>(
  * from a SQL string as parsed ASTs.
  */
 export async function getPolicies(sql: string) {
-  const result = await parseQuery(sql)
+  const result = await unwrapParseResult(parser.parse(sql))
 
   assertDefined(result.stmts, 'Expected parse result to contain statements')
 

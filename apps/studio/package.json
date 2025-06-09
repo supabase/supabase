@@ -48,7 +48,7 @@
     "@supabase/pg-meta": "workspace:*",
     "@supabase/realtime-js": "catalog:",
     "@supabase/shared-types": "0.1.80",
-    "@supabase/sql-to-rest": "^0.1.6",
+    "@supabase/sql-to-rest": "^0.1.8",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-query": "4.35.7",
     "@tanstack/react-query-devtools": "4.35.7",
