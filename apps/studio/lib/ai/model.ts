@@ -27,9 +27,9 @@ export async function getModel(): Promise<ModelResponse> {
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
 
   if (hasAwsCredentials) {
-    if (!process.env.AWS_REGION) {
+    if (!process.env.AWS_BEDROCK_REGION) {
       return {
-        error: new Error('AWS_REGION is not set'),
+        error: new Error('AWS_BEDROCK_REGION is not set'),
       }
     }
 
@@ -46,7 +46,7 @@ export async function getModel(): Promise<ModelResponse> {
 
   return {
     error: new Error(
-      'No valid AI model available. Please set up a local AWS profile (for Bedrock) or pass an OPENAI_API_KEY.'
+      'No valid AI model available. Please set up a local AWS profile to use Bedrock, or pass an OPENAI_API_KEY to use OpenAI.'
     ),
   }
 }
