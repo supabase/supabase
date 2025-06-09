@@ -85,6 +85,20 @@ type CLICommandReference implements SearchResult {
 }
 
 """
+A reference document containing a description of a Supabase Management API endpoint
+"""
+type ManagementApiReference implements SearchResult {
+  """The title of the document"""
+  title: String
+
+  """The URL of the document"""
+  href: String
+
+  """The content of the reference document, as text"""
+  content: String
+}
+
+"""
 A reference document containing a description of a function from a Supabase client library
 """
 type ClientLibraryFunctionReference implements SearchResult {
