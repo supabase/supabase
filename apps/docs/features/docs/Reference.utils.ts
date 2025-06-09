@@ -30,15 +30,21 @@ export function parseReferencePath(slug: Array<string>) {
   const isSelfHostingReference = slug[0].startsWith('self-hosting-')
 
   if (isClientSdkReference) {
-    let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
+    let sdkId: string
+    let maybeVersion: string | null
+    let maybeCrawlers: string | null
+    let path: string[]
+    ;[sdkId, maybeVersion, maybeCrawlers, ...path] = slug
     if (!/v\d+/.test(maybeVersion)) {
       maybeVersion = null
-      maybeCrawlers = maybeVersion
       path = [maybeCrawlers, ...path]
+      maybeCrawlers = maybeVersion
     }
     if (maybeCrawlers !== 'crawlers') {
+      if (typeof maybeCrawlers === 'string') {
+        path = [maybeCrawlers, ...path]
+      }
       maybeCrawlers = null
-      path = [maybeCrawlers, ...path]
     }
 
     return {
@@ -75,7 +81,7 @@ export function parseReferencePath(slug: Array<string>) {
 async function generateStaticParamsForSdkVersion(sdkId: string, version: string) {
   const flattenedSections = await getFlattenedSections(sdkId, version)
 
-  return flattenedSections
+  return (flattenedSections || [])
     .filter((section) => section.type !== 'category' && !!section.slug)
     .map((section) => ({
       slug: [
@@ -139,7 +145,7 @@ export async function generateReferenceMetadata(
     const displayName = REFERENCES[sdkId].name
     const sectionTitle =
       slug.length > 0
-        ? flattenedSections.find((section) => section.slug === slug[0])?.title
+        ? flattenedSections?.find((section) => section.slug === slug[0])?.title
         : undefined
     const url = [BASE_PATH, 'reference', sdkId, path[0]].filter(Boolean).join('/')
 
@@ -154,7 +160,6 @@ export async function generateReferenceMetadata(
       ...(slug.length > 0
         ? {
             alternates: {
-              ...parentAlternates,
               canonical: url,
             },
           }
@@ -219,8 +224,8 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
   visit(markdownTree, ['code', 'inlineCode'], (node) => {
     codeBlocks.push({
       type: node.type,
-      start: node.position.start.offset,
-      end: node.position.end.offset,
+      start: node.position?.start?.offset || 0,
+      end: node.position?.end?.offset || 0,
     })
   })
   // Sort code blocks by start offset in descending order
