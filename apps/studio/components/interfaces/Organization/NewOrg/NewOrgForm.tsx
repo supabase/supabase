@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
@@ -18,6 +19,7 @@ import {
   useOrganizationsQuery,
 } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -93,6 +95,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const stripe = useStripe()
   const elements = useElements()
   const queryClient = useQueryClient()
+
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
@@ -262,7 +269,10 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             <Button
               type="default"
               disabled={newOrgLoading}
-              onClick={() => router.push('/projects')}
+              onClick={() => {
+                if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+                else router.push('/organizations')
+              }}
             >
               Cancel
             </Button>

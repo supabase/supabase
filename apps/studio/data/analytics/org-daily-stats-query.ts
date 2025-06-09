@@ -69,7 +69,7 @@ export enum ComputeUsageMetric {
 export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) => {
   switch (computeUsageMetric) {
     case 'COMPUTE_HOURS_BRANCH':
-      return 'Branches'
+      return 'Branching'
     case 'COMPUTE_HOURS_XS':
       return 'Micro'
     case 'COMPUTE_HOURS_SM':

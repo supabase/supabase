@@ -11,13 +11,11 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -45,7 +43,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
 
@@ -59,25 +56,23 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
-        {edgeFunctionCreate && (
-          <DropdownMenuItem
-            onSelect={() => {
-              router.push(`/project/${ref}/functions/new`)
-              sendEvent({
-                action: 'edge_function_via_editor_button_clicked',
-                properties: { origin: 'secondary_action' },
-                groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-              })
-            }}
-            className="gap-4"
-          >
-            <Code className="shrink-0" size={16} strokeWidth={1.5} />
-            <div>
-              <span className="text-foreground">Via Editor</span>
-              <p>Write and deploy in the browser</p>
-            </div>
-          </DropdownMenuItem>
-        )}
+        <DropdownMenuItem
+          onSelect={() => {
+            router.push(`/project/${ref}/functions/new`)
+            sendEvent({
+              action: 'edge_function_via_editor_button_clicked',
+              properties: { origin: 'secondary_action' },
+              groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+            })
+          }}
+          className="gap-4"
+        >
+          <Code className="shrink-0" size={16} strokeWidth={1.5} />
+          <div>
+            <span className="text-foreground">Via Editor</span>
+            <p>Write and deploy in the browser</p>
+          </div>
+        </DropdownMenuItem>
         <Dialog>
           <DialogTrigger asChild>
             <DropdownMenuItem

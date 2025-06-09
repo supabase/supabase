@@ -101,7 +101,7 @@ const Reports = () => {
   function checkEditState() {
     if (config === undefined) return
     /*
-     * Shallow copying the config state variable maintains a mobx reference
+     * Shallow copying the config state variable maintains a reference
      * Instead, we stringify it and parse it again to remove anything
      * that can be mutated at component state level.
      *

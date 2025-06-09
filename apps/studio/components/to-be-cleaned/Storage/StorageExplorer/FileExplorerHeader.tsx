@@ -6,7 +6,6 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import APIDocsButton from 'components/ui/APIDocsButton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   Check,
   ChevronLeft,
@@ -160,7 +159,6 @@ const FileExplorerHeader = ({
   const uploadButtonRef: any = useRef(null)
   const previousBreadcrumbs: any = useRef(null)
 
-  const storageExplorerStore = useStorageStore()
   const {
     columns,
     sortBy,
@@ -175,9 +173,9 @@ const FileExplorerHeader = ({
     refetchAllOpenedFolders,
     addNewFolderPlaceholder,
     clearOpenedFolders,
-    closeFilePreview,
+    setSelectedFilePreview,
     selectedBucket,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
@@ -206,7 +204,7 @@ const FileExplorerHeader = ({
   const onSelectBack = () => {
     popColumn()
     popOpenedFolders()
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
   }
 
   const onSelectUpload = () => {
@@ -239,11 +237,11 @@ const FileExplorerHeader = ({
     if (paths.length === 0) {
       popColumnAtIndex(0)
       clearOpenedFolders()
-      closeFilePreview()
+      setSelectedFilePreview(undefined)
     } else {
       const pathString = paths.join('/')
       setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
-      await fetchFoldersByPath(paths)
+      await fetchFoldersByPath({ paths })
       setLoading({ isLoading: false, message: '' })
     }
   }
@@ -381,7 +379,9 @@ const FileExplorerHeader = ({
                 <DropdownMenuItem key={option.key} onClick={() => snap.setView(option.key)}>
                   <div className="flex items-center justify-between w-full">
                     <p>{option.name}</p>
-                    {snap.view === option.key && <Check className="text-brand" strokeWidth={2} />}
+                    {snap.view === option.key && (
+                      <Check size={16} className="text-brand" strokeWidth={2} />
+                    )}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -393,7 +393,9 @@ const FileExplorerHeader = ({
                     <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {sortBy === option.key && <Check className="text-brand" strokeWidth={2} />}
+                        {sortBy === option.key && (
+                          <Check size={16} className="text-brand" strokeWidth={2} />
+                        )}
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -407,7 +409,7 @@ const FileExplorerHeader = ({
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {sortByOrder === option.key && (
-                          <Check className="text-brand" strokeWidth={2} />
+                          <Check size={16} className="text-brand" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>

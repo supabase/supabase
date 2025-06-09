@@ -70,7 +70,7 @@ const SignInForm = () => {
         await queryClient.resetQueries()
         const returnTo = getReturnToPath()
         // since we're already on the /sign-in page, prevent redirect loops
-        router.push(returnTo === '/sign-in' ? '/projects' : returnTo)
+        router.push(returnTo === '/sign-in' ? '/organizations' : returnTo)
       } catch (error: any) {
         toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
         Sentry.captureMessage('[CRITICAL] Failed to sign in via EP: ' + error.message)

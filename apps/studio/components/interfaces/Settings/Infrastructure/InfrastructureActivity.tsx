@@ -36,6 +36,7 @@ import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metric
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Admonition } from 'ui-patterns/admonition'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+import { useShowNewReplicaPanel } from './InfrastructureConfiguration/use-show-new-replica'
 
 const NON_DEDICATED_IO_RESOURCES = [
   'ci_micro',
@@ -63,6 +64,8 @@ const InfrastructureActivity = () => {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const selectedAddons = addons?.selected_addons ?? []
+
+  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
 
   const { computeInstance } = getAddons(selectedAddons)
   const hasDedicatedIOResources =
@@ -211,7 +214,11 @@ const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
-          <DatabaseSelector />
+          <DatabaseSelector
+            onCreateReplicaClick={() => {
+              setShowNewReplicaPanel(true)
+            }}
+          />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker

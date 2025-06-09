@@ -5,9 +5,8 @@ import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
-import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import { makeTabPermanent, type Tab } from 'state/tabs'
+import { useTabsStateSnapshot, type Tab } from 'state/tabs'
 import { cn, TabsTrigger_Shadcn_ } from 'ui'
 
 /**
@@ -30,9 +29,8 @@ export const SortableTab = ({
   onClose: (id: string) => void
 }) => {
   const router = useRouter()
-  const { ref } = useParams()
   const currentSchema = (router.query.schema as string) || 'public'
-
+  const tabs = useTabsStateSnapshot()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
   })
@@ -73,7 +71,7 @@ export const SortableTab = ({
     >
       <TabsTrigger_Shadcn_
         value={tab.id}
-        onDoubleClick={() => makeTabPermanent(ref, tab.id)}
+        onDoubleClick={() => tabs.makeTabPermanent(tab.id)}
         className={cn(
           'flex items-center gap-2 pl-3 pr-2.5 text-xs',
           'bg-dash-sidebar/50 dark:bg-surface-100/50',

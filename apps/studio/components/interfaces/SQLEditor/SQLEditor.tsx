@@ -13,7 +13,7 @@ import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { constructHeaders } from 'data/fetchers'
+import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
@@ -36,7 +36,7 @@ import {
   useGetImpersonatedRoleState,
 } from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, getTabsStore, updateTab } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   DropdownMenu,
@@ -52,7 +52,6 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import { useSnapshot } from 'valtio'
 import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
@@ -90,8 +89,7 @@ export const SQLEditor = () => {
   const org = useSelectedOrganization()
 
   const queryClient = useQueryClient()
-  const store = getTabsStore(ref)
-  const tabs = useSnapshot(store)
+  const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -147,9 +145,12 @@ export const SQLEditor = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
-  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
-    projectRef: ref,
-  })
+  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isValidConnString(project?.connectionString) }
+  )
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -157,7 +158,7 @@ export const SQLEditor = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: includeSchemaMetadata }
+    { enabled: isValidConnString(project?.connectionString) && includeSchemaMetadata }
   )
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
@@ -219,7 +220,7 @@ export const SQLEditor = () => {
         snapV2.renameSnippet({ id, name })
         if (isSQLEditorTabsEnabled && ref) {
           const tabId = createTabId('sql', { id })
-          updateTab(ref, tabId, { label: name })
+          tabs.updateTab(tabId, { label: name })
         }
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
@@ -308,7 +309,7 @@ export const SQLEditor = () => {
         const connectionString = databases?.find(
           (db) => db.identifier === databaseSelectorState.selectedDatabaseId
         )?.connectionString
-        if (IS_PLATFORM && !connectionString) {
+        if (!isValidConnString(connectionString)) {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
@@ -499,8 +500,10 @@ export const SQLEditor = () => {
       }))
       const headerData = await constructHeaders()
 
+      const authorizationHeader = headerData.get('Authorization')
+
       await complete(prompt, {
-        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           completionMetadata: {
             textBeforeCursor: context.beforeSelection,
@@ -526,7 +529,7 @@ export const SQLEditor = () => {
     return () => {
       if (ref) {
         const tabId = createTabId('sql', { id })
-        updateTab(ref, tabId, { scrollTop: scrollTopRef.current })
+        tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

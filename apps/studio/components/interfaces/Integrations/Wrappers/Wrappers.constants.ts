@@ -3518,7 +3518,8 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: true,
           secureEntry: true,
-          urlHelper: 'https://app.hubspot.com/api-key',
+          urlHelper:
+            'https://developers.hubspot.com/docs/guides/apps/authentication/intro-to-auth#private-app-access-tokens',
         },
       ],
     },

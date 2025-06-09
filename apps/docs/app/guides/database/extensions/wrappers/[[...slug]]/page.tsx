@@ -1,9 +1,9 @@
 import matter from 'gray-matter'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
+
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import {
   genGuideMeta,
@@ -17,6 +17,7 @@ import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { octokit } from '~/lib/octokit'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 export const dynamicParams = false
 
@@ -208,7 +209,8 @@ interface Params {
   slug?: string[]
 }
 
-const WrappersDocs = async ({ params }: { params: Params }) => {
+const WrappersDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const { isExternal, meta, ...data } = await getContent(params)
 
   const options = isExternal
@@ -271,6 +273,7 @@ const getContent = async (params: Params) => {
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 
     const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
+      cache: 'force-cache',
       next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
     })
     const rawContent = await response.text()

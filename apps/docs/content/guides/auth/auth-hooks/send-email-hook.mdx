@@ -643,7 +643,7 @@ const templates = {
 
 function generateConfirmationURL(email_data) {
   // TODO: replace the ref with your project ref
-  return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+  return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token_hash}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
 }
 
 Deno.serve(async (req) => {
@@ -755,7 +755,7 @@ const templates = {
 
 function generateConfirmationURL(email_data) {
    // TODO: replace the ref with your project ref
-   return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+   return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token_hash}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
 }
 
 async function sendEmailWithPostmark(user: any, email_data: any, serverToken: string): Promise<Response> {

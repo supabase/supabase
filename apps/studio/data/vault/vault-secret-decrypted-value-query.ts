@@ -15,7 +15,7 @@ export const vaultSecretDecryptedValueQuery = (id: string) => {
 
 export type VaultSecretsDecryptedValueVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 }
 

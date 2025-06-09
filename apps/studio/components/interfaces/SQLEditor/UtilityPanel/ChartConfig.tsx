@@ -7,7 +7,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import {
   Badge,
@@ -69,7 +68,6 @@ export const ChartConfig = ({
   onConfigChange,
 }: ChartConfigProps) => {
   const { ref } = useParams()
-  const supportSQLBlocks = useFlag('reportsV2')
 
   const [acknowledged, setAcknowledged] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED(ref as string),
@@ -203,7 +201,7 @@ export const ChartConfig = ({
           )}
         </div>
 
-        {supportSQLBlocks && !acknowledged && (
+        {!acknowledged && (
           <Admonition showIcon={false} type="tip" className="p-2 relative group">
             <Tooltip>
               <TooltipTrigger

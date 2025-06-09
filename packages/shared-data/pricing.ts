@@ -591,8 +591,8 @@ export const pricing: Pricing = {
           pro: false,
           team: [
             '$60 per drain per month',
-            'and $0.20 per Million processed',
-            'and $0.09 per GB bandwidth',
+            '+ $0.20 per million events',
+            '+ $0.09 per GB bandwidth',
           ],
           enterprise: 'Custom',
         },
