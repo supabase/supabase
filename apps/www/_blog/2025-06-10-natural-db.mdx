@@ -126,15 +126,17 @@ As the codebase owner, you can customize your assistant's capabilities by modify
 5. **Telegram notifications** sends daily meal suggestions, cooking reminders, weekly grocery lists based on planned meals, and evening meal rating prompts
 6. **Daily rating system** collects user feedback on each meal through Telegram, storing ratings and comments to improve future meal suggestions
 
-### Travel Planning & Experience Tracking
+### Company Feedback Analysis
 
-**Setup**: "Help me research destinations and track my travel experiences"
+![Customer feedback analysis dashboard](/images/blog/2025-06-10-natural-db/feedback-analysis.png)
 
-1. **Database storage** creates `destinations`, `trip_plans`, and `travel_experiences` tables to store research findings, itineraries, and post-trip reflections
-2. **Web search** finds destination information, flight deals, and local recommendations based on travel preferences
-3. **Database lookup** analyzes past trip satisfaction, budget patterns, and preferred activities
-4. **Cron trigger** runs monthly to suggest new destinations and seasonal travel deals
-5. **MCP integration** automatically adds trip dates to calendar and sends pre-trip reminders with personalized packing lists and local tips
+**Setup**: "Every morning, pull the latest support tickets via MCP, analyze them, store the findings in a `feedback` table with tags, and give me a weekly summary."
+
+1.  **Cron Trigger**: A `pg_cron` job runs every morning to initiate the ticket analysis workflow.
+2.  **MCP Integration**: Connects to your support system (e.g., Zendesk, Intercom) to fetch new tickets.
+3.  **AI Analysis & Storage**: The assistant processes each ticket, identifies key themes, sentiment, and product areas, then stores this structured data with tags in a `feedback` table.
+4.  **Weekly Summary**: Every Friday, another cron job generates a summary of the week's feedback, highlighting top issues, sentiment trends, and feature requests.
+5.  **Group Email**: The weekly summary is delivered as a concise report via Zapier's Gmail MCP, keeping your team informed of the customer's voice.
 
 ### Interest-Based Article Bookmarker
 
