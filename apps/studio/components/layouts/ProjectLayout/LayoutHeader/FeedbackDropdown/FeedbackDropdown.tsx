@@ -29,6 +29,7 @@ const FeedbackDropdown = ({ className }: { className?: string }) => {
             setStage('select')
           }}
           type="outline"
+          className="rounded-full h-[32px] border-border"
         >
           <span className={className}>Feedback</span>
         </Button>
