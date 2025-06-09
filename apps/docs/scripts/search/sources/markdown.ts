@@ -46,6 +46,6 @@ export class MarkdownSource extends BaseSource {
     const sections = this.sections ?? []
     const sectionText = sections.map(({ content }) => content).join('\n\n')
 
-    return `# ${this.meta.title ?? ''}\n\n${this.meta.subtitle ?? ''}\n\n${sectionText}`
+    return `# ${this.meta?.title ?? ''}\n\n${this.meta?.subtitle ?? ''}\n\n${sectionText}`
   }
 }

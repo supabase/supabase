@@ -1,5 +1,6 @@
 import { useConstant } from 'common'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { partition } from 'lodash'
 import { NextRouter } from 'next/router'
 import { createContext, PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
@@ -353,6 +354,23 @@ function createTabsState(projectRef: string) {
 
       onClose?.(id)
     },
+    handleTabCloseAll: ({
+      editor,
+      router,
+      onClearDashboardHistory,
+    }: {
+      editor: 'sql' | 'table'
+      router: NextRouter
+      onClearDashboardHistory: () => void
+    }) => {
+      const tabsToClose =
+        editor === 'table'
+          ? store.openTabs.filter((x) => !x.startsWith('sql'))
+          : store.openTabs.filter((x) => x.startsWith('sql'))
+      store.removeTabs(tabsToClose)
+      onClearDashboardHistory()
+      router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+    },
     handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: any) => {
       // Make permanent if needed
       const draggedTab = store.tabsMap[tabId]
@@ -380,17 +398,15 @@ export type TabsState = ReturnType<typeof createTabsState>
 
 export const TabsStateContext = createContext<TabsState>(createTabsState(''))
 
-export const TabsStateContextProvider = ({
-  projectRef,
-  children,
-}: PropsWithChildren<{ projectRef?: string }>) => {
-  const state = useConstant(() => createTabsState(projectRef ?? ''))
+export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
+  const project = useSelectedProject()
+  const state = useConstant(() => createTabsState(project?.ref ?? ''))
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && projectRef) {
+    if (typeof window !== 'undefined' && project?.ref) {
       return subscribe(state, () => {
         localStorage.setItem(
-          getTabsStorageKey(projectRef),
+          getTabsStorageKey(project?.ref),
           JSON.stringify({
             activeTab: state.activeTab,
             openTabs: state.openTabs,
@@ -399,7 +415,7 @@ export const TabsStateContextProvider = ({
           })
         )
         localStorage.setItem(
-          getRecentItemsStorageKey(projectRef),
+          getRecentItemsStorageKey(project?.ref),
           JSON.stringify({
             items: state.recentItems,
           })

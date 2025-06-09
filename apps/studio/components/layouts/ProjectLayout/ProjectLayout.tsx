@@ -23,7 +23,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { EnableBranchingModal } from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -125,7 +125,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
         if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
-          aiSnap.openAssistant()
+          aiSnap.toggleAssistant()
           e.preventDefault()
           e.stopPropagation()
         }

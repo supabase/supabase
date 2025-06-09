@@ -2,6 +2,7 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Byrne
 Alaister Young
 Aleksi Immonen
 Alexander Korotkov
@@ -93,6 +94,7 @@ Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
 Supun Sudaraka Kalidasa
+Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
