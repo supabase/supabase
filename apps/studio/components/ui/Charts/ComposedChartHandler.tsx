@@ -14,11 +14,12 @@ import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
 import { getMockDataForAttribute } from 'data/reports/auth-charts'
+import { useAuthReport } from 'data/reports/auth-report-query'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line'
+type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
 
 export type MultiAttribute = {
   attribute: string
@@ -326,17 +327,16 @@ const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  const infraAttributes = attributes
-    .filter((attr) => attr?.provider === 'infra-monitoring')
-    .map((attr) => attr.attribute as InfraMonitoringAttribute)
-  const dailyStatsAttributes = attributes
-    .filter((attr) => attr?.provider === 'daily-stats')
-    .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
+  const projectRef = typeof ref === 'string' ? ref : Array.isArray(ref) ? ref[0] : ''
+
+  const infraAttributes = attributes.filter((attr) => attr.provider === 'infra-monitoring')
+  const dailyStatsAttributes = attributes.filter((attr) => attr.provider === 'daily-stats')
+  const logsAttributes = attributes.filter((attr) => attr.provider === 'logs')
   const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
-  const referenceLines = attributes.filter((attr) => attr?.provider === 'reference-line')
+  const referenceLineAttributes = attributes.filter((attr) => attr.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
-    infraAttributes,
+    infraAttributes.map((attr) => attr.attribute as InfraMonitoringAttribute),
     ref,
     startDate,
     endDate,
@@ -346,7 +346,7 @@ const useAttributeQueries = (
     isVisible
   )
   const dailyStatsQueries = useProjectDailyStatsQueries(
-    dailyStatsAttributes,
+    dailyStatsAttributes.map((attr) => attr.attribute as ProjectDailyStatsAttribute),
     ref,
     startDate,
     endDate,
@@ -356,39 +356,68 @@ const useAttributeQueries = (
     isVisible
   )
 
-  // Handle mock data queries
-  const mockQueries = useMemo(() => {
-    return mockAttributes
-      .filter((attr) => attr.enabled !== false)
-      .map((attr) => {
-        // Use the attribute value to determine which mock data to fetch
-        const mockData = getMockDataForAttribute(attr.attribute)
-
-        // The mock data is already in the correct format
-        return {
-          isLoading: false,
-          data: mockData,
-        }
-      })
-  }, [])
-
-  const referenceLineQueries = referenceLines.map((line) => {
-    let value = line.value || 0
-
-    return {
-      data: {
-        data: [], // Will be populated in combinedData
-        attribute: line.attribute,
-        total: value,
-        maximum: value,
-        totalGrouped: { [line.attribute]: value },
-      },
-      isLoading: false,
-      isError: false,
-    }
+  const logsEnabled = logsAttributes.length === 1
+  const logsMetric = logsEnabled ? logsAttributes[0].attribute : ''
+  const logsQueryResult = useAuthReport({
+    projectRef,
+    metricKey: logsMetric,
+    startDate,
+    endDate,
+    interval,
+    enabled: logsEnabled,
   })
 
-  return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries, ...mockQueries]
+  let infraIdx = 0
+  let dailyStatsIdx = 0
+  return attributes.map((attr) => {
+    if (attr.provider === 'infra-monitoring') {
+      return infraQueries[infraIdx++]
+    } else if (attr.provider === 'daily-stats') {
+      return dailyStatsQueries[dailyStatsIdx++]
+    } else if (attr.provider === 'logs') {
+      if (logsEnabled) {
+        const { data: logsData, isLoading, error } = logsQueryResult
+        return {
+          isLoading,
+          data: {
+            data: logsData || [],
+            attribute: attr.attribute,
+            error,
+          },
+        }
+      } else {
+        // Not supported: multiple logs attributes per chart
+        return {
+          isLoading: false,
+          data: undefined,
+        }
+      }
+    } else if (attr.provider === 'mock') {
+      const mockData = getMockDataForAttribute(attr.attribute)
+      return {
+        isLoading: false,
+        data: mockData,
+      }
+    } else if (attr.provider === 'reference-line') {
+      let value = attr.value || 0
+      return {
+        data: {
+          data: [],
+          attribute: attr.attribute,
+          total: value,
+          maximum: value,
+          totalGrouped: { [attr.attribute]: value },
+        },
+        isLoading: false,
+        isError: false,
+      }
+    } else {
+      return {
+        isLoading: false,
+        data: undefined,
+      }
+    }
+  })
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
