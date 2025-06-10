@@ -58,6 +58,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideHighlightedValue?: boolean
   syncId?: string
   docsUrl?: string
+  titleTooltip?: string
 }
 
 export default function ComposedChart({
@@ -145,13 +146,45 @@ export default function ComposedChart({
     color: CHART_COLORS.REFERENCE_LINE,
   }
 
+  const chartData =
+    data && !!data[0]
+      ? Object.entries(data[0])
+          ?.map(([key, value]) => ({
+            name: key,
+            value: value,
+          }))
+          .filter(
+            (att) =>
+              att.name !== 'timestamp' &&
+              att.name !== 'period_start' &&
+              att.name !== maxAttribute?.attribute &&
+              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
+          )
+          .map((att, index) => {
+            const attribute = attributes.find((attr) => attr.attribute === att.name)
+            return {
+              ...att,
+              color: attribute?.color
+                ? resolvedTheme?.includes('dark')
+                  ? attribute.color.dark
+                  : attribute.color.light
+                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+            }
+          })
+      : []
+
   const lastDataPoint = !!data[data.length - 1]
     ? Object.entries(data[data.length - 1])
         .map(([key, value]) => ({
           dataKey: key,
           value: value as number,
         }))
-        .filter((entry) => entry.dataKey !== 'timestamp')
+        .filter(
+          (entry) =>
+            entry.dataKey !== 'timestamp' &&
+            entry.dataKey !== 'period_start' &&
+            attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
+        )
     : undefined
   const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
@@ -179,22 +212,6 @@ export default function ComposedChart({
     chartHighlight?.coordinates.left &&
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
-
-  const chartData =
-    data && !!data[0]
-      ? Object.entries(data[0])
-          ?.map(([key, value], index) => ({
-            name: key,
-            value: value,
-            color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
-          }))
-          .filter(
-            (att) =>
-              att.name !== 'timestamp' &&
-              att.name !== maxAttribute?.attribute &&
-              !referenceLines.map((a) => a.attribute).includes(att.name)
-          )
-      : []
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
@@ -384,6 +401,7 @@ export default function ComposedChart({
                 y={line.value}
                 strokeWidth={1}
                 {...line}
+                color={line.color?.dark}
                 strokeDasharray={line.strokeDasharray ?? '3 3'}
                 label={undefined}
               >

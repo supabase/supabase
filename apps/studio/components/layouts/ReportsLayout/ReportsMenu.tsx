@@ -112,6 +112,11 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
+        {
+          name: 'Realtime',
+          key: 'realtime',
+          url: `/project/${ref}/reports/realtime`,
+        },
       ],
     },
   ]
