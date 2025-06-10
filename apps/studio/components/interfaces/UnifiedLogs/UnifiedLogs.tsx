@@ -85,6 +85,7 @@ export const UnifiedLogsTable = () => {
     []
   )
 
+  // [Joshen] This needs to move to the data folder to follow our proper RQ structure
   const { data, isFetching, isLoading, fetchNextPage, hasNextPage, fetchPreviousPage, refetch } =
     // @ts-ignore
     useInfiniteQuery(dataOptions(search, projectRef ?? ''))

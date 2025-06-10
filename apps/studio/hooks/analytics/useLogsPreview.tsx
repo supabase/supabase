@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { useMemo, useState, useCallback } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import {
   LogsTableName,
@@ -22,8 +22,8 @@ import {
   genDefaultQuery,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
-import { useLogsUrlState } from './useLogsUrlState'
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
+import { useLogsUrlState } from './useLogsUrlState'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
 
 interface LogsPreviewHook {
@@ -92,10 +92,6 @@ function useLogsPreview({
 
   const queryKey = useMemo(() => ['projects', projectRef, 'logs', params], [projectRef, params])
 
-  console.log('table:', table)
-
-  console.log('useLogsPreview SQL:', params.sql)
-
   const {
     data,
     isSuccess,
@@ -151,17 +147,10 @@ function useLogsPreview({
       }
     })
 
-    // Log unified logs data for debugging
-    if (table === 'unified_logs' && logData.length > 0) {
-      console.log('Unified Logs Data:', logData)
-      console.log('Sample log record:', logData[0])
-      console.log('Sample log record metadata:', logData[0]?.metadata)
-    }
-
     const oldestTimestamp = logData.length > 0 ? logData[logData.length - 1]?.timestamp : undefined
 
     return { logData, error, oldestTimestamp }
-  }, [data?.pages, table])
+  }, [data?.pages])
 
   const countQuerySql = useMemo(() => genCountQuery(table, mergedFilters), [table, mergedFilters])
   const countQueryKey = useMemo(

@@ -321,26 +321,23 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
               </CommandGroup>
               <CommandEmpty>No results found.</CommandEmpty>
             </CommandList>
-            <div
-              className="bg-surface-100 flex flex-wrap justify-between gap-3 border-t bg-accent/50 px-2 py-1.5 text-sm text-accent-foreground"
-              cmdk-footer=""
-            >
+            <div className="bg-surface-100 flex flex-wrap justify-between gap-3 border-t bg-accent/50 px-2 py-1.5 text-sm text-accent-foreground">
               <div className="flex flex-wrap gap-3">
                 <span>
-                  Use <Kbd variant="outline">↑</Kbd> <Kbd variant="outline">↓</Kbd> to navigate
+                  Use <Kbd>↑</Kbd> <Kbd>↓</Kbd> to navigate
                 </span>
                 <span>
-                  <Kbd variant="outline">Enter</Kbd> to query
+                  <Kbd>Enter</Kbd> to query
                 </span>
                 <span>
-                  <Kbd variant="outline">Esc</Kbd> to close
+                  <Kbd>Esc</Kbd> to close
                 </span>
                 <Separator orientation="vertical" className="my-auto h-3" />
                 <span>
-                  Union: <Kbd variant="outline">regions:a,b</Kbd>
+                  Union: <Kbd>regions:a,b</Kbd>
                 </span>
                 <span>
-                  Range: <Kbd variant="outline">p95:59-340</Kbd>
+                  Range: <Kbd>p95:59-340</Kbd>
                 </span>
               </div>
               {lastSearches.length ? (

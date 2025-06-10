@@ -17,7 +17,6 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/get-utc-time',
   '/edge-functions/test',
   '/edge-functions/body',
-  '/api/data-table/light',
 ]
 
 export function middleware(request: NextRequest) {

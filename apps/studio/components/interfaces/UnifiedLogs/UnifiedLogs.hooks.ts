@@ -1,18 +1,8 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { useParams } from 'next/navigation'
-import { useQueryState, useQueryStates } from 'nuqs'
+import { useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
-import SuperJSON from 'superjson'
 
 import { useHotKey } from 'hooks/ui/useHotKey'
-import { createApiQueryString } from './QueryOptions'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
-import {
-  InfiniteQueryResponse,
-  PageParam,
-  UnifiedLogSchema,
-  UnifiedLogsMeta,
-} from './UnifiedLogs.types'
 
 export const useResetFocus = () => {
   useHotKey(() => {
@@ -51,85 +41,4 @@ export const useLiveMode = <TData extends { date: Date }>(data: TData[]) => {
   }, [live, data])
 
   return { row: anchorRow, timestamp: liveTimestamp.current }
-}
-
-// [Joshen] This isn't currently being used - check if can deprecate
-export function useUnifiedLogs() {
-  // Get project ref from URL params
-  const { ref: projectRef } = useParams<{ ref: string }>()
-
-  // Use your existing search params
-  const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
-
-  // Add log_type to search params if needed
-  const queryParams = useMemo(() => {
-    return {
-      ...search,
-      // Add any unified logs specific params
-    }
-  }, [search])
-
-  // Create the query
-  // @ts-ignore
-  const result = useInfiniteQuery({
-    queryKey: ['unified-logs', projectRef, JSON.stringify(queryParams)],
-    queryFn: async ({ pageParam }) => {
-      const cursor = pageParam?.cursor ? new Date(pageParam.cursor) : undefined
-      const direction = pageParam?.direction
-
-      // Construct API params
-      const apiParams = {
-        ...queryParams,
-        uuid: null, // Explicitly remove for API call
-        live: null, // Explicitly remove for API call
-        ...(cursor && { cursor }),
-        ...(direction && { direction }),
-      }
-
-      // Define endpoint for unified logs
-      const endpoint = `/api/projects/${projectRef}/logs/unified`
-      const queryString = createApiQueryString(apiParams)
-
-      const response = await fetch(`${endpoint}${queryString}`)
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch unified logs')
-      }
-
-      const jsonString = await response.text()
-      return SuperJSON.parse<InfiniteQueryResponse<UnifiedLogSchema[], UnifiedLogsMeta>>(jsonString)
-    },
-    initialPageParam: { cursor: new Date().getTime(), direction: 'next' } as PageParam,
-    getPreviousPageParam: (firstPage) => {
-      if (!firstPage.prevCursor) return null
-      return { cursor: firstPage.prevCursor, direction: 'prev' } as PageParam
-    },
-    getNextPageParam: (lastPage) => {
-      if (!lastPage.nextCursor) return null
-      return { cursor: lastPage.nextCursor, direction: 'next' } as PageParam
-    },
-    refetchOnWindowFocus: false,
-  })
-
-  // Helper functions for the unified logs
-  const addLogTypeFilter = (logType: UnifiedLogSchema['log_type']) => {
-    const currentLogTypes = search.log_type || []
-    setSearch({
-      log_type: [...currentLogTypes, logType],
-    })
-  }
-
-  const removeLogTypeFilter = (logType: UnifiedLogSchema['log_type']) => {
-    const currentLogTypes = search.log_type || []
-    setSearch({
-      log_type: currentLogTypes.filter((type) => type !== logType),
-    })
-  }
-
-  // Return query results and helper functions
-  return {
-    ...result,
-    addLogTypeFilter,
-    removeLogTypeFilter,
-  }
 }

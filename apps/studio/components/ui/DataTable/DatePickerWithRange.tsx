@@ -24,7 +24,7 @@ import {
 import { presets as defaultPresets } from './DataTable.constants'
 import type { DatePreset } from './DataTable.types'
 import { useDebounce } from './hooks/useDebounce'
-import { kbdVariants } from './primitives/Kbd'
+import { kdbClassName } from './primitives/Kbd'
 
 interface DatePickerWithRangeProps extends HTMLAttributes<HTMLDivElement> {
   date: DateRange | undefined
@@ -129,11 +129,10 @@ function DatePresets({
               size="small"
               onClick={() => onSelect({ from, to })}
               className="text-left"
-              // className={cn(!isActive && 'border border-transparent')}
             >
               <div className="flex items-center justify-between gap-6">
                 <span className="mr-auto">{label}</span>
-                <span className={cn(kbdVariants(), 'uppercase')}>{shortcut}</span>
+                <span className={cn(kdbClassName, 'uppercase')}>{shortcut}</span>
               </div>
             </Button>
           )
@@ -187,7 +186,7 @@ function DatePresetsSelect({
                 className="flex items-center justify-between [&>span:last-child]:flex [&>span:last-child]:w-full [&>span:last-child]:justify-between"
               >
                 <span>{label}</span>
-                <span className={cn(kbdVariants(), 'ml-2 h-5 uppercase leading-snug')}>
+                <span className={cn(kdbClassName, 'ml-2 h-5 uppercase leading-snug')}>
                   {shortcut}
                 </span>
               </SelectItem>

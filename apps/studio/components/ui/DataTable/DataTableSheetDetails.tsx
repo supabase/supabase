@@ -93,7 +93,7 @@ export function DataTableSheetDetails({
               </TooltipTrigger>
               <TooltipContent>
                 <p>
-                  Navigate <Kbd variant="outline">↑</Kbd>
+                  Navigate <Kbd>↑</Kbd>
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -112,7 +112,7 @@ export function DataTableSheetDetails({
               </TooltipTrigger>
               <TooltipContent>
                 <p>
-                  Navigate <Kbd variant="outline">↓</Kbd>
+                  Navigate <Kbd>↓</Kbd>
                 </p>
               </TooltipContent>
             </Tooltip>
