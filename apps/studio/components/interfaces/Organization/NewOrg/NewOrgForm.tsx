@@ -1,6 +1,5 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
-import { useQueryClient } from '@tanstack/react-query'
 import _ from 'lodash'
 import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -14,10 +13,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
-import {
-  invalidateOrganizationsQuery,
-  useOrganizationsQuery,
-} from 'data/organizations/organizations-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
@@ -94,7 +90,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const { data: projects } = useProjectsQuery()
   const stripe = useStripe()
   const elements = useElements()
-  const queryClient = useQueryClient()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
@@ -156,7 +151,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org) => {
-      await invalidateOrganizationsQuery(queryClient)
       const prefilledProjectName = user.profile?.username
         ? user.profile.username + `'s Project`
         : 'My Project'
