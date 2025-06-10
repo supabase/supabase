@@ -56,39 +56,6 @@ import { getFacetedUniqueValues, getLevelRowClassName, logEventBus } from './Uni
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_FILTER_PROCESSING = false
 
-/**
- * [Joshen]
- * Phase 1: Clean up
- * - Deprecate unused files + code
- * - Make all files + code style consistent
- * - Resolve circular imports
- * Aim is to prevent PR from bloating up any further
- * Search for components/interfaces/DataTableDemo
- * Ensure that all useDataTable is going from ui/DataTable
- *
- * Phase 2: Fixes + Refactors
- * - Refactor infinite query to make it consistent with our writing style
- * - Resolve all other issues that we identified
- * Aim is ensure that the UI is fully functional and ready for incremental roll out
- *
- * Phase 3: Ad-hoc adjustments
- * - Incremental roll-out
- * Aim is to get this ready for GA for all users
- */
-
-/**
- * [Joshen] Slowly... This branch is a huge mess... Needs a shit ton of refactoring
- * - Deprecate infinite-logs-example
- * - Deprecate data-table
- * - Deprecate DataTableDemo
- * - Deprecate Trace (?)
- * - Rename logs-new to UnifiedLogs
- * - Components all need to be renamed for follow convention
- * - Resolve all circular imports
- *
- * First step is to clean up - make all the files consistent so that I can make sense of the code
- */
-
 export const UnifiedLogsTable = () => {
   useResetFocus()
 
