@@ -1,5 +1,4 @@
 import { ExternalLink } from 'lucide-react'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 
@@ -11,6 +10,7 @@ import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -104,7 +104,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
                   'transition-colors'
                 )}
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noreferrer noopener edit"
               >
                 Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
               </a>

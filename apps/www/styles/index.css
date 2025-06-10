@@ -17,6 +17,12 @@
   }
 }
 
+@layer components {
+  .disable-blur {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
 @font-face {
   font-family: 'custom-font';
   src:

@@ -15,7 +15,7 @@ export type TablePrivilegesRevoke = Parameters<
 
 export type TablePrivilegesRevokeVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   revokes: TablePrivilegesRevoke[]
 }
 

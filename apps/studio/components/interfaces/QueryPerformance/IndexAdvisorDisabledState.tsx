@@ -6,6 +6,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { getIndexAdvisorExtensions } from './index-advisor.utils'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
 
@@ -16,8 +17,7 @@ export const IndexAdvisorDisabledState = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const hypopgExtension = (extensions ?? []).find((ext) => ext.name === 'hypopg')
-  const indexAdvisorExtension = (extensions ?? []).find((ext) => ext.name === 'index_advisor')
+  const { hypopg, indexAdvisor } = getIndexAdvisorExtensions(extensions)
 
   const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
@@ -26,22 +26,22 @@ export const IndexAdvisorDisabledState = () => {
     if (project === undefined) return console.error('Project is required')
 
     try {
-      if (hypopgExtension?.installed_version === null) {
+      if (hypopg?.installed_version === null) {
         await enableExtension({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          name: hypopgExtension.name,
-          schema: hypopgExtension?.schema ?? 'extensions',
-          version: hypopgExtension.default_version,
+          name: hypopg.name,
+          schema: hypopg?.schema ?? 'extensions',
+          version: hypopg.default_version,
         })
       }
-      if (indexAdvisorExtension?.installed_version === null) {
+      if (indexAdvisor?.installed_version === null) {
         await enableExtension({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          name: indexAdvisorExtension.name,
-          schema: indexAdvisorExtension?.schema ?? 'extensions',
-          version: indexAdvisorExtension.default_version,
+          name: indexAdvisor.name,
+          schema: indexAdvisor?.schema ?? 'extensions',
+          version: indexAdvisor.default_version,
         })
       }
       toast.success('Successfully enabled index advisor!')
@@ -56,7 +56,7 @@ export const IndexAdvisorDisabledState = () => {
         <Markdown
           className="text-foreground"
           content={
-            indexAdvisorExtension === undefined
+            indexAdvisor === undefined
               ? 'Newer version of Postgres required'
               : 'Postgres extensions `index_advisor` and `hypopg` required'
           }
@@ -65,7 +65,7 @@ export const IndexAdvisorDisabledState = () => {
       <AlertDescription_Shadcn_>
         <Markdown
           content={
-            indexAdvisorExtension === undefined
+            indexAdvisor === undefined
               ? 'Upgrade to the latest version of Postgres to get recommendations on indexes for your queries'
               : 'These extensions can help in recommending database indexes to reduce the costs of your query.'
           }
@@ -74,7 +74,7 @@ export const IndexAdvisorDisabledState = () => {
 
       <AlertDescription_Shadcn_ className="mt-3">
         <div className="flex items-center gap-x-2">
-          {indexAdvisorExtension === undefined ? (
+          {indexAdvisor === undefined ? (
             <Button asChild type="default">
               <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
             </Button>

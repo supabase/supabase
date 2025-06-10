@@ -37,6 +37,8 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
 import type { NextPageWithLayout } from 'types'
+import { useOrganizationQuery } from '../../../../data/organizations/organization-query'
+import { useSelectedOrganization } from '../../../../hooks/misc/useSelectedOrganization'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -59,12 +61,15 @@ const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
   const isReportsV2 = useFlag('reportsDatabaseV2')
+  const org = useSelectedOrganization()
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const state = useDatabaseSelectorStateSnapshot()
-  const defaultStart = dayjs().subtract(7, 'day').toISOString()
+  const defaultStart = dayjs().subtract(1, 'day').toISOString()
   const defaultEnd = dayjs().toISOString()
   const [dateRange, setDateRange] = useState<any>({
-    period_start: { date: defaultStart, time_period: '7d' },
+    period_start: { date: defaultStart, time_period: '1d' },
     period_end: { date: defaultEnd, time_period: 'today' },
     interval: '1h',
   })
@@ -80,7 +85,7 @@ const DatabaseUsage = () => {
 
   const { data: databaseSizeData } = useDatabaseSizeQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
+    connectionString: project?.connectionString || undefined,
   })
   const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
@@ -92,11 +97,8 @@ const DatabaseUsage = () => {
     },
   })
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-
   const REPORT_ATTRIBUTES = getReportAttributes(isFreePlan)
-  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(isFreePlan)
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
     onSuccess: (_, variables) => {
@@ -124,6 +126,21 @@ const DatabaseUsage = () => {
         })
       )
     })
+    if (isReportsV2) {
+      REPORT_ATTRIBUTES_V2.forEach((chart: any) => {
+        chart.attributes.forEach((attr: any) => {
+          queryClient.invalidateQueries(
+            analyticsKeys.infraMonitoring(ref, {
+              attribute: attr.attribute,
+              startDate: period_start.date,
+              endDate: period_start.end,
+              interval,
+              databaseIdentifier: state.selectedDatabaseId,
+            })
+          )
+        })
+      })
+    }
     if (isReplicaSelected) {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {
@@ -179,7 +196,7 @@ const DatabaseUsage = () => {
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     setDateRange({
-      period_start: { date: from, time_period: '7d' },
+      period_start: { date: from, time_period: '1d' },
       period_end: { date: to, time_period: 'today' },
       interval: handleIntervalGranularity(from, to),
     })
@@ -208,7 +225,7 @@ const DatabaseUsage = () => {
             <div className="flex items-center gap-3">
               <DateRangePicker
                 loading={false}
-                value={'7d'}
+                value={'1d'}
                 options={TIME_PERIODS_INFRA}
                 currentBillingPeriodStart={undefined}
                 onChange={(values) => {
@@ -238,16 +255,21 @@ const DatabaseUsage = () => {
         {isReportsV2 ? (
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
-              REPORT_ATTRIBUTES_V2.filter((attr) => !attr.hide).map((attr) => (
+              REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
                 <ComposedChartHandler
-                  key={attr.id}
-                  {...attr}
-                  attributes={attr.attributes as MultiAttribute[]}
+                  key={chart.id}
+                  {...chart}
+                  attributes={chart.attributes as MultiAttribute[]}
                   interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
-                  defaultChartStyle={attr.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  showMaxValue={
+                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
                 />
               ))}
           </div>
@@ -258,6 +280,7 @@ const DatabaseUsage = () => {
                 REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
                   <ChartHandler
                     key={attr.id}
+                    {...attr}
                     provider="infra-monitoring"
                     attribute={attr.id}
                     label={attr.label}
@@ -298,16 +321,16 @@ const DatabaseUsage = () => {
             return (
               <div>
                 <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full mt-5">
-                  <div className="grid gap-2 col-span-2">
+                  <div className="grid gap-2 col-span-4 xl:col-span-2">
                     <h5 className="text-sm">Space used</h5>
                     <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>
                   </div>
-                  <div className="grid gap-2 col-span-2">
+                  <div className="grid gap-2 col-span-4 xl:col-span-3">
                     <h5 className="text-sm">Provisioned disk size</h5>
                     <span className="text-lg">{currentDiskSize} GB</span>
                   </div>
 
-                  <div className="col-span-8 text-right">
+                  <div className="col-span-full lg:col-span-4 xl:col-span-7 lg:text-right">
                     {project?.cloud_provider === 'AWS' ? (
                       <Button asChild type="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>

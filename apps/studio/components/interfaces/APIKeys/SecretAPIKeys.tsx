@@ -15,7 +15,7 @@ import {
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
 import { APIKeyRow } from './APIKeyRow'
-import CreateSecretAPIKeyModal from './CreateSecretAPIKeyModal'
+import CreateSecretAPIKeyDialog from './CreateSecretAPIKeyDialog'
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -56,22 +56,28 @@ export const SecretAPIKeys = () => {
     <div>
       <FormHeader
         title="Secret keys"
-        description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application. Keep secret and never publish."
-        actions={<CreateSecretAPIKeyModal />}
+        description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
+        actions={<CreateSecretAPIKeyDialog />}
       />
       <Card className={cn('w-full overflow-hidden', !empty && 'bg-surface-100')}>
         <CardContent className="p-0">
-          <Table className="p-5">
+          <Table className="p-5 table-auto">
             <TableHeader>
               <TableRow className={cn('bg-200', empty && 'hidden')}>
                 <TableHead
                   key=""
-                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 overflow-hidden"
+                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2"
                 >
                   Name
                 </TableHead>
                 <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
                   API Key
+                </TableHead>
+                <TableHead
+                  key=""
+                  className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2"
+                >
+                  Description
                 </TableHead>
                 <TableHead
                   className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2"
@@ -127,9 +133,9 @@ export const SecretAPIKeys = () => {
     return (
       <TableContainer>
         <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
-          <p className="text-sm text-foreground">No secret API keys exist</p>
+          <p className="text-sm text-foreground">No secret API keys found</p>
           <p className="text-sm text-foreground-light">
-            Your project can't be accessed using secret API keys.
+            Your project is not accessible via secret keys—there are no active secret keys created.
           </p>
         </div>
       </TableContainer>

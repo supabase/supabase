@@ -15,7 +15,7 @@ Data sent to the client when retrieving data stored in your database.
 
 <Admonition type="note">
 
-There are various ways to interact with your database, such as through the PostgREST API using one of the client SDKs or via the Supavisor connection pooler. On the Supabase Dashboard, Egress from the PostgREST API is labeled as **Database Egress**, while Egress through Supavisor is labeled as **Supavisor Egress**.
+There are various ways to interact with your database, such as through the PostgREST API using one of the client SDKs or via the Supavisor connection pooler. On the Supabase Dashboard, Egress from the PostgREST API is labeled as **Database Egress**, while Egress through Supavisor is labeled as **Shared Pooler Egress**.
 
 </Admonition>
 
@@ -42,6 +42,12 @@ Data sent to the client when executing Edge Functions.
 Data pushed to clients via Supabase Realtime for subscribed events.
 
 **Example:** When a user views a product page in an online shop, their client subscribes to real-time inventory updates. As stock levels change, Supabase Realtime pushes updates to all subscribed clients, contributing to Realtime Egress.
+
+### Shared pooler Egress
+
+Data sent to the client when using the shared connection pooler (Supavisor) to access your database. WHen using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
+
+**Example:** You are using our [shared connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
 
 ### Log Drain Egress
 

@@ -108,7 +108,7 @@ In your newly created `scribe-bot/index.ts` file, add the following code:
 ```ts supabase/functions/scribe-bot/index.ts
 import { Bot, webhookCallback } from 'https://deno.land/x/grammy@v1.34.0/mod.ts'
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 import { ElevenLabsClient } from 'npm:elevenlabs@1.50.5'
 
 console.log(`Function "elevenlabs-scribe-bot" up and running!`)

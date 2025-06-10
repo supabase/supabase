@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 
+import { PlanId } from 'data/subscriptions/types'
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
-import { PlanId } from 'data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
@@ -103,6 +103,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       totalRequests: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-total-requests
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
@@ -120,6 +121,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       topRoutes: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-top-routes
         select
           request.path as path,
           request.method as method,
@@ -142,6 +144,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       errorCounts: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-error-counts
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
@@ -162,6 +165,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       topErrorRoutes: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-top-error-routes
         select
           request.path as path,
           request.method as method,
@@ -186,6 +190,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       responseSpeed: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-response-speed
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           avg(response.origin_time) as avg
@@ -205,6 +210,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       topSlowRoutes: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-top-slow-routes
         select
           request.path as path,
           request.method as method,
@@ -228,6 +234,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       networkTraffic: {
         queryType: 'logs',
         sql: (filters) => `
+        -- reports-api-network-traffic
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           coalesce(
@@ -275,7 +282,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         queryType: 'logs',
         // storage report does not perform any filtering
         sql: (_filters) => `
--- cache-hit-rate
+        -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
   countif( h.cf_cache_status in ('HIT', 'STALE', 'REVALIDATED', 'UPDATING') ) as hit_count,
@@ -294,7 +301,7 @@ order by timestamp desc
         queryType: 'logs',
         // storage report does not perform any filtering
         sql: (_filters) => `
--- top-cache-misses
+        -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
   r.search as search,
@@ -319,8 +326,8 @@ limit 12
     queries: {
       mostFrequentlyInvoked: {
         queryType: 'db',
-        sql: (_params, where, orderBy) => `
--- Most frequently called queries
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-most-frequently-invoked
 set search_path to public, extensions;
 
 select
@@ -337,17 +344,36 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows
+    statements.rows / statements.calls as avg_rows${
+      runIndexAdvisor
+        ? `,
+    case 
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
+        : ''
+    }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
   ${orderBy || 'order by statements.calls desc'}
-  limit 20;`,
+  limit 20`,
       },
       mostTimeConsuming: {
         queryType: 'db',
-        sql: (_, where, orderBy) => `
--- Most time consuming queries
+        sql: (_, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
 select
@@ -355,17 +381,36 @@ select
     statements.query,
     statements.calls,
     statements.total_exec_time + statements.total_plan_time as total_time,
-    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time
+    to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time${
+      runIndexAdvisor
+        ? `,
+    case 
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
+        : ''
+    }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
   ${orderBy || 'order by total_time desc'}
-  limit 20;`,
+  limit 20`,
       },
       slowestExecutionTime: {
         queryType: 'db',
-        sql: (_params, where, orderBy) => `
--- Slowest queries by max execution time
+        sql: (_params, where, orderBy, runIndexAdvisor = false) => `
+        -- reports-query-performance-slowest-execution-time
 set search_path to public, extensions;
 
 select
@@ -382,7 +427,26 @@ select
     -- min_time,
     -- max_time,
     -- mean_time,
-    statements.rows / statements.calls as avg_rows
+    statements.rows / statements.calls as avg_rows${
+      runIndexAdvisor
+        ? `,
+    case 
+      when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
+      then (
+        select json_build_object(
+          'has_suggestion', array_length(index_statements, 1) > 0,
+          'startup_cost_before', startup_cost_before,
+          'startup_cost_after', startup_cost_after,
+          'total_cost_before', total_cost_before,
+          'total_cost_after', total_cost_after,
+          'index_statements', index_statements
+        )
+        from index_advisor(statements.query)
+      )
+      else null
+    end as index_advisor_result`
+        : ''
+    }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
@@ -391,7 +455,7 @@ select
       },
       queryHitRate: {
         queryType: 'db',
-        sql: (_params) => `-- Cache and index hit rate
+        sql: (_params) => `-- reports-query-performance-cache-and-index-hit-rate
 select
     'index hit rate' as name,
     (sum(idx_blks_hit)) / nullif(sum(idx_blks_hit + idx_blks_read),0) as ratio
@@ -409,7 +473,8 @@ select
     queries: {
       largeObjects: {
         queryType: 'db',
-        sql: (_) => `SELECT 
+        sql: (_) => `-- reports-database-large-objects
+SELECT 
         SCHEMA_NAME,
         relname,
         table_size
