@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -58,9 +58,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       errors.name = 'Please provide a name for your bucket'
     }
 
-    if (values.name && !/^[a-z0-9.-]+$/.test(values.name)) {
-      errors.name =
-        'The name of the bucket must only container lowercase letters, numbers, dots, and hyphens'
+    if (values.name && !/^(\w|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/.test(values.name)) {
+      errors.name = 'The name of the bucket has invalid characters.'
     }
 
     if (values.name && values.name.endsWith(' ')) {
@@ -126,8 +125,19 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   layout="vertical"
                   label="Name of bucket"
                   labelOptional="Buckets cannot be renamed once created."
-                  descriptionText="Only lowercase letters, numbers, dots, and hyphens"
                 />
+                <div className="space-y-2 mt-3">
+                  <Link
+                    href="https://supabase.com/docs/guides/storage/buckets/creating-buckets"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                      <p className="text-sm m-0">View allowed characters for bucket names</p>
+                      <ExternalLink size={16} strokeWidth={1.5} />
+                    </div>
+                  </Link>
+                </div>
                 <div className="space-y-2 mt-6">
                   <Toggle
                     id="public"
