@@ -16,7 +16,7 @@
     "dev": "turbo run dev --parallel",
     "dev:cms": "turbo run dev --filter=cms --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
-    "dev:studio-local": "pnpm run --dir tests/studio-tests codegen:setup",
+    "dev:studio-local": "pnpm setup:cli && NODE_ENV=test pnpm --prefix ./apps/studio dev",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
@@ -42,6 +42,7 @@
 
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
+    "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
     "knip": "pnpx knip@~5.50.0"
