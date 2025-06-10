@@ -4,6 +4,7 @@ import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { secretsKeys } from './keys'
+import type { SecretKey } from 'components/interfaces/JwtSecrets/JWTSecretKeysTable'
 
 export type SecretsVariables = {
   projectRef?: string

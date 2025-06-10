@@ -1,5 +1,6 @@
-import { MoreVertical } from 'lucide-react'
+import { APIKeysData } from 'data/api-keys/api-keys-query'
 import { motion } from 'framer-motion'
+import { MoreVertical } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -10,13 +11,14 @@ import {
 } from 'ui'
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
-import { APIKeysData } from 'data/api-keys/api-keys-query'
 
 export const APIKeyRow = ({
   apiKey,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
 }) => {
+  // const isSecret = apiKey.type === 'secret'
+
   const MotionTableRow = motion(TableRow)
 
   return (

@@ -8,7 +8,7 @@ import { useOrganizationAcceptInvitationMutation } from 'data/organization-membe
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
-import { Button, Loading, cn } from 'ui'
+import { Button, Loading, Separator, cn } from 'ui'
 import { OrganizationInviteError } from './OrganizationInviteError'
 
 export const OrganizationInvite = () => {
@@ -81,20 +81,22 @@ export const OrganizationInvite = () => {
             />
           )}
           {isSuccess && !hasError && (
-            <div className="flex flex-row items-center justify-center gap-3">
-              <Button type="default" disabled={isJoining} asChild>
-                <Link href="/projects">Decline</Link>
-              </Button>
-              <Button
-                type="primary"
-                loading={isJoining}
-                disabled={isJoining}
-                onClick={handleJoinOrganization}
-                icon={<CheckSquare />}
-              >
-                Join organization
-              </Button>
-            </div>
+            <>
+              <div className="flex flex-row items-center justify-center gap-3">
+                <Button type="default" disabled={isJoining} asChild>
+                  <Link href="/projects">Decline</Link>
+                </Button>
+                <Button
+                  type="primary"
+                  loading={isJoining}
+                  disabled={isJoining}
+                  onClick={handleJoinOrganization}
+                  icon={<CheckSquare />}
+                >
+                  Join organization
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </div>

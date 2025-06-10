@@ -17,8 +17,6 @@ export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
-  const canDeleteAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
-
   const { mutate: deleteAPIKey, isLoading: isDeletingAPIKey } = useAPIKeyDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted API key`)
@@ -30,6 +28,8 @@ export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
     if (!projectRef) return console.error('Project ref is required')
     deleteAPIKey({ projectRef, id: apiKey.id })
   }
+
+  const canDeleteAPIKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, '*')
 
   return (
     <>
