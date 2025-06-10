@@ -57,43 +57,15 @@ There are two ways to manage your dependencies in Supabase Edge Functions:
 
 ### Using deno.json (recommended)
 
+
 <Admonition type="note">
 
 This feature requires Supabase CLI version 1.215.0 or higher.
 
 </Admonition>
 
-Each function should have its own `deno.json` file to manage dependencies and configure Deno-specific settings. This ensures proper isolation between functions and is the recommended approach for deployment. For a complete list of supported options, see the [official Deno configuration documentation](https://docs.deno.com/runtime/manual/getting_started/configuration_file).
 
-```json supabase/functions/my-function/deno.json
-{
-  "imports": {
-    "lodash": "https://cdn.skypack.dev/lodash"
-  }
-}
-```
-
-The recommended file structure for deployment:
-
-```bash
-└── supabase
-    ├── functions
-    │   ├── function-one
-    │   │   ├── index.ts
-    │   │   ├─- deno.json    # Function-specific Deno configuration
-    │   │   └── .npmrc       # Function-specific npm configuration (if needed)
-    │   └── function-two
-    │       ├── index.ts
-    │       ├─- deno.json    # Function-specific Deno configuration
-    │       └── .npmrc       # Function-specific npm configuration (if needed)
-    └── config.toml
-```
-
-<Admonition type="caution">
-  While it's possible to use a global `deno.json` in the `/supabase/functions` directory for local
-  development, this approach is not recommended for deployment. Each function should maintain its
-  own configuration to ensure proper isolation and dependency management.
-</Admonition>
+<$Partial path="edge_functions_file_structure.mdx" />
 
 ### Using import maps (legacy)
 
