@@ -1,5 +1,5 @@
 ---
-title: 'Building a Self-Evolving AI Assistant with Postgres, Scheduling, and External Tools'
+title: 'Build an Evolving AI Assistant with Postgres'
 description: 'Learn how to build a Supabase powered AI assistant that combines PostgreSQL with scheduling and external tools for long-term memory, structured data management and autonomous actions.'
 categories:
   - product
@@ -14,9 +14,13 @@ image: 2025-06-10-natural-db/og.png
 thumb: 2025-06-10-natural-db/thumb.png
 ---
 
-While Large Language Models are effective at natural language understanding, they often lack the ability to maintain structured data across conversations. This system combines the natural language processing of LLMs with PostgreSQL for storage, creating an AI that can maintain precise, queryable records over time. The assistant converts conversations into structured database entries, enabling reliable data retrieval and analysis through database operations, scheduled prompts, web searches, and MCP integrations.
+While Large Language Models understand natural language, they often can't maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time. 
 
-The system's flexibility is created by combining these core primitives: database operations for structured data, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for real-world actions. This architecture provides a foundation that can handle simple tasks, like tracking expenses, and be extended to more complex workflows, such as automated investment monitoring. For example, a scheduled task might analyze your portfolio, trigger web searches for market trends, update your database with new insights, and send personalized reports through Zapier—all while maintaining organized, queryable data.
+At a high level, the system's flexibility is created by combining these core primitives: database operations for structured data, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for real-world actions. 
+
+The assistant converts conversations into structured database entries, enabling reliable data retrieval and analysis through database operations, scheduled prompts, web searches, and MCP integrations. For example, a scheduled task might analyze your portfolio, trigger web searches for market trends, update your database with new insights, and send personalized reports through Zapier—all while maintaining organized, queryable data.
+
+See it at work in the video below.
 
 <video className="rounded-sm m-0" autoPlay loop muted>
   <source
