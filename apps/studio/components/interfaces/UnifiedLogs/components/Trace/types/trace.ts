@@ -7,16 +7,16 @@ export interface Span {
   endTime: number
   level?: number // Optional
   highlight?: boolean
-  status?: "success" | "error" | "warning" | "info"
+  status?: 'success' | 'error' | 'warning' | 'info'
   icon?: string // Icon identifier
-  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD" // HTTP method
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD' // HTTP method
 }
 
 export interface Marker {
   id: string
   name: string
   time: number
-  type: "success" | "error" | "warning" | "info"
+  type: 'success' | 'error' | 'warning' | 'info'
 }
 
 export interface TraceData {
