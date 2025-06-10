@@ -77,7 +77,14 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
                     </span>
                     <Badge className="shrink-0">{org.plan?.name}</Badge>
                   </CardTitle>
-                  <Button size="small" onClick={() => onSelect(org)} className="shrink-0">
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      onSelect(org)
+                      setSearch('')
+                    }}
+                    className="shrink-0"
+                  >
                     Choose
                   </Button>
                 </CardHeader>

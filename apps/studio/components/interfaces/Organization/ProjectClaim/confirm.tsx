@@ -4,10 +4,12 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
+import { projectKeys } from 'data/projects/keys'
 import { BASE_PATH } from 'lib/constants'
 import { Organization } from 'types'
 import {
@@ -17,6 +19,7 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
 import { ProjectClaimLayout } from './layout'
 
@@ -33,10 +36,13 @@ export const ProjectClaimConfirm = ({
 }) => {
   const router = useRouter()
   const { token: claimToken } = useParams()
+  const queryClient = useQueryClient()
 
   const { mutate: claimProject, isLoading } = useOrganizationProjectClaimMutation({
     onSuccess: () => {
       toast.success('Project claimed successfully')
+      // invalidate the org projects to force them to be refetched
+      queryClient.invalidateQueries(projectKeys.list())
       router.push(`/org/${selectedOrganization.slug}`)
     },
     onError: (error) => {
@@ -117,8 +123,8 @@ export const ProjectClaimConfirm = ({
               </span>
               <span>
                 <span className="text-foreground">{requester?.name}</span> will receive API access
-                to all projects within your organization to continue providing its functionality to
-                the application you've built.
+                (permissions listed below) to all projects within your organization to continue
+                providing its functionality to the application you've built.
               </span>
             </li>
             <li className="flex space-x-2">
@@ -131,10 +137,12 @@ export const ProjectClaimConfirm = ({
               </span>
             </li>
           </ul>
-          <div className="text-foreground-light">
-            Upon claiming, the project may undergo a short downtime (less than 10 minutes) for
-            resizing.
-          </div>
+          <Admonition type="caution">
+            <div className="text-foreground-light">
+              Upon claiming, the project may undergo a short downtime (less than 10 minutes) for
+              resizing.
+            </div>
+          </Admonition>
         </div>
         <div className="flex space-y-4 flex-col">
           {requester.scopes.length === 0 ? (
@@ -146,8 +154,8 @@ export const ProjectClaimConfirm = ({
             <Collapsible_Shadcn_>
               <CollapsibleTrigger_Shadcn_ className="pb-3 w-full flex items-center justify-between group">
                 <p className="text-sm text-foreground-light text-left">
-                  <span className="font-foreground">List of permissions</span> which will be applied
-                  for the{' '}
+                  <span className="font-foreground">List of permissions</span> that{' '}
+                  <span className="text-foreground">{requester.name}</span> will have for the{' '}
                   <span className="text-amber-900">
                     selected organization and all of its projects.
                   </span>
