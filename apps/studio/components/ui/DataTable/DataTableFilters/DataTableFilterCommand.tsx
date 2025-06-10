@@ -57,6 +57,8 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
     }[]
   >('data-table-command', [])
 
+  const trimmedInputValue = inputValue.trim()
+
   useHotKey(() => setOpen((open) => !open), 'k')
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
     // reset
     if (currentWord !== '' && !open) setCurrentWord('')
     // avoid recursion
-    if (inputValue.trim() === '' && !open) return
+    if (trimmedInputValue === '' && !open) return
 
     const searchParams = columnParser.parse(inputValue)
 
@@ -130,12 +132,14 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
         ) : (
           <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground opacity-50 group-hover:text-popover-foreground" />
         )}
-        <span className="h-11 w-full max-w-sm truncate py-3 text-left text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 md:max-w-xl lg:max-w-4xl xl:max-w-5xl">
-          {inputValue.trim() ? (
-            <span className="text-foreground">{inputValue}</span>
-          ) : (
-            <span>Search data table...</span>
+        <span
+          className={cn(
+            'h-9 w-full max-w-sm truncate py-3 text-left text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50',
+            'flex items-center md:max-w-xl lg:max-w-4xl xl:max-w-5xl',
+            trimmedInputValue ? 'text-foreground' : 'text-foreground-light'
           )}
+        >
+          {trimmedInputValue ? inputValue : 'Search data table...'}
         </span>
         <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
           <span className="mr-1">⌘</span>
@@ -150,7 +154,6 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
         filter={(value, search, keywords) =>
           getFilterValue({ value, search, keywords, currentWord })
         }
-        // loop
       >
         <CommandInput
           ref={inputRef}
@@ -360,8 +363,6 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
     </div>
   )
 }
-
-// function CommandItemType<TData>
 
 function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<TData> }) {
   const { table, getFacetedMinMaxValues, getFacetedUniqueValues } = useDataTable()

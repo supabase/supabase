@@ -18,8 +18,9 @@ interface DataTableToolbarProps {
 export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
   const { table, isLoading, columnFilters } = useDataTable()
   const { open, setOpen } = useControls()
-  useHotKey(() => setOpen((prev) => !prev), 'b')
   const filters = table.getState().columnFilters
+
+  useHotKey(() => setOpen((prev) => !prev), 'b')
 
   const rows = useMemo(
     () => ({
@@ -38,19 +39,11 @@ export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
               <Button
                 size="tiny"
                 type="outline"
-                icon={<PanelLeftClose className="h-4 w-4" />}
+                icon={<PanelLeftClose />}
                 onClick={() => setOpen((prev) => !prev)}
-                className="hidden gap-2 sm:flex"
+                className="hidden sm:flex"
               >
-                {open ? (
-                  <>
-                    <span className="hidden md:block">Hide Controls</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="hidden md:block">Show Controls</span>
-                  </>
-                )}
+                <span className="hidden md:block">{open ? 'Hide' : 'Show'} Controls</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">

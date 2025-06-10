@@ -62,10 +62,8 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
       className={cn(live && 'border-info text-info hover:text-info')}
       onClick={handleClick}
       type={live ? 'primary' : 'default'}
-      size="small"
-      icon={
-        live ? <CirclePause className="mr-2 h-4 w-4" /> : <CirclePlay className="mr-2 h-4 w-4" />
-      }
+      size="tiny"
+      icon={live ? <CirclePause className="h-4 w-4" /> : <CirclePlay className="h-4 w-4" />}
     >
       Live
     </Button>

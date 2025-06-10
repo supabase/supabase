@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
+// [Joshen] This hook can replace all usage of copyToClipboard from lib/helpers
 export function useCopyToClipboard() {
   const [text, setText] = useState<string | null>(null)
 

@@ -1,9 +1,7 @@
-import { useDataTable } from './providers/DataTableProvider'
-
+import { cn } from 'ui'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
-
-import { cn } from 'ui'
+import { useDataTable } from './providers/DataTableProvider'
 
 export function FilterSideBar() {
   const { table } = useDataTable()
@@ -16,8 +14,8 @@ export function FilterSideBar() {
         'hidden sm:flex'
       )}
     >
-      <div className="border-b border-border bg-background p-2 md:top-0">
-        <div className="flex h-[46px] items-center justify-between gap-3">
+      <div className="border-b border-border bg-background px-2 md:top-0">
+        <div className="flex h-[48px] items-center justify-between gap-3">
           <p className="px-2 font-medium text-foreground">Filters</p>
           <div>{table.getState().columnFilters.length ? <DataTableResetButton /> : null}</div>
         </div>

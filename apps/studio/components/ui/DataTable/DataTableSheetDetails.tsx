@@ -73,27 +73,8 @@ export function DataTableSheetDetails({
   }, [selectedRowKey, onNext, onPrev])
 
   return (
-    // <Sheet
-    //   open={!!selectedRowKey}
-    //   onOpenChange={() => {
-    //     // REMINDER: focus back to the row that was selected
-    //     // We need to manually focus back due to missing Trigger component
-    //     const el = selectedRowKey ? document.getElementById(selectedRowKey) : null
-    //     table.resetRowSelection()
-
-    //     // REMINDER: when navigating between tabs in the sheet and exit the sheet, the tab gets lost
-    //     // We need a minimal delay to allow the sheet to close before focusing back to the row
-    //     setTimeout(() => el?.focus(), 0)
-    //   }}
-    // >
-    // <SheetContent
-    //   // onCloseAutoFocus={(e) => e.preventDefault()}
-    //   className="overflow-y-auto p-0 sm:max-w-md"
-    //   hideClose
-    // >
-    // <SheetHeader className="sticky top-0 z-10 border-b bg-background p-4">
     <div className="relative bg-sidebar">
-      <div className="flex items-center justify-between gap-2 px-5 py-1">
+      <div className="flex items-center justify-between gap-2 pl-5 pr-2 py-1">
         <h5 className={cn(titleClassName, 'truncate text-left')}>
           {isLoading && !selectedRowKey ? <Skeleton className="h-7 w-36" /> : title}
         </h5>
@@ -106,11 +87,9 @@ export function DataTableSheetDetails({
                   type="text"
                   disabled={!prevId}
                   onClick={onPrev}
-                  className="px-0"
+                  className="px-1"
                   icon={<ChevronUp />}
-                >
-                  <span className="sr-only">Previous</span>
-                </Button>
+                />
               </TooltipTrigger>
               <TooltipContent>
                 <p>
@@ -127,11 +106,9 @@ export function DataTableSheetDetails({
                   type="text"
                   disabled={!nextId}
                   onClick={onNext}
-                  className="px-0"
+                  className="px-1"
                   icon={<ChevronDown />}
-                >
-                  <span className="sr-only">Next</span>
-                </Button>
+                />
               </TooltipTrigger>
               <TooltipContent>
                 <p>
@@ -141,17 +118,14 @@ export function DataTableSheetDetails({
             </Tooltip>
           </TooltipProvider>
           <Separator orientation="vertical" className="mx-1" />
-          {/* <SheetClose autoFocus={true} asChild> */}
+
           <Button
             size="tiny"
             type="text"
             onClick={() => table.resetRowSelection()}
-            className="px-0"
+            className="px-1"
             icon={<X />}
-          >
-            <span className="sr-only">Close</span>
-          </Button>
-          {/* </SheetClose> */}
+          />
         </div>
       </div>
       <Separator />

@@ -36,10 +36,14 @@ export function DataTableViewOptions() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button type="outline" size="tiny" role="combobox" aria-expanded={open} className="h-9 w-9">
-          <Settings2 className="h-4 w-4" />
-          <span className="sr-only">View</span>
-        </Button>
+        <Button
+          type="outline"
+          size="tiny"
+          role="combobox"
+          aria-expanded={open}
+          className="w-[26px]"
+          icon={<Settings2 className="text-foreground" />}
+        />
       </PopoverTrigger>
       <PopoverContent side="bottom" align="end" className="w-[200px] p-0">
         <Command>

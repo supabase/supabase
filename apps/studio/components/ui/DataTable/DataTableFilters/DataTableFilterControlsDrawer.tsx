@@ -36,12 +36,7 @@ export function DataTableFilterControlsDrawer() {
         <Tooltip>
           <TooltipTrigger asChild>
             <DrawerTrigger asChild>
-              <Button
-                // size="icon"
-                // variant="ghost"
-                className="h-9 w-9"
-                ref={isMobile ? triggerButtonRef : null}
-              >
+              <Button className="h-9 w-9" ref={isMobile ? triggerButtonRef : null}>
                 <FilterIcon className="w-4 h-4" />
               </Button>
             </DrawerTrigger>

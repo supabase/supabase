@@ -12,17 +12,18 @@ export function RefreshButton({ onClick }: RefreshButtonProps) {
 
   return (
     <Button
+      size="tiny"
       type="outline"
-      size="small"
       disabled={isLoading}
       onClick={onClick}
-      className="h-9 w-9 px-0"
-    >
-      {isLoading ? (
-        <LoaderCircle className="h-4 w-4 animate-spin" />
-      ) : (
-        <RefreshCcw className="h-4 w-4" />
-      )}
-    </Button>
+      className="w-[26px]"
+      icon={
+        isLoading ? (
+          <LoaderCircle className="text-foreground animate-spin" />
+        ) : (
+          <RefreshCcw className="text-foreground" />
+        )
+      }
+    />
   )
 }

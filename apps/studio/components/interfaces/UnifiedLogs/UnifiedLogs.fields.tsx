@@ -124,7 +124,7 @@ export const sheetFields = [
       const time = format(date, 'HH:mm:ss')
 
       return (
-        <div className="font-mono whitespace-nowrap flex items-center gap-1">
+        <div className="font-mono whitespace-nowrap flex items-center gap-1 justify-end">
           <span>{month}</span>
           <span className="text-foreground/50">·</span>
           <span>{day}</span>
