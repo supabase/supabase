@@ -168,7 +168,7 @@ function StateOfStartupsPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/modules/vector`,
+          url: `https://supabase.com/state-of-startups`,
           images: [
             {
               url: meta_image,
