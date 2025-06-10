@@ -18,12 +18,15 @@ import {
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { useStorageReport } from 'data/reports/storage-report-query'
+import { getStorageReportAttributes, useStorageReport } from 'data/reports/storage-report-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import LazyComposedChartHandler, {
+  MultiAttribute,
+} from '../../../../components/ui/Charts/ComposedChartHandler'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -44,8 +47,16 @@ export const StorageReport: NextPageWithLayout = () => {
     text: defaultHelper.text,
   })
 
+  // const updateDateRange = (from: string, to: string) => {
+  //   setSelectedRange({
+  //     from: { date: from, time_period: '1d' },
+  //     to: { date: to, time_period: 'today' },
+  //     interval: handleIntervalGranularity(from, to),
+  //   })
+  // }
+
   const datepickerHelpers = createFilteredDatePickerHelpers(plan?.id || 'free')
-  const STORAGE_REPORT_ATTRIBUTES = getReportAttributesV2(organization!, project!)
+  const STORAGE_REPORT_ATTRIBUTES = getStorageReportAttributes(organization!, project!)
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
     report.mergeParams({
@@ -91,6 +102,29 @@ export const StorageReport: NextPageWithLayout = () => {
         append={TopCacheMissesRenderer}
         appendProps={{ data: report.data.topCacheMisses || [] }}
       />
+
+      {true && (
+        <div className="grid grid-cols-1 gap-4">
+          {selectedRange &&
+            STORAGE_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
+              <LazyComposedChartHandler
+                key={chart.id}
+                {...chart}
+                attributes={chart.attributes as MultiAttribute[]}
+                interval={'hour'}
+                startDate={selectedRange?.from}
+                endDate={selectedRange?.to}
+                // updateDateRange={updateDateRange}
+                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                showMaxValue={
+                  chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                    ? true
+                    : chart.showMaxValue
+                }
+              />
+            ))}
+        </div>
+      )}
     </ReportPadding>
   )
 }
