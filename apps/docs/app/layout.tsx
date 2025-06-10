@@ -16,7 +16,7 @@ const metadata: Metadata = {
   applicationName: 'Supabase Docs',
   title: 'Supabase Docs',
   description:
-    'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
+    'Supabase is the Postgres development platform providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
   robots: {
