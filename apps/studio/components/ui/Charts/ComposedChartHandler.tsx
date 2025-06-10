@@ -204,6 +204,9 @@ const ComposedChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes])
 
+  console.log('attributeQueries', attributeQueries)
+  console.log('combinedData', combinedData)
+
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   // Calculate highlighted value based on the first attribute's data

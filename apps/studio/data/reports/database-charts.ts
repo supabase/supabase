@@ -236,11 +236,21 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
       attributes: [
         {
+          attribute: 'disk_fs_used',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          stackId: '2',
+          label: 'Total Used',
+          tooltip:
+            'Total space on disk used including Database, WAL (write-ahead log) and other system files.',
+        },
+        {
           attribute: 'pg_database_size',
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'Database',
-          tooltip: 'Total space on disk used by your database (tables, indexes, data, ...).',
+          tooltip: 'Disk usage by your database (tables, indexes, data, ...).',
+          omitFromTotal: true,
         },
         {
           attribute: 'disk_fs_used_wal',
@@ -249,14 +259,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'WAL',
           tooltip:
             'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.',
-        },
-        {
-          attribute: 'disk_fs_used_system',
-          provider: 'infra-monitoring',
-          format: 'bytes',
-          label: 'System',
-          tooltip:
-            'Reserved space for the system to ensure your database runs smoothly. You cannot modify this.',
+          omitFromTotal: true,
         },
         {
           attribute: 'disk_fs_size',
@@ -347,31 +350,42 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           attribute: 'client_connections_postgres',
           provider: 'infra-monitoring',
           label: 'Postgres',
+          tooltip:
+            'Direct connections to the Postgres database from your application and external clients.',
         },
         {
           attribute: 'client_connections_authenticator',
           provider: 'infra-monitoring',
           label: 'Authenticator',
+          tooltip:
+            'Connections used by the authenticator role for user authentication and authorization processes.',
         },
         {
           attribute: 'client_connections_supabase_auth_admin',
           provider: 'infra-monitoring',
           label: 'Auth Admin',
+          tooltip:
+            'Administrative connections used by Supabase Auth service for user management and authentication operations.',
         },
         {
           attribute: 'client_connections_supabase_storage_admin',
           provider: 'infra-monitoring',
           label: 'Storage Admin',
+          tooltip:
+            'Administrative connections used by Supabase Storage service for file operations and bucket management.',
         },
         {
           attribute: 'client_connections_supabase_admin',
           provider: 'infra-monitoring',
           label: 'Admin',
+          tooltip:
+            'Administrative connections used by various Supabase services for internal operations and maintenance tasks.',
         },
         {
           attribute: 'client_connections_other',
           provider: 'infra-monitoring',
           label: 'Other',
+          tooltip: "Miscellaneous database connections that don't fall into other categories.",
         },
         {
           attribute: 'max_db_connections',
