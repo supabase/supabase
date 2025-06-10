@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { GraphQLError, GraphQLNonNull, GraphQLResolveInfo, GraphQLString } from 'graphql'
 import type {
   ErrorCollection,
@@ -47,6 +48,9 @@ async function resolveSingleError(
     (data) => data,
     (error) => {
       console.error(`Error resolving ${GRAPHQL_FIELD_ERROR_GLOBAL}:`, error)
+      if (!error.isUserError()) {
+        Sentry.captureException(error)
+      }
       return new GraphQLError(error.isPrivate() ? 'Internal Server Error' : error.message)
     }
   )
@@ -97,6 +101,9 @@ async function resolveErrors(
     (data) => data as ErrorCollection,
     (error) => {
       console.error(`Error resolving ${GRAPHQL_FIELD_ERRORS_GLOBAL}:`, error)
+      if (error instanceof ApiError && !error.isUserError()) {
+        Sentry.captureException(error)
+      }
       return error instanceof GraphQLError
         ? error
         : new GraphQLError(error.isPrivate() ? 'Internal Server Error' : error.message)
