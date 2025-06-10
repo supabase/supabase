@@ -704,12 +704,6 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.2
         version: 0.3.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-dialog':
-        specifier: ^1.1.7
-        version: 1.1.7(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@radix-ui/react-hover-card':
-        specifier: ^1.0.7
-        version: 1.0.7(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-slider':
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -779,12 +773,6 @@ importers:
       awesome-debounce-promise:
         specifier: ^2.1.0
         version: 2.1.0
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^1.2.1
-        version: 1.2.1
       common:
         specifier: workspace:*
         version: link:../../packages/common
@@ -968,12 +956,6 @@ importers:
       sqlstring:
         specifier: ^2.3.2
         version: 2.3.3
-      superjson:
-        specifier: ^2.2.2
-        version: 2.2.2
-      tailwind-merge:
-        specifier: ^1.13.2
-        version: 1.14.0
       tus-js-client:
         specifier: ^4.1.0
         version: 4.1.0
@@ -16825,10 +16807,6 @@ packages:
   superjson@1.13.3:
     resolution: {integrity: sha512-mJiVjfd2vokfDxsQPOwJ/PtanO87LhpYY88ubI5dUB1Ab58Txbyje3+jpm+/83R/fevaq/107NNhtYBLuoTrFg==}
     engines: {node: '>=10'}
-
-  superjson@2.2.2:
-    resolution: {integrity: sha512-5JRxVqC8I8NuOUjzBbvVJAKNM8qoVuH0O77h4WInc/qC2q5IreqKxYwgkga3PfA22OayK2ikceb/B26dztPl+Q==}
-    engines: {node: '>=16'}
 
   supports-color@10.0.0:
     resolution: {integrity: sha512-HRVVSbCCMbj7/kdWF9Q+bbckjBHLtHMEoJWlkmYzzdwhYMkjkOwubLM6t7NbWKjgKamGDrWL1++KrjUO1t9oAQ==}
@@ -37442,10 +37420,6 @@ snapshots:
       - supports-color
 
   superjson@1.13.3:
-    dependencies:
-      copy-anything: 3.0.5
-
-  superjson@2.2.2:
     dependencies:
       copy-anything: 3.0.5
 
