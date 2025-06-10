@@ -22,7 +22,10 @@ export const SERVICES = {
 } as const
 
 type Service = keyof typeof SERVICES
-type ErrorCollectionFetch = CollectionFetch<ErrorModel, { service?: Service }>['fetch']
+type ErrorCollectionFetch = CollectionFetch<
+  ErrorModel,
+  { service?: Service; code?: string }
+>['fetch']
 
 export class ErrorModel {
   public id: string
@@ -96,15 +99,17 @@ export class ErrorModel {
     const PAGE_SIZE = 20
     const limit = args?.first ?? args?.last ?? PAGE_SIZE
     const service = args?.additionalArgs?.service as Service | undefined
+    const code = args?.additionalArgs?.code as string | undefined
 
     const [countResult, errorCodesResult] = await Promise.all([
-      fetchTotalErrorCount(service),
+      fetchTotalErrorCount(service, code),
       fetchErrorDescriptions({
         after: args?.after ?? undefined,
         before: args?.before ?? undefined,
         reverse: !!args?.last,
         limit: limit + 1,
         service,
+        code,
       }),
     ])
 
@@ -127,7 +132,10 @@ export class ErrorModel {
   }
 }
 
-async function fetchTotalErrorCount(service?: Service): Promise<Result<number, PostgrestError>> {
+async function fetchTotalErrorCount(
+  service?: Service,
+  code?: string
+): Promise<Result<number, PostgrestError>> {
   const query = supabase()
     .schema('content')
     .from('error')
@@ -136,6 +144,10 @@ async function fetchTotalErrorCount(service?: Service): Promise<Result<number, P
 
   if (service) {
     query.eq('service.name', service)
+  }
+
+  if (code) {
+    query.eq('code', code)
   }
 
   const { count, error } = await query
@@ -159,12 +171,14 @@ async function fetchErrorDescriptions({
   reverse,
   limit,
   service,
+  code,
 }: {
   after?: string
   before?: string
   reverse: boolean
   limit: number
   service?: Service
+  code?: string
 }): Promise<Result<ErrorDescription[], PostgrestError>> {
   const query = supabase()
     .schema('content')
@@ -175,6 +189,9 @@ async function fetchErrorDescriptions({
 
   if (service) {
     query.eq('service.name', service)
+  }
+  if (code) {
+    query.eq('code', code)
   }
   if (after != undefined) {
     query.gt('id', after)

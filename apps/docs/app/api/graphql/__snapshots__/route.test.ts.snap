@@ -151,6 +151,9 @@ type RootQueryType {
 
     """Filter errors by a specific Supabase service"""
     service: Service
+
+    """Filter errors by a specific error code"""
+    code: String
   ): ErrorCollection
 }
 

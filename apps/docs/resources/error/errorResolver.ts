@@ -61,18 +61,25 @@ async function resolveErrors(
   return (
     await Result.tryCatchFlat(
       async (...args) => {
-        const fetch: CollectionFetch<ErrorModel, { service?: Service }, ApiError>['fetch'] = async (
-          fetchArgs
-        ) => {
+        const fetch: CollectionFetch<
+          ErrorModel,
+          { service?: Service; code?: string },
+          ApiError
+        >['fetch'] = async (fetchArgs) => {
           const result = await ErrorModel.loadErrors({
             ...fetchArgs,
             additionalArgs: {
               service: args[0].service ?? undefined,
+              code: args[0].code ?? undefined,
             },
           })
           return result.mapError((error) => new ApiError('Failed to resolve error codes', error))
         }
-        return await GraphQLCollectionBuilder.create<ErrorModel, { service?: Service }, ApiError>({
+        return await GraphQLCollectionBuilder.create<
+          ErrorModel,
+          { service?: Service; code?: string },
+          ApiError
+        >({
           fetch,
           args: {
             ...args[0],
@@ -121,6 +128,10 @@ export const errorsRoot = {
       service: {
         type: GraphQLEnumTypeService,
         description: 'Filter errors by a specific Supabase service',
+      },
+      code: {
+        type: GraphQLString,
+        description: 'Filter errors by a specific error code',
       },
     },
     type: createCollectionType(GraphQLObjectTypeError),
