@@ -23,10 +23,12 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
   const organization = useSelectedOrganization()
+  const { project } = useProjectContext()
 
   const { isLoading, refresh } = report
 
@@ -43,6 +45,7 @@ export const StorageReport: NextPageWithLayout = () => {
   })
 
   const datepickerHelpers = createFilteredDatePickerHelpers(plan?.id || 'free')
+  const STORAGE_REPORT_ATTRIBUTES = getReportAttributesV2(organization!, project!)
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
     report.mergeParams({
