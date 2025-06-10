@@ -1,6 +1,6 @@
-'use client'
 import { ChevronDown, Clock, Search, ZoomIn, ZoomOut } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+
 import { traceDataSets } from '../data/trace-data'
 
 interface TimelineHeaderProps {

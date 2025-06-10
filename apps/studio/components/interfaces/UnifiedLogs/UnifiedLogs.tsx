@@ -401,6 +401,8 @@ export const UnifiedLogsTable = () => {
                           />
                         </TabsContent>
 
+                        {/* [Joshen] JFYI this is currently just hardcoded data to explore the UX */}
+                        {/* Will need to be either implemented prior to launch or hidden */}
                         <TabsContent
                           value="trace"
                           className="flex-grow overflow-auto data-[state=active]:flex-grow h-full mt-0"

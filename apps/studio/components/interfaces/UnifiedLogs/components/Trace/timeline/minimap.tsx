@@ -1,6 +1,5 @@
-'use client'
+import { MouseEvent, RefObject } from 'react'
 
-import type React from 'react'
 import { cn } from 'ui'
 import type { LayoutSpan } from '../utils/layout-algorithm'
 
@@ -9,8 +8,8 @@ interface MinimapProps {
   duration: number
   visiblePortionStart: number
   visiblePortionWidth: number
-  onClick: (e: React.MouseEvent) => void
-  minimapRef: React.RefObject<HTMLDivElement>
+  onClick: (e: MouseEvent) => void
+  minimapRef: RefObject<HTMLDivElement>
   spanAbsoluteRows: Record<string, number>
 }
 

@@ -1,7 +1,6 @@
-'use client'
-
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react'
-import type React from 'react'
+
+import { MouseEvent } from 'react'
 import { cn } from 'ui'
 import type { Marker } from '../types/trace'
 
@@ -9,7 +8,7 @@ interface TimelineMarkerProps {
   marker: Marker
   duration: number
   isSelected: boolean
-  onClick: (e: React.MouseEvent, marker: Marker) => void
+  onClick: (e: MouseEvent, marker: Marker) => void
 }
 
 export function TimelineMarker({ marker, duration, isSelected, onClick }: TimelineMarkerProps) {

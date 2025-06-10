@@ -1,5 +1,3 @@
-'use client'
-
 import {
   AlertTriangle,
   ArrowRight,
@@ -12,7 +10,8 @@ import {
   Search,
   Server,
 } from 'lucide-react'
-import type React from 'react'
+import { MouseEvent } from 'react'
+
 import { cn } from 'ui'
 import type { Span } from '../types/trace'
 import type { LayoutSpan } from '../utils/layout-algorithm'
@@ -23,7 +22,7 @@ interface TimelineSpanProps {
   isSelected: boolean
   isVisible: boolean
   endBeyondViewport: boolean
-  onClick: (e: React.MouseEvent, span: LayoutSpan) => void
+  onClick: (e: MouseEvent, span: LayoutSpan) => void
   showTimestamps: boolean
   absoluteRow: number
 }

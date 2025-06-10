@@ -1,7 +1,6 @@
-'use client'
-
-import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
+
 import type { TraceData } from './types/trace'
 
 // Use dynamic import with ssr: false to prevent server-side rendering issues

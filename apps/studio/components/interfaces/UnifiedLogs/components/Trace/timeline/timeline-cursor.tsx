@@ -1,7 +1,4 @@
-'use client'
-
-import type React from 'react'
-import { forwardRef, useImperativeHandle, useRef, useEffect } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface TimelineCursorProps {

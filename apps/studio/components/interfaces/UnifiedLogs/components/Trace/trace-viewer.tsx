@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+
 import { traceDataSets } from './data/trace-data'
 import { MarkerDetail } from './details/marker-detail'
-import SpanDetail from './span-detail'
+import { SpanDetail } from './details/span-detail'
 import { Minimap } from './timeline/minimap'
 import { TimelineCursor, type TimelineCursorRef } from './timeline/timeline-cursor'
 import { TimelineHeader } from './timeline/timeline-header'
