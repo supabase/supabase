@@ -123,6 +123,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const [searchParams] = useQueryStates({
     returnTo: parseAsString.withDefault(''),
     auth_id: parseAsString.withDefault(''),
+    token: parseAsString.withDefault(''),
   })
 
   const updateForm = (key: keyof FormState, value: unknown) => {
@@ -161,9 +162,15 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         : 'My Project'
 
       if (searchParams.returnTo && searchParams.auth_id) {
-        router.push(`${searchParams.returnTo}?auth_id=${searchParams.auth_id}`, undefined, {
-          shallow: false,
-        })
+        router.push(
+          `${searchParams.returnTo}?auth_id=${searchParams.auth_id}${
+            searchParams.token && `&token=${searchParams.token}&org=${org.name}`
+          }`,
+          undefined,
+          {
+            shallow: false,
+          }
+        )
       } else {
         router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
       }
