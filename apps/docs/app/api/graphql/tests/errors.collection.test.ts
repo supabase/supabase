@@ -353,4 +353,106 @@ describe('/api/graphql errors collection', () => {
       )
     }
   })
+
+  it('filters by code when code argument is provided', async () => {
+    // First, get the first error code from the database to test with
+    const { data: dbErrors } = await supabase()
+      .schema('content')
+      .from('error')
+      .select('code')
+      .is('deleted_at', null)
+      .limit(1)
+
+    expect(dbErrors).not.toBe(null)
+    expect(dbErrors).toHaveLength(1)
+    const testCode = dbErrors![0].code
+
+    const codeFilterQuery = `
+      query {
+        errors(code: "${testCode}") {
+          totalCount
+          nodes {
+            code
+            service
+          }
+        }
+      }
+    `
+    const request = new Request('http://localhost/api/graphql', {
+      method: 'POST',
+      body: JSON.stringify({ query: codeFilterQuery }),
+    })
+
+    const result = await POST(request)
+    const json = await result.json()
+    expect(json.errors).toBeUndefined()
+
+    // Verify all returned errors have the specified code
+    expect(json.data.errors.nodes.length).toBeGreaterThan(0)
+    expect(json.data.errors.nodes.every((e: any) => e.code === testCode)).toBe(true)
+  })
+
+  it('filters by both service and code when both arguments are provided', async () => {
+    // Get an error that exists for AUTH service
+    const { data: authError } = await supabase()
+      .schema('content')
+      .from('error')
+      .select('code, ...service(service:name)')
+      .is('deleted_at', null)
+      .eq('service.name', 'AUTH')
+      .limit(1)
+
+    expect(authError).not.toBe(null)
+    expect(authError).toHaveLength(1)
+    const testCode = authError![0].code
+
+    const bothFiltersQuery = `
+      query {
+        errors(service: AUTH, code: "${testCode}") {
+          totalCount
+          nodes {
+            code
+            service
+          }
+        }
+      }
+    `
+    const request = new Request('http://localhost/api/graphql', {
+      method: 'POST',
+      body: JSON.stringify({ query: bothFiltersQuery }),
+    })
+
+    const result = await POST(request)
+    const json = await result.json()
+    expect(json.errors).toBeUndefined()
+
+    // Verify all returned errors match both filters
+    expect(json.data.errors.nodes.length).toBeGreaterThan(0)
+    expect(
+      json.data.errors.nodes.every((e: any) => e.code === testCode && e.service === 'AUTH')
+    ).toBe(true)
+  })
+
+  it('returns empty list when code filter matches no errors', async () => {
+    const nonExistentCodeQuery = `
+      query {
+        errors(code: "NONEXISTENT_CODE_12345") {
+          totalCount
+          nodes {
+            code
+          }
+        }
+      }
+    `
+    const request = new Request('http://localhost/api/graphql', {
+      method: 'POST',
+      body: JSON.stringify({ query: nonExistentCodeQuery }),
+    })
+
+    const result = await POST(request)
+    const json = await result.json()
+    expect(json.errors).toBeUndefined()
+    expect(json.data.errors.totalCount).toBe(0)
+    expect(json.data.errors.nodes).toHaveLength(0)
+  })
 })
