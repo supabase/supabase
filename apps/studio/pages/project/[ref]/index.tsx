@@ -15,7 +15,6 @@ import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -76,8 +75,6 @@ const Home: NextPageWithLayout = () => {
   const functionsCount = Math.max(0, functionsData?.length ?? 0)
   // [Joshen] JFYI minus 1 as the replicas endpoint returns the primary DB minimally
   const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
-
-  const { data: apps } = useOAuthAppsQuery({ slug: organization?.slug })
 
   return (
     <div className="w-full">
