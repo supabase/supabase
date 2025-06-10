@@ -1058,7 +1058,7 @@ importers:
         version: 4.4.2
       '@vitest/coverage-v8':
         specifier: ^3.0.9
-        version: 3.0.9(supports-color@8.1.1)(vitest@3.0.9)
+        version: 3.0.9(supports-color@8.1.1)(vitest@3.0.9(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))
       '@vitest/ui':
         specifier: ^3.0.0
         version: 3.0.4(vitest@3.0.9)
@@ -1656,6 +1656,9 @@ importers:
 
   packages/common:
     dependencies:
+      '@next/third-parties':
+        specifier: ^15.3.2
+        version: 15.3.2(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)
       '@supabase/auth-js':
         specifier: 'catalog:'
         version: 2.71.0-rc.4
@@ -4886,6 +4889,12 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
+
+  '@next/third-parties@15.3.2':
+    resolution: {integrity: sha512-zE9xYkMKZ6gLbkP6lWt60yaeKB5r0A4eZhFKAhgik/eO+zzZPFkTy5K7+0ykgfB6MTkcend3BaDXZhz9KnDjYw==}
+    peerDependencies:
+      next: ^13.0.0 || ^14.0.0 || ^15.0.0
+      react: ^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -16979,6 +16988,9 @@ packages:
     peerDependencies:
       tslib: ^2
 
+  third-party-capital@1.0.20:
+    resolution: {integrity: sha512-oB7yIimd8SuGptespDAZnNkzIz+NWaJCu2RMsbs4Wmp9zSDUM8Nhi3s2OOcqYuv3mN4hitXc8DVx+LyUmbUDiA==}
+
   thread-stream@2.7.0:
     resolution: {integrity: sha512-qQiRWsU/wvNolI6tbbCKd9iKaTnCXsTwVxhhKM6nctPdujTyztjlbUkUTUymidWcMnZ5pWR0ej4a0tjsW021vw==}
 
@@ -21963,6 +21975,12 @@ snapshots:
 
   '@next/swc-win32-x64-msvc@15.3.1':
     optional: true
+
+  '@next/third-parties@15.3.2(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)':
+    dependencies:
+      next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
+      react: 18.3.1
+      third-party-capital: 1.0.20
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -27628,6 +27646,24 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@vitest/coverage-v8@3.0.9(supports-color@8.1.1)(vitest@3.0.9(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))':
+    dependencies:
+      '@ampproject/remapping': 2.3.0
+      '@bcoe/v8-coverage': 1.0.2
+      debug: 4.4.0(supports-color@8.1.1)
+      istanbul-lib-coverage: 3.2.2
+      istanbul-lib-report: 3.0.1
+      istanbul-lib-source-maps: 5.0.6(supports-color@8.1.1)
+      istanbul-reports: 3.1.7
+      magic-string: 0.30.17
+      magicast: 0.3.5
+      std-env: 3.8.1
+      test-exclude: 7.0.1
+      tinyrainbow: 2.0.0
+      vitest: 3.0.9(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
+    transitivePeerDependencies:
+      - supports-color
+
   '@vitest/coverage-v8@3.0.9(supports-color@8.1.1)(vitest@3.0.9(@types/node@20.12.11)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.7.3(@types/node@20.12.11)(typescript@5.5.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))':
     dependencies:
       '@ampproject/remapping': 2.3.0
@@ -27661,24 +27697,6 @@ snapshots:
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
       vitest: 3.0.9(@types/node@22.13.14)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.7.3(@types/node@22.13.14)(typescript@5.5.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
-    transitivePeerDependencies:
-      - supports-color
-
-  '@vitest/coverage-v8@3.0.9(supports-color@8.1.1)(vitest@3.0.9)':
-    dependencies:
-      '@ampproject/remapping': 2.3.0
-      '@bcoe/v8-coverage': 1.0.2
-      debug: 4.4.0(supports-color@8.1.1)
-      istanbul-lib-coverage: 3.2.2
-      istanbul-lib-report: 3.0.1
-      istanbul-lib-source-maps: 5.0.6(supports-color@8.1.1)
-      istanbul-reports: 3.1.7
-      magic-string: 0.30.17
-      magicast: 0.3.5
-      std-env: 3.8.1
-      test-exclude: 7.0.1
-      tinyrainbow: 2.0.0
-      vitest: 3.0.9(@types/node@20.12.11)(@vitest/ui@3.0.4)(jiti@2.4.2)(jsdom@20.0.3(supports-color@8.1.1))(msw@2.4.11(typescript@5.5.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
     transitivePeerDependencies:
       - supports-color
 
@@ -30132,7 +30150,7 @@ snapshots:
       debug: 4.4.0(supports-color@8.1.1)
       enhanced-resolve: 5.18.1
       eslint: 8.57.0(supports-color@8.1.1)
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.31.0)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       eslint-plugin-import: 2.31.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       fast-glob: 3.3.3
       get-tsconfig: 4.10.0
@@ -30144,7 +30162,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.31.0)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
@@ -30155,7 +30173,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.31.0)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
@@ -30183,7 +30201,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0(supports-color@8.1.1)
       eslint-import-resolver-node: 0.3.9(supports-color@8.1.1)
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-plugin-import@2.31.0)(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@8.57.0(supports-color@8.1.1))(supports-color@8.1.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -30583,7 +30601,7 @@ snapshots:
       proxy-addr: 2.0.7
       rfdc: 1.4.1
       secure-json-parse: 2.7.0
-      semver: 7.6.3
+      semver: 7.7.1
       toad-cache: 3.7.0
 
   fastq@1.18.0:
@@ -37715,6 +37733,8 @@ snapshots:
   thingies@1.21.0(tslib@2.8.1):
     dependencies:
       tslib: 2.8.1
+
+  third-party-capital@1.0.20: {}
 
   thread-stream@2.7.0:
     dependencies:
