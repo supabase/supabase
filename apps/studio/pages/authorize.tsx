@@ -14,7 +14,7 @@ import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-a
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks/misc/withAuth'
+import type { withAuth } from 'hooks/misc/withAuth'
 import { NextPageWithLayout } from 'types'
 import {
   Alert,

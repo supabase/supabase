@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { FeedbackDropdown } from 'components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
@@ -10,7 +10,7 @@ export const ProjectClaimLayout = ({
   children,
   title,
 }: PropsWithChildren<{
-  title: React.ReactNode
+  title: ReactNode
 }>) => {
   return (
     <>
