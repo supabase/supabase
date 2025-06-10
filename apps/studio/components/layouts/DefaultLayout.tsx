@@ -29,6 +29,8 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
   const router = useRouter()
   const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
 
+  useCheckLatestDeploy()
+
   return (
     <SidebarProvider defaultOpen={false}>
       <ProjectContextProvider projectRef={ref}>
