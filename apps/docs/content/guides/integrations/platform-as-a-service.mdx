@@ -102,11 +102,31 @@ curl https://api.supabase.com/v1/projects/{branch_ref}/database/migrations \
 }'
 ```
 
-<Admonition type="note" title="DRAFT PR NOTE (WILL REMOVE)">
+### Create a restore point
 
-We are working on automatically creating a restore point for each migration so it's easier to roll back using PITR on `DEV` branches.
+After every change you make to the database, it's a good idea to create a restore point. This will allow you to granularly roll back the database if you decide to go in a different direction.
+
+<Admonition type="note" title="v2 Projects need to enable physical backups">
+
+In v2 Projects, you need to enable physical backups in order to create restore points.
+
+The endpoint is currently under v0 experimental but will be moved to v1 shortly.
+
+https://api.supabase.com/api/v0#tag/projects-backup/post/v0/database/{ref}/backups/enable-physical-backups
+
+You need to generate a different experimental Personal Access Token (PAT) to use this endpoint.
 
 </Admonition>
+
+```sh
+curl https://api.supabase.com/v1/projects/{branch_ref}/database/backups/restore-point \
+  --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "name": "abcdefg"
+}'
+```
 
 ### Add seed data
 
@@ -212,6 +232,26 @@ curl https://api.supabase.com/v1/projects/{ref}/database/backups/restore-pitr \
   "recovery_time_target_unix": 1
 }'
 ```
+
+Or you can roll back to a specific restore point:
+
+```sh
+curl https://api.supabase.com/v1/projects/{ref}/database/backups/undo \
+  --request POST \
+  --header 'Authorization: Bearer {PAT_OR_USER_TOKEN}' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "name": "abcdefg"
+}'
+```
+
+<Admonition type="note" title="You cannot roll forward after rolling back today">
+
+Once you roll back either to a timestamp or a restore point, you cannot roll forward.
+
+However, we are currently working on a feature that will allow you to roll forward after rolling back.
+
+</Admonition>
 
 When you revert the database, you are undo-ing all database changes since the specified point in time, including:
 
