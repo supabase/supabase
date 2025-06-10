@@ -361,7 +361,7 @@ export const UnifiedLogsTable = () => {
                       hasNextPage={hasNextPage}
                       renderLiveRow={(props) => {
                         if (!liveMode.timestamp) return null
-                        if (props?.row.original.uuid !== liveMode?.row?.uuid) return null
+                        if ((props?.row as any).original.uuid !== liveMode?.row?.uuid) return null
                         return <LiveRow colSpan={COLUMNS.length - 1} />
                       }}
                       setColumnOrder={setColumnOrder}

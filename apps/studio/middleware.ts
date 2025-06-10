@@ -18,7 +18,6 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/test',
   '/edge-functions/body',
   '/api/data-table/light',
-  '/api/data-table/infinite',
 ]
 
 export function middleware(request: NextRequest) {

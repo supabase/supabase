@@ -46,10 +46,9 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const { table } = useDataTable()
-
   const tableRef = useRef<HTMLTableElement>(null)
-  // const [topBarHeight, setTopBarHeight] = useState(0)
-  // FIXME: searchParamsParser needs to be passed as property
+
+  const headerGroups = table.getHeaderGroups()
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
@@ -79,29 +78,30 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         className="z-0"
       >
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
+          {headerGroups.map((headerGroup) => (
             <TableRow key={headerGroup.id} className="bg-surface-75">
               {headerGroup.headers.map((header) => {
+                const sort = header.column.getIsSorted()
+                const canResize = header.column.getCanResize()
+                const onResize = header.getResizeHandler()
+                const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
+
                 return (
                   <TableHead
                     key={header.id}
-                    className={header.column.columnDef.meta?.headerClassName}
+                    className={headerClassName}
                     aria-sort={
-                      header.column.getIsSorted() === 'asc'
-                        ? 'ascending'
-                        : header.column.getIsSorted() === 'desc'
-                          ? 'descending'
-                          : 'none'
+                      sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'
                     }
                   >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
-                    {header.column.getCanResize() && (
+                    {canResize && (
                       <div
                         onDoubleClick={() => header.column.resetSize()}
-                        onMouseDown={header.getResizeHandler()}
-                        onTouchStart={header.getResizeHandler()}
+                        onMouseDown={onResize}
+                        onTouchStart={onResize}
                         className={cn(
                           'user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center',
                           'before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border'
@@ -118,15 +118,13 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           id="content"
           tabIndex={-1}
           // REMINDER: avoids scroll (skipping the table header) when using skip to content
-          style={{
-            scrollMarginTop: 'calc(var(--top-bar-height))',
-          }}
+          style={{ scrollMarginTop: 'calc(var(--top-bar-height))' }}
         >
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
               <Fragment key={row.id}>
-                {renderLiveRow?.({ row })}
+                {renderLiveRow?.({ row: row as any })}
                 <MemoizedRow
                   row={row}
                   table={table}
@@ -192,7 +190,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
  * e.g. DataTableFilterControls, DataTableFilterCommand, DataTableToolbar, DataTableHeader
  */
 
-function Row<TData>({
+function DataTableRow<TData>({
   row,
   table,
   selected,
@@ -200,13 +198,13 @@ function Row<TData>({
 }: {
   row: Row<TData>
   table: TTable<TData>
-  // REMINDER: row.getIsSelected(); - just for memoization
   selected?: boolean
   searchParamsParser: any
 }) {
   // REMINDER: rerender the row when live mode is toggled - used to opacity the row
   // via the `getRowClassName` prop - but for some reasons it wil render the row on data fetch
   useQueryState('live', searchParamsParser.live)
+  const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
 
   return (
     <TableRow
@@ -220,28 +218,21 @@ function Row<TData>({
           row.toggleSelected()
         }
       }}
-      className={cn(
-        // '[&>:not(:last-child)]:border-r',
-        // 'outline-1 -outline-offset-1 outline-primary transition-colors focus-visible:bg-muted/50 focus-visible:outline data-[state=selected]:outline',
-        table.options.meta?.getRowClassName?.(row)
-      )}
+      className={cn(rowClassName)}
     >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell
-          key={cell.id}
-          className={cn(
-            // 'truncate border-b border-border',
-            cell.column.columnDef.meta?.cellClassName
-          )}
-        >
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </TableCell>
-      ))}
+      {row.getVisibleCells().map((cell) => {
+        const cellClassName = (cell.column.columnDef.meta as any)?.cellClassName
+        return (
+          <TableCell key={cell.id} className={cn(cellClassName)}>
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </TableCell>
+        )
+      })}
     </TableRow>
   )
 }
 
 const MemoizedRow = memo(
-  Row,
+  DataTableRow,
   (prev, next) => prev.row.id === next.row.id && prev.selected === next.selected
-) as typeof Row
+) as typeof DataTableRow
