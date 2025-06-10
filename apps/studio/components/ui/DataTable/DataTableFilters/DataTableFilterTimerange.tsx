@@ -3,9 +3,8 @@ import type { DateRange } from 'react-day-picker'
 
 import type { DataTableTimerangeFilterField } from '../DataTable.types'
 import { isArrayOfDates } from '../DataTable.utils'
+import { DatePickerWithRange } from '../DatePickerWithRange'
 import { useDataTable } from '../providers/DataTableProvider'
-
-import { DatePickerWithRange } from 'components/interfaces/DataTableDemo/components/custom/date-picker-with-range'
 
 export function DataTableFilterTimerange<TData>({
   value: _value,

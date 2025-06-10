@@ -1,4 +1,4 @@
-import TraceViewerClient from 'components/interfaces/Trace/trace-viewer-client'
+import TraceViewerClient from './Trace/trace-viewer-client'
 
 interface TraceDetailTabProps {
   id: string
