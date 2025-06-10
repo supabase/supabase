@@ -597,11 +597,11 @@ password = "env(SMTP_PASSWORD)"
   them separately for each branch that needs them.
 </Admonition>
 
-#### Using dotenvx for Git-based workflow
+#### Using dotenvx for git-based workflow
 
 For managing environment variables across different branches, you can use [dotenvx](https://dotenvx.com/) to securely manage your configurations. This approach is particularly useful for teams working with Git branches and preview deployments.
 
-##### Environment File Structure
+##### Environment file structure
 
 Following the conventions used in the [example repository](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone-dotenvx/README.md), environments are configured using dotenv files in the `supabase` directory:
 
@@ -613,7 +613,7 @@ Following the conventions used in the [example repository](https://github.com/su
 | .env.preview    | Branches    | No               | Yes       |
 | .env            | Any         | Maybe            | Yes       |
 
-##### Setting Up Encrypted Secrets
+##### Setting up encrypted secrets
 
 1. Generate key pair and encrypt your secrets:
 
@@ -648,14 +648,14 @@ client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 ```
 
-<Admonition type="note" label="Secret Fields">
+<Admonition type="note" label="Secret fields">
   The `encrypted:` syntax only works for designated "secret" fields in the configuration (like
   `secret` in auth providers). Using encrypted values in other fields will not be automatically
   decrypted and may cause issues. For non-secret fields, use environment variables with the `env()`
   syntax instead.
 </Admonition>
 
-##### Using with Preview Branches
+##### Using with preview branches
 
 When you commit your `.env.preview` file with encrypted values, the branching executor will automatically retrieve and use these values when deploying your branch. This allows you to maintain different configurations for different branches while keeping sensitive information secure.
 
