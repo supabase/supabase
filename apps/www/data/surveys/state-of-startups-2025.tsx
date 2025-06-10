@@ -10,8 +10,7 @@ export default (isMobile?: boolean) => ({
       <>
         There's never been a better time to build.
         <br />
-        Take our State of Startups survey to receive an exclusive Supabase t-shirt and a report on
-        the survey results.
+        Take our State of Startups survey and tell us how you're building.
       </>
     ),
     className: '[&_h1]:max-w-2xl',
