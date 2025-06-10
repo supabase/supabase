@@ -1,0 +1,284 @@
+---
+title: 'Build an Evolving AI Assistant with Postgres'
+description: 'Learn how to build a Supabase powered AI assistant that combines PostgreSQL with scheduling and external tools for long-term memory, structured data management and autonomous actions.'
+categories:
+  - product
+tags:
+  - postgres
+  - ai
+  - personal-assistant
+date: '2025-06-10T00:00:00'
+toc_depth: 3
+author: saxon_fletcher
+image: 2025-06-10-natural-db/og.png
+thumb: 2025-06-10-natural-db/thumb.png
+---
+
+While Large Language Models understand natural language, they often can't maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time. 
+
+At a high level, the system's flexibility is created by combining these core primitives: database operations for structured data, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for real-world actions. 
+
+The assistant converts conversations into structured database entries, enabling reliable data retrieval and analysis through database operations, scheduled prompts, web searches, and MCP integrations. For example, a scheduled task might analyze your portfolio, trigger web searches for market trends, update your database with new insights, and send personalized reports through Zapier—all while maintaining organized, queryable data.
+
+See it at work in the video below.
+
+<video className="rounded-sm m-0" autoPlay loop muted>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/blog/natural-db/natural-db-demo-combined.mp4"
+    type="video/mp4"
+  />
+</video>
+
+## Core Pieces
+
+### Scoped Database Control
+
+Each chat session uses a dedicated PostgreSQL schema (`chat_{chat_id}`) for data isolation:
+
+- **Private Schemas**: LLM can create tables, store data, and perform operations without accessing other users' information
+- **System Table Protection**: Critical system tables remain in the `public` schema, completely inaccessible to the LLM
+- **Automatic Schema Creation**: New chats get properly configured private schemas with restricted permissions
+- **Complete Data Separation**: Chat A's tables are invisible to Chat B, preventing any cross-contamination
+- **Shared Chat Access**: Multiple users can participate in the same chat, sharing the same assistant and data while maintaining privacy between different chat groups
+
+### Messages Context
+
+Two complementary memory types maintain conversation continuity:
+
+- **Semantic Memory (Vector Search)**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
+- **Structured Memory (SQL Data)**: Stores concrete facts in LLM-created tables for precise queries ("How much did I spend on coffee last quarter?")
+
+### Scheduled Prompts
+
+The system achieves autonomy through scheduled prompts via pg_cron, which can utilize all other components:
+
+**Example**: "Every Sunday at 6 PM, analyze my portfolio performance and research market trends"
+
+1. **Cron trigger** executes with stored prompt
+2. **Database lookup** retrieves your current portfolio holdings and historical performance
+3. **Web search** finds relevant market news and competitor analysis
+4. **Database storage** accumulates weekly performance data and market insights
+5. **MCP integration** sends personalized report via Zapier with portfolio highlights and recommendations
+6. **Memory building** enables future queries like "How has my portfolio performed compared to market trends?"
+
+### Web Search
+
+Real-time information gathering with intelligent storage:
+
+```sql
+-- Auto-generated from web search results
+CREATE TABLE research_findings (
+  topic TEXT,
+  source_url TEXT,
+  key_insights TEXT[],
+  credibility_score INTEGER,
+  search_date TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+When you ask about current information, findings are structured and stored for future reference. Months later, "What were those Spanish apps I researched?" provides exact details with sources.
+
+### Zapier MCP Integration
+
+Through Zapier's MCP integration, your assistant can:
+
+- Read/send emails (Gmail, Outlook)
+- Manage calendar events
+- Update spreadsheets
+- Send notifications (Slack, Discord, SMS)
+- Create tasks (Trello, Asana, Notion)
+- Control smart home devices
+
+### Input/Output Integration
+
+The system uses Telegram as the default interface, implemented as an edge function with webhook support for real-time messaging. All input/output is processed through the `natural-db` function for consistent behavior.
+
+### Self-Evolving System Prompt
+
+The assistant maintains two behavioral layers:
+
+- **Base Behavior**: Core functionality (database operations, scheduling, web search) remains constant
+- **Personalized Behavior**: Communication style and preferences that evolve based on user feedback
+
+When you say "be more formal" or "address me by name," these preferences are stored with version history and persist across all conversations, creating a personalized experience.
+
+## Code Ownership & Extensibility
+
+As the codebase owner, you can customize your assistant's capabilities by modifying system prompts to adjust its personality and expertise, or by creating custom edge functions for specific needs.
+
+## Use Cases
+
+### Run Tracking
+
+![Run tracking dashboard showing activity history and statistics](/images/blog/2025-06-10-natural-db/runs.png)
+
+**Setup**: Track running activities and maintain consistent training schedule
+
+1. **Database storage** creates `runs` table to store distance, duration, route, weather conditions, and personal notes for each run
+2. **Daily reminders** via cron check last run date and send personalized Telegram notifications with previous run details to encourage consistency
+3. **Run logging** allows users to record new runs through Telegram, automatically calculating pace and updating personal records
+4. **Monthly summaries** via cron analyze running patterns, highlight achievements, and suggest training adjustments based on progress
+
+### Personal Recipe & Meal Planning
+
+**Setup**: "Track what I cook, suggest meals based on dietary preferences and ingredients I have"
+
+1. **Database storage** creates `recipes`, `ingredients`, `meal_history`, and `meal_ratings` tables to track cooking experiences, dietary restrictions, ingredient preferences, and meal satisfaction
+2. **Web search** finds new recipes based on available ingredients and dietary goals
+3. **Database lookup** analyzes cooking patterns, favorite cuisines, nutritional balance, and meal ratings
+4. **Cron trigger** runs weekly to suggest meal prep plans and grocery lists
+5. **Telegram notifications** sends daily meal suggestions, cooking reminders, weekly grocery lists based on planned meals, and evening meal rating prompts
+6. **Daily rating system** collects user feedback on each meal through Telegram, storing ratings and comments to improve future meal suggestions
+
+### Company Feedback Analysis
+
+**Setup**: "Every morning, pull the latest support tickets via MCP, analyze them, store the findings in a `feedback` table with tags, and give me a weekly summary."
+
+1.  **Cron Trigger**: A `pg_cron` job runs every morning to initiate the ticket analysis workflow.
+2.  **MCP Integration**: Connects to your support system (e.g., Zendesk, Intercom) to fetch new tickets.
+3.  **AI Analysis & Storage**: The assistant processes each ticket, identifies key themes, sentiment, and product areas, then stores this structured data with tags in a `feedback` table.
+4.  **Weekly Summary**: Every Friday, another cron job generates a summary of the week's feedback, highlighting top issues, sentiment trends, and feature requests.
+5.  **Group Email**: The weekly summary is delivered as a concise report via Zapier's Gmail MCP, keeping your team informed of the customer's voice.
+
+### Interest-Based Article Bookmarker
+
+**Setup**: "Track articles about AI and climate change, remind me of important ones I haven't read"
+
+1. **Database storage** creates `articles` table to store article metadata, user interests, read status, and relevance score
+2. **Web search** daily finds new articles matching user interests
+3. **Database lookup** analyzes reading patterns and article engagement
+4. **Cron trigger** runs weekly to identify top unread articles by relevance
+5. **Telegram notifications** sends personalized weekly digest with must-read articles based on interests
+
+## Implementation Guide
+
+### Prerequisites
+
+- Supabase account (free tier sufficient)
+- OpenAI API key
+- Telegram bot token
+- Zapier account (optional)
+
+### Optional: Using the CLI
+
+If you prefer the command line, you can use the Supabase CLI to set up your database and Edge Functions. This replaces **Step 1** and **Step 2**.
+
+1.  **Clone the repository**.
+    ```bash
+    git clone https://github.com/supabase-community/natural-db.git
+    cd natural-db
+    ```
+2.  **Log in to the Supabase CLI and link your project**.
+    Create a new project on the [Supabase Dashboard](https://supabase.com/dashboard), then run:
+    ```bash
+    supabase login
+    supabase link --project-ref <YOUR-PROJECT-ID>
+    ```
+3.  **Push the database schema**.
+    ```bash
+    supabase db push
+    ```
+4.  **Deploy Edge Functions**.
+    ```bash
+    supabase functions deploy --no-verify-jwt
+    ```
+
+After completing these steps, you can proceed to **Step 3: Telegram Bot**.
+
+### Step 1: Database Setup
+
+Run the migration SQL in your Supabase SQL editor: [migration.sql](https://github.com/supabase-community/natural-db/blob/main/supabase/migrations/001_create_initial_schema.sql)
+
+- Sets up extensions (pgvector, pg_cron)
+- Creates system tables with proper permissions
+- Configures cron job scheduling
+
+### Step 2: Edge Functions
+
+Create three functions in Supabase dashboard:
+
+**natural-db**: Main AI brain handling all processing, database operations, scheduling, and tool integration
+
+- [natural-db/index.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/natural-db/index.ts)
+- [natural-db/db-utils.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/natural-db/db-utils.ts)
+
+**telegram-input**: Webhook handler for incoming messages with user validation and timezone management
+
+- [telegram-input/index.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/telegram-input/index.ts)
+
+**telegram-outgoing**: Response formatter and delivery handler with error management
+
+- [telegram-outgoing/index.ts](https://github.com/supabase-community/natural-db/blob/main/supabase/functions/telegram-outgoing/index.ts)
+
+### Step 3: Telegram Bot
+
+1. Create bot via [@BotFather](https://t.me/botfather)
+2. Set webhook: `https://api.telegram.org/bot[TOKEN]/setWebhook?url=https://[PROJECT].supabase.co/functions/v1/telegram-input`
+
+### Step 4: Environment Variables
+
+Set the following environment variables in your Supabase project settings (Project Settings → Edge Functions):
+
+##### Required Variables:
+
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `TELEGRAM_BOT_TOKEN`: Bot token from @BotFather
+
+##### Optional Variables:
+
+- `OPENAI_MODEL`: OpenAI model to use (defaults to "gpt-4.1-mini")
+- `TELEGRAM_WEBHOOK_SECRET`: Secret token for webhook validation
+- `TELEGRAM_ALLOWED_USERNAMES`: Comma-separated list of allowed Telegram usernames
+- `ZAPIER_MCP_URL`: MCP server URL for Zapier integrations
+
+### Step 5: Test Integration
+
+Try these commands with your bot:
+
+- "Store my grocery budget as $400 monthly"
+- "What's the weather today?" (web search)
+- "Remind me to exercise every Monday at 7 AM"
+- "Be more enthusiastic when I discuss hobbies" (personality)
+
+## Input and Output Methods
+
+The natural-db edge function is decoupled from how messages are received or sent out. This means you can interact with your AI companion through any channel you prefer:
+
+- WhatsApp messages
+- Email
+- Slack
+- Web interface
+- Any other messaging platform
+
+## Cost Considerations
+
+Based on 10 messages per day (300 messages/month):
+
+- **Supabase**: Free tier (500MB database, 2GB bandwidth) - $0/month
+- **OpenAI GPT-4.1-mini**: $0.40 per 1M input tokens, $1.60 per 1M output tokens
+  - Average 1200 input + 800 output tokens per message
+  - Input: 300 messages × 1200 tokens × $0.40/1M = $0.144/month
+  - Output: 300 messages × 800 tokens × $1.60/1M = $0.384/month
+  - Total OpenAI: $0.53/month
+- **Telegram**: Free API usage
+- **Zapier**: Free tier (300 tasks/month) - $0/month
+- **Vector Embeddings**: $0.02 per 1M tokens (text-embedding-3-small)
+  - 300 messages × 1200 tokens × $0.02/1M = $0.0072/month
+
+**Total monthly cost: ~$0.54**
+
+Note: Costs scale linearly with usage. At 100 messages/day (~3K messages/month), expect ~$5.40/month.
+
+## Summary
+
+This system uses the natural language understanding of LLMs to create structured data, addressing the common challenge of memory persistence. By combining this capability with PostgreSQL's querying power, cron scheduling, and external tool integration, the AI can build on its knowledge over time.
+
+**Key advantages**:
+
+- **Persistent Memory**: Each interaction builds structured, queryable knowledge
+- **Complete Privacy**: Isolated database schemas ensure data security
+- **Autonomous Intelligence**: Scheduled operations create analysis loops that build on previous results
+- **Real-world Integration**: Actions across email, calendar, and hundreds of tools
+- **Adaptive Personality**: Evolving communication style based on user preferences
+
+This creates a persistent AI assistant that accumulates knowledge and takes autonomous action, becoming more effective with use.
