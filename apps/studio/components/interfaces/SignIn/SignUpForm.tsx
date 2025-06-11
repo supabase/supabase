@@ -46,22 +46,22 @@ const SignUpForm = () => {
     },
   })
 
-  const isInsideOAuthFlow = !!searchParams.auth_id
-  const redirectUrlBase = `${
-    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-      ? window.location.origin
-      : process.env.NEXT_PUBLIC_SITE_URL
-  }${BASE_PATH}`
-  const redirectTo = isInsideOAuthFlow
-    ? `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
-    : `${redirectUrlBase}/sign-in`
-
   const onSignUp = async ({ email, password }: { email: string; password: string }) => {
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
       token = captchaResponse?.response ?? null
     }
+
+    const isInsideOAuthFlow = !!searchParams.auth_id
+    const redirectUrlBase = `${
+      process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+        ? location.origin
+        : process.env.NEXT_PUBLIC_SITE_URL
+    }${BASE_PATH}`
+    const redirectTo = isInsideOAuthFlow
+      ? `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+      : `${redirectUrlBase}/sign-in`
 
     signup({
       email,
