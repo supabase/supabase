@@ -10,6 +10,7 @@ import { errorRoot, errorsRoot } from './error/errorResolver'
 import { searchRoot } from './globalSearch/globalSearchResolver'
 import { GraphQLObjectTypeGuide } from './guide/guideSchema'
 import { GraphQLObjectTypeReferenceCLICommand } from './reference/referenceCLISchema'
+import { GraphQLObjectTypeReferenceManagementApi } from './reference/referenceManagementApiSchema'
 import { GraphQLObjectTypeReferenceSDKFunction } from './reference/referenceSDKSchema'
 import { GraphQLObjectTypeTroubleshooting } from './troubleshooting/troubleshootingSchema'
 
@@ -43,6 +44,7 @@ export const rootGraphQLSchema = new GraphQLSchema({
   types: [
     GraphQLObjectTypeGuide,
     GraphQLObjectTypeReferenceCLICommand,
+    GraphQLObjectTypeReferenceManagementApi,
     GraphQLObjectTypeReferenceSDKFunction,
     GraphQLObjectTypeTroubleshooting,
   ],
