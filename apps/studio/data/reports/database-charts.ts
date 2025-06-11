@@ -103,7 +103,10 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      YAxisProps: { width: 45, tickFormatter: (value: any) => `${numberFormatter(value, 2)}%` },
+      YAxisProps: {
+        width: 45,
+        tickFormatter: (value: any) => `${numberFormatter(value, 2)}%`,
+      },
       hideChartType: false,
       defaultChartStyle: 'line',
       attributes: [
@@ -167,7 +170,10 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       hideChartType: false,
       showGrid: true,
       showMaxValue: true,
-      YAxisProps: { width: 35, tickFormatter: (value: any) => numberFormatter(value, 2) },
+      YAxisProps: {
+        width: 35,
+        tickFormatter: (value: any) => numberFormatter(value, 2),
+      },
       defaultChartStyle: 'line',
       docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#compute-size',
       attributes: [
@@ -208,7 +214,10 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       showMaxValue: false,
       hideChartType: false,
       showGrid: true,
-      YAxisProps: { width: 70, tickFormatter: (value: any) => `${numberFormatter(value, 6)}%` },
+      YAxisProps: {
+        width: 70,
+        tickFormatter: (value: any) => `${numberFormatter(value, 6)}%`,
+      },
       defaultChartStyle: 'line',
       attributes: [
         {
@@ -230,7 +239,10 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       showLegend: true,
       showMaxValue: true,
       showGrid: true,
-      YAxisProps: { width: 65, tickFormatter: (value: any) => formatBytes(value, 1) },
+      YAxisProps: {
+        width: 65,
+        tickFormatter: (value: any) => formatBytes(value, 1),
+      },
       hideChartType: false,
       defaultChartStyle: 'line',
       docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
@@ -306,7 +318,10 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
-      YAxisProps: { width: 65, tickFormatter: (value: any) => formatBytes(value, 1) },
+      YAxisProps: {
+        width: 65,
+        tickFormatter: (value: any) => formatBytes(value, 1),
+      },
       hideChartType: false,
       defaultChartStyle: 'line',
       hideHighlightedValue: true,
@@ -334,17 +349,13 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     {
       id: 'client-connections',
       label: 'Database client connections',
-      syncId: 'database-reports',
       valuePrecision: 0,
       hide: false,
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
-      showGrid: true,
-      YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#limits-and-constraints',
       attributes: [
         {
           attribute: 'client_connections_postgres',
@@ -356,21 +367,21 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
         {
           attribute: 'client_connections_authenticator',
           provider: 'infra-monitoring',
-          label: 'Authenticator',
+          label: 'PostgREST',
           tooltip:
             'Connections used by the authenticator role for user authentication and authorization processes.',
         },
         {
           attribute: 'client_connections_supabase_auth_admin',
           provider: 'infra-monitoring',
-          label: 'Auth Admin',
+          label: 'Auth',
           tooltip:
             'Administrative connections used by Supabase Auth service for user management and authentication operations.',
         },
         {
           attribute: 'client_connections_supabase_storage_admin',
           provider: 'infra-monitoring',
-          label: 'Storage Admin',
+          label: 'Storage',
           tooltip:
             'Administrative connections used by Supabase Storage service for file operations and bucket management.',
         },
