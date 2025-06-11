@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { GraphQLError, GraphQLNonNull, GraphQLResolveInfo, GraphQLString } from 'graphql'
 import type {
   ErrorCollection,
@@ -47,6 +48,9 @@ async function resolveSingleError(
     (data) => data,
     (error) => {
       console.error(`Error resolving ${GRAPHQL_FIELD_ERROR_GLOBAL}:`, error)
+      if (!error.isUserError()) {
+        Sentry.captureException(error)
+      }
       return new GraphQLError(error.isPrivate() ? 'Internal Server Error' : error.message)
     }
   )
@@ -61,18 +65,25 @@ async function resolveErrors(
   return (
     await Result.tryCatchFlat(
       async (...args) => {
-        const fetch: CollectionFetch<ErrorModel, { service?: Service }, ApiError>['fetch'] = async (
-          fetchArgs
-        ) => {
+        const fetch: CollectionFetch<
+          ErrorModel,
+          { service?: Service; code?: string },
+          ApiError
+        >['fetch'] = async (fetchArgs) => {
           const result = await ErrorModel.loadErrors({
             ...fetchArgs,
             additionalArgs: {
               service: args[0].service ?? undefined,
+              code: args[0].code ?? undefined,
             },
           })
           return result.mapError((error) => new ApiError('Failed to resolve error codes', error))
         }
-        return await GraphQLCollectionBuilder.create<ErrorModel, { service?: Service }, ApiError>({
+        return await GraphQLCollectionBuilder.create<
+          ErrorModel,
+          { service?: Service; code?: string },
+          ApiError
+        >({
           fetch,
           args: {
             ...args[0],
@@ -90,6 +101,9 @@ async function resolveErrors(
     (data) => data as ErrorCollection,
     (error) => {
       console.error(`Error resolving ${GRAPHQL_FIELD_ERRORS_GLOBAL}:`, error)
+      if (error instanceof ApiError && !error.isUserError()) {
+        Sentry.captureException(error)
+      }
       return error instanceof GraphQLError
         ? error
         : new GraphQLError(error.isPrivate() ? 'Internal Server Error' : error.message)
@@ -121,6 +135,10 @@ export const errorsRoot = {
       service: {
         type: GraphQLEnumTypeService,
         description: 'Filter errors by a specific Supabase service',
+      },
+      code: {
+        type: GraphQLString,
+        description: 'Filter errors by a specific error code',
       },
     },
     type: createCollectionType(GraphQLObjectTypeError),

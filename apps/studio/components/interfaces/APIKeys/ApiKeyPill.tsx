@@ -116,7 +116,7 @@ export function ApiKeyPill({
             isSecret ? 'overflow-hidden' : '',
             show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
             'transition-all',
-            'max-w-[380px]',
+            'max-w-[340px]',
             'cursor-text',
             'relative'
           )}
