@@ -19,6 +19,9 @@ export type ModelError = {
 
 export type ModelResponse = ModelSuccess | ModelError
 
+export const ModelErrorMessage =
+  'No valid AI model available. Please set up a local AWS profile to use Bedrock, or pass an OPENAI_API_KEY to use OpenAI.'
+
 /**
  * Retrieves the appropriate AI model based on available credentials.
  */
@@ -45,8 +48,6 @@ export async function getModel(): Promise<ModelResponse> {
   }
 
   return {
-    error: new Error(
-      'No valid AI model available. Please set up a local AWS profile to use Bedrock, or pass an OPENAI_API_KEY to use OpenAI.'
-    ),
+    error: new Error(ModelErrorMessage),
   }
 }

@@ -2,7 +2,7 @@ import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as bedrockModule from './bedrock'
 import { bedrock } from './bedrock'
-import { getModel, modelsByProvider } from './model'
+import { getModel, ModelErrorMessage, modelsByProvider } from './model'
 
 vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
@@ -60,10 +60,6 @@ describe('getModel', () => {
 
     const { error } = await getModel()
 
-    expect(error).toEqual(
-      new Error(
-        'No valid AI model available. Please set up a local AWS profile (for Bedrock) or pass an OPENAI_API_KEY to use OpenAI.'
-      )
-    )
+    expect(error).toEqual(new Error(ModelErrorMessage))
   })
 })
