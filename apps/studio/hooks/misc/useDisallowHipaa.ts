@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useMemo } from 'react'
 
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -6,19 +6,18 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
-export function useDisallowHipaa() {
-  const selectedOrganization = useSelectedOrganization()
+export function useProjectShouldNotUseAI() {
   const project = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: project?.ref })
 
-  const disallowHipaa = useCallback(
-    (allowed: boolean) => {
-      return hasHipaaAddon && projectSettings?.is_sensitive ? false : allowed
-    },
-    [hasHipaaAddon, projectSettings]
-  )
+  const shouldNotUseAI = useMemo(() => {
+    return hasHipaaAddon && !!projectSettings?.is_sensitive
+  }, [hasHipaaAddon, projectSettings])
 
-  return disallowHipaa
+  return shouldNotUseAI
 }

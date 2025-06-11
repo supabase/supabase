@@ -10,7 +10,6 @@ import {
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
-import AISettingsModal from 'components/ui/AISettingsModal'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -268,7 +267,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           </ResizablePanelGroup>
         </div>
         <EnableBranchingModal />
-        <AISettingsModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
