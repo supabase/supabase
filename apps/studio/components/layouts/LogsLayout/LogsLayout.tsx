@@ -2,28 +2,32 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
-import { LOCAL_STORAGE_KEYS } from 'common'
 
 interface LogsLayoutProps {
   title?: string
+  hideSidebar?: boolean
 }
 
-const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
-  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckProjectPermissions(
-    PermissionAction.ANALYTICS_READ,
-    'logflare'
-  )
-
+const LogsLayout = ({
+  title,
+  children,
+  hideSidebar = false,
+}: PropsWithChildren<LogsLayoutProps>) => {
   const router = useRouter()
   const [_, setLastLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
     router.pathname.split('/logs/')[1] || ''
+  )
+  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckProjectPermissions(
+    PermissionAction.ANALYTICS_READ,
+    'logflare'
   )
 
   useEffect(() => {
@@ -50,7 +54,11 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   }
 
   return (
-    <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
+    <ProjectLayout
+      title={title}
+      product="Logs & Analytics"
+      productMenu={hideSidebar ? null : <LogsSidebarMenuV2 />}
+    >
       {children}
     </ProjectLayout>
   )

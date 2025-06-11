@@ -2072,7 +2072,8 @@ export interface paths {
     /** Gets project's logs */
     get: operations['LogsController_getApiPaths']
     put?: never
-    post?: never
+    /** Post project's logs */
+    post: operations['LogsController_postApiPaths']
     delete?: never
     options?: never
     head?: never
@@ -6630,6 +6631,9 @@ export interface components {
       is_updatable: boolean
       name: string
       schema: string
+    }
+    PostProjectLogsBody: {
+      sql: string
     }
     PreviewProjectTransferResponse: {
       errors: {
@@ -14315,6 +14319,50 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get project's logs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogsController_postApiPaths: {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        project?: string
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PostProjectLogsBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to POST project's logs */
       500: {
         headers: {
           [name: string]: unknown

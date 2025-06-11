@@ -165,7 +165,6 @@ const LogTable = ({
       case 'pg_cron':
         columns = DatabasePostgresColumnRender
         break
-
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
           columns = DefaultPreviewColumnRenderer
@@ -397,6 +396,7 @@ const LogTable = ({
             rowKeyGetter={(r) => {
               if (!hasId) return JSON.stringify(r)
               const row = r as LogData
+              if (!row.id) return `${row.timestamp || ''}-${Math.random()}`
               return row.id
             }}
             renderers={{

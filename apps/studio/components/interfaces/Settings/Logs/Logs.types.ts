@@ -94,6 +94,7 @@ export type QueryType =
   | 'pg_upgrade'
   | 'pg_cron'
   | 'pgbouncer'
+  | 'unified'
 
 export type Mode = 'simple' | 'custom'
 

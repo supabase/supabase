@@ -223,6 +223,7 @@ const ProjectLinks = () => {
   const { securityLints, errorLints } = useLints()
 
   const showWarehouse = useFlag('warehouse')
+  const showUnifiedLogs = useFlag('unifiedLogs')
   const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
@@ -248,7 +249,7 @@ const ProjectLinks = () => {
     storage: storageEnabled,
     realtime: realtimeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project)
+  const otherRoutes = generateOtherRoutes(ref, project, { unifiedLogs: showUnifiedLogs })
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
   return (

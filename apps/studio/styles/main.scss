@@ -9,7 +9,7 @@
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
 
 :root {
-  --chart-1: hsl(var(--brand-default));
+  --chart-1: var(--brand-default);
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
@@ -30,7 +30,7 @@
 .deep-dark,
 [data-theme='dark'],
 .dark {
-  --chart-1: hsl(var(--brand-default));
+  --chart-1: var(--brand-default);
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
