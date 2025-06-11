@@ -1,5 +1,5 @@
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import type { PaymentIntentResult, PaymentMethod, Stripe } from '@stripe/stripe-js'
+import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import _ from 'lodash'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -97,7 +97,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
   const user = useProfile()
   const { data: organizations, isSuccess } = useOrganizationsQuery()
   const { data: projects } = useProjectsQuery()
-
+  const orbPendingPaymentInOrgCreation = useFlag('orbPendingPaymentInOrgCreation')
   const { resolvedTheme } = useTheme()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
@@ -116,10 +116,10 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
 
   const [customerData, setCustomerData] = useState<FormCustomerData | null>(null)
 
-  const options = {
-    clientSecret: setupIntent ? setupIntent.client_secret : '',
-    paymentMethodCreation: 'manual',
+  const stripeOptionsPaymentMethod: StripeElementsOptions = {
+    clientSecret: setupIntent ? setupIntent.client_secret! : '',
     appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+    ...(orbPendingPaymentInOrgCreation ? { paymentMethodCreation: 'manual' } : {}),
   } as const
 
   const [formState, setFormState] = useState<FormState>({
@@ -221,11 +221,11 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
     return value.length >= 1
   }
 
-  const optionsConfirm = useMemo(() => {
+  const stripeOptionsConfirm = useMemo(() => {
     return {
       clientSecret: paymentIntentSecret,
       appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
-    } as any
+    } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
   async function createOrg(paymentMethodId?: string) {
@@ -531,7 +531,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
 
         {setupIntent && formState.plan !== 'FREE' && (
           <Panel.Content>
-            <Elements stripe={stripePromise} options={options}>
+            <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
               <Payment ref={paymentRef} />
             </Elements>
           </Panel.Content>
@@ -611,7 +611,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
       </ConfirmationModal>
 
       {stripePromise && paymentIntentSecret && paymentMethod && (
-        <Elements stripe={stripePromise} options={optionsConfirm}>
+        <Elements stripe={stripePromise} options={stripeOptionsConfirm}>
           <PaymentConfirmation
             paymentIntentSecret={paymentIntentSecret}
             onPaymentIntentConfirm={(paymentIntentConfirmation) =>
