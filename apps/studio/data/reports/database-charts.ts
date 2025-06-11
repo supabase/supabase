@@ -368,8 +368,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           attribute: 'client_connections_authenticator',
           provider: 'infra-monitoring',
           label: 'PostgREST',
-          tooltip:
-            'Connections used by the authenticator role for user authentication and authorization processes.',
+          tooltip: 'Connections magaged by PostgREST to auto-generate RESTful API.',
         },
         {
           attribute: 'client_connections_supabase_auth_admin',
