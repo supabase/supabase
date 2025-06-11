@@ -16542,6 +16542,11 @@ export interface operations {
           | 'max_db_connections'
           | 'network_receive_bytes'
           | 'network_transmit_bytes'
+          | 'realtime_connections_per_tenant'
+          | 'realtime_rate_of_channel_joins'
+          | 'realtime_events_broadcast'
+          | 'realtime_events_presence'
+          | 'realtime_db_connections'
           | 'pgbouncer_pools_client_active_connections'
         databaseIdentifier?: string
         endDate: string
