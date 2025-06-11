@@ -9,6 +9,7 @@ import React from 'react'
 import { isUnixMicro, unixMicroToIsoTimestamp } from './Logs.utils'
 import { AlertCircle, Info } from 'lucide-react'
 import dayjs from 'dayjs'
+import { cn } from 'ui'
 
 export const RowLayout: React.FC<React.PropsWithChildren> = ({ children }) => (
   <div className="flex h-full w-full items-center gap-4">{children}</div>
@@ -57,7 +58,7 @@ export const TextFormatter: React.FC<{ className?: string; value: string }> = ({
   className,
 }) => <span className={'font-mono text-xs truncate ' + className}>{value}</span>
 
-export const ResponseCodeFormatter = ({ value }: any) => {
+export const ResponseCodeFormatter = ({ value }: { value: string }) => {
   if (!value) {
     return (
       <div>
@@ -66,66 +67,49 @@ export const ResponseCodeFormatter = ({ value }: any) => {
     )
   }
 
+  const ResponseCodeItem = ({
+    children,
+    className,
+  }: {
+    children: React.ReactNode
+    className?: string
+  }) => (
+    <div className="flex h-full items-center">
+      <div
+        className={cn(
+          `relative flex h-6 items-center rounded-md justify-center px-2 py-1 text-center`,
+          className
+        )}
+      >
+        <label className="block font-mono text-sm">{children}</label>
+      </div>
+    </div>
+  )
+
   const split = value.toString().split('')[0]
 
   switch (split) {
     // 2XX || 1XX responses
     case '1':
+      return <ResponseCodeItem>{value}</ResponseCodeItem>
     case '2':
-      return (
-        <div className="flex h-full items-center">
-          <div className="relative flex h-6 items-center justify-center rounded border bg-surface-200 px-2 py-1 text-center">
-            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
-          </div>
-        </div>
-      )
-      break
+      return <ResponseCodeItem className="bg-surface-100 text-brand">{value}</ResponseCodeItem>
     // 5XX responses
     case '5':
-      return (
-        <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded bg-red-400 px-2 py-1
-            text-center
+      return <ResponseCodeItem className="bg-red-300 text-red-1100">{value}</ResponseCodeItem>
 
-            "
-          >
-            <label className="block font-mono text-sm text-red-1100">{value}</label>
-          </div>
-        </div>
-      )
-      break
     // 4XX || 3XX responses
     case '4':
     case '3':
-      return (
-        <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded bg-amber-400 px-2 py-1
-            text-center
+      return <ResponseCodeItem className="bg-amber-300 text-amber-1100">{value}</ResponseCodeItem>
 
-            "
-          >
-            <label className="block font-mono text-sm text-amber-1100">{value}</label>
-          </div>
-        </div>
-      )
-      break
     // All other responses
     default:
       return (
-        <div className="flex h-full items-center">
-          <div
-            className="relative flex h-6 items-center justify-center rounded bg-surface-100 px-2 py-1
-            text-center
-
-            "
-          >
-            <label className="block font-mono text-sm text-foreground-lighter">{value}</label>
-          </div>
-        </div>
+        <ResponseCodeItem className="bg-surface-100 text-foreground-lighter">
+          {value}
+        </ResponseCodeItem>
       )
-      break
   }
 }
 

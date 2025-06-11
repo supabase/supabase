@@ -3,7 +3,7 @@ export const ROLES_SQL = /* SQL */ `
 -- https://github.com/supabase/postgres-meta/issues/212
 
 select
-  r.oid :: int8 as id,
+  r.oid as id,
   rolname as name,
   rolsuper as "isSuperuser",
   rolcreatedb as "canCreateDb",

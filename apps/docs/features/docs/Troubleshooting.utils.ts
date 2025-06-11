@@ -27,7 +27,9 @@ export interface ITroubleshootingEntry {
 export const getArticleSlug = getArticleSlugInternal
 
 async function getAllTroubleshootingEntriesTyped() {
-  const result = (await getAllTroubleshootingEntriesInternal()) as ITroubleshootingEntry[]
+  const result: ITroubleshootingEntry[] = (
+    IS_PLATFORM ? await getAllTroubleshootingEntriesInternal() : []
+  ) as ITroubleshootingEntry[]
   return result
 }
 export const getAllTroubleshootingEntries = cache_fullProcess_withDevCacheBust(
@@ -65,7 +67,7 @@ export async function getAllTroubleshootingErrors() {
   const entries = await getAllTroubleshootingEntries()
   const allErrors = new Set(
     entries
-      .flatMap((entry) => entry.data.errors)
+      .flatMap((entry) => entry.data.errors ?? [])
       .filter((error) => error?.http_status_code || error?.code)
   )
 
@@ -79,8 +81,8 @@ export async function getAllTroubleshootingErrors() {
   }
 
   function sortErrors(
-    a: ITroubleshootingMetadata['errors'][number],
-    b: ITroubleshootingMetadata['errors'][number]
+    a: NonNullable<ITroubleshootingMetadata['errors']>[number],
+    b: NonNullable<ITroubleshootingMetadata['errors']>[number]
   ) {
     return formatError(a).localeCompare(formatError(b))
   }

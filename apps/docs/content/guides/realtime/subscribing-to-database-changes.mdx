@@ -1,27 +1,106 @@
 ---
 id: 'subscribing-to-database-changes'
 title: 'Subscribing to Database Changes'
+subtitle: 'Listen to database changes in real-time from your website or application.'
 description: 'Listen to database changes in real-time from your website or application.'
 sidebar_label: 'Videos'
 ---
 
-Supabase allows you to subscribe to real-time changes on your database from your client application.
+You can use Supabase to subscribe to real-time database changes. There are two options available:
 
-You can listen to database changes using the [Postgres Changes](/docs/guides/realtime/postgres-changes) extension.
-The following video shows how you can enable this feature for your tables.
+1. [Broadcast](/docs/guides/realtime/broadcast). This is the recommended method for scalability and security.
+1. [Postgres Changes](/docs/guides/realtime/postgres-changes). This is a simpler method. It requires less setup, but does not scale as well as Broadcast.
 
-## Demo
+## Using Broadcast
+
+To automatically send messages when a record is created, updated, or deleted, we can attach a [Postgres trigger](/docs/guides/database/postgres/triggers) to any table. Supabase Realtime provides a `realtime.broadcast_changes()` function which we can use in conjunction with a trigger. This function will use a private channel and needs broadcast authorization RLS policies to be met.
+
+### Broadcast authorization
+
+[Realtime Authorization](/docs/guides/realtime/authorization) is required for receiving Broadcast messages. This is an example of a policy that allows authenticated users to listen to messages from topics:
+
+{/* prettier-ignore */}
+```sql
+create policy "Authenticated users can receive broadcasts"
+on "realtime"."messages"
+for select
+to authenticated
+using ( true );
+```
+
+### Create a trigger function
+
+Let's create a function that we can call any time a record is created, updated, or deleted. This function will make use of some of Postgres's native [trigger variables](https://www.postgresql.org/docs/current/plpgsql-trigger.html#PLPGSQL-DML-TRIGGER). For this example, we want to have a topic with the name `topic:<record id>` to which we're going to broadcast events.
+
+{/* prettier-ignore */}
+```sql
+create or replace function public.your_table_changes()
+returns trigger
+security definer
+language plpgsql
+as $$
+begin
+  perform realtime.broadcast_changes(
+    'topic:' || coalesce(NEW.topic, OLD.topic) ::text, -- topic - the topic to which we're broadcasting
+    TG_OP,                                             -- event - the event that triggered the function
+    TG_OP,                                             -- operation - the operation that triggered the function
+    TG_TABLE_NAME,                                     -- table - the table that caused the trigger
+    TG_TABLE_SCHEMA,                                   -- schema - the schema of the table that caused the trigger
+    NEW,                                               -- new record - the record after the change
+    OLD                                                -- old record - the record before the change
+  );
+  return null;
+end;
+$$;
+```
+
+### Create a trigger
+
+Let's set up a trigger so the function is executed after any changes to the table.
+
+{/* prettier-ignore */}
+```sql
+create trigger handle_your_table_changes
+after insert or update or delete
+on public.your_table
+for each row
+execute function your_table_changes ();
+```
+
+#### Listening on client side
+
+Finally, on the client side, listen to the topic `topic:<record_id>` to receive the events. Remember to set the channel as a private channel, since `realtime.broadcast_changes` uses Realtime Authorization.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+const gameId = 'id'
+await supabase.realtime.setAuth() // Needed for Realtime Authorization
+const changes = supabase
+  .channel(`topic:${gameId}`, {
+    config: { private: true },
+  })
+  .on('broadcast', { event: 'INSERT' }, (payload) => console.log(payload))
+  .on('broadcast', { event: 'UPDATE' }, (payload) => console.log(payload))
+  .on('broadcast', { event: 'DELETE' }, (payload) => console.log(payload))
+  .subscribe()
+```
+
+## Using Postgres Changes
+
+Postgres Changes are simple to use, but have some [limitations](/docs/guides/realtime/postgres-changes#limitations) as your application scales. We recommend using Broadcast for most use cases.
 
 <div className="video-container">
   <iframe
     src="https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ"
-    frameBorder="1"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowFullScreen
   ></iframe>
 </div>
 
-## Setup
+### Enable Postgres Changes
 
 You'll first need to create a `supabase_realtime` publication and add your tables (that you want to subscribe to) to the publication:
 
@@ -43,15 +122,16 @@ alter
   publication supabase_realtime add table messages;
 ```
 
-## Streaming inserts
+### Streaming inserts
 
 You can use the `INSERT` event to stream all new rows.
 
 ```js
+// @noImplicitAny: false
 import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
-
+// ---cut---
 const channel = supabase
   .channel('schema-db-changes')
   .on(
@@ -65,15 +145,16 @@ const channel = supabase
   .subscribe()
 ```
 
-## Streaming updates
+### Streaming updates
 
 You can use the `UPDATE` event to stream all updated rows.
 
 ```js
+// @noImplicitAny: false
 import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
-
+// ---cut---
 const channel = supabase
   .channel('schema-db-changes')
   .on(
@@ -86,12 +167,3 @@ const channel = supabase
   )
   .subscribe()
 ```
-
-## More resources
-
-- Learn more about the [Postgres Changes](/docs/guides/realtime/postgres-changes) extension.
-- Client Libraries:
-  - [JavaScript](/docs/reference/javascript/subscribe)
-  - [Flutter](/docs/reference/dart/stream)
-  - [Python](/docs/reference/python/subscribe)
-  - [C#](/docs/reference/csharp/subscribe)

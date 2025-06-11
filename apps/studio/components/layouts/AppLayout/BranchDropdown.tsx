@@ -1,4 +1,4 @@
-import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle } from 'lucide-react'
+import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -21,6 +21,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
 
@@ -51,20 +52,17 @@ const BranchLink = ({
           setOpen(false)
         }}
       >
-        <p className="truncate w-60" title={branch.name}>
+        <p className="truncate w-60 flex items-center gap-1" title={branch.name}>
+          {branch.is_default && <Shield size={14} className="text-amber-900" />}
           {branch.name}
         </p>
-        {isSelected && <Check />}
+        {isSelected && <Check size={14} strokeWidth={1.5} />}
       </CommandItem_Shadcn_>
     </Link>
   )
 }
 
-interface BranchDropdownProps {
-  isNewNav?: boolean
-}
-
-const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
+export const BranchDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -76,6 +74,15 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
 
   const [open, setOpen] = useState(false)
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
+
+  const mainBranch = branches?.find((branch) => branch.is_default)
+  const restOfBranches = branches
+    ?.filter((branch) => !branch.is_default)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+  const sortedBranches = mainBranch
+    ? [mainBranch].concat(restOfBranches ?? [])
+    : restOfBranches ?? []
 
   const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 
@@ -91,19 +98,24 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
       )}
 
       {isSuccess && branches.length > 0 && (
-        <div className="flex items-center px-2">
+        <>
+          <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+            <span className="text-foreground max-w-32 lg:max-w-none truncate">
+              {selectedBranch?.name}
+            </span>
+            {selectedBranch?.is_default ? (
+              <Badge variant="warning">Production</Badge>
+            ) : (
+              <Badge variant="brand">Preview Branch</Badge>
+            )}
+          </Link>
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
-              <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-                <div className="flex items-center space-x-2">
-                  <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedBranch?.name}</p>
-                  {selectedBranch?.is_default ? (
-                    <Badge variant="warning">Production</Badge>
-                  ) : (
-                    <Badge variant="brand">Preview Branch</Badge>
-                  )}
-                </div>
-              </Button>
+              <Button
+                type="text"
+                className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+                iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+              />
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
               <Command_Shadcn_>
@@ -112,7 +124,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
                     <ScrollArea className="max-h-[210px] overflow-y-auto">
-                      {branches?.map((branch) => (
+                      {sortedBranches?.map((branch) => (
                         <BranchLink
                           key={branch.id}
                           branch={branch}
@@ -171,10 +183,8 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
               </Command_Shadcn_>
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
-        </div>
+        </>
       )}
     </>
   )
 }
-
-export default BranchDropdown

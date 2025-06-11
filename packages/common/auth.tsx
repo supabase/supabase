@@ -10,7 +10,10 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { gotrueClient } from './gotrue'
+import { gotrueClient, type User } from './gotrue'
+import { clearLocalStorage } from './constants/local-storage'
+
+export type { User }
 
 const DEFAULT_SESSION: any = {
   access_token: undefined,
@@ -111,6 +114,13 @@ export const useIsLoggedIn = () => {
   const user = useUser()
 
   return user !== null
+}
+
+export const signOut = async () => await gotrueClient.signOut()
+
+export const logOut = async () => {
+  await signOut()
+  clearLocalStorage()
 }
 
 let currentSession: Session | null = null

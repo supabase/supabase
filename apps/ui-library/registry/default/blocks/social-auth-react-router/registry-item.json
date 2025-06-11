@@ -1,0 +1,45 @@
+{
+  "name": "social-auth-react-router",
+  "type": "registry:block",
+  "title": "Social Auth flow for React Router and Supabase",
+  "description": "Social Auth flow for React Router and Supabase",
+  "registryDependencies": ["button", "card"],
+  "dependencies": [
+    "@supabase/ssr@latest",
+    "@react-router/dev@latest",
+    "@react-router/fs-routes@latest"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/social-auth-react-router/app/routes/auth.error.tsx",
+      "type": "registry:file",
+      "target": "app/routes/auth.error.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-react-router/app/routes/auth.oauth.tsx",
+      "type": "registry:file",
+      "target": "app/routes/auth.oauth.tsx"
+    },
+
+    {
+      "path": "registry/default/blocks/social-auth-react-router/app/routes/login.tsx",
+      "type": "registry:file",
+      "target": "app/routes/login.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-react-router/app/routes/logout.tsx",
+      "type": "registry:file",
+      "target": "app/routes/logout.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-react-router/app/routes/protected.tsx",
+      "type": "registry:file",
+      "target": "app/routes/protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/social-auth-react-router/app/routes.ts",
+      "type": "registry:file",
+      "target": "app/routes.ts"
+    }
+  ]
+}

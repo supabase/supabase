@@ -26,8 +26,9 @@ import {
 } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
-const NotificationsPopoverV2 = () => {
+export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'inbox' | 'archived'>('inbox')
 
@@ -41,8 +42,8 @@ const NotificationsPopoverV2 = () => {
   // so opting to simplify and implement it here for now
   const rowHeights = useRef<{ [key: number]: number }>({})
 
-  const { data: projects } = useProjectsQuery()
-  const { data: organizations } = useOrganizationsQuery()
+  const { data: projects } = useProjectsQuery({ enabled: open })
+  const { data: organizations } = useOrganizationsQuery({ enabled: open })
   const {
     data,
     error,
@@ -52,19 +53,22 @@ const NotificationsPopoverV2 = () => {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useNotificationsV2Query({
-    status:
-      activeTab === 'archived'
-        ? 'archived'
-        : snap.filterStatuses.includes('unread')
-          ? 'new'
-          : undefined,
-    filters: {
-      priority: snap.filterPriorities,
-      organizations: snap.filterOrganizations,
-      projects: snap.filterProjects,
+  } = useNotificationsV2Query(
+    {
+      status:
+        activeTab === 'archived'
+          ? 'archived'
+          : snap.filterStatuses.includes('unread')
+            ? 'new'
+            : undefined,
+      filters: {
+        priority: snap.filterPriorities,
+        organizations: snap.filterOrganizations,
+        projects: snap.filterProjects,
+      },
     },
-  })
+    { enabled: open }
+  )
   const { data: summary } = useNotificationsSummaryQuery()
   const { mutate: updateNotifications } = useNotificationsV2UpdateMutation()
   const { mutate: archiveAllNotifications, isLoading: isArchiving } =
@@ -93,10 +97,15 @@ const NotificationsPopoverV2 = () => {
       }}
     >
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
+        <ButtonTooltip
+          tooltip={{
+            content: {
+              text: 'Notifications',
+            },
+          }}
           type={hasNewNotifications ? 'outline' : 'text'}
           className={cn(
-            'h-[26px]',
+            'rounded-none h-[30px] w-[32px]',
             // !hasCritical || !hasWarning || !hasNewNotifications ? 'w-[26px]' : '',
             'group',
             hasNewNotifications ? 'rounded-full px-1.5' : 'px-1',
@@ -127,12 +136,16 @@ const NotificationsPopoverV2 = () => {
             <InboxIcon
               size={18}
               strokeWidth={1.5}
-              className="transition group-hover:text-foreground text-foreground-light"
+              className="!h-[18px] !w-[18px] transition group-hover:text-foreground text-foreground-light"
             />
           }
         />
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[450px] overflow-hidden" side="bottom" align="end">
+      <PopoverContent_Shadcn_
+        className="p-0 w-screen md:w-[450px] overflow-hidden"
+        side="bottom"
+        align="end"
+      >
         <div className="px-4">
           <p className="pt-4 pb-1 text-sm">Notifications</p>
           <div className="flex items-center">
@@ -271,5 +284,3 @@ const NotificationsPopoverV2 = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default NotificationsPopoverV2

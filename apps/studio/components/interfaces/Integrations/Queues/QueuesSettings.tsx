@@ -138,6 +138,7 @@ export const QueuesSettings = () => {
             projectRef: project?.ref,
             connectionString: project?.connectionString,
             id: x.id,
+            name: x.name,
             schema: x.schema,
             payload: { id: x.id, rls_enabled: true },
           })
@@ -206,7 +207,7 @@ export const QueuesSettings = () => {
                               <code className="text-xs">send_batch</code>,{' '}
                               <code className="text-xs">read</code>,{' '}
                               <code className="text-xs">pop</code>,
-                              <code className="text-xs">archive</code>, and
+                              <code className="text-xs">archive</code>, and{' '}
                               <code className="text-xs">delete</code>
                             </p>
                           </>

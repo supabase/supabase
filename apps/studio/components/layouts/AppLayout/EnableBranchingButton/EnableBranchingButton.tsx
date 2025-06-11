@@ -6,11 +6,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 
-interface EnableBranchingButtonProps {
-  isNewNav?: boolean
-}
-
-const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps) => {
+export const EnableBranchingButton = () => {
   const snap = useAppStateSnapshot()
   const project = useSelectedProject()
 
@@ -22,9 +18,10 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
   return (
     <ButtonTooltip
       disabled={isDisabled}
-      type={isNewNav ? 'default' : 'text'}
+      type={'text'}
       icon={<GitBranch strokeWidth={1.5} />}
       onClick={() => snap.setShowEnableBranchingModal(true)}
+      className="bg-none hover:bg-none text-foreground-light hover:text-foreground [&_span]:w-full [&_span]:text-left "
       tooltip={{
         content: {
           side: 'bottom',
@@ -41,5 +38,3 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
     </ButtonTooltip>
   )
 }
-
-export default EnableBranchingButton

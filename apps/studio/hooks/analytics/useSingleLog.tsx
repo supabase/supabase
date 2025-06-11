@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { LOGS_TABLES, genQueryParams } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
   LogData,
   Logs,
@@ -7,8 +7,7 @@ import type {
   QueryType,
 } from 'components/interfaces/Settings/Logs/Logs.types'
 import { genSingleLogQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get } from 'data/fetchers'
 
 interface SingleLogHook {
   data: LogData | undefined
@@ -34,10 +33,6 @@ function useSingleLog({
 
   const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
 
-  const endpointUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
-    params as any
-  )}`
-
   const isWarehouseQuery = queryType === 'warehouse'
   // Warehouse queries are handled differently
   const enabled = Boolean(id && table && !isWarehouseQuery)
@@ -50,7 +45,20 @@ function useSingleLog({
     refetch,
   } = useQuery(
     ['projects', projectRef, 'single-log', id, queryType],
-    ({ signal }) => get(endpointUrl, { signal }) as Promise<Logs>,
+    async ({ signal }) => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: params,
+        },
+        signal,
+      })
+      if (error) {
+        throw error
+      }
+
+      return data as unknown as Logs
+    },
     {
       enabled,
       refetchOnWindowFocus: false,

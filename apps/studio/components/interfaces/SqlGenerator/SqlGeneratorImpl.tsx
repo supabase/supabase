@@ -1,13 +1,13 @@
 import { AlertTriangle, User } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useEffectOnce } from 'react-use'
-import { format } from 'sql-formatter'
 
 import { IS_PLATFORM } from 'common'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { formatSql } from 'lib/formatSql'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
@@ -45,11 +45,14 @@ import { SAMPLE_QUERIES, generatePrompt } from './SqlGenerator.utils'
 import { SQLOutputActions } from './SqlOutputActions'
 
 function useSchemaMetadataForAi() {
-  const isOptedInToAI = useOrgOptedIntoAi()
+  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
   const project = useSelectedProject()
 
   const [schemas] = useSchemasForAi(project?.ref!)
-  const includeMetadata = (isOptedInToAI || !IS_PLATFORM) && schemas.length > 0 && !!project
+  const includeMetadata =
+    ((isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM) &&
+    schemas.length > 0 &&
+    !!project
 
   const metadataSkipReason: AiMetadataSkipReason = !project ? 'no_project' : 'forbidden'
 
@@ -231,17 +234,6 @@ function Messages({
   messages: ReturnType<typeof useAiChat>['messages']
   handleReset: () => void
 }) {
-  function formatAnswer(answer: string) {
-    try {
-      return format(answer, {
-        language: 'postgresql',
-        keywordCase: 'lower',
-      })
-    } catch {
-      return answer
-    }
-  }
-
   const X_PADDING = 'px-4'
 
   const UserAvatar = useCallback(() => {
@@ -279,7 +271,7 @@ function Messages({
 
         const answer =
           message.status === MessageStatus.Complete
-            ? formatAnswer(unformattedAnswer)
+            ? formatSql(unformattedAnswer)
             : unformattedAnswer
         const cantHelp = answer.replace(/^-- /, '') === "Sorry, I don't know how to help with that."
 

@@ -226,6 +226,12 @@
     "title": "Edge Functions",
     "items": [
       {
+        "id": "v1-bulk-update-functions",
+        "title": "Bulk update functions",
+        "slug": "v1-bulk-update-functions",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-function",
         "title": "Create a function",
         "slug": "v1-create-a-function",
@@ -235,6 +241,12 @@
         "id": "v1-delete-a-function",
         "title": "Delete a function",
         "slug": "v1-delete-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "v1-deploy-a-function",
+        "title": "Deploy a function",
+        "slug": "v1-deploy-a-function",
         "type": "operation"
       },
       {
@@ -376,6 +388,12 @@
     "title": "Projects",
     "items": [
       {
+        "id": "v1-cancel-a-project-restoration",
+        "title": "Cancel a project restoration",
+        "slug": "v1-cancel-a-project-restoration",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-project",
         "title": "Create a project",
         "slug": "v1-create-a-project",
@@ -436,9 +454,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-list-available-restore-versions",
+        "title": "List available restore versions",
+        "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
         "id": "v1-pause-a-project",
         "title": "Pause a project",
         "slug": "v1-pause-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-a-project",
+        "title": "Restore a project",
+        "slug": "v1-restore-a-project",
         "type": "operation"
       },
       {

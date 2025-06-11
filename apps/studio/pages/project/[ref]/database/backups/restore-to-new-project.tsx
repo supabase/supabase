@@ -8,19 +8,23 @@ import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
 import { BackupsList } from 'components/interfaces/Database/Backups/RestoreToNewProject/BackupsList'
 import { ConfirmRestoreDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/ConfirmRestoreDialog'
 import { CreateNewProjectDialog } from 'components/interfaces/Database/Backups/RestoreToNewProject/CreateNewProjectDialog'
+import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
+import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
+import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
@@ -29,7 +33,6 @@ import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge, Button } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
-import Panel from 'components/ui/Panel'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -50,14 +53,15 @@ const RestoreToNewProjectPage: NextPageWithLayout = () => {
 }
 
 RestoreToNewProjectPage.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <DefaultLayout>
+    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  </DefaultLayout>
 )
 
 const RestoreToNewProject = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
   const isOrioleDb = useIsOrioleDb()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
@@ -73,7 +77,7 @@ const RestoreToNewProject = () => {
     isError,
   } = useCloneBackupsQuery({ projectRef: project?.ref }, { enabled: !isFreePlan })
 
-  const plan = subscription?.plan?.id
+  const plan = organization?.plan?.id
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -86,6 +90,11 @@ const RestoreToNewProject = () => {
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
+  const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb
+  const targetComputeSize = cloneBackups?.target_compute_size
+  const planId = organization?.plan?.id ?? 'free'
+  const { data } = useDiskAttributesQuery({ projectRef: project?.ref })
+  const storageType = data?.attributes?.type ?? 'gp3'
 
   const {
     data: cloneStatus,
@@ -179,10 +188,21 @@ const RestoreToNewProject = () => {
     }
   }
 
+  if (organization?.managed_by === 'vercel-marketplace') {
+    return (
+      <Admonition
+        type="default"
+        title="Restore to new project is not available for Vercel Marketplace organizations"
+        description="Restoring project backups to a new project created via Vercel Marketplace is not supported yet."
+      />
+    )
+  }
+
   if (isFreePlan) {
     return (
       <UpgradeToPro
         buttonText="Upgrade"
+        source="backupsRestoreToNewProject"
         primaryText="Restore to a new project requires a pro plan or above."
         secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
       />
@@ -259,7 +279,7 @@ const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full [&>p]:!leading-normal"
           content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore from a restored project, please reach out via [support](/support/new?ref=${project?.ref}).`}
+          If you need to restore from a restored project, please reach out via [support](/support/new?projectRef=${project?.ref}).`}
         />
         <Button asChild type="default">
           <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
@@ -310,6 +330,13 @@ const RestoreToNewProject = () => {
     )
   }
 
+  const additionalMonthlySpend = projectSpecToMonthlyPrice({
+    targetVolumeSizeGb: targetVolumeSizeGb ?? 0,
+    targetComputeSize: targetComputeSize ?? 'nano',
+    planId: planId ?? 'free',
+    storageType: storageType as DiskType,
+  })
+
   return (
     <div className="flex flex-col gap-4">
       <ConfirmRestoreDialog
@@ -319,11 +346,13 @@ const RestoreToNewProject = () => {
           setShowConfirmationDialog(false)
           setShowNewProjectDialog(true)
         }}
+        additionalMonthlySpend={additionalMonthlySpend}
       />
       <CreateNewProjectDialog
         open={showNewProjectDialog}
         selectedBackupId={selectedBackupId}
         recoveryTimeTarget={recoveryTimeTarget}
+        additionalMonthlySpend={additionalMonthlySpend}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
           refetchCloneStatus()

@@ -16,6 +16,7 @@ export async function updateVercelConnection({
       path: { connection_id: id },
     },
     body: {
+      // the array part of this type correctly
       env_sync_targets: envSyncTargets,
       public_env_var_prefix: publicEnvVarPrefix,
     },

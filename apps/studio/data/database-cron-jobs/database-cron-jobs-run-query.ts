@@ -7,7 +7,7 @@ import { databaseCronJobsKeys } from './keys'
 
 export type DatabaseCronJobRunVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   jobId: number
 }
 
@@ -30,10 +30,10 @@ export async function getDatabaseCronJobRun({
     sql: query,
   })
 
-  return result[0]
+  return result[0] ?? null
 }
 
-export type DatabaseCronJobRunData = CronJobRun
+export type DatabaseCronJobRunData = CronJobRun | null
 export type DatabaseCronJobRunError = ResponseError
 
 export const useCronJobRunQuery = <TData = DatabaseCronJobRunData>(

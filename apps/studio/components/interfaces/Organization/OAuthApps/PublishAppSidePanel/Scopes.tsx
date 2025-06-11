@@ -1,6 +1,7 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, PropsWithChildren, SetStateAction } from 'react'
+
 import {
   Button,
   DropdownMenu,
@@ -78,7 +79,7 @@ const Scope = ({
             <p>{accessDescription}</p>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuLabel>Select an access level</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <ScopeDropdownCheckboxItem scopeName={readScopeName} scopes={scopes} onChange={setScopes}>

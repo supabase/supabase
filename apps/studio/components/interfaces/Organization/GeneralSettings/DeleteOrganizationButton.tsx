@@ -3,12 +3,14 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, Form, Input, Modal } from 'ui'
 
-const DeleteOrganizationButton = () => {
+export const DeleteOrganizationButton = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const { slug: orgSlug, name: orgName } = selectedOrganization ?? {}
@@ -16,11 +18,17 @@ const DeleteOrganizationButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
 
+  const [_, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
   const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: deleteOrganization, isLoading: isDeleting } = useOrganizationDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${orgName}`)
-      router.push('/projects')
+      setLastVisitedOrganization('')
+      router.push('/organizations')
     },
   })
 
@@ -52,7 +60,6 @@ const DeleteOrganizationButton = () => {
         </Button>
       </div>
       <Modal
-        closable
         hideFooter
         size="small"
         visible={isOpen}
@@ -114,5 +121,3 @@ const DeleteOrganizationButton = () => {
     </>
   )
 }
-
-export default DeleteOrganizationButton

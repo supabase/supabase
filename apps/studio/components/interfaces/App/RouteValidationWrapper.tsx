@@ -2,11 +2,13 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { useIsLoggedIn, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
-import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
 // Ideally these could all be within a _middleware when we use Next 12
@@ -16,6 +18,20 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const isLoggedIn = useIsLoggedIn()
   const snap = useAppStateSnapshot()
+
+  const organization = useSelectedOrganization()
+
+  const [dashboardHistory, _, { isSuccess: isSuccessStorage }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref ?? ''),
+    { editor: undefined, sql: undefined }
+  )
+
+  const [__, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
+
+  const DEFAULT_HOME = IS_PLATFORM ? '/organizations' : '/project/default'
 
   /**
    * Array of urls/routes that should be ignored
@@ -86,30 +102,6 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   }, [projectsInitialized])
 
   useEffect(() => {
-    if (orgsInitialized && slug) {
-      // Save organization slug to local storage
-      const organizations = organizationsRef.current ?? []
-      const organization = organizations.find((org) => org.slug === slug)
-      if (organization) {
-        localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
-      }
-    }
-  }, [slug, orgsInitialized])
-
-  useEffect(() => {
-    if (projectsInitialized && ref) {
-      // Save organization slug to local storage
-      const projects = projectsRef.current ?? []
-      const project = projects.find((project) => project.ref === ref)
-      const organizationId = project?.organization_id
-      const organization = organizations?.find((organization) => organization.id === organizationId)
-      if (organization) {
-        localStorage.setItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION, organization.slug)
-      }
-    }
-  }, [ref, projectsInitialized])
-
-  useEffect(() => {
     if (ref !== undefined && id !== undefined) {
       if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
         snap.setDashboardHistory(ref, 'sql', id)
@@ -119,6 +111,20 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       }
     }
   }, [ref, id])
+
+  useEffect(() => {
+    // Load dashboard history into app state
+    if (isSuccessStorage && ref) {
+      snap.setDashboardHistory(ref, 'editor', dashboardHistory.editor)
+      snap.setDashboardHistory(ref, 'sql', dashboardHistory.sql)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessStorage, ref])
+
+  useEffect(() => {
+    if (organization) setLastVisitedOrganization(organization.slug)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organization])
 
   return <>{children}</>
 }

@@ -14,7 +14,6 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -56,10 +55,7 @@ const StorageSettings = () => {
   } = useProjectStorageConfigQuery({ projectRef })
 
   const organization = useSelectedOrganization()
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization?.slug,
-  })
-  const isFreeTier = isSuccessSubscription && subscription.plan.id === 'free'
+  const isFreeTier = organization?.plan.id === 'free'
 
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
@@ -131,12 +127,9 @@ const StorageSettings = () => {
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
-      // @ts-ignore [Joshen clean up] Remove this once storage changes are deployed'
       features: {
         imageTransformation: { enabled: data.imageTransformationEnabled },
-        ...(config.features.s3Protocol !== undefined
-          ? { s3Protocol: config?.features.s3Protocol }
-          : {}),
+        s3Protocol: { enabled: config.features.s3Protocol.enabled },
       },
     })
   }
@@ -271,6 +264,7 @@ const StorageSettings = () => {
                   icon={<Clock size={14} className="text-foreground-muted" />}
                   primaryText="Free Plan has a fixed upload file size limit of 50 MB."
                   secondaryText="Upgrade to the Pro Plan for a configurable upload file size limit of up to 50 GB."
+                  source="storageSizeLimit"
                 />
               </div>
             )}

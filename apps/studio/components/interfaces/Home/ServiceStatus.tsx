@@ -1,12 +1,15 @@
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Info, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
-import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
-import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
+import {
+  ProjectServiceStatus,
+  useProjectServiceStatusQuery,
+} from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
@@ -16,40 +19,58 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
 const StatusMessage = ({
+  status,
   isLoading,
-  isSuccess,
+  isHealthy,
   isProjectNew,
 }: {
   isLoading: boolean
-  isSuccess: boolean
+  isHealthy: boolean
   isProjectNew: boolean
+  status?: ProjectServiceStatus
 }) => {
+  if (isHealthy) return 'Healthy'
   if (isLoading) return 'Checking status'
+  if (status === 'UNHEALTHY') return 'Unhealthy'
+  if (status === 'COMING_UP') return 'Coming up...'
+  if (status === 'ACTIVE_HEALTHY') return 'Healthy'
   if (isProjectNew) return 'Coming up...'
-  if (isSuccess) return 'No issues'
   return 'Unable to connect'
 }
 
+const iconProps = {
+  size: 18,
+  strokeWidth: 1.5,
+}
+const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangle {...iconProps} />
+const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+
 const StatusIcon = ({
   isLoading,
-  isSuccess,
+  isHealthy,
   isProjectNew,
+  projectStatus,
 }: {
   isLoading: boolean
-  isSuccess: boolean
+  isHealthy: boolean
   isProjectNew: boolean
+  projectStatus?: ProjectServiceStatus
 }) => {
-  if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
-  if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-  return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+  if (isHealthy) return <CheckIcon />
+  if (isLoading) return <LoaderIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
+  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (isProjectNew) return <LoaderIcon />
+  return <AlertIcon />
 }
 
-const ServiceStatus = () => {
+export const ServiceStatus = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
@@ -73,22 +94,29 @@ const ServiceStatus = () => {
     data: status,
     isLoading,
     refetch: refetchServiceStatus,
-  } = useProjectServiceStatusQuery({ projectRef: ref })
+  } = useProjectServiceStatusQuery(
+    {
+      projectRef: ref,
+    },
+    {
+      refetchInterval: (data) => (data?.some((service) => !service.healthy) ? 5000 : false),
+    }
+  )
   const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
-    useEdgeFunctionServiceStatusQuery({ projectRef: ref })
-  const {
-    isLoading: isLoadingPostgres,
-    isSuccess: isSuccessPostgres,
-    refetch: refetchPostgresServiceStatus,
-  } = usePostgresServiceStatusQuery({
-    projectRef: ref,
-    connectionString: project?.connectionString,
-  })
+    useEdgeFunctionServiceStatusQuery(
+      {
+        projectRef: ref,
+      },
+      {
+        refetchInterval: (data) => (!data?.healthy ? 5000 : false),
+      }
+    )
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
   const realtimeStatus = status?.find((service) => service.name === 'realtime')
   const storageStatus = status?.find((service) => service.name === 'storage')
+  const dbStatus = status?.find((service) => service.name === 'db')
 
   // [Joshen] Need individual troubleshooting docs for each service eventually for users to self serve
   const services: {
@@ -96,15 +124,17 @@ const ServiceStatus = () => {
     error?: string
     docsUrl?: string
     isLoading: boolean
-    isSuccess?: boolean
+    isHealthy: boolean
+    status: ProjectServiceStatus
     logsUrl: string
   }[] = [
     {
       name: 'Database',
       error: undefined,
       docsUrl: undefined,
-      isLoading: isLoadingPostgres,
-      isSuccess: isSuccessPostgres,
+      isLoading: isLoading,
+      isHealthy: !!dbStatus?.healthy,
+      status: dbStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgres-logs',
     },
     {
@@ -112,7 +142,8 @@ const ServiceStatus = () => {
       error: restStatus?.error,
       docsUrl: undefined,
       isLoading,
-      isSuccess: restStatus?.healthy,
+      isHealthy: !!restStatus?.healthy,
+      status: restStatus?.status ?? 'UNHEALTHY',
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -122,7 +153,8 @@ const ServiceStatus = () => {
             error: authStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: authStatus?.healthy,
+            isHealthy: !!authStatus?.healthy,
+            status: authStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/auth-logs',
           },
         ]
@@ -134,7 +166,8 @@ const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: realtimeStatus?.healthy,
+            isHealthy: !!realtimeStatus?.healthy,
+            status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/realtime-logs',
           },
         ]
@@ -146,7 +179,8 @@ const ServiceStatus = () => {
             error: storageStatus?.error,
             docsUrl: undefined,
             isLoading,
-            isSuccess: storageStatus?.healthy,
+            isHealthy: !!storageStatus?.healthy,
+            status: storageStatus?.status ?? 'UNHEALTHY',
             logsUrl: '/logs/storage-logs',
           },
         ]
@@ -158,7 +192,12 @@ const ServiceStatus = () => {
             error: undefined,
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
-            isSuccess: edgeFunctionsStatus?.healthy,
+            isHealthy: !!edgeFunctionsStatus?.healthy,
+            status: edgeFunctionsStatus?.healthy
+              ? 'ACTIVE_HEALTHY'
+              : isLoading
+                ? 'COMING_UP'
+                : ('UNHEALTHY' as ProjectServiceStatus),
             logsUrl: '/logs/edge-functions-logs',
           },
         ]
@@ -166,7 +205,7 @@ const ServiceStatus = () => {
   ]
 
   const isLoadingChecks = services.some((service) => service.isLoading)
-  const allServicesOperational = services.every((service) => service.isSuccess)
+  const allServicesOperational = services.every((service) => service.isHealthy)
 
   // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
   const isProjectNew =
@@ -184,7 +223,6 @@ const ServiceStatus = () => {
 
       timer = setTimeout(() => {
         refetchServiceStatus()
-        refetchPostgresServiceStatus()
         refetchEdgeFunctionServiceStatus()
       }, remainingTimeTillNextCheck * 1000)
     }
@@ -201,8 +239,8 @@ const ServiceStatus = () => {
         <Button
           type="default"
           icon={
-            isLoadingChecks || isProjectNew ? (
-              <Loader2 className="animate-spin" />
+            isLoadingChecks || (!allServicesOperational && isProjectNew) ? (
+              <LoaderIcon />
             ) : (
               <div
                 className={`w-2 h-2 rounded-full ${
@@ -215,7 +253,7 @@ const ServiceStatus = () => {
           {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}
@@ -225,16 +263,18 @@ const ServiceStatus = () => {
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
-                isSuccess={!!service.isSuccess}
+                isHealthy={!!service.isHealthy}
                 isProjectNew={isProjectNew}
+                projectStatus={service.status}
               />
               <div className="flex-1">
                 <p>{service.name}</p>
                 <p className="text-foreground-light flex items-center gap-1">
                   <StatusMessage
                     isLoading={service.isLoading}
-                    isSuccess={!!service.isSuccess}
+                    isHealthy={!!service.isHealthy}
                     isProjectNew={isProjectNew}
+                    status={service.status}
                   />
                 </p>
               </div>
@@ -245,16 +285,18 @@ const ServiceStatus = () => {
             </div>
           </Link>
         ))}
-        <PopoverSeparator />
-        <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
-          <div className="mt-0.5">
-            <InfoIcon />
-          </div>
-          Recently restored projects can take up to 5 minutes to become fully operational.
-        </div>
+        {allServicesOperational ? null : (
+          <>
+            <PopoverSeparator />
+            <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
+              <div className="mt-0.5">
+                <InfoIcon />
+              </div>
+              Recently restored projects can take up to 5 minutes to become fully operational.
+            </div>
+          </>
+        )}
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
 }
-
-export default ServiceStatus

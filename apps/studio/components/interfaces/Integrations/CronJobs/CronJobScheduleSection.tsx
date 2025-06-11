@@ -6,6 +6,7 @@ import { useDebounce } from 'use-debounce'
 import { useCompletion } from 'ai/react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
+import { constructHeaders } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import {
   Accordion_Shadcn_,
@@ -78,7 +79,11 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
 
   useEffect(() => {
     if (useNaturalLanguage && debouncedValue) {
-      generateCronSyntax(debouncedValue)
+      constructHeaders().then((headers) =>
+        generateCronSyntax(debouncedValue, {
+          headers: { Authorization: headers.get('Authorization') ?? '' },
+        })
+      )
       return () => stop()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

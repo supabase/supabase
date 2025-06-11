@@ -62,10 +62,6 @@ Manage Supabase infrastructure via Terraform, an Infrastructure as Code tool. [D
 
 Deploy read-only databases across multiple regions, for lower latency and better resource management. [Docs](/docs/guides/platform/read-replicas).
 
-### Fly Postgres
-
-Launch the Supabase stack on Fly.io edge network. [Docs](/docs/guides/platform/fly-postgres).
-
 ### Log drains
 
 Export Supabase logs at to 3rd party providers and external tooling. [Docs](/docs/guides/platform/log-drains).
@@ -82,11 +78,11 @@ Login to the Supabase dashboard via SSO. [Docs](/docs/guides/platform/sso).
 
 ### Postgres changes
 
-Receive your database changes through websockets. [Docs](/docs/guides/realtime/postgres-changes).
+Receive your database changes through WebSockets. [Docs](/docs/guides/realtime/postgres-changes).
 
 ### Broadcast
 
-Send messages between connected users through websockets. [Docs](/docs/guides/realtime/broadcast).
+Send messages between connected users through WebSockets. [Docs](/docs/guides/realtime/broadcast).
 
 ### Presence
 
@@ -114,9 +110,9 @@ Build passwordless logins via magic links for your application or website. [Docs
 
 Control the data each user can access with Postgres Policies. [Docs](/docs/guides/database/postgres/row-level-security).
 
-### Captcha protection
+### CAPTCHA protection
 
-Add Captcha to your sign-in, sign-up, and password reset forms. [Docs](/docs/guides/auth/auth-captcha).
+Add CAPTCHA to your sign-in, sign-up, and password reset forms. [Docs](/docs/guides/auth/auth-captcha).
 
 ### Server-Side Auth
 
@@ -215,7 +211,6 @@ In addition to the Beta requirements, features in GA are covered by the [uptime 
 | Platform       | Branching                  | `public alpha`  | N/A                                         |
 | Platform       | Terraform Provider         | `public alpha`  | N/A                                         |
 | Platform       | Read Replicas              | `private alpha` | N/A                                         |
-| Platform       | Fly Postgres               | `private alpha` | N/A                                         |
 | Platform       | Log Drains                 | `public alpha`  | ✅                                          |
 | Studio         |                            | `GA`            | ✅                                          |
 | Studio         | SSO                        | `GA`            | ✅                                          |
@@ -240,7 +235,7 @@ In addition to the Beta requirements, features in GA are covered by the [uptime 
 | Auth           | Passwordless login         | `GA`            | ✅                                          |
 | Auth           | SSO with SAML              | `GA`            | ✅                                          |
 | Auth           | Authorization via RLS      | `GA`            | ✅                                          |
-| Auth           | Captcha protection         | `GA`            | ✅                                          |
+| Auth           | CAPTCHA protection         | `GA`            | ✅                                          |
 | Auth           | Server-side Auth           | `beta`          | ✅                                          |
 | CLI            |                            | `GA`            | ✅ Works with self-hosted                   |
 | Management API |                            | `GA`            | N/A                                         |

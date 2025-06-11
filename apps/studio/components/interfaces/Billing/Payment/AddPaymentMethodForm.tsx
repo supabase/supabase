@@ -111,7 +111,7 @@ const AddPaymentMethodForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <Modal.Content
         className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
       >
@@ -147,16 +147,17 @@ const AddPaymentMethodForm = ({
         </Button>
         <Button
           block
-          htmlType="submit"
+          htmlType="button"
           size="small"
           type="primary"
           loading={isSaving}
           disabled={isSaving}
+          onClick={handleSubmit}
         >
           Add payment method
         </Button>
       </Modal.Content>
-    </form>
+    </div>
   )
 }
 

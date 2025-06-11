@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
+import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import ProjectLinker, {
   ForeignProject,
 } from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
@@ -26,7 +27,7 @@ const VERCEL_ICON = (
 )
 
 const VercelIntegration: NextPageWithLayout = () => {
-  const { slug, configurationId, next, organizationSlug } = useParams()
+  const { slug, configurationId, next } = useParams()
 
   /**
    * Fetch the list of organization based integration installations for Vercel.
@@ -106,7 +107,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
       onSuccess() {
-        if (next) {
+        if (next && isVercelUrl(next)) {
           snapshot.setLoading(false)
           window.location.href = next
         }
@@ -164,7 +165,7 @@ This Supabase integration manages your environment variables automatically to pr
             getForeignProjectIcon={getForeignProjectIcon}
             choosePrompt="Choose Vercel Project"
             onSkip={() => {
-              if (next) {
+              if (next && isVercelUrl(next)) {
                 window.location.href = next
               }
             }}

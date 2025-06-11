@@ -7,17 +7,15 @@ import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSet
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const diskManagementV2 = useFlag('diskManagementV2')
   const project = useSelectedProject()
-
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
 
   return (
     <>
@@ -51,6 +49,10 @@ const ProjectSettings: NextPageWithLayout = () => {
   )
 }
 
-ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</SettingsLayout>
+ProjectSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Database">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 
 export default ProjectSettings

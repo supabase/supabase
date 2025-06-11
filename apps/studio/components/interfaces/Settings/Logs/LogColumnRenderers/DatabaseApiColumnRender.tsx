@@ -15,9 +15,9 @@ const columns: Column<LogData>[] = [
       return (
         <RowLayout>
           <TimestampInfo utcTimestamp={props.row.timestamp!} />
-          <ResponseCodeFormatter row={props} value={props.row.status_code} />
-          <TextFormatter className="w-20" value={props.row.method as string} />
-          <TextFormatter className="w-full" value={props.row.path as string} />
+          <ResponseCodeFormatter value={String(props.row.status_code)} />
+          <TextFormatter value={String(props.row.method)} />
+          <TextFormatter value={String(props.row.path)} />
         </RowLayout>
       )
     },

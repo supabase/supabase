@@ -69,7 +69,7 @@ In response, the server sends the Postgres configuration with a unique ID. With 
 ## System messages
 
 System message are used to inform a client about the status of the Postgres subscription. The `payload.status` indicates if the subscription successful or not.
-The body of the `payload.message` can be "Subscribed to PostgreSQL" or "Subscribing to PostgreSQL failed" with subscription params.
+The body of the `payload.message` can be "Subscribed to Postgres" or "Subscribing to Postgres failed" with subscription params.
 
 ```ts
 {

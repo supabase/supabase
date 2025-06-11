@@ -24,7 +24,7 @@ const StoragePolicies = () => {
   const { data, isLoading: isLoadingBuckets } = useBucketsQuery({ projectRef })
   const buckets = data ?? []
 
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState({})
+  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<any>({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
   const [isEditingPolicyForBucket, setIsEditingPolicyForBucket] = useState<any>({})
 
@@ -155,7 +155,7 @@ const StoragePolicies = () => {
       await updateDatabasePolicy({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        id: payload.id,
+        originalPolicy: selectedPolicyToEdit,
         payload,
       })
       return false
@@ -170,7 +170,7 @@ const StoragePolicies = () => {
     deleteDatabasePolicy({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      id: selectedPolicyToDelete.id,
+      originalPolicy: selectedPolicyToDelete,
     })
   }
 

@@ -1,8 +1,9 @@
-import { ChevronDown, Database, Plus, X } from 'lucide-react'
+import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
 import { ComponentProps, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
@@ -19,15 +20,17 @@ import {
   Select,
   cn,
 } from 'ui'
-import DatePickers from '../Settings/Logs/Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
+  isLoading: boolean
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
-  onDatepickerChange: ComponentProps<typeof DatePickers>['onChange']
+  onRefresh: () => void
+  onDatepickerChange: ComponentProps<typeof LogsDatePicker>['onSubmit']
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
@@ -78,11 +81,11 @@ const PRODUCT_FILTERS = [
 
 const ReportFilterBar = ({
   filters,
+  isLoading = false,
   onAddFilter,
   onDatepickerChange,
-  datepickerTo = '',
-  datepickerFrom = '',
   onRemoveFilters,
+  onRefresh,
   datepickerHelpers,
 }: ReportFilterBarProps) => {
   const { ref } = useParams()
@@ -114,6 +117,11 @@ const ReportFilterBar = ({
     })
   }
 
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    onDatepickerChange(vals)
+    setSelectedRange(vals)
+  }
+
   const handleProductFilterChange = async (
     nextProductFilter: null | (typeof PRODUCT_FILTERS)[number]
   ) => {
@@ -136,13 +144,28 @@ const ReportFilterBar = ({
     setCurrentProductFilter(nextProductFilter)
   }
 
+  const defaultHelper = datepickerHelpers[0]
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
+    to: defaultHelper.calcTo(),
+    from: defaultHelper.calcFrom(),
+    isHelper: true,
+    text: defaultHelper.text,
+  })
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
-        <DatePickers
-          onChange={onDatepickerChange}
-          to={datepickerTo}
-          from={datepickerFrom}
+        <ButtonTooltip
+          type="default"
+          disabled={isLoading}
+          icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+          className="w-7"
+          tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+          onClick={() => onRefresh()}
+        />
+        <LogsDatePicker
+          onSubmit={handleDatepickerChange}
+          value={selectedRange}
           helpers={datepickerHelpers}
         />
         <DropdownMenu>

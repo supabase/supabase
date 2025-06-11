@@ -1,30 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
-import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
-import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Clipboard, Eye, EyeOff, Play } from 'lucide-react'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
-import { toast } from 'sonner'
-import Papa from 'papaparse'
+import { createPortal } from 'react-dom'
 
+import { IS_PLATFORM, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CSVButton from 'components/ui/CSVButton'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Item, Menu, useContextMenu } from 'react-contexify'
-import { createPortal } from 'react-dom'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  cn,
-} from 'ui'
+import { ResponseError } from 'types'
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
@@ -37,13 +27,13 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
-import { ResponseError } from 'types'
 
 interface Props {
   data?: LogData[]
   onHistogramToggle?: () => void
   isHistogramShowing?: boolean
   isLoading?: boolean
+  isSaving?: boolean
   error?: LogQueryError | null
   showDownload?: boolean
   queryType?: QueryType
@@ -75,6 +65,7 @@ const LogTable = ({
   onHistogramToggle,
   isHistogramShowing,
   isLoading,
+  isSaving,
   error,
   projectRef,
   onRun,
@@ -90,10 +81,11 @@ const LogTable = ({
   selectedLogError,
   onSelectedLogChange,
 }: Props) => {
+  const { ref } = useParams()
   const { profile } = useProfile()
+  const [selectedLogId] = useSelectedLog()
   const { show: showContextMenu } = useContextMenu()
 
-  const downloadCsvRef = useRef<HTMLDivElement>(null)
   const [cellPosition, setCellPosition] = useState<any>()
   const [selectionOpen, setSelectionOpen] = useState(false)
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
@@ -184,7 +176,6 @@ const LogTable = ({
     }
   }
 
-  const stringData = useMemo(() => JSON.stringify(data), [data])
   const [dedupedData, logMap] = useMemo<[LogData[], LogMap]>(() => {
     const deduped = [...new Set(data)] as LogData[]
 
@@ -241,54 +232,12 @@ const LogTable = ({
       )}
     >
       <div className="flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="text" iconRight={<ChevronDown size={14} />}>
-              Results {data && data.length ? `(${data.length})` : ''}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem
-              onClick={() => {
-                downloadCsvRef.current?.click()
-              }}
-              className="space-x-2"
-            >
-              <Download size={14} />
-              <div>Download CSV</div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                const csvData = Papa.unparse(data)
-                copyToClipboard(csvData, () => {
-                  toast.success('Results copied to clipboard')
-                })
-              }}
-              className="space-x-2"
-            >
-              <Clipboard size={14} />
-              <div>Copy as CSV</div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                copyToClipboard(stringData, () => {
-                  toast.success('Results copied to clipboard')
-                })
-              }}
-              className="space-x-2"
-            >
-              <Clipboard size={14} />
-              <div>Copy as JSON</div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Using .hidden with a ref so I don't have to duplicate the code to download the CSV - Jordi */}
-      <div className="hidden">
-        <CSVButton buttonType={'text'} data={data}>
-          <div ref={downloadCsvRef}>Download CSV</div>
-        </CSVButton>
+        <DownloadResultsButton
+          type="text"
+          text={`Results ${data && data.length ? `(${data.length})` : ''}`}
+          results={data}
+          fileName={`supabase-logs-${ref}.csv`}
+        />
       </div>
 
       {showHistogramToggle && (
@@ -308,6 +257,7 @@ const LogTable = ({
           <ButtonTooltip
             type="default"
             onClick={onSave}
+            loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}
             tooltip={{
               content: {
@@ -351,7 +301,7 @@ const LogTable = ({
     }
 
     return (
-      <div className="text-foreground flex gap-2 font-mono px-6">
+      <div className="text-foreground flex gap-2 font-mono p-4">
         <DefaultErrorRenderer {...childProps} />
       </div>
     )
@@ -367,6 +317,25 @@ const LogTable = ({
     onSelectedLogChange?.(row)
   }
 
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!logDataRows.length || !selectedRow) return
+
+      const currentIndex = logDataRows.findIndex((row) => isEqual(row, selectedRow))
+      if (currentIndex === -1) return
+
+      if (event.key === 'ArrowUp' && currentIndex > 0) {
+        const prevRow = logDataRows[currentIndex - 1]
+        onRowClick(prevRow)
+      } else if (event.key === 'ArrowDown' && currentIndex < logDataRows.length - 1) {
+        const nextRow = logDataRows[currentIndex + 1]
+        onRowClick(nextRow)
+      }
+    },
+    [logDataRows, selectedRow, onRowClick]
+  )
+
   useEffect(() => {
     if (selectedLog || isSelectedLogLoading) {
       setSelectionOpen(true)
@@ -375,6 +344,22 @@ const LogTable = ({
       setSelectedRow(null)
     }
   }, [selectedLog, isSelectedLogLoading])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
+
+  useEffect(() => {
+    if (!isLoading && !selectedRow) {
+      // [Joshen] Only want to run this once on a fresh session when log param is provided in URL
+      // Subsequently, selectedRow state is just controlled by the user's clicks on LogTable
+      const logData = data.find((x) => x.id === selectedLogId)
+      if (logData) setSelectedRow(logData)
+    }
+  }, [isLoading])
 
   if (!data) return null
 

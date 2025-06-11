@@ -1,4 +1,4 @@
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 export type ComputeInstanceAddonVariantId =
   | Extract<
@@ -13,6 +13,14 @@ export type ComputeInstanceAddonVariantId =
       | 'ci_8xlarge'
       | 'ci_12xlarge'
       | 'ci_16xlarge'
+      | 'ci_24xlarge'
+      | 'ci_24xlarge_optimized_cpu'
+      | 'ci_24xlarge_optimized_memory'
+      | 'ci_24xlarge_high_memory'
+      | 'ci_48xlarge'
+      | 'ci_48xlarge_optimized_cpu'
+      | 'ci_48xlarge_optimized_memory'
+      | 'ci_48xlarge_high_memory'
     >
   | 'ci_nano'
 
@@ -28,8 +36,17 @@ export type ComputeInstanceSize =
   | '8XL'
   | '12XL'
   | '16XL'
+  | '24XL'
+  | '24XL - Optimized CPU'
+  | '24XL - Optimized Memory'
+  | '24XL - High Memory'
+  | '48XL'
+  | '48XL - Optimized CPU'
+  | '48XL - Optimized Memory'
+  | '48XL - High Memory'
 
 export type InfraInstanceSize =
+  | 'pico'
   | 'nano'
   | 'micro'
   | 'small'
@@ -41,6 +58,14 @@ export type InfraInstanceSize =
   | '8xlarge'
   | '12xlarge'
   | '16xlarge'
+  | '24xlarge'
+  | '24xlarge_optimized_memory'
+  | '24xlarge_optimized_cpu'
+  | '24xlarge_high_memory'
+  | '48xlarge'
+  | '48xlarge_optimized_memory'
+  | '48xlarge_optimized_cpu'
+  | '48xlarge_high_memory'
 
 export interface DiskManagementMessage {
   message: string

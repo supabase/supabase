@@ -1,5 +1,4 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import React from 'react'
 
@@ -10,7 +9,6 @@ type Props = {
 }
 
 function DatabaseBackupsNav({ active }: Props) {
-  const isCloneToNewProjectEnabled = useFlag('clonetonewproject')
   const { ref, cloud_provider } = useProjectContext()?.project || {}
 
   const navMenuItems = [
@@ -27,7 +25,7 @@ function DatabaseBackupsNav({ active }: Props) {
       href: `/project/${ref}/database/backups/pitr`,
     },
     {
-      enabled: isCloneToNewProjectEnabled && cloud_provider !== 'FLY',
+      enabled: cloud_provider !== 'FLY',
       id: 'rtnp',
       label: (
         <div className="flex items-center gap-1">
@@ -42,7 +40,7 @@ function DatabaseBackupsNav({ active }: Props) {
   ] as const
 
   return (
-    <NavMenu>
+    <NavMenu className="overflow-hidden overflow-x-auto">
       {navMenuItems.map(
         (item) =>
           item.enabled && (

@@ -28,7 +28,7 @@ alter table countries enable row level security;
 - In a new query, create the following access policy.
 
 ```sql
-create policy "public can read countries"
+create policy "authenticated users can read countries"
 on public.countries
 for select to authenticated
 using (true);

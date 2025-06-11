@@ -50,6 +50,17 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
     onRowChange({ ...row, [column.key]: value }, true)
   }
 
+  const setToNow = () => {
+    const formattedNow = dayjs().format(
+      type === 'date'
+        ? 'YYYY-MM-DD'
+        : type === 'datetimetz'
+          ? 'YYYY-MM-DDTHH:mm:ssZ'
+          : 'YYYY-MM-DDTHH:mm:ss'
+    )
+    saveChanges(formattedNow)
+  }
+
   useEffect(() => {
     try {
       ref.current?.focus({ preventScroll: true })
@@ -75,7 +86,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           <Input
             ref={ref}
             value={inputValue ?? ''}
-            placeholder={FORMAT_MAP[type]}
+            placeholder={format}
             onChange={(e) => setInputValue(e.target.value)}
             className="border-0 rounded-none bg-dash-sidebar outline-none !ring-0 !ring-offset-0"
           />
@@ -123,7 +134,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
             </div>
           </div>
           <div className="flex">
-            {isNullable && (
+            {isNullable ? (
               <>
                 <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
                   Set NULL
@@ -137,18 +148,14 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-20" align="end">
-                    <DropdownMenuItem
-                      onClick={() => {
-                        // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
-                        const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
-                        saveChanges(now)
-                      }}
-                    >
-                      Set to NOW
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={setToNow}>Set to NOW</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
+            ) : (
+              <Button type="default" onClick={setToNow}>
+                Set to NOW
+              </Button>
             )}
           </div>
         </div>

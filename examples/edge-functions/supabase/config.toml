@@ -73,3 +73,6 @@ objects_path = "./buckets/images"
 
 [functions.kysely-postgres]
 import_map = "./functions/import_map.json"
+
+[functions.wasm-modules]
+static_files = [ "./functions/wasm-modules/add-wasm/pkg/*.wasm"]

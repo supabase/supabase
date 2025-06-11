@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { PlanId } from 'data/subscriptions/types'
 import jsonLogic from 'json-logic-js'
 
 export interface Organization {
@@ -10,9 +11,14 @@ export interface Organization {
   opt_in_tags: string[]
   subscription_id?: string | null
   restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
-  restriction_data: Record<string, never>
+  restriction_data: Record<string, string> | null
   managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
   partner_id?: string
+  plan: {
+    id: PlanId
+    name: string
+  }
+  usage_billing_enabled: boolean
 }
 
 /**
@@ -36,7 +42,7 @@ export interface ProjectBase {
  */
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
-  connectionString?: string
+  connectionString?: string | null
   dbVersion?: string
   restUrl?: string
   lastDatabaseResizeAt?: string | null
@@ -90,11 +96,19 @@ export interface ResponseFailure {
 
 export type SupaResponse<T> = T | ResponseFailure
 
-export interface ResponseError {
-  code?: number | string
-  message: string
+export class ResponseError extends Error {
+  code?: number
   requestId?: string
+  retryAfter?: number
+
+  constructor(message: string | undefined, code?: number, requestId?: string, retryAfter?: number) {
+    super(message || 'API error happened while trying to communicate with the server.')
+    this.code = code
+    this.requestId = requestId
+    this.retryAfter = retryAfter
+  }
 }
+
 export interface Dictionary<T> {
   [Key: string]: T
 }
