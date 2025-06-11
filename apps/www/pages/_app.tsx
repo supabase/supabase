@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useThemeSandbox()
 
-  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+  const site_title = `${APP_NAME} | The Postgres Development Platform.`
   const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()

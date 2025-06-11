@@ -138,6 +138,7 @@ allow_list = [
     "DigitalOcean",
     "Django",
     "Docker",
+    "dotenvx",
     "Drizzle",
     "ElevenLabs",
     "EnterpriseDB",

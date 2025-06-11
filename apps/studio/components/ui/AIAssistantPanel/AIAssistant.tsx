@@ -7,12 +7,10 @@ import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
@@ -86,7 +84,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const project = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const { id: entityId } = useParams()
+  const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
 
   const disablePrompts = useFlag('disableAssistantPrompts')
@@ -96,7 +94,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
-  const { aiOptInLevel } = useOrgAiOptInLevel()
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const showMetadataWarning =
+    IS_PLATFORM &&
+    !!selectedOrganization &&
+    (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -111,9 +113,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const snippet = snippets[entityId ?? '']
   const snippetContent = snippet?.snippet?.content?.sql
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
   const { data: tables, isLoading: isLoadingTables } = useTablesQuery(
     {
       projectRef: project?.ref,
@@ -127,8 +126,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const currentSchema = searchParams?.get('schema') ?? 'public'
   const currentChat = snap.activeChat?.name
 
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   // Handle completion of the assistant's response
@@ -225,12 +222,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     if (content.includes('Help me to debug')) {
       sendEvent({
         action: 'assistant_debug_submitted',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrganization?.slug ?? 'Unknown',
+        },
       })
     } else {
       sendEvent({
         action: 'assistant_prompt_submitted',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrganization?.slug ?? 'Unknown',
+        },
       })
     }
   }
@@ -344,38 +347,36 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 </div>
               </div>
             </div>
-            {IS_PLATFORM &&
-              (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema') &&
-              selectedOrganization && (
-                <Admonition
-                  type="default"
-                  title={
-                    aiOptInLevel === 'disabled'
-                      ? 'Project metadata is not shared'
-                      : 'Limited metadata is shared'
-                  }
-                  description={
-                    hasHipaaAddon
-                      ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
-                      : aiOptInLevel === 'disabled'
-                        ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
-                        : aiOptInLevel === 'schema'
-                          ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
-                          : ''
-                  }
-                  className="border-0 border-b rounded-none bg-background"
-                >
-                  {!hasHipaaAddon && (
-                    <Button
-                      type="default"
-                      className="w-fit mt-4"
-                      onClick={() => setIsConfirmOptInModalOpen(true)}
-                    >
-                      Update AI settings
-                    </Button>
-                  )}
-                </Admonition>
-              )}
+            {showMetadataWarning && (
+              <Admonition
+                type="default"
+                title={
+                  aiOptInLevel === 'disabled'
+                    ? 'Project metadata is not shared'
+                    : 'Limited metadata is shared'
+                }
+                description={
+                  isHipaaProjectDisallowed
+                    ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
+                    : aiOptInLevel === 'disabled'
+                      ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
+                      : aiOptInLevel === 'schema'
+                        ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                        : ''
+                }
+                className="border-0 border-b rounded-none bg-background"
+              >
+                {!isHipaaProjectDisallowed && (
+                  <Button
+                    type="default"
+                    className="w-fit mt-4"
+                    onClick={() => setIsConfirmOptInModalOpen(true)}
+                  >
+                    Update AI settings
+                  </Button>
+                )}
+              </Admonition>
+            )}
           </div>
           {!hasMessages && (
             <div className="h-48 flex-0 m-8">

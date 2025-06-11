@@ -89,7 +89,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
 
   // we're serving search bots a different file (/crawlers/[...slug])
   // and need to modify content to suit that
-  const isCrawlerPage = router.route.includes('/crawlers/[...slug]')
+  const isCrawlerPage = router?.route.includes('/crawlers/[...slug]') || false
 
   const { ref } = useInView({
     threshold: 1,

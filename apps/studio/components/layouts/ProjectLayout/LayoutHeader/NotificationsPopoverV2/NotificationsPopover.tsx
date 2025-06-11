@@ -26,6 +26,7 @@ import {
 } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -96,10 +97,15 @@ export const NotificationsPopoverV2 = () => {
       }}
     >
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
+        <ButtonTooltip
+          tooltip={{
+            content: {
+              text: 'Notifications',
+            },
+          }}
           type={hasNewNotifications ? 'outline' : 'text'}
           className={cn(
-            'h-[26px]',
+            'rounded-none h-[30px] w-[32px]',
             // !hasCritical || !hasWarning || !hasNewNotifications ? 'w-[26px]' : '',
             'group',
             hasNewNotifications ? 'rounded-full px-1.5' : 'px-1',
@@ -130,7 +136,7 @@ export const NotificationsPopoverV2 = () => {
             <InboxIcon
               size={18}
               strokeWidth={1.5}
-              className="transition group-hover:text-foreground text-foreground-light"
+              className="!h-[18px] !w-[18px] transition group-hover:text-foreground text-foreground-light"
             />
           }
         />

@@ -178,6 +178,10 @@ export const appState = proxy({
     }
   },
 
+  toggleEditorPanel: (value?: boolean) => {
+    appState.editorPanel.open = value ?? !appState.editorPanel.open
+  },
+
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value

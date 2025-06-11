@@ -139,7 +139,11 @@ export async function fetchAllSources() {
 
   const partnerIntegrationSources = fetchPartners()
     .then((partners) =>
-      Promise.all(partners.map((partner) => new IntegrationLoader(partner.slug, partner).load()))
+      partners
+        ? Promise.all(
+            partners.map((partner) => new IntegrationLoader(partner.slug, partner).load())
+          )
+        : []
     )
     .then((data) => data.flat())
 
