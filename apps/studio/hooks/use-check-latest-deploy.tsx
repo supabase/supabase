@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { IS_PLATFORM } from 'common'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { Button, StatusIcon } from 'ui'
+import { useFlag } from './ui/useFlag'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()
@@ -33,10 +34,11 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
 // This hook checks if the user is using old Studio pages and shows a toast to refresh the page. It's only triggered if
 // the user has been more than 24 hours and a new version of Studio is available.
 export function useCheckLatestDeploy() {
+  const showRefreshToast = useFlag('showRefreshToast')
   const [currentCommitTime, setCurrentCommitTime] = useState('')
   const [isToastShown, setIsToastShown] = useState(false)
   const { data: commit } = useDeploymentCommitQuery({
-    enabled: IS_PLATFORM,
+    enabled: IS_PLATFORM && showRefreshToast,
     staleTime: 30 * 60 * 1000, // 30 minutes
   })
 
