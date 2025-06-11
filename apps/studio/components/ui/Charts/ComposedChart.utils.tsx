@@ -177,7 +177,7 @@ const CustomTooltip = ({
             {isPercentage ? '%' : ''}
 
             {/* Show percentage if max value is set */}
-            {!!maxValueData && !isMax && (
+            {!!maxValueData && !isMax && !isPercentage && (
               <span className="text-[11px] text-foreground-light mb-0.5">({percentage}%)</span>
             )}
           </span>
