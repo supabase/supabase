@@ -211,6 +211,7 @@ const CustomTooltip = ({
                   {isPercentage ? '%' : ''}
                 </span>
                 {maxValueAttribute &&
+                  !isPercentage &&
                   !isNaN((total as number) / maxValueData?.value) &&
                   isFinite((total as number) / maxValueData?.value) && (
                     <span className="text-[11px] text-foreground-light mb-0.5">
