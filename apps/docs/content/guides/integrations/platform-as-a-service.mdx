@@ -106,18 +106,6 @@ curl https://api.supabase.com/v1/projects/{branch_ref}/database/migrations \
 
 After every change you make to the database, it's a good idea to create a restore point. This will allow you to granularly roll back the database if you decide to go in a different direction.
 
-<Admonition type="note" title="v2 Projects need to enable physical backups">
-
-In v2 Projects, you need to enable physical backups in order to create restore points.
-
-The endpoint is currently under v0 experimental but will be moved to v1 shortly.
-
-https://api.supabase.com/api/v0#tag/projects-backup/post/v0/database/{ref}/backups/enable-physical-backups
-
-You need to generate a different experimental Personal Access Token (PAT) to use this endpoint.
-
-</Admonition>
-
 ```sh
 curl https://api.supabase.com/v1/projects/{branch_ref}/database/backups/restore-point \
   --request POST \
