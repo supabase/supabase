@@ -209,6 +209,7 @@ create or replace function util.queue_embeddings()
 returns trigger
 language plpgsql
 security definer
+set search_path = ''
 as $$
 declare
   content_function text = TG_ARGV[0];
