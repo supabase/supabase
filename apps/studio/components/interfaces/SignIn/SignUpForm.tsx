@@ -1,5 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import * as yup from 'yup'
@@ -7,7 +8,6 @@ import * as yup from 'yup'
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
-import { parseAsString, useQueryStates } from 'nuqs'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -49,7 +49,7 @@ const SignUpForm = () => {
   const isInsideOAuthFlow = !!searchParams.auth_id
   const redirectUrlBase = `${
     process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-      ? location.origin
+      ? window.location.origin
       : process.env.NEXT_PUBLIC_SITE_URL
   }${BASE_PATH}`
   const redirectTo = isInsideOAuthFlow
