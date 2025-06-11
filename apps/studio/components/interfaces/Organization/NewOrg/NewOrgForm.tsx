@@ -1,6 +1,5 @@
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, Stripe } from '@stripe/stripe-js'
-import { useQueryClient } from '@tanstack/react-query'
 import _ from 'lodash'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -23,7 +22,6 @@ import {
   Input,
   Input_Shadcn_,
   Label_Shadcn_,
-  LoadingLine,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -42,6 +40,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useProfile } from 'lib/profile'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -122,8 +121,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
   } as const
 
   const [formState, setFormState] = useState<FormState>({
-    plan: 'PRO',
-    name: 'a',
+    plan: 'FREE',
+    name: '',
     kind: ORG_KIND_DEFAULT,
     size: ORG_SIZE_DEFAULT,
     spend_cap: true,
@@ -625,6 +624,11 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
 
 export default NewOrgForm
 
+/**
+ * Set up as a separate component, as we need any component using stripe/elements to be wrapped in Elements.
+ *
+ * If Elements is on a higher level, we risk losing all form state in case a payment fails.
+ */
 const Payment = forwardRef(({}: {}, ref) => {
   const stripe = useStripe()
   const elements = useElements()
@@ -654,35 +658,3 @@ const Payment = forwardRef(({}: {}, ref) => {
 })
 
 Payment.displayName = 'Payment'
-
-const PaymentConfirmation = ({
-  paymentIntentSecret,
-  onPaymentIntentConfirm,
-  onLoadingChange,
-  paymentMethodId,
-}: {
-  paymentIntentSecret: string
-  paymentMethodId: string
-  onPaymentIntentConfirm: (response: PaymentIntentResult) => void
-  onLoadingChange: (loading: boolean) => void
-}) => {
-  const stripe = useStripe()
-
-  useEffect(() => {
-    if (stripe && paymentIntentSecret) {
-      onLoadingChange(true)
-      stripe!
-        .confirmCardPayment(paymentIntentSecret, { payment_method: paymentMethodId })
-        .then((res) => {
-          onPaymentIntentConfirm(res)
-          onLoadingChange(false)
-        })
-        .catch((err) => {
-          console.error(err)
-          onLoadingChange(false)
-        })
-    }
-  }, [paymentIntentSecret, stripe])
-
-  return <LoadingLine loading={true} />
-}

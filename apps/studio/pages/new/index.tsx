@@ -32,6 +32,7 @@ const Wizard: NextPageWithLayout = () => {
     if (!hcaptchaToken) return console.error('Hcaptcha token is required')
 
     // Force a reload of Elements, necessary for Stripe
+    // Also mitigates card testing to some extent as we generate a new captcha token
     setIntent(undefined)
     setupIntent({ hcaptchaToken })
   }
