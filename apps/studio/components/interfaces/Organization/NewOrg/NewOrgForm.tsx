@@ -41,6 +41,8 @@ import { useTheme } from 'next-themes'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { useFlag } from 'hooks/ui/useFlag'
+import { getURL } from 'lib/helpers'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -258,6 +260,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
       if (paymentMethod) {
         setPaymentMethod(paymentMethod)
         createOrg(paymentMethod.id)
+      } else {
+        setNewOrgLoading(false)
       }
     } else {
       createOrg(paymentMethod.id)
@@ -633,17 +637,39 @@ const Payment = forwardRef(({}: {}, ref) => {
   const stripe = useStripe()
   const elements = useElements()
 
+  const orbPendingPaymentInOrgCreation = useFlag('orbPendingPaymentInOrgCreation')
+
   const createPaymentMethod = async () => {
     if (!stripe || !elements) return
     await elements.submit()
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      elements,
-    })
-    if (error || paymentMethod == null) {
-      toast.error(error?.message ?? ' Failed to process card details')
-      return
+
+    if (orbPendingPaymentInOrgCreation) {
+      // To avoid double 3DS confirmation, we just create the payment method here, as there might be a confirmation step while doing the actual payment
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        elements,
+      })
+      if (error || paymentMethod == null) {
+        toast.error(error?.message ?? ' Failed to process card details')
+        return
+      }
+      return paymentMethod
+    } else {
+      const { error, setupIntent } = await stripe.confirmSetup({
+        elements,
+        redirect: 'if_required',
+        confirmParams: {
+          return_url: `${getURL()}/new`,
+          expand: ['payment_method'],
+        },
+      })
+
+      if (error || !setupIntent.payment_method) {
+        toast.error(error?.message ?? ' Failed to save card details')
+        return
+      }
+
+      return setupIntent.payment_method as PaymentMethod
     }
-    return paymentMethod
   }
 
   useImperativeHandle(ref, () => ({
