@@ -7,7 +7,7 @@ import { IS_PLATFORM } from 'common'
 import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { Button, StatusIcon } from 'ui'
 
-const DeployCheckToast = ({ id, onDismiss }: { id: string | number; onDismiss: () => void }) => {
+const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()
 
   return (
@@ -21,13 +21,7 @@ const DeployCheckToast = ({ id, onDismiss }: { id: string | number; onDismiss: (
       </div>
 
       <div className="flex gap-5 justify-end">
-        <Button
-          type="outline"
-          onClick={() => {
-            toast.dismiss(id)
-            onDismiss()
-          }}
-        >
+        <Button type="outline" onClick={() => toast.dismiss(id)}>
           Not now
         </Button>
         <Button onClick={() => router.reload()}>Refresh</Button>
@@ -40,7 +34,7 @@ const DeployCheckToast = ({ id, onDismiss }: { id: string | number; onDismiss: (
 // the user has been more than 24 hours and a new version of Studio is available.
 export function useCheckLatestDeploy() {
   const [currentCommitTime, setCurrentCommitTime] = useState('')
-  const [isDismissed, setIsDismissed] = useState(false)
+  const [isToastShown, setIsToastShown] = useState(false)
   const { data: commit } = useDeploymentCommitQuery({
     enabled: IS_PLATFORM,
     staleTime: 30 * 60 * 1000, // 30 minutes
@@ -58,25 +52,26 @@ export function useCheckLatestDeploy() {
       return
     }
 
-    // // if the current commit is the same as the fetched commit, do nothing
+    // if the current commit is the same as the fetched commit, do nothing
     if (currentCommitTime === commit.commitTime) {
       return
     }
 
-    // // if the app showed the toast once and the user has dismissed the toast, don't ping them again
-    if (isDismissed) {
+    // prevent showing the toast again if user has already seen and dismissed it
+    if (isToastShown) {
       return
     }
 
-    // Check if the time difference between commits is more than 24 hours
+    // check if the time difference between commits is more than 24 hours
     const hourDiff = dayjs(commit.commitTime).diff(dayjs(currentCommitTime), 'hour')
     if (hourDiff < 24) {
       return
     }
 
     // show the toast
-    toast.custom((id) => <DeployCheckToast id={id} onDismiss={() => setIsDismissed(true)} />, {
+    toast.custom((id) => <DeployCheckToast id={id} />, {
       duration: Infinity,
     })
-  }, [commit, isDismissed, currentCommitTime])
+    setIsToastShown(true)
+  }, [commit, isToastShown, currentCommitTime])
 }
