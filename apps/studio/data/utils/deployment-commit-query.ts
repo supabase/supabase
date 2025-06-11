@@ -4,7 +4,7 @@ import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
 
 export async function getDeploymentCommit(signal?: AbortSignal) {
-  const response = await fetchHandler(`${BASE_PATH}/api/get-deployment-version`)
+  const response = await fetchHandler(`${BASE_PATH}/api/get-deployment-commit`)
   return (await response.json()) as { commitSha: string; commitTime: string }
 }
 

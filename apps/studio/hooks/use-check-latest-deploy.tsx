@@ -1,12 +1,13 @@
-import { IS_PLATFORM } from 'common'
-import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
+import { IS_PLATFORM } from 'common'
+import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import { Button, StatusIcon } from 'ui'
 
-const DeployCheckToast = ({ id }: { id: string | number }) => {
+const DeployCheckToast = ({ id, onDismiss }: { id: string | number; onDismiss: () => void }) => {
   const router = useRouter()
 
   return (
@@ -20,7 +21,13 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
       </div>
 
       <div className="flex gap-5 justify-end">
-        <Button type="outline" onClick={() => toast.dismiss(id)}>
+        <Button
+          type="outline"
+          onClick={() => {
+            toast.dismiss(id)
+            onDismiss()
+          }}
+        >
           Not now
         </Button>
         <Button onClick={() => router.reload()}>Refresh</Button>
@@ -57,7 +64,7 @@ export function useCheckLatestDeploy() {
     }
 
     // // if the app showed the toast once and the user has dismissed the toast, don't ping them again
-    if (!isDismissed) {
+    if (isDismissed) {
       return
     }
 
@@ -68,11 +75,8 @@ export function useCheckLatestDeploy() {
     }
 
     // show the toast
-    toast.custom((id) => <DeployCheckToast id={id} />, {
+    toast.custom((id) => <DeployCheckToast id={id} onDismiss={() => setIsDismissed(true)} />, {
       duration: Infinity,
-      onDismiss: () => {
-        setIsDismissed(true)
-      },
     })
   }, [commit, isDismissed, currentCommitTime])
 }
