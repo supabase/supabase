@@ -39,7 +39,7 @@ export function useCheckLatestDeploy() {
   const [isToastShown, setIsToastShown] = useState(false)
   const { data: commit } = useDeploymentCommitQuery({
     enabled: IS_PLATFORM && showRefreshToast,
-    staleTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 10000, // 10 seconds
   })
 
   useEffect(() => {
@@ -66,9 +66,9 @@ export function useCheckLatestDeploy() {
 
     // check if the time difference between commits is more than 24 hours
     const hourDiff = dayjs(commit.commitTime).diff(dayjs(currentCommitTime), 'hour')
-    if (hourDiff < 24) {
-      return
-    }
+    // if (hourDiff < 24) {
+    //   return
+    // }
 
     // show the toast
     toast.custom((id) => <DeployCheckToast id={id} />, {
