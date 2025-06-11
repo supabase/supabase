@@ -11,8 +11,6 @@
  *  the last Git commit date.
  */
 
-import _configureDotEnv from './utils/dotenv.js'
-
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import matter from 'gray-matter'
 import { createHash } from 'node:crypto'
@@ -24,8 +22,6 @@ import { parseArgs } from 'node:util'
 import { SimpleGit, simpleGit } from 'simple-git'
 import { parse } from 'smol-toml'
 import { Section } from './helpers.mdx.js'
-
-const _ = _configureDotEnv
 
 interface Options {
   reset: boolean
