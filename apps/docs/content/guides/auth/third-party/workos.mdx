@@ -1,0 +1,64 @@
+---
+id: 'auth-third-party-workos'
+title: 'WorkOS'
+subtitle: 'Use WorkOS with your Supabase project'
+---
+
+WorkOS can be used as a third-party authentication provider alongside Supabase Auth, or standalone, with your Supabase project.
+
+## Getting started
+
+1. First you need to add an integration to connect your Supabase project with your WorkOS tenant. You will need your WorkOS client ID.
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
+3. Set up a JWT template to assign the `role: 'authenticated'` claim to your access token.
+
+## Setup the Supabase client library
+
+<Tabs type="underlined" queryGroup="workos-create-client">
+
+<TabPanel id="ts" label="TypeScript">
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+import { createClient as createAuthKitClient } from "@workos-inc/authkit-js";
+
+const authkit = await createAuthKitClient('WORKOS_CLIENT_ID', {
+  apiHostname: '<WORKOS_AUTH_DOMAIN>',
+}
+
+const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
+  accessToken: async () => {
+    return authkit.getAccessToken()
+  },
+})
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Add a new Third-Party Auth integration to your project
+
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+
+In the CLI add the following config to your `supabase/config.toml` file:
+
+```toml
+[auth.third_party.workos]
+enabled = true
+client_id = "<client_id>"
+custom_auth_domain = "<custom_auth_domain>" # if you have configured a custom auth domain
+```
+
+## Set up a JWT template to add the authenticated role.
+
+Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
+
+WorkOS JWTs already contain a `role` claim that corresponds to the user's WorkOS role. It is necessary to adjust the `role` claim to the `authenticated` role that Supabase expects using JWT templates. This can be configured in the WorkOS Dashboard (Authentication -> Sessions -> JWT Template)
+
+```json
+{
+  "role": "authenticated",
+  "app_role": {{organization_membership.role}}
+}
+```
