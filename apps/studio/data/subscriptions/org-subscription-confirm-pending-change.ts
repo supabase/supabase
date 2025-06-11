@@ -5,6 +5,8 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from 'data/organizations/keys'
 import { permissionKeys } from 'data/permissions/keys'
+import { castOrganizationResponseToOrganization } from 'data/organizations/organizations-query'
+import type { components } from 'api-types'
 
 export type PendingSubscriptionChangeVariables = {
   payment_intent_id: string
@@ -64,7 +66,12 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
         },
         (prev: any) => {
           if (!prev) return prev
-          return [...prev, data]
+          return [
+            ...prev,
+            castOrganizationResponseToOrganization(
+              data as components['schemas']['OrganizationResponse']
+            ),
+          ]
         }
       )
 
