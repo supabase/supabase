@@ -7,6 +7,7 @@ import * as yup from 'yup'
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
+import { parseAsString, useQueryStates } from 'nuqs'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -28,6 +29,11 @@ const SignUpForm = () => {
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
+  const [searchParams] = useQueryStates({
+    auth_id: parseAsString.withDefault(''),
+    token: parseAsString.withDefault(''),
+  })
+
   const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
@@ -40,6 +46,16 @@ const SignUpForm = () => {
     },
   })
 
+  const isInsideOAuthFlow = !!searchParams.auth_id
+  const redirectUrlBase = `${
+    process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+      ? location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL
+  }${BASE_PATH}`
+  const redirectTo = isInsideOAuthFlow
+    ? `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+    : `${redirectUrlBase}/sign-in`
+
   const onSignUp = async ({ email, password }: { email: string; password: string }) => {
     let token = captchaToken
     if (!token) {
@@ -51,11 +67,7 @@ const SignUpForm = () => {
       email,
       password,
       hcaptchaToken: token ?? null,
-      redirectTo: `${
-        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? location.origin
-          : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/sign-in`,
+      redirectTo,
     })
   }
 
