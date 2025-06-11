@@ -6,7 +6,7 @@ description: "First-layer protection for your project's data"
 
 Supabase gives you fine-grained control over which application components are allowed to access your project through API keys.
 
-API keys are the first-level of authentication to accessing your data. To wrap your head around them, consider these two questions:
+API keys provide the first layer of authentication for data access. Auth then builds upon that. This chart covers the differences:
 
 | Responsibility                     | Question                           | Answer                                         |
 | ---------------------------------- | ---------------------------------- | ---------------------------------------------- |
@@ -15,94 +15,70 @@ API keys are the first-level of authentication to accessing your data. To wrap y
 
 ## Overview
 
-Each project can have a number of different API keys that have different formats, data-access privileges, availability and use-cases:
+An API key authenticates an application component to give it access to Supabase services. An application component might be a web page, a mobile app, or a server. The API key _does not_ distinguish between users, only between applications.
 
-| Type            | Format               | Privileges | Availability  | Use                                                                                                                                                                                                                                                                                                     |
-| --------------- | -------------------- | ---------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Publishable key | `sb_publishable_...` | Low        | Platform      | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                              |
-| Secret keys     | `sb_secret_...`      | Elevated   | Platform      | **Only use in backend components of your app:** servers, already secured APIs (admin panels), [Edge Functions](/docs/guides/functions), microservices. They provide _full access_ to your project's data, bypassing [Row-Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). |
-| `anon`          | JWT (long lived)     | Low        | Platform, CLI | Exactly like the publishable key.                                                                                                                                                                                                                                                                       |
-| `service_role`  | JWT (long lived)     | Elevated   | Platform, CLI | Exactly like secret keys.                                                                                                                                                                                                                                                                               |
+There are 4 types of API keys that can be used with Supabase:
+
+| Type                                                       | Format                                                           | Privileges | Availability  | Use                                                                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------- | ---------------------------------------------------------------- | ---------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Publishable key                                            | <span className="!whitespace-nowrap">`sb_publishable_...`</span> | Low        | Platform      | Safe to expose online: web page, mobile or desktop app, GitHub actions, CLIs, source code.                                                                                                                                                                                                              |
+| Secret keys                                                | <span className="!whitespace-nowrap">`sb_secret_...`</span>      | Elevated   | Platform      | **Only use in backend components of your app:** servers, already secured APIs (admin panels), [Edge Functions](/docs/guides/functions), microservices. They provide _full access_ to your project's data, bypassing [Row-Level Security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html). |
+| <span className="!whitespace-nowrap">`anon`</span>         | JWT (long lived)                                                 | Low        | Platform, CLI | Exactly like the publishable key.                                                                                                                                                                                                                                                                       |
+| <span className="!whitespace-nowrap">`service_role`</span> | JWT (long lived)                                                 | Elevated   | Platform, CLI | Exactly like secret keys.                                                                                                                                                                                                                                                                               |
 
 <Admonition type="note">
 
-`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and can only be changed when you rotate the JWT secret. This can cause significant issues in production applications. Please use the publishable and secret keys instead.
+`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and can only be changed when you rotate the JWT secret. This can cause significant issues in production applications. Use the publishable and secret keys instead.
 
 </Admonition>
 
-## `anon` and the publishable key
+## `anon` and publishable keys
 
-Both the `anon` and publishable key authenticate public, insecure components of your application. These include:
+The `anon` and publishable keys secure the public components of your application. Public components run in environments where it is impossible to secure any secrets. These include:
 
 - Web pages, where the key is bundled in source code.
 - Mobile or desktop applications, where the key is bundled inside the compiled packages or executables.
 - CLI, scripts, tools, or other pre-built executables.
 - Other publicly available APIs that return the key without prior additional authorization.
-- Important: Turing test challenges, obfuscation, specialized knowledge does not count as authorization.
+
+These environments are always considered public because anyone can retrieve the key from the source code or build artifacts. Obfuscation can increase the difficulty, but never eliminate the possibility. (In general, obfuscation, Turing test challenges, and specialized knowledge do not count as authorization for the purpose of securing secrets.)
+
+### Interaction with Supabase Auth
+
+Using the `anon` or publishable key does not mean that your user is anonymous. (Thinking of both these keys as publishable rather than `anon` makes the mental model clearer.)
+
+Your application can be authenticated with the publishable key, while your user is authenticated (via Supabase Auth) with their personal JWT:
+
+| Key             | User logged in via Supabase Auth | Postgres role used for RLS, etc. |
+| --------------- | -------------------------------- | -------------------------------- |
+| Publishable key | No                               | `anon`                           |
+| `anon`          | No                               | `anon`                           |
+| Publishable key | Yes                              | `authenticated`                  |
+| `anon`          | Yes                              | `authenticated`                  |
+
+### Protection
 
 These keys provide first-layer protection to your project's data, performance and bill, such as:
 
 - Providing basic Denial-of-Service protection, by requiring a minimal threshold of knowledge.
 - Protecting your bill by ignoring bots, scrapers, automated vulnerability scanners and other well meaning or random Internet activity.
 
-Since you often embed them in source code or build artifacts, it's easy to extract them with little or some specialized knowledge. You may wish to use obfuscation to increase this difficulty, but these approaches rarely produce the desired result.
+### Security considerations
 
-Importantly publishable and `anon` key **do not protect from**:
+The publishable and `anon` keys are not intended to protect from the following, since key retrieval is always possible from a public component:
 
 - Static or dynamic code analysis and reverse engineering attempts.
 - Use of the Network inspector in the browser.
 - Cross-site request forgery, cross-site scripting, phishing attacks.
 - Man-in-the-middle attacks.
-- Others breaking the law on the Internet.
 
-When using the publishable or `anon` key, access to your project's data is guarded by Postgres via the built-in `anon` role. Unless you modify it, it will not allow reading or writing data to your project unless:
+When using the publishable or `anon` key, access to your project's data is guarded by Postgres via the built-in `anon` and `authenticated` roles. To ensure protection, make sure:
 
-- You've modified the role's options to behave differently.
-- You've added a permissive Row-Level Security policy in your database granting acccess to the `anon` role.
-- **Common gotcha:** You have tables that **do not have Row-Level Security enabled.**
+- You have enabled Row Level Security on all tables.
+- You regularly review your Row Level Security policies for permissions granted to the `anon` and `authenticated` roles.
+- You do not modify the role's options without understanding the changes you are making.
 
 Your project's [Security Advisor](/dashboard/project/_/advisors/security) constantly checks for common security problems in the `anon` Postgres role. Make sure you carefully review each finding before dismissing it.
-
-### Authenticated users
-
-Using [Supabase Auth](/docs/guides/auth) or one of the supported [Third-Party Auth providers](/docs/guides/auth/third-party) changes the Postgres role from the `anon` to `authenticated`. In this case, the level of access to your project's data is controlled by the authentication server and the Row-Level Security policies attached to the `authenticated` role.
-
-### Granting access to the `anon` role
-
-In some situations, you may wish to allow database operations to the `anon` role provided by the `anon` and publishable key. Typical examples for this are:
-
-| Example                                         | Better alternative                                                                                                                                                                                                                       |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Newsletters, wait litsts, public forms.         | Consider using [Supabase Auth](/docs/guides/auth) via [Anonymous Users](/docs/guides/auth/auth-anonymous), [Email (magic link or OTP)](/docs/guides/auth/auth-email-passwordless) or [Phone OTP](/docs/guides/auth/phone-login) sign in. |
-| Public registries or APIs.                      | Consider using [Edge Functions](/docs/guides/functions) or other servers that have the ability to serve cached data as well as verify a Turing test.                                                                                     |
-| Public or free multi-player games or chat apps. | Consider using [Anonymous Users](/docs/guides/auth/auth-anonymous) instead.                                                                                                                                                              |
-| Web analytics.                                  | Use [Edge Functions](/docs/guides/functions) or other servers to effectively throttle large volumes of requests.                                                                                                                         |
-| Dynamic configuration, feature flags.           | Prefer [Edge Functions](/docs/guides/functions) or other servers that can send cached or rarely-changing data.                                                                                                                           |
-
-Suppose you want to use the Data API to implement simple feature flags. Your database would probably look similar to this:
-
-```sql
-create table public.feature_flags (
-  name text primary key,
-  value jsonb default null
-);
-```
-
-To be able to query this table from the `anon` role, add a permissive Row-Level Security policy similar to this:
-
-```sql
-create policy "Allow public access to feature_flags table"
-  on public.feature_flags
-  for select -- only reads, only you as the developer change this table
-  to anon -- important
-  using (true); -- allow everyone to query the table
-```
-
-Recommendations if you plan on giving access to data via the `anon` role:
-
-- Consider other alternatives that may be more cost efficient, or that offer built-in protection from abuse.
-- Separate your main, authenticated data in one project, and your truly public data in another.
-- Configure a [spend cap](/docs/guides/platform/cost-control) to prevent surprising bills.
 
 ## `service_role` and secret keys
 
@@ -110,11 +86,9 @@ Unlike the `anon` and publishable key, the `service_role` and secret keys allow 
 
 - Servers that implement prior authorization themselves, such as Edge Functions, microservices, traditional or specialized web servers.
 - Periodic jobs, queue processors, topic subscribers.
-- Admin and backoffice tools, with prior authorization checks only.
-- Data processing pipelines.
+- Admin and back-office tools, with prior authorization checks only.- Data processing pipelines.
 
-<Admonition type="warning">
-
+<Admonition type="caution">
 Never expose your `service_role` and secret keys publicly. Your data is at risk. **Do not:**
 
 - Add in web pages, public documents, source code, bundle in executables or packages for mobile, desktop or CLI apps.
@@ -131,7 +105,7 @@ Ensure you handle them with care and using [secure coding practices](https://owa
 
 Secret keys and the `service_role` JWT-based API key authorize access to your project's data via the built-in `service_role` Postgres role. By design, this role has full access to your project's data. It also uses the `BYPASSRLS` attribute, skipping any and all Row-Level Security policies you attach.
 
-Unlike the JWT-based `service_role` key:
+The secret key is an improvement over the old JWT-based `service_role` key, and we recommend using it where possible. It adds more checks to prevent misuse, specifically:
 
 - You cannot use a secret key in the browser (matches on the `User-Agent` header) and it will always reply with HTTP 401 Unauthorized.
 - You don't need to have any secret keys if you are not using them.
@@ -163,15 +137,19 @@ If you are still using the JWT-based `service_role` key, there are two options.
 
 As the publishable and secret keys are no longer JWT-based, there are some known limitations and compatibility differences that you may need to plan for:
 
-- You cannot send a publishable or secret key in the `Authorization: Bearer ...` header, except if the value matches exactly as the `apikey` header. In this case, your request will be forwarded down to your project's database, but will be rejected on JWT parsing and validation logic.
-- Edge Functions **only support JWT verification** via the `anon` and `service_role` JWT-based API keys. You will need to use the `--no-verify-jwt`. The Supabase platform does not verify the `apikey` header when using Edge Functions in this way. Implement your own `apikey`-header authorization logic inside the Edge Function code itself.
-- Public Realtime connections are limited to 24 hours in duration, unless the connection is upgraded and further maintained with user-level authenitcation via Supabase Auth or a supported Third-Party Auth provider.
+- You cannot send a publishable or secret key in the `Authorization: Bearer ...` header, except if the value exactly matches `apikey` header. In this case, your request will be forwarded down to your project's database, but will be rejected on JWT parsing and validation logic.
+- Edge Functions **only support JWT verification** via the `anon` and `service_role` JWT-based API keys. You will need to use the `--no-verify-jwt` option when using publishable and secret keys. The Supabase platform does not verify the `apikey` header when using Edge Functions in this way. Implement your own `apikey`-header authorization logic inside the Edge Function code itself.
+- Public Realtime connections are limited to 24 hours in duration, unless the connection is upgraded and further maintained with user-level authentication via Supabase Auth or a supported Third-Party Auth provider.
 
 ## Frequently asked questions
 
+{/* supa-mdx-lint-disable Rule004ExcludeWords */}
+
 ### I am using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate my `service_role` JWT secret?
 
-If you suspect or know that the JWT secret (that signs the `anon` and `service_role` JWT-based API keys) is compromised, read this section carefully. If this is not the case, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard.
+If you know or suspect that the JWT secret itself is leaked, refer to the section on [rotating the JWT](#what-to-do-if-a-secret-key-or-servicerole-has-leaked).
+
+If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard. This will prevent downtime for your application.
 
 ### How do I deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
 
@@ -197,7 +175,7 @@ The main reasons for preferring the publishable and secret keys (`sb_publishable
 
 ### Why is there no publishable or secret keys in the CLI / self-hosting?
 
-Publishable and secret keys is currently functionality only available from the Supabase hosted platform, specifically our API Gateway component which does not currently have a CLI equivalent.
+Publishable and secret keys are only available on the Supabase hosted platform. They are managed by our API Gateway component, which does not currently have a CLI equivalent.
 
 We are looking into providing similar but limited in scope support for publishable or secret keys in the future. For now you can only use the `anon` and `service_role` JWT-based keys there.
 
