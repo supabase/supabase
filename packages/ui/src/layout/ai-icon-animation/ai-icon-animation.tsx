@@ -17,7 +17,7 @@ const AiIconAnimationComponent = ({
   className,
   allowHoverEffect = false,
 }: AiIconAnimationProps) => {
-  const strokeWidth = Math.max(1, size / 46) // Ensure minimum stroke width of 1
+  const strokeWidth = Math.max(1.5, size / 46) // Ensure minimum stroke width of 1.5
   const containerRef = useRef<HTMLDivElement>(null)
   const [isHovering, setIsHovering] = useState(false)
 

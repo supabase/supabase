@@ -188,8 +188,19 @@ const LayoutHeader = ({
           {IS_PLATFORM ? (
             <>
               <FeedbackDropdown />
-              <NotificationsPopoverV2 />
-              <HelpPopover />
+
+              <div className="overflow-hidden flex items-center rounded-full border">
+                <HelpPopover />
+                <NotificationsPopoverV2 />
+                <AnimatePresence initial={false}>
+                  {!!projectRef && (
+                    <>
+                      <InlineEditorButton />
+                      <AssistantButton />
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
               <UserDropdown />
             </>
           ) : (
@@ -200,25 +211,6 @@ const LayoutHeader = ({
           )}
         </div>
       </div>
-
-      <AnimatePresence initial={false}>
-        {!!projectRef && (
-          <motion.div
-            className="border-l h-full flex items-center justify-center flex-shrink-0"
-            initial={{ opacity: 0, x: 0, width: 0 }}
-            animate={{ opacity: 1, x: 0, width: 'auto' }}
-            exit={{ opacity: 0, x: 0, width: 0 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-          >
-            <div className="border-r h-full flex items-center justify-center px-2">
-              <InlineEditorButton />
-            </div>
-            <div className="px-2">
-              <AssistantButton />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   )
 }

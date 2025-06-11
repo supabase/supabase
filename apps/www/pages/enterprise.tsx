@@ -12,7 +12,7 @@ const EnterpriseUseCases = dynamic(() => import('components/Enterprise/UseCases'
 const EnterprisePerformance = dynamic(() => import('components/Enterprise/Performance'))
 const EnterpriseSecurity = dynamic(() => import('components/Enterprise/Security'))
 const EnterpriseSupport = dynamic(() => import('components/Enterprise/Support'))
-const EnterpriseQuote = dynamic(() => import('components/Enterprise/SingleQuote'))
+const EnterpriseQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 const CTAForm = dynamic(() => import('components/Enterprise/CTAForm'))
 
 const Enterprise: NextPage = () => (

@@ -33,6 +33,7 @@
     "sync": "tsx --conditions=react-server ./resources/rootSync.ts",
     "test": "pnpm supabase start && pnpm run test:local && pnpm supabase stop",
     "test:local": "vitest --exclude \"**/*.smoke.test.ts\"",
+    "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --run",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
     "troubleshooting:sync": "node features/docs/Troubleshooting.script.mjs",
     "typecheck": "tsc --noEmit"
