@@ -62,7 +62,7 @@ describe('getModel', () => {
 
     expect(error).toEqual(
       new Error(
-        'No valid AI model available. Please set up a local AWS profile (for Bedrock) or pass an OPENAI_API_KEY.'
+        'No valid AI model available. Please set up a local AWS profile (for Bedrock) or pass an OPENAI_API_KEY to use OpenAI.'
       )
     )
   })
