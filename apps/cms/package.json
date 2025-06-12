@@ -40,7 +40,7 @@
     "eslint-config-supabase": "workspace:*",
     "graphql": "^16.8.1",
     "lucide-react": "^0.511.0",
-    "next": "~15.3.0",
+    "next": "catalog:",
     "payload": "3.33.0",
     "prism-react-renderer": "^2.3.1",
     "react": "catalog:",

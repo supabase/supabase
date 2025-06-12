@@ -7,7 +7,7 @@
  * Discussions.
  */
 
-import _configureDotEnv from '../../scripts/utils/dotenv'
+import '../../scripts/utils/dotenv.js'
 
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
@@ -26,8 +26,6 @@ import {
   getAllTroubleshootingEntriesInternal as getAllTroubleshootingEntries,
   getArticleSlug,
 } from './Troubleshooting.utils.common.mjs'
-
-const _ = _configureDotEnv
 
 const REPOSITORY_ID = 'MDEwOlJlcG9zaXRvcnkyMTQ1ODcxOTM='
 const TROUBLESHOOTING_CATEGORY_ID = 'DIC_kwDODMpXOc4CUvEr'

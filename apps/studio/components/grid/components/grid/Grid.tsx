@@ -123,7 +123,11 @@ export const Grid = memo(
             >
               {isLoading && <GenericSkeletonLoader />}
               {isError && (
-                <AlertError error={error} subject="Failed to retrieve rows from table">
+                <AlertError
+                  className="pointer-events-auto"
+                  error={error}
+                  subject="Failed to retrieve rows from table"
+                >
                   {filters.length > 0 && (
                     <p>
                       Verify that the filter values are correct, as the error may stem from an
