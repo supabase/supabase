@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Boxes } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
@@ -82,12 +82,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Skeleton,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ActionCard } from 'components/ui/ActionCard'
+import AlertError from 'components/ui/AlertError'
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -137,10 +140,10 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug, projectName } = useParams()
+  const { slug, projectName, error: orgNotFoundError } = useParams()
   const currentOrg = useSelectedOrganization()
   const isFreePlan = currentOrg?.plan?.id === 'free'
-
+  const orgNotFound = orgNotFoundError === 'org_not_found'
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -165,8 +168,15 @@ const Wizard: NextPageWithLayout = () => {
 
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const [search, setSearch] = useState('')
 
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const {
+    data: organizations,
+    isSuccess: isOrganizationsSuccess,
+    isLoading: isOrganizationsLoading,
+    isError: isOrganizationsError,
+    error: organizationsError,
+  } = useOrganizationsQuery()
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
     () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
@@ -235,6 +245,7 @@ const Wizard: NextPageWithLayout = () => {
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
   const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
+
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
@@ -400,7 +411,6 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/new`)
     }
   }, [isEmptyOrganizations, router])
-
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
@@ -412,7 +422,8 @@ const Wizard: NextPageWithLayout = () => {
     // Redirect to first org if the slug doesn't match an org slug
     // this is mainly to capture the /new/new-project url, which is redirected from database.new
     if (isInvalidSlug && isOrganizationsSuccess && (organizations?.length ?? 0) > 0) {
-      router.push(`/new/${organizations?.[0].slug}`)
+      //router.push(`/new/${organizations?.[0].slug}`)
+      router.push(`/new/${slug}?error=org_not_found`) // not sure how to handle the database.new referrals here
     }
   }, [isInvalidSlug, isOrganizationsSuccess, organizations])
 
@@ -588,45 +599,94 @@ const Wizard: NextPageWithLayout = () => {
             ) : (
               <div className="divide-y divide-border-muted">
                 <Panel.Content className={['space-y-4'].join(' ')}>
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="organization"
-                    render={({ field }) => (
-                      <FormItemLayout label="Organization" layout="horizontal">
-                        {(organizations?.length ?? 0) > 0 && (
-                          <Select_Shadcn_
-                            onValueChange={(slug) => {
-                              field.onChange(slug)
-                              router.push(`/new/${slug}`)
-                            }}
-                            value={field.value}
-                            defaultValue={field.value}
-                          >
-                            <FormControl_Shadcn_>
-                              <SelectTrigger_Shadcn_>
-                                <SelectValue_Shadcn_ placeholder="Select an organization" />
-                              </SelectTrigger_Shadcn_>
-                            </FormControl_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectGroup_Shadcn_>
-                                {organizations?.map((x) => (
-                                  <SelectItem_Shadcn_
-                                    key={x.id}
-                                    value={x.slug}
-                                    className="flex justify-between"
-                                  >
-                                    <span className="mr-2">{x.name}</span>
-                                    <Badge>{x.plan.name}</Badge>
-                                  </SelectItem_Shadcn_>
-                                ))}
-                              </SelectGroup_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                  {isAdmin && !isInvalidSlug && (
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="organization"
+                      render={({ field }) => (
+                        <FormItemLayout label="Organization" layout="horizontal">
+                          {(organizations?.length ?? 0) > 0 && (
+                            <Select_Shadcn_
+                              onValueChange={(slug) => {
+                                field.onChange(slug)
+                                router.push(`/new/${slug}`)
+                              }}
+                              value={field.value}
+                              defaultValue={field.value}
+                            >
+                              <FormControl_Shadcn_>
+                                <SelectTrigger_Shadcn_>
+                                  <SelectValue_Shadcn_ placeholder="Select an organization" />
+                                </SelectTrigger_Shadcn_>
+                              </FormControl_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                <SelectGroup_Shadcn_>
+                                  {organizations?.map((x) => (
+                                    <SelectItem_Shadcn_
+                                      key={x.id}
+                                      value={x.slug}
+                                      className="flex justify-between"
+                                    >
+                                      <span className="mr-2">{x.name}</span>
+                                      <Badge>{x.plan.name}</Badge>
+                                    </SelectItem_Shadcn_>
+                                  ))}
+                                </SelectGroup_Shadcn_>
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
+                          )}
+                        </FormItemLayout>
+                      )}
+                    />
+                  )}
+
+                  {!isAdmin && <NotOrganizationOwnerWarning slug={slug} />}
+                  {orgNotFound && (
+                    <>
+                      <div className="grid gap-2">
+                        <h2 className="mt-6">Your organizations</h2>
+                        <h3 className="text-sm  ">Create a new project in your organization</h3>
+                      </div>
+
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {isOrganizationsLoading && (
+                          <>
+                            <Skeleton className="h-[62px] rounded-md" />
+                            <Skeleton className="h-[62px] rounded-md" />
+                            <Skeleton className="h-[62px] rounded-md" />
+                          </>
                         )}
-                      </FormItemLayout>
-                    )}
-                  />
-                  {!isAdmin && <NotOrganizationOwnerWarning />}
+                        {isOrganizationsError && (
+                          <AlertError
+                            error={organizationsError}
+                            subject="Failed to load organizations"
+                          />
+                        )}
+                        {isOrganizationsSuccess &&
+                          organizations?.map((organization) => {
+                            const numProjects = allProjects?.filter(
+                              (x) => x.organization_slug === organization.slug
+                            ).length
+
+                            if (!numProjects) return null
+
+                            return (
+                              <ActionCard
+                                bgColor="bg border"
+                                className="[&>div]:items-center"
+                                key={organization.id}
+                                icon={
+                                  <Boxes size={18} strokeWidth={1} className="text-foreground" />
+                                }
+                                title={organization.name}
+                                description={`${organization.plan.name} Plan${numProjects > 0 ? `${'  '}•${'  '}${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
+                                onClick={() => router.push(`/new/${organization.slug}`)}
+                              />
+                            )
+                          })}
+                      </div>
+                    </>
+                  )}
                 </Panel.Content>
 
                 {canCreateProject && (
