@@ -43,9 +43,20 @@ const metricSqlMap: Record<
 > = {
   ActiveUsers: (start, end, interval) => activeUsersSql(analyticsIntervalToBQGranularity(interval)),
 
-  SignInAttempts: (start, end, interval) => `
-    -- TODO: Return time series of sign in attempts (by time bucket)
-  `,
+  SignInAttempts: (start, end, interval) => {
+    const granularity = analyticsIntervalToBQGranularity(interval)
+    return `
+      select 
+        timestamp_trunc(timestamp, ${granularity}) as timestamp,
+        count(*) as count
+      from auth_logs f
+      where json_value(f.event_message, "$.action") = 'login'
+        and timestamp >= '${start}'
+        and timestamp < '${end}'
+      group by timestamp
+      order by timestamp desc
+    `
+  },
 
   PasswordResetRequests: (start, end, interval) => `
     -- TODO: Return time series of password reset requests (by time bucket)

@@ -14,6 +14,20 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     ],
   },
   {
+    id: 'sign-in-attempts',
+    label: 'Sign In Attempts',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: false,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    attributes: [
+      { attribute: 'SignInAttempts', provider: 'logs', label: 'Sign In Attempts', enabled: true },
+    ],
+  },
+  {
     id: 'signups-by-provider',
     label: 'Sign Ups',
     valuePrecision: 0,
