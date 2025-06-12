@@ -331,6 +331,7 @@ const useAttributeQueries = (
   const dailyStatsAttributes = attributes
     .filter((attr) => attr?.provider === 'daily-stats')
     .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
+
   const referenceLines = attributes.filter((attr) => attr?.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
