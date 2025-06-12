@@ -221,6 +221,7 @@ const PlanUpdateSidePanel = () => {
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
+                          // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
                           (selectedOrganization?.managed_by !== 'supabase' &&
                             plan.id !== 'tier_free') ||
                           hasOrioleProjects ||
