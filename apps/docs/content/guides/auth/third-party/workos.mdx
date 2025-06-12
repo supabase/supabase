@@ -54,11 +54,13 @@ custom_auth_domain = "<custom_auth_domain>" # if you have configured a custom au
 
 Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
 
-WorkOS JWTs already contain a `role` claim that corresponds to the user's WorkOS role. It is necessary to adjust the `role` claim to the `authenticated` role that Supabase expects using JWT templates. This can be configured in the WorkOS Dashboard (Authentication -> Sessions -> JWT Template)
+WorkOS JWTs already contain a `role` claim that corresponds to the user's role in their organization. It is necessary to adjust the `role` claim to be `"authenticated"` like Supabase expects. This can be done using JWT templates (navigate to Authentication -> Sessions -> JWT Template in the WorkOS Dashboard).
+
+This template overrides the `role` claim to meet Supabase's expectaitons, and adds the WorkOS role in a new `user_role` claim:
 
 ```json
 {
   "role": "authenticated",
-  "app_role": {{organization_membership.role}}
+  "user_role": {{organization_membership.role}}
 }
 ```
