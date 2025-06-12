@@ -8,7 +8,6 @@ import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { PrivacyUpdateBanner } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const [search, setSearch] = useState('')
@@ -22,7 +21,6 @@ const ProjectsPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainerLegacy>
       <div>
-        <PrivacyUpdateBanner />
         <HomePageActions
           search={search}
           setSearch={setSearch}

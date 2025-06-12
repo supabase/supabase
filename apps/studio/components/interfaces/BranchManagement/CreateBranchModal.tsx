@@ -84,6 +84,9 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)
     },
+    onError: (error) => {
+      toast.error(`Failed to create branch: ${error.message}`)
+    },
   })
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
@@ -204,7 +207,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                   render={({ field }) => (
                     <FormItem_Shadcn_>
                       <div className="flex items-center justify-between mb-2">
-                        <Label>Link to Git Branch (Optional)</Label>
+                        <Label>Link to Git Branch {gitlessBranching ? '(Optional)' : ''}</Label>
                         <div className="flex items-center gap-2 text-sm">
                           <Image
                             className={cn('dark:invert')}

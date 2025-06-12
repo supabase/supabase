@@ -15,14 +15,23 @@ import { useParams } from 'common'
 import { TabsUpdateTooltip } from 'components/interfaces/App/FeaturePreview/TableEditorTabs'
 import { useAppStateSnapshot } from 'state/app-state'
 import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
-import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  cn,
+  ContextMenu_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 
 export const EditorTabs = () => {
-  const { ref } = useParams()
+  const { ref, id } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
 
@@ -59,13 +68,56 @@ export const EditorTabs = () => {
     }
   }
 
-  const handleClose = (id: string) => {
-    const onClearDashboardHistory = () => {
-      if (ref && editor) {
-        appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
+  const onClearDashboardHistory = () => {
+    if (ref && editor) {
+      appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
+    }
+  }
+
+  const handleClose = (tabId: string) => {
+    tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+  }
+
+  const handleCloseAll = () => {
+    if (editor) {
+      const tabsToClose =
+        editor === 'table'
+          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
+          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+
+      tabs.removeTabs(tabsToClose)
+      onClearDashboardHistory()
+      router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+    }
+  }
+
+  const handleCloseOthers = (tabId: string) => {
+    if (editor) {
+      const tabsToClose =
+        editor === 'table'
+          ? tabs.openTabs.filter((x) => !x.startsWith('sql') && x !== tabId)
+          : tabs.openTabs.filter((x) => x.startsWith('sql') && x !== tabId)
+
+      tabs.removeTabs(tabsToClose)
+      onClearDashboardHistory()
+
+      const entityId = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
+      if (id !== entityId) {
+        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
       }
     }
-    tabs.handleTabClose({ id, router, editor, onClearDashboardHistory })
+  }
+
+  const handleCloseRight = (tabId: string) => {
+    if (editor) {
+      const openedTabs =
+        editor === 'table'
+          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
+          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+      const tabIdx = openedTabs.indexOf(tabId)
+      const tabsToClose = openedTabs.slice(tabIdx + 1)
+      tabs.removeTabs(tabsToClose)
+    }
   }
 
   const handleTabChange = (id: string) => {
@@ -80,19 +132,42 @@ export const EditorTabs = () => {
         onValueChange={handleTabChange}
       >
         <CollapseButton hideTabs={false} />
-        <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-clip overflow-x-auto ">
+        <TabsList_Shadcn_
+          className={cn(
+            'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
+            'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'
+          )}
+        >
           <SortableContext
             items={editorTabs.map((tab) => tab.id)}
             strategy={horizontalListSortingStrategy}
           >
             {editorTabs.map((tab, index) => (
-              <SortableTab
-                key={tab.id}
-                tab={tab}
-                index={index}
-                openTabs={openTabs}
-                onClose={() => handleClose(tab.id)}
-              />
+              <ContextMenu_Shadcn_>
+                <ContextMenuTrigger_Shadcn_>
+                  <SortableTab
+                    key={tab.id}
+                    tab={tab}
+                    index={index}
+                    openTabs={openTabs}
+                    onClose={() => handleClose(tab.id)}
+                  />
+                </ContextMenuTrigger_Shadcn_>
+                <ContextMenuContent_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={() => handleClose(tab.id)}>
+                    Close
+                  </ContextMenuItem_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseOthers(tab.id)}>
+                    Close Others
+                  </ContextMenuItem_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseRight(tab.id)}>
+                    Close to the Right
+                  </ContextMenuItem_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={handleCloseAll}>
+                    Close All
+                  </ContextMenuItem_Shadcn_>
+                </ContextMenuContent_Shadcn_>
+              </ContextMenu_Shadcn_>
             ))}
           </SortableContext>
 

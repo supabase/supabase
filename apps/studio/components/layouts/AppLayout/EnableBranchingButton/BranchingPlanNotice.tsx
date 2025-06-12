@@ -10,7 +10,7 @@ export const BranchingPlanNotice = () => {
   const selectedOrg = useSelectedOrganization()
 
   return (
-    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 border-0 border-y">
+    <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 border-0 border-t">
       <AlertCircleIcon />
       <AlertTitle_Shadcn_>
         Database branching is only available on the Pro Plan and above
