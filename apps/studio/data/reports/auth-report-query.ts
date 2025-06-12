@@ -58,9 +58,20 @@ const metricSqlMap: Record<
     `
   },
 
-  PasswordResetRequests: (start, end, interval) => `
-    -- TODO: Return time series of password reset requests (by time bucket)
-  `,
+  PasswordResetRequests: (start, end, interval) => {
+    const granularity = analyticsIntervalToBQGranularity(interval)
+    return `
+      select 
+        timestamp_trunc(timestamp, ${granularity}) as timestamp,
+        count(*) as count
+      from auth_logs f
+      where json_value(f.event_message, "$..action") = 'user_recovery_requested'
+        and timestamp >= '${start}'
+        and timestamp < '${end}'
+      group by timestamp
+      order by timestamp desc
+    `
+  },
 
   TotalSignUpsByProvider: (start, end, interval) => `
     -- TODO: Return total sign-ups by provider (email, social, etc.)

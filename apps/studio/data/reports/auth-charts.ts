@@ -28,6 +28,25 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     ],
   },
   {
+    id: 'password-reset-requests',
+    label: 'Password Reset Requests',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: false,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    attributes: [
+      {
+        attribute: 'PasswordResetRequests',
+        provider: 'logs',
+        label: 'Password Reset Requests',
+        enabled: true,
+      },
+    ],
+  },
+  {
     id: 'signups-by-provider',
     label: 'Sign Ups',
     valuePrecision: 0,
