@@ -6,6 +6,7 @@ import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { castOrganizationResponseToOrganization } from './organizations-query'
 
 export type OrganizationCreateVariables = {
   name: string
@@ -71,7 +72,7 @@ export const useOrganizationCreateMutation = ({
           },
           (prev: any) => {
             if (!prev) return prev
-            return [...prev, data]
+            return [...prev, castOrganizationResponseToOrganization(data)]
           }
         )
 

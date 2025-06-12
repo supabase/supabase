@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
 import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
@@ -35,20 +36,32 @@ export const ProjectClaimConfirm = ({
   setStep: (step: 'choose-org' | 'benefits' | 'confirm') => void
 }) => {
   const router = useRouter()
-  const { token: claimToken } = useParams()
+  const { auth_id, token: claimToken } = useParams()
   const queryClient = useQueryClient()
 
-  const { mutate: claimProject, isLoading } = useOrganizationProjectClaimMutation({
-    onSuccess: () => {
+  const { mutateAsync: approveRequest, isLoading: isApproving } =
+    useApiAuthorizationApproveMutation()
+
+  const { mutateAsync: claimProject, isLoading: isClaiming } = useOrganizationProjectClaimMutation()
+
+  const onClaimProject = async () => {
+    try {
+      await approveRequest({ id: auth_id!, slug: selectedOrganization.slug })
+      await claimProject({
+        slug: selectedOrganization.slug,
+        token: claimToken!,
+      })
+
       toast.success('Project claimed successfully')
       // invalidate the org projects to force them to be refetched
       queryClient.invalidateQueries(projectKeys.list())
       router.push(`/org/${selectedOrganization.slug}`)
-    },
-    onError: (error) => {
+    } catch (error: any) {
       toast.error(`Failed to claim project ${error.message}`)
-    },
-  })
+    }
+  }
+
+  const isLoading = isApproving || isClaiming
 
   return (
     <ProjectClaimLayout
@@ -236,17 +249,7 @@ export const ProjectClaimConfirm = ({
         </div>
       </div>
       <div className="flex justify-center sticky bottom-0">
-        <Button
-          size="medium"
-          loading={isLoading}
-          disabled={isLoading}
-          onClick={() =>
-            claimProject({
-              slug: selectedOrganization.slug,
-              token: claimToken!,
-            })
-          }
-        >
+        <Button size="medium" loading={isLoading} disabled={isLoading} onClick={onClaimProject}>
           Claim project {projectClaim?.project?.name}
         </Button>
       </div>
