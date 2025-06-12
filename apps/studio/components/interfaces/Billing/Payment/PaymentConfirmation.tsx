@@ -8,11 +8,13 @@ export const PaymentConfirmation = ({
   onPaymentIntentConfirm,
   onLoadingChange,
   paymentMethodId,
+  onError,
 }: {
   paymentIntentSecret: string
   paymentMethodId: string
   onPaymentIntentConfirm: (response: PaymentIntentResult) => void
   onLoadingChange: (loading: boolean) => void
+  onError?: (error: Error) => void
 }) => {
   const stripe = useStripe()
 
@@ -27,6 +29,7 @@ export const PaymentConfirmation = ({
         })
         .catch((err) => {
           console.error(err)
+          onError?.(err)
           onLoadingChange(false)
         })
     }

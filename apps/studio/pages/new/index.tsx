@@ -1,5 +1,4 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
 
 import { NewOrgForm } from 'components/interfaces/Organization'
@@ -14,13 +13,13 @@ import type { NextPageWithLayout } from 'types'
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const { resolvedTheme } = useTheme()
-
   const [intent, setIntent] = useState<SetupIntentResponse>()
   const captchaLoaded = useIsHCaptchaLoaded()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
 
   const { mutate: setupIntent } = useSetupIntent({ onSuccess: (res) => setIntent(res) })
 
@@ -37,7 +36,10 @@ const Wizard: NextPageWithLayout = () => {
     setupIntent({ hcaptchaToken })
   }
 
-  const loadPaymentForm = async () => {
+  const loadPaymentForm = async (force = false) => {
+    if (selectedPlan == null || selectedPlan === 'FREE') return
+    if (intent != null && !force) return
+
     if (captchaRef && captchaLoaded) {
       let token = captchaToken
 
@@ -57,10 +59,11 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     loadPaymentForm()
-  }, [captchaRef, captchaLoaded])
+  }, [captchaRef, captchaLoaded, selectedPlan])
 
   const resetSetupIntent = () => {
-    return loadPaymentForm()
+    setIntent(undefined)
+    return loadPaymentForm(true)
   }
 
   const onLocalCancel = () => {
@@ -87,7 +90,11 @@ const Wizard: NextPageWithLayout = () => {
         }}
       />
 
-      <NewOrgForm setupIntent={intent} onPaymentMethodReset={() => resetSetupIntent()} />
+      <NewOrgForm
+        setupIntent={intent}
+        onPaymentMethodReset={() => resetSetupIntent()}
+        onPlanSelected={(plan) => setSelectedPlan(plan)}
+      />
     </>
   )
 }

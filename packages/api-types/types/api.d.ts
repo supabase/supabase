@@ -1569,6 +1569,9 @@ export interface components {
       external_zoom_client_id: string | null
       external_zoom_enabled: boolean | null
       external_zoom_secret: string | null
+      hook_before_user_created_enabled: boolean | null
+      hook_before_user_created_secrets: string | null
+      hook_before_user_created_uri: string | null
       hook_custom_access_token_enabled: boolean | null
       hook_custom_access_token_secrets: string | null
       hook_custom_access_token_uri: string | null
@@ -2581,6 +2584,9 @@ export interface components {
       external_zoom_client_id?: string | null
       external_zoom_enabled?: boolean | null
       external_zoom_secret?: string | null
+      hook_before_user_created_enabled?: boolean | null
+      hook_before_user_created_secrets?: string | null
+      hook_before_user_created_uri?: string | null
       hook_custom_access_token_enabled?: boolean | null
       hook_custom_access_token_secrets?: string | null
       hook_custom_access_token_uri?: string | null

@@ -5670,6 +5670,9 @@ export interface components {
       EXTERNAL_ZOOM_CLIENT_ID: string
       EXTERNAL_ZOOM_ENABLED: boolean
       EXTERNAL_ZOOM_SECRET: string
+      HOOK_BEFORE_USER_CREATED_ENABLED: boolean
+      HOOK_BEFORE_USER_CREATED_SECRETS: string
+      HOOK_BEFORE_USER_CREATED_URI: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_SECRETS: string
       HOOK_CUSTOM_ACCESS_TOKEN_URI: string
@@ -7328,11 +7331,7 @@ export interface components {
     }
     SetupIntentResponse: {
       client_secret: string
-      payment_method:
-        | string
-        | {
-            [key: string]: unknown
-          }
+      pending_subscription_flow_enabled_for_creation: boolean
     }
     SignedUrlResponse: {
       signedUrl: string
@@ -7867,6 +7866,9 @@ export interface components {
       EXTERNAL_ZOOM_CLIENT_ID?: string | null
       EXTERNAL_ZOOM_ENABLED?: boolean | null
       EXTERNAL_ZOOM_SECRET?: string | null
+      HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
+      HOOK_BEFORE_USER_CREATED_SECRETS?: string | null
+      HOOK_BEFORE_USER_CREATED_URI?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean | null
       HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string | null
@@ -7977,6 +7979,9 @@ export interface components {
       URI_ALLOW_LIST?: string | null
     }
     UpdateGoTrueConfigHooksBody: {
+      HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
+      HOOK_BEFORE_USER_CREATED_SECRETS?: string | null
+      HOOK_BEFORE_USER_CREATED_URI?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean | null
       HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string | null

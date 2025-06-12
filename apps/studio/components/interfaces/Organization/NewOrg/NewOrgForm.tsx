@@ -41,7 +41,6 @@ import { useTheme } from 'next-themes'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { useFlag } from 'hooks/ui/useFlag'
 import { getURL } from 'lib/helpers'
 
 const ORG_KIND_TYPES = {
@@ -66,6 +65,7 @@ const ORG_SIZE_DEFAULT = '1'
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
   setupIntent?: SetupIntentResponse
+  onPlanSelected: (plan: string) => void
 }
 
 const formSchema = z.object({
@@ -92,12 +92,11 @@ const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
  * No org selected yet, create a new one
  * [Joshen] Need to refactor to use Form_Shadcn here
  */
-const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
+const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
   const { data: organizations, isSuccess } = useOrganizationsQuery()
   const { data: projects } = useProjectsQuery()
-  const orbPendingPaymentInOrgCreation = useFlag('orbPendingPaymentInOrgCreation')
   const { resolvedTheme } = useTheme()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
@@ -116,11 +115,20 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
 
   const [customerData, setCustomerData] = useState<FormCustomerData | null>(null)
 
-  const stripeOptionsPaymentMethod: StripeElementsOptions = {
-    clientSecret: setupIntent ? setupIntent.client_secret! : '',
-    appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
-    ...(orbPendingPaymentInOrgCreation ? { paymentMethodCreation: 'manual' } : {}),
-  } as const
+  const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
+    () =>
+      ({
+        clientSecret: setupIntent ? setupIntent.client_secret! : '',
+        appearance: {
+          theme: resolvedTheme?.includes('dark') ? 'night' : 'flat',
+          labels: 'floating',
+        },
+        ...(setupIntent?.pending_subscription_flow_enabled_for_creation === true
+          ? { paymentMethodCreation: 'manual' }
+          : {}),
+      }) as const,
+    [setupIntent, resolvedTheme]
+  )
 
   const [formState, setFormState] = useState<FormState>({
     plan: 'FREE',
@@ -146,7 +154,10 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
 
     if (typeof name === 'string') updateForm('name', name)
     if (typeof kind === 'string') updateForm('kind', kind)
-    if (typeof plan === 'string') updateForm('plan', plan)
+    if (typeof plan === 'string') {
+      updateForm('plan', plan)
+      onPlanSelected(plan)
+    }
     if (typeof size === 'string') updateForm('size', size)
     if (typeof spend_cap === 'string') updateForm('spend_cap', spend_cap === 'true')
   }, [router.isReady])
@@ -199,6 +210,11 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
         kind: formState.kind,
         size: formState.size,
       })
+    } else {
+      // If the payment intent is not successful, we reset the payment method and show an error
+      toast.error(`Could not confirm payment. Please try again or use a different card.`)
+      resetPaymentMethod()
+      setNewOrgLoading(false)
     }
   }
 
@@ -449,7 +465,10 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
             <div className="col-span-2">
               <Select_Shadcn_
                 value={formState.plan}
-                onValueChange={(value) => updateForm('plan', value)}
+                onValueChange={(value) => {
+                  updateForm('plan', value)
+                  onPlanSelected(value)
+                }}
               >
                 <SelectTrigger_Shadcn_ id="plan" className="w-full">
                   <SelectValue_Shadcn_ />
@@ -532,7 +551,12 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
         {setupIntent && formState.plan !== 'FREE' && (
           <Panel.Content>
             <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
-              <Payment ref={paymentRef} />
+              <Payment
+                ref={paymentRef}
+                pending_subscription_flow_enabled_for_creation={
+                  setupIntent?.pending_subscription_flow_enabled_for_creation === true
+                }
+              />
             </Elements>
           </Panel.Content>
         )}
@@ -619,6 +643,11 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent }: NewOrgFormProps) => {
             }
             onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
             paymentMethodId={paymentMethod.id}
+            onError={(err) => {
+              toast.error(`Failed to confirm payment: ${err.message}`)
+              setNewOrgLoading(false)
+              resetPaymentMethod()
+            }}
           />
         </Elements>
       )}
@@ -633,54 +662,59 @@ export default NewOrgForm
  *
  * If Elements is on a higher level, we risk losing all form state in case a payment fails.
  */
-const Payment = forwardRef(({}: {}, ref) => {
-  const stripe = useStripe()
-  const elements = useElements()
+const Payment = forwardRef(
+  (
+    {
+      pending_subscription_flow_enabled_for_creation,
+    }: { pending_subscription_flow_enabled_for_creation: boolean },
+    ref
+  ) => {
+    const stripe = useStripe()
+    const elements = useElements()
 
-  const orbPendingPaymentInOrgCreation = useFlag('orbPendingPaymentInOrgCreation')
+    const createPaymentMethod = async () => {
+      if (!stripe || !elements) return
+      await elements.submit()
 
-  const createPaymentMethod = async () => {
-    if (!stripe || !elements) return
-    await elements.submit()
+      if (pending_subscription_flow_enabled_for_creation) {
+        // To avoid double 3DS confirmation, we just create the payment method here, as there might be a confirmation step while doing the actual payment
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+          elements,
+        })
+        if (error || paymentMethod == null) {
+          toast.error(error?.message ?? ' Failed to process card details')
+          return
+        }
+        return paymentMethod
+      } else {
+        const { error, setupIntent } = await stripe.confirmSetup({
+          elements,
+          redirect: 'if_required',
+          confirmParams: {
+            return_url: `${getURL()}/new`,
+            expand: ['payment_method'],
+          },
+        })
 
-    if (orbPendingPaymentInOrgCreation) {
-      // To avoid double 3DS confirmation, we just create the payment method here, as there might be a confirmation step while doing the actual payment
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        elements,
-      })
-      if (error || paymentMethod == null) {
-        toast.error(error?.message ?? ' Failed to process card details')
-        return
+        if (error || !setupIntent.payment_method) {
+          toast.error(error?.message ?? ' Failed to save card details')
+          return
+        }
+
+        return setupIntent.payment_method as PaymentMethod
       }
-      return paymentMethod
-    } else {
-      const { error, setupIntent } = await stripe.confirmSetup({
-        elements,
-        redirect: 'if_required',
-        confirmParams: {
-          return_url: `${getURL()}/new`,
-          expand: ['payment_method'],
-        },
-      })
-
-      if (error || !setupIntent.payment_method) {
-        toast.error(error?.message ?? ' Failed to save card details')
-        return
-      }
-
-      return setupIntent.payment_method as PaymentMethod
     }
+
+    useImperativeHandle(ref, () => ({
+      createPaymentMethod,
+    }))
+
+    return (
+      <Panel.Content>
+        <PaymentElement />
+      </Panel.Content>
+    )
   }
-
-  useImperativeHandle(ref, () => ({
-    createPaymentMethod,
-  }))
-
-  return (
-    <Panel.Content>
-      <PaymentElement />
-    </Panel.Content>
-  )
-})
+)
 
 Payment.displayName = 'Payment'
