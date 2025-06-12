@@ -171,6 +171,9 @@ describe('copyToClipboard', () => {
       },
     })
 
+    // CopyToClipboard uses setTimeout to call the callback
+    vi.useFakeTimers()
+
     // If ClipboardItem is used
     vi.stubGlobal('ClipboardItem', function (items: any) {
       return items
@@ -182,10 +185,12 @@ describe('copyToClipboard', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.useRealTimers()
   })
 
   it('uses clipboard.write if available', async () => {
     await copyToClipboard('hello')
+    vi.runAllTimers()
     expect(writeMock).toHaveBeenCalled()
   })
 
