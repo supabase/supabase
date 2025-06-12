@@ -34,7 +34,6 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { configKeys } from 'data/config/keys'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
-import type { Project } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
 import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
@@ -208,12 +207,6 @@ function createStorageExplorerState({
       localStorage.setItem(localStorageKey, JSON.stringify({ view, sortBy, sortByOrder }))
     },
 
-    openBucket: async (bucket: Bucket) => {
-      const { id, name } = bucket
-      state.setSelectedBucket(bucket)
-      await state.fetchFolderContents({ folderId: id, folderName: name, index: -1 })
-    },
-
     // Functions that manage the UI of the Storage Explorer
 
     getLatestColumnIndex: () => {
@@ -305,11 +298,13 @@ function createStorageExplorerState({
     },
 
     fetchFolderContents: async ({
+      bucketId,
       folderId,
       folderName,
       index,
       searchString,
     }: {
+      bucketId: string
       folderId: string | null
       folderName: string
       index: number
@@ -340,8 +335,8 @@ function createStorageExplorerState({
       try {
         const data = await listBucketObjects(
           {
+            bucketId,
             projectRef: state.projectRef,
-            bucketId: state.selectedBucket.id,
             path: prefix,
             options,
           },
