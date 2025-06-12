@@ -4,7 +4,7 @@ import { AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
@@ -56,8 +56,15 @@ const APIKeys = () => {
     isLoading: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery(
     { projectRef },
-    { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
+    {
+      enabled: !isProjectSettingsLoading && isApiKeysEmpty,
+    }
   )
+
+  // Only show JWT loading state if the query is actually enabled
+  const showJwtLoading =
+    isJwtSecretUpdateStatusLoading && !isProjectSettingsLoading && isApiKeysEmpty
+
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
@@ -93,14 +100,20 @@ const APIKeys = () => {
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
-      ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+      ) : isProjectSettingsLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">
-            {isProjectSettingsLoading || isApiKeysEmpty
-              ? 'Retrieving API keys'
-              : 'JWT secret is being updated'}
-          </p>
+          <p className="text-sm text-foreground-light">Retrieving API keys</p>
+        </div>
+      ) : isApiKeysEmpty ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">Retrieving API keys</p>
+        </div>
+      ) : showJwtLoading ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">JWT secret is being updated</p>
         </div>
       ) : (
         <>

@@ -118,7 +118,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query.from('table with spaces', 'public').select('*').toSql()
 
-      expect(sql).toMatchInlineSnapshot('"select * from public."table with spaces";"')
+      expect(sql).toMatchInlineSnapshot(`"select * from public."table with spaces";"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
       expect(result[0]['column with spaces']).toBe('value with spaces')
@@ -129,7 +129,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query.from('quoted"table', 'public').select('*').toSql()
 
-      expect(sql).toMatchInlineSnapshot('"select * from public."quoted""table";"')
+      expect(sql).toMatchInlineSnapshot(`"select * from public."quoted""table";"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
       expect(result[0].name).toBe('quoted table row 1')
@@ -140,7 +140,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query.from("quoted'table", 'public').select('*').toSql()
 
-      expect(sql).toMatchInlineSnapshot('"select * from public."quoted\'table";"')
+      expect(sql).toMatchInlineSnapshot(`"select * from public."quoted'table";"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
       expect(result[0].name).toBe('single quoted table row 1')
@@ -151,7 +151,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query.from('camelCaseTable', 'public').select('*').toSql()
 
-      expect(sql).toMatchInlineSnapshot('"select * from public."camelCaseTable";"')
+      expect(sql).toMatchInlineSnapshot(`"select * from public."camelCaseTable";"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
       expect(result[0].name).toBe('camel case table row 1')
@@ -162,7 +162,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query.from('special#$%^&Table', 'public').select('*').toSql()
 
-      expect(sql).toMatchInlineSnapshot('"select * from public."special#$%^&Table";"')
+      expect(sql).toMatchInlineSnapshot(`"select * from public."special#$%^&Table";"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
       expect(result[0].name).toBe('special char table row 1')
@@ -174,7 +174,7 @@ describe('Advanced Query Tests', () => {
       const sql = query.from('table with spaces', 'public').select('"column with spaces"').toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select "column with spaces" from public."table with spaces";"'
+        `"select "column with spaces" from public."table with spaces";"`
       )
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
@@ -187,7 +187,7 @@ describe('Advanced Query Tests', () => {
       const sql = query.from('table with spaces', 'public').select('"quoted""column"').toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select "quoted""column" from public."table with spaces";"'
+        `"select "quoted""column" from public."table with spaces";"`
       )
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
@@ -199,9 +199,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query.from('table with spaces', 'public').select('"quoted\'column"').toSql()
 
-      expect(sql).toMatchInlineSnapshot(
-        '"select "quoted\'column" from public."table with spaces";"'
-      )
+      expect(sql).toMatchInlineSnapshot(`"select "quoted'column" from public."table with spaces";"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
       expect(result[0]["quoted'column"]).toBe("value with 'quotes'")
@@ -213,7 +211,7 @@ describe('Advanced Query Tests', () => {
       const sql = query.from('table with spaces', 'public').select('"camelCaseColumn"').toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select "camelCaseColumn" from public."table with spaces";"'
+        `"select "camelCaseColumn" from public."table with spaces";"`
       )
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
@@ -226,7 +224,7 @@ describe('Advanced Query Tests', () => {
       const sql = query.from('table with spaces', 'public').select('"special#$%^&Column"').toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select "special#$%^&Column" from public."table with spaces";"'
+        `"select "special#$%^&Column" from public."table with spaces";"`
       )
       const result = await validateSql(db, sql)
       expect(result.length).toBe(2)
@@ -261,7 +259,7 @@ describe('Advanced Query Tests', () => {
         .toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select * from public."table with spaces" where "column with spaces" = \'test value\';"'
+        `"select * from public."table with spaces" where "column with spaces" = 'test value';"`
       )
 
       // Validate the generated SQL directly against the database
@@ -284,7 +282,7 @@ describe('Advanced Query Tests', () => {
         .toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        "\"select * from public.normal_table where name = 'O''Reilly';\""
+        `"select * from public.normal_table where name = 'O''Reilly';"`
       )
 
       const result = await validateSql(db, sql)
@@ -345,7 +343,7 @@ describe('Advanced Query Tests', () => {
           .toSql()
 
         expect(sql).toMatchInlineSnapshot(
-          '"select id, name from public.normal_table where id > 10 and name ~~ \'%John%\' order by normal_table.name asc nulls last limit 10 offset 0;"'
+          `"select id, name from public.normal_table where id > 10 and name ~~ '%John%' order by normal_table.name asc nulls last limit 10 offset 0;"`
         )
 
         const result = await validateSql(db, sql)
@@ -507,7 +505,7 @@ describe('Advanced Query Tests', () => {
         .toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select * from public.normal_table where name = \'Special $ ^ & * ( ) _ + { } | : < > ? characters\';"'
+        `"select * from public.normal_table where name = 'Special $ ^ & * ( ) _ + { } | : < > ? characters';"`
       )
       await validateSql(db, sql)
     })
@@ -532,7 +530,7 @@ describe('Advanced Query Tests', () => {
         .filter('id', 'in', [1, 2, 3])
         .toSql()
 
-      expect(sql).toMatchInlineSnapshot('"select * from public.normal_table where id in (1,2,3);"')
+      expect(sql).toMatchInlineSnapshot(`"select * from public.normal_table where id in (1,2,3);"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(3)
       expect(result.map((row: any) => row.id).sort()).toEqual([1, 2, 3])
@@ -554,7 +552,7 @@ describe('Advanced Query Tests', () => {
         .filter('name', 'is', 'null')
         .toSql()
 
-      expect(sql).toMatchInlineSnapshot('"select * from public.normal_table where name is null;"')
+      expect(sql).toMatchInlineSnapshot(`"select * from public.normal_table where name is null;"`)
       const result = await validateSql(db, sql)
       expect(result.length).toBe(1)
       expect(result[0].id).toBe(2)
@@ -578,7 +576,7 @@ describe('Advanced Query Tests', () => {
         .toSql()
 
       expect(sql).toMatchInlineSnapshot(
-        '"select * from public.normal_table where name is not null;"'
+        `"select * from public.normal_table where name is not null;"`
       )
       const result = await validateSql(db, sql)
       expect(result.length).toBe(1)

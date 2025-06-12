@@ -1,9 +1,9 @@
 import { Search } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -16,10 +16,11 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -27,8 +28,11 @@ import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
-const TeamSettings = () => {
-  const newLayoutPreview = useNewLayout()
+export const TeamSettings = () => {
+  const [_, setLastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const {
     organizationMembersCreate: organizationMembersCreationEnabled,
@@ -36,11 +40,13 @@ const TeamSettings = () => {
   } = useIsFeatureEnabled(['organization_members:create', 'organization_members:delete'])
 
   const { slug } = useParams()
+  const router = useRouter()
   const { profile } = useProfile()
   const selectedOrganization = useSelectedOrganization()
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
+  const { refetch: refetchOrganizations } = useOrganizationsQuery()
   const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
 
@@ -59,10 +65,15 @@ const TeamSettings = () => {
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
   const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setIsLeaving(false)
       setIsLeaveTeamModalOpen(false)
-      window?.location.replace(BASE_PATH) // Force reload to clear Store
+
+      await refetchOrganizations()
+      toast.success(`Successfully left ${selectedOrganization?.name}`)
+
+      setLastVisitedOrganization('')
+      router.push('/organizations')
     },
     onError: (error) => {
       setIsLeaving(false)
@@ -82,7 +93,7 @@ const TeamSettings = () => {
   return (
     <>
       <ScaffoldContainerLegacy>
-        {newLayoutPreview && <ScaffoldTitle>Team</ScaffoldTitle>}
+        <ScaffoldTitle>Team</ScaffoldTitle>
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
             <Input
@@ -161,5 +172,3 @@ const TeamSettings = () => {
     </>
   )
 }
-
-export default TeamSettings

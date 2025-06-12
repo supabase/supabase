@@ -23,7 +23,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npx sv create my-app
       ```
 
@@ -42,7 +42,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app && npm install @supabase/supabase-js
       ```
 
@@ -62,7 +62,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```js src/lib/supabaseClient.js
+      ```js name=src/lib/supabaseClient.js
         import { createClient } from '@supabase/supabase-js'
 
         export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
@@ -83,7 +83,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
 
-      ```js src/routes/+page.server.js
+      ```js name=src/routes/+page.server.js
         import { supabase } from "$lib/supabaseClient";
 
         export async function load() {
@@ -104,7 +104,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
 
-      ```svelte src/routes/+page.svelte
+      ```svelte name=src/routes/+page.svelte
         <script>
           let { data } = $props();
         </script>
@@ -129,7 +129,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 

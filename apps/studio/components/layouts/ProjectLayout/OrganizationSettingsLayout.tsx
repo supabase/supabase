@@ -2,28 +2,27 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { cn, NavMenu, NavMenuItem } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
+import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {
-  const newLayoutPreview = useNewLayout()
-
   const { slug } = useParams()
-  const currentPath = useCurrentPath()
+  // Get the path without any hash values
+  const fullCurrentPath = useCurrentPath()
+  const [currentPath] = fullCurrentPath.split('#')
 
-  // hide these settings in the new layout
-  // when path equals `/org/${slug}/team`
-  // or `/org/${slug}/integrations`
-  // or `/org/${slug}/usage`
-  // make the function
+  // [Joshen] RE Organization Settings - need to figure out how to enforce MFA across users before this goes live
+  const newSecurityPage = useFlag('showOrganizationSecuritySettings')
+
+  // Hide these settings in the new layout on the following paths
   const isHidden = (path: string) => {
     return (
-      newLayoutPreview &&
-      (path === `/org/${slug}/team` ||
-        path === `/org/${slug}/integrations` ||
-        path === `/org/${slug}/usage`)
+      path === `/org/${slug}/team` ||
+      path === `/org/${slug}/integrations` ||
+      path === `/org/${slug}/usage` ||
+      path === `/org/${slug}/billing`
     )
   }
 
@@ -36,25 +35,9 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    !newLayoutPreview && {
-      label: 'Team',
-      href: `/org/${slug}/team`,
-    },
-    !newLayoutPreview && {
-      label: 'Integrations',
-      href: `/org/${slug}/integrations`,
-    },
-    {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-    },
-    !newLayoutPreview && {
-      label: 'Usage',
-      href: `/org/${slug}/usage`,
-    },
-    {
-      label: 'Invoices',
-      href: `/org/${slug}/invoices`,
+    newSecurityPage && {
+      label: 'Security',
+      href: `/org/${slug}/security`,
     },
     {
       label: 'OAuth Apps',
@@ -72,21 +55,16 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
 
   return (
     <>
-      <ScaffoldContainerLegacy>
+      <ScaffoldContainerLegacy className="mb-0">
         <ScaffoldTitle>Organization Settings</ScaffoldTitle>
+        <NavMenu className="overflow-x-auto" aria-label="Organization menu navigation">
+          {(navMenuItems.filter(Boolean) as { label: string; href: string }[]).map((item) => (
+            <NavMenuItem key={item.label} active={currentPath === item.href}>
+              <Link href={item.href}>{item.label}</Link>
+            </NavMenuItem>
+          ))}
+        </NavMenu>
       </ScaffoldContainerLegacy>
-      <NavMenu
-        className={cn(
-          '[&_ul]:mx-auto [&_ul]:max-w-[1200px] [&_ul]:px-6 [&_ul]:lg:px-14 [&_ul]:xl:px-24 [&_ul]:2xl:px-32'
-        )}
-        aria-label="Organization menu navigation"
-      >
-        {(navMenuItems.filter(Boolean) as { label: string; href: string }[]).map((item) => (
-          <NavMenuItem key={item.label} active={currentPath === item.href}>
-            <Link href={item.href}>{item.label}</Link>
-          </NavMenuItem>
-        ))}
-      </NavMenu>
       <main className="h-full w-full overflow-y-auto">{children}</main>
     </>
   )

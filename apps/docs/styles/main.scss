@@ -350,20 +350,43 @@ th code {
   @apply not-sr-only;
 }
 
-// Shiki dark mode styling
-
-[data-theme="dark"] :is(.shiki,
-.shiki span) {
-  color: var(--shiki-dark) !important;
-  background-color: var(--shiki-dark-bg) !important;
-  /* Optional, if you also want font styles */
-  font-style: var(--shiki-dark-font-style) !important;
-  font-weight: var(--shiki-dark-font-weight) !important;
-  text-decoration: var(--shiki-dark-text-decoration) !important;
+// Code blocks need margin applied when in content container
+.prose :where(.shiki:not(.shiki-wrapper *), .shiki-wrapper) {
+  margin-block: 2rem;
 }
 
-// Code blocks need margin applied when in content container
-
-.prose :where(.shiki) {
-  margin-block: 2rem;
+// Code block theme colors for use with Supabase Theme
+[data-theme='dark'],
+[data-theme='deep-dark'],
+.dark,
+.deep-dark {
+  --code-token-keyword: #bda4ff;
+  --code-foreground: #ffffff;
+  --code-token-constant: #3ecf8e;
+  --code-token-string: #ffcda1;
+  --code-token-comment: #7e7e7e;
+  --code-token-parameter: #ffffff;
+  --code-token-function: #3ecf8e;
+  --code-token-string-expression: #ffcda1;
+  --code-token-punctuation: #ffffff;
+  --code-token-link: #ffffff;
+  --code-token-number: #ffffff;
+  --code-token-property: #3ecf8e;
+  --code-highlight-color: #232323;
+}
+[data-theme='light'],
+.light {
+  --code-token-keyword: #6b35dc;
+  --code-foreground: hsl(var(--foreground-light) / 1);
+  --code-token-constant: #15593b;
+  --code-token-string: #f1a10d;
+  --code-token-comment: #7e7e7e;
+  --code-token-parameter: hsl(var(--foreground-light) / 1);
+  --code-token-function: #15593b;
+  --code-token-string-expression: #f1a10d;
+  --code-token-punctuation: hsl(var(--foreground-light) / 1);
+  --code-token-link: hsl(var(--foreground-light) / 1);
+  --code-token-number: hsl(var(--foreground-light) / 1);
+  --code-token-property: #15593b;
+  --code-highlight-color: #1c1c1c;
 }

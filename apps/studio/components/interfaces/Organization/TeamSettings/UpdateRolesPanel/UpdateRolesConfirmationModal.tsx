@@ -219,7 +219,7 @@ export const UpdateRolesConfirmationModal = ({
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       From <span className="text-foreground">{originalRoleName}</span> to{' '}
-                      <span className="text-foreground">{updatedRole?.name}</span> on{' '}
+                      <span className="text-foreground">{updatedRole?.name ?? 'Unknown'}</span> on{' '}
                       <span className={project !== undefined ? 'text-foreground' : ''}>
                         {project?.name ?? 'organization'}
                       </span>

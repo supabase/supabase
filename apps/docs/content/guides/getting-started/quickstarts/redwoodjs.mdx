@@ -64,7 +64,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash Terminal
+      ```bash name=Terminal
       yarn create redwood-app my-app --ts
       ```
     </StepHikeCompact.Code>
@@ -77,7 +77,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app
       code .
       ```
@@ -97,7 +97,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash .env
+      ```bash name=.env
       # Transaction mode connection string used for migrations
       DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
 
@@ -116,7 +116,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```prisma api/db/schema.prisma
+      ```prisma name=api/db/schema.prisma
       datasource db {
         provider  = "postgresql"
         url       = env("DATABASE_URL")
@@ -133,7 +133,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```prisma api/db/schema.prisma
+      ```prisma name=api/db/schema.prisma
       model Instrument {
         id   Int    @id @default(autoincrement())
         name String @unique
@@ -152,7 +152,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```ts scripts/seed.ts
+      ```ts name=scripts/seed.ts
       import type { Prisma } from '@prisma/client'
       import { db } from 'api/src/lib/db'
 
@@ -190,7 +190,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash Terminal
+      ```bash name=Terminal
       yarn rw prisma db seed
       ```
     </StepHikeCompact.Code>
@@ -203,7 +203,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```bash Terminal
+      ```bash name=Terminal
       yarn rw g scaffold instrument
       ```
     </StepHikeCompact.Code>

@@ -30,7 +30,7 @@ export const ActionCard = (card: {
         </div>
         <div className="flex flex-col gap-0">
           <h3 className="text-sm text-foreground mb-0">{card.title}</h3>
-          <p className="text-xs text-foreground-light">{card.description}</p>
+          <pre className="text-xs text-foreground-light font-sans">{card.description}</pre>
         </div>
       </div>
     </Card>

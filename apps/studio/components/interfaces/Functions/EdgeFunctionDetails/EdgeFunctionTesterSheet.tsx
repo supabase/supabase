@@ -9,13 +9,13 @@ import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonatio
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { constructHeaders } from 'data/fetchers'
+import { useEdgeFunctionTestMutation } from 'data/edge-functions/edge-function-test-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { prettifyJSON } from 'lib/helpers'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import {
   Badge,
   Button,
@@ -76,18 +76,33 @@ const FormSchema = z.object({
 type FormValues = z.infer<typeof FormSchema>
 
 export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
-  const { ref: projectRef, functionSlug } = useParams()
-  const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
+  const { ref: projectRef, functionSlug } = useParams()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
+
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const getImpersonatedRole = useGetImpersonatedRole()
   const { serviceKey } = getAPIKeys(settings)
+
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: testEdgeFunction, isLoading } = useEdgeFunctionTestMutation({
+    onSuccess: (res) => setResponse(res),
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      if (err instanceof Error) {
+        const errorWithStatus = err as ErrorWithStatus
+        setResponse({
+          status: errorWithStatus.cause?.status || 500,
+          headers: {},
+          body: '',
+        })
+      }
+    },
+  })
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
@@ -139,98 +154,66 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   }
 
   const onSubmit = async (values: FormValues) => {
+    setError(null)
+    setResponse(null)
+
+    // Validate that the body is valid JSON
     try {
-      setIsLoading(true)
-      setError(null)
-      setResponse(null)
-
-      // Validate that the body is valid JSON
-      try {
-        JSON.parse(values.body)
-      } catch (e) {
-        form.setError('body', { message: 'Must be a valid JSON string' })
-        return
-      }
-
-      let testAuthorization: string | undefined
-      const role = getImpersonatedRole()
-
-      if (
-        projectRef !== undefined &&
-        config?.jwt_secret !== undefined &&
-        role !== undefined &&
-        role.type === 'postgrest'
-      ) {
-        try {
-          const token = await getRoleImpersonationJWT(projectRef, config.jwt_secret, role)
-          testAuthorization = 'Bearer ' + token
-        } catch (err: any) {
-          console.error('Failed to generate JWT:', {
-            error: err.message,
-            roleDetails: role,
-          })
-        }
-      }
-
-      // Construct custom headers
-      const customHeaders: Record<string, string> = {}
-      headerFields.forEach(({ key, value }) => {
-        if (key && value) {
-          customHeaders[key] = value
-        }
-      })
-
-      // Construct query parameters
-      const queryString = queryParamFields
-        .filter(({ key, value }) => key && value)
-        .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-        .join('&')
-
-      const finalUrl = queryString ? `${url}?${queryString}` : url
-
-      const defaultHeaders = await constructHeaders()
-      const res = await fetch(`${BASE_PATH}/api/edge-functions/test`, {
-        method: 'POST',
-        headers: {
-          ...defaultHeaders,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: finalUrl,
-          method: values.method,
-          body: values.body,
-          headers: {
-            ...(accessToken && {
-              Authorization: `Bearer ${accessToken}`,
-            }),
-            'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
-            'Content-Type': 'application/json',
-            ...customHeaders,
-          },
-        }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error?.message || 'Failed to test edge function', {
-          cause: { status: data.status },
-        })
-      }
-
-      setResponse(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
-      if (err instanceof Error) {
-        const errorWithStatus = err as ErrorWithStatus
-        setResponse({
-          status: errorWithStatus.cause?.status || 500,
-          headers: {},
-          body: '',
-        })
-      }
-    } finally {
-      setIsLoading(false)
+      JSON.parse(values.body)
+    } catch (e) {
+      form.setError('body', { message: 'Must be a valid JSON string' })
+      return
     }
+
+    let testAuthorization: string | undefined
+    const role = getImpersonatedRoleState().role
+
+    if (
+      projectRef !== undefined &&
+      config?.jwt_secret !== undefined &&
+      role !== undefined &&
+      role.type === 'postgrest'
+    ) {
+      try {
+        const token = await getRoleImpersonationJWT(projectRef, config.jwt_secret, role)
+        testAuthorization = 'Bearer ' + token
+      } catch (err: any) {
+        console.error('Failed to generate JWT:', {
+          error: err.message,
+          roleDetails: role,
+        })
+      }
+    }
+
+    // Construct custom headers
+    const customHeaders: Record<string, string> = {}
+    headerFields.forEach(({ key, value }) => {
+      if (key && value) {
+        customHeaders[key] = value
+      }
+    })
+
+    // Construct query parameters
+    const queryString = queryParamFields
+      .filter(({ key, value }) => key && value)
+      .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&')
+
+    const finalUrl = queryString ? `${url}?${queryString}` : url
+
+    testEdgeFunction({
+      url: finalUrl,
+      method: values.method,
+      body: values.body,
+      headers: {
+        ...(accessToken && {
+          Authorization: `Bearer ${accessToken}`,
+        }),
+        'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
+        'Content-Type': 'application/json',
+        ...customHeaders,
+      },
+    })
   }
 
   const renderKeyValuePairs = (type: 'headers' | 'queryParams', label: string) => (
@@ -433,7 +416,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover />
+                <RoleImpersonationPopover portal={false} />
                 <Button
                   type="primary"
                   htmlType="submit"

@@ -11,7 +11,7 @@ import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
-import { PromoToast } from 'ui-patterns'
+// import { PromoToast } from 'ui-patterns'
 
 /**
  * Global providers that wrap the entire app
@@ -28,7 +28,7 @@ function GlobalProviders({ children }: PropsWithChildren) {
               <CommandProvider>
                 <div className="flex flex-col">
                   <SiteLayout>
-                    <PromoToast />
+                    {/* <PromoToast /> */}
                     {children}
                     <DocsCommandMenu />
                   </SiteLayout>

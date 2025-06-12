@@ -1,5 +1,6 @@
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
+import { databaseIndexesKeys } from 'data/database-indexes/keys'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { databaseTriggerKeys } from 'data/database-triggers/keys'
 import { databaseKeys } from 'data/database/keys'
@@ -21,6 +22,7 @@ export const identifyQueryType = (query: string) => {
 }
 
 // Check for function calls that aren't in the safe list
+/** @deprecated [Joshen] Ideally we move away from this as this isn't a scalable way to deduce */
 export const containsUnknownFunction = (query: string) => {
   const normalizedQuery = query.trim().toLowerCase()
   const functionCallRegex = /\w+\s*\(/g
@@ -32,6 +34,11 @@ export const containsUnknownFunction = (query: string) => {
   })
 }
 
+/** @deprecated
+ * [Joshen] This isn't really a scalable way to reduce this behaviour, we now have support
+ * for a readonly connection string which we can use this to run queries, and is a much
+ * clearer way to deduce if the query is read only or not
+ */
 export const isReadOnlySelect = (query: string): boolean => {
   const normalizedQuery = query.trim().toLowerCase()
 
@@ -87,7 +94,7 @@ export const getContextualInvalidationKeys = ({
         'database/triggers': [databaseTriggerKeys.list(ref)],
         'database/types': [enumeratedTypesKeys.list(ref)],
         'database/extensions': [databaseExtensionsKeys.list(ref)],
-        'database/indexes': [databaseKeys.indexes(ref, schema)],
+        'database/indexes': [databaseIndexesKeys.list(ref, schema)],
       } as const
     )[key] ?? []
   )

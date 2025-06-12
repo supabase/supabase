@@ -119,6 +119,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'platform',
           },
           {
+            label: 'Security & Compliance',
+            icon: 'security',
+            href: '/guides/security',
+            level: 'security',
+          },
+          {
             label: 'Telemetry',
             icon: 'telemetry',
             href: '/guides/telemetry',
@@ -625,6 +631,7 @@ export const auth = {
           ],
         },
         { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Web3 (Sign in with Solana)', url: '/guides/auth/auth-web3' },
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
         {
           name: 'Identity Linking',
@@ -911,10 +918,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/configuration',
         },
         {
-          name: 'Managing database replication',
-          url: '/guides/database/replication',
-        },
-        {
           name: 'Query optimization',
           url: '/guides/database/query-optimization',
         },
@@ -954,6 +957,22 @@ export const database: NavMenuConstant = {
     ormQuickstarts,
     guiQuickstarts,
     {
+      name: 'Database replication',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/database/replication' },
+        {
+          name: 'Setting up replication',
+          url: '/guides/database/replication/setting-up-replication',
+        },
+        {
+          name: 'Monitoring replication',
+          url: '/guides/database/replication/monitoring-replication',
+        },
+        { name: 'FAQ', url: '/guides/database/replication/faq' },
+      ],
+    },
+    {
       name: 'Extensions',
       url: undefined,
       items: [
@@ -963,7 +982,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/hypopg',
         },
         {
-          name: 'plv8: Javascript Language',
+          name: 'plv8 (deprecated)',
           url: '/guides/database/extensions/plv8',
         },
         {
@@ -979,7 +998,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgaudit',
         },
         {
-          name: 'pgjwt: JSON Web Tokens',
+          name: 'pgjwt (deprecated)',
           url: '/guides/database/extensions/pgjwt',
         },
         {
@@ -1051,7 +1070,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/plpgsql_check',
         },
         {
-          name: 'timescaledb: Time-series data',
+          name: 'timescaledb (deprecated)',
           url: '/guides/database/extensions/timescaledb',
         },
         {
@@ -1950,6 +1969,10 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/managing-config',
         },
         {
+          name: 'Restoring downloaded backup',
+          url: '/guides/local-development/restoring-downloaded-backup',
+        },
+        {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates',
         },
@@ -2048,14 +2071,18 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
 ]
 
 export const security: NavMenuConstant = {
-  icon: 'platform',
+  icon: 'security',
   title: 'Security',
   url: '/guides/security',
   items: [
     { name: 'Overview', url: '/guides/security' },
     {
       name: 'Product security',
-      url: '/guides/security/product-security',
+      url: undefined,
+      items: [
+        { name: 'Product configuration', url: '/guides/security/product-security' },
+        { name: 'Security testing', url: '/guides/security/security-testing' },
+      ],
     },
     {
       name: 'Compliance',
@@ -2063,6 +2090,19 @@ export const security: NavMenuConstant = {
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
+        {
+          name: 'Shared Responsibility Model',
+          url: '/guides/deployment/shared-responsibility-model',
+        },
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Hardening the Data API', url: '/guides/database/hardening-data-api' },
       ],
     },
   ],
@@ -2146,7 +2186,6 @@ export const platform: NavMenuConstant = {
         { name: 'Regions', url: '/guides/platform/regions' },
         { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
-        { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
         {
           name: 'Network Restrictions',

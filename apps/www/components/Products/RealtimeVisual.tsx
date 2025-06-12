@@ -152,6 +152,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       {/* Gradient to hide animation under text to maintain readability */}
       <div
         className="
+          visual-overlay
           absolute pointer-events-none
           w-full h-full max-h-[400px] lg:max-h-none
           inset-0 top-auto

@@ -142,7 +142,7 @@ const OAuthApps = () => {
                   <div className="flex items-center gap-2">
                     <p className="text-sm text-foreground-light">Client ID</p>
                     <p className="font-mono text-sm">{createdApp.client_id}</p>
-                    <CopyButton text={createdApp.client_secret} type="default" iconOnly />
+                    <CopyButton text={createdApp.client_id} type="default" iconOnly />
                   </div>
 
                   <div className="flex items-center gap-2">

@@ -19,7 +19,10 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import {
+  useAsyncCheckProjectPermissions,
+  useCheckPermissions,
+} from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getURL } from 'lib/helpers'
 import { Alert, Button } from 'ui'
@@ -43,10 +46,8 @@ const PaymentMethods = () => {
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug })
 
-  const canReadPaymentMethods = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.payment_methods'
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadPaymentMethods } =
+    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.payment_methods')
   const canUpdatePaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
@@ -73,7 +74,7 @@ const PaymentMethods = () => {
                 installationId: selectedOrganization?.partner_id,
               }}
             />
-          ) : !canReadPaymentMethods ? (
+          ) : isPermissionsLoaded && !canReadPaymentMethods ? (
             <NoPermission resourceText="view this organization's payment methods" />
           ) : (
             <>
@@ -151,6 +152,8 @@ const PaymentMethods = () => {
                                 paymentMethodType={subscription?.payment_method_type}
                                 setSelectedMethodForUse={setSelectedMethodForUse}
                                 setSelectedMethodToDelete={setSelectedMethodToDelete}
+                                paymentMethodCount={paymentMethods?.data.length ?? 0}
+                                subscriptionPlan={subscription?.plan.id}
                               />
                             ))}
                           </div>

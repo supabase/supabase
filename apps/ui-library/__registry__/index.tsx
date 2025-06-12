@@ -49,7 +49,55 @@ export const Index: Record<string, any> = {
       registryDependencies: ["button","card","input","label"],
       component: React.lazy(() => import("@/registry/default/blocks/password-based-auth-tanstack/routes/login.tsx")),
       source: "",
-      files: ["registry/default/blocks/password-based-auth-tanstack/routes/login.tsx","registry/default/blocks/password-based-auth-tanstack/routes/auth/error.tsx","registry/default/blocks/password-based-auth-tanstack/routes/_protected.tsx","registry/default/blocks/password-based-auth-tanstack/routes/_protected/info.tsx","registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts","registry/default/blocks/password-based-auth-tanstack/components/login-form.tsx","registry/default/blocks/password-based-auth-tanstack/routes/sign-up.tsx","registry/default/blocks/password-based-auth-tanstack/routes/sign-up-success.tsx","registry/default/blocks/password-based-auth-tanstack/components/sign-up-form.tsx","registry/default/blocks/password-based-auth-tanstack/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-tanstack/routes/update-password.tsx","registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form.tsx","registry/default/blocks/password-based-auth-tanstack/components/update-password-form.tsx","registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      files: ["registry/default/blocks/password-based-auth-tanstack/routes/login.tsx","registry/default/blocks/password-based-auth-tanstack/routes/auth/error.tsx","registry/default/blocks/password-based-auth-tanstack/routes/_protected.tsx","registry/default/blocks/password-based-auth-tanstack/routes/_protected/protected.tsx","registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts","registry/default/blocks/password-based-auth-tanstack/components/login-form.tsx","registry/default/blocks/password-based-auth-tanstack/routes/sign-up.tsx","registry/default/blocks/password-based-auth-tanstack/routes/sign-up-success.tsx","registry/default/blocks/password-based-auth-tanstack/components/sign-up-form.tsx","registry/default/blocks/password-based-auth-tanstack/routes/forgot-password.tsx","registry/default/blocks/password-based-auth-tanstack/routes/update-password.tsx","registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form.tsx","registry/default/blocks/password-based-auth-tanstack/components/update-password-form.tsx","registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "social-auth-nextjs": {
+      name: "social-auth-nextjs",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/social-auth-nextjs/app/auth/login/page.tsx")),
+      source: "",
+      files: ["registry/default/blocks/social-auth-nextjs/app/auth/login/page.tsx","registry/default/blocks/social-auth-nextjs/app/auth/error/page.tsx","registry/default/blocks/social-auth-nextjs/app/protected/page.tsx","registry/default/blocks/social-auth-nextjs/app/auth/oauth/route.ts","registry/default/blocks/social-auth-nextjs/components/login-form.tsx","registry/default/blocks/social-auth-nextjs/middleware.ts","registry/default/blocks/social-auth-nextjs/components/logout-button.tsx","registry/default/clients/nextjs/lib/supabase/client.ts","registry/default/clients/nextjs/lib/supabase/middleware.ts","registry/default/clients/nextjs/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "social-auth-react": {
+      name: "social-auth-react",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/social-auth-react/components/login-form.tsx")),
+      source: "",
+      files: ["registry/default/blocks/social-auth-react/components/login-form.tsx","registry/default/clients/react/lib/supabase/client.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "social-auth-react-router": {
+      name: "social-auth-react-router",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/social-auth-react-router/app/routes/auth.error.tsx")),
+      source: "",
+      files: ["registry/default/blocks/social-auth-react-router/app/routes/auth.error.tsx","registry/default/blocks/social-auth-react-router/app/routes/auth.oauth.tsx","registry/default/blocks/social-auth-react-router/app/routes/login.tsx","registry/default/blocks/social-auth-react-router/app/routes/logout.tsx","registry/default/blocks/social-auth-react-router/app/routes/protected.tsx","registry/default/blocks/social-auth-react-router/app/routes.ts","registry/default/clients/react-router/lib/supabase/client.ts","registry/default/clients/react-router/lib/supabase/server.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "social-auth-tanstack": {
+      name: "social-auth-tanstack",
+      type: "registry:block",
+      registryDependencies: ["button","card"],
+      component: React.lazy(() => import("@/registry/default/blocks/social-auth-tanstack/components/login-form.tsx")),
+      source: "",
+      files: ["registry/default/blocks/social-auth-tanstack/components/login-form.tsx","registry/default/blocks/social-auth-tanstack/lib/supabase/fetch-user-server-fn.ts","registry/default/blocks/social-auth-tanstack/routes/_protected.tsx","registry/default/blocks/social-auth-tanstack/routes/_protected/protected.tsx","registry/default/blocks/social-auth-tanstack/routes/auth/error.tsx","registry/default/blocks/social-auth-tanstack/routes/auth/oauth.ts","registry/default/blocks/social-auth-tanstack/routes/login.tsx","registry/default/clients/tanstack/lib/supabase/client.ts","registry/default/clients/tanstack/lib/supabase/server.ts"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -295,6 +343,18 @@ export const Index: Record<string, any> = {
       chunks: []
     }
     ,
+    "infinite-query-hook": {
+      name: "infinite-query-hook",
+      type: "registry:block",
+      registryDependencies: [],
+      
+      source: "",
+      files: ["registry/default/blocks/infinite-query-hook/hooks/use-infinite-query.ts"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
     "supabase-client-nextjs": {
       name: "supabase-client-nextjs",
       type: "registry:lib",
@@ -349,7 +409,7 @@ export const Index: Record<string, any> = {
       registryDependencies: [],
       
       source: "",
-      files: ["registry/default/ai-editor-rules/create-db-functions.md","registry/default/ai-editor-rules/create-migration.md","registry/default/ai-editor-rules/create-rls-policies.md","registry/default/ai-editor-rules/postgres-sql-style-guide.md","registry/default/ai-editor-rules/writing-supabase-edge-functions.md"],
+      files: ["registry/default/ai-editor-rules/create-db-functions.mdc","registry/default/ai-editor-rules/create-migration.mdc","registry/default/ai-editor-rules/create-rls-policies.mdc","registry/default/ai-editor-rules/postgres-sql-style-guide.mdc","registry/default/ai-editor-rules/writing-supabase-edge-functions.mdc"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -434,6 +494,18 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/examples/realtime-avatar-stack-preview.tsx")),
       source: "",
       files: ["registry/default/examples/realtime-avatar-stack-preview.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    }
+    ,
+    "infinite-query-hook-demo": {
+      name: "infinite-query-hook-demo",
+      type: "registry:example",
+      registryDependencies: [],
+      component: React.lazy(() => import("@/registry/default/examples/infinite-query-hook-demo.tsx")),
+      source: "",
+      files: ["registry/default/examples/infinite-query-hook-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

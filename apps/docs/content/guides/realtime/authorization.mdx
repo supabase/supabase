@@ -132,6 +132,10 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
 >
   <TabPanel id="js" label="JavaScript">
     ```javascript
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const channel = supabase.channel('room-1', {
       config: { private: true },
     })

@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -63,9 +62,7 @@ const BranchLink = ({
   )
 }
 
-const BranchDropdown = () => {
-  const newLayoutPreview = useNewLayout()
-
+export const BranchDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -102,41 +99,23 @@ const BranchDropdown = () => {
 
       {isSuccess && branches.length > 0 && (
         <>
-          {newLayoutPreview && (
-            <Link
-              href={`/project/${ref}`}
-              className="flex items-center gap-2 flex-shrink-0 text-sm"
-            >
-              <span className="text-foreground max-w-32 lg:max-w-none truncate">
-                {selectedBranch?.name}
-              </span>
-              {selectedBranch?.is_default ? (
-                <Badge variant="warning">Production</Badge>
-              ) : (
-                <Badge variant="brand">Preview Branch</Badge>
-              )}
-            </Link>
-          )}
+          <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+            <span className="text-foreground max-w-32 lg:max-w-none truncate">
+              {selectedBranch?.name}
+            </span>
+            {selectedBranch?.is_default ? (
+              <Badge variant="warning">Production</Badge>
+            ) : (
+              <Badge variant="brand">Preview Branch</Badge>
+            )}
+          </Link>
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
-              {newLayoutPreview ? (
-                <Button
-                  type="text"
-                  className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-                  iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-                />
-              ) : (
-                <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-                  <div className="flex items-center space-x-2">
-                    <p className={'text-xs'}>{selectedBranch?.name}</p>
-                    {selectedBranch?.is_default ? (
-                      <Badge variant="warning">Production</Badge>
-                    ) : (
-                      <Badge variant="brand">Preview Branch</Badge>
-                    )}
-                  </div>
-                </Button>
-              )}
+              <Button
+                type="text"
+                className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+                iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+              />
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
               <Command_Shadcn_>
@@ -209,5 +188,3 @@ const BranchDropdown = () => {
     </>
   )
 }
-
-export default BranchDropdown

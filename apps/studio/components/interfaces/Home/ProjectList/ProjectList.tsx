@@ -1,22 +1,15 @@
-import { groupBy } from 'lodash'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import PartnerIcon from 'components/ui/PartnerIcon'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import {
-  OverdueInvoicesResponse,
-  useOverdueInvoicesQuery,
-} from 'data/invoices/invoices-overdue-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import type { Organization, ResponseError } from 'types'
@@ -25,25 +18,25 @@ import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'
 
 export interface ProjectListProps {
+  organization?: Organization
   rewriteHref?: (projectRef: string) => string
   search?: string
   filterStatus?: string[]
   resetFilterStatus?: () => void
-  // if true, only show projects for the current organization
-  filterToSlug?: boolean
 }
 
 const ProjectList = ({
   search = '',
+  organization: organization_,
   rewriteHref,
   filterStatus,
   resetFilterStatus,
-  filterToSlug,
 }: ProjectListProps) => {
-  const { slug } = useParams()
-  const { data: organizations, isLoading, isSuccess } = useOrganizationsQuery()
+  const selectedOrganization = useSelectedOrganization()
+  const organization = organization_ ?? selectedOrganization
+
   const {
-    data: allProjects,
+    data: allProjects = [],
     isLoading: isLoadingProjects,
     isSuccess: isSuccessProjects,
     isError: isErrorProjects,
@@ -55,15 +48,15 @@ const ProjectList = ({
     error: permissionsError,
   } = usePermissionsQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery()
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery()
-  const projectsByOrg = groupBy(allProjects, 'organization_id')
+
+  const orgProjects = allProjects.filter((x) => x.organization_slug === organization?.slug)
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
 
   const hasFilterStatusApplied = filterStatus !== undefined && filterStatus.length !== 2
   const noResultsFromSearch =
     search.length > 0 &&
     isSuccessProjects &&
-    allProjects.filter((project) => {
+    orgProjects.filter((project) => {
       return (
         project.name.toLowerCase().includes(search.toLowerCase()) ||
         project.ref.includes(search.toLowerCase())
@@ -72,9 +65,9 @@ const ProjectList = ({
   const noResultsFromStatusFilter =
     hasFilterStatusApplied &&
     isSuccessProjects &&
-    allProjects.filter((project) => filterStatus.includes(project.status)).length === 0
+    orgProjects.filter((project) => filterStatus.includes(project.status)).length === 0
 
-  if (isLoading) {
+  if (isLoadingProjects || !organization) {
     return (
       <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <ShimmeringCard />
@@ -114,38 +107,22 @@ const ProjectList = ({
     )
   }
 
-  const filteredOrganizations = filterToSlug
-    ? organizations?.filter((org) => org.slug === slug)
-    : organizations
-
-  return isSuccess && organizations && organizations?.length > 0 ? (
-    <>
-      {filteredOrganizations?.map((organization) => {
-        return (
-          <OrganizationProjects
-            key={organization.slug}
-            organization={organization}
-            projects={projectsByOrg[organization.id]}
-            overdueInvoices={(allOverdueInvoices ?? []).filter(
-              (it) => it.organization_id === organization.id
-            )}
-            resourceWarnings={resourceWarnings ?? []}
-            rewriteHref={rewriteHref}
-            isLoadingPermissions={isLoadingPermissions}
-            isErrorPermissions={isErrorPermissions}
-            permissionsError={permissionsError}
-            isLoadingProjects={isLoadingProjects}
-            isErrorProjects={isErrorProjects}
-            projectsError={projectsError}
-            search={search}
-            filterStatus={filterStatus}
-            filterToSlug={filterToSlug}
-          />
-        )
-      })}
-    </>
-  ) : (
-    <NoProjectsState slug={''} />
+  return (
+    <OrganizationProjects
+      key={organization.slug}
+      organization={organization}
+      projects={orgProjects}
+      resourceWarnings={resourceWarnings ?? []}
+      rewriteHref={rewriteHref}
+      isLoadingPermissions={isLoadingPermissions}
+      isErrorPermissions={isErrorPermissions}
+      permissionsError={permissionsError}
+      isLoadingProjects={isLoadingProjects}
+      isErrorProjects={isErrorProjects}
+      projectsError={projectsError}
+      search={search}
+      filterStatus={filterStatus}
+    />
   )
 }
 
@@ -154,7 +131,6 @@ export default ProjectList
 type OrganizationProjectsProps = {
   organization: Organization
   projects: ProjectInfo[]
-  overdueInvoices: OverdueInvoicesResponse[]
   resourceWarnings: ResourceWarning[]
   isLoadingPermissions: boolean
   isErrorPermissions: boolean
@@ -165,13 +141,11 @@ type OrganizationProjectsProps = {
   rewriteHref?: (projectRef: string) => string
   search: string
   filterStatus?: string[]
-  filterToSlug?: boolean
 }
 
 const OrganizationProjects = ({
   organization,
   projects,
-  overdueInvoices,
   resourceWarnings,
   isLoadingPermissions,
   isErrorPermissions,
@@ -182,7 +156,6 @@ const OrganizationProjects = ({
   rewriteHref,
   search,
   filterStatus,
-  filterToSlug,
 }: OrganizationProjectsProps) => {
   const isEmpty = !projects || projects.length === 0
   const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
@@ -234,42 +207,6 @@ const OrganizationProjects = ({
 
   return (
     <div className="space-y-3" key={organization.slug}>
-      {!filterToSlug && (
-        <div className="flex space-x-4 items-center">
-          <div className="flex items-center gap-2">
-            <h4 className="text-lg flex items-center">{organization.name}</h4>{' '}
-            <PartnerIcon organization={organization} />
-          </div>
-          {!!overdueInvoices.length && (
-            <div>
-              <Button asChild type="danger">
-                <Link href={`/org/${organization.slug}/invoices`}>Outstanding Invoices</Link>
-              </Button>
-            </div>
-          )}
-          {organization?.restriction_status === 'grace_period' && (
-            <div>
-              <Button asChild type="warning">
-                <Link href={`/org/${organization.slug}/billing`}>Grace Period</Link>
-              </Button>
-            </div>
-          )}
-          {organization?.restriction_status === 'grace_period_over' && (
-            <div>
-              <Button asChild type="warning">
-                <Link href={`/org/${organization.slug}/billing`}>Grace Period Over</Link>
-              </Button>
-            </div>
-          )}
-          {organization?.restriction_status === 'restricted' && (
-            <div>
-              <Button asChild type="danger">
-                <Link href={`/org/${organization.slug}/billing`}>Services Restricted</Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
       {isLoadingPermissions || isLoadingProjects ? (
         <ul className="mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           <ShimmeringCard />

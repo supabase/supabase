@@ -17,13 +17,15 @@ import {
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 
+import { useParams } from 'common'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -46,7 +48,7 @@ import {
 } from '../Storage.constants'
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
-import { copyPathToFolder } from './StorageExplorer.utils'
+import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
 export const RowIcon = ({
@@ -111,26 +113,25 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   selectedItems = [],
   openedFolders = [],
 }) => {
-  const storageExplorerStore = useStorageStore()
+  const { ref: projectRef, bucketId } = useParams()
+
   const {
+    selectedBucket,
+    selectedFilePreview,
     popColumnAtIndex,
     pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
-    setFilePreview,
-    closeFilePreview,
     clearSelectedItems,
-    selectedBucket,
+    setSelectedFilePreview,
+    setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    setSelectedFileCustomExpiry,
     fetchFolderContents,
-    downloadFile,
     downloadFolder,
     selectRangeItems,
-    selectedFilePreview,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
 
   const isPublic = selectedBucket.public
@@ -146,16 +147,16 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   const onSelectFile = async (columnIndex: number, file: StorageItem) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
-    setFilePreview(itemWithColumnIndex)
+    setSelectedFilePreview(itemWithColumnIndex)
     clearSelectedItems()
   }
 
   const onSelectFolder = async (columnIndex: number, folder: StorageItem) => {
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
     clearSelectedItems(columnIndex + 1)
     popOpenedFoldersAtIndex(columnIndex - 1)
     pushOpenedFolderAtIndex(folder, columnIndex)
-    await fetchFolderContents(folder.id, folder.name, columnIndex)
+    await fetchFolderContents({ folderId: folder.id, folderName: folder.name, index: columnIndex })
   }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
@@ -171,7 +172,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     } else {
       setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
   }
 
   const rowOptions =
@@ -260,7 +261,13 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                       {
                         name: 'Download',
                         icon: <Download size={14} strokeWidth={1} />,
-                        onClick: async () => await downloadFile(itemWithColumnIndex),
+                        onClick: async () => {
+                          await downloadFile({
+                            projectRef,
+                            bucketId,
+                            file: itemWithColumnIndex,
+                          })
+                        },
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
@@ -317,13 +324,13 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
       }}
     >
       <div
-        className={[
+        className={cn(
           'storage-row group flex h-full items-center px-2.5',
           'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
-        ].join(' ')}
+          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+        )}
         onClick={(event) => {
           event.stopPropagation()
           event.preventDefault()
@@ -335,10 +342,10 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
         }}
       >
         <div
-          className={[
+          className={cn(
             'flex items-center',
-            view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]',
-          ].join(' ')}
+            view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
+          )}
         >
           <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
             {!isSelected && (
@@ -408,7 +415,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
               strokeWidth={2}
             />
           ) : (
-            <DropdownMenu modal={false}>
+            <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
                   <MoreVertical size={16} strokeWidth={2} />

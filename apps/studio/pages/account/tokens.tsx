@@ -7,29 +7,44 @@ import {
   NewAccessTokenButton,
   NewTokenBanner,
 } from 'components/interfaces/Account'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const UserAccessTokens: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
 
-  const PageContent = () => (
+  return (
     <>
+      <div className="flex items-center space-x-4 mb-6">
+        <div className="flex items-center space-x-2">
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Link
+              href="https://supabase.com/docs/reference/api/introduction"
+              target="_blank"
+              rel="noreferrer"
+            >
+              API Docs
+            </Link>
+          </Button>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Link
+              href="https://supabase.com/docs/reference/cli/start"
+              target="_blank"
+              rel="noreferrer"
+            >
+              CLI docs
+            </Link>
+          </Button>
+        </div>
+        <NewAccessTokenButton onCreateToken={setNewToken} />
+      </div>
       <div className="flex items-center justify-between">
         <Admonition
           type="warning"
@@ -42,74 +57,6 @@ const UserAccessTokens: NextPageWithLayout = () => {
         <AccessTokenList />
       </div>
     </>
-  )
-
-  if (newLayoutPreview) {
-    return (
-      <>
-        <div className="flex items-center space-x-4 mb-6">
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/reference/api/introduction"
-                target="_blank"
-                rel="noreferrer"
-              >
-                API Docs
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/reference/cli/start"
-                target="_blank"
-                rel="noreferrer"
-              >
-                CLI docs
-              </Link>
-            </Button>
-          </div>
-          <NewAccessTokenButton onCreateToken={setNewToken} />
-        </div>
-        <PageContent />
-      </>
-    )
-  }
-
-  return (
-    <ScaffoldContainer>
-      <ScaffoldHeader className="flex flex-col md:flex-row md:items-center justify-between">
-        <div className="flex flex-col">
-          <ScaffoldTitle>Access Tokens</ScaffoldTitle>
-          <ScaffoldDescription>
-            Personal access tokens can be used with our Management API or CLI.
-          </ScaffoldDescription>
-        </div>
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/reference/api/introduction"
-                target="_blank"
-                rel="noreferrer"
-              >
-                API Docs
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/reference/cli/start"
-                target="_blank"
-                rel="noreferrer"
-              >
-                CLI docs
-              </Link>
-            </Button>
-          </div>
-          <NewAccessTokenButton onCreateToken={setNewToken} />
-        </div>
-      </ScaffoldHeader>
-      <PageContent />
-    </ScaffoldContainer>
   )
 }
 

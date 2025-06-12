@@ -6,7 +6,7 @@ import { useProfile } from 'lib/profile'
 import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
-function castOrganizationResponseToOrganization(
+export function castOrganizationResponseToOrganization(
   org: components['schemas']['OrganizationResponse']
 ): Organization {
   return {

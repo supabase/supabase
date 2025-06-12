@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -30,7 +29,6 @@ const IPv4SidePanel = () => {
   const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)
@@ -57,7 +55,7 @@ const IPv4SidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'ipv4')?.variants ?? []
 
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionIpV4Option?.variant.identifier ?? 'ipv4_none')
   const selectedIPv4 = availableOptions.find((option) => option.identifier === selectedOption)
   const isPgBouncerEnabled = !isFreePlan
@@ -184,7 +182,9 @@ const IPv4SidePanel = () => {
                         Allow direct database connections via IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                        <p className="text-foreground text-sm" translate="no">
+                          {formatCurrency(option.price)}
+                        </p>
                         <p className="text-foreground-light translate-y-[1px]">
                           / month / database
                         </p>
@@ -219,12 +219,10 @@ const IPv4SidePanel = () => {
                   charge.
                 </p>
               )}
-              {!subscription?.billing_via_partner && (
-                <p className="text-sm text-foreground-light">
-                  There are no immediate charges. The addon is billed at the end of your billing
-                  cycle based on your usage and prorated to the hour.
-                </p>
-              )}
+              <p className="text-sm text-foreground-light">
+                There are no immediate charges. The addon is billed at the end of your billing cycle
+                based on your usage and prorated to the hour.
+              </p>
             </>
           )}
 

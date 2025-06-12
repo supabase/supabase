@@ -10,6 +10,7 @@ type LogTable =
   | 'supavisor_logs'
   | 'pgbouncer_logs'
   | 'pg_cron_logs'
+  | 'pg_upgrade_logs'
 
 type LogSchema = {
   name: string
@@ -287,6 +288,15 @@ const schemas: LogSchema[] = [
       { path: 'timestamp', type: 'datetime' },
       { path: 'metadata.host', type: 'string' },
       { path: 'project', type: 'string' },
+    ],
+  },
+  {
+    name: 'Database Version Upgrade',
+    reference: 'pg_upgrade_logs',
+    fields: [
+      { path: 'event_message', type: 'string' },
+      { path: 'id', type: 'string' },
+      { path: 'timestamp', type: 'datetime' },
     ],
   },
 ]

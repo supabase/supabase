@@ -8,23 +8,25 @@ type GitHubRepositoryRelease = {
   published_at: string
 }
 
+const current = `v${process.env.CURRENT_CLI_VERSION}`
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // [Joshen] Added under supabase/turbo.json, but not sure why it's still warning
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
-  const version = process.env.CURRENT_CLI_VERSION
-  const fallback = { current: version, latest: null, published_at: null }
   try {
-    const data: GitHubRepositoryRelease[] = await fetch(
-      'https://api.github.com/repos/supabase/cli/releases?per_page=1'
+    const { tag_name: latest, published_at }: GitHubRepositoryRelease = await fetch(
+      'https://api.github.com/repos/supabase/cli/releases/latest'
     ).then((res) => res.json())
 
-    if (data.length === 0) return res.status(200).json(fallback)
+    const data: GitHubRepositoryRelease[] = await fetch(
+      'https://api.github.com/repos/supabase/cli/releases?per_page=1'
+    )
+      .then((res) => res.json())
+      // Ignore errors fetching beta release version
+      .catch(() => [])
+    const beta = data[0]?.tag_name
 
-    return res
-      .status(200)
-      .json({ current: version, latest: data[0].tag_name, published_at: data[0].published_at })
+    return res.status(200).json({ current, latest, beta, published_at })
   } catch {
-    return res.status(200).json(fallback)
+    return res.status(200).json({ current })
   }
 }
 

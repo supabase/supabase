@@ -5,7 +5,7 @@ title: 'Manage Monthly Active SSO Users usage'
 
 ## What you are charged for
 
-You are charged for the number of distinct users who log in or refresh their token during the billing cycle using a SAML 2.0 compatible identity provider. Each unique user is counted only once per billing cycle, regardless of how many times they authenticate. These users are referred to as "SSO MAUs".
+You are charged for the number of distinct users who log in or refresh their token during the billing cycle using a SAML 2.0 compatible identity provider (e.g. Google Workspace, Microsoft Active Directory). Each unique user is counted only once per billing cycle, regardless of how many times they authenticate. These users are referred to as "SSO MAUs".
 
 ### Example
 
@@ -75,11 +75,11 @@ The count resets at the start of each billing cycle.
 
 </Admonition>
 
-| Plan       | Quota  | Over-Usage         |
-| ---------- | ------ | ------------------ |
-| Pro        | 50     | $0.015 per SSO MAU |
-| Team       | 50     | $0.015 per SSO MAU |
-| Enterprise | Custom | Custom             |
+| Plan       | Quota  | Over-Usage                          |
+| ---------- | ------ | ----------------------------------- |
+| Pro        | 50     | <Price price="0.015" /> per SSO MAU |
+| Team       | 50     | <Price price="0.015" /> per SSO MAU |
+| Enterprise | Custom | Custom                              |
 
 ## Billing examples
 
@@ -87,27 +87,27 @@ The count resets at the start of each billing cycle.
 
 The organization's SSO MAU usage for the billing cycle is within the quota, so no charges apply.
 
-| Line Item                | Units      | Costs   |
-| ------------------------ | ---------- | ------- |
-| Pro Plan                 | 1          | $25     |
-| Compute Hours Micro      | 744 hours  | $10     |
-| Monthly Active SSO Users | 37 SSO MAU | $0      |
-| **Subtotal**             |            | **$35** |
-| Compute Credits          |            | -$10    |
-| **Total**                |            | **$25** |
+| Line Item                | Units      | Costs                    |
+| ------------------------ | ---------- | ------------------------ |
+| Pro Plan                 | 1          | <Price price="25" />     |
+| Compute Hours Micro      | 744 hours  | <Price price="10" />     |
+| Monthly Active SSO Users | 37 SSO MAU | <Price price="0" />      |
+| **Subtotal**             |            | **<Price price="35" />** |
+| Compute Credits          |            | -<Price price="10" />    |
+| **Total**                |            | **<Price price="25" />** |
 
 ### Exceeding quota
 
 The organization's SSO MAU usage for the billing cycle exceeds the quota by 10, incurring charges for this additional usage.
 
-| Line Item                | Units      | Costs      |
-| ------------------------ | ---------- | ---------- |
-| Pro Plan                 | 1          | $25        |
-| Compute Hours Micro      | 744 hours  | $10        |
-| Monthly Active SSO Users | 60 SSO MAU | $0.15      |
-| **Subtotal**             |            | **$35.15** |
-| Compute Credits          |            | -$10       |
-| **Total**                |            | **$25.15** |
+| Line Item                | Units      | Costs                       |
+| ------------------------ | ---------- | --------------------------- |
+| Pro Plan                 | 1          | <Price price="25" />        |
+| Compute Hours Micro      | 744 hours  | <Price price="10" />        |
+| Monthly Active SSO Users | 60 SSO MAU | <Price price="0.15" />      |
+| **Subtotal**             |            | **<Price price="35.15" />** |
+| Compute Credits          |            | -<Price price="10" />       |
+| **Total**                |            | **<Price price="25.15" />** |
 
 ## View usage
 

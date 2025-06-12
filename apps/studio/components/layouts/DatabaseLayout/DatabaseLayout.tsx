@@ -9,6 +9,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export interface DatabaseLayoutProps {
   title?: string

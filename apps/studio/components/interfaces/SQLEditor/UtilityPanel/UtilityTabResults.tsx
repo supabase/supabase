@@ -1,15 +1,17 @@
 import { ExternalLink, Loader2 } from 'lucide-react'
-import Link from 'next/link'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import CopyButton from 'components/ui/CopyButton'
+import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import Results from './Results'
 
 export type UtilityTabResultsProps = {
@@ -21,21 +23,25 @@ export type UtilityTabResultsProps = {
 }
 
 const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
-  ({ id, isExecuting, isDisabled, isDebugging, onDebug }, htmlRef) => {
+  ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const organization = useSelectedOrganization()
     const snapV2 = useSqlEditorV2StateSnapshot()
+    const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
     const result = snapV2.results[id]?.[0]
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
     // Customers on HIPAA plans should not have access to Supabase AI
-    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
+    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
-      result?.error?.message?.includes('upstream request timeout')
+      result?.error?.message?.includes('upstream request timeout') ||
+      result?.error?.message?.includes('Query read timeout')
+
     const isNetWorkError = result?.error?.message?.includes('EHOSTUNREACH')
 
     if (isExecuting) {
@@ -61,26 +67,25 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
           <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
             {isTimeout ? (
               <div className="flex flex-col gap-y-1">
-                <p className="font-mono text-sm">SQL query ran into an upstream timeout</p>
-                <p className="font-mono text-sm text-foreground-light">
+                <p className="font-mono text-sm tracking-tight">
+                  Error: SQL query ran into an upstream timeout
+                </p>
+                <p className="text-sm text-foreground-light">
                   You can either{' '}
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline transition hover:text-foreground"
-                    href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-                  >
+                  <InlineLink href="https://supabase.com/docs/guides/platform/performance#examining-query-performance">
                     optimize your query
-                  </a>
+                  </InlineLink>
                   , or{' '}
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline transition hover:text-foreground"
-                    href="https://supabase.com/docs/guides/database/timeouts"
-                  >
+                  <InlineLink href="https://supabase.com/docs/guides/database/timeouts">
                     increase the statement timeout
-                  </a>
+                  </InlineLink>
+                  {' or '}
+                  <span
+                    className={cn(InlineLinkClassName, 'cursor-pointer')}
+                    onClick={() => setShowConnect(true)}
+                  >
+                    connect to your database directly
+                  </span>
                   .
                 </p>
               </div>
@@ -110,15 +115,13 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 {payloadTooLargeError && (
                   <p className="text-sm text-foreground-light flex items-center gap-x-1">
                     Run this query by{' '}
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`/project/${ref}/settings/database`}
-                      className="underline transition hover:text-foreground flex items-center gap-x-1"
+                    <span
+                      onClick={() => setShowConnect(true)}
+                      className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
                     >
                       connecting to your database directly
                       <ExternalLink size={12} />
-                    </Link>
+                    </span>
                     .
                   </p>
                 )}
@@ -150,11 +153,11 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
               )}
               {!hasHipaaAddon && (
                 <Button
-                  icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugging} />}
+                  icon={<AiIconAnimation size={16} loading={isDebugging} />}
                   disabled={!!isDisabled || isDebugging}
                   onClick={onDebug}
                 >
-                  Debug with Supabase AI
+                  Debug with Assistant
                 </Button>
               )}
             </div>

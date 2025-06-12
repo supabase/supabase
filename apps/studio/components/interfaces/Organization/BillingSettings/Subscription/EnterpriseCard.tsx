@@ -1,6 +1,5 @@
 import { Check } from 'lucide-react'
 
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PricingInformation } from 'shared-data'
@@ -18,8 +17,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, billingPartner }: Enterpri
   const orgSlug = selectedOrganization?.slug
 
   const features = pickFeatures(plan, billingPartner)
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
-  const currentPlan = subscription?.plan.name
+  const currentPlan = selectedOrganization?.plan.name
 
   const { mutate: sendEvent } = useSendEventMutation()
 

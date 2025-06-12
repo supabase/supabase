@@ -3,14 +3,17 @@ import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
+import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getTools } from './tools'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
 const pgMetaSchemasList = pgMeta.schemas.list()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
     return res.status(500).json({
       error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
@@ -27,6 +30,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages, projectRef, connectionString, includeSchemaMetadata, schema, table } = req.body
@@ -53,7 +61,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             'Content-Type': 'application/json',
             ...(cookie && { cookie }),
             ...(authorization && { Authorization: authorization }),
-          }
+          },
+          IS_PLATFORM ? undefined : queryPgMetaSelfHosted
         )
       : { result: [] }
 

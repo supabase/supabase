@@ -17,7 +17,6 @@ import type { OrgPlan } from 'data/subscriptions/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
@@ -26,7 +25,7 @@ import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
-import SubscriptionPlanUpdateDialog from './SubscriptionPlanUpdateDialog'
+import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 
 const PlanUpdateSidePanel = () => {
@@ -36,7 +35,6 @@ const PlanUpdateSidePanel = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
-  const allowOrioleDB = useFlag('allowOrioleDb')
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
@@ -52,8 +50,8 @@ const PlanUpdateSidePanel = () => {
     (it) => it.organization_id === selectedOrganization?.id
   )
 
-  const { data } = useOrganizationQuery({ slug }, { enabled: allowOrioleDB })
-  const hasOrioleProjects = allowOrioleDB ? false : !!data?.has_oriole_project
+  const { data } = useOrganizationQuery({ slug })
+  const hasOrioleProjects = !!data?.has_oriole_project
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
@@ -194,7 +192,9 @@ const PlanUpdateSidePanel = () => {
                           <ShimmeringLoader className="w-[30px] h-[24px]" />
                         </div>
                       ) : (
-                        <p className="text-foreground text-lg">{formatCurrency(price)}</p>
+                        <p className="text-foreground text-lg" translate="no">
+                          {formatCurrency(price)}
+                        </p>
                       )}
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
@@ -303,7 +303,7 @@ const PlanUpdateSidePanel = () => {
         billingViaPartner={billingViaPartner}
         billingPartner={billingPartner}
         subscription={subscription}
-        slug={slug}
+        projects={orgProjects}
         currentPlanMeta={{
           ...availablePlans.find((p) => p.id === subscription?.plan?.id),
           features:

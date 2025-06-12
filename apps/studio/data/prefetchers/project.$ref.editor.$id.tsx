@@ -12,7 +12,7 @@ import { Filter, Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
-import { ImpersonationRole } from 'lib/role-impersonation'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
 import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
@@ -20,11 +20,11 @@ import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 interface PrefetchEditorTablePageArgs {
   queryClient: QueryClient
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   sorts?: Sort[]
   filters?: Filter[]
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function prefetchEditorTablePage({
@@ -34,7 +34,7 @@ export function prefetchEditorTablePage({
   id,
   sorts,
   filters,
-  impersonatedRole,
+  roleImpersonationState,
 }: PrefetchEditorTablePageArgs) {
   return prefetchTableEditor(queryClient, {
     projectRef,
@@ -55,7 +55,7 @@ export function prefetchEditorTablePage({
         filters: filters ?? formatFilterURLParams(localFilters),
         page: 1,
         limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
-        impersonatedRole,
+        roleImpersonationState,
       })
     }
   })
@@ -83,12 +83,12 @@ export function usePrefetchEditorTablePage() {
         id,
         sorts,
         filters,
-        impersonatedRole: roleImpersonationState.role,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       }).catch(() => {
         // eat prefetching errors as they are not critical
       })
     },
-    [project, queryClient, roleImpersonationState.role, router]
+    [project, queryClient, roleImpersonationState, router]
   )
 }
 

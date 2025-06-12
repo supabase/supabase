@@ -2,10 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@import '~ui/build/css/source/global.css';
-@import '~ui/build/css/themes/dark.css';
-@import '~ui/build/css/themes/light.css';
-@import '~ui/build/css/themes/classic-dark.css';
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/light.css';
+@import './../../../packages/ui/build/css/themes/classic-dark.css';
 
 :root {
   --chart-1: hsl(var(--brand-default));
@@ -192,6 +193,13 @@ a {
   }
 }
 
+.input-sm {
+  input,
+  textarea {
+    @apply text-sm;
+  }
+}
+
 .input-xs {
   input,
   textarea {
@@ -251,12 +259,6 @@ div[data-radix-portal]:not(.portal--toast) {
   button {
     display: block;
     width: 100%;
-  }
-}
-
-.text-area-text-sm {
-  textarea {
-    @apply text-sm;
   }
 }
 

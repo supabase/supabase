@@ -22,8 +22,6 @@
   - [Community channels](#community-channels)
   - [Contributors](#contributors)
 
-- [Common tasks](#common-tasks)
-  - [Add a redirect](#add-a-redirect)
 - [Community channels](#community-channels)
 
 ## Getting started

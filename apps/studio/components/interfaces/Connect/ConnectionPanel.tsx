@@ -4,6 +4,7 @@ import { PropsWithChildren, ReactNode } from 'react'
 
 import { useParams } from 'common'
 import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
@@ -206,31 +207,35 @@ export const ConnectionPanel = ({
             </>
           )}
 
-          <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
-            <div className="flex items-center gap-2">
-              <IPv4StatusIcon active={ipv4Status.type === 'success'} />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs text-foreground">{ipv4Status.title}</span>
-              {ipv4Status.description &&
-                (typeof ipv4Status.description === 'string' ? (
-                  <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
-                ) : (
-                  ipv4Status.description
-                ))}
-              {links.length > 0 && (
-                <div className="flex items-center gap-x-2 mt-2">
-                  {links.map((link) => (
-                    <Button key={link.text} asChild type="default" size="tiny">
-                      <Link href={link.url} className="text-xs text-light hover:text-foreground">
-                        {link.text}
-                      </Link>
-                    </Button>
+          {IS_PLATFORM && (
+            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
+              <div className="flex items-center gap-2">
+                <IPv4StatusIcon active={ipv4Status.type === 'success'} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-foreground">{ipv4Status.title}</span>
+                {ipv4Status.description &&
+                  (typeof ipv4Status.description === 'string' ? (
+                    <span className="text-xs text-foreground-lighter">
+                      {ipv4Status.description}
+                    </span>
+                  ) : (
+                    ipv4Status.description
                   ))}
-                </div>
-              )}
+                {links.length > 0 && (
+                  <div className="flex items-center gap-x-2 mt-2">
+                    {links.map((link) => (
+                      <Button key={link.text} asChild type="default" size="tiny">
+                        <Link href={link.url} className="text-xs text-light hover:text-foreground">
+                          {link.text}
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {type === 'session' && (
             <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
@@ -246,7 +251,7 @@ export const ConnectionPanel = ({
             </div>
           )}
 
-          {ipv4Status.type === 'error' && (
+          {IS_PLATFORM && ipv4Status.type === 'error' && (
             <Collapsible_Shadcn_ className="group -space-y-px">
               <CollapsibleTrigger_Shadcn_
                 asChild

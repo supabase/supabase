@@ -23,37 +23,40 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-
-/**
- * TODO: Chat with Qiao how we can pass the CLI version into the env var for STUDIO_VERSION
- * Ideally we can also mark the beta version via STUDIO_VERSION too
- */
+import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
 
 export const LocalVersionPopover = () => {
   const { data, isSuccess } = useCLIReleaseVersionQuery()
-  const hasLatestCLIVersion = isSuccess && !!data?.latest
-  const isLatestVersion = data?.current === data?.latest
+  const currentCliVersion = data?.current
+  const latestCliVersion = data?.latest
+  const hasLatestCLIVersion = isSuccess && !!latestCliVersion
 
-  // [Joshen] This is just scaffolding - will need to figure out how to identify beta versions
-  // We can do this separately
-  const isBeta = false ///(data?.latest ?? '').includes('beta')
+  const current = getSemver(currentCliVersion)
+  const latest = getSemver(latestCliVersion)
+
+  const hasUpdate =
+    !!current && !!latest
+      ? currentCliVersion !== latestCliVersion && semverLte(current, latest)
+      : false
+  const isBeta =
+    !!current && !!latest && currentCliVersion !== latestCliVersion && semverGte(current, latest)
 
   const approximateNextRelease = !!data?.published_at
     ? dayjs(data?.published_at).utc().add(14, 'day').format('DD MMM YYYY')
     : undefined
 
-  if (!isSuccess) return null
+  if (!isSuccess || !currentCliVersion) return null
 
   return (
     <Popover_Shadcn_>
       <PopoverTrigger_Shadcn_ className="flex items-center">
-        <Badge variant={isBeta ? 'warning' : isLatestVersion ? 'default' : 'brand'}>
-          {isBeta ? 'Beta' : isLatestVersion ? 'Latest' : 'Update available'}
+        <Badge variant={isBeta ? 'warning' : hasUpdate ? 'brand' : 'default'}>
+          {isBeta ? 'Beta' : hasUpdate ? 'Update available' : 'Latest'}
         </Badge>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ align="end" className="w-80 px-0">
         {hasLatestCLIVersion ? (
-          !isBeta && !isLatestVersion ? (
+          !isBeta && hasUpdate ? (
             <div className="px-4 mb-3">
               <p className="text-sm mb-2">A new version of Supabase CLI is available:</p>
               <Tabs_Shadcn_ defaultValue="macos">
@@ -78,7 +81,7 @@ export const LocalVersionPopover = () => {
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="windows">
                   <SimpleCodeBlock parentClassName="bg-selection rounded !px-2">
-                    scoop upgrade supabase
+                    scoop update supabase
                   </SimpleCodeBlock>
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_ className="mt-2 text-xs" value="linux">
@@ -143,11 +146,16 @@ export const LocalVersionPopover = () => {
                   description="Beta releases are also available between stable releases through the Beta version of the CLI, which might be helpful if you are waiting for a specific fix."
                 >
                   <p className="!mt-2">If you'd like to try, we recommend doing so via npm:</p>
-                  <div className="flex items-center bg-surface-200 py-1 px-2 rounded mt-2">
+                  <div className="flex items-center bg-surface-200 py-1 px-2 rounded mt-2 mb-1">
                     <SimpleCodeBlock parentClassName="bg-surface-200">
                       npm i supabase@beta --save-dev
                     </SimpleCodeBlock>
                   </div>
+                  {
+                    <p className="text-sm text-foreground-lighter">
+                      Latest Beta version: <span>{data.beta}</span>
+                    </p>
+                  }
                   <DocsButton
                     href="https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux#using-beta-version"
                     className="!no-underline mt-2"
@@ -170,12 +178,12 @@ export const LocalVersionPopover = () => {
         <div className="flex items-center gap-x-4 px-4">
           <div className="flex flex-col gap-y-1">
             <p className="text-xs">Current version:</p>
-            <p className="text-sm font-mono">{data.current}</p>
+            <p className="text-sm font-mono">{currentCliVersion}</p>
           </div>
-          {hasLatestCLIVersion && !isLatestVersion && !isBeta && (
+          {hasLatestCLIVersion && hasUpdate && !isBeta && (
             <div className="flex flex-col gap-y-1">
               <p className="text-xs">Available version:</p>
-              <p className="text-sm font-mono">{data.latest}</p>
+              <p className="text-sm font-mono">{latestCliVersion}</p>
             </div>
           )}
         </div>

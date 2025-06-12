@@ -36,6 +36,8 @@ import SecondLevelNav from './SecondLevelNav'
 const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
+  const isIntroduction =
+    snap.activeDocsSection.length === 1 && snap.activeDocsSection[0] === 'introduction'
   const isEntityDocs =
     snap.activeDocsSection.length === 2 && snap.activeDocsSection[0] === 'entities'
 
@@ -76,9 +78,11 @@ const ProjectAPIDocs = () => {
             <h4>API Docs</h4>
             <div className="flex items-center space-x-1">
               {!isEntityDocs && <LanguageSelector simplifiedVersion />}
-              <Button type="default" onClick={() => setShowKeys(!showKeys)}>
-                {showKeys ? 'Hide keys' : 'Show keys'}
-              </Button>
+              {isIntroduction && (
+                <Button type="default" onClick={() => setShowKeys(!showKeys)}>
+                  {showKeys ? 'Hide keys' : 'Show keys'}
+                </Button>
+              )}
             </div>
           </div>
 

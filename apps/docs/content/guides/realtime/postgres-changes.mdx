@@ -106,7 +106,7 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```bash
-        npm install @supabase/supabase-js
+      npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
@@ -124,12 +124,12 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```js
-        import { createClient } from '@supabase/supabase-js'
+      import { createClient } from '@supabase/supabase-js'
 
-        const supabase = createClient(
-          'https://<project>.supabase.co',
-          '<your-anon-key>'
-        )
+      const supabase = createClient(
+        'https://<project>.supabase.co',
+        '<your-anon-key>'
+      )
       ```
 
     </StepHikeCompact.Code>
@@ -152,17 +152,21 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```js
-        const channelA = supabase
-          .channel('schema-db-changes')
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-            },
-            (payload) => console.log(payload)
-          )
-          .subscribe()
+      import { createClient } from '@supabase/supabase-js'
+      const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+      // ---cut---
+      const channelA = supabase
+        .channel('schema-db-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+          },
+          (payload) => console.log(payload)
+        )
+        .subscribe()
       ```
 
     </StepHikeCompact.Code>

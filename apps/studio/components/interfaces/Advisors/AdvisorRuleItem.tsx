@@ -32,12 +32,9 @@ interface AdvisorRuleItemProps {
 export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
-  // const [expandedLint, setExpandedLint] = useQueryState('lint')
-
-  const expandedLint = 'lint'
-  const setExpandedLint = (value: string | null) => {}
 
   const [open, setOpen] = useState(false)
+  const [expandedLint, setExpandedLint] = useState<string>()
   const [selectedRuleToDelete, setSelectedRuleToDelete] = useState<string>()
 
   const { data: members = [] } = useOrganizationMembersQuery({ slug: organization?.slug })
@@ -73,7 +70,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
         open={expandedLint === lint.name}
         onOpenChange={(open) => {
           if (open) setExpandedLint(lint.name)
-          else setExpandedLint(null)
+          else setExpandedLint(undefined)
         }}
       >
         <CollapsibleTrigger_Shadcn_ asChild className="[&[data-state=open]>div>svg]:!rotate-90">

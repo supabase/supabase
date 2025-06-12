@@ -1,18 +1,11 @@
 import { Smartphone } from 'lucide-react'
 
 import { TOTPFactors } from 'components/interfaces/Account'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -37,10 +30,9 @@ const collapsibleClasses = [
 ]
 
 const Security: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
   const { data } = useMfaListFactorsQuery()
 
-  const PageContent = () => (
+  return (
     <Collapsible_Shadcn_ className={cn(collapsibleClasses)}>
       <CollapsibleTrigger_Shadcn_ asChild>
         <button
@@ -63,23 +55,6 @@ const Security: NextPageWithLayout = () => {
         <TOTPFactors />
       </CollapsibleContent_Shadcn_>
     </Collapsible_Shadcn_>
-  )
-
-  if (newLayoutPreview) {
-    return <PageContent />
-  }
-
-  return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>Multi-Factor Authentication</ScaffoldTitle>
-        <ScaffoldDescription>
-          Add an additional layer of security to your account by requiring more than just a password
-          to sign in.
-        </ScaffoldDescription>
-      </ScaffoldHeader>
-      <PageContent />
-    </ScaffoldContainer>
   )
 }
 

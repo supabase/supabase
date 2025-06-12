@@ -1,11 +1,11 @@
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Settings, Users } from 'lucide-react'
+import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, ComponentPropsWithoutRef, FC, useEffect } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -20,7 +20,6 @@ import { useLints } from 'hooks/misc/useLints'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Home } from 'icons'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -42,11 +41,9 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns'
 import {
   useIsAPIDocsSidePanelEnabled,
   useIsSQLEditorTabsEnabled,
-  useNewLayout,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
@@ -63,10 +60,6 @@ const SidebarMotion = motion(SidebarPrimitive) as FC<
 export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPrimitive> {}
 
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
-  const newLayoutPreview = useNewLayout()
-
-  const { ref } = useParams()
-
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
 
@@ -81,75 +74,57 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
     if (sidebarBehaviour === 'closed') setOpen(false)
   }, [sidebarBehaviour, setOpen])
 
-  if (!newLayoutPreview && !ref) {
-    return null
-  }
-
   return (
-    <>
-      <AnimatePresence>
-        {!hideSideBar && (
-          <SidebarMotion
-            {...props}
-            transition={{
-              delay: 0.4,
-              duration: 0.4,
-            }}
-            overflowing={sidebarBehaviour === 'expandable'}
-            collapsible="icon"
-            variant="sidebar"
-            onMouseEnter={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(true)
-            }}
-            onMouseLeave={() => {
-              if (sidebarBehaviour === 'expandable') setOpen(false)
-            }}
-          >
-            <SidebarContent
-              footer={
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="text"
-                      className="w-min px-1.5 mx-0.5 group-data-[state=expanded]:px-2"
-                      icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="top" align="start" className="w-40">
-                    <DropdownMenuRadioGroup
-                      value={sidebarBehaviour}
-                      onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
-                    >
-                      <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="expandable">
-                        Expand on hover
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              }
-            />
-          </SidebarMotion>
-        )}
-      </AnimatePresence>
-    </>
+    <AnimatePresence>
+      {!hideSideBar && (
+        <SidebarMotion
+          {...props}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          overflowing={sidebarBehaviour === 'expandable'}
+          collapsible="icon"
+          variant="sidebar"
+          onMouseEnter={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(true)
+          }}
+          onMouseLeave={() => {
+            if (sidebarBehaviour === 'expandable') setOpen(false)
+          }}
+        >
+          <SidebarContent
+            footer={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="text"
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="w-40">
+                  <DropdownMenuRadioGroup
+                    value={sidebarBehaviour}
+                    onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
+                  >
+                    <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="expandable">
+                      Expand on hover
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            }
+          />
+        </SidebarMotion>
+      )}
+    </AnimatePresence>
   )
 }
 
-export function SidebarContent({ footer }: { footer?: React.ReactNode }) {
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
   const { ref: projectRef } = useParams()
-
-  // temporary logic to show settings route in sidebar footer
-  // this will be removed once we move to an updated org/project nav
-  const router = useRouter()
-  const { ref } = useParams()
-  const { project } = useProjectContext()
-  const settingsRoutes = generateSettingsRoutes(ref, project)
-  const activeRoute = router.pathname.split('/')[3]
 
   return (
     <>
@@ -197,7 +172,7 @@ export function SideBarNavLink({
   const buttonProps = {
     tooltip: sidebarBehaviour === 'closed' ? route.label : '',
     isActive: active,
-    className: 'text-sm',
+    className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
     size: 'default' as const,
     onClick: onClick,
   }
@@ -239,7 +214,7 @@ const ActiveDot = (errorArray: any[], warningArray: any[]) => {
   )
 }
 
-function ProjectLinks() {
+const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -382,7 +357,7 @@ const OrganizationLinks = () => {
     {
       label: 'Projects',
       href: `/org/${slug}`,
-      key: '',
+      key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
@@ -404,6 +379,12 @@ const OrganizationLinks = () => {
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
+      label: 'Billing',
+      href: `/org/${slug}/billing`,
+      key: 'billing',
+      icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    },
+    {
       label: 'Organization settings',
       href: `/org/${slug}/general`,
       key: 'settings',
@@ -422,11 +403,10 @@ const OrganizationLinks = () => {
                 ? activeRoute === undefined
                 : item.key === 'settings'
                   ? router.pathname.includes('/general') ||
-                    router.pathname.includes('/billing') ||
-                    router.pathname.includes('/invoices') ||
                     router.pathname.includes('/apps') ||
                     router.pathname.includes('/audit') ||
-                    router.pathname.includes('/documents')
+                    router.pathname.includes('/documents') ||
+                    router.pathname.includes('/security')
                   : activeRoute === item.key
             }
             route={{

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
-import { useIsLoggedIn } from 'common'
+import { useIsLoggedIn, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
@@ -23,6 +23,9 @@ import MenuItem from './MenuItem'
 import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import useDropdownMenu from './useDropdownMenu'
+import { AnnouncementBanner, AuthenticatedDropdownMenu } from 'ui-patterns'
+import Announcement from '../LaunchWeek/7/LaunchSection/Announcement'
 
 interface Props {
   hideNavbar: boolean
@@ -37,6 +40,8 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const menu = getMenu()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const user = useUser()
+  const userMenu = useDropdownMenu(user)
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
@@ -67,6 +72,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      <AnnouncementBanner />
       <div
         className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
@@ -130,9 +136,12 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 <GitHubButton />
 
                 {isLoggedIn ? (
-                  <Button className="hidden lg:block" asChild>
-                    <Link href="/dashboard/projects">Dashboard</Link>
-                  </Button>
+                  <>
+                    <Button className="hidden lg:block" asChild>
+                      <Link href="/dashboard/projects">Dashboard</Link>
+                    </Button>
+                    <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
+                  </>
                 ) : (
                   <>
                     <Button type="default" className="hidden lg:block" asChild>

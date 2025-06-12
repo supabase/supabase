@@ -7,13 +7,484 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
+    "test:coverage": "vitest --run --coverage",
     "clean": "rimraf node_modules",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "gen:exports": "tsx ./scripts/update-exports.ts"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./index.tsx",
+      "types": "./index.tsx"
+    },
+    "./AssistantChat/AssistantChatForm": {
+      "import": "./src/AssistantChat/AssistantChatForm.tsx",
+      "types": "./src/AssistantChat/AssistantChatForm.tsx"
+    },
+    "./AssistantChat/AssistantCommandsPopover": {
+      "import": "./src/AssistantChat/AssistantCommandsPopover.tsx",
+      "types": "./src/AssistantChat/AssistantCommandsPopover.tsx"
+    },
+    "./AssistantChat": {
+      "import": "./src/AssistantChat/index.ts",
+      "types": "./src/AssistantChat/index.ts"
+    },
+    "./AuthenticatedDropdownMenu": {
+      "import": "./src/AuthenticatedDropdownMenu/index.tsx",
+      "types": "./src/AuthenticatedDropdownMenu/index.tsx"
+    },
+    "./Banners/Countdown": {
+      "import": "./src/Banners/Countdown.tsx",
+      "types": "./src/Banners/Countdown.tsx"
+    },
+    "./Banners/LW14Announcement": {
+      "import": "./src/Banners/LW14Announcement.tsx",
+      "types": "./src/Banners/LW14Announcement.tsx"
+    },
+    "./Banners/LW14Banner": {
+      "import": "./src/Banners/LW14Banner.tsx",
+      "types": "./src/Banners/LW14Banner.tsx"
+    },
+    "./CommandMenu/api/Badges": {
+      "import": "./src/CommandMenu/api/Badges.tsx",
+      "types": "./src/CommandMenu/api/Badges.tsx"
+    },
+    "./CommandMenu/api/CommandHeader": {
+      "import": "./src/CommandMenu/api/CommandHeader.tsx",
+      "types": "./src/CommandMenu/api/CommandHeader.tsx"
+    },
+    "./CommandMenu/api/CommandInput": {
+      "import": "./src/CommandMenu/api/CommandInput.tsx",
+      "types": "./src/CommandMenu/api/CommandInput.tsx"
+    },
+    "./CommandMenu/api/CommandList": {
+      "import": "./src/CommandMenu/api/CommandList.tsx",
+      "types": "./src/CommandMenu/api/CommandList.tsx"
+    },
+    "./CommandMenu/api/CommandMenu": {
+      "import": "./src/CommandMenu/api/CommandMenu.tsx",
+      "types": "./src/CommandMenu/api/CommandMenu.tsx"
+    },
+    "./CommandMenu/api/CommandProvider": {
+      "import": "./src/CommandMenu/api/CommandProvider.tsx",
+      "types": "./src/CommandMenu/api/CommandProvider.tsx"
+    },
+    "./CommandMenu/api/TextHighlighter": {
+      "import": "./src/CommandMenu/api/TextHighlighter.tsx",
+      "types": "./src/CommandMenu/api/TextHighlighter.tsx"
+    },
+    "./CommandMenu/api/hooks/commandsHooks.test": {
+      "import": "./src/CommandMenu/api/hooks/commandsHooks.test.tsx",
+      "types": "./src/CommandMenu/api/hooks/commandsHooks.test.tsx"
+    },
+    "./CommandMenu/api/hooks/commandsHooks": {
+      "import": "./src/CommandMenu/api/hooks/commandsHooks.ts",
+      "types": "./src/CommandMenu/api/hooks/commandsHooks.ts"
+    },
+    "./CommandMenu/api/hooks/pagesHooks.test": {
+      "import": "./src/CommandMenu/api/hooks/pagesHooks.test.tsx",
+      "types": "./src/CommandMenu/api/hooks/pagesHooks.test.tsx"
+    },
+    "./CommandMenu/api/hooks/pagesHooks": {
+      "import": "./src/CommandMenu/api/hooks/pagesHooks.ts",
+      "types": "./src/CommandMenu/api/hooks/pagesHooks.ts"
+    },
+    "./CommandMenu/api/hooks/queryHooks": {
+      "import": "./src/CommandMenu/api/hooks/queryHooks.ts",
+      "types": "./src/CommandMenu/api/hooks/queryHooks.ts"
+    },
+    "./CommandMenu/api/hooks/useCommandFilterState": {
+      "import": "./src/CommandMenu/api/hooks/useCommandFilterState.ts",
+      "types": "./src/CommandMenu/api/hooks/useCommandFilterState.ts"
+    },
+    "./CommandMenu/api/hooks/useCrossCompatRouter": {
+      "import": "./src/CommandMenu/api/hooks/useCrossCompatRouter.tsx",
+      "types": "./src/CommandMenu/api/hooks/useCrossCompatRouter.tsx"
+    },
+    "./CommandMenu/api/hooks/useHistoryKeys": {
+      "import": "./src/CommandMenu/api/hooks/useHistoryKeys.ts",
+      "types": "./src/CommandMenu/api/hooks/useHistoryKeys.ts"
+    },
+    "./CommandMenu/api/hooks/viewHooks": {
+      "import": "./src/CommandMenu/api/hooks/viewHooks.ts",
+      "types": "./src/CommandMenu/api/hooks/viewHooks.ts"
+    },
+    "./CommandMenu/api/types": {
+      "import": "./src/CommandMenu/api/types.ts",
+      "types": "./src/CommandMenu/api/types.ts"
+    },
+    "./CommandMenu/api/utils": {
+      "import": "./src/CommandMenu/api/utils.ts",
+      "types": "./src/CommandMenu/api/utils.ts"
+    },
+    "./CommandMenu": {
+      "import": "./src/CommandMenu/index.tsx",
+      "types": "./src/CommandMenu/index.tsx"
+    },
+    "./CommandMenu/internal/Command": {
+      "import": "./src/CommandMenu/internal/Command.tsx",
+      "types": "./src/CommandMenu/internal/Command.tsx"
+    },
+    "./CommandMenu/internal/CommandEmpty": {
+      "import": "./src/CommandMenu/internal/CommandEmpty.tsx",
+      "types": "./src/CommandMenu/internal/CommandEmpty.tsx"
+    },
+    "./CommandMenu/internal/CommandGroup": {
+      "import": "./src/CommandMenu/internal/CommandGroup.tsx",
+      "types": "./src/CommandMenu/internal/CommandGroup.tsx"
+    },
+    "./CommandMenu/internal/CommandSection": {
+      "import": "./src/CommandMenu/internal/CommandSection.tsx",
+      "types": "./src/CommandMenu/internal/CommandSection.tsx"
+    },
+    "./CommandMenu/internal/Context": {
+      "import": "./src/CommandMenu/internal/Context.tsx",
+      "types": "./src/CommandMenu/internal/Context.tsx"
+    },
+    "./CommandMenu/internal/state/commandsState": {
+      "import": "./src/CommandMenu/internal/state/commandsState.ts",
+      "types": "./src/CommandMenu/internal/state/commandsState.ts"
+    },
+    "./CommandMenu/internal/state/commandsStates.test": {
+      "import": "./src/CommandMenu/internal/state/commandsStates.test.ts",
+      "types": "./src/CommandMenu/internal/state/commandsStates.test.ts"
+    },
+    "./CommandMenu/internal/state/pagesState.test": {
+      "import": "./src/CommandMenu/internal/state/pagesState.test.ts",
+      "types": "./src/CommandMenu/internal/state/pagesState.test.ts"
+    },
+    "./CommandMenu/internal/state/pagesState": {
+      "import": "./src/CommandMenu/internal/state/pagesState.ts",
+      "types": "./src/CommandMenu/internal/state/pagesState.ts"
+    },
+    "./CommandMenu/internal/state/queryState": {
+      "import": "./src/CommandMenu/internal/state/queryState.ts",
+      "types": "./src/CommandMenu/internal/state/queryState.ts"
+    },
+    "./CommandMenu/internal/state/viewState": {
+      "import": "./src/CommandMenu/internal/state/viewState.ts",
+      "types": "./src/CommandMenu/internal/state/viewState.ts"
+    },
+    "./CommandMenu/internal/state/viewState.types": {
+      "import": "./src/CommandMenu/internal/state/viewState.types.ts",
+      "types": "./src/CommandMenu/internal/state/viewState.types.ts"
+    },
+    "./CommandMenu/internal/types": {
+      "import": "./src/CommandMenu/internal/types.ts",
+      "types": "./src/CommandMenu/internal/types.ts"
+    },
+    "./CommandMenu/prepackaged/Changelog": {
+      "import": "./src/CommandMenu/prepackaged/Changelog.tsx",
+      "types": "./src/CommandMenu/prepackaged/Changelog.tsx"
+    },
+    "./CommandMenu/prepackaged/DocsAi/DocsAiPage": {
+      "import": "./src/CommandMenu/prepackaged/DocsAi/DocsAiPage.tsx",
+      "types": "./src/CommandMenu/prepackaged/DocsAi/DocsAiPage.tsx"
+    },
+    "./CommandMenu/prepackaged/DocsAi": {
+      "import": "./src/CommandMenu/prepackaged/DocsAi/index.tsx",
+      "types": "./src/CommandMenu/prepackaged/DocsAi/index.tsx"
+    },
+    "./CommandMenu/prepackaged/DocsSearch/DocsSearchPage": {
+      "import": "./src/CommandMenu/prepackaged/DocsSearch/DocsSearchPage.tsx",
+      "types": "./src/CommandMenu/prepackaged/DocsSearch/DocsSearchPage.tsx"
+    },
+    "./CommandMenu/prepackaged/DocsSearch": {
+      "import": "./src/CommandMenu/prepackaged/DocsSearch/index.tsx",
+      "types": "./src/CommandMenu/prepackaged/DocsSearch/index.tsx"
+    },
+    "./CommandMenu/prepackaged/Support": {
+      "import": "./src/CommandMenu/prepackaged/Support.tsx",
+      "types": "./src/CommandMenu/prepackaged/Support.tsx"
+    },
+    "./CommandMenu/prepackaged/ThemeSwitcher": {
+      "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx",
+      "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx"
+    },
+    "./CommandMenu/prepackaged/ai/AiWarning": {
+      "import": "./src/CommandMenu/prepackaged/ai/AiWarning.tsx",
+      "types": "./src/CommandMenu/prepackaged/ai/AiWarning.tsx"
+    },
+    "./CommandMenu/prepackaged/ai": {
+      "import": "./src/CommandMenu/prepackaged/ai/index.tsx",
+      "types": "./src/CommandMenu/prepackaged/ai/index.tsx"
+    },
+    "./CommandMenu/prepackaged/ai/queryAi": {
+      "import": "./src/CommandMenu/prepackaged/ai/queryAi.ts",
+      "types": "./src/CommandMenu/prepackaged/ai/queryAi.ts"
+    },
+    "./CommandMenu/prepackaged/ai/useAiChat": {
+      "import": "./src/CommandMenu/prepackaged/ai/useAiChat.ts",
+      "types": "./src/CommandMenu/prepackaged/ai/useAiChat.ts"
+    },
+    "./CommandMenu/prepackaged/ai/utils": {
+      "import": "./src/CommandMenu/prepackaged/ai/utils.ts",
+      "types": "./src/CommandMenu/prepackaged/ai/utils.ts"
+    },
+    "./CommandMenu/prepackaged/shared/constants": {
+      "import": "./src/CommandMenu/prepackaged/shared/constants.ts",
+      "types": "./src/CommandMenu/prepackaged/shared/constants.ts"
+    },
+    "./ComplexTabs": {
+      "import": "./src/ComplexTabs/index.tsx",
+      "types": "./src/ComplexTabs/index.tsx"
+    },
+    "./ComplexTabs/withQueryParams": {
+      "import": "./src/ComplexTabs/withQueryParams.tsx",
+      "types": "./src/ComplexTabs/withQueryParams.tsx"
+    },
+    "./ComplexTabs/withSticky": {
+      "import": "./src/ComplexTabs/withSticky.tsx",
+      "types": "./src/ComplexTabs/withSticky.tsx"
+    },
+    "./ComplexTabs/withSticky.utils": {
+      "import": "./src/ComplexTabs/withSticky.utils.ts",
+      "types": "./src/ComplexTabs/withSticky.utils.ts"
+    },
+    "./ComputeBadge": {
+      "import": "./src/ComputeBadge/index.tsx",
+      "types": "./src/ComputeBadge/index.tsx"
+    },
+    "./ConsentToast": {
+      "import": "./src/ConsentToast/index.tsx",
+      "types": "./src/ConsentToast/index.tsx"
+    },
+    "./CountdownWidget/CountdownStep": {
+      "import": "./src/CountdownWidget/CountdownStep.tsx",
+      "types": "./src/CountdownWidget/CountdownStep.tsx"
+    },
+    "./CountdownWidget": {
+      "import": "./src/CountdownWidget/index.tsx",
+      "types": "./src/CountdownWidget/index.tsx"
+    },
+    "./DataInputs/Input": {
+      "import": "./src/DataInputs/Input.tsx",
+      "types": "./src/DataInputs/Input.tsx"
+    },
+    "./Dialogs/ConfirmDialog": {
+      "import": "./src/Dialogs/ConfirmDialog.tsx",
+      "types": "./src/Dialogs/ConfirmDialog.tsx"
+    },
+    "./Dialogs/ConfirmationModal": {
+      "import": "./src/Dialogs/ConfirmationModal.tsx",
+      "types": "./src/Dialogs/ConfirmationModal.tsx"
+    },
+    "./Dialogs/TextConfirmModal": {
+      "import": "./src/Dialogs/TextConfirmModal.tsx",
+      "types": "./src/Dialogs/TextConfirmModal.tsx"
+    },
+    "./ExpandableVideo": {
+      "import": "./src/ExpandableVideo/index.tsx",
+      "types": "./src/ExpandableVideo/index.tsx"
+    },
+    "./FilterBar/FilterBar": {
+      "import": "./src/FilterBar/FilterBar.tsx",
+      "types": "./src/FilterBar/FilterBar.tsx"
+    },
+    "./FilterBar/FilterCondition": {
+      "import": "./src/FilterBar/FilterCondition.tsx",
+      "types": "./src/FilterBar/FilterCondition.tsx"
+    },
+    "./FilterBar/FilterGroup": {
+      "import": "./src/FilterBar/FilterGroup.tsx",
+      "types": "./src/FilterBar/FilterGroup.tsx"
+    },
+    "./FilterBar": {
+      "import": "./src/FilterBar/index.ts",
+      "types": "./src/FilterBar/index.ts"
+    },
+    "./FilterBar/types": {
+      "import": "./src/FilterBar/types.ts",
+      "types": "./src/FilterBar/types.ts"
+    },
+    "./GlassPanel": {
+      "import": "./src/GlassPanel/index.tsx",
+      "types": "./src/GlassPanel/index.tsx"
+    },
+    "./IconPanel": {
+      "import": "./src/IconPanel/index.tsx",
+      "types": "./src/IconPanel/index.tsx"
+    },
+    "./InnerSideMenu": {
+      "import": "./src/InnerSideMenu/index.tsx",
+      "types": "./src/InnerSideMenu/index.tsx"
+    },
+    "./LogsBarChart": {
+      "import": "./src/LogsBarChart/index.tsx",
+      "types": "./src/LogsBarChart/index.tsx"
+    },
+    "./MobileSheetNav/MobileSheetNav": {
+      "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
+      "types": "./src/MobileSheetNav/MobileSheetNav.tsx"
+    },
+    "./MobileSheetNav": {
+      "import": "./src/MobileSheetNav/index.ts",
+      "types": "./src/MobileSheetNav/index.ts"
+    },
+    "./MultiSelectDeprecated/Badges": {
+      "import": "./src/MultiSelectDeprecated/Badges.tsx",
+      "types": "./src/MultiSelectDeprecated/Badges.tsx"
+    },
+    "./MultiSelectDeprecated/MultiSelectV2": {
+      "import": "./src/MultiSelectDeprecated/MultiSelectV2.tsx",
+      "types": "./src/MultiSelectDeprecated/MultiSelectV2.tsx"
+    },
+    "./MultiSelectDeprecated": {
+      "import": "./src/MultiSelectDeprecated/index.tsx",
+      "types": "./src/MultiSelectDeprecated/index.tsx"
+    },
+    "./PrivacySettings": {
+      "import": "./src/PrivacySettings/index.tsx",
+      "types": "./src/PrivacySettings/index.tsx"
+    },
+    "./PromoToast/PromoBg": {
+      "import": "./src/PromoToast/PromoBg.tsx",
+      "types": "./src/PromoToast/PromoBg.tsx"
+    },
+    "./PromoToast/PromoToast": {
+      "import": "./src/PromoToast/PromoToast.tsx",
+      "types": "./src/PromoToast/PromoToast.tsx"
+    },
+    "./PromoToast": {
+      "import": "./src/PromoToast/index.ts",
+      "types": "./src/PromoToast/index.ts"
+    },
+    "./ShimmeringLoader": {
+      "import": "./src/ShimmeringLoader/index.tsx",
+      "types": "./src/ShimmeringLoader/index.tsx"
+    },
+    "./SqlToRest/assumptions": {
+      "import": "./src/SqlToRest/assumptions.ts",
+      "types": "./src/SqlToRest/assumptions.ts"
+    },
+    "./SqlToRest/base-url-dialog": {
+      "import": "./src/SqlToRest/base-url-dialog.tsx",
+      "types": "./src/SqlToRest/base-url-dialog.tsx"
+    },
+    "./SqlToRest/faqs": {
+      "import": "./src/SqlToRest/faqs.ts",
+      "types": "./src/SqlToRest/faqs.ts"
+    },
+    "./SqlToRest": {
+      "import": "./src/SqlToRest/index.tsx",
+      "types": "./src/SqlToRest/index.tsx"
+    },
+    "./SqlToRest/sql-to-rest": {
+      "import": "./src/SqlToRest/sql-to-rest.tsx",
+      "types": "./src/SqlToRest/sql-to-rest.tsx"
+    },
+    "./SqlToRest/syntax-highlighter/framer-features": {
+      "import": "./src/SqlToRest/syntax-highlighter/framer-features.ts",
+      "types": "./src/SqlToRest/syntax-highlighter/framer-features.ts"
+    },
+    "./SqlToRest/syntax-highlighter/transform-renderer": {
+      "import": "./src/SqlToRest/syntax-highlighter/transform-renderer.tsx",
+      "types": "./src/SqlToRest/syntax-highlighter/transform-renderer.tsx"
+    },
+    "./SqlToRest/util": {
+      "import": "./src/SqlToRest/util.ts",
+      "types": "./src/SqlToRest/util.ts"
+    },
+    "./ThemeToggle": {
+      "import": "./src/ThemeToggle.tsx",
+      "types": "./src/ThemeToggle.tsx"
+    },
+    "./TimestampInfo": {
+      "import": "./src/TimestampInfo/index.tsx",
+      "types": "./src/TimestampInfo/index.tsx"
+    },
+    "./Toc": {
+      "import": "./src/Toc/index.ts",
+      "types": "./src/Toc/index.ts"
+    },
+    "./Toc/mdx-plugins/remark-heading": {
+      "import": "./src/Toc/mdx-plugins/remark-heading.ts",
+      "types": "./src/Toc/mdx-plugins/remark-heading.ts"
+    },
+    "./Toc/mdx-plugins/remark-utils": {
+      "import": "./src/Toc/mdx-plugins/remark-utils.ts",
+      "types": "./src/Toc/mdx-plugins/remark-utils.ts"
+    },
+    "./Toc/server/get-toc": {
+      "import": "./src/Toc/server/get-toc.tsx",
+      "types": "./src/Toc/server/get-toc.tsx"
+    },
+    "./Toc/toc-primitive": {
+      "import": "./src/Toc/toc-primitive.tsx",
+      "types": "./src/Toc/toc-primitive.tsx"
+    },
+    "./Toc/toc-thumb": {
+      "import": "./src/Toc/toc-thumb.tsx",
+      "types": "./src/Toc/toc-thumb.tsx"
+    },
+    "./Toc/toc": {
+      "import": "./src/Toc/toc.tsx",
+      "types": "./src/Toc/toc.tsx"
+    },
+    "./Toc/types": {
+      "import": "./src/Toc/types.ts",
+      "types": "./src/Toc/types.ts"
+    },
+    "./TweetCard": {
+      "import": "./src/TweetCard/index.tsx",
+      "types": "./src/TweetCard/index.tsx"
+    },
+    "./admonition": {
+      "import": "./src/admonition.tsx",
+      "types": "./src/admonition.tsx"
+    },
+    "./consent": {
+      "import": "./src/consent.tsx",
+      "types": "./src/consent.tsx"
+    },
+    "./form/FormItemLayout/FormItemLayout": {
+      "import": "./src/form/FormItemLayout/FormItemLayout.tsx",
+      "types": "./src/form/FormItemLayout/FormItemLayout.tsx"
+    },
+    "./form/FormLayout2": {
+      "import": "./src/form/FormLayout2.tsx",
+      "types": "./src/form/FormLayout2.tsx"
+    },
+    "./form/Layout/FormLayout": {
+      "import": "./src/form/Layout/FormLayout.tsx",
+      "types": "./src/form/Layout/FormLayout.tsx"
+    },
+    "./form/Layout/InputIconContainer": {
+      "import": "./src/form/Layout/InputIconContainer.tsx",
+      "types": "./src/form/Layout/InputIconContainer.tsx"
+    },
+    "./form/utils": {
+      "import": "./src/form/utils.tsx",
+      "types": "./src/form/utils.tsx"
+    },
+    "./info-tooltip": {
+      "import": "./src/info-tooltip.tsx",
+      "types": "./src/info-tooltip.tsx"
+    },
+    "./multi-select": {
+      "import": "./src/multi-select/index.tsx",
+      "types": "./src/multi-select/index.tsx"
+    },
+    "./multi-select/multi-select.test": {
+      "import": "./src/multi-select/multi-select.test.tsx",
+      "types": "./src/multi-select/multi-select.test.tsx"
+    },
+    "./multi-select/multi-select": {
+      "import": "./src/multi-select/multi-select.tsx",
+      "types": "./src/multi-select/multi-select.tsx"
+    },
+    "./types/assets.d": {
+      "import": "./src/types/assets.d.ts",
+      "types": "./src/types/assets.d.ts"
+    }
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@supabase/sql-to-rest": "^0.1.6",
+    "@supabase/supabase-js": "catalog:",
+    "@vitest/coverage-v8": "^3.0.9",
     "class-variance-authority": "^0.6.0",
     "clsx": "^1.2.1",
     "cmdk": "^1.0.0",
@@ -22,13 +493,16 @@
     "dayjs": "^1.11.13",
     "framer-motion": "^11.1.9",
     "github-slugger": "^2.0.0",
+    "icons": "workspace:*",
     "lodash": "^4.17.21",
     "lucide-react": "*",
     "mdast": "^3.0.0",
     "monaco-editor": "*",
     "next-themes": "*",
     "openai": "^4.20.1",
+    "react": "catalog:",
     "react-countdown": "^2.3.5",
+    "react-dom": "catalog:",
     "react-error-boundary": "^4.0.12",
     "react-hook-form": "^7.45.0",
     "react-intersection-observer": "^9.8.2",
@@ -46,31 +520,30 @@
     "tsconfig": "workspace:*",
     "ui": "workspace:*",
     "unist-util-visit": "^5.0.0",
-    "valtio": "*",
+    "valtio": "catalog:",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.1.0",
-    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/dom": "^10.0.0",
+    "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/lodash": "^4.17.5",
     "@types/mdast": "^3.0.0",
     "@types/node": "catalog:",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "typescript": "~5.5.0",
+    "tsx": "^4.19.3",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
-    "vite": "^6.2.4",
+    "vite": "catalog:",
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
-    "next": "catalog:",
-    "react": "*",
-    "react-dom": "*"
+    "next": "*"
   }
 }

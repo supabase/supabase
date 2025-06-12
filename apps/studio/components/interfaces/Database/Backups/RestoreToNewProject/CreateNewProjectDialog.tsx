@@ -9,7 +9,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { passwordStrength } from 'lib/helpers'
 import { generateStrongPassword } from 'lib/project'
@@ -68,8 +67,7 @@ export const CreateNewProjectDialog = ({
     },
   })
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
 
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },

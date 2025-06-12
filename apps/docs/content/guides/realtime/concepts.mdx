@@ -31,6 +31,11 @@ const roomOne = supabase.channel('room-one') // set your topic here
 Realtime Broadcast follows the [publish-subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) where a client publishes messages to a channel based on a unique topic. For example, a user could send a message to a channel with topic `room-one`.
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+const roomOne = supabase.channel('room-one') // set your topic here
+
+// ---cut---
 roomOne.send({
   type: 'broadcast',
   event: 'test',
@@ -47,6 +52,11 @@ An example use-case is sharing a user's cursor position with other clients in an
 Presence can be used to share an individual's state with others within a Channel.
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+const roomOne = supabase.channel('room-one') // set your topic here
+
+// ---cut---
 const presenceTrackStatus = await roomOne.track({
   user: 'user-1',
   online_at: new Date().toISOString(),
@@ -62,6 +72,10 @@ When a new client subscribes to a channel, it will immediately receive the chann
 The Postgres Changes extension listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 const allChanges = supabase
   .channel('schema-db-changes')
   .on(

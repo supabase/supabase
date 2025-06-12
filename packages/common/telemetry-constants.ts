@@ -272,6 +272,10 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
   properties: {
     instanceSize: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -288,6 +292,9 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
    */
   properties: {
     instanceSize: string
+  }
+  groups: {
+    organization: string
   }
 }
 
@@ -602,6 +609,10 @@ export interface AssistantSuggestionRunQueryClickedEvent {
     queryType: string
     category?: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -658,6 +669,10 @@ export interface AssistantEditInSqlEditorClickedEvent {
  */
 export interface CustomReportAddSQLBlockClicked {
   action: 'custom_report_add_sql_block_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -669,6 +684,10 @@ export interface CustomReportAddSQLBlockClicked {
  */
 export interface CustomReportAssistantSQLBlockAdded {
   action: 'custom_report_assistant_sql_block_added'
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -888,6 +907,23 @@ export interface SeeDocumentationButtonClickedEvent {
  */
 export interface RequestDemoButtonClickedEvent {
   action: 'request_demo_button_clicked'
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, cta banner, product page header.
+     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
+     */
+    buttonLocation: string
+  }
+}
+
+/**
+ * User clicked the "Register" button in the State of Startups 2025 newsletter form.
+ *
+ * @group Events
+ * @source www
+ */
+export interface RegisterStateOfStartups2025NewsletterClicked {
+  action: 'register_for_state_of_startups_newsletter_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, cta banner, product page header.
@@ -1255,6 +1291,40 @@ export interface EdgeFunctionTestSidePanelOpenedEvent {
 }
 
 /**
+ * User submitted a support ticket. Project and organization are optional because the ticket might be about user account issues.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportTicketSubmittedEvent {
+  action: 'support_ticket_submitted'
+  properties: {
+    ticketCategory: string
+  }
+  groups: {
+    project?: string
+    organization?: string
+  }
+}
+
+/**
+ * User clicked the AI Assistant card on top of the support ticket form.
+ * This event is specifically when the user goes back to the AI Assistant in the Studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface AiAssistantInSupportFormClickedEvent {
+  action: 'ai_assistant_in_support_form_clicked'
+  groups: {
+    project?: string
+    organization?: string
+  }
+}
+
+/**
  * User copied the command for a Supabase UI component.
  *
  * @group Events
@@ -1327,6 +1397,7 @@ export type TelemetryEvent =
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
+  | RegisterStateOfStartups2025NewsletterClicked
   | SignInButtonClickedEvent
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
@@ -1347,3 +1418,5 @@ export type TelemetryEvent =
   | EdgeFunctionTestSendButtonClickedEvent
   | EdgeFunctionTestSidePanelOpenedEvent
   | SupabaseUiCommandCopyButtonClickedEvent
+  | SupportTicketSubmittedEvent
+  | AiAssistantInSupportFormClickedEvent

@@ -15,7 +15,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { NextPageWithLayout } from 'types'
 
@@ -35,8 +34,7 @@ export const ApiReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan
+  const plan = organization?.plan
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
     mergeParams({

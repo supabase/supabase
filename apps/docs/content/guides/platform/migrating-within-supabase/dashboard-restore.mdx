@@ -59,20 +59,15 @@ Here are some things that are not stored directly in your database and will requ
     - Database extensions and settings
     - Read Replicas
 
-Here is a non-exhaustive list of items that are commonly asked about and will be migrated with your backup restoration:
-
-    - Database triggers
-    - Database functions
-
 ## Restore backup
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
-      Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+      On your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
       <Admonition type="note">
-        Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
+        Use the Session pooler connection string by default. If your ISP supports IPv6 or you have the IPv4 add-on enabled, use the direct connection string.
       </Admonition>
 
       Session pooler connection string:

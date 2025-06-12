@@ -7,12 +7,12 @@ import type {
   ICommonSection,
   IFunctionDefinition,
   ISpec,
-} from '../../../components/reference/Reference.types'
-import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec'
-import { flattenSections } from '../../../lib/helpers'
-import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers'
-import type { Json } from '../../helpers.mdx'
-import { BaseLoader, BaseSource } from './base'
+} from '../../../components/reference/Reference.types.js'
+import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec.js'
+import { flattenSections } from '../../../lib/helpers.js'
+import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers.js'
+import type { Json } from '../../helpers.mdx.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
   type = 'reference' as const
@@ -30,7 +30,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
     super(source, path)
   }
 
-  async load() {
+  async load(): Promise<BaseSource[]> {
     const specContents = await readFile(this.specFilePath, 'utf8')
     const refSectionsContents = await readFile(this.sectionsFilePath, 'utf8')
 
@@ -52,16 +52,19 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
           `${this.path}/${refSection.slug}`,
           refSection,
           specSection,
-          this.meta
+          this.enhanceMeta(specSection)
         )
       })
-      .filter(Boolean)
+      .filter((item): item is ReferenceSource<SpecSection> => item !== undefined)
 
-    return sections
+    return sections as BaseSource[]
   }
 
   abstract getSpecSections(specContents: string): SpecSection[]
-  abstract matchSpecSection(specSections: SpecSection[], id: string): SpecSection
+  abstract matchSpecSection(specSections: SpecSection[], id: string): SpecSection | undefined
+  enhanceMeta(section: SpecSection): Json {
+    return this.meta
+  }
 }
 
 export abstract class ReferenceSource<SpecSection> extends BaseSource {
@@ -133,7 +136,7 @@ export class OpenApiReferenceLoader extends ReferenceLoader<enrichedOperation> {
 
     return generatedSpec.operations
   }
-  matchSpecSection(operations: enrichedOperation[], id: string): enrichedOperation {
+  matchSpecSection(operations: enrichedOperation[], id: string): enrichedOperation | undefined {
     return operations.find((operation) => operation.operationId === id)
   }
 }
@@ -163,9 +166,9 @@ export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
 
   extractIndexedContent(): string {
     const { summary, description, operation, tags } = this.specSection
-    return `# ${this.meta.title ?? ''}\n\n${summary ?? ''}\n\n${description ?? ''}\n\n${operation ?? ''}\n\n${tags.join(
-      ', '
-    )}`
+    return `# ${this.meta.title ?? ''}\n\n${summary ?? ''}\n\n${description ?? ''}\n\n${operation ?? ''}\n\n${
+      tags?.join(', ') ?? ''
+    }`
   }
 }
 
@@ -186,8 +189,16 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
 
     return spec.functions
   }
-  matchSpecSection(functionDefinitions: IFunctionDefinition[], id: string): IFunctionDefinition {
+
+  matchSpecSection(
+    functionDefinitions: IFunctionDefinition[],
+    id: string
+  ): IFunctionDefinition | undefined {
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
+  }
+
+  enhanceMeta(section: IFunctionDefinition): Json {
+    return { ...this.meta, slug: section.id, methodName: section.title }
   }
 }
 
@@ -238,7 +249,7 @@ export class CliReferenceLoader extends ReferenceLoader<CliCommand> {
 
     return spec.commands
   }
-  matchSpecSection(cliCommands: CliCommand[], id: string): CliCommand {
+  matchSpecSection(cliCommands: CliCommand[], id: string): CliCommand | undefined {
     return cliCommands.find((cliCommand) => cliCommand.id === id)
   }
 }

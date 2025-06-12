@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -14,15 +15,13 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
@@ -52,12 +51,10 @@ const PITR = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
   const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-
-  const plan = subscription?.plan?.id
+  const plan = organization?.plan?.id
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -68,7 +65,7 @@ const PITR = () => {
     return <NoPermission resourceText="view PITR backups" />
   }
 
-  if (isOrioleDb) {
+  if (isOrioleDbInAws) {
     return (
       <Admonition
         type="default"
@@ -93,7 +90,7 @@ const PITR = () => {
               primaryText="Point in Time Recovery is a Pro Plan add-on."
               secondaryText={
                 plan === 'free'
-                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro Plan customers. Note that the Pro Plan already includes daily backups for no extra charge — PITR is an optional upgrade.'
+                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro Plan customers. Note that the Pro Plan already includes daily backups for no extra charge — PITR is an optional upgrade that starts at $100/month.'
                   : 'Please enable the add-on to enable point in time recovery for your project.'
               }
             />

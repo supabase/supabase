@@ -29,6 +29,10 @@ Our client libraries methods like `getPublicUrl` and `createSignedUrl` support t
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').getPublicUrl('image.jpg', {
   transform: {
     width: 500,
@@ -108,6 +112,10 @@ To share a transformed image in a private bucket for a fixed amount of time, pro
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
   transform: {
     width: 200,
@@ -173,6 +181,10 @@ To download a transformed image, pass the `transform` option to the `download` f
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     width: 800,
@@ -269,6 +281,10 @@ In case you'd like to return the original format of the image and **opt-out** fr
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 await supabase.storage.from('bucket').download('image.jpeg', {
   transform: {
     width: 200,
@@ -402,6 +418,10 @@ Example:
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     quality: 50,
@@ -498,6 +518,10 @@ Example:
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     width: 800,
