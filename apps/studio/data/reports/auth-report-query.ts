@@ -1,27 +1,107 @@
 import { useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
+import { AnalyticsInterval } from 'data/analytics/constants'
 
-function activeUsersSql(bucket: 'day' | 'week' | 'month', start: string, end: string) {
+type BQGranularity = 'second' | 'minute' | 'hour' | 'day' | 'week'
+function analyticsIntervalToBQGranularity(interval: AnalyticsInterval): BQGranularity {
+  switch (interval) {
+    case '1m':
+      return 'minute'
+    case '5m':
+      return 'minute'
+    case '10m':
+      return 'minute'
+    case '30m':
+      return 'minute'
+    case '1h':
+      return 'hour'
+    case '1d':
+      return 'day'
+    default:
+      return 'hour'
+  }
+}
+
+function activeUsersSql(interval: BQGranularity) {
   return `
     select 
-      timestamp_trunc(timestamp, ${bucket}) as timestamp,
+      timestamp_trunc(timestamp, ${interval}) as timestamp,
       count(distinct json_value(f.event_message, "$.user_id")) as count
     from auth_logs f
     where json_value(f.event_message, "$.action") in (
       'login', 'user_signedup', 'token_refreshed', 'user_modified',
       'user_recovery_requested', 'user_reauthenticate_requested'
     )
-      and timestamp >= '${start}'
-      and timestamp <= '${end}'
     group by timestamp
     order by timestamp desc
   `
 }
 
-const metricSqlMap: Record<string, (start: string, end: string, interval: string) => string> = {
-  DAU: (start, end, interval) => activeUsersSql('day', start, end),
-  WAU: (start, end, interval) => activeUsersSql('week', start, end),
-  MAU: (start, end, interval) => activeUsersSql('month', start, end),
+const metricSqlMap: Record<
+  string,
+  (start: string, end: string, interval: AnalyticsInterval) => string
+> = {
+  ActiveUsers: (start, end, interval) => activeUsersSql(analyticsIntervalToBQGranularity(interval)),
+
+  SignInAttempts: (start, end, interval) => `
+    -- TODO: Return time series of sign in attempts (by time bucket)
+  `,
+
+  PasswordResetRequests: (start, end, interval) => `
+    -- TODO: Return time series of password reset requests (by time bucket)
+  `,
+
+  TotalSignUpsByProvider: (start, end, interval) => `
+    -- TODO: Return total sign-ups by provider (email, social, etc.)
+  `,
+  TotalSignInsByProvider: (start, end, interval) => `
+    -- TODO: Return total sign-ins by provider (email, social, etc.)
+  `,
+  FailedAuthAttempts: (start, end, interval) => `
+    -- TODO: Return time series of failed authentication attempts
+  `,
+
+  NewUserGrowthRate: (start, end, interval) => `
+    -- TODO: Return new user growth rate over time
+  `,
+  UserRetention: (start, end, interval) => `
+    -- TODO: Return user retention/churn metrics
+  `,
+  SessionsCreated: (start, end, interval) => `
+    -- TODO: Return sessions created over time
+  `,
+  SessionsExpired: (start, end, interval) => `
+    -- TODO: Return sessions expired over time
+  `,
+
+  SignInLatency: (start, end, interval) => `
+    -- TODO: Return sign-in operation latency over time
+  `,
+  SignUpLatency: (start, end, interval) => `
+    -- TODO: Return sign-up operation latency over time
+  `,
+  TokenRefreshLatency: (start, end, interval) => `
+    -- TODO: Return token refresh operation latency over time
+  `,
+  TokenVerificationSpeed: (start, end, interval) => `
+    -- TODO: Return token verification speed over time
+  `,
+  AuthProviderResponseTimes: (start, end, interval) => `
+    -- TODO: Return auth provider response times (by provider)
+  `,
+
+  SuspiciousActivity: (start, end, interval) => `
+    -- TODO: Return suspicious activity (multiple failed attempts, unusual locations, etc.)
+  `,
+  RateLimitedRequests: (start, end, interval) => `
+    -- TODO: Return rate limited requests over time
+  `,
+  TokenRevocations: (start, end, interval) => `
+    -- TODO: Return token revocations over time
+  `,
+  MFAUsage: (start, end, interval) => `
+    -- TODO: Return MFA usage statistics over time
+  `,
 }
 
 export function useAuthReport({
@@ -36,7 +116,7 @@ export function useAuthReport({
   metricKey: string
   startDate: string
   endDate: string
-  interval: string
+  interval: AnalyticsInterval
   enabled?: boolean
 }) {
   const sql = metricSqlMap[metricKey]?.(startDate, endDate, interval)

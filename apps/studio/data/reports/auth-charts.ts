@@ -1,7 +1,7 @@
 export const getAuthReportAttributes = (isFreePlan: boolean) => [
   {
     id: 'active-users',
-    label: 'Daily Active Users',
+    label: 'Active Users',
     valuePrecision: 0,
     hide: false,
     showTooltip: false,
@@ -10,35 +10,7 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     hideChartType: false,
     defaultChartStyle: 'bar',
     attributes: [
-      { attribute: 'DAU', provider: 'logs', label: 'Daily Active Users', enabled: true },
-    ],
-  },
-  {
-    id: 'weekly-active-users',
-    label: 'Weekly Active Users',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: false,
-    showLegend: false,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'WAU', provider: 'logs', label: 'Weekly Active Users', enabled: true },
-    ],
-  },
-  {
-    id: 'monthly-active-users',
-    label: 'Monthly Active Users',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: false,
-    showLegend: false,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      { attribute: 'MAU', provider: 'logs', label: 'Monthly Active Users', enabled: true },
+      { attribute: 'ActiveUsers', provider: 'logs', label: 'Active Users', enabled: true },
     ],
   },
   {

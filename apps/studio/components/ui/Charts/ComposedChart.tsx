@@ -135,7 +135,14 @@ export default function ComposedChart({
       (focusDataIndex !== null &&
         data &&
         data[focusDataIndex] !== undefined &&
-        day(data[focusDataIndex].timestamp).format(customDateFormat)) ||
+        (() => {
+          const ts = data[focusDataIndex].timestamp
+          // If ts is a number and greater than 1e12, treat as microseconds
+          if (typeof ts === 'number' && ts > 1e12) {
+            return day(ts / 1000).format(customDateFormat)
+          }
+          return day(ts).format(customDateFormat)
+        })()) ||
       highlightedLabel
     )
   }
