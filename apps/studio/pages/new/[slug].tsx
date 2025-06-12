@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { ExternalLink, Boxes } from 'lucide-react'
+import { Boxes, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
@@ -27,6 +27,8 @@ import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityO
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
+import { ActionCard } from 'components/ui/ActionCard'
+import AlertError from 'components/ui/AlertError'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
@@ -76,21 +78,19 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Skeleton,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { ActionCard } from 'components/ui/ActionCard'
-import AlertError from 'components/ui/AlertError'
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -140,10 +140,9 @@ export type CreateProjectForm = z.infer<typeof FormSchema>
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug, projectName, error: orgNotFoundError } = useParams()
+  const { slug, projectName } = useParams()
   const currentOrg = useSelectedOrganization()
   const isFreePlan = currentOrg?.plan?.id === 'free'
-  const orgNotFound = orgNotFoundError === 'org_not_found'
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -168,7 +167,6 @@ const Wizard: NextPageWithLayout = () => {
 
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
-  const [search, setSearch] = useState('')
 
   const {
     data: organizations,
@@ -243,7 +241,9 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
+
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
+  const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
   const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
 
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
@@ -411,21 +411,13 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/new`)
     }
   }, [isEmptyOrganizations, router])
+
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
     if (slug && slug !== '_') form.setValue('organization', slug)
     if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
-
-  useEffect(() => {
-    // Redirect to first org if the slug doesn't match an org slug
-    // this is mainly to capture the /new/new-project url, which is redirected from database.new
-    if (isInvalidSlug && isOrganizationsSuccess && (organizations?.length ?? 0) > 0) {
-      //router.push(`/new/${organizations?.[0].slug}`)
-      router.push(`/new/${slug}?error=org_not_found`) // not sure how to handle the database.new referrals here
-    }
-  }, [isInvalidSlug, isOrganizationsSuccess, organizations])
 
   useEffect(() => {
     if (form.getValues('dbRegion') === undefined && defaultRegion) {
@@ -641,6 +633,7 @@ const Wizard: NextPageWithLayout = () => {
                   )}
 
                   {!isAdmin && <NotOrganizationOwnerWarning slug={slug} />}
+                  {/* If the org is not found, list all orgs and let the user select one */}
                   {orgNotFound && (
                     <>
                       <div className="grid gap-2">
