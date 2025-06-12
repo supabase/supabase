@@ -51,7 +51,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
-  if (!accessToken) {
+  if (IS_PLATFORM && !accessToken) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
 
@@ -70,7 +70,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  const { messages, projectRef, connectionString, aiOptInLevel, schema, table } = data
+  const { messages, projectRef, connectionString, aiOptInLevel } = data
 
   try {
     let mcpTools: ToolSet = {}
@@ -149,7 +149,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         : { result: [] }
 
     const schemasString =
-      schemas.length > 0
+      schemas?.length > 0
         ? `The available database schema names are: ${JSON.stringify(schemas)}`
         : "You don't have access to any schemas."
 
@@ -164,7 +164,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           includeSchemaMetadata: aiOptInLevel !== 'disabled',
         }),
       }
-    } else {
+    } else if (accessToken) {
       // If platform, fetch MCP client and tools which replace old local tools
       const mcpClient = await createSupabaseMCPClient({
         accessToken,
