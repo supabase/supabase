@@ -189,9 +189,8 @@ export const FunctionsEmptyStateLocal = () => {
                 <Code size={20} />
                 <h4 className="text-base text-foreground">Create an Edge Function</h4>
               </div>
-              <p className="text-sm text-foreground-light mt-1 mb-4">
-                Create a new edge function called{' '}
-                <code className="text-foreground">hello-world</code> in your project via the
+              <p className="text-sm text-foreground-light mt-1 mb-4 prose [&>code]:text-xs text-sm max-w-full">
+                Create a new edge function called <code>hello-world</code> in your project via the
                 Supabase CLI.
               </p>
               <div className="mb-4">
@@ -212,9 +211,8 @@ export const FunctionsEmptyStateLocal = () => {
                 <Play size={20} />
                 <h4 className="text-base text-foreground">Run Edge Functions locally</h4>
               </div>
-              <p className="text-sm text-foreground-light mt-1 mb-4">
-                You can run your Edge Function locally using{' '}
-                <code className="text-foreground">supabase functions serve</code>.
+              <p className="text-sm text-foreground-light mt-1 mb-4 prose [&>code]:text-xs text-sm max-w-full">
+                You can run your Edge Function locally using <code>supabase functions serve</code>.
               </p>
               <div className="mb-4">
                 <CodeBlock
@@ -342,17 +340,13 @@ export const FunctionsSecretsEmptyStateLocal = () => {
               ways
             </p>
             <ul className="list-disc pl-6">
-              <li>
-                Through an <code className="text-foreground">.env</code> file placed at{' '}
-                <code className="text-foreground">supabase/functions/.env</code>, which is
-                automatically loaded on <code className="text-foreground">supabase start</code>
+              <li className="prose [&>code]:text-xs text-sm max-w-full">
+                Through an <code>.env</code> file placed at <code>supabase/functions/.env</code>,
+                which is automatically loaded on <code>supabase start</code>
               </li>
-              <li>
-                Through the <code className="text-foreground">--env-file</code> option for{' '}
-                <code className="text-foreground">supabase functions serve</code>, for example: s
-                <code className="text-foreground">
-                  upabase functions serve --env-file ./path/to/.env-file
-                </code>
+              <li className="prose [&>code]:text-xs text-sm max-w-full">
+                Through the <code>--env-file</code> option for <code>supabase functions serve</code>
+                , for example: <code>supabase functions serve --env-file ./path/to/.env-file</code>
               </li>
             </ul>
           </div>
