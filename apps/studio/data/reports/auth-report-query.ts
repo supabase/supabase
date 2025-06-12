@@ -22,10 +22,16 @@ function analyticsIntervalToBQGranularity(interval: AnalyticsInterval): BQGranul
   }
 }
 
-function activeUsersSql(interval: BQGranularity) {
-  return `
+const metricSqlMap: Record<
+  string,
+  (start: string, end: string, interval: AnalyticsInterval) => string
+> = {
+  ActiveUsers: (start, end, interval) => {
+    const granularity = analyticsIntervalToBQGranularity(interval)
+
+    return `
     select 
-      timestamp_trunc(timestamp, ${interval}) as timestamp,
+      timestamp_trunc(timestamp, ${granularity}) as timestamp,
       count(distinct json_value(f.event_message, "$.user_id")) as count
     from auth_logs f
     where json_value(f.event_message, "$.action") in (
@@ -35,13 +41,7 @@ function activeUsersSql(interval: BQGranularity) {
     group by timestamp
     order by timestamp desc
   `
-}
-
-const metricSqlMap: Record<
-  string,
-  (start: string, end: string, interval: AnalyticsInterval) => string
-> = {
-  ActiveUsers: (start, end, interval) => activeUsersSql(analyticsIntervalToBQGranularity(interval)),
+  },
 
   SignInAttempts: (start, end, interval) => {
     const granularity = analyticsIntervalToBQGranularity(interval)
