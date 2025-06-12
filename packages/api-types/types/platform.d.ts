@@ -7224,6 +7224,7 @@ export interface components {
     }
     RunQueryBody: {
       query: string
+      disable_statement_timeout?: boolean
     }
     SearchProfileBody: {
       keywords: string
