@@ -1,28 +1,29 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  tryParseJson,
-  minifyJSON,
-  prettifyJSON,
-  removeJSONTrailingComma,
-  timeout,
-  getURL,
-  makeRandomString,
-  pluckObjectFields,
-  tryParseInt,
-  propsAreEqual,
-  formatBytes,
-  snakeToCamel,
-  copyToClipboard,
   detectBrowser,
   detectOS,
-  pluralize,
-  isValidHttpUrl,
-  removeCommentsFromSql,
-  getSemanticVersion,
+  formatBytes,
+  formatCurrency,
   getDatabaseMajorVersion,
   getDistanceLatLonKM,
-  formatCurrency,
+  getSemanticVersion,
+  getURL,
+  isValidHttpUrl,
+  makeRandomString,
+  minifyJSON,
+  pluckObjectFields,
+  pluralize,
+  prettifyJSON,
+  propsAreEqual,
+  removeCommentsFromSql,
+  removeJSONTrailingComma,
+  snakeToCamel,
+  timeout,
+  tryParseInt,
+  tryParseJson,
 } from './helpers'
+
+import { copyToClipboard } from 'ui'
 
 describe('tryParseJson', () => {
   it('should return the parsed JSON', () => {
