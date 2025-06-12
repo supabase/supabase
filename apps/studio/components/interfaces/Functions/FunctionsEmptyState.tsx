@@ -1,4 +1,4 @@
-import { Code, Github, Play, Server, Terminal } from 'lucide-react'
+import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -28,7 +28,6 @@ import {
   DialogTrigger,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
 import { TerminalInstructions } from './TerminalInstructions'
 
@@ -174,18 +173,17 @@ export const FunctionsEmptyStateLocal = () => {
   return (
     <>
       <div className="flex flex-col gap-y-4">
-        <Admonition
-          className="mb-0"
-          type="note"
-          title="Management of Edge Functions is currently not supported via Studio for CLI or self-host"
-          description="You can still develop and test edge functions locally, or explore self-hosting the Supabase Edge Runtime."
-        />
-
         <Card>
           <CardHeader>
             <CardTitle>Developing Edge Functions locally</CardTitle>
           </CardHeader>
-          <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
+          <CardContent
+            className={cn(
+              'p-0 flex flex-col',
+              '2xl:grid 2xl:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] 2xl:divide-y-0 2xl:divide-x',
+              'divide-y divide-default items-stretch'
+            )}
+          >
             <div className="p-8">
               <div className="flex items-center gap-2">
                 <Code size={20} />
@@ -200,7 +198,9 @@ export const FunctionsEmptyStateLocal = () => {
                 <CodeBlock
                   language="bash"
                   hideLineNumbers={true}
-                  className={cn('px-3.5 max-w-full prose dark:prose-dark [&>code]:m-0 min-h-28')}
+                  className={cn(
+                    'px-3.5 max-w-full prose dark:prose-dark [&>code]:m-0 2xl:min-h-28'
+                  )}
                   value="supabase functions new hello-world"
                 />
               </div>
@@ -220,7 +220,9 @@ export const FunctionsEmptyStateLocal = () => {
                 <CodeBlock
                   language="bash"
                   hideLineNumbers={true}
-                  className={cn('px-3.5 max-w-full prose dark:prose-dark [&>code]:m-0 min-h-28')}
+                  className={cn(
+                    'px-3.5 max-w-full prose dark:prose-dark [&>code]:m-0 2xl:min-h-28'
+                  )}
                   value={`
 supabase start # start the supabase stack
 supabase functions serve # start the Functions watcher`.trim()}
@@ -242,7 +244,9 @@ supabase functions serve # start the Functions watcher`.trim()}
                 <CodeBlock
                   language="bash"
                   hideLineNumbers={true}
-                  className={cn('px-3.5 max-w-full prose dark:prose-dark [&>code]:m-0 min-h-28')}
+                  className={cn(
+                    'px-3.5 max-w-full prose dark:prose-dark [&>code]:m-0 2xl:min-h-28'
+                  )}
                   value={`
 curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
   --header 'Authorization: Bearer SUPABASE_ANON_KEY' \\
@@ -317,5 +321,44 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
         </ResourceList>
       </div>
     </>
+  )
+}
+
+export const FunctionsSecretsEmptyStateLocal = () => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Managing secrets and environment variables locally</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
+        <div className="p-8">
+          <div className="flex items-center gap-2">
+            <Lock size={20} />
+            <h4 className="text-base text-foreground">Managing secrets</h4>
+          </div>
+          <div className="text-sm text-foreground-light mt-1 mb-4 max-w-3xl">
+            <p>
+              Local secrets and environment variables can be loaded in either of the following two
+              ways
+            </p>
+            <ul className="list-disc pl-6">
+              <li>
+                Through an <code className="text-foreground">.env</code> file placed at{' '}
+                <code className="text-foreground">supabase/functions/.env</code>, which is
+                automatically loaded on <code className="text-foreground">supabase start</code>
+              </li>
+              <li>
+                Through the <code className="text-foreground">--env-file</code> option for{' '}
+                <code className="text-foreground">supabase functions serve</code>, for example: s
+                <code className="text-foreground">
+                  upabase functions serve --env-file ./path/to/.env-file
+                </code>
+              </li>
+            </ul>
+          </div>
+          <DocsButton href="https://supabase.com/docs/guides/functions/secrets#using-the-cli" />
+        </div>
+      </CardContent>
+    </Card>
   )
 }

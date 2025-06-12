@@ -4,7 +4,6 @@ import { PropsWithChildren } from 'react'
 import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM } from 'lib/constants'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 
 const EdgeFunctionsProductMenu = () => {
@@ -23,16 +22,12 @@ const EdgeFunctionsProductMenu = () => {
           url: `/project/${projectRef}/functions`,
           items: [],
         },
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Secrets',
-                key: 'secrets',
-                url: `/project/${projectRef}/functions/secrets`,
-                items: [],
-              },
-            ]
-          : []),
+        {
+          name: 'Secrets',
+          key: 'secrets',
+          url: `/project/${projectRef}/functions/secrets`,
+          items: [],
+        },
       ],
     },
   ]
