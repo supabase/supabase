@@ -213,7 +213,7 @@ const PlanUpdateSidePanel = () => {
                     </div>
                     {isCurrentPlan ? (
                       <Button block disabled type="default">
-                        Current plan 
+                        Current plan
                       </Button>
                     ) : (
                       <ButtonTooltip
@@ -221,7 +221,8 @@ const PlanUpdateSidePanel = () => {
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
-                          (selectedOrganization?.managed_by !== 'supabase' && plan.id !== 'tier_free') ||
+                          (selectedOrganization?.managed_by !== 'supabase' &&
+                            plan.id !== 'tier_free') ||
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
