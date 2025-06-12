@@ -10,7 +10,7 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getTools } from '../sql/tools'
 
-export const maxDuration = 30
+export const maxDuration = 60
 
 const pgMetaSchemasList = pgMeta.schemas.list()
 

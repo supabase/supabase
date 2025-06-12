@@ -19,7 +19,7 @@ import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
-export const maxDuration = 30
+export const maxDuration = 60
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req

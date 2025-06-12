@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 
-export const maxDuration = 30
+export const maxDuration = 60
 
 const ServiceSchema = z.object({
   name: z.enum(['Auth', 'Storage', 'Database', 'Edge Function', 'Cron', 'Queues', 'Vector']),
