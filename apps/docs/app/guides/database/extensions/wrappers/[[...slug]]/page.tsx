@@ -96,6 +96,10 @@ async function getLatestRelease(after: string | null = null) {
   }
 }
 
+function rewriteAssetUrls(mdContent: string, baseUrl: string): string {
+  return mdContent.replace(/(\.\.\/)+assets\//g, baseUrl)
+}
+
 // Each external docs page is mapped to a local page
 const pageMap = [
   {
@@ -278,7 +282,14 @@ const getContent = async (params: Params) => {
     })
     const rawContent = await response.text()
 
-    const { content: contentWithoutFrontmatter } = matter(rawContent)
+    // Build assets base URL dynamically
+    const baseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
+
+    // Rewrite asset URLs in the content
+    const rewrittenContent = rewriteAssetUrls(rawContent, baseUrl)
+
+    // Use rewritten content with proper external asset URLs
+    const { content: contentWithoutFrontmatter } = matter(rewrittenContent)
     content = removeRedundantH1(contentWithoutFrontmatter)
   }
 
