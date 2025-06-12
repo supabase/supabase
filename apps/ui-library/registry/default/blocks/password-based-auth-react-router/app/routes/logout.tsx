@@ -4,7 +4,7 @@ import { type ActionFunctionArgs, redirect } from 'react-router'
 export async function loader({ request }: ActionFunctionArgs) {
   const { supabase, headers } = createClient(request)
 
-  const { error } = await supabase.auth.signOut()
+  const { error } = await supabase.auth.signOut({ scope: 'local' })
 
   if (error) {
     console.error(error)

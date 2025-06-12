@@ -260,7 +260,7 @@ const SessionsAuthSettingsForm = () => {
                   <div className="mb-4">
                     <UpgradeToPro
                       primaryText="Upgrade to Pro"
-                      secondaryText="Configuring user sessions requires the Pro Plan."
+                      secondaryText="Configuring user sessions requires the Pro Plan. Note: Multi-session issues may affect Free tier users who cannot configure these settings."
                     />
                   </div>
                 )}
@@ -272,7 +272,7 @@ const SessionsAuthSettingsForm = () => {
                     <FormItemLayout
                       layout="flex-row-reverse"
                       label="Enforce single session per user"
-                      description="If enabled, all but a user's most recently active session will be terminated."
+                      description="If enabled, all but a user's most recently active session will be terminated. Disable this for multi-device applications. Note: When disabled, ensure your app uses 'local' scope for signOut() to prevent unexpected logouts across devices."
                     >
                       <FormControl_Shadcn_>
                         <Switch
