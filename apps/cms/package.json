@@ -7,7 +7,7 @@
     "node": "20.*"
   },
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack --experimental-build-mode compile && pnpm run migrate",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack && pnpm run migrate",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -17,6 +17,7 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3030",
     "ci": "cross-env NODE_OPTIONS=--no-deprecation pnpm run build",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
+    "postbuild": "pnpm run migrate",
     "clean": "rimraf node_modules .next",
     "typecheck_IGNORED": "tsc --noEmit"
   },
@@ -46,7 +47,6 @@
     "lucide-react": "^0.511.0",
     "next": "catalog:",
     "payload": "3.33.0",
-    "pg": "^8.13.1",
     "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-dom": "catalog:",
