@@ -16,7 +16,7 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
   return (
     <>
       <Admonition type="danger">
-        The selected organization does not exist or you don't have permissions to access it.{' '}
+        The selected organization does not exist or you don't have permission to access it.{' '}
         {slug ? (
           <>
             Contact the owner or administrator to create a new project in the <code>{slug}</code>{' '}
