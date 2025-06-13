@@ -162,6 +162,9 @@ importers:
       payload:
         specifier: 3.33.0
         version: 3.33.0(graphql@16.10.0)(typescript@5.7.3)
+      pg:
+        specifier: ^8.13.1
+        version: 8.13.1
       prism-react-renderer:
         specifier: ^2.3.1
         version: 2.3.1(react@18.3.1)
@@ -10834,7 +10837,6 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
-    bundledDependencies: []
 
   eslint-plugin-import@2.31.0:
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}
@@ -20406,7 +20408,7 @@ snapshots:
       crypto-js: 4.2.0
       fastify: 4.29.1
       fastify-metrics: 10.6.0(fastify@4.29.1)
-      pg: 8.11.3
+      pg: 8.13.1
       pg-connection-string: 2.6.2
       pg-format: 1.0.4
       pg-protocol: 1.6.0
@@ -25360,7 +25362,7 @@ snapshots:
   '@supabase/postgres-meta@0.64.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
       '@sinclair/typebox': 0.25.24
-      pg: 8.11.3
+      pg: 8.13.1
       pg-format: 1.0.4
       pgsql-parser: 13.5.0(encoding@0.1.13)(supports-color@8.1.1)
       postgres-array: 3.0.2
