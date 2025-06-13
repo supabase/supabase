@@ -21,10 +21,9 @@ import MembersView from './MembersView'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 export const TeamSettings = () => {
-  const {
-    organizationMembersCreate: organizationMembersCreationEnabled,
-    organizationMembersDelete: organizationMembersDeletionEnabled,
-  } = useIsFeatureEnabled(['organization_members:create', 'organization_members:delete'])
+  const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
+    'organization_members:create',
+  ])
 
   const { slug } = useParams()
   const { profile } = useProfile()
