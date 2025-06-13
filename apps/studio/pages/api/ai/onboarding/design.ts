@@ -1,12 +1,12 @@
-import { openai } from '@ai-sdk/openai'
 import { streamText, tool } from 'ai'
-import apiWrapper from 'lib/api/apiWrapper'
+import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-const openAiKey = process.env.OPENAI_API_KEY
+import { getModel } from 'lib/ai/model'
+import apiWrapper from 'lib/api/apiWrapper'
 
-export const maxDuration = 30
+export const maxDuration = 60
 
 const ServiceSchema = z.object({
   name: z.enum(['Auth', 'Storage', 'Database', 'Edge Function', 'Cron', 'Queues', 'Vector']),
@@ -47,12 +47,6 @@ const getTools = () => {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!openAiKey) {
-    return res.status(400).json({
-      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
-    })
-  }
-
   const { method } = req
 
   switch (method) {
@@ -70,12 +64,18 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const { model, error: modelError } = await getModel()
+
+  if (modelError) {
+    return res.status(500).json({ error: modelError.message })
+  }
+
   const { messages } = req.body
 
   const result = await streamText({
-    model: openai('gpt-4o-mini'),
+    model,
     maxSteps: 7,
-    system: `
+    system: source`
       You are a Supabase expert who helps people set up their Supabase project. You specializes in database schema design. You are to help the user design a database schema for their application but also suggest Supabase services they should use. 
       
       When designing database schemas, follow these rules:
@@ -95,7 +95,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       4. Always respond with a short single paragraph of less than 80 words of what you changed and the current state of the schema.
     
       If user requests to reset the database, call the reset tool.
-      `,
+    `,
     messages,
     tools: getTools(),
   })

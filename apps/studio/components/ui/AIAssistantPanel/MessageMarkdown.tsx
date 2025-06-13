@@ -25,7 +25,7 @@ import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
@@ -243,7 +243,7 @@ export const MarkdownPre = ({
   }
 
   return (
-    <div className="w-auto -ml-[36px] overflow-x-hidden">
+    <div className="w-auto overflow-x-hidden not-prose">
       {language === 'edge' ? (
         <EdgeFunctionBlock
           label={title}

@@ -9,11 +9,10 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 
 interface AIOnboardingProps {
-  setMessages: (messages: any[]) => void
   onSendMessage: (message: string) => void
 }
 
-export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardingProps) {
+export const AIOnboarding = ({ onSendMessage }: AIOnboardingProps) => {
   const sendMessageToAssistant = (message: string) => {
     onSendMessage(message)
   }
