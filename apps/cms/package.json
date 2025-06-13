@@ -7,18 +7,18 @@
     "node": "20.*"
   },
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack && pnpm run migrate",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
+    "ci": "payload migrate && pnpm build",
+    "clean": "rimraf node_modules .next",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
+    "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
+    "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate --force-accept-warning",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3030",
-    "ci": "cross-env NODE_OPTIONS=--no-deprecation pnpm run build",
-    "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
-    "postbuild": "pnpm run migrate",
-    "clean": "rimraf node_modules .next",
     "typecheck_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
