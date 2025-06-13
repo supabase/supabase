@@ -14,7 +14,7 @@ import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDbInAwsRevamped } from 'hooks/misc/useSelectedProject'
+import { useIsAwsNew } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -33,9 +33,9 @@ const PauseProjectButton = () => {
     'queue_jobs.projects.pause'
   )
 
-  const isOrioleDBInAwsNew = useIsOrioleDbInAwsRevamped()
+  const isAwsNew = useIsAwsNew()
   const isFreePlan = organization?.plan.id === 'free'
-  const isPaidAndNotAwsNew = !isFreePlan && !isOrioleDBInAwsNew
+  const isPaidAndNotAwsNew = !isFreePlan && !isAwsNew
 
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
