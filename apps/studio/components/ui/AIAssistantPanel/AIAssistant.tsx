@@ -158,7 +158,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       // [Joshen] Specifically limiting the chat history that get's sent to reduce the
       // size of the context that goes into the model. This should always be an odd number
       // as much as possible so that the first message is always the user's
-      const MAX_CHAT_HISTORY = 11
+      const MAX_CHAT_HISTORY = 5
 
       return JSON.stringify({
         messages: messages.slice(-MAX_CHAT_HISTORY),
