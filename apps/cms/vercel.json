@@ -1,3 +1,11 @@
 {
-  "buildCommand": "pnpm run ci"
+  "buildCommand": "pnpm run build && pnpm run payload migrate",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
