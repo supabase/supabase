@@ -395,6 +395,24 @@ export interface paths {
     patch: operations['updateApiKey']
     trace?: never
   }
+  '/v1/projects/{ref}/api-keys/legacy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** [Beta] Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
+    get: operations['checkLegacyApiKeys']
+    /** [Beta] Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
+    put: operations['updateLegacyApiKeys']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/billing/addons': {
     parameters: {
       query?: never
@@ -2062,6 +2080,9 @@ export interface components {
       }
       updated_at?: string
     }
+    LegacyApiKeysResponse: {
+      enabled: boolean
+    }
     ListProjectAddonsResponse: {
       available_addons: {
         name: string
@@ -2967,7 +2988,11 @@ export interface components {
       allowed_release_channels: ('internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview')[]
       id: string
       name: string
-      opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
+      opt_in_tags: (
+        | 'AI_SQL_GENERATOR_OPT_IN'
+        | 'AI_DATA_GENERATOR_OPT_IN'
+        | 'AI_LOG_GENERATOR_OPT_IN'
+      )[]
       /** @enum {string} */
       plan?: 'free' | 'pro' | 'team' | 'enterprise'
     }
@@ -3955,8 +3980,11 @@ export interface operations {
   deleteApiKey: {
     parameters: {
       query?: {
+        reason?: string
         /** @description Boolean string, true or false */
         reveal?: boolean
+        /** @description Boolean string, true or false */
+        was_compromised?: boolean
       }
       header?: never
       path: {
@@ -4010,6 +4038,65 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ApiKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  checkLegacyApiKeys: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LegacyApiKeysResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  updateLegacyApiKeys: {
+    parameters: {
+      query: {
+        /** @description Boolean string, true or false */
+        enabled: boolean
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['LegacyApiKeysResponse']
         }
       }
       403: {

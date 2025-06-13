@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
@@ -7,10 +8,12 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { Input } from 'ui'
+import { Input, Button } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
+import { useLegacyAPIKeysEnabledQuery } from 'data/api-keys/api-keys-query'
+import { useUpdateLegacyAPIKeysEnabledMutation } from 'data/api-keys/legacy-api-key-enable-mutation'
 
 const DisplayApiSettings = ({
   legacy,
@@ -21,6 +24,7 @@ const DisplayApiSettings = ({
 }) => {
   const { ref: projectRef } = useParams()
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const newApiKeysInRollOut = useFlag('basicApiKeys')
 
   const {
@@ -35,10 +39,38 @@ const DisplayApiSettings = ({
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const { isLoading, can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
+
+  const { isLoading: isLoadingLegacyAPIKeysEnabled, data: legacyAPIKeysEnabledData } =
+    useLegacyAPIKeysEnabledQuery({ projectRef })
+
+  const { mutate: updateLegacyAPIKeyEnabled, isLoading: isUpdatingLegacyAPIKeyEnabled } =
+    useUpdateLegacyAPIKeysEnabledMutation()
+
+  const onToggleLegacyAPIKeysEnabled = () => {
+    const enabled = !legacyAPIKeysEnabledData?.enabled
+
+    updateLegacyAPIKeyEnabled(
+      { projectRef, enabled },
+      {
+        onSuccess: () => {
+          toast.success(
+            enabled
+              ? 'Your anon and service_role keys have been re-enabled!'
+              : 'Your anon and service_role keys have been disabled!'
+          )
+          setIsConfirmOpen(false)
+        },
+      }
+    )
+  }
+
+  const isLoading =
+    isProjectSettingsLoading || isLoadingPermissions || isLoadingLegacyAPIKeysEnabled
+
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
   const apiKeys = settings?.service_api_keys ?? []
@@ -200,6 +232,65 @@ const DisplayApiSettings = ({
             />
           )
         ) : null}
+
+        {newApiKeysInRollOut && !showNotice && !isLoading && legacyAPIKeysEnabledData && (
+          <>
+            <TextConfirmModal
+              visible={isConfirmOpen}
+              onCancel={() => setIsConfirmOpen(false)}
+              onConfirm={onToggleLegacyAPIKeysEnabled}
+              title={
+                legacyAPIKeysEnabledData.enabled
+                  ? 'Disable JWT-based keys'
+                  : 'Re-enable JWT-based keys'
+              }
+              confirmString={legacyAPIKeysEnabledData.enabled ? 'disable' : 're-enable'}
+              confirmLabel={`Yes, ${legacyAPIKeysEnabledData.enabled ? 'disable' : 're-enable'} anon and service_role`}
+              confirmPlaceholder={legacyAPIKeysEnabledData.enabled ? 'disable' : 're-enable'}
+              loading={isUpdatingLegacyAPIKeyEnabled}
+              variant={legacyAPIKeysEnabledData.enabled ? 'destructive' : 'default'}
+              alert={
+                legacyAPIKeysEnabledData.enabled
+                  ? {
+                      title: 'Disabling can cause downtime!',
+                      description: `If you disable your anon and service_role keys while they are in use, your applications will stop functioning. All API endpoints will receive HTTP 401 Unauthorized. Make sure you are no longer using them before proceeding.`,
+                    }
+                  : {
+                      title: 'Prefer publishable and secret keys',
+                      description:
+                        'While re-enabling anon and service_role keys makes sense in some cases, a better and more secure alternative is the publishable or secret key. Consider using those before proceeding!',
+                    }
+              }
+            />
+
+            <Panel.Content className="flex flex-row">
+              <div className="grow" />
+
+              {!legacyAPIKeysEnabledData.enabled && (
+                <Button
+                  onClick={() => {
+                    setIsConfirmOpen(true)
+                  }}
+                  loading={isUpdatingLegacyAPIKeyEnabled}
+                >
+                  Re-enable JWT-based API keys
+                </Button>
+              )}
+
+              {legacyAPIKeysEnabledData.enabled && (
+                <Button
+                  type="danger"
+                  onClick={() => {
+                    setIsConfirmOpen(true)
+                  }}
+                  loading={isUpdatingLegacyAPIKeyEnabled}
+                >
+                  Disable JWT-based API keys
+                </Button>
+              )}
+            </Panel.Content>
+          </>
+        )}
       </Panel>
     </>
   )

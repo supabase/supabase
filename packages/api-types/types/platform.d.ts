@@ -4251,7 +4251,7 @@ export interface components {
       /** @default 0 */
       recoveryTimeTarget?: number
     }
-    ConfirmSubscriptionChangeBody: {
+    ConfirmCreateSubscriptionChangeBody: {
       kind?: string
       name: string
       payment_intent_id: string
@@ -4554,6 +4554,7 @@ export interface components {
           is_owner: boolean
           name: string
           opt_in_tags: string[]
+          organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
             id: 'free' | 'pro' | 'team' | 'enterprise'
@@ -6151,6 +6152,7 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
+      organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
         id: 'free' | 'pro' | 'team' | 'enterprise'
@@ -7274,8 +7276,9 @@ export interface components {
       }[]
     }
     RunQueryBody: {
-      query: string
+      /** @default false */
       disable_statement_timeout?: boolean
+      query: string
     }
     SearchProfileBody: {
       keywords: string
@@ -8032,7 +8035,11 @@ export interface components {
       /** Format: email */
       billing_email?: string
       name?: string
-      opt_in_tags?: 'AI_SQL_GENERATOR_OPT_IN'[]
+      opt_in_tags?: (
+        | 'AI_SQL_GENERATOR_OPT_IN'
+        | 'AI_DATA_GENERATOR_OPT_IN'
+        | 'AI_LOG_GENERATOR_OPT_IN'
+      )[]
     }
     UpdateOrganizationResponse: {
       billing_email?: string
@@ -12047,7 +12054,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ConfirmSubscriptionChangeBody']
+        'application/json': components['schemas']['ConfirmCreateSubscriptionChangeBody']
       }
     }
     responses: {
