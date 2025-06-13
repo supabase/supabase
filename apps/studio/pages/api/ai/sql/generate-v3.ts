@@ -19,7 +19,7 @@ import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
-export const maxDuration = 90
+export const maxDuration = 120
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -236,7 +236,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
               - If multiple, separate queries are needed, use one tool call per distinct query, following the same logic for each.
           - For **Edge Functions**:
               - Explain your plan and the function's purpose.
-              - Use the \`display_edge_function\` tool with the name and Typescript code to propose it to the user. If you lack schema context because MCP tools were unavailable, state this limitation and generate the function based on general best practices.
+              - Use the \`display_edge_function\` tool with the name and Typescript code to propose it to the user. If you lack schema context because MCP tools were unavailable, state this limitation and generate the function based on general best practices. Note that this tool should only be used for displaying Edge Function code, not for displaying logs or other types of content.
       - **UI Rendering & Explanation**: The frontend uses the \`display_query\` and \`display_edge_function\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
       - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.
 
@@ -358,7 +358,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const result = streamText({
       model,
-      maxSteps: 10,
+      maxSteps: 5,
       system,
       messages,
       tools,

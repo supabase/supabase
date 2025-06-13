@@ -1,4 +1,6 @@
 import { toast } from 'sonner'
+import { handleError } from 'data/fetchers'
+import { ResponseError } from 'types'
 
 import { authKeys } from 'data/auth/keys'
 import { databaseExtensionsKeys } from 'data/database-extensions/keys'
@@ -103,11 +105,20 @@ export const getContextualInvalidationKeys = ({
   )
 }
 
-export const onErrorChat = (error: { message: string }) => {
-  const errorObject = tryParseJson(error.message)
-  if (errorObject) {
-    toast.error(errorObject.error)
-  } else {
-    toast.error(error.message)
+export const onErrorChat = (error: Error) => {
+  const parsedError = tryParseJson(error.message)
+
+  try {
+    handleError(parsedError?.error || parsedError || error)
+  } catch (e: any) {
+    if (e instanceof ResponseError) {
+      toast.error(e.message)
+    } else if (e instanceof Error) {
+      toast.error(e.message)
+    } else if (typeof e === 'string') {
+      toast.error(e)
+    } else {
+      toast.error('An unknown error occurred')
+    }
   }
 }

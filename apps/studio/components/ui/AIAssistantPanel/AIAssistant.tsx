@@ -162,6 +162,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       schema: currentSchema,
       table: currentTable?.name,
     },
+    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+      const headers = await constructHeaders()
+      const existingHeaders = new Headers(init?.headers)
+      for (const [key, value] of headers.entries()) {
+        existingHeaders.set(key, value)
+      }
+      return fetch(input, { ...init, headers: existingHeaders })
+    },
     onError: onErrorChat,
     onFinish: handleChatFinish,
   })
@@ -198,24 +206,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const hasMessages = chatMessages.length > 0
 
-  const sendMessageToAssistant = async (content: string) => {
+  const sendMessageToAssistant = (content: string) => {
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
-    const headerData = await constructHeaders()
     snap.clearSqlSnippets()
 
     // Store the user message in the ref before appending
     lastUserMessageRef.current = payload
 
-    const authorizationHeader = headerData.get('Authorization')
-
-    append(
-      payload,
-      authorizationHeader
-        ? {
-            headers: { Authorization: authorizationHeader },
-          }
-        : undefined
-    )
+    append(payload)
 
     setValue('')
 
@@ -386,36 +384,41 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           {hasMessages ? (
             <div className="w-full p-5">
               {renderedMessages}
-              {(last(chatMessages)?.role === 'user' ||
-                last(chatMessages)?.content?.length === 0) && (
-                <div className="flex gap-4 w-auto overflow-hidden">
-                  <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-                  <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
-                    <span>Thinking</span>
-                    <div className="flex gap-1">
-                      <motion.span
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                      >
-                        .
-                      </motion.span>
-                      <motion.span
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                      >
-                        .
-                      </motion.span>
-                      <motion.span
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                      >
-                        .
-                      </motion.span>
+              <AnimatePresence>
+                {isChatLoading && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex gap-4 w-auto overflow-hidden"
+                  >
+                    <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                      <span>Thinking</span>
+                      <div className="flex gap-1">
+                        <motion.span
+                          animate={{ opacity: [0, 1, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                        >
+                          .
+                        </motion.span>
+                        <motion.span
+                          animate={{ opacity: [0, 1, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                        >
+                          .
+                        </motion.span>
+                        <motion.span
+                          animate={{ opacity: [0, 1, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                        >
+                          .
+                        </motion.span>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
-              <div className="h-1" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : snap.suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
