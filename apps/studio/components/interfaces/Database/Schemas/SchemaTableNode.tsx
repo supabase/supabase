@@ -1,4 +1,5 @@
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DiamondIcon, ExternalLink, Fingerprint, Hash, InfoIcon, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { Handle, NodeProps } from 'reactflow'
 
@@ -13,6 +14,7 @@ export type TableNodeData = {
   name: string
   ref: string
   isForeign: boolean
+  comment?: string
   columns: {
     id: string
     isPrimary: boolean
@@ -35,7 +37,7 @@ const TableNode = ({
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
 
   const itemHeight = 'h-[22px]'
-
+  console.log(data)
   return (
     <>
       {data.isForeign ? (
@@ -65,13 +67,24 @@ const TableNode = ({
               <Table2 strokeWidth={1} size={12} className="text-light" />
               {data.name}
             </div>
-            {data.id && !placeholder && (
-              <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
-                <Link href={`/project/${data.ref}/editor/${data.id}`}>
-                  <ExternalLink size={10} className="text-foreground-light" />
-                </Link>
-              </Button>
-            )}
+            <div className="flex gap-x-1 items-center">
+              <ButtonTooltip
+                type="text"
+                className="px-0 w-[16px] h-[16px] rounded"
+                icon={<InfoIcon size={5} className="text-foreground-light !w-[10px] !h-[10px]" />}
+                onClick={() => {}}
+                tooltip={{
+                  content: { side: 'top', text: data.comment ?? 'No Description Available' },
+                }}
+              />
+              {data.id && !placeholder && (
+                <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
+                  <Link href={`/project/${data.ref}/editor/${data.id}`}>
+                    <ExternalLink size={10} className="text-foreground-light" />
+                  </Link>
+                </Button>
+              )}
+            </div>
           </header>
 
           {data.columns.map((column) => (
