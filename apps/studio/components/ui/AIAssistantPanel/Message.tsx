@@ -133,7 +133,7 @@ export const Message = function Message({
                           return (
                             <div
                               key={`${id}-tool-loading-${toolName}`}
-                              className="rounded border text-xs mono text-foreground-lighter py-2 px-3"
+                              className="rounded border text-xs font-mono text-xs text-foreground-lighter py-2 px-3"
                             >
                               {`Calling ${toolName}...`}
                             </div>
