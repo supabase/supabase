@@ -28,8 +28,12 @@ import {
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import { calculateTotalChartAggregate, CustomLabel, CustomTooltip } from './ComposedChart.utils'
-import { MultiAttribute } from './ComposedChartHandler'
+import {
+  calculateTotalChartAggregate,
+  CustomLabel,
+  CustomTooltip,
+  type MultiAttribute,
+} from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { formatBytes } from 'lib/helpers'
@@ -202,11 +206,10 @@ export default function ComposedChart({
   const isDiskSpaceChart = chartData?.some((att: any) =>
     att.name.toLowerCase().includes('disk_space_')
   )
-  const isDBSizeChart = chartData?.some((att: any) =>
-    att.name.toLowerCase().includes('pg_database_size')
-  )
+  const isDiskSizeChart = chartData?.some((att: any) => att.name.toLowerCase().includes('disk_fs_'))
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDiskSizeChart || isNetworkChart
+
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
