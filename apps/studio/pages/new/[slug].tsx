@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { debounce } from 'lodash'
-import { Boxes, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
@@ -16,6 +16,7 @@ import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
+import { OrgNotFound } from 'components/interfaces/Organization/OrgNotFound'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import {
   extractPostgresVersionDetails,
@@ -27,8 +28,6 @@ import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityO
 import { SpecialSymbolsCallout } from 'components/interfaces/ProjectCreation/SpecialSymbolsCallout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
-import { ActionCard } from 'components/ui/ActionCard'
-import AlertError from 'components/ui/AlertError'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import { InlineLink } from 'components/ui/InlineLink'
 import Panel from 'components/ui/Panel'
@@ -78,7 +77,6 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -540,7 +538,6 @@ const Wizard: NextPageWithLayout = () => {
                                   Total Monthly Compute Costs
                                   {/**
                                    * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                   *
                                    * Will be adjusted in the future [kevin]
                                    */}
                                   {organizationProjects.length > 0 && (
@@ -632,54 +629,8 @@ const Wizard: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isAdmin && <NotOrganizationOwnerWarning slug={slug} />}
-                  {/* If the org is not found, list all orgs and let the user select one */}
-                  {orgNotFound && (
-                    <>
-                      <div className="grid gap-2">
-                        <h2 className="mt-6">Your organizations</h2>
-                        <h3 className="text-sm  ">Create a new project in your organization</h3>
-                      </div>
-
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {isOrganizationsLoading && (
-                          <>
-                            <Skeleton className="h-[62px] rounded-md" />
-                            <Skeleton className="h-[62px] rounded-md" />
-                            <Skeleton className="h-[62px] rounded-md" />
-                          </>
-                        )}
-                        {isOrganizationsError && (
-                          <AlertError
-                            error={organizationsError}
-                            subject="Failed to load organizations"
-                          />
-                        )}
-                        {isOrganizationsSuccess &&
-                          organizations?.map((organization) => {
-                            const numProjects = allProjects?.filter(
-                              (x) => x.organization_slug === organization.slug
-                            ).length
-
-                            if (!numProjects) return null
-
-                            return (
-                              <ActionCard
-                                bgColor="bg border"
-                                className="[&>div]:items-center"
-                                key={organization.id}
-                                icon={
-                                  <Boxes size={18} strokeWidth={1} className="text-foreground" />
-                                }
-                                title={organization.name}
-                                description={`${organization.plan.name} Plan${numProjects > 0 ? `${'  '}•${'  '}${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
-                                onClick={() => router.push(`/new/${organization.slug}`)}
-                              />
-                            )
-                          })}
-                      </div>
-                    </>
-                  )}
+                  {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
+                  {orgNotFound && <OrgNotFound />}
                 </Panel.Content>
 
                 {canCreateProject && (
