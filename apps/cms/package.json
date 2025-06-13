@@ -7,7 +7,7 @@
     "node": "20.*"
   },
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack && pnpm start",
     "ci": "payload migrate && pnpm build",
     "clean": "rimraf node_modules .next",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
