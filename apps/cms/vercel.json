@@ -1,0 +1,11 @@
+{
+  "buildCommand": "pnpm run ci",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ]
+}
