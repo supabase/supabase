@@ -15,7 +15,6 @@ import {
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -29,7 +28,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { LeaveTeamButton } from './LeaveTeamButton'
+import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
 interface MemberActionsProps {
@@ -48,7 +48,11 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
+
+  const memberIsUser = member.gotrue_id == profile?.gotrue_id
+  const isOwner = selectedOrganization?.is_owner
+  const roles = allRoles?.org_scoped_roles ?? []
+  const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
@@ -162,6 +166,14 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             },
           }}
         />
+      </div>
+    )
+  }
+
+  if (memberIsUser) {
+    return (
+      <div className="flex items-center justify-end">
+        <LeaveTeamButton />
       </div>
     )
   }
