@@ -15,7 +15,7 @@ services:
     env_file:
       - .env
 
-  # Uncomment the following to use postgres
+  # Uncomment the following to use postgres 
   postgres:
     restart: always
     image: postgres:latest
