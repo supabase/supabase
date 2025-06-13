@@ -106,6 +106,11 @@ export const Restriction = () => {
                   {org.plan.id === 'free' ? 'Upgrade plan' : 'Disable spend cap'}
                 </Link>
               </Button>
+
+              <Button key="view-usage-button" asChild type="default">
+                <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
+              </Button>
+
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a href="https://supabase.com/docs/guides/platform/billing-faq#fair-use-policy">
                   About Fair Use Policy
