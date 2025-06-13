@@ -308,7 +308,6 @@ const PlanUpdateSidePanel = () => {
 
       <SubscriptionPlanUpdateDialog
         selectedTier={selectedTier}
-        selectedOrganization={selectedOrganization}
         onClose={() => setSelectedTier(undefined)}
         subscriptionPlanMeta={subscriptionPlanMeta}
         planMeta={planMeta}

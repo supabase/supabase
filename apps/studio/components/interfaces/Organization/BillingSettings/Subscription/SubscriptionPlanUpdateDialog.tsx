@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import tweets from 'shared-data/tweets'
 import { toast } from 'sonner'
 
@@ -14,13 +14,22 @@ import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS } from 'lib/constants'
+import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { Badge, Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { BillingCustomerDataExistingOrgDialog } from '../BillingCustomerData/BillingCustomerDataExistingOrgDialog'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import { useTheme } from 'next-themes'
+import { PaymentIntentResult } from '@stripe/stripe-js'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const getRandomTweet = () => {
   const filteredTweets = tweets.filter((it) => it.text.length < 180)
@@ -57,7 +66,6 @@ interface Props {
   subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse | undefined
   billingViaPartner: boolean
   billingPartner?: string
-  selectedOrganization: any
   subscription: any
   currentPlanMeta: any
   projects: ProjectInfo[]
@@ -74,15 +82,27 @@ export const SubscriptionPlanUpdateDialog = ({
   subscriptionPreview,
   billingViaPartner,
   billingPartner,
-  selectedOrganization,
   subscription,
   currentPlanMeta,
   projects,
 }: Props) => {
+  const { resolvedTheme } = useTheme()
   const queryClient = useQueryClient()
-  const { slug } = useSelectedOrganization() ?? {}
+  const selectedOrganization = useSelectedOrganization()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [testimonialTweet, setTestimonialTweet] = useState(getRandomTweet())
+  const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
+  const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
+  const paymentMethodSelection = useRef<{
+    createPaymentMethod: () => Promise<PaymentMethod | undefined>
+  }>(null)
+
+  const stripeOptionsConfirm = useMemo(() => {
+    return {
+      clientSecret: paymentIntentSecret,
+      appearance: getStripeElementsAppearanceOptions(resolvedTheme),
+    } as StripeElementsOptions
+  }, [paymentIntentSecret, resolvedTheme])
 
   useEffect(() => {
     if (selectedTier !== undefined && selectedTier !== 'tier_free') {
@@ -90,14 +110,23 @@ export const SubscriptionPlanUpdateDialog = ({
     }
   }, [selectedTier])
 
+  const onSuccessfulPlanChange = () => {
+    toast.success(
+      `Successfully ${planMeta?.change_type === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
+    )
+    onClose()
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  }
+
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
-      onSuccess: () => {
-        toast.success(
-          `Successfully ${planMeta?.change_type === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
-        )
-        onClose()
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      onSuccess: (data) => {
+        if (data.pending_payment_intent_secret) {
+          setPaymentIntentSecret(data.pending_payment_intent_secret)
+          return
+        }
+
+        onSuccessfulPlanChange()
       },
       onError: (error) => {
         toast.error(`Unable to update subscription: ${error.message}`)
@@ -105,25 +134,56 @@ export const SubscriptionPlanUpdateDialog = ({
     }
   )
 
+  const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionChangeMutation({
+    onSuccess: () => {
+      onSuccessfulPlanChange()
+    },
+    onError: (error) => {
+      toast.error(`Unable to update subscription: ${error.message}`)
+    },
+  })
+
+  const paymentIntentConfirmed = async (paymentIntentConfirmation: PaymentIntentResult) => {
+    // Reset payment intent secret to ensure another attempt works as expected
+    setPaymentIntentSecret('')
+
+    if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded') {
+      await confirmPendingSubscriptionChange({
+        slug: selectedOrganization?.slug,
+        payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
+      })
+    } else {
+      setPaymentConfirmationLoading(false)
+      // If the payment intent is not successful, we reset the payment method and show an error
+      toast.error(`Could not confirm payment. Please try again or use a different card.`)
+    }
+  }
+
   const onUpdateSubscription = async () => {
-    if (!slug) return console.error('org slug is required')
+    if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
-    if (!selectedPaymentMethod && subscription?.payment_method_type !== 'invoice') {
+
+    const paymentMethod = await paymentMethodSelection.current?.createPaymentMethod()
+
+    if (!paymentMethod && subscription?.payment_method_type !== 'invoice') {
       return toast.error('Please select a payment method')
     }
 
-    if (selectedPaymentMethod) {
-      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          defaultPaymentMethodId: selectedPaymentMethod,
-          data: prev.data.map((pm: any) => ({
-            ...pm,
-            is_default: pm.id === selectedPaymentMethod,
-          })),
+    if (paymentMethod) {
+      queryClient.setQueriesData(
+        organizationKeys.paymentMethods(selectedOrganization.slug),
+        (prev: any) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            defaultPaymentMethodId: paymentMethod?.id,
+            data: prev.data.map((pm: any) => ({
+              ...pm,
+              is_default: pm.id === paymentMethod?.id,
+            })),
+          }
         }
-      })
+      )
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default
@@ -132,7 +192,11 @@ export const SubscriptionPlanUpdateDialog = ({
         ? (PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier)
         : selectedTier
 
-    updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
+    updateOrgSubscription({
+      slug: selectedOrganization?.slug,
+      tier,
+      paymentMethod: paymentMethod?.id,
+    })
   }
 
   const features = subscriptionPlanMeta?.features?.[0]?.features || []
@@ -182,11 +246,11 @@ export const SubscriptionPlanUpdateDialog = ({
       <DialogContent
         onOpenAutoFocus={(event) => event.preventDefault()}
         size="xlarge"
-        className="p-0"
+        className="p-0 overflow-y-auto max-h-[1000px]"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 h-full items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 h-full items-stretch">
           {/* Left Column */}
-          <div className="p-8 pb-8 flex flex-col">
+          <div className="p-8 pb-8 flex flex-col xl:col-span-3">
             <div className="flex-1">
               <h3 className="text-base mb-4">
                 {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
@@ -256,7 +320,7 @@ export const SubscriptionPlanUpdateDialog = ({
                           <>
                             {' '}
                             <Link
-                              href={`/org/${slug}/billing#breakdown`}
+                              href={`/org/${selectedOrganization?.slug}/billing#breakdown`}
                               className="text-sm text-brand hover:text-brand-600 transition"
                               target="_blank"
                             >
@@ -483,16 +547,23 @@ export const SubscriptionPlanUpdateDialog = ({
               )}
             </div>
 
-            <div className="pt-6">
-              {!billingViaPartner ? (
+            <div className="pt-4">
+              {!billingViaPartner && (
                 <div className="space-y-2 mb-4">
                   <BillingCustomerDataExistingOrgDialog />
+
                   <PaymentMethodSelection
+                    ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={setSelectedPaymentMethod}
+                    createPaymentMethodInline={
+                      subscriptionPreview?.pending_subscription_flow === true
+                    }
                   />
                 </div>
-              ) : (
+              )}
+
+              {billingViaPartner && (
                 <div className="mb-4">
                   <p className="text-sm">
                     This organization is billed through our partner{' '}
@@ -518,21 +589,22 @@ export const SubscriptionPlanUpdateDialog = ({
                 (it) =>
                   it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
                   it.status === PROJECT_STATUS.COMING_UP
-              ).length === 0 && (
-                <div className="pb-2">
-                  <Admonition title="Empty organization" type="warning">
-                    This organization has no active projects. Did you select the correct
-                    organization?
-                  </Admonition>
-                </div>
-              )}
+              ).length === 0 &&
+                subscriptionPreview?.plan_change_type !== 'downgrade' && (
+                  <div className="pb-2">
+                    <Admonition title="Empty organization" type="warning">
+                      This organization has no active projects. Did you select the correct
+                      organization?
+                    </Admonition>
+                  </div>
+                )}
 
               <div className="flex space-x-2">
                 <Button type="default" size="medium" onClick={onClose} className="flex-1">
                   Cancel
                 </Button>
                 <Button
-                  loading={isUpdating}
+                  loading={isUpdating || paymentConfirmationLoading}
                   type="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
@@ -545,13 +617,13 @@ export const SubscriptionPlanUpdateDialog = ({
           </div>
 
           {/* Right Column */}
-          <div className="bg-surface-100 p-8 flex flex-col border-l">
+          <div className="bg-surface-100 p-8 flex flex-col border-l xl:col-span-2">
             {planMeta?.change_type === 'downgrade'
               ? featuresToLose.length > 0 && (
                   <div className="mb-4">
                     <h3 className="text-sm mb-1">Features you'll lose</h3>
                     <p className="text-xs text-foreground-light mb-4">
-                      Please review this carefully before downgrading.
+                      Please review carefully before downgrading.
                     </p>
                     <div className="space-y-2 mb-4 text-foreground-light">
                       {featuresToLose.map((feature: string | [string, ...any[]]) => (
@@ -604,6 +676,19 @@ export const SubscriptionPlanUpdateDialog = ({
             )}
           </div>
         </div>
+
+        {stripePromise && paymentIntentSecret && (
+          <Elements stripe={stripePromise} options={stripeOptionsConfirm}>
+            <PaymentConfirmation
+              paymentIntentSecret={paymentIntentSecret}
+              onPaymentIntentConfirm={(paymentIntentConfirmation) =>
+                paymentIntentConfirmed(paymentIntentConfirmation)
+              }
+              onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
+              paymentMethodId={selectedPaymentMethod!}
+            />
+          </Elements>
+        )}
       </DialogContent>
     </Dialog>
   )
