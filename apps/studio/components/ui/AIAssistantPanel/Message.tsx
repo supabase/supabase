@@ -112,11 +112,7 @@ export const Message = function Message({
                               isUser && 'text-foreground font-semibold'
                             )}
                             remarkPlugins={[remarkGfm]}
-                            components={{
-                              ...baseMarkdownComponents,
-                              ...markdownComponents,
-                              pre: 'pre',
-                            }}
+                            components={allMarkdownComponents}
                           >
                             {part.text}
                           </ReactMarkdown>

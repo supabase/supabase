@@ -243,7 +243,7 @@ export const MarkdownPre = ({
   }
 
   return (
-    <div className="w-auto -ml-[36px] overflow-x-hidden">
+    <div className="w-auto overflow-x-hidden not-prose">
       {language === 'edge' ? (
         <EdgeFunctionBlock
           label={title}
