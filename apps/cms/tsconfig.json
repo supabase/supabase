@@ -17,11 +17,10 @@
     "incremental": true,
     "jsx": "preserve",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "sourceMap": true,
     "isolatedModules": true,
-    "allowImportingTsExtensions": true,
     "plugins": [
       {
         "name": "next"
