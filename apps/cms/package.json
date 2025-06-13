@@ -4,7 +4,7 @@
   "description": "Payload CMS for Supabase",
   "license": "MIT",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack && pnpm run payload migrate",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -12,7 +12,7 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3030",
-    "ci": "cross-env NODE_OPTIONS=--no-deprecation pnpm build && payload migrate",
+    "ci": "cross-env NODE_OPTIONS=--no-deprecation pnpm build --turbopack && payload migrate",
     "clean": "rimraf node_modules .next",
     "typecheck_IGNORED": "tsc --noEmit"
   },
