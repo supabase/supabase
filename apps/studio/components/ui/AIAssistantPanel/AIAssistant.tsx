@@ -1,7 +1,6 @@
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { last } from 'lodash'
 import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -155,12 +154,20 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
     initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
-    body: {
-      aiOptInLevel,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: currentSchema,
-      table: currentTable?.name,
+    experimental_prepareRequestBody: ({ messages }) => {
+      // [Joshen] Specifically limiting the chat history that get's sent to reduce the
+      // size of the context that goes into the model. This should always be an odd number
+      // as much as possible so that the first message is always the user's
+      const MAX_CHAT_HISTORY = 11
+
+      return JSON.stringify({
+        messages: messages.slice(-MAX_CHAT_HISTORY),
+        aiOptInLevel,
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: currentSchema,
+        table: currentTable?.name,
+      })
     },
     fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
       const headers = await constructHeaders()

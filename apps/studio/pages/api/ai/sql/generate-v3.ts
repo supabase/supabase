@@ -1,23 +1,23 @@
-import crypto from 'crypto'
 import pgMeta from '@supabase/pg-meta'
+import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import { streamText, tool, ToolSet } from 'ai'
+import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { aiOptInLevelSchema } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
+import { getTools } from '../sql/tools'
 import {
   createSupabaseMCPClient,
   expectedToolsSchema,
   filterToolsByOptInLevel,
   transformToolResult,
 } from './supabase-mcp'
-import { getTools } from '../sql/tools'
-import { IS_PLATFORM } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 export const maxDuration = 120
 
@@ -61,7 +61,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: modelError.message })
   }
 
-  const { data, error: parseError } = requestBodySchema.safeParse(req.body)
+  const { data, error: parseError } = requestBodySchema.safeParse(JSON.parse(req.body))
 
   if (parseError) {
     return res.status(400).json({
