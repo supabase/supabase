@@ -166,13 +166,7 @@ const Wizard: NextPageWithLayout = () => {
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
 
-  const {
-    data: organizations,
-    isSuccess: isOrganizationsSuccess,
-    isLoading: isOrganizationsLoading,
-    isError: isOrganizationsError,
-    error: organizationsError,
-  } = useOrganizationsQuery()
+  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
 
   const isNotOnTeamOrEnterprisePlan = useMemo(
     () => !['team', 'enterprise'].includes(currentOrg?.plan.id ?? ''),
@@ -630,7 +624,7 @@ const Wizard: NextPageWithLayout = () => {
                   )}
 
                   {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
-                  {orgNotFound && <OrgNotFound />}
+                  {orgNotFound && <OrgNotFound slug={slug} />}
                 </Panel.Content>
 
                 {canCreateProject && (

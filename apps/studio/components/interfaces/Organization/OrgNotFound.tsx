@@ -1,9 +1,10 @@
 import AlertError from 'components/ui/AlertError'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { Skeleton } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { OrganizationCard } from './OrganizationCard'
 
-export const OrgNotFound = () => {
+export const OrgNotFound = ({ slug }: { slug?: string }) => {
   const {
     data: organizations,
     isSuccess: isOrganizationsSuccess,
@@ -14,6 +15,18 @@ export const OrgNotFound = () => {
 
   return (
     <>
+      <Admonition type="danger">
+        The selected organization does not exist or you don't have permissions to access it.{' '}
+        {slug ? (
+          <>
+            Contact the owner or administrator to create a new project in the <code>{slug}</code>{' '}
+            organization.
+          </>
+        ) : (
+          <>Contact the owner or administrator to create a new project.</>
+        )}
+      </Admonition>
+
       <h3 className="text-sm">Select an organization to create your new project from</h3>
 
       <div className="grid gap-2 grid-cols-2">
