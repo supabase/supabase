@@ -52,8 +52,12 @@ const useLogsQuery = (
       ...initialParams,
       project: projectRef,
       sql: initialParams?.sql ?? prev.sql,
-      iso_timestamp_start: initialParams.iso_timestamp_start ?? prev.iso_timestamp_start,
-      iso_timestamp_end: initialParams.iso_timestamp_end ?? prev.iso_timestamp_end,
+      iso_timestamp_start: initialParams.iso_timestamp_start
+        ? initialParams.iso_timestamp_start
+        : defaultHelper.calcFrom(),
+      iso_timestamp_end: initialParams.iso_timestamp_end
+        ? initialParams.iso_timestamp_end
+        : defaultHelper.calcTo(),
     }))
   }, [
     projectRef,

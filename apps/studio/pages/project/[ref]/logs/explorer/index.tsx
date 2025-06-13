@@ -12,6 +12,8 @@ import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LOGS_TABLES,
   TEMPLATES,
+  EXPLORER_DATEPICKER_HELPERS,
+  getDefaultHelper,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
 import {
   DatePickerToFrom,
@@ -106,6 +108,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     isLoading: logsLoading,
     changeQuery,
     runQuery,
+    setParams,
   } = useLogsQuery(
     projectRef,
     {
@@ -221,7 +224,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       })
     }
 
-    changeQuery(query)
+    setParams((prev: typeof params) => ({
+      ...prev,
+      sql: query,
+      iso_timestamp_start: timestampStart,
+      iso_timestamp_end: timestampEnd,
+    }))
     runQuery()
     router.push({
       pathname: router.pathname,
@@ -353,6 +361,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       }
     }
   }, [timestampStart, organization])
+
+  // Ensure default date range is set in URL state on first load
+  useEffect(() => {
+    const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
+    if (!timestampStart && !timestampEnd) {
+      setTimeRange(defaultHelper.calcFrom(), defaultHelper.calcTo())
+    }
+  }, [timestampStart, timestampEnd, setTimeRange])
 
   return (
     <div className="w-full h-full mx-auto">
