@@ -223,6 +223,33 @@ Update the `./docker/.env` file with your own secrets. In particular, these are 
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
+### Changing passwords after initial setup
+
+If you need to change passwords (like `POSTGRES_PASSWORD`) after your services are already running, you'll need to take additional steps to ensure the database recognizes the new password:
+
+1. **Stop all services and remove volumes:**
+   ```sh
+   docker compose down -v
+   ```
+
+2. **Remove existing Postgres data (this will delete all data):**
+   ```sh
+   rm -rf volumes/db/data/
+   ```
+
+3. **Update your passwords in the `.env` file**
+
+4. **Start the services with the new configuration:**
+   ```sh
+   docker compose up -d
+   ```
+
+<Admonition type="caution">
+
+The steps above will **delete all data** in your database. Make sure to backup any important data before changing passwords.
+
+</Admonition>
+
 ### Dashboard authentication
 
 The Dashboard is protected with basic authentication. The default user and password MUST be updated before using Supabase in production.
