@@ -22,6 +22,7 @@ import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { toast } from 'sonner'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
@@ -50,6 +51,7 @@ import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
 import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
+import { useSelectedBucket } from './useSelectedBucket'
 
 export const RowIcon = ({
   view,
@@ -114,6 +116,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   openedFolders = [],
 }) => {
   const { ref: projectRef, bucketId } = useParams()
+  const { bucket } = useSelectedBucket()
 
   const {
     selectedBucket,
@@ -152,11 +155,18 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   }
 
   const onSelectFolder = async (columnIndex: number, folder: StorageItem) => {
+    if (!bucket) return toast.error('Unable to retrieve bucket details')
+
     setSelectedFilePreview(undefined)
     clearSelectedItems(columnIndex + 1)
     popOpenedFoldersAtIndex(columnIndex - 1)
     pushOpenedFolderAtIndex(folder, columnIndex)
-    await fetchFolderContents({ folderId: folder.id, folderName: folder.name, index: columnIndex })
+    await fetchFolderContents({
+      bucketId: bucket.id,
+      folderId: folder.id,
+      folderName: folder.name,
+      index: columnIndex,
+    })
   }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
