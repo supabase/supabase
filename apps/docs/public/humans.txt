@@ -2,6 +2,7 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Byrne
 Alaister Young
 Aleksi Immonen
 Alexander Korotkov
@@ -37,12 +38,14 @@ Egor Romanov
 Eleftheria Trivyzaki
 Etienne Stalmans
 Fabrizio Fenoglio
+Felipe Stival
 Francesco Sansalvadore
 Greg P
 Greg Richardson
 Guilherme Souza
 Haydn Maley
 Hieu Pham
+Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
@@ -92,6 +95,7 @@ Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
 Supun Sudaraka Kalidasa
+Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff

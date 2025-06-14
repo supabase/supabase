@@ -10,9 +10,11 @@ import {
   Line,
   ComposedChart as RechartComposedChart,
   ReferenceArea,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
+  Label,
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
@@ -26,17 +28,13 @@ import {
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import {
-  calculateTotalChartAggregate,
-  CustomLabel,
-  CustomTooltip,
-  formatBytes,
-} from './ComposedChart.utils'
+import { calculateTotalChartAggregate, CustomLabel, CustomTooltip } from './ComposedChart.utils'
 import { MultiAttribute } from './ComposedChartHandler'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
+import { formatBytes } from 'lib/helpers'
 
-export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
+export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
   yAxisKey: string
   xAxisKey: string
@@ -56,6 +54,10 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
+  hideYAxis?: boolean
+  hideHighlightedValue?: boolean
+  syncId?: string
+  docsUrl?: string
 }
 
 export default function ComposedChart({
@@ -88,16 +90,22 @@ export default function ComposedChart({
   chartStyle,
   onChartStyleChange,
   updateDateRange,
-}: BarChartProps) {
+  hideYAxis,
+  hideHighlightedValue,
+  syncId,
+  docsUrl,
+}: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null)
+  const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
+  const isDarkMode = resolvedTheme?.includes('dark')
 
   // Update chart colors when theme changes
   useEffect(() => {
-    updateStackedChartColors(resolvedTheme?.includes('dark') ?? false)
+    updateStackedChartColors(isDarkMode ?? false)
   }, [resolvedTheme])
 
   const { Container } = useChartSize(size)
@@ -134,7 +142,7 @@ export default function ComposedChart({
   const maxAttribute = attributes.find((a) => a.isMaxValue)
   const maxAttributeData = {
     name: maxAttribute?.attribute,
-    color: '#3ECF8E',
+    color: CHART_COLORS.REFERENCE_LINE,
   }
 
   const lastDataPoint = !!data[data.length - 1]
@@ -145,21 +153,26 @@ export default function ComposedChart({
         }))
         .filter((entry) => entry.dataKey !== 'timestamp')
     : undefined
+  const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
   const resolvedHighlightedLabel = getHeaderLabel()
+
+  const attributesToIgnore =
+    attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
+
+  const attributesToIgnoreFromTotal = [
+    ...attributesToIgnore,
+    ...(referenceLines?.map((a: MultiAttribute) => a.attribute) ?? []),
+    ...(maxAttribute?.attribute ? [maxAttribute?.attribute] : []),
+  ]
+
   const resolvedHighlightedValue =
     focusDataIndex !== null
       ? showTotal
-        ? calculateTotalChartAggregate(
-            _activePayload,
-            maxAttribute?.attribute ? [maxAttribute?.attribute] : []
-          )
+        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
         : data[focusDataIndex]?.[yAxisKey]
       : showTotal && lastDataPoint
-        ? calculateTotalChartAggregate(
-            lastDataPoint,
-            maxAttribute?.attribute ? [maxAttribute?.attribute] : []
-          )
+        ? calculateTotalChartAggregate(lastDataPoint, attributesToIgnoreFromTotal)
         : highlightedValue
 
   const showHighlightActions =
@@ -175,13 +188,25 @@ export default function ComposedChart({
             value: value,
             color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
           }))
-          .filter((att) => att.name !== 'timestamp' && att.name !== maxAttribute?.attribute)
+          .filter(
+            (att) =>
+              att.name !== 'timestamp' &&
+              att.name !== maxAttribute?.attribute &&
+              !referenceLines.map((a) => a.attribute).includes(att.name)
+          )
       : []
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
   const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
-
+  const isDiskSpaceChart = chartData?.some((att: any) =>
+    att.name.toLowerCase().includes('disk_space_')
+  )
+  const isDBSizeChart = chartData?.some((att: any) =>
+    att.name.toLowerCase().includes('pg_database_size')
+  )
+  const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
+  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
@@ -213,8 +238,11 @@ export default function ComposedChart({
         customDateFormat={customDateFormat}
         highlightedValue={
           typeof resolvedHighlightedValue === 'number'
-            ? isRamChart
-              ? formatBytes(resolvedHighlightedValue, valuePrecision)
+            ? shouldFormatBytes
+              ? formatBytes(
+                  isNetworkChart ? Math.abs(resolvedHighlightedValue) : resolvedHighlightedValue,
+                  valuePrecision
+                )
               : numberFormatter(resolvedHighlightedValue, valuePrecision)
             : resolvedHighlightedValue
         }
@@ -225,11 +253,15 @@ export default function ComposedChart({
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
+        hideHighlightedValue={hideHighlightedValue}
+        docsUrl={docsUrl}
       />
       <Container className="relative z-10">
         <RechartComposedChart
           data={data}
+          syncId={syncId}
           onMouseMove={(e: any) => {
+            setIsActiveHoveredChart(true)
             if (e.activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(e.activeTooltipIndex)
               setActivePayload(e.activePayload)
@@ -249,6 +281,7 @@ export default function ComposedChart({
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
           onMouseLeave={(e) => {
+            setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
             setActivePayload(null)
           }}
@@ -258,7 +291,14 @@ export default function ComposedChart({
           }}
         >
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
-          <YAxis {..._YAxisProps} hide domain={isPercentage ? yDomain : undefined} key={yAxisKey} />
+          <YAxis
+            {..._YAxisProps}
+            hide={hideYAxis}
+            axisLine={{ stroke: CHART_COLORS.AXIS }}
+            tickLine={{ stroke: CHART_COLORS.AXIS }}
+            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
+            key={yAxisKey}
+          />
           <XAxis
             {..._XAxisProps}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
@@ -277,6 +317,7 @@ export default function ComposedChart({
                   attributes={attributes}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
+                  isActiveHoveredChart={isActiveHoveredChart}
                 />
               ) : null
             }
@@ -286,22 +327,23 @@ export default function ComposedChart({
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
-                  stackId="1"
+                  stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
                   fill={attribute.color}
-                  fillOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.25 : 1}
+                  fillOpacity={hoveredLabel && hoveredLabel !== attribute?.name ? 0.25 : 1}
                   radius={0.75}
-                  opacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.5 : 1}
+                  opacity={hoveredLabel && hoveredLabel !== attribute?.name ? 0.5 : 1}
                   name={
-                    attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
+                    attributes?.find((a) => a.attribute === attribute?.name)?.label ||
+                    attribute?.name
                   }
                 />
               ))
-            : stackedAttributes.map((attribute) => (
+            : stackedAttributes.map((attribute, i) => (
                 <Area
                   key={attribute.name}
                   type="step"
                   dataKey={attribute.name}
-                  stackId="1"
+                  stackId={attributes?.find((a) => a.attribute === attribute.name)?.stackId ?? '1'}
                   fill={attribute.color}
                   strokeOpacity={hoveredLabel && hoveredLabel !== attribute.name ? 0.4 : 1}
                   stroke={attribute.color}
@@ -317,6 +359,8 @@ export default function ComposedChart({
                   name={
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
+                  // Show dot for the first attribute when a point is focused
+                  dot={false}
                 />
               ))}
           {/* Max value, if available */}
@@ -325,13 +369,33 @@ export default function ComposedChart({
               key={maxAttribute.attribute}
               type="stepAfter"
               dataKey={maxAttribute.attribute}
-              stroke="#3ECF8E"
+              stroke={CHART_COLORS.REFERENCE_LINE}
               strokeWidth={2}
-              strokeDasharray="3 3"
+              strokeDasharray={maxAttribute.strokeDasharray ?? '3 3'}
               dot={false}
               name={maxAttribute.label}
             />
           )}
+          {referenceLines
+            .filter((line) => line.isReferenceLine)
+            .map((line) => (
+              <ReferenceLine
+                key={line.attribute}
+                y={line.value}
+                strokeWidth={1}
+                {...line}
+                strokeDasharray={line.strokeDasharray ?? '3 3'}
+                label={undefined}
+              >
+                <Label
+                  value={line.label}
+                  position="insideTopRight"
+                  fill={CHART_COLORS.REFERENCE_LINE_TEXT}
+                  className="text-xs"
+                  style={{ fill: CHART_COLORS.REFERENCE_LINE_TEXT }}
+                />
+              </ReferenceLine>
+            ))}
           {/* Selection highlight */}
           {showHighlightActions && (
             <ReferenceArea
@@ -347,7 +411,10 @@ export default function ComposedChart({
         <ChartHighlightActions chartHighlight={chartHighlight} updateDateRange={updateDateRange} />
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
+        <div
+          className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"
+          style={{ marginLeft: YAxisProps?.width }}
+        >
           <span>
             {xAxisIsDate ? day(data[0]?.timestamp).format(customDateFormat) : data[0]?.timestamp}
           </span>

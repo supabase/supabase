@@ -50,9 +50,9 @@ const FormSchema = z.object({
     .regex(/^\S+$/, 'Name should not contain spaces or whitespaces'),
   schema: z.string(),
   table: z.string(),
-  activation: z.string(),
-  enabled_mode: z.string(),
-  orientation: z.string(),
+  activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
+  enabled_mode: z.enum(['ORIGIN', 'REPLICA', 'ALWAYS', 'DISABLED']),
+  orientation: z.enum(['ROW', 'STATEMENT']),
   function_name: z.string().min(1, 'Please select a database function for your trigger to call'),
   function_schema: z.string(),
   events: z.array(z.string()).min(1, 'Please select at least one event'),
@@ -61,7 +61,7 @@ const FormSchema = z.object({
   tableId: z.string().optional(),
 })
 
-const defaultValues = {
+const defaultValues: z.infer<typeof FormSchema> = {
   name: '',
   schema: '',
   table: '',
@@ -133,7 +133,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
       updateDatabaseTrigger({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        id: selectedTrigger.id,
+        originalTrigger: selectedTrigger,
         payload: { name: payload.name, enabled_mode: payload.enabled_mode },
       })
     } else {
@@ -151,7 +151,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
       if (isEditing) {
         form.reset(selectedTrigger)
-      } else {
+      } else if (tables.length > 0) {
         form.reset({
           ...defaultValues,
           tableId: tables[0].id.toString(),
@@ -168,7 +168,11 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
-            <SheetTitle>Create a new database trigger</SheetTitle>
+            <SheetTitle>
+              {isEditing
+                ? `Edit database trigger: ${selectedTrigger.name}`
+                : 'Create a new database trigger'}
+            </SheetTitle>
           </SheetHeader>
 
           <Form_Shadcn_ {...form}>

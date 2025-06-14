@@ -338,7 +338,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         text: 'Querying large date ranges can be slow. Consider selecting a smaller date range.',
       })
     }
-    if (editorValue && !editorValue.includes('limit')) {
+    if (editorValue && !editorValue.toLowerCase().includes('limit')) {
       newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
     }
     setWarnings(newWarnings)

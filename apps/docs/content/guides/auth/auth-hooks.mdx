@@ -197,8 +197,6 @@ We recommend that you do not use any tag and explicitly grant permissions to `su
 
 Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
-There are no restrictions as to what language can be used to write a Postgres Hook. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
-
 Once done, save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](/docs/reference/cli/supabase-migration-new) to create a migration.
 
 <Admonition type="caution">

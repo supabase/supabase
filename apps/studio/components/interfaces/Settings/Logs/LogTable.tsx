@@ -11,10 +11,16 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
-import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import {
+  Button,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  cn,
+  copyToClipboard,
+} from 'ui'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'

@@ -17,6 +17,7 @@ import {
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
@@ -25,11 +26,12 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { copyToClipboard } from 'lib/helpers'
+import { formatSql } from 'lib/formatSql'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -44,11 +46,17 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
   isLocked: boolean
   isActive?: boolean
+}
+
+// [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
+function isTableLikeEntityListItem(entity: { type?: string }) {
+  return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
@@ -285,6 +293,39 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 <Clipboard size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
+
+              {isTableLikeEntityListItem(entity) && (
+                <DropdownMenuItem
+                  key="copy-schema"
+                  className="space-x-2"
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const toastId = toast.loading('Getting table schema...')
+
+                    const tableDefinition = await getTableDefinition({
+                      id: entity.id,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                    })
+                    if (!tableDefinition) {
+                      return toast.error('Failed to get table schema', { id: toastId })
+                    }
+
+                    try {
+                      const formatted = formatSql(tableDefinition)
+                      await copyToClipboard(formatted)
+                      toast.success('Table schema copied to clipboard', { id: toastId })
+                    } catch (err: any) {
+                      toast.error('Failed to copy schema: ' + (err.message || err), {
+                        id: toastId,
+                      })
+                    }
+                  }}
+                >
+                  <Clipboard size={12} />
+                  <span>Copy table schema</span>
+                </DropdownMenuItem>
+              )}
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>

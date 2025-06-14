@@ -6,6 +6,11 @@ export const data = {
       description: '',
       url: '/solutions/ai-builders',
     },
+    {
+      text: 'Switch from Neon',
+      description: '',
+      url: '/solutions/switch-from-neon',
+    },
   ],
 }
 

@@ -1,80 +1,129 @@
-# Bíblia: XML + SQL + JSON
-Este projeto tem o objetivo de democratizar o acesso à Bíblia Sagrada em português brasileiro a programadores, desenvolvedores e pessoas interessadas em proclamar o Evangelho e as boas-novas do Reino de Deus por meio da tecnologia. Gostou do projeto? Você pode nos ajudar a ir ainda mais longe, basta fazer uma contribuição via PayPal.
+It looks like you've provided two different README files, one for a "Bible: XML + SQL + JSON" project and another for "Supabase." It seems like the intention is to correct or merge parts of the first one ("Bible: XML + SQL + JSON").
 
-[![Doar](https://www.paypalobjects.com/pt_BR/BR/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A9FM66AQT672L&lc=BR&item_name=Bible%20Sources&currency_code=BRL&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+I will focus on correcting and improving the "Bible: XML + SQL + JSON" README based on common README best practices and clarity. The "Supabase" content appears to be a complete and separate README, so I won't be integrating it unless you specifically request parts of it to be incorporated.
 
-## Quais as versões contidas no projeto?
-Atualmente o projeto conta com três versões da Bíblia Sagrada em Português Brasileiro (pt-BR):
-- Nova Versão Internacional (NVI)
-- Almeida Corrigida e Fiel (ACF)
-- Almeida Revisada Imprensa Bíblica (AA)
+Here's a revised version of your "Bible: XML + SQL + JSON" README, incorporating standard Markdown practices, improving readability, and making minor corrections:
 
-## Quais os formatos de arquivos disponibilizados?
-As versões estão disponibilizadas em três formatos:
-- XML
-- SQL
-- JSON
+-----
+
+# Bible: XML + SQL + JSON
+
+This project aims to democratize access to the **Holy Bible in Brazilian Portuguese** for programmers, developers, and anyone interested in proclaiming the Gospel and the good news of the Kingdom of God through technology.
+
+Did you find this project helpful? You can support us in going even further by making a contribution via PayPal.
+
+[](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A9FM66AQT672L&lc=BR&item_name=Bible%20Sources&currency_code=BRL&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+
+-----
+
+## What Bible Versions Are Included?
+
+Currently, this project includes three versions of the Holy Bible in Brazilian Portuguese (pt-BR):
+
+  * **New International Version (NIV)**
+  * **King James Version (ACF)**
+  * **King James Version Revised Bible Press (AA)**
+
+-----
+
+## Available File Formats
+
+The Bible versions are available in three common formats:
+
+  * **XML**
+  * **SQL**
+  * **JSON**
 
 ### XML
-Há um arquivo XML para cada versão descrita acima. Os arquivos XML estão codificados em UTF-8 e possuem a seguinte estrutura:
+
+Each Bible version has its own XML file. These files are **UTF-8 encoded** and follow this structure:
+
 ```xml
 <book>
   <chapter>
-    <verse>Texto</verse>
+    <verse>Text</verse>
   </chapter>
 </book>
 ```
 
-Há também arquivos mínimos contendo as versões com todos os livros.
+There are also minimal files containing all the books for each version.
 
 ### SQL
-Há um arquivo SQL para cada versão descrita acima. Os arquivos SQL estão codificados em UTF-8 e possuem a seguinte estrutura:
-- Cria a tabela 'testament'
-- Cria a tabela 'books'
-- Popula as duas tabelas
-- Cria a tabela 'verses'
-- Popula a tabela com os versículos
 
-A tabela 'verses' está estruturada da seguinte forma:
-- id: é o identificador único do versículo
-- version: é a versão da Bíblia (NVI, ACF, AA, etc)
-- testament: é a identificação do testamento, (1) Velho Testamento ou (2) Novo Testamento
-- book: é a identificação do livro da Bília (1-66)
-- chapter: é o número do caítulo
-- verse: é o número do versículo
-- text: é o texto do versículo
+Each Bible version has its own SQL file. These SQL files are **UTF-8 encoded** and include the following:
+
+  * Creation of the `'testament'` table
+  * Creation of the `'books'` table
+  * Population of both `'testament'` and `'books'` tables
+  * Creation of the `'verses'` table
+  * Population of the `'verses'` table with the biblical texts
+
+The `'verses'` table is structured as follows:
+
+  * `id`: The unique identifier for the verse.
+  * `version`: The version of the Bible (e.g., NIV, ACF, AA).
+  * `testament`: The identification of the testament (1 for Old Testament, 2 for New Testament).
+  * `book`: The identification of the book of the Bible (1-66).
+  * `chapter`: The chapter number.
+  * `verse`: The verse number.
+  * `text`: The actual text of the verse.
 
 ### JSON
-Há um arquivo JSON para cada versão descrita acima. Os arquivos JSON estão codificados em UTF-8 e possuem a seguinte estrutura:
+
+Each Bible version has its own JSON file. These JSON files are **UTF-8 encoded** and have the following structure:
+
 ```javascript
 [
-	{
-	"abbrev" : "abbrev"
-	"book" : "name"
-	"chapters": 
-		[
-			["Texto do versículo 1", "Texto do versículo 2", "Texto do versculo 3", "..."],
-			["Texto do versículo 1", "Texto do versículo 2", "Texto do versculo 3", "..."],
-			["Texto do versículo 1", "Texto do versículo 2", "Texto do versculo 3", "..."]
-		]
-	}
+  {
+    "abbrev": "abbrev",
+    "book": "name",
+    "chapters": [
+      ["Text of verse 1", "Text of verse 2", "Text of verse 3", "..."],
+      ["Text of verse 1", "Text of verse 2", "Text of verse 3", "..."],
+      ["Text of verse 1", "Text of verse 2", "Text of verse 3", "..."]
+    ]
+  }
 ]
 ```
-Os números dos capítulos e versículos podem ser recuperados pelo índice das arrays.
 
-## Como os arquivos foram montados?
-A compilação dos arquivos foi obtida por meio do crawling de páginas web. Sendo assim, é possível, embora pouco provável, que haja pequenos erros de coleta.
+The chapter and verse numbers can be retrieved using array indices.
 
-## Há também versões em outros idiomas?
-Sim, temos versões em muitos outros idiomas. Você pode visualizar acessando nosso projeto [Bible: XML + JSON](https://github.com/thiagobodruk/bible).
+-----
 
-## Como funcionam as licenças e direitos?
-Este projeto é distribuído sob a licença Creative Commons BY-NC. As traduções bíblicas deste projeto são de autoria e propriedade intelectual da Sociedade Bíblica Internacional (NVI), da Sociedade Bíblica Trinitariana (ACF) e da Imprensa Bíblica Brasileira (AA). Todos os direitos reservados aos autores.
+## How Were the Files Compiled?
 
-## Como eu posso ajudar?
-Ajude-nos a entregar um conteúdo de qualidade, revisando os códigos e montando estruturas otimizadas. Toda ajuda é bem vinda! :)
+The compilation of these files was achieved through web page crawling. While unlikely, it's possible that minor collection errors may exist.
 
-## Eu posso fazer uma doação para o projeto?
-Sim, você pode! Basta fazer uma doação voluntária por meio do [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A9FM66AQT672L&lc=BR&item_name=Bible%20Sources&currency_code=BRL&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted).
+-----
 
-[![Doar](https://www.paypalobjects.com/pt_BR/BR/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=A9FM66AQT672L&lc=BR&item_name=Bible%20Sources&currency_code=BRL&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted)
+## Versions in Other Languages
+
+Yes, we also have Bible versions in many other languages\! You can preview them by visiting our main project: [Bible: XML + JSON](https://github.com/thiagobodruk/bible).
+
+-----
+
+## Licenses and Entitlements
+
+This project is distributed under the **Creative Commons BY-NC license**. The Bible translations included in this project are the intellectual property of their respective authors:
+
+  * **New International Version (NIV)**: International Bible Society
+  * **King James Version (ACF)**: Trinitarian Bible Society
+  * **King James Version Revised Bible Press (AA)**: Brazilian Bible Press
+
+All rights are reserved to these authors.
+
+-----
+
+## How Can You Contribute?
+
+Help us deliver quality content by reviewing the code and suggesting optimized structures. All help is welcome\! :)
+
+-----
+
+## Support the Project
+
+Yes, you can make a voluntary donation through [PayPal](https://www.google.com/search?q=https://www.paypal.com/cgi-bin/webscr%3Fcmd%3D_donations%26business%3DA9FM66AQT672L%26lc%3DBR%26item_name%3DBible%2520Sources%26currency_code%3DBRL%26bn%3DPP%252dDonationsBF%253abtn_donateCC%255fLG%252egif%253aNonHosted).
+
+[](https://www.google.com/search?q=%5Bhttps://www.paypal.com/cgi-bin/webscr%3Fcmd%3D_donations%26business%3DA9FM66AQT672L%26lc%3DBR%26item_name%3DBible%2520Sources%26currency_code%3DBRL%26bn%3DPP%252dDonationsBF%253abtn_donateCC%255fLG%252egif%253aNonHosted%5D\(https://www.paypal.com/cgi-bin/webscr%3Fcmd%3D_donations%26business%3DA9FM66AQT672L%26lc%3DBR%26item_name%3DBible%2520Sources%26currency_code%3DBRL%26bn%3DPP%252dDonationsBF%253abtn_donateCC%255fLG%252egif%253aNonHosted\))
+
+-----

@@ -45,29 +45,15 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AddUserDropdown from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserPanel } from './UserPanel'
-import { MAX_BULK_DELETE, PROVIDER_FILTER_OPTIONS } from './Users.constants'
+import {
+  ColumnConfiguration,
+  MAX_BULK_DELETE,
+  PROVIDER_FILTER_OPTIONS,
+  USERS_TABLE_COLUMNS,
+} from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
-export type UsersTableColumn = {
-  id: string
-  name: string
-  minWidth?: number
-  width?: number
-  resizable?: boolean
-}
-export type ColumnConfiguration = { id: string; width?: number }
-export const USERS_TABLE_COLUMNS: UsersTableColumn[] = [
-  { id: 'img', name: '', minWidth: 95, width: 95, resizable: false },
-  { id: 'id', name: 'UID', width: 280 },
-  { id: 'name', name: 'Display name', minWidth: 0, width: 150 },
-  { id: 'email', name: 'Email', width: 300 },
-  { id: 'phone', name: 'Phone' },
-  { id: 'providers', name: 'Providers', minWidth: 150 },
-  { id: 'provider_type', name: 'Provider type', minWidth: 150 },
-  { id: 'created_at', name: 'Created at', width: 260 },
-  { id: 'last_sign_in_at', name: 'Last sign in at', width: 260 },
-]
 
 // [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
 // Can change it to remove V2 thereafter

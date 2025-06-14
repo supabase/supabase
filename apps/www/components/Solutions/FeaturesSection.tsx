@@ -2,17 +2,27 @@ import React, { FC } from 'react'
 
 import { cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import type { Feature, WhySection } from '~/data/solutions/solutions.types'
+import type {
+  Feature,
+  FeaturesSection as FeaturesSectionType,
+} from '~/data/solutions/solutions.types'
 
-const Support: FC<WhySection> = (props) => {
+const FeaturesSection: FC<FeaturesSectionType> = (props) => {
   return (
     <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8">
       <div className="flex flex-col gap-2">
         <span className="label">{props.label}</span>
         <h2 className="h2 text-foreground-lighter">{props.heading}</h2>
       </div>
-      <ul className="grid grid-cols-1 gap-4 gap-y-10 md:grid-cols-3 md:gap-12 xl:gap-20">
-        {props.features?.map((feature, index) => <FeatureItem feature={feature} key={index} />)}
+      <ul
+        className={cn(
+          'grid grid-cols-1 gap-4 gap-y-10 md:grid-cols-3 md:gap-12 xl:gap-20',
+          props.features?.length === 4 && 'md:grid-cols-2 xl:grid-cols-4'
+        )}
+      >
+        {props.features?.map((feature: Feature, index: number) => (
+          <FeatureItem feature={feature} key={index} />
+        ))}
       </ul>
     </SectionContainer>
   )
@@ -29,10 +39,31 @@ const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
   const iconHeight = `h-${iconSize}`
 
   return (
-    <li className="flex flex-col gap-2 text-sm">
-      {Icon && (
-        <Icon className={cn('stroke-1 mb-2 text-foreground-lighter', iconWidth, iconHeight)} />
-      )}
+    <li className="flex flex-col gap-2 text-sm text-foreground-lighter">
+      {Icon &&
+        (typeof Icon === 'string' ? (
+          <svg
+            width="25"
+            height="25"
+            viewBox="0 0 25 25"
+            fill={feature.iconNoStroke ? 'currentColor' : 'none'}
+            className="w-7 h-7 mb-2"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d={Icon}
+              fillRule="evenodd"
+              clipRule="evenodd"
+              stroke={feature.iconNoStroke ? 'none' : 'currentColor'}
+              strokeMiterlimit="10"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              strokeWidth="1"
+            />
+          </svg>
+        ) : (
+          <Icon className={cn('stroke-1 mb-2 text-current', iconWidth, iconHeight)} />
+        ))}
       <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
         <span className={cn('h-full bg-foreground-lighter', iconWidth)} />
       </div>
@@ -43,4 +74,4 @@ const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
   )
 }
 
-export default Support
+export default FeaturesSection

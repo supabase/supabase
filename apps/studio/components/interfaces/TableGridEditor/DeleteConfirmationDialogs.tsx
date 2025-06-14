@@ -69,7 +69,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteRows } = useTableRowDeleteMutation({
+  const { mutate: deleteRows, isLoading: isDeletingRows } = useTableRowDeleteMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -81,7 +81,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: deleteAllRows } = useTableRowDeleteAllMutation({
+  const { mutate: deleteAllRows, isLoading: isDeletingAllRows } = useTableRowDeleteAllMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -96,7 +96,7 @@ const DeleteConfirmationDialogs = ({
     },
   })
 
-  const { mutate: truncateRows } = useTableRowTruncateMutation({
+  const { mutate: truncateRows, isLoading: isTruncatingRows } = useTableRowTruncateMutation({
     onSuccess: () => {
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
@@ -149,8 +149,9 @@ const DeleteConfirmationDialogs = ({
     deleteTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      schema: selectedTableToDelete.schema,
       id: selectedTableToDelete.id,
+      name: selectedTableToDelete.name,
+      schema: selectedTableToDelete.schema,
       cascade: isDeleteWithCascade,
     })
   }
@@ -309,6 +310,7 @@ const DeleteConfirmationDialogs = ({
         confirmLabelLoading="Deleting"
         onCancel={() => snap.closeConfirmationDialog()}
         onConfirm={() => onConfirmDeleteRow()}
+        loading={isTruncatingRows || isDeletingRows || isDeletingAllRows}
       >
         <div className="space-y-4">
           <p className="text-sm text-foreground-light">

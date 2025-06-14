@@ -138,3 +138,8 @@ gcloud.json
 .temp/cli-latest
 
 .pnpm-store/*
+
+# Sentry CLI config
+**/.sentryclirc
+
+keys.json
