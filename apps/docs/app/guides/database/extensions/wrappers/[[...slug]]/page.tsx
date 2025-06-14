@@ -96,10 +96,6 @@ async function getLatestRelease(after: string | null = null) {
   }
 }
 
-function rewriteAssetUrls(mdContent: string, baseUrl: string): string {
-  return mdContent.replace(/(\.\.\/)+assets\//g, baseUrl)
-}
-
 // Each external docs page is mapped to a local page
 const pageMap = [
   {
@@ -215,7 +211,20 @@ interface Params {
 
 const WrappersDocs = async (props: { params: Promise<Params> }) => {
   const params = await props.params
-  const { isExternal, meta, ...data } = await getContent(params)
+  const { isExternal, meta, assetsBaseUrl, ...data } = await getContent(params)
+
+  // Create a combined URL transformer that handles both regular URLs and asset URLs
+  const combinedUrlTransformer: UrlTransformFunction = (url, node) => {
+    // First try assets URL transformation (starts with ../assets/)
+    const transformedUrl = assetUrlTransform(url, assetsBaseUrl)
+
+    // If URL wasn't changed proceed with regular URL transformation
+    if (transformedUrl === url) {
+      return urlTransform(url, node)
+    }
+
+    return transformedUrl
+  }
 
   const options = isExternal
     ? ({
@@ -226,7 +235,7 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
             remarkPyMdownTabs,
             [removeTitle, meta.title],
           ],
-          rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
+          rehypePlugins: [[linkTransform, combinedUrlTransformer], rehypeSlug],
         },
       } as SerializeOptions)
     : undefined
@@ -246,6 +255,7 @@ const getContent = async (params: Params) => {
   let meta: any
   let content: string
   let editLink: string
+  let assetsBaseUrl: string = ''
 
   if (!federatedPage) {
     isExternal = false
@@ -282,14 +292,9 @@ const getContent = async (params: Params) => {
     })
     const rawContent = await response.text()
 
-    // Build assets base URL dynamically
-    const baseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
+    assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`
 
-    // Rewrite asset URLs in the content
-    const rewrittenContent = rewriteAssetUrls(rawContent, baseUrl)
-
-    // Use rewritten content with proper external asset URLs
-    const { content: contentWithoutFrontmatter } = matter(rewrittenContent)
+    const { content: contentWithoutFrontmatter } = matter(rawContent)
     content = removeRedundantH1(contentWithoutFrontmatter)
   }
 
@@ -300,7 +305,18 @@ const getContent = async (params: Params) => {
     editLink: newEditLink(editLink),
     meta,
     content,
+    assetsBaseUrl,
   }
+}
+
+const assetUrlTransform = (url: string, baseUrl: string): string => {
+  const assetPattern = /(\.\.\/)+assets\//
+
+  if (assetPattern.test(url)) {
+    return url.replace(assetPattern, baseUrl)
+  }
+
+  return url
 }
 
 const urlTransform: UrlTransformFunction = (url) => {
