@@ -99,7 +99,7 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    ...(IS_PLATFORM && edgeFunctionsEnabled
+    ...(edgeFunctionsEnabled
       ? [
           {
             key: 'functions',
