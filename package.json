@@ -76,7 +76,7 @@
   },
   "engines": {
     "pnpm": ">=9",
-    "node": ">=20"
+    "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@9.15.5"
