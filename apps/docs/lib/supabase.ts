@@ -18,7 +18,12 @@ type Database = {
             DatabaseGenerated['public']['Functions']['search_content']['Returns'][number],
             'subsections' | 'metadata'
           > & {
-            metadata: { language?: string; methodName?: string; platform?: string }
+            metadata: {
+              subtitle?: string
+              language?: string
+              methodName?: string
+              platform?: string
+            }
             subsections: Array<{ title?: string; href?: string; content?: string }>
           }
         >
