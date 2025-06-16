@@ -2,7 +2,6 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
-const { getCSP } = require('./csp')
 
 // Required for nextjs standalone build
 const path = require('path')
@@ -386,8 +385,6 @@ const nextConfig = {
     ]
   },
   async headers() {
-    const csp = await getCSP()
-
     return [
       {
         source: '/(.*?)',
@@ -409,7 +406,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
+            value: "frame-ancestors 'none';",
           },
           {
             key: 'Referrer-Policy',
