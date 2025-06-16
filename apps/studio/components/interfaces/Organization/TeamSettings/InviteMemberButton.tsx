@@ -189,7 +189,7 @@ export const InviteMemberButton = () => {
               className="pointer-events-auto flex-grow md:flex-grow-0"
               onClick={() => setIsOpen(true)}
             >
-              Invite
+              Invite member
             </Button>
           </TooltipTrigger>
           {!canInviteMembers && (

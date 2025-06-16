@@ -1,8 +1,8 @@
+import { toast } from 'sonner'
+
 import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
 import { StorageObject } from 'data/storage/bucket-objects-list-mutation'
-import { copyToClipboard } from 'lib/helpers'
-import { toast } from 'sonner'
-import { SONNER_DEFAULT_DURATION } from 'ui'
+import { SONNER_DEFAULT_DURATION, copyToClipboard } from 'ui'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata, StorageItemWithColumn } from '../Storage.types'
 

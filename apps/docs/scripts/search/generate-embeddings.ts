@@ -1,4 +1,4 @@
-import _configureDotenv from '../utils/dotenv'
+import '../utils/dotenv.js'
 
 import { createClient } from '@supabase/supabase-js'
 import { parseArgs } from 'node:util'
@@ -6,8 +6,6 @@ import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 import type { Json, Section } from '../helpers.mdx.js'
 import { fetchAllSources } from './sources/index.js'
-
-const _ = _configureDotenv
 
 const args = parseArgs({
   options: {
@@ -41,8 +39,8 @@ async function generateEmbeddings() {
   }
 
   const supabaseClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SECRET_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!,
     {
       auth: {
         persistSession: false,

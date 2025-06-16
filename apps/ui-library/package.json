@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "next dev --port 3004",
+    "dev": "next dev --turbopack --port 3004",
     "build": "pnpm run content:build && pnpm run build:registry && pnpm run build:llms && next build",
     "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --write registry.json && rimraf -G public/r && shadcn build && tsx scripts/clean-registry.ts",
     "build:llms": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-llms-txt.ts",
@@ -78,6 +78,6 @@
     "tsx": "^4.19.3",
     "typescript": "~5.5.0",
     "unist-builder": "3.0.0",
-    "vite": "^6.2.6"
+    "vite": "catalog:"
   }
 }
