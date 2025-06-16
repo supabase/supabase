@@ -35,6 +35,7 @@ export const useLegacyAPIKeysStatusQuery = <TData = LegacyAPIKeysStatusData>(
     apiKeysKeys.status(projectRef),
     ({ signal }) => getLegacyAPIKeysStatus({ projectRef }, signal),
     {
+      enabled: !!projectRef,
       ...options,
     }
   )

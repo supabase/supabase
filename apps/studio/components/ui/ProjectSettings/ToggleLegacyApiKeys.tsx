@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { OAuthScope, PermissionAction } from '@supabase/shared-types/out/constants'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
@@ -18,7 +18,7 @@ export const ToggleLegacyApiKeysPanel = () => {
     useLegacyAPIKeysStatusQuery({ projectRef: project!.ref })
 
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
-    useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, OAuthScope.SECRETS_WRITE)
+    useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
 
   if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess)) {
     return null
@@ -26,7 +26,7 @@ export const ToggleLegacyApiKeysPanel = () => {
 
   return (
     <section>
-      <Alert_Shadcn_ variant="destructive">
+      <Alert_Shadcn_ variant={legacyAPIKeysStatusData.enabled ? 'destructive' : 'warning'}>
         <CriticalIcon />
         <AlertTitle_Shadcn_>
           {legacyAPIKeysStatusData.enabled
@@ -40,7 +40,7 @@ export const ToggleLegacyApiKeysPanel = () => {
         </AlertDescription_Shadcn_>
         <div className="mt-2">
           <ButtonTooltip
-            type="danger"
+            type={legacyAPIKeysStatusData.enabled ? 'danger' : 'warning'}
             onClick={() => setIsConfirmOpen(true)}
             disabled={!canUpdateAPIKeys}
             tooltip={{
