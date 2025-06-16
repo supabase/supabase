@@ -41,15 +41,6 @@ const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABAS
 
 In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
 
-In the CLI add the following config to your `supabase/config.toml` file:
-
-```toml
-[auth.third_party.workos]
-enabled = true
-client_id = "<client_id>"
-custom_auth_domain = "<custom_auth_domain>" # if you have configured a custom auth domain
-```
-
 ## Set up a JWT template to add the authenticated role.
 
 Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
