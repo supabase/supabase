@@ -219,6 +219,17 @@ function createStorageExplorerState({
       })
     },
 
+    openBucket: async (bucket: Bucket) => {
+      const { id, name } = bucket
+      state.setSelectedBucket(bucket)
+      await state.fetchFolderContents({
+        bucketId: bucket.id,
+        folderId: id,
+        folderName: name,
+        index: -1,
+      })
+    },
+
     // ======== Folders CRUD ========
 
     getPathAlongOpenedFolders: (includeBucket = true) => {

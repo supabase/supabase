@@ -30,6 +30,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     openedFolders,
     selectedItemsToMove,
     selectedBucket,
+    openBucket,
     fetchFolderContents,
     fetchMoreFolderContents,
     fetchFoldersByPath,
@@ -40,7 +41,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
     popColumnAtIndex,
     popOpenedFoldersAtIndex,
     setSelectedItems,
-    setSelectedBucket,
     clearSelectedItems,
     setSelectedFilePreview,
     setSelectedItemsToMove,
@@ -119,7 +119,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
   }, [itemSearchString])
 
   useEffect(() => {
-    setSelectedBucket(bucket)
+    openBucket(bucket)
   }, [bucket])
 
   /** Checkbox selection methods */
