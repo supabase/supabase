@@ -80,9 +80,12 @@ const TextConfirmModal = forwardRef<
     ref
   ) => {
     const formSchema = z.object({
-      confirmValue: z.literal(confirmString, {
-        required_error: 'Value entered does not match.',
-      }),
+      confirmValue: z.preprocess(
+        (val) => (typeof val === 'string' ? val.trim() : val),
+        z.literal(confirmString.trim(), {
+          required_error: 'Value entered does not match.',
+        })
+      ),
     })
 
     // 1. Define your form.

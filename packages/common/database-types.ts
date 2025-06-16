@@ -9,6 +9,7 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           http_status_code: number | null
+          id: string
           message: string | null
           metadata: Json | null
           service: string
@@ -19,6 +20,7 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           http_status_code?: number | null
+          id?: string
           message?: string | null
           metadata?: Json | null
           service: string
@@ -29,6 +31,7 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           http_status_code?: number | null
+          id?: string
           message?: string | null
           metadata?: Json | null
           service?: string

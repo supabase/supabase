@@ -33,6 +33,7 @@
     "sync": "tsx --conditions=react-server ./resources/rootSync.ts",
     "test": "pnpm supabase start && pnpm run test:local && pnpm supabase stop",
     "test:local": "vitest --exclude \"**/*.smoke.test.ts\"",
+    "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --run",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
     "troubleshooting:sync": "node features/docs/Troubleshooting.script.mjs",
     "typecheck": "tsc --noEmit"
@@ -155,7 +156,7 @@
     "twoslash": "^0.3.1",
     "typescript": "~5.5.0",
     "unist-util-visit-parents": "5.1.3",
-    "vite": "^6.2.6",
+    "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^3.0.5"
   }

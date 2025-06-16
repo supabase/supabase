@@ -37,8 +37,14 @@ export const HelpPopover = () => {
         <ButtonTooltip
           id="help-popover-button"
           type="text"
-          className="px-1"
-          icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
+          className="rounded-none w-[32px] h-[30px] group"
+          icon={
+            <HelpCircle
+              size={18}
+              strokeWidth={1.5}
+              className="!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground"
+            />
+          }
           tooltip={{ content: { side: 'bottom', text: 'Help' } }}
           onClick={() => {
             sendEvent({

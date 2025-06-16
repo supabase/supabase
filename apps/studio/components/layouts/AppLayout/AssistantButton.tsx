@@ -13,7 +13,7 @@ export const AssistantButton = () => {
       type="text"
       size="tiny"
       id="assistant-trigger"
-      className="w-[24px] h-[24px] flex items-center justify-center p-0"
+      className="rounded-none w-[32px] h-[30px] flex items-center justify-center p-0 hover:bg-brand-400"
       onClick={() => {
         snap.toggleAssistant()
         setEditorPanel({ open: false })

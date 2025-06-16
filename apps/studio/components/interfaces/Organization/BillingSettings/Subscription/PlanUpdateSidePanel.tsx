@@ -27,6 +27,7 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -143,6 +144,18 @@ const PlanUpdateSidePanel = () => {
           </div>
         }
       >
+        {selectedOrganization?.managed_by === 'vercel-marketplace' && (
+          <PartnerManagedResource
+            partner={selectedOrganization?.managed_by}
+            resource="Organization plans"
+            cta={{
+              installationId: selectedOrganization?.partner_id,
+              path: '/settings',
+              message: 'Change Plan on Vercel Marketplace',
+            }}
+            // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+          />
+        )}
         <SidePanel.Content>
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
@@ -208,6 +221,9 @@ const PlanUpdateSidePanel = () => {
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
+                          // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
+                          (selectedOrganization?.managed_by !== 'supabase' &&
+                            plan.id !== 'tier_free') ||
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
