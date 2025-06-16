@@ -10,6 +10,6 @@ export async function queryPgMetaSelfHosted(sql: string, headersInit?: { [prop: 
   if (response.error) {
     return { error: response.error as ResponseError }
   } else {
-    return { data: response.data }
+    return { data: response }
   }
 }
