@@ -41,11 +41,9 @@ export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
   let contributorArray: Contributor[] = []
   try {
     const contributorResponseData = await contributorResponse.json()
-    console.log('contributorResponseData', contributorResponseData)
     // if the response is not in the expected format, throw an error and return an empty array
     contributorArray = ContributorSchema.array().parse(contributorResponseData)
   } catch {}
-  console.log('contributorArray', contributorArray)
 
   const contributor_data = contributorArray.map((contributor) => {
     return {
