@@ -1,6 +1,6 @@
 export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
   {
-    id: 'realtime-connections-per-tenant',
+    id: 'events-per-second',
     label: 'Events per second',
     valuePrecision: 0,
     hide: false,
@@ -12,7 +12,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
     attributes: [
       { attribute: 'realtime_events_presence', provider: 'infra-monitoring', label: 'Presence' },
       {
-        attribute: 'realtime_postgres_changes_total_subscriptions',
+        attribute: 'realtime_events_postgres_changes',
         provider: 'infra-monitoring',
         label: 'Postgres Changes',
       },
