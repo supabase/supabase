@@ -390,46 +390,6 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
           </div>
         </SectionContainer>
 
-        <SectionContainer>
-          <div className="md:text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">How we hire</h2>
-            <p className="text-sm lg:text-base text-foreground-light pt-3">
-              The entire process is fully remote and all communication happens over email or via
-              video chat in Google Meet. The calls are all 1:1 and usually take between 20-45
-              minutes. We know you are interviewing us too, so please ask questions. We are happy to
-              answer.
-            </p>
-          </div>
-          <div className="mt-16 md:ml-36 lg:flex lg:items-start lg:w-fit lg:mx-auto">
-            {career.hiring.map((hiring: { title: string; text: string }, i: number) => {
-              return (
-                <div
-                  key={i + 1}
-                  className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
-                >
-                  <div className="lg:flex items-center">
-                    <div className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
-                      {i + 1}
-                    </div>
-                    <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-500 lg:pr-6"></div>
-                  </div>
-                  <div className="lg:mt-6">
-                    <h3 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
-                      {hiring.title}
-                    </h3>
-                    <p className="text-foreground-light text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
-                      {hiring.text}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-            <h3 className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-xl w-[44px] lg:min-w-[40px] min-h-[40px] px-2 py-1 rounded-md grid justify-items-center items-center">
-              <Check />
-            </h3>
-          </div>
-        </SectionContainer>
-
         <Separator />
 
         <div id="positions" className="max-w-6xl mx-auto">
