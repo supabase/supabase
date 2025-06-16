@@ -22,7 +22,7 @@ SecretsPage.getLayout = (page) => {
         <PageLayout
           size="large"
           title="Edge Function Secrets"
-          subtitle="Manage the secrets for your project's edge functions"
+          subtitle="Manage the secrets for your project's Edge Functions"
         >
           {page}
         </PageLayout>
