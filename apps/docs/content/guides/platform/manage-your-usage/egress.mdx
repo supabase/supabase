@@ -45,7 +45,7 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 
 ### Shared pooler Egress
 
-Data sent to the client when using the shared connection pooler (Supavisor) to access your database. WHen using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
+Data sent to the client when using the shared connection pooler (Supavisor) to access your database. When using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
 
 **Example:** You are using our [shared connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
 

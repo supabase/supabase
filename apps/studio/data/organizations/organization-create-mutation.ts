@@ -6,6 +6,7 @@ import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { castOrganizationResponseToOrganization } from './organizations-query'
 
 export type OrganizationCreateVariables = {
   name: string
@@ -61,21 +62,24 @@ export const useOrganizationCreateMutation = ({
     (vars) => createOrganization(vars),
     {
       async onSuccess(data, variables, context) {
-        // [Joshen] We're manually updating the query client here as the org's subscription is
-        // created async, and the invalidation will happen too quick where the GET organizations
-        // endpoint will error out with a 500 since the subscription isn't created yet.
-        queryClient.setQueriesData(
-          {
-            queryKey: organizationKeys.list(),
-            exact: true,
-          },
-          (prev: any) => {
-            if (!prev) return prev
-            return [...prev, data]
-          }
-        )
+        if (data && !('pending_payment_intent_secret' in data)) {
+          // [Joshen] We're manually updating the query client here as the org's subscription is
+          // created async, and the invalidation will happen too quick where the GET organizations
+          // endpoint will error out with a 500 since the subscription isn't created yet.
+          queryClient.setQueriesData(
+            {
+              queryKey: organizationKeys.list(),
+              exact: true,
+            },
+            (prev: any) => {
+              if (!prev) return prev
+              return [...prev, castOrganizationResponseToOrganization(data)]
+            }
+          )
 
-        await queryClient.invalidateQueries(permissionKeys.list())
+          await queryClient.invalidateQueries(permissionKeys.list())
+        }
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

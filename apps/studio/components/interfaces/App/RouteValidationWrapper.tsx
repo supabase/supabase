@@ -69,8 +69,8 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const isValidOrg = organizations.some((org) => org.slug === slug)
 
       if (!isValidOrg) {
-        toast.error('This organization does not exist')
-        router.push(DEFAULT_HOME)
+        toast.error("We couldn't find that organization")
+        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
         return
       }
     }

@@ -1,4 +1,4 @@
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { ObjectExpression } from 'estree'
 import GithubSlugger from 'github-slugger'
 import matter from 'gray-matter'
