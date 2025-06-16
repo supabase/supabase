@@ -155,7 +155,7 @@ export const Message = function Message({
                             return (
                               <div
                                 key={`${id}-tool-${toolCallId}`}
-                                className="w-auto -ml-[36px] overflow-x-hidden"
+                                className="w-auto overflow-x-hidden"
                               >
                                 <EdgeFunctionBlock
                                   label={args.name || 'Edge Function'}
