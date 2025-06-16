@@ -124,6 +124,14 @@ In-place upgrades do not currently support upgrading of databases using extensio
 
 To upgrade to a newer version of Postgres, you will need to drop the extensions before the upgrade, and recreate them after the upgrade.
 
+### Deprecated Extensions
+
+Some extensions are no longer supported or recommended.
+
+- `pgjwt`: This extension is deprecated.
+
+To check if your project uses `pgjwt`, search for the use of `sign()` or `verify()` functions in your SQL or RPC code.
+
 #### Authentication method changes - deprecating md5 in favor of scram-sha-256
 
 The md5 hashing method has [known weaknesses](https://en.wikipedia.org/wiki/MD5#Security) that make it unsuitable for cryptography.
