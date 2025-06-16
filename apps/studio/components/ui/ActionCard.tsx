@@ -6,6 +6,8 @@ export const ActionCard = (card: {
   bgColor?: string
   description?: string
   isBeta?: boolean
+  isMfaRequired?: boolean
+  isDisabled?: boolean
   className?: string
   onClick?: () => void
 }) => {
@@ -13,7 +15,8 @@ export const ActionCard = (card: {
     <Card
       className={cn(
         'grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer',
-        card.className
+        card.className,
+        card.isDisabled === true ? 'pointer-events-none opacity-50' : ''
       )}
       onClick={card.onClick}
     >
@@ -21,6 +24,11 @@ export const ActionCard = (card: {
         {card.isBeta && (
           <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
             Coming soon
+          </Badge>
+        )}
+        {card.isMfaRequired && (
+          <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
+            MFA Enforced
           </Badge>
         )}
         <div

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useParams } from 'common'
+import { useIsMFAEnabled, useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -33,6 +33,7 @@ export const OrganizationDropdown = () => {
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
+  const isUserMFAEnabled = useIsMFAEnabled()
 
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
@@ -81,12 +82,14 @@ export const OrganizationDropdown = () => {
                           router.push(href)
                         }}
                         onClick={() => setOpen(false)}
+                        disabled={!isUserMFAEnabled && org?.organization_requires_mfa}
                       >
                         <Link href={href} className="w-full flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span>{org.name}</span>
                             <PartnerIcon organization={org} />
                           </div>
+                          {!isUserMFAEnabled && org?.organization_requires_mfa && 'MFA required'}
                           {org.slug === slug && <Check size={16} />}
                         </Link>
                       </CommandItem_Shadcn_>

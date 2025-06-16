@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useParams } from 'common'
+import { useIsMFAEnabled, useParams } from 'common'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from 'components/layouts/Scaffold'
@@ -30,6 +30,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const [search, setSearch] = useState('')
   const { error: orgNotFoundError, org: orgSlug } = useParams()
   const orgNotFound = orgNotFoundError === 'org_not_found'
+  const isUserMFAEnabled = useIsMFAEnabled()
 
   const { data: projects = [] } = useProjectsQuery()
   const { data: organizations = [], error, isLoading, isError, isSuccess } = useOrganizationsQuery()
@@ -119,6 +120,8 @@ const OrganizationsPage: NextPageWithLayout = () => {
                 title={organization.name}
                 description={`${organization.plan.name} Plan${numProjects > 0 ? `${'  '}•${'  '}${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
                 onClick={() => router.push(`/org/${organization.slug}`)}
+                isMfaRequired={organization.organization_requires_mfa}
+                isDisabled={!isUserMFAEnabled && organization.organization_requires_mfa}
               />
             )
           })}
