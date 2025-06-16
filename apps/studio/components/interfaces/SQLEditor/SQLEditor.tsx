@@ -97,8 +97,6 @@ export const SQLEditor = () => {
   const includeSchemaMetadata = (isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM
   const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
-  console.log({ isHipaaProjectDisallowed })
-
   const {
     sourceSqlDiff,
     setSourceSqlDiff,
