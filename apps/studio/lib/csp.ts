@@ -83,6 +83,11 @@ const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
+// Additional URLs for Google Ads
+const GOOGLE_AD_SERVICES_URL = 'https://www.googleadservices.com'
+const GOOGLE_ADS_DOUBLECLICK_URL = 'https://googleads.g.doubleclick.net'
+const GOOGLE_COM_URL = 'https://google.com'
+
 export function getCSP(): string {
   const DEFAULT_SRC_URLS: string[] = [
     API_URL,
@@ -112,6 +117,9 @@ export function getCSP(): string {
     GOOGLE_MAIN_URL,
     GOOGLE_PAGEAD_URL,
     ...GOOGLE_DOMAINS_FOR_ANALYTICS.split(' '),
+    // Google Ads support
+    GOOGLE_AD_SERVICES_URL,
+    GOOGLE_COM_URL,
   ]
   const SCRIPT_SRC_URLS: string[] = [
     CLOUDFLARE_CDN_URL,
@@ -119,6 +127,10 @@ export function getCSP(): string {
     STRIPE_JS_URL,
     SUPABASE_ASSETS_URL,
     GOOGLE_TAG_MANAGER_URL,
+    // Google Ads script sources
+    GOOGLE_AD_SERVICES_URL,
+    GOOGLE_PAGEAD_URL,
+    GOOGLE_ADS_DOUBLECLICK_URL,
   ]
   const FRAME_SRC_URLS: string[] = [
     HCAPTCHA_ASSET_URL,
@@ -127,6 +139,7 @@ export function getCSP(): string {
     // Google Analytics 4 with Google Signals frame sources
     GOOGLE_DOUBLECLICK_FRAME_URL,
     GOOGLE_TAG_MANAGER_FRAME_URL,
+    // Note: Google Ads frame sources are already covered by existing URLs
   ]
   const IMG_SRC_URLS: string[] = [
     SUPABASE_URL,
@@ -143,6 +156,10 @@ export function getCSP(): string {
     GOOGLE_DOUBLECLICK_URL,
     GOOGLE_MAIN_URL,
     ...GOOGLE_DOMAINS_FOR_ANALYTICS.split(' '),
+    // Google Ads image sources
+    GOOGLE_ADS_DOUBLECLICK_URL,
+    GOOGLE_AD_SERVICES_URL,
+    GOOGLE_COM_URL,
   ]
   const STYLE_SRC_URLS: string[] = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS: string[] = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]

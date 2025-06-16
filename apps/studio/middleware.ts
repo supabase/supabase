@@ -25,9 +25,13 @@ const HOSTED_SUPPORTED_API_URLS = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // In middleware, you can access the basePath from the config
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+  const apiPath = `${basePath}/api/`
+
   // Handle API endpoint restrictions for hosted platform (only for API routes)
   if (
-    pathname.startsWith('/api/') &&
+    pathname.startsWith(apiPath) &&
     IS_PLATFORM &&
     !HOSTED_SUPPORTED_API_URLS.some((url) => request.url.endsWith(url))
   ) {
