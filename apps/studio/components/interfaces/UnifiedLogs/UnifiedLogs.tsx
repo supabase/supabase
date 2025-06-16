@@ -56,7 +56,7 @@ import { getFacetedUniqueValues, getLevelRowClassName, logEventBus } from './Uni
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_FILTER_PROCESSING = false
 
-export const UnifiedLogsTable = () => {
+export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
