@@ -47,7 +47,7 @@ Your Supabase project inspects the `role` claim present in all JWTs sent to it, 
 
 WorkOS JWTs already contain a `role` claim that corresponds to the user's role in their organization. It is necessary to adjust the `role` claim to be `"authenticated"` like Supabase expects. This can be done using JWT templates (navigate to Authentication -> Sessions -> JWT Template in the WorkOS Dashboard).
 
-This template overrides the `role` claim to meet Supabase's expectaitons, and adds the WorkOS role in a new `user_role` claim:
+This template overrides the `role` claim to meet Supabase's expectations, and adds the WorkOS role in a new `user_role` claim:
 
 ```json
 {
