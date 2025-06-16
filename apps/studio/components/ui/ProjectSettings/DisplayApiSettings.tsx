@@ -1,30 +1,30 @@
-import { useMemo, useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { useMemo } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
-import { AlertCircle, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { Input, Button } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
-import { useLegacyAPIKeysEnabledQuery } from 'data/api-keys/api-keys-query'
-import { useUpdateLegacyAPIKeysEnabledMutation } from 'data/api-keys/legacy-api-key-enable-mutation'
+import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
 
-const DisplayApiSettings = ({
-  legacy,
+export const DisplayApiSettings = ({
+  showTitle = true,
   showNotice = true,
+  showLegacyText = true,
 }: {
-  legacy?: boolean
+  showTitle?: boolean
   showNotice?: boolean
+  showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
 
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const newApiKeysInRollOut = useFlag('basicApiKeys')
 
   const {
@@ -44,36 +44,11 @@ const DisplayApiSettings = ({
     'service_api_keys'
   )
 
-  const { isLoading: isLoadingLegacyAPIKeysEnabled, data: legacyAPIKeysEnabledData } =
-    useLegacyAPIKeysEnabledQuery({ projectRef })
-
-  const { mutate: updateLegacyAPIKeyEnabled, isLoading: isUpdatingLegacyAPIKeyEnabled } =
-    useUpdateLegacyAPIKeysEnabledMutation()
-
-  const onToggleLegacyAPIKeysEnabled = () => {
-    const enabled = !legacyAPIKeysEnabledData?.enabled
-
-    updateLegacyAPIKeyEnabled(
-      { projectRef, enabled },
-      {
-        onSuccess: () => {
-          toast.success(
-            enabled
-              ? 'Your anon and service_role keys have been re-enabled!'
-              : 'Your anon and service_role keys have been disabled!'
-          )
-          setIsConfirmOpen(false)
-        },
-      }
-    )
-  }
-
-  const isLoading =
-    isProjectSettingsLoading || isLoadingPermissions || isLoadingLegacyAPIKeysEnabled
+  const isLoading = isProjectSettingsLoading || isLoadingPermissions
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
-  const apiKeys = settings?.service_api_keys ?? []
+  const apiKeys = useMemo(() => settings?.service_api_keys ?? [], [settings])
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
@@ -98,8 +73,9 @@ const DisplayApiSettings = ({
   return (
     <>
       <Panel
+        noMargin
         title={
-          !legacy && (
+          showTitle && (
             <div className="space-y-3">
               <h5 className="text-base">Project API Keys</h5>
               <p className="text-sm text-foreground-light">
@@ -191,9 +167,9 @@ const DisplayApiSettings = ({
                 descriptionText={
                   x.tags === 'service_role'
                     ? 'This key has the ability to bypass Row Level Security. Never share it publicly. If leaked, generate a new JWT secret immediately. ' +
-                      (legacy ? 'Prefer using Publishable API keys instead.' : '')
+                      (showLegacyText ? 'Prefer using Publishable API keys instead.' : '')
                     : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies. ' +
-                      (legacy ? 'Prefer using Secret API keys instead.' : '')
+                      (showLegacyText ? 'Prefer using Secret API keys instead.' : '')
                 }
               />
 
@@ -232,67 +208,8 @@ const DisplayApiSettings = ({
             />
           )
         ) : null}
-
-        {newApiKeysInRollOut && !showNotice && !isLoading && legacyAPIKeysEnabledData && (
-          <>
-            <TextConfirmModal
-              visible={isConfirmOpen}
-              onCancel={() => setIsConfirmOpen(false)}
-              onConfirm={onToggleLegacyAPIKeysEnabled}
-              title={
-                legacyAPIKeysEnabledData.enabled
-                  ? 'Disable JWT-based keys'
-                  : 'Re-enable JWT-based keys'
-              }
-              confirmString={legacyAPIKeysEnabledData.enabled ? 'disable' : 're-enable'}
-              confirmLabel={`Yes, ${legacyAPIKeysEnabledData.enabled ? 'disable' : 're-enable'} anon and service_role`}
-              confirmPlaceholder={legacyAPIKeysEnabledData.enabled ? 'disable' : 're-enable'}
-              loading={isUpdatingLegacyAPIKeyEnabled}
-              variant={legacyAPIKeysEnabledData.enabled ? 'destructive' : 'default'}
-              alert={
-                legacyAPIKeysEnabledData.enabled
-                  ? {
-                      title: 'Disabling can cause downtime!',
-                      description: `If you disable your anon and service_role keys while they are in use, your applications will stop functioning. All API endpoints will receive HTTP 401 Unauthorized. Make sure you are no longer using them before proceeding.`,
-                    }
-                  : {
-                      title: 'Prefer publishable and secret keys',
-                      description:
-                        'While re-enabling anon and service_role keys makes sense in some cases, a better and more secure alternative is the publishable or secret key. Consider using those before proceeding!',
-                    }
-              }
-            />
-
-            <Panel.Content className="flex flex-row">
-              <div className="grow" />
-
-              {!legacyAPIKeysEnabledData.enabled && (
-                <Button
-                  onClick={() => {
-                    setIsConfirmOpen(true)
-                  }}
-                  loading={isUpdatingLegacyAPIKeyEnabled}
-                >
-                  Re-enable JWT-based API keys
-                </Button>
-              )}
-
-              {legacyAPIKeysEnabledData.enabled && (
-                <Button
-                  type="danger"
-                  onClick={() => {
-                    setIsConfirmOpen(true)
-                  }}
-                  loading={isUpdatingLegacyAPIKeyEnabled}
-                >
-                  Disable JWT-based API keys
-                </Button>
-              )}
-            </Panel.Content>
-          </>
-        )}
       </Panel>
+      {newApiKeysInRollOut && !showNotice && <ToggleLegacyApiKeysPanel />}
     </>
   )
 }
-export default DisplayApiSettings
