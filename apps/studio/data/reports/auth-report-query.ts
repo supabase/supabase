@@ -32,9 +32,9 @@ const metricSqlMap: Record<
     return `
     select 
       timestamp_trunc(timestamp, ${granularity}) as timestamp,
-      count(distinct json_value(f.event_message, "$.user_id")) as count
+      count(distinct json_value(f.event_message, "$.auth_event.actor_id")) as count
     from auth_logs f
-    where json_value(f.event_message, "$.action") in (
+    where json_value(f.event_message, "$.auth_event.action") in (
       'login', 'user_signedup', 'token_refreshed', 'user_modified',
       'user_recovery_requested', 'user_reauthenticate_requested'
     )
@@ -65,7 +65,7 @@ const metricSqlMap: Record<
         timestamp_trunc(timestamp, ${granularity}) as timestamp,
         count(*) as count
       from auth_logs f
-      where json_value(f.event_message, "$..action") = 'user_recovery_requested'
+      where json_value(f.event_message, "$.auth_event.action") = 'user_recovery_requested'
         and timestamp >= '${start}'
         and timestamp < '${end}'
       group by timestamp
