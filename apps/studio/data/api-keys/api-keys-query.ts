@@ -64,7 +64,7 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
   return data as unknown as (LegacyKeys | SecretKeys | PublishableKeys)[]
 }
 
-type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
+export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
   { projectRef, reveal }: APIKeysVariables,
