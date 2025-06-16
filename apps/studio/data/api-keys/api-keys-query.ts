@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 
-import { apiKeysKeys, legacyAPIKeysEnabledKeys } from './keys'
+import { apiKeysKeys } from './keys'
 
 type LegacyKeys = {
   api_key: string
@@ -43,16 +43,12 @@ type PublishableKeys = {
   updated_at?: string
 }
 
-export interface APIKeysVariables {
+interface APIKeysVariables {
   projectRef?: string
   reveal: boolean
 }
 
-export interface LegacyAPIKeysEnabledVariables {
-  projectRef?: string
-}
-
-export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
+async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
@@ -68,26 +64,7 @@ export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signa
   return data as unknown as (LegacyKeys | SecretKeys | PublishableKeys)[]
 }
 
-export async function getLegacyAPIKeysEnabled(
-  { projectRef }: LegacyAPIKeysEnabledVariables,
-  signal?: AbortSignal
-) {
-  if (!projectRef) throw new Error('projectRef is required')
-
-  const { data, error } = await get(`/v1/projects/{ref}/api-keys/legacy`, {
-    params: { path: { ref: projectRef } },
-    signal,
-  })
-
-  if (error) {
-    handleError(error)
-  }
-
-  return data
-}
-
-export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
-export type LegacyAPIKeysEnabledData = Awaited<ReturnType<typeof getLegacyAPIKeysEnabled>>
+type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
   { projectRef, reveal }: APIKeysVariables,
@@ -98,18 +75,6 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
     ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     {
       enabled: enabled && !!projectRef,
-      ...options,
-    }
-  )
-
-export const useLegacyAPIKeysEnabledQuery = <TData = LegacyAPIKeysEnabledData>(
-  { projectRef }: LegacyAPIKeysEnabledVariables,
-  { ...options }: UseQueryOptions<LegacyAPIKeysEnabledData, ResponseError, TData> = {}
-) =>
-  useQuery<LegacyAPIKeysEnabledData, ResponseError, TData>(
-    legacyAPIKeysEnabledKeys.enabled(projectRef),
-    ({ signal }) => getLegacyAPIKeysEnabled({ projectRef }, signal),
-    {
       ...options,
     }
   )
