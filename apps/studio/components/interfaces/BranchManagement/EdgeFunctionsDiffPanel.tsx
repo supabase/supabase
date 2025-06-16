@@ -1,7 +1,25 @@
 import { DiffEditor } from '@monaco-editor/react'
 import { editor as monacoEditor } from 'monaco-editor'
-import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
+import {
+  getEdgeFunctionBody,
+  type EdgeFunctionBodyData,
+} from 'data/edge-functions/edge-function-body-query'
 import type { EdgeFunctionsData } from 'data/edge-functions/edge-functions-query'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Skeleton,
+  Tabs_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
+import { Code, Wind } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import { useQueries } from '@tanstack/react-query'
 
 interface EdgeFunctionsDiffPanelProps {
   currentBranchFunctions?: EdgeFunctionsData
@@ -12,55 +30,26 @@ interface EdgeFunctionsDiffPanelProps {
   mainBranchRef?: string
 }
 
-interface FunctionChange {
-  added: EdgeFunctionsData
-  removed: EdgeFunctionsData
-  modified: EdgeFunctionsData
-}
-
 interface FunctionDiffProps {
   functionSlug: string
+  currentBody: EdgeFunctionBodyData
+  mainBody: EdgeFunctionBodyData
   currentBranchRef?: string
-  mainBranchRef?: string
 }
 
-const FunctionDiff = ({ functionSlug, currentBranchRef, mainBranchRef }: FunctionDiffProps) => {
-  const {
-    data: currentFunctionBody,
-    isLoading: isCurrentLoading,
-    error: currentError,
-    isError: isCurrentError,
-    isSuccess: isCurrentSuccess,
-  } = useEdgeFunctionBodyQuery(
-    { projectRef: currentBranchRef, slug: functionSlug },
-    {
-      enabled: !!currentBranchRef && !!functionSlug,
-      retry: false,
-      retryOnMount: false,
-      refetchOnWindowFocus: false,
-    }
-  )
+// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
+const fileKey = (fullPath: string) => fullPath.split('/').pop() ?? fullPath
 
-  const {
-    data: mainFunctionBody,
-    isLoading: isMainLoading,
-    error: mainError,
-    isError: isMainError,
-    isSuccess: isMainSuccess,
-  } = useEdgeFunctionBodyQuery(
-    { projectRef: mainBranchRef, slug: functionSlug },
-    {
-      enabled: !!mainBranchRef && !!functionSlug,
-      retry: false,
-      retryOnMount: false,
-      refetchOnWindowFocus: false,
-    }
-  )
-
+const FunctionDiff = ({
+  functionSlug,
+  currentBody,
+  mainBody,
+  currentBranchRef,
+}: FunctionDiffProps) => {
   // Monaco editor options for diff display
   const defaultOptions: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
     readOnly: true,
-    renderSideBySide: true,
+    renderSideBySide: false,
     minimap: { enabled: false },
     wordWrap: 'on',
     lineNumbers: 'on',
@@ -71,138 +60,79 @@ const FunctionDiff = ({ functionSlug, currentBranchRef, mainBranchRef }: Functio
     scrollBeyondLastLine: false,
   }
 
-  // Debug info
-  console.log('FunctionDiff Debug:', {
-    functionSlug,
-    currentBranchRef,
-    mainBranchRef,
-    isCurrentLoading,
-    isMainLoading,
-    isCurrentError,
-    isMainError,
-    isCurrentSuccess,
-    isMainSuccess,
-    currentError: currentError?.message,
-    mainError: mainError?.message,
-    currentFunctionBody: !!currentFunctionBody,
-    mainFunctionBody: !!mainFunctionBody,
-  })
+  // Determine list of files with differences (by canonical key)
+  const diffFileKeys = useMemo(() => {
+    const keys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
 
-  // Handle errors
-  if (isCurrentError || isMainError) {
-    return (
-      <div className="border rounded-lg overflow-hidden mb-4">
-        <div className="bg-gray-50 px-4 py-2 border-b">
-          <h4 className="font-mono text-sm font-medium">{functionSlug}</h4>
-        </div>
-        <div className="p-4 text-center text-red-500">
-          <p>Error loading function code:</p>
-          {currentError && <p className="text-sm">Current branch: {currentError.message}</p>}
-          {mainError && <p className="text-sm">Main branch: {mainError.message}</p>}
-          <div className="text-xs text-gray-400 mt-2">
-            <p>Current branch ref: {currentBranchRef}</p>
-            <p>Main branch ref: {mainBranchRef}</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+    return Array.from(keys).filter((key) => {
+      const currentFile = currentBody.find((f) => fileKey(f.name) === key)
+      const mainFile = mainBody.find((f) => fileKey(f.name) === key)
+      return (currentFile?.content || '') !== (mainFile?.content || '')
+    })
+  }, [currentBody, mainBody])
 
-  // Handle loading
-  if (isCurrentLoading || isMainLoading) {
-    return (
-      <div className="border rounded-lg overflow-hidden mb-4">
-        <div className="bg-gray-50 px-4 py-2 border-b">
-          <h4 className="font-mono text-sm font-medium">{functionSlug}</h4>
-        </div>
-        <div className="p-4 text-center">
-          <p>Loading function code...</p>
-          <p className="text-sm text-gray-500 mt-1">
-            Current: {isCurrentLoading ? 'Loading...' : isCurrentSuccess ? 'Loaded' : 'Error'} |
-            Main: {isMainLoading ? 'Loading...' : isMainSuccess ? 'Loaded' : 'Error'}
-          </p>
-          <div className="text-xs text-gray-400 mt-2">
-            <p>Function: {functionSlug}</p>
-            <p>Current ref: {currentBranchRef}</p>
-            <p>Main ref: {mainBranchRef}</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const [activeFileKey, setActiveFileKey] = useState<string | undefined>(() => diffFileKeys[0])
 
-  // Handle missing data after successful queries
-  if ((isCurrentSuccess && !currentFunctionBody) || (isMainSuccess && !mainFunctionBody)) {
-    return (
-      <div className="border rounded-lg overflow-hidden mb-4">
-        <div className="bg-gray-50 px-4 py-2 border-b">
-          <h4 className="font-mono text-sm font-medium">{functionSlug}</h4>
-        </div>
-        <div className="p-4 text-center text-amber-600">
-          <p>Function code not available</p>
-          <p className="text-sm text-gray-500 mt-1">
-            Current branch:{' '}
-            {isCurrentSuccess
-              ? currentFunctionBody
-                ? 'Available'
-                : 'Empty response'
-              : 'Not loaded'}{' '}
-            | Main branch:{' '}
-            {isMainSuccess ? (mainFunctionBody ? 'Available' : 'Empty response') : 'Not loaded'}
-          </p>
-          <div className="text-xs text-gray-400 mt-2">
-            <p>Function: {functionSlug}</p>
-            <p>Current ref: {currentBranchRef}</p>
-            <p>Main ref: {mainBranchRef}</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Keep active tab in sync when diffFileKeys changes (e.g. data fetch completes)
+  useEffect(() => {
+    if (!activeFileKey || !diffFileKeys.includes(activeFileKey)) {
+      setActiveFileKey(diffFileKeys[0])
+    }
+  }, [diffFileKeys, activeFileKey])
 
-  // Both queries must be successful and have data to proceed
-  if (!isCurrentSuccess || !isMainSuccess || !currentFunctionBody || !mainFunctionBody) {
-    return (
-      <div className="border rounded-lg overflow-hidden mb-4">
-        <div className="bg-gray-50 px-4 py-2 border-b">
-          <h4 className="font-mono text-sm font-medium">{functionSlug}</h4>
-        </div>
-        <div className="p-4 text-center">
-          <p>Waiting for function data...</p>
-          <div className="text-xs text-gray-400 mt-2">
-            <p>Current success: {isCurrentSuccess ? 'Yes' : 'No'}</p>
-            <p>Main success: {isMainSuccess ? 'Yes' : 'No'}</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  if (diffFileKeys.length === 0) return null
 
-  // Get the main file content (usually index.ts/js)
-  const currentMainFile =
-    currentFunctionBody.find((f) => f.name.includes('index.')) || currentFunctionBody[0]
-  const mainMainFile =
-    mainFunctionBody.find((f) => f.name.includes('index.')) || mainFunctionBody[0]
+  const currentFile = currentBody.find((f) => fileKey(f.name) === activeFileKey)
+  const mainFile = mainBody.find((f) => fileKey(f.name) === activeFileKey)
+
+  const language = useMemo(() => {
+    if (!activeFileKey) return 'plaintext'
+    if (activeFileKey.endsWith('.ts') || activeFileKey.endsWith('.tsx')) return 'typescript'
+    if (activeFileKey.endsWith('.js') || activeFileKey.endsWith('.jsx')) return 'javascript'
+    if (activeFileKey.endsWith('.json')) return 'json'
+    if (activeFileKey.endsWith('.sql')) return 'sql'
+    return 'plaintext'
+  }, [activeFileKey])
 
   return (
-    <div className="border rounded-lg overflow-hidden mb-4">
-      <div className="bg-gray-50 px-4 py-2 border-b">
-        <h4 className="font-mono text-sm font-medium">{functionSlug}</h4>
-        <div className="text-xs text-gray-500">
-          Files: {currentFunctionBody.length} current, {mainFunctionBody.length} main
-        </div>
-      </div>
-      <div className="h-64">
+    <Card>
+      <CardHeader className="space-y-0">
+        {/* Function title */}
+        <Link
+          href={`/project/${currentBranchRef}/functions/${functionSlug}`}
+          className="text-sm text-foreground-light flex items-center gap-2"
+        >
+          <Code strokeWidth={1.5} size={16} className="text-foreground-light" />
+          {functionSlug}
+        </Link>
+
+        {/* File tabs */}
+        {diffFileKeys.length > 1 && (
+          <Tabs_Shadcn_
+            value={activeFileKey ?? diffFileKeys[0]}
+            onValueChange={(v: string) => setActiveFileKey(v)}
+          >
+            <TabsList_Shadcn_ className="gap-4 overflow-x-auto border-b-0 -mx-6 -mb-4 mt-1 px-6">
+              {diffFileKeys.map((key) => (
+                <TabsTrigger_Shadcn_ key={key} value={key}>
+                  {key}
+                </TabsTrigger_Shadcn_>
+              ))}
+            </TabsList_Shadcn_>
+          </Tabs_Shadcn_>
+        )}
+      </CardHeader>
+      <CardContent className="p-0 h-96">
         <DiffEditor
           theme="supabase"
-          language="typescript"
+          language={language}
           height="100%"
-          original={mainMainFile?.content || ''}
-          modified={currentMainFile?.content || ''}
+          original={mainFile?.content || ''}
+          modified={currentFile?.content || ''}
           options={defaultOptions}
         />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -214,10 +144,10 @@ const EdgeFunctionsDiffPanel = ({
   currentBranchRef,
   mainBranchRef,
 }: EdgeFunctionsDiffPanelProps) => {
-  // Compare edge functions between branches
-  const compareEdgeFunctions = (): FunctionChange => {
+  // Compare edge functions between branches for added/removed and potential overlap
+  const compareEdgeFunctions = () => {
     if (!currentBranchFunctions || !mainBranchFunctions) {
-      return { added: [], removed: [], modified: [] }
+      return { added: [], removed: [], overlap: [] as typeof currentBranchFunctions }
     }
 
     const currentFuncs = currentBranchFunctions || []
@@ -231,31 +161,126 @@ const EdgeFunctionsDiffPanel = ({
       (mainFunc) => !currentFuncs.find((currentFunc) => currentFunc.slug === mainFunc.slug)
     )
 
-    // Consider a function modified if it exists in both branches and has more than 1 deployment in current branch
-    const modified = currentFuncs.filter((currentFunc) => {
-      const mainFunc = mainFuncs.find((f) => f.slug === currentFunc.slug)
-      return mainFunc && currentFunc.version > 1
-    })
-
-    return { added, removed, modified }
-  }
-
-  const { added, removed, modified } = compareEdgeFunctions()
-
-  if (isCurrentFunctionsLoading || isMainFunctionsLoading) {
-    return (
-      <div className="p-6 text-center">
-        <p>Loading edge functions...</p>
-      </div>
+    // Functions that exist in both branches are potential modifications
+    const overlap = currentFuncs.filter((currentFunc) =>
+      mainFuncs.find((f) => f.slug === currentFunc.slug)
     )
+
+    return { added, removed, overlap }
   }
 
-  const hasChanges = added.length > 0 || removed.length > 0 || modified.length > 0
+  const {
+    added = [],
+    removed = [],
+    overlap = [],
+  } = useMemo(compareEdgeFunctions, [currentBranchFunctions, mainBranchFunctions])
 
+  // Fetch bodies for overlapping functions in both branches
+  const overlapSlugs = overlap.map((f) => f.slug)
+
+  // FIRST_EDIT: introduce slug arrays for added and removed
+  const addedSlugs = added.map((f) => f.slug)
+  const removedSlugs = removed.map((f) => f.slug)
+
+  const currentBodiesQueries = useQueries({
+    queries: overlapSlugs.map((slug) => ({
+      queryKey: ['edge-function-body', currentBranchRef, slug],
+      queryFn: ({ signal }: { signal?: AbortSignal }) =>
+        getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
+      enabled: !!currentBranchRef,
+    })),
+  })
+
+  const mainBodiesQueries = useQueries({
+    queries: overlapSlugs.map((slug) => ({
+      queryKey: ['edge-function-body', mainBranchRef, slug],
+      queryFn: ({ signal }: { signal?: AbortSignal }) =>
+        getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
+      enabled: !!mainBranchRef,
+    })),
+  })
+
+  // SECOND_EDIT: fetch bodies for added and removed functions
+  const addedBodiesQueries = useQueries({
+    queries: addedSlugs.map((slug) => ({
+      queryKey: ['edge-function-body', currentBranchRef, slug],
+      queryFn: ({ signal }: { signal?: AbortSignal }) =>
+        getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
+      enabled: !!currentBranchRef,
+    })),
+  })
+
+  const removedBodiesQueries = useQueries({
+    queries: removedSlugs.map((slug) => ({
+      queryKey: ['edge-function-body', mainBranchRef, slug],
+      queryFn: ({ signal }: { signal?: AbortSignal }) =>
+        getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
+      enabled: !!mainBranchRef,
+    })),
+  })
+
+  // THIRD_EDIT: include added/removed loading status
+  const isBodiesLoading =
+    currentBodiesQueries.some((q) => q.isLoading) ||
+    mainBodiesQueries.some((q) => q.isLoading) ||
+    addedBodiesQueries.some((q) => q.isLoading) ||
+    removedBodiesQueries.some((q) => q.isLoading)
+
+  const currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
+  currentBodiesQueries.forEach((q, idx) => {
+    if (q.data) currentBodiesMap[overlapSlugs[idx]] = q.data
+  })
+
+  const mainBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
+  mainBodiesQueries.forEach((q, idx) => {
+    if (q.data) mainBodiesMap[overlapSlugs[idx]] = q.data
+  })
+
+  // FOURTH_EDIT: build bodies map for added and removed slugs
+  const addedBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
+  addedBodiesQueries.forEach((q, idx) => {
+    if (q.data) addedBodiesMap[addedSlugs[idx]] = q.data
+  })
+
+  const removedBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
+  removedBodiesQueries.forEach((q, idx) => {
+    if (q.data) removedBodiesMap[removedSlugs[idx]] = q.data
+  })
+
+  // Determine which overlapping functions actually have modifications in any of their files
+  const modifiedSlugs = overlapSlugs.filter((slug) => {
+    const currentBody = currentBodiesMap[slug]
+    const mainBody = mainBodiesMap[slug]
+    if (!currentBody || !mainBody) return false
+
+    const keys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
+
+    for (const key of keys) {
+      const currentFile = currentBody.find((f) => fileKey(f.name) === key)
+      const mainFile = mainBody.find((f) => fileKey(f.name) === key)
+      if ((currentFile?.content || '') !== (mainFile?.content || '')) {
+        return true
+      }
+    }
+
+    return false
+  })
+
+  const hasChanges = added.length > 0 || removed.length > 0 || modifiedSlugs.length > 0
+
+  if (isCurrentFunctionsLoading || isMainFunctionsLoading || isBodiesLoading) {
+    return <Skeleton className="h-64" />
+  }
+
+  // If no changes and checking complete
   if (!hasChanges) {
     return (
       <div className="p-6 text-center">
-        <p>No edge function changes detected between branches</p>
+        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <h3 className="mb-1">No changes detected between branches</h3>
+        <p className="text-sm text-foreground-light">
+          Any changes to your edge functions will be shown here for review
+        </p>
       </div>
     )
   }
@@ -264,15 +289,15 @@ const EdgeFunctionsDiffPanel = ({
     <div className="space-y-6">
       {added.length > 0 && (
         <div>
-          <h3 className="text-lg font-medium text-green-600 mb-3">
-            Added Functions ({added.length})
-          </h3>
-          <div className="space-y-2">
-            {added.map((func) => (
-              <div key={func.slug} className="border rounded-lg p-4 bg-green-50">
-                <div className="font-mono text-sm font-medium">{func.slug}</div>
-                <div className="text-sm text-gray-600">Deployments: {func.version}</div>
-              </div>
+          <div className="space-y-4">
+            {addedSlugs.map((slug) => (
+              <FunctionDiff
+                key={slug}
+                functionSlug={slug}
+                currentBody={addedBodiesMap[slug]!}
+                mainBody={[] as EdgeFunctionBodyData}
+                currentBranchRef={currentBranchRef}
+              />
             ))}
           </div>
         </div>
@@ -280,38 +305,31 @@ const EdgeFunctionsDiffPanel = ({
 
       {removed.length > 0 && (
         <div>
-          <h3 className="text-lg font-medium text-red-600 mb-3">
-            Removed Functions ({removed.length})
-          </h3>
-          <div className="space-y-2">
-            {removed.map((func) => (
-              <div key={func.slug} className="border rounded-lg p-4 bg-red-50">
-                <div className="font-mono text-sm font-medium">{func.slug}</div>
-                <div className="text-sm text-gray-600">Deployments: {func.version}</div>
-              </div>
+          <div className="space-y-4">
+            {removedSlugs.map((slug) => (
+              <FunctionDiff
+                key={slug}
+                functionSlug={slug}
+                currentBody={[] as EdgeFunctionBodyData}
+                mainBody={removedBodiesMap[slug]!}
+                currentBranchRef={mainBranchRef}
+              />
             ))}
           </div>
         </div>
       )}
 
-      {modified.length > 0 && (
-        <div>
-          <h3 className="text-lg font-medium text-blue-600 mb-3">
-            Modified Functions ({modified.length})
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Functions with more than 1 deployment in the current branch
-          </p>
-          <div className="space-y-4">
-            {modified.map((func) => (
-              <FunctionDiff
-                key={func.slug}
-                functionSlug={func.slug}
-                currentBranchRef={currentBranchRef}
-                mainBranchRef={mainBranchRef}
-              />
-            ))}
-          </div>
+      {modifiedSlugs.length > 0 && (
+        <div className="space-y-4">
+          {modifiedSlugs.map((slug) => (
+            <FunctionDiff
+              key={slug}
+              functionSlug={slug}
+              currentBody={currentBodiesMap[slug]!}
+              mainBody={mainBodiesMap[slug]!}
+              currentBranchRef={currentBranchRef}
+            />
+          ))}
         </div>
       )}
     </div>

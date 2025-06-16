@@ -1,13 +1,15 @@
 import { DiffEditor } from '@monaco-editor/react'
-import { Wind } from 'lucide-react'
+import { Database, Wind, Loader2 } from 'lucide-react'
 import { editor as monacoEditor } from 'monaco-editor'
-import { Card, CardContent, CardHeader, CardTitle } from 'ui'
+import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
 
 interface DatabaseDiffPanelProps {
   diffContent?: string
   isLoading: boolean
   error?: any
   showRefreshButton?: boolean
+  currentBranchRef?: string
   onRefresh?: () => void
 }
 
@@ -16,6 +18,7 @@ const DatabaseDiffPanel = ({
   isLoading,
   error,
   showRefreshButton = false,
+  currentBranchRef,
   onRefresh,
 }: DatabaseDiffPanelProps) => {
   // Monaco editor options for diff display
@@ -33,11 +36,7 @@ const DatabaseDiffPanel = ({
   }
 
   if (isLoading) {
-    return (
-      <div className="p-6 text-center">
-        <p>Loading branch diff...</p>
-      </div>
-    )
+    return <Skeleton className="h-64" />
   }
 
   if (error) {
@@ -82,7 +81,15 @@ const DatabaseDiffPanel = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Changes</CardTitle>
+        <CardTitle>
+          <Link
+            href={`/project/${currentBranchRef}/database/schema`}
+            className="text-foreground-light flex items-center gap-2"
+          >
+            <Database strokeWidth={1.5} size={16} />
+            Schema Changes
+          </Link>
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0 h-96">
         <DiffEditor
