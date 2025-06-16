@@ -313,16 +313,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
-  const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
-
-    if (shouldShowUpgradePrompt) {
-      setShowUpgradePrompt(!showUpgradePrompt)
-    } else {
-      setTimeRange(from || '', to || '')
-    }
-  }
-
   useEffect(() => {
     if (warehouseError) toast.error(warehouseError.message)
   }, [warehouseError])
@@ -379,9 +369,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       >
         <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
-            defaultFrom={timestampStart || ''}
-            defaultTo={timestampEnd || ''}
-            onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
             warehouseCollections={warehouseCollections || []}

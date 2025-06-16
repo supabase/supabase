@@ -27,23 +27,21 @@ import {
   LOGS_SOURCE_DESCRIPTION,
   LogsTableName,
 } from './Logs.constants'
-import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
+import { LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   warehouseTemplates?: WarehouseQueryTemplate[]
-  defaultFrom: string
-  defaultTo: string
   warnings: LogsWarning[]
   warehouseCollections: WarehouseCollection[]
   dataSource: SourceType
   onSelectTemplate: (template: LogTemplate) => void
   onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
   onSelectSource: (source: string) => void
-  onDateChange: (value: DatePickerValue) => void
   onDataSourceChange: (sourceType: SourceType) => void
 }
 
@@ -59,18 +57,16 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
 const LogsQueryPanel = ({
   templates = [],
   warehouseTemplates = [],
-  defaultFrom,
-  defaultTo,
   warnings,
   warehouseCollections,
   dataSource,
   onSelectTemplate,
   onSelectWarehouseTemplate,
   onSelectSource,
-  onDateChange,
   onDataSourceChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
+  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
 
   const {
     projectAuthAll: authEnabled,
@@ -90,27 +86,6 @@ const LogsQueryPanel = ({
       return true
     })
     .map(([, value]) => value)
-
-  function getDefaultDatePickerValue() {
-    if (defaultFrom && defaultTo) {
-      return {
-        to: defaultTo,
-        from: defaultFrom,
-        text: `${dayjs(defaultFrom).format('DD MMM, HH:mm')} - ${dayjs(defaultTo).format('DD MMM, HH:mm')}`,
-        isHelper: false,
-      }
-    }
-    return {
-      to: EXPLORER_DATEPICKER_HELPERS[0].calcTo(),
-      from: EXPLORER_DATEPICKER_HELPERS[0].calcFrom(),
-      text: EXPLORER_DATEPICKER_HELPERS[0].text,
-      isHelper: true,
-    }
-  }
-
-  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
-    getDefaultDatePickerValue()
-  )
 
   return (
     <div className="border-b bg-surface-100">
@@ -222,16 +197,7 @@ const LogsQueryPanel = ({
               </DropdownMenu>
             )}
 
-            {dataSource === 'logs' && (
-              <LogsDatePicker
-                value={selectedDatePickerValue}
-                onSubmit={(value) => {
-                  setSelectedDatePickerValue(value)
-                  onDateChange(value)
-                }}
-                helpers={EXPLORER_DATEPICKER_HELPERS}
-              />
-            )}
+            {dataSource === 'logs' && <LogsDatePicker helpers={EXPLORER_DATEPICKER_HELPERS} />}
 
             <div
               data-testid="log-explorer-warnings"

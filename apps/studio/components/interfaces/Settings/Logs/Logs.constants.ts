@@ -672,42 +672,50 @@ export const LOGS_TAILWIND_CLASSES = {
 
 export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
+    id: 'last_15_minutes',
     text: 'Last 15 minutes',
     calcFrom: () => dayjs().subtract(15, 'minute').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_30_minutes',
     text: 'Last 30 minutes',
     calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_hour',
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
     calcTo: () => '',
     default: true,
   },
   {
+    id: 'last_3_hours',
     text: 'Last 3 hours',
     calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_24_hours',
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_2_days',
     text: 'Last 2 days',
     calcFrom: () => dayjs().subtract(2, 'day').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_3_days',
     text: 'Last 3 days',
     calcFrom: () => dayjs().subtract(3, 'day').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_5_days',
     text: 'Last 5 days',
     calcFrom: () => dayjs().subtract(5, 'day').toISOString(),
     calcTo: () => '',
@@ -715,27 +723,32 @@ export const PREVIEWER_DATEPICKER_HELPERS: DatetimeHelper[] = [
 ]
 export const EXPLORER_DATEPICKER_HELPERS: DatetimeHelper[] = [
   {
+    id: 'last_hour',
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
     calcTo: () => '',
     default: true,
   },
   {
+    id: 'last_3_hours',
     text: 'Last 3 hours',
     calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_24_hours',
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_3_days',
     text: 'Last 3 days',
     calcFrom: () => dayjs().subtract(3, 'day').toISOString(),
     calcTo: () => '',
   },
   {
+    id: 'last_7_days',
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').toISOString(),
     calcTo: () => '',
