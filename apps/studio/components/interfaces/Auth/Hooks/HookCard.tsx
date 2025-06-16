@@ -1,10 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, Webhook } from 'lucide-react'
-import { Badge, Input } from 'ui'
+import { Badge, Input, copyToClipboard } from 'ui'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { copyToClipboard } from 'lib/helpers'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
