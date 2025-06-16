@@ -46,7 +46,6 @@ import {
 import { COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
-import { TraceDetailTab } from './components/TraceDetailTab'
 import { dataOptions, useChartData } from './QueryOptions'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields, sheetFields } from './UnifiedLogs.fields'
@@ -380,7 +379,6 @@ export const UnifiedLogs = () => {
                       >
                         <TabsList className="flex gap-3 px-5">
                           <TabsTrigger value="details">Log Details</TabsTrigger>
-                          <TabsTrigger value="trace">Trace</TabsTrigger>
                         </TabsList>
 
                         <TabsContent
@@ -400,23 +398,6 @@ export const UnifiedLogs = () => {
                               ...metadata,
                             }}
                           />
-                        </TabsContent>
-
-                        {/* [Joshen] JFYI this is currently just hardcoded data to explore the UX */}
-                        {/* Will need to be either implemented prior to launch or hidden */}
-                        <TabsContent
-                          value="trace"
-                          className="flex-grow overflow-auto data-[state=active]:flex-grow h-full mt-0"
-                        >
-                          {selectedRow?.original?.has_trace ? (
-                            <TraceDetailTab id={selectedRow?.original?.id} />
-                          ) : (
-                            <div className="flex flex-col gap-2">
-                              <p className="text-sm text-muted-foreground">
-                                No trace found for this log
-                              </p>
-                            </div>
-                          )}
                         </TabsContent>
                       </Tabs>
                     </DataTableSheetDetails>

@@ -1,12 +1,10 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Bolt } from 'lucide-react'
 
 import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
 import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
-import { logEventBus } from '../UnifiedLogs.utils'
 import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
@@ -58,21 +56,6 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
       const logType = row.getValue<ColumnSchema['log_type']>('log_type')
       return (
         <div className="absolute right-0 top-1/2 -translate-y-1/2 text-right flex items-center gap-1">
-          {row.original.has_trace && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Bolt
-                  className="text-foreground/30 cursor-pointer hover:text-foreground/70"
-                  size={12}
-                  onClick={(e) => {
-                    e.stopPropagation() // Prevent row selection
-                    logEventBus.emit('selectTraceTab', row.original.uuid)
-                  }}
-                />
-              </TooltipTrigger>
-              <TooltipContent>View trace details</TooltipContent>
-            </Tooltip>
-          )}
           <LogTypeIcon type={logType} size={16} className="text-foreground/70" />
         </div>
       )

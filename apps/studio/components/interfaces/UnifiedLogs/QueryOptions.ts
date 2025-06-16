@@ -455,7 +455,6 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
             log_type: row.log_type || '',
             latency: row.latency || 0,
             log_count: row.log_count || null,
-            has_trace: Math.random() < 0.5, // Simple 50% random chance
             logs: row.logs || [],
             auth_user: row.auth_user || null,
           }

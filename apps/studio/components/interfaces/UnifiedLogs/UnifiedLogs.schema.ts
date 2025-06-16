@@ -32,7 +32,6 @@ export const columnSchema = z.object({
   timestamp: z.number(),
   event_message: z.string().optional(),
   log_count: z.number().optional(), // used to count function logs for a given execution_id
-  has_trace: z.boolean().optional(),
   logs: z.array(z.any()).optional(), // array of function logs
   auth_user: z.string().optional(),
 })
@@ -67,7 +66,6 @@ export const columnFilterSchema = z.object({
     .transform((val) => val.split(RANGE_DELIMITER).map(Number))
     .pipe(z.coerce.date().array())
     .optional(),
-  has_trace: z.boolean().optional(),
   auth_user: z.string().optional(),
 })
 
