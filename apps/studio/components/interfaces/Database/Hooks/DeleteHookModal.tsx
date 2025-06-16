@@ -53,8 +53,8 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       confirmString={name || ''}
       text={
         <>
-          This will delete the webhook
-          <span className="text-bold text-foreground">{name}</span> rom the schema
+          This will delete the webhook{' '}
+          <span className="text-bold text-foreground">{name}</span>{' '}from the schema{' '}
           <span className="text-bold text-foreground">{schema}</span>
         </>
       }
