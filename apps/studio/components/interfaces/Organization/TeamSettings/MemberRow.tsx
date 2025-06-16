@@ -41,7 +41,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
 
   const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
-  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
@@ -204,7 +203,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
         )}
       </Table.td>
 
-      <Table.td>{!memberIsUser && <MemberActions member={member} />}</Table.td>
+      <Table.td>
+        <MemberActions member={member} />
+      </Table.td>
     </Table.tr>
   )
 }
