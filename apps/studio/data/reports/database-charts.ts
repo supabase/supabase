@@ -248,21 +248,11 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
       attributes: [
         {
-          attribute: 'disk_fs_used',
-          provider: 'infra-monitoring',
-          format: 'bytes',
-          stackId: '2',
-          label: 'Total Used',
-          tooltip:
-            'Total space on disk used including Database, WAL (write-ahead log) and other system files.',
-        },
-        {
           attribute: 'pg_database_size',
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'Database',
           tooltip: 'Disk usage by your database (tables, indexes, data, ...).',
-          omitFromTotal: true,
         },
         {
           attribute: 'disk_fs_used_wal',
@@ -271,7 +261,13 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'WAL',
           tooltip:
             'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.',
-          omitFromTotal: true,
+        },
+        {
+          attribute: 'disk_fs_used_system',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'System',
+          tooltip: 'Reserved space for the system to ensure your database runs smoothly.',
         },
         {
           attribute: 'disk_fs_size',
