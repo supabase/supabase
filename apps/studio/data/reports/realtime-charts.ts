@@ -4,14 +4,18 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
     label: 'Events per second',
     valuePrecision: 0,
     hide: false,
-    showTooltip: false,
+    showTooltip: true,
     showLegend: true,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
     attributes: [
       { attribute: 'realtime_events_presence', provider: 'infra-monitoring', label: 'Presence' },
-      // { attribute: 'postgres-changes', provider: 'infra-monitoring', label: 'Postgres Changes' },
+      {
+        attribute: 'realtime_postgres_changes_total_subscriptions',
+        provider: 'infra-monitoring',
+        label: 'Postgres Changes',
+      },
       {
         attribute: 'realtime_events_broadcast',
         provider: 'infra-monitoring',

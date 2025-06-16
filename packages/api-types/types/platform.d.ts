@@ -16632,6 +16632,7 @@ export interface operations {
           | 'realtime_connections'
           | 'realtime_events_broadcast'
           | 'realtime_events_presence'
+          | 'realtime_postgres_changes_total_subscriptions'
           | 'realtime_channel_joins_rate'
           | 'pgbouncer_pools_client_active_connections'
         databaseIdentifier?: string
