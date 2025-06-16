@@ -170,4 +170,3 @@ Existing projects on lower versions of Postgres are not impacted, and the extens
 Projects planning to upgrade from Postgres 15 to Postgres 17 need to drop the extensions by [disabling them in the Supabase Dashboard](/dashboard/project/_/database/extensions).
 
 `pgjwt` was enabled by default on older projects, so you may see it enabled on your project even if you didn't manually enable it yourself. If you are not using it, you can safely drop it. (Check for usage of the `url_encode`, `url_decode`, `algorithm_sign`, `sign`, `try_cast_double` and `verify` functions.)
-
