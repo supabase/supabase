@@ -1,12 +1,15 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
 import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { useDebounce } from 'use-debounce'
 
-import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -18,8 +21,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  PopoverSeparator_Shadcn_,
   TextArea_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
 interface FeedbackWidgetProps {
@@ -30,7 +35,7 @@ interface FeedbackWidgetProps {
   setScreenshot: (value: string | undefined) => void
 }
 
-const FeedbackWidget = ({
+export const FeedbackWidget = ({
   feedback,
   screenshot,
   onClose,
@@ -48,6 +53,11 @@ const FeedbackWidget = ({
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
   const [isFeedbackSent, setIsFeedbackSent] = useState(false)
+  const [debouncedFeedback] = useDebounce(feedback, 450)
+
+  const { data: category } = useFeedbackCategoryQuery({
+    prompt: debouncedFeedback,
+  })
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -171,18 +181,51 @@ const FeedbackWidget = ({
     <ThanksMessage onClose={onClose} />
   ) : (
     <>
-      <div className="px-5">
-        <TextArea_Shadcn_
-          placeholder="It would be great if..."
-          rows={5}
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-          onPaste={handlePasteEvent}
-          className="text-sm mt-4 mb-1"
-        />
+      <div>
+        <div className="px-5 pb-4">
+          <TextArea_Shadcn_
+            placeholder="It would be great if..."
+            rows={5}
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            onPaste={handlePasteEvent}
+            className="text-sm mt-4 mb-1"
+          />
+        </div>
+
+        <AnimatePresence>
+          {category === 'support' && (
+            <motion.div
+              key="support-alert"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.25 }}
+            >
+              <Admonition
+                type="caution"
+                title="This looks like an issue that's better handled by support"
+                className="rounded-none border-x-0 border-b-0 mb-0 [&>h5]:text-xs [&>h5]:mb-0.5"
+              >
+                <p className="text-xs text-foreground-light !leading-tight">
+                  Please{' '}
+                  <InlineLink
+                    className="text-foreground-light hover:text-foreground"
+                    href={`/support/new/?projectRef=${slug}&message=${encodeURIComponent(feedback)}`}
+                  >
+                    open a support ticket
+                  </InlineLink>{' '}
+                  to get help with this issue, as we do not reply to all product feedback.
+                </p>
+              </Admonition>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-      <PopoverSeparator />
-      <div className="px-5 flex flex-row justify-between items-start">
+
+      <PopoverSeparator_Shadcn_ />
+
+      <div className="px-5 flex flex-row justify-between items-start mt-4">
         <div>
           <p className="text-xs text-foreground">Have a technical issue?</p>
           <p className="text-xs text-foreground-light">
@@ -286,8 +329,6 @@ const FeedbackWidget = ({
   )
 }
 
-export default FeedbackWidget
-
 const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
   return (
     <div className="px-0 pt-3 pb-0">
@@ -300,7 +341,7 @@ const ThanksMessage = ({ onClose }: { onClose: () => void }) => {
             instead.
           </p>
         </div>
-        <PopoverSeparator />
+        <PopoverSeparator_Shadcn_ />
         <div className="flex items-center justify-between px-4">
           <p className="text-xs text-foreground-light">
             <Link href="/support/new">

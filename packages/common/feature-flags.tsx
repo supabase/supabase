@@ -1,6 +1,6 @@
 'use client'
 
-import { FlagValues } from '@vercel/flags/react'
+import { FlagValues } from 'flags/react'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 import { components } from 'api-types'

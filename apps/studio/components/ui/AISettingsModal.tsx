@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -19,12 +19,12 @@ import { SchemaComboBox } from './SchemaComboBox'
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
   const selectedOrganization = useSelectedOrganization()
-  const isOptedInToAI = useOrgOptedIntoAi()
+  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
   const selectedProject = useSelectedProject()
 
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(selectedProject?.ref!)
 
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const includeSchemaMetadata = (isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM
 
   return (
     <Modal
@@ -45,7 +45,7 @@ const AISettingsModal = () => {
                   } selected`
                 : 'No schemas selected'
             }
-            disabled={IS_PLATFORM && !isOptedInToAI}
+            disabled={(IS_PLATFORM && !isOptedInToAI) || isHipaaProjectDisallowed}
             selectedSchemas={selectedSchemas}
             onSelectSchemas={setSelectedSchemas}
           />
@@ -54,16 +54,18 @@ const AISettingsModal = () => {
             request. This will generate queries that are more relevant to your project.
           </p>
         </div>
-        {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
+        {IS_PLATFORM && (!isOptedInToAI || isHipaaProjectDisallowed) && selectedOrganization && (
           <Alert_Shadcn_ variant="warning">
             <WarningIcon />
             <AlertTitle_Shadcn_>
-              Your organization does not allow sending anonymous data to OpenAI
+              {isHipaaProjectDisallowed
+                ? 'Sending data to OpenAI is disabled for HIPAA projects'
+                : 'Your organization does not allow sending anonymous data to OpenAI'}
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               This option is only available if your organization has opted-in to sending anonymous
-              data to OpenAI. You may configure your opt-in preferences through your organization's
-              settings.
+              data to OpenAI and non-HIPAA projects. You may configure your opt-in preferences
+              through your organization's settings.
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-3">
               <Button asChild type="default">

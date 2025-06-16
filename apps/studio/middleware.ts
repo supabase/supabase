@@ -13,6 +13,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/complete',
   '/ai/sql/title',
   '/ai/sql/cron',
+  '/ai/feedback/classify',
   '/get-ip-address',
   '/get-utc-time',
   '/edge-functions/test',

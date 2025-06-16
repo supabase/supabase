@@ -5,8 +5,9 @@ import { Item, ItemParams, Menu } from 'react-contexify'
 import type { SupaRow } from 'components/grid/types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { copyToClipboard } from 'ui'
 import { ROW_CONTEXT_MENU_ID } from '.'
-import { copyToClipboard, formatClipboardValue } from '../../utils/common'
+import { formatClipboardValue } from '../../utils/common'
 
 export type RowContextMenuProps = {
   rows: SupaRow[]

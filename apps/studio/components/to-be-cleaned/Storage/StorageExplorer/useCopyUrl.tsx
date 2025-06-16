@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { copyToClipboard } from 'lib/helpers'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { copyToClipboard } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
 
