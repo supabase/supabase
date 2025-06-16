@@ -141,3 +141,5 @@ gcloud.json
 
 # Sentry CLI config
 **/.sentryclirc
+
+keys.json

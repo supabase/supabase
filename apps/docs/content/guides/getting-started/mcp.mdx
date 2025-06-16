@@ -95,6 +95,10 @@ For more info on using MCP in VS Code, see the [Copilot documentation](https://c
 
 ### Claude code
 
+You can add the Supabase MCP server to Claude Code in two ways:
+
+#### Option 1: Project-scoped server (via .mcp.json file)
+
 1. Create a `.mcp.json` file in your project root if it doesn't exist.
 1. Add the following configuration:
 
@@ -103,6 +107,18 @@ For more info on using MCP in VS Code, see the [Copilot documentation](https://c
 1. Save the configuration file.
 
 1. Restart [Claude code](https://claude.ai/code) to apply the new configuration.
+
+#### Option 2: Locally-scoped server (via CLI command)
+
+You can also add the Supabase MCP server as a locally-scoped server, which will only be available to you in the current project:
+
+1. Run the following command in your terminal:
+
+   ```bash
+   claude mcp add supabase -s local -e SUPABASE_ACCESS_TOKEN=your_token_here npx -y @supabase/mcp-server-supabase@latest
+   ```
+
+Locally-scoped servers take precedence over project-scoped servers with the same name and are stored in your project-specific user settings.
 
 ### Next steps
 

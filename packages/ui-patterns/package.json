@@ -540,7 +540,7 @@
     "tsx": "^4.19.3",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",
-    "vite": "^6.2.6",
+    "vite": "catalog:",
     "vitest": "^3.0.5"
   },
   "peerDependencies": {

@@ -29,6 +29,9 @@ const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com'
 const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
 const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
 const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
+const CONFIGCAT_PROXY_URL = ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
+  ? 'https://configcat.supabase.green'
+  : 'https://configcat.supabase.com'
 const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
 const STRIPE_JS_URL = 'https://js.stripe.com'
 const STRIPE_NETWORK_URL = 'https://*.stripe.network'
@@ -74,6 +77,7 @@ exports.getCSP = () => {
     SUPABASE_PROJECTS_URL_WS,
     HCAPTCHA_SUBDOMAINS_URL,
     CONFIGCAT_URL,
+    CONFIGCAT_PROXY_URL,
     STRIPE_SUBDOMAINS_URL,
     STRIPE_NETWORK_URL,
     CLOUDFLARE_URL,
