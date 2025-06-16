@@ -6,11 +6,8 @@ import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { formatBytes } from 'lib/helpers'
 
 import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
-import type { Project } from '../projects/project-detail-query'
-import type { Organization } from 'types'
 
 export const useStorageReport = () => {
   const { ref: projectRef } = useParams()
@@ -161,52 +158,4 @@ export const useStorageReport = () => {
     isLoading,
     refresh: handleRefresh,
   }
-}
-
-export const getStorageReportAttributes = (org: Organization, project: Project) => {
-  const isFreePlan = org?.plan?.id === 'free'
-  const computeSize = project?.infra_compute_size || 'medium'
-  const isSpendCapEnabled =
-    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
-
-  return [
-    {
-      id: 'storage-usage',
-      label: 'Storage Usage',
-      hide: false,
-      showTooltip: true,
-      showLegend: true,
-      hideChartType: false,
-      defaultChartStyle: 'line',
-      showMaxValue: true,
-      showGrid: true,
-      syncId: 'storage-reports',
-      valuePrecision: 2,
-      YAxisProps: {
-        width: 60,
-        tickFormatter: (value: any) => formatBytes(value, 2),
-      },
-      attributes: [
-        {
-          attribute: 'node_filesystem_avail_bytes',
-          provider: 'infra-monitoring',
-          label: 'Available',
-          tooltip: '',
-        },
-        {
-          attribute: 'node_filesystem_free_bytes',
-          provider: 'infra-monitoring',
-          label: 'Free',
-          tooltip: '',
-        },
-        {
-          attribute: 'node_filesystem_size_bytes',
-          provider: 'infra-monitoring',
-          label: 'Max',
-          isMaxValue: true,
-          tooltip: '',
-        },
-      ],
-    },
-  ]
 }

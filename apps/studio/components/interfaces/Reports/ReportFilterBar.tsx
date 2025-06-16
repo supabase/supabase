@@ -35,6 +35,7 @@ interface ReportFilterBarProps {
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
   productFilter?: string
+  className?: string
 }
 
 const PRODUCT_FILTERS = [
@@ -89,6 +90,7 @@ const ReportFilterBar = ({
   onRefresh,
   datepickerHelpers,
   productFilter,
+  className,
 }: ReportFilterBarProps) => {
   const { ref } = useParams()
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
@@ -161,7 +163,7 @@ const ReportFilterBar = ({
   }, [])
 
   return (
-    <div className="flex items-center justify-between">
+    <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
         <ButtonTooltip
           type="default"

@@ -281,7 +281,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       cacheHitRate: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (_filters) => `
+        sql: (filters) => `
         -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
@@ -293,8 +293,10 @@ from edge_logs f
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
 where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
-group by timestamp
-order by timestamp desc
+${generateRegexpWhere(filters)}
+GROUP BY
+ timestamp
+ORDER BY timestamp desc
 `,
       },
       topCacheMisses: {
