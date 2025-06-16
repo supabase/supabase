@@ -41,22 +41,24 @@ export const LeaveTeamButton = () => {
   const roles = allRoles?.org_scoped_roles ?? []
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
-  const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
-    onSuccess: async () => {
-      setIsLeaving(false)
-      setIsLeaveTeamModalOpen(false)
+  const { mutate: deleteMember, isLoading: isDeletingMember } = useOrganizationMemberDeleteMutation(
+    {
+      onSuccess: async () => {
+        setIsLeaving(false)
+        setIsLeaveTeamModalOpen(false)
 
-      await refetchOrganizations()
-      toast.success(`Successfully left ${selectedOrganization?.name}`)
+        await refetchOrganizations()
+        toast.success(`Successfully left ${selectedOrganization?.name}`)
 
-      setLastVisitedOrganization('')
-      router.push('/organizations')
-    },
-    onError: (error) => {
-      setIsLeaving(false)
-      toast.error(`Failed to leave organization: ${error?.message}`)
-    },
-  })
+        setLastVisitedOrganization('')
+        router.push('/organizations')
+      },
+      onError: (error) => {
+        setIsLeaving(false)
+        toast.error(`Failed to leave organization: ${error?.message}`)
+      },
+    }
+  )
 
   const leaveTeam = async () => {
     if (!slug) return console.error('Org slug is required')
@@ -111,6 +113,7 @@ export const LeaveTeamButton = () => {
         }}
         onCancel={() => setIsLeaveTeamModalOpen(false)}
         onConfirm={() => leaveTeam()}
+        loading={isDeletingMember}
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to leave this organization? This is permanent.
