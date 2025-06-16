@@ -4,17 +4,31 @@ import dayjs from 'dayjs'
 import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/ui/DataTable/DataTable.constants'
 import { get } from 'data/fetchers'
 import { getLogsChartQuery, getLogsCountQuery, getUnifiedLogsQuery } from './UnifiedLogs.queries'
-import { type FacetMetadataSchema } from './UnifiedLogs.schema'
-import type {
-  ExtendedColumnSchema,
-  InfiniteQueryResponse,
-  PageParam,
-  SearchParamsType,
-  UnifiedLogsMeta,
-} from './UnifiedLogs.types'
+import { BaseChartSchema, ColumnSchema, type FacetMetadataSchema } from './UnifiedLogs.schema'
+import type { PageParam, SearchParamsType, UnifiedLogsMeta } from './UnifiedLogs.types'
 
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_MODE = false
+
+export type ExtendedColumnSchema = ColumnSchema & {
+  timestamp: string // Original database timestamp
+  date: Date // Date object for display
+}
+
+type InfiniteQueryMeta<TMeta = Record<string, unknown>> = {
+  totalRowCount: number
+  filterRowCount: number
+  chartData: BaseChartSchema[]
+  facets: Record<string, FacetMetadataSchema>
+  metadata?: TMeta
+}
+
+type InfiniteQueryResponse<TData, TMeta = unknown> = {
+  data: TData
+  meta: InfiniteQueryMeta<TMeta>
+  prevCursor: number | null
+  nextCursor: number | null
+}
 
 export function createApiQueryString(params: Record<string, any>): string {
   const queryParams = new URLSearchParams()

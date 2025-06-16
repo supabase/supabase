@@ -1,21 +1,15 @@
 import { type inferParserType } from 'nuqs'
 
-import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
-import type { BaseChartSchema, ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
+import { LOG_TYPES, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 
 type Percentile = 50 | 75 | 90 | 95 | 99
+
+export type LogType = (typeof LOG_TYPES)[number]
 
 export type UnifiedLogSchema = {
   id: string
   timestamp: Date
-  log_type:
-    | 'edge'
-    | 'postgres'
-    | 'function logs'
-    | 'edge function'
-    | 'auth'
-    | 'supavisor'
-    | 'postgres upgrade'
+  log_type: LogType
   code: string
   level: string
   path: string | null
@@ -23,12 +17,6 @@ export type UnifiedLogSchema = {
   method: string
   api_role: string
   auth_user: string | null
-}
-
-// Extended column schema to include raw timestamp
-export type ExtendedColumnSchema = ColumnSchema & {
-  timestamp: string // Original database timestamp
-  date: Date // Date object for display
 }
 
 export type LogsMeta = {
@@ -43,21 +31,6 @@ export type UnifiedLogsMeta = {
 export type PageParam = { cursor: number; direction: 'next' | 'prev' }
 
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
-
-type InfiniteQueryMeta<TMeta = Record<string, unknown>> = {
-  totalRowCount: number
-  filterRowCount: number
-  chartData: BaseChartSchema[]
-  facets: Record<string, FacetMetadataSchema>
-  metadata?: TMeta
-}
-
-export type InfiniteQueryResponse<TData, TMeta = unknown> = {
-  data: TData
-  meta: InfiniteQueryMeta<TMeta>
-  prevCursor: number | null
-  nextCursor: number | null
-}
 
 export type SearchParams = {
   [key: string]: string | string[] | undefined

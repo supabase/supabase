@@ -4,12 +4,12 @@ import { get, isEqual } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import type { PlanId } from 'data/subscriptions/types'
 import logConstants from 'shared-data/logConstants'
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
-import { IS_PLATFORM } from 'common'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -253,7 +253,7 @@ union all
 select 
   id, 
   fl.timestamp as timestamp,
-  'function logs' as log_type,
+  'function_logs' as log_type,
   'undefined' as code,
   fl_metadata.level as level,
   null as path,
@@ -272,7 +272,7 @@ union all
 select 
   id, 
   fel.timestamp as timestamp,
-  'edge function' as log_type,
+  'edge_function' as log_type,
   CAST(fel_response.status_code as STRING) as code,
   'undefined' as level,
   fel_request.url as path,
@@ -364,7 +364,7 @@ union all
 select 
   id, 
   pgul.timestamp as timestamp,
-  'postgres upgrade' as log_type,
+  'postgres_upgrade' as log_type,
   'undefined' as code,
   'undefined' as level,
   -- pgul.level as level,

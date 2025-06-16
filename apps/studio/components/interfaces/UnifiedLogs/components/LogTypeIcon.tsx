@@ -2,7 +2,7 @@ import { BookHeart, Box, Cpu, Database, Globe } from 'lucide-react'
 
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { type LOG_TYPES } from '../UnifiedLogs.schema'
+import { type LOG_TYPES } from '../UnifiedLogs.constants'
 
 interface LogTypeIconProps {
   type: (typeof LOG_TYPES)[number]
@@ -21,16 +21,17 @@ export const LogTypeIcon = ({
     edge: () => <Globe size={size} strokeWidth={strokeWidth} className={className} />,
     postgrest: () => <BookHeart size={size} strokeWidth={strokeWidth} className={className} />,
     auth: () => <Auth size={size} strokeWidth={strokeWidth} className={className} />,
-    'edge function': () => (
+    edge_function: () => (
       <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
     ),
     postgres: () => <Database size={size} strokeWidth={strokeWidth} className={className} />,
-    'function events': () => (
+    function_events: () => (
       <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
     ),
     supavisor: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
-    'postgres upgrade': () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
+    postgres_upgrade: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
     storage: () => <Storage size={size} strokeWidth={strokeWidth} className={className} />,
+
     // cron: () => <Clock size={size} strokeWidth={strokeWidth} className={className} />,
   }
 

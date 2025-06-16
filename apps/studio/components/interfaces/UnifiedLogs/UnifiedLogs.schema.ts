@@ -5,19 +5,7 @@ import {
   LEVELS,
   RANGE_DELIMITER,
 } from 'components/ui/DataTable/DataTable.constants'
-import { METHODS, REGIONS } from './UnifiedLogs.constants'
-
-export const LOG_TYPES = [
-  'edge',
-  'postgrest',
-  'auth',
-  'edge function',
-  'postgres',
-  'function events',
-  'supavisor',
-  'postgres upgrade',
-  'storage',
-] as const
+import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
 
 export const columnSchema = z.object({
   id: z.string(),
