@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import tweets from 'shared-data/tweets'
 import { toast } from 'sonner'
 
@@ -28,6 +28,7 @@ import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe
 import { useTheme } from 'next-themes'
 import { PaymentIntentResult } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -58,14 +59,11 @@ type DowngradePlanHeadingKey = keyof typeof DOWNGRADE_PLAN_HEADINGS
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
-  subscriptionPlanMeta: any
   planMeta: any
   subscriptionPreviewError: any
   subscriptionPreviewIsLoading: boolean
   subscriptionPreviewInitialized: boolean
   subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse | undefined
-  billingViaPartner: boolean
-  billingPartner?: string
   subscription: any
   currentPlanMeta: any
   projects: ProjectInfo[]
@@ -74,14 +72,11 @@ interface Props {
 export const SubscriptionPlanUpdateDialog = ({
   selectedTier,
   onClose,
-  subscriptionPlanMeta,
   planMeta,
   subscriptionPreviewError,
   subscriptionPreviewIsLoading,
   subscriptionPreviewInitialized,
   subscriptionPreview,
-  billingViaPartner,
-  billingPartner,
   subscription,
   currentPlanMeta,
   projects,
@@ -96,6 +91,9 @@ export const SubscriptionPlanUpdateDialog = ({
     createPaymentMethod: () => Promise<PaymentMethod | undefined>
   }>(null)
 
+    const billingViaPartner = subscription?.billing_via_partner === true
+  const billingPartner = subscription?.billing_partner
+
   const stripeOptionsConfirm = useMemo(() => {
     return {
       clientSecret: paymentIntentSecret,
@@ -104,6 +102,11 @@ export const SubscriptionPlanUpdateDialog = ({
   }, [paymentIntentSecret, resolvedTheme])
 
   const testimonialTweet = useMemo(() => getRandomTweet(), [])
+
+  const subscriptionPlanMeta = useMemo(
+    () => subscriptionsPlans.find((tier) => tier.id === selectedTier),
+    [selectedTier]
+  )
 
   const onSuccessfulPlanChange = () => {
     toast.success(

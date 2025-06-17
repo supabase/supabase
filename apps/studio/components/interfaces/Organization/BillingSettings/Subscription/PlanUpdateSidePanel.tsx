@@ -70,7 +70,6 @@ const PlanUpdateSidePanel = () => {
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
 
-  const billingViaPartner = subscription?.billing_via_partner === true
   const billingPartner = subscription?.billing_partner
 
   const {
@@ -84,7 +83,6 @@ const PlanUpdateSidePanel = () => {
   const hasMembersExceedingFreeTierLimit =
     (membersExceededLimit || []).length > 0 &&
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
-  const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 
   useEffect(() => {
     if (visible) {
@@ -299,7 +297,6 @@ const PlanUpdateSidePanel = () => {
 
       <DowngradeModal
         visible={selectedTier === 'tier_free'}
-        selectedPlan={subscriptionPlanMeta}
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
@@ -309,14 +306,11 @@ const PlanUpdateSidePanel = () => {
       <SubscriptionPlanUpdateDialog
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
-        subscriptionPlanMeta={subscriptionPlanMeta}
         planMeta={planMeta}
         subscriptionPreviewError={subscriptionPreviewError}
         subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
         subscriptionPreviewInitialized={subscriptionPreviewInitialized}
         subscriptionPreview={subscriptionPreview}
-        billingViaPartner={billingViaPartner}
-        billingPartner={billingPartner}
         subscription={subscription}
         projects={orgProjects}
         currentPlanMeta={{
