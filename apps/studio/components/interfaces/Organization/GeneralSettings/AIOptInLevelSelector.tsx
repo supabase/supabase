@@ -2,7 +2,9 @@ import { ReactNode } from 'react'
 import { Control } from 'react-hook-form'
 
 import { AIOptInFormValues } from 'hooks/forms/useAIOptInForm'
+import { useFlag } from 'hooks/ui/useFlag'
 import { FormField_Shadcn_, RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
 
@@ -46,11 +48,20 @@ export const AIOptInLevelSelector = ({
   label,
   layout = 'vertical',
 }: AIOptInLevelSelectorProps) => {
+  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
+
   return (
     <FormItemLayout
       label={label}
       description={
         <div className="flex flex-col gap-y-4 my-4 max-w-xl">
+          {!newOrgAiOptIn && (
+            <Admonition
+              type="note"
+              title="Assistant Opt-in is temporarily disabled"
+              description="We will re-enable opting in to the assistant shortly!"
+            />
+          )}
           <p>
             Supabase AI can provide more relevant answers if you choose to share different levels of
             data. This feature is powered by Amazon Bedrock which does not store or log your prompts
