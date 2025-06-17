@@ -179,6 +179,7 @@ export const InviteMemberButton = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
+          type="primary"
           disabled={!canInviteMembers}
           className="pointer-events-auto flex-grow md:flex-grow-0"
           onClick={() => setIsOpen(true)}
