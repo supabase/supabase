@@ -253,6 +253,7 @@ const getEdgeLogsQuery = () => {
 
     -- ONLY include logs where the path does not include /rest/
     WHERE edge_logs_request.path NOT LIKE '%/rest/%'
+    AND edge_logs_request.path NOT LIKE '%/storage/%'
     
   `
 }
@@ -441,6 +442,70 @@ const getSupavisorLogsQuery = () => {
   `
 }
 
+// /**
+//  * Supabase Storage logs query fragment
+//  */
+// const getSupabaseStorageLogsQuery = () => {
+//   return `
+//     select
+//       id,
+//       sl.timestamp as timestamp,
+//       'storage' as log_type,
+//       'undefined' as status,
+//       CASE
+//           WHEN LOWER(sl_metadata.level) = 'error' THEN 'error'
+//           WHEN LOWER(sl_metadata.level) = 'warn' OR LOWER(sl_metadata.level) = 'warning' THEN 'warning'
+//           ELSE 'success'
+//       END as level,
+//       null as path,
+//       null as host,
+//       null as event_message,
+//       null as method,
+//       'api_role' as api_role,
+//       null as auth_user,
+//       null as log_count,
+//       null as logs
+//     from storage_logs as sl
+//     cross join unnest(metadata) as sl_metadata
+//   `
+// }
+
+// WHERE pathname includes `/storage/`
+const getSupabaseStorageLogsQuery = () => {
+  return `
+    select 
+      id,
+      el.timestamp as timestamp,
+      'storage' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
+      CASE
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      edge_logs_request.path as path,
+      edge_logs_request.host as host,
+      null as event_message,
+      edge_logs_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
+      null as log_count,
+      null as logs
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    left join unnest(edge_logs_request.sb) as sb
+    left join unnest(sb.jwt) as jwt
+    left join unnest(jwt.authorization) as auth
+    left join unnest(auth.payload) as authorization_payload
+
+    -- ONLY include logs where the path includes /storage/
+    WHERE edge_logs_request.path LIKE '%/storage/%'
+  `
+}
+
 /**
  * Combine all log sources to create the unified logs CTE
  */
@@ -458,6 +523,8 @@ WITH unified_logs AS (
     ${getAuthLogsQuery()}
     union all
     ${getSupavisorLogsQuery()}
+    union all
+    ${getSupabaseStorageLogsQuery()}
 )
   `
 }
