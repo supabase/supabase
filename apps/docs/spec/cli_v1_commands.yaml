@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.24.3
+  version: 2.26.9
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1366,6 +1366,7 @@ commands:
       - local-dev
     links: []
     subcommands:
+      - supabase-migration-down
       - supabase-migration-fetch
       - supabase-migration-list
       - supabase-migration-new
@@ -1644,6 +1645,31 @@ commands:
         name: --local
         description: Fetches migration history from the local database.
         default_value: 'false'
+  - id: supabase-migration-down
+    title: supabase migration down
+    summary: Resets applied migrations up to the last n versions
+    tags: []
+    links: []
+    usage: supabase migration down [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Resets applied migrations on the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: last
+        name: --last <uint>
+        description: Reset up to the last n migration versions.
+        default_value: '1'
+      - id: linked
+        name: --linked
+        description: Resets applied migrations on the linked project.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Resets applied migrations on the local database.
+        default_value: 'true'
   - id: supabase-logout
     title: supabase logout
     summary: Log out and delete access tokens locally
@@ -3016,6 +3042,10 @@ commands:
         description: |
           Resets the database specified by the connection string (must be percent-encoded).
         default_value: ''
+      - id: last
+        name: --last <uint>
+        description: Reset up to the last n migration versions.
+        default_value: '0'
       - id: linked
         name: --linked
         description: Resets the linked project with local migrations.
@@ -3875,4 +3905,42 @@ commands:
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
+        default_value: ''
+  - id: supabase-backups
+    title: supabase backups
+    summary: Manage Supabase physical backups
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-backups-list
+      - supabase-backups-restore
+    flags: []
+  - id: supabase-backups-restore
+    title: supabase backups restore
+    summary: Restore to a specific timestamp using PITR
+    tags: []
+    links: []
+    usage: supabase backups restore [flags]
+    subcommands: []
+    flags:
+      - id: timestamp
+        name: -t, --timestamp <int>
+        description: The recovery time target in seconds since epoch.
+        default_value: '0'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-backups-list
+    title: supabase backups list
+    summary: Lists available physical backups
+    tags: []
+    links: []
+    usage: supabase backups list
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
         default_value: ''
