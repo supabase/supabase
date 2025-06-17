@@ -2159,7 +2159,7 @@ export const platform: NavMenuConstant = {
         },
         {
           name: 'Multi-factor Authentication',
-          url: undefined,
+          url: '/guides/platform/multi-factor-authentication',
           items: [
             {
               name: 'Enable MFA',
