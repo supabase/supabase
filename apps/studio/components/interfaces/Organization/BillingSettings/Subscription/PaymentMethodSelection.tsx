@@ -56,7 +56,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<{ createPaymentMethod: () => Promise<PaymentMethod | undefined> }>(null)
-  const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState(false)
+  const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
 
   const {
     data: paymentMethods,
@@ -78,6 +78,12 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   })
 
   useEffect(() => {
+    if (paymentMethods?.data && paymentMethods.data.length === 0 && setupNewPaymentMethod == null) {
+      setSetupNewPaymentMethod(true)
+    }
+  }, [paymentMethods])
+
+  useEffect(() => {
     const loadSetupIntent = async (hcaptchaToken: string | undefined) => {
       const slug = selectedOrganization?.slug
       if (!slug) return console.error('Slug is required')
@@ -88,18 +94,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     const loadPaymentForm = async () => {
-      console.log({
-        l: paymentMethods?.data.length,
-        setupNewPaymentMethod,
-        captchaRef,
-        createPaymentMethod,
-      })
-      if (
-        ((paymentMethods && paymentMethods.data.length === 0) || setupNewPaymentMethod) &&
-        createPaymentMethodInline &&
-        captchaRef &&
-        captchaLoaded
-      ) {
+      if (setupNewPaymentMethod && createPaymentMethodInline && captchaRef && captchaLoaded) {
         let token = captchaToken
 
         try {
@@ -117,7 +112,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     loadPaymentForm()
-  }, [createPaymentMethodInline, captchaRef, captchaLoaded, paymentMethods, setupNewPaymentMethod])
+  }, [createPaymentMethodInline, captchaRef, captchaLoaded, setupNewPaymentMethod])
 
   const resetCaptcha = () => {
     setCaptchaToken(null)
@@ -159,10 +154,8 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   // If createPaymentMethod already exists, use it. Otherwise, define it here.
   const createPaymentMethod = async () => {
     if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
-      console.log('in here')
       return paymentRef.current?.createPaymentMethod()
     } else {
-      console.log('222')
       return { id: selectedPaymentMethod }
     }
   }

@@ -90,7 +90,6 @@ export const SubscriptionPlanUpdateDialog = ({
   const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
-  const [testimonialTweet, setTestimonialTweet] = useState(getRandomTweet())
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const paymentMethodSelection = useRef<{
@@ -104,11 +103,7 @@ export const SubscriptionPlanUpdateDialog = ({
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
-  useEffect(() => {
-    if (selectedTier !== undefined && selectedTier !== 'tier_free') {
-      setTestimonialTweet(getRandomTweet())
-    }
-  }, [selectedTier])
+  const testimonialTweet = useMemo(() => getRandomTweet(), [])
 
   const onSuccessfulPlanChange = () => {
     toast.success(
@@ -134,14 +129,15 @@ export const SubscriptionPlanUpdateDialog = ({
     }
   )
 
-  const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionChangeMutation({
-    onSuccess: () => {
-      onSuccessfulPlanChange()
-    },
-    onError: (error) => {
-      toast.error(`Unable to update subscription: ${error.message}`)
-    },
-  })
+  const { mutate: confirmPendingSubscriptionChange, isLoading: isConfirming } =
+    useConfirmPendingSubscriptionChangeMutation({
+      onSuccess: () => {
+        onSuccessfulPlanChange()
+      },
+      onError: (error) => {
+        toast.error(`Unable to update subscription: ${error.message}`)
+      },
+    })
 
   const paymentIntentConfirmed = async (paymentIntentConfirmation: PaymentIntentResult) => {
     // Reset payment intent secret to ensure another attempt works as expected
@@ -165,8 +161,12 @@ export const SubscriptionPlanUpdateDialog = ({
 
     const paymentMethod = await paymentMethodSelection.current?.createPaymentMethod()
 
-    if (!paymentMethod && subscription?.payment_method_type !== 'invoice') {
-      return toast.error('Please select a payment method')
+    if (
+      !paymentMethod &&
+      subscription?.payment_method_type !== 'invoice' &&
+      planMeta?.change_type === 'upgrade'
+    ) {
+      return
     }
 
     if (paymentMethod) {
@@ -235,6 +235,8 @@ export const SubscriptionPlanUpdateDialog = ({
 
   // Calculate total charge (new plan - prorated credit)
   const totalCharge = Math.max(0, newPlanCost - proratedCredit - customerBalance)
+
+  if (selectedTier == null) return null
 
   return (
     <Dialog
@@ -548,20 +550,22 @@ export const SubscriptionPlanUpdateDialog = ({
             </div>
 
             <div className="pt-4">
-              {!billingViaPartner && (
-                <div className="space-y-2 mb-4">
-                  <BillingCustomerDataExistingOrgDialog />
+              {!billingViaPartner &&
+                !subscriptionPreviewIsLoading &&
+                planMeta?.change_type === 'upgrade' && (
+                  <div className="space-y-2 mb-4">
+                    <BillingCustomerDataExistingOrgDialog />
 
-                  <PaymentMethodSelection
-                    ref={paymentMethodSelection}
-                    selectedPaymentMethod={selectedPaymentMethod}
-                    onSelectPaymentMethod={setSelectedPaymentMethod}
-                    createPaymentMethodInline={
-                      subscriptionPreview?.pending_subscription_flow === true
-                    }
-                  />
-                </div>
-              )}
+                    <PaymentMethodSelection
+                      ref={paymentMethodSelection}
+                      selectedPaymentMethod={selectedPaymentMethod}
+                      onSelectPaymentMethod={setSelectedPaymentMethod}
+                      createPaymentMethodInline={
+                        subscriptionPreview?.pending_subscription_flow === true
+                      }
+                    />
+                  </div>
+                )}
 
               {billingViaPartner && (
                 <div className="mb-4">
@@ -604,7 +608,8 @@ export const SubscriptionPlanUpdateDialog = ({
                   Cancel
                 </Button>
                 <Button
-                  loading={isUpdating || paymentConfirmationLoading}
+                  loading={isUpdating || paymentConfirmationLoading || isConfirming}
+                  disabled={subscriptionPreviewIsLoading}
                   type="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"

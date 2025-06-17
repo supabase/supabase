@@ -82,7 +82,10 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to confirm payment: ${data.message}`)
+        toast.error(data.message, {
+          dismissible: true,
+          duration: 10_000,
+        })
       } else {
         onError(data, variables, context)
       }

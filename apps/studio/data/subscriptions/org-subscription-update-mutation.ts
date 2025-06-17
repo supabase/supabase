@@ -74,7 +74,10 @@ export const useOrgSubscriptionUpdateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to update subscription: ${data.message}`)
+          toast.error(data.message, {
+            dismissible: true,
+            duration: 10_000,
+          })
         } else {
           onError(data, variables, context)
         }
