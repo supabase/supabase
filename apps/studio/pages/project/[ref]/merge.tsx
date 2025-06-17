@@ -16,12 +16,6 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { Badge, Button } from 'ui'
-import {
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -211,6 +205,32 @@ const MergePage: NextPageWithLayout = () => {
     [diffContent, currentBranchFunctions, mainBranchFunctions]
   )
 
+  // Determine current active tab via query param (defaults to 'database')
+  const currentTab = (router.query.tab as string) || 'database'
+
+  // Navigation items for PageLayout - updates the `tab` query param
+  const navigationItems = useMemo(() => {
+    const buildHref = (tab: string) => {
+      const query: Record<string, string> = { tab }
+      if (workflowRunId) query.workflow_run_id = workflowRunId
+      const qs = new URLSearchParams(query).toString()
+      return `/project/[ref]/merge?${qs}`
+    }
+
+    return [
+      {
+        label: 'Database',
+        href: buildHref('database'),
+        active: currentTab === 'database',
+      },
+      {
+        label: 'Edge Functions',
+        href: buildHref('edge-functions'),
+        active: currentTab === 'edge-functions',
+      },
+    ]
+  }, [workflowRunId, currentTab])
+
   if (!isBranch || !currentBranch) {
     return (
       <PageLayout title="Merge Request">
@@ -283,8 +303,10 @@ const MergePage: NextPageWithLayout = () => {
       subtitle={pageSubtitle()}
       breadcrumbs={breadcrumbs}
       primaryActions={primaryActions}
+      size="full"
+      navigationItems={navigationItems}
     >
-      <ScaffoldContainer className="pt-6 pb-12">
+      <ScaffoldContainer size="full" className="pt-6 pb-12">
         {/* Merge workflow logs */}
         <WorkflowLogsCard
           attemptedMerge={attemptedMerge}
@@ -295,34 +317,26 @@ const MergePage: NextPageWithLayout = () => {
           mainBranchRef={mainBranch?.project_ref}
         />
 
-        <Tabs defaultValue="database" className="w-full">
-          <TabsList className="gap-4 mb-8">
-            <TabsTrigger value="database">Database</TabsTrigger>
-            <TabsTrigger value="edge-functions">Edge Functions</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="database">
-            <DatabaseDiffPanel
-              diffContent={diffContent}
-              isLoading={isDiffLoading}
-              error={diffError}
-              showRefreshButton={!isPolling}
-              onRefresh={() => refetchDiff()}
-              currentBranchRef={ref}
-            />
-          </TabsContent>
-
-          <TabsContent value="edge-functions">
-            <EdgeFunctionsDiffPanel
-              currentBranchFunctions={currentBranchFunctions}
-              mainBranchFunctions={mainBranchFunctions}
-              isCurrentFunctionsLoading={isCurrentFunctionsLoading}
-              isMainFunctionsLoading={isMainFunctionsLoading}
-              currentBranchRef={ref}
-              mainBranchRef={parentProjectRef}
-            />
-          </TabsContent>
-        </Tabs>
+        {/* Content based on selected tab */}
+        {currentTab === 'database' ? (
+          <DatabaseDiffPanel
+            diffContent={diffContent}
+            isLoading={isDiffLoading}
+            error={diffError}
+            showRefreshButton={!isPolling}
+            onRefresh={() => refetchDiff()}
+            currentBranchRef={ref}
+          />
+        ) : (
+          <EdgeFunctionsDiffPanel
+            currentBranchFunctions={currentBranchFunctions}
+            mainBranchFunctions={mainBranchFunctions}
+            isCurrentFunctionsLoading={isCurrentFunctionsLoading}
+            isMainFunctionsLoading={isMainFunctionsLoading}
+            currentBranchRef={ref}
+            mainBranchRef={parentProjectRef}
+          />
+        )}
       </ScaffoldContainer>
     </PageLayout>
   )

@@ -5,17 +5,7 @@ import {
   type EdgeFunctionBodyData,
 } from 'data/edge-functions/edge-function-body-query'
 import type { EdgeFunctionsData } from 'data/edge-functions/edge-functions-query'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  cn,
-  Skeleton,
-  Tabs_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 import { Code, Wind } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
@@ -96,41 +86,56 @@ const FunctionDiff = ({
 
   return (
     <Card>
-      <CardHeader className="space-y-0">
+      <CardHeader className="space-y-0 px-4">
         {/* Function title */}
-        <Link
-          href={`/project/${currentBranchRef}/functions/${functionSlug}`}
-          className="text-sm text-foreground-light flex items-center gap-2"
-        >
-          <Code strokeWidth={1.5} size={16} className="text-foreground-light" />
-          {functionSlug}
-        </Link>
-
-        {/* File tabs */}
-        {diffFileKeys.length > 1 && (
-          <Tabs_Shadcn_
-            value={activeFileKey ?? diffFileKeys[0]}
-            onValueChange={(v: string) => setActiveFileKey(v)}
+        <CardTitle>
+          <Link
+            href={`/project/${currentBranchRef}/functions/${functionSlug}`}
+            className="flex items-center gap-2"
           >
-            <TabsList_Shadcn_ className="gap-4 overflow-x-auto border-b-0 -mx-6 -mb-4 mt-1 px-6">
-              {diffFileKeys.map((key) => (
-                <TabsTrigger_Shadcn_ key={key} value={key}>
-                  {key}
-                </TabsTrigger_Shadcn_>
-              ))}
-            </TabsList_Shadcn_>
-          </Tabs_Shadcn_>
-        )}
+            <Code strokeWidth={1.5} size={16} className="text-foreground-light" />
+            {functionSlug}
+          </Link>
+        </CardTitle>
+
+        {/* File list sidebar will be shown instead of top tabs */}
       </CardHeader>
       <CardContent className="p-0 h-96">
-        <DiffEditor
-          theme="supabase"
-          language={language}
-          height="100%"
-          original={mainFile?.content || ''}
-          modified={currentFile?.content || ''}
-          options={defaultOptions}
-        />
+        <div className="flex h-full min-h-0">
+          {/* Sidebar file list */}
+          <div className="w-48 border-r bg-surface-200 flex flex-col overflow-y-auto">
+            <ul className="divide-y divide-border">
+              {diffFileKeys.map((key) => (
+                <li key={key} className="flex">
+                  <button
+                    type="button"
+                    onClick={() => setActiveFileKey(key)}
+                    className={cn(
+                      'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',
+                      activeFileKey === key
+                        ? 'bg-surface-300 text-foreground'
+                        : 'text-foreground-light hover:bg-surface-300'
+                    )}
+                  >
+                    {key}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Diff viewer */}
+          <div className="flex-1 min-h-0">
+            <DiffEditor
+              theme="supabase"
+              language={language}
+              height="100%"
+              original={mainFile?.content || ''}
+              modified={currentFile?.content || ''}
+              options={defaultOptions}
+            />
+          </div>
+        </div>
       </CardContent>
     </Card>
   )
