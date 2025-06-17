@@ -556,6 +556,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
                     setupIntent?.pending_subscription_flow_enabled_for_creation === true
                   }
                   email={user.profile?.primary_email}
+                  readOnly={newOrgLoading || paymentConfirmationLoading}
                 />
               </Panel.Content>
             </Elements>

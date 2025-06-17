@@ -37,6 +37,7 @@ export interface PaymentMethodSelectionProps {
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
   createPaymentMethodInline: boolean
+  readOnly: boolean
 }
 
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
@@ -45,6 +46,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     onSelectPaymentMethod,
     layout = 'vertical',
     createPaymentMethodInline = false,
+    readOnly,
   }: PaymentMethodSelectionProps,
   ref
 ) {
@@ -286,6 +288,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               ref={paymentRef}
               pending_subscription_flow_enabled={true}
               email={selectedOrganization?.billing_email}
+              readOnly={readOnly}
             />
           </Elements>
         )}

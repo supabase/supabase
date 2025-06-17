@@ -255,6 +255,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                       createPaymentMethodInline={false}
                       onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
                       selectedPaymentMethod={form.getValues('paymentMethod')}
+                      readOnly={executingTopUp || paymentConfirmationLoading}
                     />
                   )}
                 />

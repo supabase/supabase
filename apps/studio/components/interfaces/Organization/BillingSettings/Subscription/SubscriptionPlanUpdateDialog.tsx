@@ -160,6 +160,9 @@ export const SubscriptionPlanUpdateDialog = ({
     if (!selectedTier) return console.error('Selected plan is required')
 
     const paymentMethod = await paymentMethodSelection.current?.createPaymentMethod()
+    if (paymentMethod) {
+      setSelectedPaymentMethod(paymentMethod.id)
+    }
 
     if (
       !paymentMethod &&
@@ -561,6 +564,7 @@ export const SubscriptionPlanUpdateDialog = ({
                       createPaymentMethodInline={
                         subscriptionPreview?.pending_subscription_flow === true
                       }
+                      readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                     />
                   </div>
                 )}
