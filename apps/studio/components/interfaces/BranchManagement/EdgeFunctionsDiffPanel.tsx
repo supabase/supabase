@@ -55,8 +55,6 @@ const FunctionDiff = ({
     }
   }, [diffFileKeys, activeFileKey])
 
-  if (diffFileKeys.length === 0) return null
-
   const currentFile = currentBody.find((f) => fileKey(f.name) === activeFileKey)
   const mainFile = mainBody.find((f) => fileKey(f.name) === activeFileKey)
 
@@ -68,6 +66,8 @@ const FunctionDiff = ({
     if (activeFileKey.endsWith('.sql')) return 'sql'
     return 'plaintext'
   }, [activeFileKey])
+
+  if (diffFileKeys.length === 0) return null
 
   return (
     <Card>
