@@ -107,7 +107,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const testimonialTweet = useMemo(() => getRandomTweet(), [])
 
   const changeType = useMemo(() => {
-    return getPlanChangeType(subscription?.plan?.id, planMeta?.planId)
+    return getPlanChangeType(subscription?.plan?.id, planMeta?.id)
   }, [planMeta, subscription])
 
   const subscriptionPlanMeta = useMemo(
