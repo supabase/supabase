@@ -28,6 +28,7 @@ import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billin
 import { useTheme } from 'next-themes'
 import { Elements } from '@stripe/react-stripe-js'
 import { NewPaymentMethodElement } from '../PaymentMethods/NewPaymentMethodElement'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -68,14 +69,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     setCaptchaRef(node)
   }, [])
 
-  const { mutate: initSetupIntent } = useOrganizationPaymentMethodSetupIntent({
-    onSuccess: (intent) => {
-      setSetupIntent(intent)
-    },
-    onError: (error) => {
-      toast.error(`Failed to setup intent: ${error.message}`)
-    },
-  })
+  const { mutate: initSetupIntent, isLoading: setupIntentLoading } =
+    useOrganizationPaymentMethodSetupIntent({
+      onSuccess: (intent) => {
+        setSetupIntent(intent)
+      },
+      onError: (error) => {
+        toast.error(`Failed to setup intent: ${error.message}`)
+      },
+    })
 
   useEffect(() => {
     if (paymentMethods?.data && paymentMethods.data.length === 0 && setupNewPaymentMethod == null) {
@@ -286,6 +288,17 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               email={selectedOrganization?.billing_email}
             />
           </Elements>
+        )}
+
+        {setupIntentLoading && (
+          <div className="space-y-2">
+            <ShimmeringLoader className="h-10" />
+            <div className="grid grid-cols-2 gap-4">
+              <ShimmeringLoader className="h-10" />
+              <ShimmeringLoader className="h-10" />
+            </div>
+            <ShimmeringLoader className="h-10" />
+          </div>
         )}
       </div>
 

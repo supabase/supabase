@@ -236,8 +236,6 @@ export const SubscriptionPlanUpdateDialog = ({
   // Calculate total charge (new plan - prorated credit)
   const totalCharge = Math.max(0, newPlanCost - proratedCredit - customerBalance)
 
-  if (selectedTier == null) return null
-
   return (
     <Dialog
       open={selectedTier !== undefined && selectedTier !== 'tier_free'}
