@@ -41,7 +41,9 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
           <AlertError error={organizationsError} subject="Failed to load organizations" />
         )}
         {isOrganizationsSuccess &&
-          organizations?.map((org) => <OrganizationCard key={org.slug} organization={org} />)}
+          organizations?.map((org) => (
+            <OrganizationCard key={org.slug} organization={org} href={`/new/${org.slug}`} />
+          ))}
       </div>
     </>
   )
