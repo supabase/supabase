@@ -67,6 +67,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           if (!currentFolder) {
             // At root of bucket
             await fetchFolderContents({
+              bucketId: bucket.id,
               folderId: bucket.id,
               folderName: bucket.name,
               index: -1,
@@ -74,6 +75,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
             })
           } else {
             await fetchFolderContents({
+              bucketId: bucket.id,
               folderId: currentFolder.id,
               folderName: currentFolder.name,
               index: currentFolderIdx,
@@ -83,9 +85,15 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         } else {
           if (!currentFolder) {
             // At root of bucket
-            await fetchFolderContents({ folderId: bucket.id, folderName: bucket.name, index: -1 })
+            await fetchFolderContents({
+              bucketId: bucket.id,
+              folderId: bucket.id,
+              folderName: bucket.name,
+              index: -1,
+            })
           } else {
             await fetchFolderContents({
+              bucketId: bucket.id,
               folderId: currentFolder.id,
               folderName: currentFolder.name,
               index: currentFolderIdx,
@@ -93,8 +101,17 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
           }
         }
       } else if (view === STORAGE_VIEWS.COLUMNS) {
-        const paths = openedFolders.map((folder) => folder.name)
-        fetchFoldersByPath({ paths, searchString: itemSearchString, showLoading: true })
+        if (openedFolders.length > 0) {
+          const paths = openedFolders.map((folder) => folder.name)
+          fetchFoldersByPath({ paths, searchString: itemSearchString, showLoading: true })
+        } else {
+          await fetchFolderContents({
+            bucketId: bucket.id,
+            folderId: bucket.id,
+            folderName: bucket.name,
+            index: -1,
+          })
+        }
       }
     }
 
