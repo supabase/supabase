@@ -122,8 +122,8 @@ const BuildingState = () => {
                 </ul>
               </div>
             </div>
-            <div className="col-span-12  lg:col-span-8">
-              <DisplayApiSettings />
+            <div className="col-span-12  lg:col-span-8 flex flex-col gap-8">
+              <DisplayApiSettings showLegacyText={false} />
               <DisplayConfigSettings />
             </div>
           </div>

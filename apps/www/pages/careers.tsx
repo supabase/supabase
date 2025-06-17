@@ -1,47 +1,59 @@
-import { GetServerSideProps, NextPage } from 'next'
+import { GlobeAltIcon } from '@heroicons/react/outline'
+import { Check } from 'lucide-react'
+import { GetServerSideProps } from 'next'
+import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
-import { GlobeAltIcon } from '@heroicons/react/outline'
-import { Check } from 'lucide-react'
-import { Badge, Button, Separator, buttonVariants, cn } from 'ui'
 import ReactMarkdown from 'react-markdown'
+import { Badge, Button, buttonVariants, cn, Separator } from 'ui'
+import { z } from 'zod'
 import Styles from '~/styles/career.module.css'
 
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-import { groupJobsByTeam, filterGenericJob, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
 import career from '~/data/career.json'
+import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+
+const ContributorSchema = z.object({
+  login: z.string(),
+  avatar_url: z.string(),
+  html_url: z.string(),
+})
+
+type Contributor = z.infer<typeof ContributorSchema>
 
 export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
   // refresh every 5 minutes
   res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=300')
 
   const job_res = await fetch('https://api.ashbyhq.com/posting-api/job-board/supabase')
-  const job_data = await job_res.json()
+  const job_data = (await job_res.json()) as { jobs: JobItemProps[] }
 
-  const jobs = groupJobsByTeam(job_data.jobs.filter((job: JobItemProps) => !filterGenericJob(job)))
+  const jobs = groupJobsByTeam(job_data.jobs.filter((job) => !filterGenericJob(job)))
   const placeholderJob = job_data.jobs.find(filterGenericJob)
 
-  const contributor_res = await fetch(
+  const contributorResponse = await fetch(
     'https://api.github.com/repos/supabase/supabase/contributors?per_page=100'
   )
-  const contributor_arr = await contributor_res.json()
+  let contributorArray: Contributor[] = []
+  try {
+    const contributorResponseData = await contributorResponse.json()
+    // if the response is not in the expected format, throw an error and return an empty array
+    contributorArray = ContributorSchema.array().parse(contributorResponseData)
+  } catch {}
 
-  const contributor_data = await contributor_arr.map(
-    (contributor: { login: string; avatar_url: string; html_url: string }) => {
-      return {
-        login: contributor.login,
-        avatar_url: contributor.avatar_url,
-        html_url: contributor.html_url,
-      }
+  const contributor_data = contributorArray.map((contributor) => {
+    return {
+      login: contributor.login,
+      avatar_url: contributor.avatar_url,
+      html_url: contributor.html_url,
     }
-  )
+  })
 
-  const contributors = await contributor_data.filter((contributor: any) =>
+  const contributors = await contributor_data.filter((contributor) =>
     career.contributors.includes(contributor.login)
   )
 
@@ -74,11 +86,11 @@ export const getServerSideProps: GetServerSideProps = (async ({ res }) => {
 
 interface CareersPageProps {
   jobs: Record<string, JobItemProps[]>
-  placeholderJob: JobItemProps
+  placeholderJob: JobItemProps | null
   contributors: { login: string; avatar_url: string; html_url: string }[]
 }
 
-const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contributors }) => {
+const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) => {
   const { basePath } = useRouter()
 
   const meta_title = 'Careers | Supabase'
@@ -118,7 +130,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
 
         <SectionContainer className="!pt-8">
           <div className="flex flex-wrap md:flex-nowrap -mt-6 md:mt-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
-            {career.company.map((company: { number: string; text: string }, i: number) => {
+            {career.company.map((company, i) => {
               return (
                 <div
                   key={i}
@@ -284,18 +296,16 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 our team effective:
               </p>
               <div className="grid pt-10 gap-8 grid-cols-2 md:grid-cols-3 lg:gap-16 lg:grid-cols-5">
-                {career.humanPowered.map(
-                  (human: { icon: string; title: string; text: string }, i: number) => {
-                    return (
-                      <div key={i} className="flex flex-col gap-3">
-                        <div>
-                          <h3 className="text-base">{human.title}</h3>
-                          <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
-                        </div>
+                {career.humanPowered.map((human, i) => {
+                  return (
+                    <div key={i} className="flex flex-col gap-3">
+                      <div>
+                        <h3 className="text-base">{human.title}</h3>
+                        <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
                       </div>
-                    )
-                  }
-                )}
+                    </div>
+                  )
+                })}
               </div>
             </SectionContainer>
 
@@ -312,7 +322,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 </p>
               </div>
               <div className="w-[1080px] h-[370px] mx-auto sm:mt-10 md:mt-16 lg:mt-28 2xl:mt-60">
-                {contributors.map((contributor: any, i: number) => {
+                {contributors.map((contributor, i) => {
                   return (
                     <div
                       className={`${
@@ -372,20 +382,16 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
               </h2>
             </div>
             <div className="mt-12 xl:mt-0 space-y-6 lg:space-y-0 sm:w-fit sm:mx-auto lg:grid lg:grid-cols-2 lg:gap-16">
-              {career.benefits.map(
-                (benefits: { icon: string; title: string; text: string }, i: number) => {
-                  return (
-                    <div className="h-full flex items-start space-x-6 w-full" key={i}>
-                      <div className="h-fit text-sm lg:text-base">
-                        <h3 className="text-sm">{benefits.title}</h3>
-                        <ReactMarkdown className="prose pt-1 text-sm">
-                          {benefits.text}
-                        </ReactMarkdown>
-                      </div>
+              {career.benefits.map((benefits, i) => {
+                return (
+                  <div className="h-full flex items-start space-x-6 w-full" key={i}>
+                    <div className="h-fit text-sm lg:text-base">
+                      <h3 className="text-sm">{benefits.title}</h3>
+                      <ReactMarkdown className="prose pt-1 text-sm">{benefits.text}</ReactMarkdown>
                     </div>
-                  )
-                }
-              )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         </SectionContainer>
@@ -401,7 +407,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
             </p>
           </div>
           <div className="mt-16 md:ml-36 lg:flex lg:items-start lg:w-fit lg:mx-auto">
-            {career.hiring.map((hiring: { title: string; text: string }, i: number) => {
+            {career.hiring.map((hiring, i) => {
               return (
                 <div
                   key={i + 1}
@@ -444,9 +450,9 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 <div key={team}>
                   <h3 className="text-foreground-lighter text-sm">{team}</h3>
                   <div className="mt-2 -space-y-px">
-                    {(teamJobs as JobItemProps[])
-                      .filter((job: any) => !filterGenericJob(job))
-                      .map((job: JobItemProps) => (
+                    {teamJobs
+                      .filter((job) => !filterGenericJob(job))
+                      .map((job) => (
                         <JobItem job={job} key={job.id} />
                       ))}
                   </div>
@@ -481,7 +487,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
   )
 }
 
-const JobItem: React.FC<{ job: JobItemProps }> = ({ job }) => {
+const JobItem = ({ job }: { job: JobItemProps }) => {
   const isPlaceholderJob = job.id === PLACEHOLDER_JOB_ID
 
   return (

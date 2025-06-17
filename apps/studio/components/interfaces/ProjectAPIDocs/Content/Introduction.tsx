@@ -1,8 +1,7 @@
 import { useParams } from 'common'
-import { Button, Input } from 'ui'
+import { Button, Input, copyToClipboard } from 'ui'
 
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { copyToClipboard } from 'lib/helpers'
 import { Copy } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ContentSnippet from '../ContentSnippet'
