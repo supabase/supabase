@@ -10,31 +10,31 @@ export const EnableBranchingButton = () => {
   const snap = useAppStateSnapshot()
   const project = useSelectedProject()
 
-  const canEnableBranching = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-    resource: { is_default: true },
+  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
+    resource: { is_default: false },
   })
-  const isDisabled = !canEnableBranching || project?.status !== 'ACTIVE_HEALTHY'
+  const isDisabled = !canCreateBranches || project?.status !== 'ACTIVE_HEALTHY'
 
   return (
     <ButtonTooltip
       disabled={isDisabled}
       type={'text'}
       icon={<GitBranch strokeWidth={1.5} />}
-      onClick={() => snap.setShowEnableBranchingModal(true)}
+      onClick={() => snap.setShowCreateBranchModal(true)}
       className="bg-none hover:bg-none text-foreground-light hover:text-foreground [&_span]:w-full [&_span]:text-left "
       tooltip={{
         content: {
           side: 'bottom',
           text:
             project?.status !== 'ACTIVE_HEALTHY'
-              ? 'Unpause your project to enable branching'
-              : !canEnableBranching
-                ? 'You need additional permissions to enable branching'
+              ? 'Unpause your project to create branches'
+              : !canCreateBranches
+                ? 'You need additional permissions to create branches'
                 : undefined,
         },
       }}
     >
-      Enable branching
+      Create branch
     </ButtonTooltip>
   )
 }

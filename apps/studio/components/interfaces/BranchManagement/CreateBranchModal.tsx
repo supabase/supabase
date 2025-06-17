@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Check, DollarSign, Github, Loader2 } from 'lucide-react'
+import { Check, DollarSign, FileText, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -17,6 +17,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { BASE_PATH } from 'lib/constants'
 import { sidePanelsState } from 'state/side-panels'
 import {
@@ -39,6 +40,9 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
+import { useQueryClient } from '@tanstack/react-query'
+import { projectKeys } from 'data/projects/keys'
 
 interface CreateBranchModalProps {
   visible: boolean
@@ -68,14 +72,22 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
+  const { data: addons } = useProjectAddonsQuery({ projectRef })
+  const hasPitrEnabled =
+    (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
   const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
+  const queryClient = useQueryClient()
+
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
+      if (projectRef) {
+        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
+      }
       onClose()
     },
     onError: (error) => {
@@ -278,25 +290,63 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
               )}
             </DialogSection>
 
-            <DialogFooter className="sm:justify-between gap-2" padding="medium">
-              <p className="flex items-center gap-2 text-sm text-foreground">
-                <DollarSign size={16} strokeWidth={1.5} />
-                Each preview branch costs $0.32 per day
-              </p>
-              <div className="flex items-center gap-2">
-                <Button disabled={isCreating} type="default" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  form={formId}
-                  disabled={!isSuccessConnections || isCreating || !canSubmit || isChecking}
-                  loading={isCreating}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  Create branch
-                </Button>
+            <DialogSectionSeparator />
+
+            <DialogSection padding="medium" className="flex flex-col gap-4">
+              {githubConnection && (
+                <div className="flex flex-row gap-4">
+                  <div>
+                    <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                      <FileText className="text-info" size={20} strokeWidth={2} />
+                    </figure>
+                  </div>
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-sm text-foreground">
+                      Migrations are applied from your GitHub repository
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      Migration files in your <code className="text-xs">./supabase</code> directory
+                      will run on both Preview Branches and Production when pushing and merging
+                      branches.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-row gap-4">
+                <div>
+                  <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                    <DollarSign className="text-info" size={20} strokeWidth={2} />
+                  </figure>
+                </div>
+                <div className="flex flex-col gap-y-1">
+                  <p className="text-sm text-foreground">
+                    Preview branches are billed $0.32 per day
+                  </p>
+                  <p className="text-sm text-foreground-light">
+                    This cost will continue for as long as the branch has not been removed.
+                  </p>
+                </div>
               </div>
+
+              {!hasPitrEnabled && <BranchingPITRNotice />}
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogFooter className="justify-end gap-2" padding="medium">
+              <Button disabled={isCreating} type="default" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                form={formId}
+                disabled={!isSuccessConnections || isCreating || !canSubmit || isChecking}
+                loading={isCreating}
+                type="primary"
+                htmlType="submit"
+              >
+                Create branch
+              </Button>
             </DialogFooter>
           </form>
         </Form_Shadcn_>

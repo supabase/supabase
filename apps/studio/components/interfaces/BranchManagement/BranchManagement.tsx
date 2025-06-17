@@ -25,13 +25,9 @@ import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
-import { CreateBranchModal } from './CreateBranchModal'
-import {
-  BranchingEmptyState,
-  PreviewBranchesEmptyState,
-  PullRequestsEmptyState,
-} from './EmptyStates'
+import { PreviewBranchesEmptyState, PullRequestsEmptyState } from './EmptyStates'
 import Overview from './Overview'
+import { useAppStateSnapshot } from 'state/app-state'
 
 type Tab = 'overview' | 'prs' | 'branches'
 
@@ -52,7 +48,8 @@ const BranchManagement = () => {
   const tab = urlParams.tab ?? 'overview'
   const setTab = (tab: Tab) => setParams({ tab })
 
-  const [showCreateBranch, setShowCreateBranch] = useState(false)
+  const snap = useAppStateSnapshot()
+
   const [showDisableBranching, setShowDisableBranching] = useState(false)
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
@@ -135,8 +132,6 @@ const BranchManagement = () => {
     disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
   }
 
-  if (!hasBranchEnabled) return <BranchingEmptyState />
-
   return (
     <>
       <ScaffoldContainer>
@@ -193,7 +188,7 @@ const BranchManagement = () => {
                   <ButtonTooltip
                     type="primary"
                     disabled={!canCreateBranches}
-                    onClick={() => setShowCreateBranch(true)}
+                    onClick={() => snap.setShowCreateBranchModal(true)}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -282,9 +277,10 @@ const BranchManagement = () => {
                           mainBranch={mainBranch}
                           previewBranches={previewBranches}
                           onViewAllBranches={() => setTab('branches')}
-                          onSelectCreateBranch={() => setShowCreateBranch(true)}
+                          onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
                           onSelectDeleteBranch={setSelectedBranchToDelete}
                           generateCreatePullRequestURL={generateCreatePullRequestURL}
+                          showProductionBranch={hasBranchEnabled}
                         />
                       )}
                       {tab === 'prs' && (
@@ -326,7 +322,7 @@ const BranchManagement = () => {
                           )}
                           {isSuccessBranches && previewBranches.length === 0 && (
                             <PreviewBranchesEmptyState
-                              onSelectCreateBranch={() => setShowCreateBranch(true)}
+                              onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
                             />
                           )}
                           {isSuccessBranches &&
@@ -395,8 +391,6 @@ const BranchManagement = () => {
           </li>
         </ul>
       </ConfirmationModal>
-
-      <CreateBranchModal visible={showCreateBranch} onClose={() => setShowCreateBranch(false)} />
     </>
   )
 }

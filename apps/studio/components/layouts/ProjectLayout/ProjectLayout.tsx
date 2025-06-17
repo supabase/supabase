@@ -23,7 +23,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { EnableBranchingModal } from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -98,6 +98,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       setMobileMenuOpen,
       toggleEditorPanel,
       setEditorPanel,
+      showCreateBranchModal,
+      setShowCreateBranchModal,
     } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
@@ -267,7 +269,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <EnableBranchingModal />
+        <CreateBranchModal
+          visible={showCreateBranchModal}
+          onClose={() => setShowCreateBranchModal(false)}
+        />
         <AISettingsModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

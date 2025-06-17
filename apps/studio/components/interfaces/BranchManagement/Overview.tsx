@@ -18,6 +18,7 @@ interface OverviewProps {
   onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
   generateCreatePullRequestURL: (branchName?: string) => string
+  showProductionBranch?: boolean
 }
 
 const Overview = ({
@@ -30,15 +31,18 @@ const Overview = ({
   onSelectCreateBranch,
   onSelectDeleteBranch,
   generateCreatePullRequestURL,
+  showProductionBranch = true,
 }: OverviewProps) => {
   return (
     <>
-      <BranchManagementSection header="Production branch">
-        {isLoading && <BranchRowLoader />}
-        {isSuccess && mainBranch !== undefined && (
-          <BranchRow isMain branch={mainBranch} repo={repo} onSelectDeleteBranch={noop} />
-        )}
-      </BranchManagementSection>
+      {showProductionBranch && (
+        <BranchManagementSection header="Production branch">
+          {isLoading && <BranchRowLoader />}
+          {isSuccess && mainBranch !== undefined && (
+            <BranchRow isMain branch={mainBranch} repo={repo} onSelectDeleteBranch={noop} />
+          )}
+        </BranchManagementSection>
+      )}
 
       <BranchManagementSection
         header="Preview branches"
