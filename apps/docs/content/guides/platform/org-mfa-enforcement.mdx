@@ -9,7 +9,7 @@ Supabase provides multi-factor authentication (MFA) enforcement on the organizat
 
 MFA enforcement is only available on the [Pro, Team and Enterprise plans](https://supabase.com/pricing).
 
-This feature is currently in limited preview. If you would like to opt-in to try it, please contact support.
+This feature is currently in limited preview. If you would like to opt-in to try it, contact support.
 
 </Admonition>
 
@@ -23,8 +23,10 @@ To enable MFA on an organization, visit the [security settings](/dashboard/org/_
 
 <Admonition type="caution">
 
-When MFA enforcement is enabled, users without MFA will immediately lose access to the organization and all resources in the organization. The users will still be members of the organization and will regain their original permissions once they enable MFA on their account.
-
-An organization with MFA enforcement will **not** be visible to users without MFA, even if those users are members of the organization.
+When MFA enforcement is enabled, users without MFA will immediately lose access all resources in the organization. The users will still be members of the organization and will regain their original permissions once they enable MFA on their account.
 
 </Admonition>
+
+## Personal access tokens
+
+Personal access tokens are not affected by MFA enforcement. Personal access tokens are designed for programatic access and issuing of these require a valid Supabase session backed by MFA, if enabled on the account.
