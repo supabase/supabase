@@ -30,9 +30,13 @@ const MergePage: NextPageWithLayout = () => {
   const { ref } = useParams()
 
   const gitlessBranching = useFlag('gitlessBranching')
-  if (!gitlessBranching) {
-    router.push(`/project/${ref}/branches`)
-  }
+
+  // Redirect to branches page if feature flag disabled
+  useEffect(() => {
+    if (!gitlessBranching && ref) {
+      router.push(`/project/${ref}/branches`)
+    }
+  }, [gitlessBranching, ref, router])
 
   const project = useSelectedProject()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -41,7 +45,10 @@ const MergePage: NextPageWithLayout = () => {
   const parentProjectRef = project?.parent_project_ref
 
   // Get branch information
-  const { data: branches } = useBranchesQuery({ projectRef: parentProjectRef })
+  const { data: branches } = useBranchesQuery(
+    { projectRef: parentProjectRef },
+    { enabled: gitlessBranching && !!parentProjectRef }
+  )
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
@@ -53,7 +60,7 @@ const MergePage: NextPageWithLayout = () => {
   const { data: workflowRuns } = useWorkflowRunsQuery(
     { projectRef: parentProjectRef },
     {
-      enabled: !!parentProjectRef && !!workflowRunId,
+      enabled: gitlessBranching && !!parentProjectRef && !!workflowRunId,
       refetchInterval: 3000, // Poll every 3 seconds to check for status changes
     }
   )
@@ -73,7 +80,7 @@ const MergePage: NextPageWithLayout = () => {
   const { data: workflowRunLogs } = useWorkflowRunQuery(
     { workflowRunId },
     {
-      enabled: !!workflowRunId,
+      enabled: gitlessBranching && !!workflowRunId,
       refetchInterval: isPolling ? 2000 : false, // Poll logs every 2 seconds until complete
     }
   )
@@ -89,7 +96,7 @@ const MergePage: NextPageWithLayout = () => {
       branchId: currentBranch?.id || '',
       projectRef: parentProjectRef || '',
     },
-    { enabled: !!currentBranch?.id }
+    { enabled: gitlessBranching && !!currentBranch?.id }
   )
 
   // Show toast notifications when workflow status changes
@@ -119,11 +126,11 @@ const MergePage: NextPageWithLayout = () => {
 
   // Get edge functions for both branches
   const { data: currentBranchFunctions, isLoading: isCurrentFunctionsLoading } =
-    useEdgeFunctionsQuery({ projectRef: ref }, { enabled: !!ref })
+    useEdgeFunctionsQuery({ projectRef: ref }, { enabled: gitlessBranching && !!ref })
 
   const { data: mainBranchFunctions, isLoading: isMainFunctionsLoading } = useEdgeFunctionsQuery(
     { projectRef: parentProjectRef },
-    { enabled: !!parentProjectRef }
+    { enabled: gitlessBranching && !!parentProjectRef }
   )
 
   // Check if there are any changes (database or edge functions)
@@ -238,6 +245,7 @@ const MergePage: NextPageWithLayout = () => {
     ]
   }, [workflowRunId, currentTab])
 
+  // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
     return (
       <PageLayout title="Merge Request">
@@ -246,6 +254,11 @@ const MergePage: NextPageWithLayout = () => {
         </div>
       </PageLayout>
     )
+  }
+
+  if (!gitlessBranching) {
+    // Render nothing while redirecting
+    return null
   }
 
   const isDataLoaded = !isDiffLoading && !isCurrentFunctionsLoading && !isMainFunctionsLoading

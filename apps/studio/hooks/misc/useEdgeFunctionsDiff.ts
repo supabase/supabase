@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useQueries } from '@tanstack/react-query'
+import { handleError } from 'data/fetchers'
 import {
   getEdgeFunctionBody,
   type EdgeFunctionBodyData,
@@ -103,6 +104,18 @@ export const useEdgeFunctionsDiff = ({
     ...addedBodiesQueries,
     ...removedBodiesQueries,
   ].some((q) => q.isLoading)
+
+  // Aggregate errors across all queries and handle the first encountered error.
+  const firstError = [
+    ...currentBodiesQueries,
+    ...mainBodiesQueries,
+    ...addedBodiesQueries,
+    ...removedBodiesQueries,
+  ].find((q) => q.error)?.error
+
+  if (firstError) {
+    handleError(firstError)
+  }
 
   // Build lookup maps --------------------------------------------------------
   const currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}

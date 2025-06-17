@@ -40,7 +40,7 @@ export async function getBranchDiff({
     return diffData || ''
   } catch (error) {
     handleError(error)
-    throw error
+    return ''
   }
 }
 
