@@ -5,12 +5,18 @@ import { ActionCard } from 'components/ui/ActionCard'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { Organization } from 'types'
 
-export const OrganizationCard = ({ organization }: { organization: Organization }) => {
+export const OrganizationCard = ({
+  organization,
+  href,
+}: {
+  organization: Organization
+  href?: string
+}) => {
   const { data: allProjects = [] } = useProjectsQuery()
   const numProjects = allProjects.filter((x) => x.organization_slug === organization.slug).length
 
   return (
-    <Link href={`/new/${organization.slug}`}>
+    <Link href={href ?? `/org/${organization.slug}`}>
       <ActionCard
         bgColor="bg border"
         className="[&>div]:items-center"
