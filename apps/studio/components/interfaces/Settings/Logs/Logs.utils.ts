@@ -145,7 +145,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code
+select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
 from edge_logs
 ${joins}
 ${where}
@@ -153,7 +153,7 @@ ${orderBy}
 limit ${limit};
 `
       }
-      return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
+      return `select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
   from ${table}
   ${joins}
   ${where}
