@@ -87,7 +87,7 @@ Unlike the `anon` and publishable key, the `service_role` and secret keys allow 
 - Servers that implement prior authorization themselves, such as Edge Functions, microservices, traditional or specialized web servers.
 - Periodic jobs, queue processors, topic subscribers.
 - Admin and back-office tools, with prior authorization checks only.
-- Data processing pipelines, such as for analytics, reports, backups, or database syncrhonization.
+- Data processing pipelines, such as for analytics, reports, backups, or database synchronization.
 
 <Admonition type="caution">
 
@@ -152,7 +152,7 @@ As the publishable and secret keys are no longer JWT-based, there are some known
 
 ### I am using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate my `service_role` JWT secret?
 
-If you know or suspect that the JWT secret itself is leaked, refer to the section on [rotating the JWT](#what-to-do-if-a-secret-key-or-servicerole-has-leaked).
+If you know or suspect that the JWT secret itself is leaked, refer to the section on [rotating the JWT](#what-to-do-if-a-secret-key-or-servicerole-has-been-leaked-or-compromised).
 
 If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard. This will prevent downtime for your application.
 
