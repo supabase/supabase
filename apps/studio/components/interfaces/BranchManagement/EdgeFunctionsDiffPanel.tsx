@@ -1,15 +1,14 @@
-import { DiffEditor } from '@monaco-editor/react'
-import { editor as monacoEditor } from 'monaco-editor'
-import {
-  getEdgeFunctionBody,
-  type EdgeFunctionBodyData,
-} from 'data/edge-functions/edge-function-body-query'
 import type { EdgeFunctionsData } from 'data/edge-functions/edge-functions-query'
-import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
+import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
+
+import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import { Code, Wind } from 'lucide-react'
+import DiffViewer from 'components/ui/DiffViewer'
+import { Loading, EmptyState } from 'components/ui/AsyncState'
+import useEdgeFunctionsDiff from 'hooks/misc/useEdgeFunctionsDiff'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { useQueries } from '@tanstack/react-query'
+import { basename } from 'path'
 
 interface EdgeFunctionsDiffPanelProps {
   currentBranchFunctions?: EdgeFunctionsData
@@ -28,7 +27,7 @@ interface FunctionDiffProps {
 }
 
 // Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
-const fileKey = (fullPath: string) => fullPath.split('/').pop() ?? fullPath
+const fileKey = (fullPath: string) => basename(fullPath)
 
 const FunctionDiff = ({
   functionSlug,
@@ -36,20 +35,6 @@ const FunctionDiff = ({
   mainBody,
   currentBranchRef,
 }: FunctionDiffProps) => {
-  // Monaco editor options for diff display
-  const defaultOptions: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
-    readOnly: true,
-    renderSideBySide: false,
-    minimap: { enabled: false },
-    wordWrap: 'on',
-    lineNumbers: 'on',
-    folding: false,
-    padding: { top: 16, bottom: 16 },
-    lineNumbersMinChars: 3,
-    fontSize: 13,
-    scrollBeyondLastLine: false,
-  }
-
   // Determine list of files with differences (by canonical key)
   const diffFileKeys = useMemo(() => {
     const keys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
@@ -126,13 +111,10 @@ const FunctionDiff = ({
 
           {/* Diff viewer */}
           <div className="flex-1 min-h-0">
-            <DiffEditor
-              theme="supabase"
+            <DiffViewer
               language={language}
-              height="100%"
               original={mainFile?.content || ''}
               modified={currentFile?.content || ''}
-              options={defaultOptions}
             />
           </div>
         </div>
@@ -149,150 +131,40 @@ const EdgeFunctionsDiffPanel = ({
   currentBranchRef,
   mainBranchRef,
 }: EdgeFunctionsDiffPanelProps) => {
-  // Compare edge functions between branches for added/removed and potential overlap
-  const compareEdgeFunctions = () => {
-    if (!currentBranchFunctions || !mainBranchFunctions) {
-      return { added: [], removed: [], overlap: [] as typeof currentBranchFunctions }
-    }
-
-    const currentFuncs = currentBranchFunctions || []
-    const mainFuncs = mainBranchFunctions || []
-
-    const added = currentFuncs.filter(
-      (currentFunc) => !mainFuncs.find((mainFunc) => mainFunc.slug === currentFunc.slug)
-    )
-
-    const removed = mainFuncs.filter(
-      (mainFunc) => !currentFuncs.find((currentFunc) => currentFunc.slug === mainFunc.slug)
-    )
-
-    // Functions that exist in both branches are potential modifications
-    const overlap = currentFuncs.filter((currentFunc) =>
-      mainFuncs.find((f) => f.slug === currentFunc.slug)
-    )
-
-    return { added, removed, overlap }
-  }
-
   const {
-    added = [],
-    removed = [],
-    overlap = [],
-  } = useMemo(compareEdgeFunctions, [currentBranchFunctions, mainBranchFunctions])
-
-  // Fetch bodies for overlapping functions in both branches
-  const overlapSlugs = overlap.map((f) => f.slug)
-
-  // FIRST_EDIT: introduce slug arrays for added and removed
-  const addedSlugs = added.map((f) => f.slug)
-  const removedSlugs = removed.map((f) => f.slug)
-
-  const currentBodiesQueries = useQueries({
-    queries: overlapSlugs.map((slug) => ({
-      queryKey: ['edge-function-body', currentBranchRef, slug],
-      queryFn: ({ signal }: { signal?: AbortSignal }) =>
-        getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
-      enabled: !!currentBranchRef,
-    })),
+    addedSlugs,
+    removedSlugs,
+    modifiedSlugs,
+    addedBodiesMap,
+    removedBodiesMap,
+    currentBodiesMap,
+    mainBodiesMap,
+    isLoading,
+    hasChanges,
+  } = useEdgeFunctionsDiff({
+    currentBranchFunctions,
+    mainBranchFunctions,
+    currentBranchRef,
+    mainBranchRef,
   })
 
-  const mainBodiesQueries = useQueries({
-    queries: overlapSlugs.map((slug) => ({
-      queryKey: ['edge-function-body', mainBranchRef, slug],
-      queryFn: ({ signal }: { signal?: AbortSignal }) =>
-        getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
-      enabled: !!mainBranchRef,
-    })),
-  })
-
-  // SECOND_EDIT: fetch bodies for added and removed functions
-  const addedBodiesQueries = useQueries({
-    queries: addedSlugs.map((slug) => ({
-      queryKey: ['edge-function-body', currentBranchRef, slug],
-      queryFn: ({ signal }: { signal?: AbortSignal }) =>
-        getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
-      enabled: !!currentBranchRef,
-    })),
-  })
-
-  const removedBodiesQueries = useQueries({
-    queries: removedSlugs.map((slug) => ({
-      queryKey: ['edge-function-body', mainBranchRef, slug],
-      queryFn: ({ signal }: { signal?: AbortSignal }) =>
-        getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
-      enabled: !!mainBranchRef,
-    })),
-  })
-
-  // THIRD_EDIT: include added/removed loading status
-  const isBodiesLoading =
-    currentBodiesQueries.some((q) => q.isLoading) ||
-    mainBodiesQueries.some((q) => q.isLoading) ||
-    addedBodiesQueries.some((q) => q.isLoading) ||
-    removedBodiesQueries.some((q) => q.isLoading)
-
-  const currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
-  currentBodiesQueries.forEach((q, idx) => {
-    if (q.data) currentBodiesMap[overlapSlugs[idx]] = q.data
-  })
-
-  const mainBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
-  mainBodiesQueries.forEach((q, idx) => {
-    if (q.data) mainBodiesMap[overlapSlugs[idx]] = q.data
-  })
-
-  // FOURTH_EDIT: build bodies map for added and removed slugs
-  const addedBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
-  addedBodiesQueries.forEach((q, idx) => {
-    if (q.data) addedBodiesMap[addedSlugs[idx]] = q.data
-  })
-
-  const removedBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}
-  removedBodiesQueries.forEach((q, idx) => {
-    if (q.data) removedBodiesMap[removedSlugs[idx]] = q.data
-  })
-
-  // Determine which overlapping functions actually have modifications in any of their files
-  const modifiedSlugs = overlapSlugs.filter((slug) => {
-    const currentBody = currentBodiesMap[slug]
-    const mainBody = mainBodiesMap[slug]
-    if (!currentBody || !mainBody) return false
-
-    const keys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
-
-    for (const key of keys) {
-      const currentFile = currentBody.find((f) => fileKey(f.name) === key)
-      const mainFile = mainBody.find((f) => fileKey(f.name) === key)
-      if ((currentFile?.content || '') !== (mainFile?.content || '')) {
-        return true
-      }
-    }
-
-    return false
-  })
-
-  const hasChanges = added.length > 0 || removed.length > 0 || modifiedSlugs.length > 0
-
-  if (isCurrentFunctionsLoading || isMainFunctionsLoading || isBodiesLoading) {
-    return <Skeleton className="h-64" />
+  if (isCurrentFunctionsLoading || isMainFunctionsLoading || isLoading) {
+    return <Loading />
   }
 
-  // If no changes and checking complete
   if (!hasChanges) {
     return (
-      <div className="p-6 text-center">
-        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
-        <h3 className="mb-1">No changes detected between branches</h3>
-        <p className="text-sm text-foreground-light">
-          Any changes to your edge functions will be shown here for review
-        </p>
-      </div>
+      <EmptyState
+        title="No changes detected between branches"
+        description="Any changes to your edge functions will be shown here for review"
+        icon={Wind}
+      />
     )
   }
 
   return (
     <div className="space-y-6">
-      {added.length > 0 && (
+      {addedSlugs.length > 0 && (
         <div>
           <div className="space-y-4">
             {addedSlugs.map((slug) => (
@@ -308,7 +180,7 @@ const EdgeFunctionsDiffPanel = ({
         </div>
       )}
 
-      {removed.length > 0 && (
+      {removedSlugs.length > 0 && (
         <div>
           <div className="space-y-4">
             {removedSlugs.map((slug) => (

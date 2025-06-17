@@ -23,10 +23,17 @@ import { GitMerge } from 'lucide-react'
 import Link from 'next/link'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
+
+  const gitlessBranching = useFlag('gitlessBranching')
+  if (!gitlessBranching) {
+    router.push(`/project/${ref}/branches`)
+  }
+
   const project = useSelectedProject()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
