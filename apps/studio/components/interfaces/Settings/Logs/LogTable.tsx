@@ -11,10 +11,16 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { copyToClipboard } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
-import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import {
+  Button,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  cn,
+  copyToClipboard,
+} from 'ui'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
 import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresColumnRender'
@@ -27,6 +33,7 @@ import { isDefaultLogPreviewFormat } from './Logs.utils'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
+import { toast } from 'sonner'
 
 interface Props {
   data?: LogData[]
@@ -121,7 +128,13 @@ const LogTable = ({
       resizable: true,
       renderCell: ({ row }: any) => {
         return (
-          <span onContextMenu={(e) => showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })}>
+          <span
+            onContextMenu={(e) => {
+              e.preventDefault()
+              setCellPosition({ row, column: { name: v } })
+              showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })
+            }}
+          >
             {formatCellValue(row?.[v])}
           </span>
         )
@@ -201,9 +214,23 @@ const LogTable = ({
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
-      return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
+      const handleContextMenu = (e: React.MouseEvent) => {
+        if (columns.length > 0) {
+          setCellPosition({ row: props.row, column: columns[0] })
+        }
+        showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })
+      }
+      return (
+        <Row
+          key={key}
+          {...props}
+          isRowSelected={false}
+          selectedCellIdx={undefined}
+          onContextMenu={handleContextMenu}
+        />
+      )
     },
-    []
+    [columns, showContextMenu]
   )
 
   const formatCellValue = (value: any) => {
@@ -215,12 +242,11 @@ const LogTable = ({
   }
 
   const onCopyCell = () => {
-    if (cellPosition) {
-      const { row, column } = cellPosition
-      const cellValue = row?.[column.name] ?? ''
-      const value = formatCellValue(cellValue)
-      copyToClipboard(value)
-    }
+    if (!cellPosition) return
+    const eventMessage = cellPosition.row.event_message
+    copyToClipboard(eventMessage, () => {
+      toast.success('Copied to clipboard')
+    })
   }
 
   const LogsExplorerTableHeader = () => (
@@ -414,7 +440,7 @@ const LogTable = ({
               <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
                 <Item onClick={onCopyCell}>
                   <Clipboard size={14} />
-                  <span className="ml-2 text-xs">Copy cell content</span>
+                  <span className="ml-2 text-xs">Copy event message</span>
                 </Item>
               </Menu>,
               document.body

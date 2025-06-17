@@ -1496,6 +1496,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/confirm-subscription': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm subscription change and apply pending changes */
+    post: operations['OrganizationsController_confirmSubscription']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/fly/{fly_organization_id}': {
     parameters: {
       query?: never
@@ -4234,6 +4251,12 @@ export interface components {
       /** @default 0 */
       recoveryTimeTarget?: number
     }
+    ConfirmCreateSubscriptionChangeBody: {
+      kind?: string
+      name: string
+      payment_intent_id: string
+      size?: string
+    }
     CopyObjectBody: {
       from: string
       to: string
@@ -4521,6 +4544,32 @@ export interface components {
       /** @enum {string} */
       tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
+    CreateOrganizationResponse:
+      | {
+          pending_payment_intent_secret: string | null
+        }
+      | {
+          billing_email: string | null
+          id: number
+          is_owner: boolean
+          name: string
+          opt_in_tags: string[]
+          organization_requires_mfa: boolean
+          plan: {
+            /** @enum {string} */
+            id: 'free' | 'pro' | 'team' | 'enterprise'
+            name: string
+          }
+          restriction_data: {
+            [key: string]: string
+          } | null
+          /** @enum {string|null} */
+          restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
+          slug: string
+          stripe_customer_id: string | null
+          subscription_id: string | null
+          usage_billing_enabled: boolean
+        }
     CreatePipelineResponse: {
       id: number
     }
@@ -5622,6 +5671,9 @@ export interface components {
       EXTERNAL_ZOOM_CLIENT_ID: string
       EXTERNAL_ZOOM_ENABLED: boolean
       EXTERNAL_ZOOM_SECRET: string
+      HOOK_BEFORE_USER_CREATED_ENABLED: boolean
+      HOOK_BEFORE_USER_CREATED_SECRETS: string
+      HOOK_BEFORE_USER_CREATED_URI: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_SECRETS: string
       HOOK_CUSTOM_ACCESS_TOKEN_URI: string
@@ -6100,6 +6152,7 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
+      organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
         id: 'free' | 'pro' | 'team' | 'enterprise'
@@ -7223,6 +7276,8 @@ export interface components {
       }[]
     }
     RunQueryBody: {
+      /** @default false */
+      disable_statement_timeout?: boolean
       query: string
     }
     SearchProfileBody: {
@@ -7280,11 +7335,7 @@ export interface components {
     }
     SetupIntentResponse: {
       client_secret: string
-      payment_method:
-        | string
-        | {
-            [key: string]: unknown
-          }
+      pending_subscription_flow_enabled_for_creation: boolean
     }
     SignedUrlResponse: {
       signedUrl: string
@@ -7819,6 +7870,9 @@ export interface components {
       EXTERNAL_ZOOM_CLIENT_ID?: string | null
       EXTERNAL_ZOOM_ENABLED?: boolean | null
       EXTERNAL_ZOOM_SECRET?: string | null
+      HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
+      HOOK_BEFORE_USER_CREATED_SECRETS?: string | null
+      HOOK_BEFORE_USER_CREATED_URI?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean | null
       HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string | null
@@ -7929,6 +7983,9 @@ export interface components {
       URI_ALLOW_LIST?: string | null
     }
     UpdateGoTrueConfigHooksBody: {
+      HOOK_BEFORE_USER_CREATED_ENABLED?: boolean | null
+      HOOK_BEFORE_USER_CREATED_SECRETS?: string | null
+      HOOK_BEFORE_USER_CREATED_URI?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean | null
       HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string | null
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string | null
@@ -7978,7 +8035,11 @@ export interface components {
       /** Format: email */
       billing_email?: string
       name?: string
-      opt_in_tags?: 'AI_SQL_GENERATOR_OPT_IN'[]
+      opt_in_tags?: (
+        | 'AI_SQL_GENERATOR_OPT_IN'
+        | 'AI_DATA_GENERATOR_OPT_IN'
+        | 'AI_LOG_GENERATOR_OPT_IN'
+      )[]
     }
     UpdateOrganizationResponse: {
       billing_email?: string
@@ -10151,7 +10212,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['OrganizationResponse']
+          'application/json': components['schemas']['CreateOrganizationResponse']
         }
       }
       /** @description Unexpected error creating an organization */
@@ -11976,6 +12037,36 @@ export interface operations {
         }
       }
       /** @description Failed to get usage stats */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_confirmSubscription: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConfirmCreateSubscriptionChangeBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      /** @description Failed to confirm subscription changes */
       500: {
         headers: {
           [name: string]: unknown
