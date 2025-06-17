@@ -60,3 +60,10 @@ ALTER PUBLICATION example_pub ADD TABLE example_table;
 ```sql
 select * from pg_stat_replication;
 ```
+
+<Admonition type="note">
+
+You can add more tables to the initial publication, but you're going to need to do a REFRESH on the subscribing database.
+See https://www.postgresql.org/docs/current/sql-alterpublication.html
+
+</Admonition>
