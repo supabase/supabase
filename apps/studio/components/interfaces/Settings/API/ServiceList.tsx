@@ -8,7 +8,6 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
-import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
@@ -19,9 +18,9 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Badge, Input } from 'ui'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
+import { ApiKeysMoved } from './ApiKeysMoved'
 import JWTSettings from './JWTSettings'
 import { PostgrestConfig } from './PostgrestConfig'
-import { ApiKeysMoved } from './ApiKeysMoved'
 
 const ServiceList = () => {
   const client = useQueryClient()

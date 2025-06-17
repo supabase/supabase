@@ -1,17 +1,16 @@
-import { Boxes, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import { useIsMFAEnabled, useParams } from 'common'
+import { useParams } from 'common'
+import { OrganizationCard } from 'components/interfaces/Organization/OrganizationCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from 'components/layouts/Scaffold'
-import { ActionCard } from 'components/ui/ActionCard'
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { withAuth } from 'hooks/misc/withAuth'
 import { NextPageWithLayout } from 'types'
@@ -30,9 +29,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const [search, setSearch] = useState('')
   const { error: orgNotFoundError, org: orgSlug } = useParams()
   const orgNotFound = orgNotFoundError === 'org_not_found'
-  const isUserMFAEnabled = useIsMFAEnabled()
 
-  const { data: projects = [] } = useProjectsQuery()
   const { data: organizations = [], error, isLoading, isError, isSuccess } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
@@ -106,25 +103,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
         )}
         {isError && <AlertError error={error} subject="Failed to load organizations" />}
         {isSuccess &&
-          filteredOrganizations.map((organization) => {
-            const numProjects = projects.filter(
-              (x) => x.organization_slug === organization.slug
-            ).length
-
-            return (
-              <ActionCard
-                bgColor="bg border"
-                className="[&>div]:items-center"
-                key={organization.id}
-                icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
-                title={organization.name}
-                description={`${organization.plan.name} Plan${numProjects > 0 ? `${'  '}•${'  '}${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
-                onClick={() => router.push(`/org/${organization.slug}`)}
-                isMfaRequired={organization.organization_requires_mfa}
-                isDisabled={!isUserMFAEnabled && organization.organization_requires_mfa}
-              />
-            )
-          })}
+          filteredOrganizations.map((org) => <OrganizationCard key={org.id} organization={org} />)}
       </div>
     </ScaffoldContainerLegacy>
   )

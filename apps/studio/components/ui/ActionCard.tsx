@@ -1,13 +1,12 @@
+import { JSX, ReactNode } from 'react'
 import { Badge, Card, cn } from 'ui'
 
 export const ActionCard = (card: {
   icon: JSX.Element
   title: string
   bgColor?: string
-  description?: string
+  description?: string | ReactNode
   isBeta?: boolean
-  isMfaRequired?: boolean
-  isDisabled?: boolean
   className?: string
   onClick?: () => void
 }) => {
@@ -15,8 +14,7 @@ export const ActionCard = (card: {
     <Card
       className={cn(
         'grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer',
-        card.className,
-        card.isDisabled === true ? 'pointer-events-none opacity-50' : ''
+        card.className
       )}
       onClick={card.onClick}
     >
@@ -26,19 +24,18 @@ export const ActionCard = (card: {
             Coming soon
           </Badge>
         )}
-        {card.isMfaRequired && (
-          <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
-            MFA Enforced
-          </Badge>
-        )}
         <div
           className={`rounded-full ${card.bgColor} w-8 h-8 flex items-center justify-center flex-shrink-0`}
         >
           {card.icon}
         </div>
-        <div className="flex flex-col gap-0">
+        <div className="flex flex-col gap-0 w-full">
           <h3 className="text-sm text-foreground mb-0">{card.title}</h3>
-          <pre className="text-xs text-foreground-light font-sans">{card.description}</pre>
+          {typeof card.description === 'string' ? (
+            <pre className="text-xs text-foreground-light font-sans">{card.description}</pre>
+          ) : (
+            card.description
+          )}
         </div>
       </div>
     </Card>

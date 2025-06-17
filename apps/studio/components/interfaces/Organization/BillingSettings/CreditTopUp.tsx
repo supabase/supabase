@@ -39,6 +39,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -149,7 +150,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const options = useMemo(() => {
     return {
       clientSecret: paymentIntentSecret,
-      appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+      appearance: getStripeElementsAppearanceOptions(resolvedTheme),
     } as any
   }, [paymentIntentSecret, resolvedTheme])
 
