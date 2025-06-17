@@ -6,7 +6,7 @@
 
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { PaymentMethod } from '@stripe/stripe-js'
-import { getURL } from 'next/dist/shared/lib/utils'
+import { getURL } from 'lib/helpers'
 import { forwardRef, useImperativeHandle } from 'react'
 import { toast } from 'sonner'
 
