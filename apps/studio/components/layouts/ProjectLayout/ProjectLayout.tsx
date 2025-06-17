@@ -37,6 +37,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -91,6 +92,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
+    const projectRefForGitHubLinker = selectedProject?.parent_project_ref ?? selectedProject?.ref
     const {
       editorPanel,
       mobileMenuOpen,
@@ -273,6 +275,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           visible={showCreateBranchModal}
           onClose={() => setShowCreateBranchModal(false)}
         />
+        <SidePanelGitHubRepoLinker projectRef={projectRefForGitHubLinker} />
         <AISettingsModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
