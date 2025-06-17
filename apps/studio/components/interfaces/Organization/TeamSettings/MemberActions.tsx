@@ -29,7 +29,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LeaveTeamButton } from './LeaveTeamButton'
-import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
 interface MemberActionsProps {
@@ -50,10 +50,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
-  const isOwner = selectedOrganization?.is_owner
-  const roles = allRoles?.org_scoped_roles ?? []
-  const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
-
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
   const isPendingInviteAcceptance = !!member.invited_id
@@ -148,25 +144,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     deleteInvitation(
       { slug, id: invitedId },
       { onSuccess: () => toast.success('Successfully revoked the invitation.') }
-    )
-  }
-
-  if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
-    return (
-      <div className="flex items-center justify-end">
-        <ButtonTooltip
-          disabled
-          type="text"
-          className="px-1.5"
-          icon={<MoreVertical size={18} />}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: 'You need additional permissions to manage this team member',
-            },
-          }}
-        />
-      </div>
     )
   }
 
