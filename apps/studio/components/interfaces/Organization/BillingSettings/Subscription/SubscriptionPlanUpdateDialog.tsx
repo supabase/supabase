@@ -5,7 +5,10 @@ import { useMemo, useRef, useState } from 'react'
 import tweets from 'shared-data/tweets'
 import { toast } from 'sonner'
 
-import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import {
+  billingPartnerLabel,
+  getPlanChangeType,
+} from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { organizationKeys } from 'data/organizations/keys'
@@ -91,7 +94,7 @@ export const SubscriptionPlanUpdateDialog = ({
     createPaymentMethod: () => Promise<PaymentMethod | undefined>
   }>(null)
 
-    const billingViaPartner = subscription?.billing_via_partner === true
+  const billingViaPartner = subscription?.billing_via_partner === true
   const billingPartner = subscription?.billing_partner
 
   const stripeOptionsConfirm = useMemo(() => {
@@ -103,6 +106,10 @@ export const SubscriptionPlanUpdateDialog = ({
 
   const testimonialTweet = useMemo(() => getRandomTweet(), [])
 
+  const changeType = useMemo(() => {
+    return getPlanChangeType(subscription?.plan?.id, planMeta?.planId)
+  }, [planMeta, subscription])
+
   const subscriptionPlanMeta = useMemo(
     () => subscriptionsPlans.find((tier) => tier.id === selectedTier),
     [selectedTier]
@@ -110,7 +117,7 @@ export const SubscriptionPlanUpdateDialog = ({
 
   const onSuccessfulPlanChange = () => {
     toast.success(
-      `Successfully ${planMeta?.change_type === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
+      `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )
     onClose()
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
@@ -170,7 +177,7 @@ export const SubscriptionPlanUpdateDialog = ({
     if (
       !paymentMethod &&
       subscription?.payment_method_type !== 'invoice' &&
-      planMeta?.change_type === 'upgrade'
+      changeType === 'upgrade'
     ) {
       return
     }
@@ -213,11 +220,11 @@ export const SubscriptionPlanUpdateDialog = ({
 
   // Features that will be lost when downgrading
   const featuresToLose =
-    planMeta?.change_type === 'downgrade'
+    changeType === 'downgrade'
       ? currentPlanFeatures.filter((feature: string | [string, ...any[]]) => {
           const featureStr = typeof feature === 'string' ? feature : feature[0]
           // Check if this feature exists in the new plan
-          return !topFeatures.some((newFeature: string | [string, ...any[]]) => {
+          return !topFeatures.some((newFeature: string | string[]) => {
             const newFeatureStr = typeof newFeature === 'string' ? newFeature : newFeature[0]
             return newFeatureStr === featureStr
           })
@@ -235,7 +242,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const proratedCredit = currentPlanMonthlyPrice * remainingRatio
 
   // Calculate new plan cost
-  const newPlanCost = subscriptionPlanMeta?.priceMonthly ?? 0
+  const newPlanCost = Number(subscriptionPlanMeta?.priceMonthly) ?? 0
 
   const customerBalance = ((subscription?.customer_balance ?? 0) / 100) * -1
 
@@ -259,9 +266,9 @@ export const SubscriptionPlanUpdateDialog = ({
           <div className="p-8 pb-8 flex flex-col xl:col-span-3">
             <div className="flex-1">
               <h3 className="text-base mb-4">
-                {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
+                {changeType === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
                 <span className="font-bold">{selectedOrganization?.name}</span> to{' '}
-                {planMeta?.change_type === 'downgrade'
+                {changeType === 'downgrade'
                   ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
                   : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
               </h3>
@@ -554,23 +561,21 @@ export const SubscriptionPlanUpdateDialog = ({
             </div>
 
             <div className="pt-4">
-              {!billingViaPartner &&
-                !subscriptionPreviewIsLoading &&
-                planMeta?.change_type === 'upgrade' && (
-                  <div className="space-y-2 mb-4">
-                    <BillingCustomerDataExistingOrgDialog />
+              {!billingViaPartner && !subscriptionPreviewIsLoading && changeType === 'upgrade' && (
+                <div className="space-y-2 mb-4">
+                  <BillingCustomerDataExistingOrgDialog />
 
-                    <PaymentMethodSelection
-                      ref={paymentMethodSelection}
-                      selectedPaymentMethod={selectedPaymentMethod}
-                      onSelectPaymentMethod={setSelectedPaymentMethod}
-                      createPaymentMethodInline={
-                        subscriptionPreview?.pending_subscription_flow === true
-                      }
-                      readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
-                    />
-                  </div>
-                )}
+                  <PaymentMethodSelection
+                    ref={paymentMethodSelection}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    onSelectPaymentMethod={setSelectedPaymentMethod}
+                    createPaymentMethodInline={
+                      subscriptionPreview?.pending_subscription_flow === true
+                    }
+                    readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
+                  />
+                </div>
+              )}
 
               {billingViaPartner && (
                 <div className="mb-4">
@@ -620,7 +625,7 @@ export const SubscriptionPlanUpdateDialog = ({
                   className="flex-1"
                   size="medium"
                 >
-                  Confirm {planMeta?.change_type === 'downgrade' ? 'downgrade' : 'upgrade'}
+                  Confirm {changeType === 'downgrade' ? 'downgrade' : 'upgrade'}
                 </Button>
               </div>
             </div>
@@ -628,7 +633,7 @@ export const SubscriptionPlanUpdateDialog = ({
 
           {/* Right Column */}
           <div className="bg-surface-100 p-8 flex flex-col border-l xl:col-span-2">
-            {planMeta?.change_type === 'downgrade'
+            {changeType === 'downgrade'
               ? featuresToLose.length > 0 && (
                   <div className="mb-4">
                     <h3 className="text-sm mb-1">Features you'll lose</h3>
@@ -657,7 +662,7 @@ export const SubscriptionPlanUpdateDialog = ({
                     <h3 className="text-sm mb-4">Upgrade features</h3>
 
                     <div className="space-y-2 mb-4 text-foreground-light">
-                      {topFeatures.map((feature: string | [string, ...any[]]) => (
+                      {topFeatures.map((feature: string | string[]) => (
                         <div
                           key={typeof feature === 'string' ? feature : feature[0]}
                           className="flex items-center gap-2"
@@ -676,7 +681,7 @@ export const SubscriptionPlanUpdateDialog = ({
                     </div>
                   </div>
                 )}
-            {planMeta?.change_type !== 'downgrade' && (
+            {changeType !== 'downgrade' && (
               <div className="border-t pt-6">
                 <blockquote className="text-sm text-foreground-light italic">
                   {testimonialTweet.text}

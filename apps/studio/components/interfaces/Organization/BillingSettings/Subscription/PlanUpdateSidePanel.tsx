@@ -28,6 +28,7 @@ import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -159,7 +160,8 @@ const PlanUpdateSidePanel = () => {
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
               const price = planMeta?.price ?? 0
-              const isDowngradeOption = planMeta?.change_type === 'downgrade'
+              const isDowngradeOption =
+                getPlanChangeType(subscription?.plan.id, plan?.planId) === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
               const features = pickFeatures(plan, billingPartner)
               const footer = pickFooter(plan, billingPartner)
