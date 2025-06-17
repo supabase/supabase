@@ -25,7 +25,7 @@ export async function mergeBranch({
   let migrationCreated = false
 
   if (diffContent && diffContent.trim() !== '') {
-    // Step 2: Send the whole diff to POST /v1/projects/<branch-project-ref>/database/migrations
+    // Step 2: Send the whole diff to PUT /v1/projects/<branch-project-ref>/database/migrations
     // to record it as a migration on the dev branch
     const { data: migrationData, error: migrationError } = await put(
       '/v1/projects/{ref}/database/migrations',
