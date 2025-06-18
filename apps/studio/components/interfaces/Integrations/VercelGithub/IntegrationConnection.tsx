@@ -167,4 +167,4 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
 
 IntegrationConnectionItem.displayName = 'IntegrationConnectionItem'
 
-export { IntegrationConnectionItem }
+export { IntegrationConnectionItem, IntegrationConnection }

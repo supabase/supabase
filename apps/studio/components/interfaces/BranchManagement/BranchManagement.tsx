@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { ExternalLink, Github, MessageCircle } from 'lucide-react'
-import Link from 'next/link'
+import { MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -28,6 +27,7 @@ import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels
 import { PreviewBranchesEmptyState, PullRequestsEmptyState } from './EmptyStates'
 import Overview from './Overview'
 import { useAppStateSnapshot } from 'state/app-state'
+import AutomaticBranchingRow from 'components/interfaces/Settings/Integrations/GithubIntegration/AutomaticBranchingRow'
 
 type Tab = 'overview' | 'prs' | 'branches'
 
@@ -56,9 +56,6 @@ const BranchManagement = () => {
   const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
   const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
     resource: { is_default: false },
-  })
-  const canDisableBranching = useCheckPermissions(PermissionAction.DELETE, 'preview_branches', {
-    resource: { is_default: true },
   })
 
   const {
@@ -214,51 +211,7 @@ const BranchManagement = () => {
                     />
                   )}
 
-                  {isSuccessConnections && !gitlessBranching && (
-                    <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
-                      <div className="flex items-center gap-x-4">
-                        <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
-                          <Github size={18} strokeWidth={2} />
-                        </div>
-                        <p className="text-sm">GitHub branch workflow</p>
-                        <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                          <Link passHref href={`/project/${ref}/settings/integrations`}>
-                            Settings
-                          </Link>
-                        </Button>
-                        <Button
-                          type="text"
-                          size="small"
-                          className="text-light hover:text py-1 px-1.5"
-                          iconRight={<ExternalLink size={14} strokeWidth={1.5} />}
-                        >
-                          <Link
-                            passHref
-                            target="_blank"
-                            rel="noreferrer"
-                            href={`https://github.com/${repo}`}
-                          >
-                            {repo}
-                          </Link>
-                        </Button>
-                      </div>
-                      <ButtonTooltip
-                        type="default"
-                        disabled={!canDisableBranching}
-                        onClick={() => setShowDisableBranching(true)}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: !canDisableBranching
-                              ? 'You need additional permissions to disable branching'
-                              : undefined,
-                          },
-                        }}
-                      >
-                        Disable branching
-                      </ButtonTooltip>
-                    </div>
-                  )}
+                  {isSuccessConnections && hasBranchEnabled && <AutomaticBranchingRow />}
 
                   {isErrorBranches && tab === 'overview' && (
                     <AlertError
