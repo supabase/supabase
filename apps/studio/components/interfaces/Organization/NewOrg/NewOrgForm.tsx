@@ -1,11 +1,11 @@
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import _ from 'lodash'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -19,7 +19,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import {
   Button,
-  Input,
   Input_Shadcn_,
   Label_Shadcn_,
   Select_Shadcn_,
@@ -35,13 +34,12 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BillingCustomerDataNewOrgDialog } from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
 import { FormCustomerData } from '../BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
-import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
+import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { getURL } from 'lib/helpers'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { NewPaymentMethodElement } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
 
@@ -190,7 +188,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     },
   })
 
-  const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionChangeMutation({
+  const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
     onSuccess: (data) => {
       if (data && 'slug' in data) {
         onOrganizationCreated({ slug: data.slug })
@@ -557,6 +555,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
                     setupIntent?.pending_subscription_flow_enabled_for_creation === true
                   }
                   email={user.profile?.primary_email}
+                  readOnly={newOrgLoading || paymentConfirmationLoading}
                 />
               </Panel.Content>
             </Elements>
