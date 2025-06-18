@@ -368,6 +368,13 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           tooltip: 'Connections magaged by PostgREST to auto-generate RESTful API.',
         },
         {
+          attribute: 'client_connections_supabase_admin',
+          provider: 'infra-monitoring',
+          label: 'Admin',
+          tooltip:
+            'Administrative connections used by various Supabase services for internal operations and maintenance tasks.',
+        },
+        {
           attribute: 'client_connections_supabase_auth_admin',
           provider: 'infra-monitoring',
           label: 'Auth',
@@ -380,13 +387,6 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'Storage',
           tooltip:
             'Administrative connections used by Supabase Storage service for file operations and bucket management.',
-        },
-        {
-          attribute: 'client_connections_supabase_admin',
-          provider: 'infra-monitoring',
-          label: 'Admin',
-          tooltip:
-            'Administrative connections used by various Supabase services for internal operations and maintenance tasks.',
         },
         {
           attribute: 'client_connections_other',
