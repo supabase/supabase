@@ -97,14 +97,13 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   // existingConnection comes from the connections query (see below)
   // selectedRepo is derived from the repo list using existingConnection
   const [isGitBranchValid, setIsGitBranchValid] = useState<boolean>(true)
-  const [autoBranchingEnabled, setAutoBranchingEnabled] = useState<boolean>(false)
 
   const { data: connections } = useGitHubConnectionsQuery(
     {
       organizationId: selectedOrganization?.id,
     },
     {
-      enabled: visible,
+      enabled: !!projectRef && visible,
     }
   )
 
@@ -129,18 +128,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     { enabled: !!projectRef && visible }
   )
 
-  // Sync toggle with actual current setting when data is available
-  useEffect(() => {
-    if (!visible) return
-    if (prodBranch) {
-      const gitBranchVal = prodBranch.git_branch
-      setAutoBranchingEnabled(Boolean(gitBranchVal && gitBranchVal.trim().length > 0))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [existingBranches?.map((b: any) => b.id).join(','), visible])
-
   const isBranchingEnabled = selectedProject?.is_branch_enabled ?? false
-  const formDisabled = !(existingConnection && selectedRepo && autoBranchingEnabled)
 
   const { mutate: createConnection, isLoading: isCreatingConnection } =
     useGitHubConnectionCreateMutation()
@@ -158,31 +146,43 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
 
   const FormSchema = z
     .object({
-      branchName: z.string().min(1, 'Branch name cannot be empty'),
+      autoBranchingEnabled: z.boolean().default(false),
+      branchName: z.string(),
       supabaseDirectory: z.string().default(''),
       supabaseChangesOnly: z.boolean().default(false),
       branchLimit: z.string().default('50'),
     })
     .superRefine(async (val, ctx) => {
-      // Mirror validation logic from CreateBranchModal.tsx
-      if (existingConnection?.id && val.branchName && val.branchName.length > 0) {
-        try {
-          await checkGithubBranchValidity({
-            connectionId: Number(existingConnection.id),
-            branchName: val.branchName,
-          })
-          setIsGitBranchValid(true)
-        } catch (error) {
-          setIsGitBranchValid(false)
+      if (val.autoBranchingEnabled) {
+        if (val.branchName.length === 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Branch "${val.branchName}" not found in repository`,
+            message: 'Branch name cannot be empty',
             path: ['branchName'],
           })
+          return
+        }
+
+        if (existingConnection?.id && val.branchName && val.branchName.length > 0) {
+          try {
+            await checkGithubBranchValidity({
+              connectionId: Number(existingConnection.id),
+              branchName: val.branchName,
+            })
+            setIsGitBranchValid(true)
+          } catch (error) {
+            setIsGitBranchValid(false)
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Branch "${val.branchName}" not found in repository`,
+              path: ['branchName'],
+            })
+          }
+        } else {
+          setIsGitBranchValid(true)
         }
       } else {
-        // No branch name supplied or no connection – treat as valid
-        setIsGitBranchValid(!val.branchName || val.branchName.length === 0)
+        setIsGitBranchValid(true)
       }
     })
 
@@ -191,6 +191,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     mode: 'onBlur',
     reValidateMode: 'onChange',
     defaultValues: {
+      autoBranchingEnabled: false,
       branchName: selectedRepo?.default_branch ?? 'main',
       supabaseDirectory: '',
       supabaseChangesOnly: false,
@@ -198,32 +199,44 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     },
   })
 
+  const autoBranchingEnabled = form.watch('autoBranchingEnabled')
+
   const prodBranch = existingBranches?.find((b: any) => b.is_default)
   const currentGitBranch = prodBranch?.git_branch
   const isCurrentlyEnabled = prodBranch
     ? Boolean(currentGitBranch && currentGitBranch.trim().length > 0)
     : false
 
+  const formDisabled = !(existingConnection && selectedRepo && autoBranchingEnabled)
+
   // Reset form whenever the repo / connection / branches change
   useEffect(() => {
-    if (!selectedRepo) return
-    const defaults = {
-      branchName: prodBranch?.git_branch ?? selectedRepo.default_branch ?? 'main',
-      supabaseDirectory:
-        (existingConnection as any)?.workdir ??
-        (existingConnection as any)?.metadata?.supabaseConfig?.supabaseDirectory ??
-        '',
-      supabaseChangesOnly: false,
-      branchLimit: String(
-        ((existingConnection as any)?.branch_limit as number | undefined) ??
-          (existingConnection as any)?.metadata?.supabaseConfig?.branchLimit ??
-          50
-      ),
-    }
+    if (visible) {
+      const isAutoBranchingEnabled = prodBranch
+        ? Boolean(prodBranch.git_branch && prodBranch.git_branch.trim().length > 0)
+        : false
 
-    form.reset(defaults)
+      if (selectedRepo) {
+        const defaults = {
+          autoBranchingEnabled: isAutoBranchingEnabled,
+          branchName: prodBranch?.git_branch ?? selectedRepo.default_branch ?? 'main',
+          supabaseDirectory:
+            (existingConnection as any)?.workdir ??
+            (existingConnection as any)?.metadata?.supabaseConfig?.supabaseDirectory ??
+            '',
+          supabaseChangesOnly: false,
+          branchLimit: String(
+            ((existingConnection as any)?.branch_limit as number | undefined) ??
+              (existingConnection as any)?.metadata?.supabaseConfig?.branchLimit ??
+              50
+          ),
+        }
+
+        form.reset(defaults)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRepo?.id, existingConnection?.id, existingBranches])
+  }, [selectedRepo?.id, existingConnection?.id, existingBranches, visible, prodBranch])
 
   // This saves connection settings and creates/updates branches which also enables branching if it's not already enabled
   const handleSave = (data: z.infer<typeof FormSchema>) => {
@@ -233,7 +246,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
 
     const defaultBranch = data.branchName
 
-    if (autoBranchingEnabled) {
+    if (data.autoBranchingEnabled) {
       if (!isBranchingEnabled) {
         // create production branch (enables branching)
         createBranch({
@@ -398,21 +411,29 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
 
               <div className="mt-4">
                 {/* Global enable toggle which just sets the git branch to empty string if disabled */}
-                <div
-                  className={cn('mb-4', !existingConnection && 'opacity-25 pointer-events-none')}
-                >
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Enable automatic branching"
-                    description="Automatically create and merge preview branches from Pull Requests."
-                  >
-                    <Switch
-                      checked={autoBranchingEnabled}
-                      onCheckedChange={setAutoBranchingEnabled}
-                      disabled={!existingConnection}
-                    />
-                  </FormItemLayout>
-                </div>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="autoBranchingEnabled"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      className={cn(
+                        'mb-4',
+                        !existingConnection && 'opacity-25 pointer-events-none'
+                      )}
+                      layout="flex-row-reverse"
+                      label="Enable automatic branching"
+                      description="Automatically create and merge preview branches from Pull Requests."
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={!existingConnection}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
 
                 {/* Branch / connection settings form */}
                 <div
@@ -440,12 +461,14 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                           </FormControl_Shadcn_>
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
                             {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
-                            {field.value && !isCheckingBranch && isGitBranchValid && (
-                              <Check size={14} className="text-brand" strokeWidth={2} />
-                            )}
+                            {field.value &&
+                              !isCheckingBranch &&
+                              isGitBranchValid &&
+                              autoBranchingEnabled && (
+                                <Check size={14} className="text-brand" strokeWidth={2} />
+                              )}
                           </div>
                         </div>
-                        <FormMessage_Shadcn_ />
                       </FormItemLayout>
                     )}
                   />
