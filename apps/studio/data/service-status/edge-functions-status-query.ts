@@ -8,12 +8,16 @@ export type EdgeFunctionServiceStatusVariables = {
 }
 
 export async function getEdgeFunctionServiceStatus(signal?: AbortSignal) {
-  const res = await fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check', {
-    method: 'GET',
-    signal,
-  })
-  const response = await res.json()
-  return response as { healthy: boolean }
+  try {
+    const res = await fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check', {
+      method: 'GET',
+      signal,
+    })
+    const response = await res.json()
+    return response as { healthy: boolean }
+  } catch (err) {
+    return { healthy: false }
+  }
 }
 
 export type EdgeFunctionServiceStatusData = Awaited<ReturnType<typeof getEdgeFunctionServiceStatus>>

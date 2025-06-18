@@ -36,7 +36,7 @@ const RestoringState = () => {
         if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
           setIsCompleted(true)
         } else {
-          if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
+          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
         }
       },
     }

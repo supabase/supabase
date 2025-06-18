@@ -28,8 +28,8 @@ const BuildingState = () => {
       },
       onSuccess: async (res) => {
         if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-          if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
-          await invalidateProjectsQuery(queryClient)
+          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+          invalidateProjectsQuery(queryClient)
         }
       },
     }
