@@ -15,8 +15,8 @@ const NewPaymentMethodElement = forwardRef(
     {
       pending_subscription_flow_enabled,
       email,
-      readOnly
-    }: { pending_subscription_flow_enabled: boolean; email?: string, readOnly: boolean },
+      readOnly,
+    }: { pending_subscription_flow_enabled: boolean; email?: string; readOnly: boolean },
     ref
   ) => {
     const stripe = useStripe()
@@ -59,7 +59,7 @@ const NewPaymentMethodElement = forwardRef(
       createPaymentMethod,
     }))
 
-    return <PaymentElement options={{ defaultValues: { billingDetails: { email } }, readOnly}} />
+    return <PaymentElement options={{ defaultValues: { billingDetails: { email } }, readOnly }} />
   }
 )
 
