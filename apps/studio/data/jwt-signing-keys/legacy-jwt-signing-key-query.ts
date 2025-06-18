@@ -29,7 +29,7 @@ async function getLegacyJWTSigningKey(
 export type LegacyJWTSigningKeyData = Awaited<ReturnType<typeof getLegacyJWTSigningKey>>
 
 export const useLegacyJWTSigningKeyQuery = <TData = LegacyJWTSigningKeyData>(
-  { projectRef, reveal }: LegacyJWTSigningKeyVariables,
+  { projectRef }: LegacyJWTSigningKeyVariables,
   { enabled, ...options }: UseQueryOptions<LegacyJWTSigningKeyData, ResponseError, TData> = {}
 ) =>
   useQuery<LegacyJWTSigningKeyData, ResponseError, TData>(

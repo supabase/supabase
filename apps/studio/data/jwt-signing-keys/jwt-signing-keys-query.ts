@@ -26,7 +26,7 @@ async function getJWTSigningKeys({ projectRef }: JWTSigningKeysVariables, signal
 export type JWTSigningKeysData = Awaited<ReturnType<typeof getJWTSigningKeys>>
 
 export const useJWTSigningKeysQuery = <TData = JWTSigningKeysData>(
-  { projectRef, reveal }: JWTSigningKeysVariables,
+  { projectRef }: JWTSigningKeysVariables,
   { enabled, ...options }: UseQueryOptions<JWTSigningKeysData, ResponseError, TData> = {}
 ) =>
   useQuery<JWTSigningKeysData, ResponseError, TData>(
