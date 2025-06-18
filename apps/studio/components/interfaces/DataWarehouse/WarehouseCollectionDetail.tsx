@@ -22,22 +22,26 @@ import { TestCollectionDialog } from './TestCollectionDialog'
 
 const INTERVALS: DatetimeHelper[] = [
   {
+    id: 'last-hour',
     text: 'Last hour',
     calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
     calcTo: () => dayjs().toISOString(),
     default: true,
   },
   {
+    id: 'last-12-hours',
     text: 'Last 12 hours',
     calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
     calcTo: () => dayjs().toISOString(),
   },
   {
+    id: 'last-day',
     text: 'Last day',
     calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
     calcTo: () => dayjs().toISOString(),
   },
   {
+    id: 'last-7-days',
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').toISOString(),
     calcTo: () => dayjs().toISOString(),
@@ -202,22 +206,7 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               /> */}
-              <LogsDatePicker
-                helpers={INTERVALS}
-                value={{
-                  from: filters.interval.from(),
-                  to: filters.interval.to(),
-                }}
-                onSubmit={(e) =>
-                  setFilters({
-                    ...filters,
-                    interval: {
-                      to: () => e.to || '',
-                      from: () => e.from || '',
-                    },
-                  })
-                }
-              />
+              <LogsDatePicker helpers={INTERVALS} />
             </form>
             <div className="flex items-center gap-2">
               <Tooltip>

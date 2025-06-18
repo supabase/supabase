@@ -16,6 +16,7 @@ import {
   checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'data/fetchers'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -34,16 +35,13 @@ const useLogsQuery = (
   initialParams: Partial<LogsEndpointParams> = {},
   enabled = true
 ): LogsQueryHook => {
+  const { timestampStart, timestampEnd } = useLogsUrlState()
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
     project: projectRef,
-    iso_timestamp_start: initialParams.iso_timestamp_start
-      ? initialParams.iso_timestamp_start
-      : defaultHelper.calcFrom(),
-    iso_timestamp_end: initialParams.iso_timestamp_end
-      ? initialParams.iso_timestamp_end
-      : defaultHelper.calcTo(),
+    iso_timestamp_start: timestampStart || initialParams.iso_timestamp_start || '',
+    iso_timestamp_end: timestampEnd || initialParams.iso_timestamp_end || '',
   })
 
   useEffect(() => {
@@ -52,19 +50,10 @@ const useLogsQuery = (
       ...initialParams,
       project: projectRef,
       sql: initialParams?.sql ?? prev.sql,
-      iso_timestamp_start: initialParams.iso_timestamp_start
-        ? initialParams.iso_timestamp_start
-        : defaultHelper.calcFrom(),
-      iso_timestamp_end: initialParams.iso_timestamp_end
-        ? initialParams.iso_timestamp_end
-        : defaultHelper.calcTo(),
+      iso_timestamp_start: timestampStart || initialParams.iso_timestamp_start || '',
+      iso_timestamp_end: timestampEnd || initialParams.iso_timestamp_end || '',
     }))
-  }, [
-    projectRef,
-    initialParams.sql,
-    initialParams.iso_timestamp_start,
-    initialParams.iso_timestamp_end,
-  ])
+  }, [projectRef, initialParams.sql, timestampStart, timestampEnd])
 
   const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 

@@ -10,7 +10,6 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -22,26 +21,9 @@ export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
   const organization = useSelectedOrganization()
 
-  const {
-    data,
-    error,
-    filters,
-    isLoading,
-    params,
-    mergeParams,
-    removeFilters,
-    addFilter,
-    refresh,
-  } = report
+  const { data, error, filters, isLoading, params, removeFilters, addFilter, refresh } = report
 
   const plan = organization?.plan
-
-  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
-    mergeParams({
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
-    })
-  }
 
   return (
     <ReportPadding>
@@ -49,9 +31,6 @@ export const ApiReport: NextPageWithLayout = () => {
       <div className="w-full flex flex-col gap-1">
         <ReportFilterBar
           onRemoveFilters={removeFilters}
-          onDatepickerChange={handleDatepickerChange}
-          datepickerFrom={params.totalRequests.iso_timestamp_start}
-          datepickerTo={params.totalRequests.iso_timestamp_end}
           onAddFilter={addFilter}
           onRefresh={refresh}
           isLoading={isLoading}
