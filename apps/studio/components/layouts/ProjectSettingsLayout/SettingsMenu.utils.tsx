@@ -64,6 +64,13 @@ export const generateSettingsMenu = (
                 items: [],
                 label: 'NEW',
               },
+              {
+                name: 'JWT Signing Keys',
+                key: 'jwt-signing-keys',
+                url: `/project/${ref}/settings/jwt-signing-keys`,
+                items: [],
+                label: 'NEW',
+              },
             ]
           : []),
         {
