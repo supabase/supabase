@@ -64,8 +64,6 @@ import {
 } from 'ui/src/components/shadcn/ui/table'
 import { Textarea } from 'ui/src/components/shadcn/ui/textarea'
 import { AlgorithmHoverCard } from './AlgorithmHoverCard'
-import { WhyRotateKeysIllustration, WhyUseStandbyKeysIllustration } from './illustrations'
-import ShowPublicJWTsDialogComposer from './ShowPublicJWTsDialogComposer'
 import DotGrid from 'components/ui/DotGrid'
 import type { components } from 'api-types'
 import {
@@ -383,12 +381,12 @@ export default function JWTSecretKeysTable() {
 
             {!standbyKey && (
               <ActionPanel
-                title="Create Standby Key"
+                title="Create standby key"
                 description="Create a standby key for the next rotation which will be used on next key rotation."
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isLoadingMutation}
-                type="default"
+                type="primary"
                 icon={<Timer />}
               />
             )}
@@ -703,8 +701,6 @@ export default function JWTSecretKeysTable() {
         </div>
       )}
 
-      <Separator />
-
       {/* TODO(hf): For launch <div>
         <h2 className="text-xl mb-4">Resources</h2>
 
@@ -971,10 +967,6 @@ export default function JWTSecretKeysTable() {
           </DialogSection>
         </DialogContent>
       </Dialog>
-
-      <div className="flex items-center space-x-2">
-        <ShowPublicJWTsDialogComposer inUseKey={inUseKey} />
-      </div>
 
       {selectedKey && selectedKey.status === 'previously_used' && (
         <TextConfirmModal
