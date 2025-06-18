@@ -14,11 +14,9 @@ image: 2025-06-10-natural-db/og.png
 thumb: 2025-06-10-natural-db/thumb.png
 ---
 
-While Large Language Models understand natural language, they often can't maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time.
+While Large Language Models understand natural language, they don't generally maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time.
 
-At a high level, the system's flexibility is created by combining these core primitives: database operations for structured data, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for real-world actions.
-
-The assistant converts conversations into structured database entries, enabling reliable data retrieval and analysis through database operations, scheduled prompts, web searches, and MCP integrations. For example, a scheduled task might analyze your portfolio, trigger web searches for market trends, update your database with new insights, and send personalized reports through Zapier—all while maintaining organized, queryable data.
+At a high level, the system's flexibility is created by combining these core primitives: An LLM owned database schema through an execute_sql tool, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for extended actions to may integrate with external tools.
 
 See it at work in the video below.
 
@@ -35,14 +33,15 @@ See it at work in the video below.
 
 The assistant uses a dedicated PostgreSQL schema called `memories` to store all of its structured data. To ensure security, the LLM operates under a specific role, `memories_role`, which is granted permissions only within this schema.
 
-- **Scoped Schema**: The LLM can create tables, store data, and perform operations exclusively within the `memories` schema.
+- **Scoped Schema**: The LLM can create tables, store data, and perform operations exclusively within the `memories` schema by calling an execute_sql tool
 - **System Table Protection**: All other schemas, including `public`, are inaccessible to the LLM.
 
 ### Messages Context
 
-Two complementary memory types maintain conversation continuity:
+Three complementary memory types maintain conversation continuity:
 
-- **Semantic Memory (Vector Search)**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
+- **Message History (Short-term Memory)**: Maintains a chronological list of recent messages for immediate context
+- **Semantic Memory (Vector Search using pgvector)**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
 - **Structured Memory (SQL Data)**: Stores concrete facts in LLM-created tables for precise queries ("How much did I spend on coffee last quarter?")
 
 ### Scheduled Prompts
@@ -94,14 +93,10 @@ The system uses Telegram as the default interface, implemented as an edge functi
 
 The assistant maintains two behavioral layers:
 
-- **Base Behavior**: Core functionality (database operations, scheduling, web search) remains constant
-- **Personalized Behavior**: Communication style and preferences that evolve based on user feedback
+- **Base Behavior**: Core functionality (database operations, scheduling, web search) remains constant via a constant system prompt
+- **Personalized Behavior**: Communication style and preferences that evolve based on user feedback which can be changed via a dedicated tool and stored in a public.system_prompts table
 
 When you say "be more formal" or "address me by name," these preferences are stored with version history and persist across all conversations, creating a personalized experience.
-
-## Code Ownership & Extensibility
-
-As the codebase owner, you can customize your assistant's capabilities by modifying system prompts to adjust its personality and expertise, or by creating custom edge functions for specific needs.
 
 ## Use Cases
 
@@ -265,18 +260,8 @@ Based on 10 messages per day (300 messages/month):
 
 **Total monthly cost: ~$0.54**
 
-Note: Costs scale linearly with usage. At 100 messages/day (~3K messages/month), expect ~$5.40/month.
+## Make it your own
 
-## Summary
+This experiment demonstrates the power of combining fundamental building blocks, with an LLM being one, to create something greater than the sum of its parts. My hope is this also inspires you to build and deploy your own personalized assistant in a way that still gives you control over the code and the data.
 
-This system uses the natural language understanding of LLMs to create structured data, addressing the common challenge of memory persistence. By combining this capability with PostgreSQL's querying power, cron scheduling, and external tool integration, the AI can build on its knowledge over time.
-
-**Key advantages**:
-
-- **Persistent Memory**: Each interaction builds structured, queryable knowledge
-- **Secure by Design**: The LLM operates with a role limited to its own `memories` schema, protecting the rest of your database.
-- **Autonomous Intelligence**: Scheduled operations create analysis loops that build on previous results
-- **Real-world Integration**: Actions across email, calendar, and hundreds of tools
-- **Adaptive Personality**: Evolving communication style based on user preferences
-
-This creates a persistent AI assistant that accumulates knowledge and takes autonomous action, becoming more effective with use.
+If you're interested in helping to evolve this as a starting template, head on over to the [GitHub repo](https://github.com/supabase-community/natural-db) where you can contribute via issues, discussions or pull requests.
