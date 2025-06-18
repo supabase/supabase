@@ -4900,7 +4900,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['SigningKeysResponse']
+          'application/json': components['schemas']['SigningKeyResponse']
         }
       }
       403: {

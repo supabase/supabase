@@ -7,7 +7,7 @@ import { jwtSigningKeysKeys } from './keys'
 
 interface JWTSigningKeyCreateVariables {
   projectRef?: string
-  algorithm: 'HS256' | 'RS256' | 'ES256'
+  algorithm: 'HS256' | 'RS256' | 'ES256' | 'EdDSA'
   status: 'in_use' | 'standby'
 }
 

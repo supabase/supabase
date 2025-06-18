@@ -7,7 +7,7 @@ import { jwtSigningKeysKeys } from './keys'
 
 interface JWTSigningKeyUpdateVariables {
   projectRef?: string
-  id: string
+  keyId: string
   status: 'in_use' | 'standby' | 'previously_used' | 'revoked'
 }
 
@@ -16,7 +16,7 @@ export async function updateJWTSigningKey(payload: JWTSigningKeyUpdateVariables)
 
   const { data, error } = await patch('/v1/projects/{ref}/config/auth/signing-keys/{id}', {
     params: {
-      path: { ref: payload.projectRef, id: payload.id },
+      path: { ref: payload.projectRef, id: payload.keyId },
     },
     body: {
       status: payload.status,
