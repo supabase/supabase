@@ -8,7 +8,7 @@ import { uuidv4 } from 'lib/helpers'
 import { ResponseError } from 'types'
 import type { paths } from './api' // generated from openapi-typescript
 
-const DEFAULT_HEADERS = { 'Content-Type': 'application/json', Accept: 'application/json' }
+const DEFAULT_HEADERS = { Accept: 'application/json' }
 
 export const fetchHandler: typeof fetch = async (input, init) => {
   try {
@@ -193,7 +193,11 @@ export async function fetchPost<T = any>(
 ): Promise<T | ResponseError> {
   try {
     const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
-    const headers = await constructHeaders({ ...DEFAULT_HEADERS, ...otherHeaders })
+    const headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      ...DEFAULT_HEADERS,
+      ...otherHeaders,
+    })
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(data),
