@@ -193,7 +193,7 @@ export async function fetchPost<T = any>(
 ): Promise<T | ResponseError> {
   try {
     const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
-    const headers = await constructHeaders({ ...DEFAULT_HEADERS, otherHeaders })
+    const headers = await constructHeaders({ ...DEFAULT_HEADERS, ...otherHeaders })
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(data),
