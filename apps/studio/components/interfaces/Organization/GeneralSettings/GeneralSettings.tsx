@@ -9,7 +9,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
-// Import the new form components
 import { DataPrivacyForm } from './DataPrivacyForm'
 import { OrganizationDetailsForm } from './OrganizationDetailsForm'
 
