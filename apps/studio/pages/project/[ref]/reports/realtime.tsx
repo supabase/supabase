@@ -7,16 +7,13 @@ import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 
 import { analyticsKeys } from 'data/analytics/keys'
-import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
@@ -41,8 +38,8 @@ export type UpdateDateRange = (from: string, to: string) => void
 export default RealtimeReport
 
 const RealtimeUsage = () => {
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const { db, chart, ref } = useParams()
-  const { project } = useProjectContext()
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(7, 'day').toISOString()
@@ -55,13 +52,6 @@ const RealtimeUsage = () => {
 
   const queryClient = useQueryClient()
 
-  const [isRefreshing, setIsRefreshing] = useState(false)
-
-  const isReplicaSelected = state.selectedDatabaseId !== project?.ref
-
-  const report = useDatabaseReport()
-  const { refresh } = report
-
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
@@ -73,7 +63,7 @@ const RealtimeUsage = () => {
     // [Joshen] Since we can't track individual loading states for each chart
     // so for now we mock a loading state that only lasts for a second
     setIsRefreshing(true)
-    refresh()
+
     const { period_start, interval } = dateRange
     REALTIME_REPORT_ATTRIBUTES.forEach((attr) => {
       queryClient.invalidateQueries(
@@ -86,17 +76,7 @@ const RealtimeUsage = () => {
         })
       )
     })
-    if (isReplicaSelected) {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
-          attribute: 'physical_replication_lag_physical_replica_lag_seconds',
-          startDate: period_start.date,
-          endDate: period_start.end,
-          interval,
-          databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
-    }
+
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
@@ -116,7 +96,7 @@ const RealtimeUsage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 200)
     }
-  }, [db, chart])
+  }, [])
 
   const handleIntervalGranularity = (from: string, to: string) => {
     const conditions = {

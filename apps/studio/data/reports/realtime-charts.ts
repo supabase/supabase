@@ -1,25 +1,61 @@
 export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
+  // {
+  //   id: 'events-per-second',
+  //   label: 'Events per second',
+  //   valuePrecision: 0,
+  //   hide: false,
+  //   showTooltip: true,
+  //   showLegend: true,
+  //   showMaxValue: false,
+  //   hideChartType: false,
+  //   defaultChartStyle: 'bar',
+  //   attributes: [
+  //     { attribute: 'realtime_events_presence', provider: 'infra-monitoring', label: 'Presence' },
+  //     {
+  //       attribute: 'realtime_events_postgres_changes',
+  //       provider: 'infra-monitoring',
+  //       label: 'Postgres Changes',
+  //     },
+  //     {
+  //       attribute: 'realtime_channel_events',
+  //       provider: 'infra-monitoring',
+  //       label: 'Broadcast',
+  //     },
+  //   ],
+  // },
   {
-    id: 'events-per-second',
-    label: 'Events per second',
+    id: 'channel-events',
+    label: 'Channel Events',
     valuePrecision: 0,
     hide: false,
     showTooltip: true,
-    showLegend: true,
+    showLegend: false,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
     attributes: [
-      { attribute: 'realtime_events_presence', provider: 'infra-monitoring', label: 'Presence' },
       {
-        attribute: 'realtime_events_postgres_changes',
-        provider: 'infra-monitoring',
-        label: 'Postgres Changes',
-      },
-      {
-        attribute: 'realtime_events_broadcast',
+        attribute: 'realtime_channel_events',
         provider: 'infra-monitoring',
         label: 'Broadcast',
+      },
+    ],
+  },
+  {
+    id: 'channel-presence-events',
+    label: 'Channel Presence Events',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    attributes: [
+      {
+        attribute: 'realtime_channel_presence_events',
+        provider: 'infra-monitoring',
+        label: 'Presence',
       },
     ],
   },
@@ -35,7 +71,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
     defaultChartStyle: 'bar',
     attributes: [
       {
-        attribute: 'realtime_rate_of_channel_joins',
+        attribute: 'realtime_channel_joins_rate',
         provider: 'infra-monitoring',
         label: 'Presence',
       },
@@ -43,7 +79,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
   },
   {
     id: 'client-to-realtime-connections',
-    label: 'Client to Realtime connections',
+    label: 'Realtime connections',
     valuePrecision: 0,
     hide: false,
     showTooltip: true,
@@ -54,7 +90,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
     titleTooltip: '',
     attributes: [
       {
-        attribute: 'realtime_connections',
+        attribute: 'realtime_connections_connected',
         provider: 'infra-monitoring',
         label: 'Connections',
         enabled: true,
