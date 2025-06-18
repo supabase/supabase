@@ -61,8 +61,8 @@ export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signa
   }
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
-  return data as unknown as ( // // Legacy keys //
-    | {
+  return data as unknown as // // Legacy keys //
+  (| {
         api_key: string
         description?: string | null
         hash?: string | null
