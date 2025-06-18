@@ -166,7 +166,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   We work together, <br className="md:hidden" />
                   wherever we are
                 </h2>
-                <p className="text-foreground-light mt-4 text-sm md:text-base md:w-full">
+                <p className="text-foreground-light mt-4 text-sm md:text-lg md:w-full">
                   Working in a globally distributed team is rewarding but has its challenges. We are
                   across many different timezones, so we use tools like Notion, Slack, and Discord
                   to stay connected to our team, and our community.
@@ -187,11 +187,11 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">
                       What is Supabase
                     </h2>
-                    <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
+                    <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
                       Supabase is the Postgres development platform, built by developers for
                       developers. Supabase adds auth, realtime, storage, restful APIs, and edge
                     </p>
-                    <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
+                    <p className="text-foreground-light text-sm lg:text-lg pt-2 sm:max-w-md xl:max-w-lg">
                       Supabase was born-remote. Having a globally distributed, open source company
                       is our secret weapon to hiring top-tier talent.
                     </p>
@@ -292,7 +292,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
 
             <SectionContainer>
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">Human powered</h2>
-              <p className="text-foreground-lighter text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+              <p className="text-foreground-light text-sm lg:text-lg pt-3 sm:w-3/5 lg:max-w-md">
                 As a completely remote and asynchronous team, we focus on these five traits to keep
                 our team effective:
               </p>
@@ -387,7 +387,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                 return (
                   <div className="h-full flex items-start space-x-6 w-full" key={i}>
                     <div className="h-fit text-sm lg:text-base">
-                      <h3 className="text-sm">{benefits.title}</h3>
+                      <h3 className="text-base">{benefits.title}</h3>
                       <ReactMarkdown className="prose pt-1 text-sm">{benefits.text}</ReactMarkdown>
                     </div>
                   </div>
