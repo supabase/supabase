@@ -77,6 +77,8 @@ import {
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Admonition } from 'ui-patterns'
+import { useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 
 dayjs.extend(relativeTime)
 
@@ -112,7 +114,7 @@ export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
   const createMutation = useSigningKeyCreateMutation()
   const deleteMutation = useSigningKeyDeleteMutation()
-  const { data: signingKeys, isLoading } = useSigningKeysQuery({ projectRef })
+  //const { data: signingKeys, isLoading } = useSigningKeysQuery({ projectRef })
   const { rotateKey } = useJwtSecrets()
 
   const [selectedKey, setSelectedKey] = useState<SigningKey | null>(null)
@@ -127,6 +129,15 @@ export default function JWTSecretKeysTable() {
   const [formError, setFormError] = useState('')
   const [isRotating, setIsRotating] = useState(false)
   const [showRevokeKeyDialog, setShowRevokeKeyDialog] = useState(false)
+
+  const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery({
+    projectRef,
+  })
+  const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery({
+    projectRef,
+  })
+
+  const isLoading = isLoadingSigningKeys || isLoadingLegacyKey
 
   const sortedKeys = useMemo(() => {
     if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
