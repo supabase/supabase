@@ -14,7 +14,7 @@ image: 2025-06-10-natural-db/og.png
 thumb: 2025-06-10-natural-db/thumb.png
 ---
 
-While Large Language Models understand natural language, they don't generally maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time.
+Large Language Models excel at turning raw text into structured data, though they struggle to retrieve that structured data accurately across long sessions. In this post we'll use this strength and combine it with a Postgres database, along with a few other tools, to create a personalised Assistant with a long term memory.
 
 At a high level, the system's flexibility is created by combining these core building blocks: An LLM owned database schema through an execute_sql tool, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for extended actions to may integrate with external tools.
 
@@ -93,7 +93,7 @@ The system uses Telegram as the default interface, implemented as an edge functi
 
 The assistant maintains two behavioral layers:
 
-- **Base Behavior**: Core functionality (database operations, scheduling, web search) remains constant via a constant system prompt
+- **Base Behavior**: Core functionality (database operations, scheduling, web search) remains consistent via a constant system prompt
 - **Personalized Behavior**: Communication style and preferences that evolve based on user feedback which can be changed via a dedicated tool and stored in a public.system_prompts table
 
 When you say "be more formal" or "address me by name," these preferences are stored with version history and persist across all conversations, creating a personalized experience.
@@ -262,6 +262,6 @@ Based on 10 messages per day (300 messages/month):
 
 ## Make it your own
 
-This experiment demonstrates the power of combining fundamental building blocks, with an LLM being one, to create something greater than the sum of its parts. My hope is this also inspires you to build and deploy your own personalized assistant in a way that still gives you control over the code and the data. For more inspiration, check out [this fantastic post by Geoffrey Litt](https://www.geoffreylitt.com/2025/04/12/how-i-made-a-useful-ai-assistant-with-one-sqlite-table-and-a-handful-of-cron-jobs).
+This experiment demonstrates the power of combining fundamental building blocks, with an LLM being one, to create something greater than the sum of its parts. My hope is this also inspires you to build and deploy your own personalized assistant in a way that still gives you control over your code and data. For more inspiration, check out [this fantastic post by Geoffrey Litt](https://www.geoffreylitt.com/2025/04/12/how-i-made-a-useful-ai-assistant-with-one-sqlite-table-and-a-handful-of-cron-jobs).
 
 If you're interested in helping to evolve this as a starting template, head on over to the [GitHub repo](https://github.com/supabase-community/natural-db) where you can contribute via issues, discussions or pull requests.
