@@ -114,7 +114,11 @@ function validateGraphQLRequest(query: string, isDevGraphiQL = false): ReadonlyA
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    return await handleGraphQLRequest(request)
+    const result = await handleGraphQLRequest(request)
+    // Do not let Vercel close the process until Sentry has flushed
+    // https://github.com/getsentry/sentry-javascript/issues/9626
+    await Sentry.flush(2000)
+    return result
   } catch (error: unknown) {
     console.error(error)
 
@@ -122,12 +126,18 @@ export async function POST(request: Request): Promise<NextResponse> {
       if (!error.isUserError()) {
         Sentry.captureException(error)
       }
+      // Do not let Vercel close the process until Sentry has flushed
+      // https://github.com/getsentry/sentry-javascript/issues/9626
+      await Sentry.flush(2000)
 
       return NextResponse.json({
         errors: [{ message: error.isPrivate() ? 'Internal Server Error' : error.message }],
       })
     } else {
       Sentry.captureException(error)
+      // Do not let Vercel close the process until Sentry has flushed
+      // https://github.com/getsentry/sentry-javascript/issues/9626
+      await Sentry.flush(2000)
 
       return NextResponse.json({
         errors: [{ message: 'Internal Server Error' }],
