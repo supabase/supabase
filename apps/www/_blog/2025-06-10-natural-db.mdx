@@ -14,9 +14,9 @@ image: 2025-06-10-natural-db/og.png
 thumb: 2025-06-10-natural-db/thumb.png
 ---
 
-While Large Language Models understand natural language, they often can't maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time. 
+While Large Language Models understand natural language, they often can't maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time.
 
-At a high level, the system's flexibility is created by combining these core primitives: database operations for structured data, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for real-world actions. 
+At a high level, the system's flexibility is created by combining these core primitives: database operations for structured data, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for real-world actions.
 
 The assistant converts conversations into structured database entries, enabling reliable data retrieval and analysis through database operations, scheduled prompts, web searches, and MCP integrations. For example, a scheduled task might analyze your portfolio, trigger web searches for market trends, update your database with new insights, and send personalized reports through Zapier—all while maintaining organized, queryable data.
 
@@ -33,13 +33,10 @@ See it at work in the video below.
 
 ### Scoped Database Control
 
-Each chat session uses a dedicated PostgreSQL schema (`chat_{chat_id}`) for data isolation:
+The assistant uses a dedicated PostgreSQL schema called `memories` to store all of its structured data. To ensure security, the LLM operates under a specific role, `memories_role`, which is granted permissions only within this schema.
 
-- **Private Schemas**: LLM can create tables, store data, and perform operations without accessing other users' information
-- **System Table Protection**: Critical system tables remain in the `public` schema, completely inaccessible to the LLM
-- **Automatic Schema Creation**: New chats get properly configured private schemas with restricted permissions
-- **Complete Data Separation**: Chat A's tables are invisible to Chat B, preventing any cross-contamination
-- **Shared Chat Access**: Multiple users can participate in the same chat, sharing the same assistant and data while maintaining privacy between different chat groups
+- **Scoped Schema**: The LLM can create tables, store data, and perform operations exclusively within the `memories` schema.
+- **System Table Protection**: All other schemas, including `public`, are inaccessible to the LLM.
 
 ### Messages Context
 
@@ -50,16 +47,16 @@ Two complementary memory types maintain conversation continuity:
 
 ### Scheduled Prompts
 
-The system achieves autonomy through scheduled prompts via pg_cron, which can utilize all other components:
+The system achieves autonomy through scheduled prompts which are powered by pg_cron through a dedicated tool. Scheduled prompts call the same natural-db endpoints and can therefore use all the same tools.
 
 **Example**: "Every Sunday at 6 PM, analyze my portfolio performance and research market trends"
 
-1. **Cron trigger** executes with stored prompt
-2. **Database lookup** retrieves your current portfolio holdings and historical performance
-3. **Web search** finds relevant market news and competitor analysis
-4. **Database storage** accumulates weekly performance data and market insights
-5. **MCP integration** sends personalized report via Zapier with portfolio highlights and recommendations
-6. **Memory building** enables future queries like "How has my portfolio performed compared to market trends?"
+1.  **A cron job** executes a stored prompt at the scheduled time.
+2.  **The secure tool** uses elevated permissions (`service_role`) to retrieve data from anywhere in your database, like current portfolio holdings.
+3.  **Web search** is triggered to find relevant market news and competitor analysis.
+4.  **Database storage** in the `memories` schema accumulates weekly performance data.
+5.  **MCP integration** sends a personalized report via Zapier.
+6.  **Memory building** enables future queries like "How has my portfolio performed compared to market trends?"
 
 ### Web Search
 
@@ -189,9 +186,10 @@ After completing these steps, you can proceed to **Step 3: Telegram Bot**.
 
 Run the migration SQL in your Supabase SQL editor: [migration.sql](https://github.com/supabase-community/natural-db/blob/main/supabase/migrations/001_create_initial_schema.sql)
 
-- Sets up extensions (pgvector, pg_cron)
-- Creates system tables with proper permissions
-- Configures cron job scheduling
+- Sets up required extensions like `pgvector` and `pg_cron`.
+- Creates the `memories` schema for the assistant's data.
+- Creates the `memories_role` with scoped permissions to the `memories` schema.
+- Configures cron job scheduling.
 
 ### Step 2: Edge Functions
 
@@ -276,7 +274,7 @@ This system uses the natural language understanding of LLMs to create structured
 **Key advantages**:
 
 - **Persistent Memory**: Each interaction builds structured, queryable knowledge
-- **Complete Privacy**: Isolated database schemas ensure data security
+- **Secure by Design**: The LLM operates with a role limited to its own `memories` schema, protecting the rest of your database.
 - **Autonomous Intelligence**: Scheduled operations create analysis loops that build on previous results
 - **Real-world Integration**: Actions across email, calendar, and hundreds of tools
 - **Adaptive Personality**: Evolving communication style based on user preferences
