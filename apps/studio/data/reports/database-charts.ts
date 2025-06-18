@@ -1,7 +1,8 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { formatBytes } from 'lib/helpers'
-import { Organization } from '../../types'
+import { Organization } from 'types'
 import { Project } from '../projects/project-detail-query'
+import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getReportAttributes = (isFreePlan: boolean) => [
   { id: 'ram_usage', label: 'Memory usage', hide: false },
@@ -26,7 +27,10 @@ export const getReportAttributes = (isFreePlan: boolean) => [
   },
 ]
 
-export const getReportAttributesV2 = (org: Organization, project: Project) => {
+export const getReportAttributesV2: (org: Organization, project: Project) => ReportAttributes[] = (
+  org,
+  project
+) => {
   const isFreePlan = org?.plan?.id === 'free'
   const computeSize = project?.infra_compute_size || 'medium'
   const isSpendCapEnabled =
@@ -46,7 +50,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       syncId: 'database-reports',
       valuePrecision: 2,
       YAxisProps: {
-        width: 60,
+        width: 75,
         tickFormatter: (value: any) => formatBytes(value, 2),
       },
       attributes: [
@@ -226,8 +230,8 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       ],
     },
     {
-      id: 'db-size',
-      label: 'Database Size',
+      id: 'disk-size',
+      label: 'Disk Size',
       syncId: 'database-reports',
       valuePrecision: 2,
       hide: false,
@@ -244,18 +248,35 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
       attributes: [
         {
-          attribute: 'pg_database_size',
+          attribute: 'disk_fs_used_system',
           provider: 'infra-monitoring',
-          label: 'Database',
-          tooltip: 'Total space on disk used by your database (tables, indexes, data, ...).',
+          format: 'bytes',
+          label: 'System',
+          tooltip: 'Reserved space for the system to ensure your database runs smoothly.',
         },
         {
-          attribute: 'max_pg_database_size',
-          provider: 'reference-line',
-          label: 'Disk size',
-          value: (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
-          tooltip: 'Disk Size refers to the total space your project occupies on disk',
+          attribute: 'disk_fs_used_wal',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'WAL',
+          tooltip:
+            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.',
+        },
+
+        {
+          attribute: 'pg_database_size',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'Database',
+          tooltip: 'Disk usage by your database (tables, indexes, data, ...).',
+        },
+        {
+          attribute: 'disk_fs_size',
+          provider: 'infra-monitoring',
           isMaxValue: true,
+          format: 'bytes',
+          label: 'Disk Size',
+          tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
         !isFreePlan &&
           (isSpendCapEnabled
@@ -304,20 +325,21 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showTotal: false,
       attributes: [
         {
-          attribute: 'network_transmit_bytes',
-          provider: 'infra-monitoring',
-          label: 'Transmit',
-          tooltip:
-            'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
-          stackId: '2',
-        },
-        {
           attribute: 'network_receive_bytes',
           provider: 'infra-monitoring',
-          label: 'Receive',
+          label: 'Ingress',
+          manipulateValue: (value: number) => value * -1,
           tooltip:
             'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
           stackId: '1',
+        },
+        {
+          attribute: 'network_transmit_bytes',
+          provider: 'infra-monitoring',
+          label: 'Egress',
+          tooltip:
+            'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
+          stackId: '2',
         },
       ],
     },
@@ -335,44 +357,49 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
         {
           attribute: 'client_connections_postgres',
           provider: 'infra-monitoring',
-          label: 'postgres',
-          tooltip: 'Active connections',
+          label: 'Postgres',
+          tooltip:
+            'Direct connections to the Postgres database from your application and external clients.',
         },
         {
           attribute: 'client_connections_authenticator',
           provider: 'infra-monitoring',
-          label: 'postgrest',
-          tooltip: 'Active connections',
-        },
-        {
-          attribute: 'client_connections_supabase_auth_admin',
-          provider: 'infra-monitoring',
-          label: 'auth',
-          tooltip: 'Active connections',
-        },
-        {
-          attribute: 'client_connections_supabase_storage_admin',
-          provider: 'infra-monitoring',
-          label: 'storage',
-          tooltip: 'Active connections',
+          label: 'PostgREST',
+          tooltip: 'Connections magaged by PostgREST to auto-generate RESTful API.',
         },
         {
           attribute: 'client_connections_supabase_admin',
           provider: 'infra-monitoring',
-          label: 'supabase-admin',
-          tooltip: 'Active connections',
+          label: 'Admin',
+          tooltip:
+            'Administrative connections used by various Supabase services for internal operations and maintenance tasks.',
+        },
+        {
+          attribute: 'client_connections_supabase_auth_admin',
+          provider: 'infra-monitoring',
+          label: 'Auth',
+          tooltip:
+            'Administrative connections used by Supabase Auth service for user management and authentication operations.',
+        },
+        {
+          attribute: 'client_connections_supabase_storage_admin',
+          provider: 'infra-monitoring',
+          label: 'Storage',
+          tooltip:
+            'Administrative connections used by Supabase Storage service for file operations and bucket management.',
         },
         {
           attribute: 'client_connections_other',
           provider: 'infra-monitoring',
-          label: 'other',
-          tooltip: 'Active connections',
+          label: 'Other',
+          tooltip: "Miscellaneous database connections that don't fall into other categories.",
         },
         {
           attribute: 'max_db_connections',
-          provider: 'infra-monitoring',
-          label: 'Maximum connections allowed',
-          tooltip: 'Maximum connections for instance size',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: getConnectionLimits(computeSize).direct,
+          tooltip: 'Max available connections for your current compute size',
           isMaxValue: true,
         },
       ],
