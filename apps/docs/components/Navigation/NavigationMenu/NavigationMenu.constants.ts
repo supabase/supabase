@@ -663,6 +663,7 @@ export const auth = {
         { name: 'Firebase Auth', url: '/guides/auth/third-party/firebase-auth' },
         { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
         { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
+        { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
       ],
     },
     {
