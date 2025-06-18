@@ -1,6 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
 import type { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
 
@@ -9,10 +8,12 @@ export type EdgeFunctionServiceStatusVariables = {
 }
 
 export async function getEdgeFunctionServiceStatus(signal?: AbortSignal) {
-  const res = await get(`https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check`, {
+  const res = await fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check', {
+    method: 'GET',
     signal,
   })
-  return res as { healthy: boolean }
+  const response = await res.json()
+  return response as { healthy: boolean }
 }
 
 export type EdgeFunctionServiceStatusData = Awaited<ReturnType<typeof getEdgeFunctionServiceStatus>>
