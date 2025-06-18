@@ -7,9 +7,6 @@ import { render } from 'tests/helpers'
 test('run and clear', async () => {
   render(
     <LogsQueryPanel
-      defaultFrom=""
-      defaultTo=""
-      onDateChange={() => {}}
       onSelectSource={() => {}}
       onSelectTemplate={() => {}}
       warnings={[]}

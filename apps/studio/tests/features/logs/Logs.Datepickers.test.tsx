@@ -18,16 +18,7 @@ test('renders warning', async () => {
   const from = dayjs().subtract(10, 'days')
   const to = dayjs()
 
-  render(
-    <LogsDatePicker
-      helpers={[]}
-      onSubmit={mockFn}
-      value={{
-        from: from.toISOString(),
-        to: to.toISOString(),
-      }}
-    />
-  )
+  render(<LogsDatePicker helpers={[]} />)
   await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   await screen.findByText(/memory errors/)
   await screen.findByText(RegExp(from.format('DD MMM')))
@@ -36,16 +27,7 @@ test('renders warning', async () => {
 test('renders dates in local time', async () => {
   const from = dayjs().subtract(1, 'days')
   const to = dayjs()
-  render(
-    <LogsDatePicker
-      helpers={PREVIEWER_DATEPICKER_HELPERS}
-      onSubmit={mockFn}
-      value={{
-        from: from.toISOString(),
-        to: to.toISOString(),
-      }}
-    />
-  )
+  render(<LogsDatePicker helpers={PREVIEWER_DATEPICKER_HELPERS} />)
   // renders time locally
   await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   await screen.findByText(RegExp(from.format('MMMM YYYY')))
@@ -54,16 +36,7 @@ test('renders dates in local time', async () => {
 test('renders datepicker selected dates in local time', async () => {
   const from = dayjs().date(25)
   const to = dayjs().date(27)
-  render(
-    <LogsDatePicker
-      helpers={PREVIEWER_DATEPICKER_HELPERS}
-      value={{
-        from: from.toISOString(),
-        to: to.toISOString(),
-      }}
-      onSubmit={mockFn}
-    />
-  )
+  render(<LogsDatePicker helpers={PREVIEWER_DATEPICKER_HELPERS} />)
   // renders time locally
   await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   // inputs with local time
@@ -80,16 +53,7 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   const todayAt1300 = dayjs().hour(13).minute(0).second(0).millisecond(0).toISOString()
   const todayAt2359 = dayjs().hour(23).minute(59).second(59).millisecond(0).toISOString()
 
-  render(
-    <LogsDatePicker
-      helpers={PREVIEWER_DATEPICKER_HELPERS}
-      value={{
-        from: todayAt1300,
-        to: todayAt2359,
-      }}
-      onSubmit={mockFn}
-    />
-  )
+  render(<LogsDatePicker helpers={PREVIEWER_DATEPICKER_HELPERS} />)
 
   // open the datepicker
   userEvent.click(screen.getByText(/13:00/i))
@@ -119,11 +83,13 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
 test('disabled helpers are disabled', async () => {
   const helpers: DatetimeHelper[] = [
     {
+      id: 'last-7-days',
       text: 'Last 7 days',
       calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
       calcTo: () => '',
     },
     {
+      id: 'last-30-days',
       text: 'Last 30 days',
       calcFrom: () => dayjs().subtract(30, 'day').startOf('day').toISOString(),
       calcTo: () => '',
@@ -131,18 +97,7 @@ test('disabled helpers are disabled', async () => {
     },
   ]
 
-  const el = render(
-    <LogsDatePicker
-      helpers={helpers}
-      onSubmit={mockFn}
-      value={{
-        from: dayjs().subtract(7, 'day').startOf('day').toISOString(),
-        to: '',
-        isHelper: true,
-        text: 'Last 7 days',
-      }}
-    />
-  )
+  const el = render(<LogsDatePicker helpers={helpers} />)
 
   // click the datepicker
   userEvent.click(screen.getByText('Last 7 days'))
@@ -160,13 +115,7 @@ test('passing a value prop shows the correct dates in the label', async () => {
   const from = dayjs().subtract(10, 'days')
   const to = dayjs()
 
-  render(
-    <LogsDatePicker
-      helpers={[]}
-      value={{ from: from.toISOString(), to: to.toISOString() }}
-      onSubmit={mockFn}
-    />
-  )
+  render(<LogsDatePicker helpers={[]} />)
 
   await screen.findByText(
     `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
@@ -183,23 +132,13 @@ test('passing a value prop shows the correct dates in the label', async () => {
 
 test('passing a helper as a value prop shows the helper text in the label', async () => {
   const helper = {
+    id: 'last-7-days',
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   }
 
-  render(
-    <LogsDatePicker
-      helpers={[helper]}
-      value={{
-        from: helper.calcFrom(),
-        to: helper.calcTo(),
-        isHelper: true,
-        text: helper.text,
-      }}
-      onSubmit={mockFn}
-    />
-  )
+  render(<LogsDatePicker helpers={[helper]} />)
 
   await screen.findByText(helper.text)
 })
