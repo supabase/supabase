@@ -16,7 +16,7 @@ thumb: 2025-06-10-natural-db/thumb.png
 
 While Large Language Models understand natural language, they don't generally maintain structured data across conversations. The system outlined in this post helps you do just that. And we'll use it to build an evolving AI assistant that can maintain precise, queryable records over time.
 
-At a high level, the system's flexibility is created by combining these core primitives: An LLM owned database schema through an execute_sql tool, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for extended actions to may integrate with external tools.
+At a high level, the system's flexibility is created by combining these core building blocks: An LLM owned database schema through an execute_sql tool, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for extended actions to may integrate with external tools.
 
 See it at work in the video below.
 
@@ -262,6 +262,6 @@ Based on 10 messages per day (300 messages/month):
 
 ## Make it your own
 
-This experiment demonstrates the power of combining fundamental building blocks, with an LLM being one, to create something greater than the sum of its parts. My hope is this also inspires you to build and deploy your own personalized assistant in a way that still gives you control over the code and the data.
+This experiment demonstrates the power of combining fundamental building blocks, with an LLM being one, to create something greater than the sum of its parts. My hope is this also inspires you to build and deploy your own personalized assistant in a way that still gives you control over the code and the data. For more inspiration, check out [this fantastic post by Geoffrey Litt](https://www.geoffreylitt.com/2025/04/12/how-i-made-a-useful-ai-assistant-with-one-sqlite-table-and-a-handful-of-cron-jobs).
 
 If you're interested in helping to evolve this as a starting template, head on over to the [GitHub repo](https://github.com/supabase-community/natural-db) where you can contribute via issues, discussions or pull requests.
