@@ -4,8 +4,44 @@ import { useCallback, useReducer, useRef, useState } from 'react'
 import { SSE } from 'sse.js'
 
 import { BASE_PATH } from '../shared/constants'
-import type { Message, MessageAction } from './utils'
+import type { Message, MessageAction, SourceLink } from './utils'
 import { MessageRole, MessageStatus } from './utils'
+
+export function parseSourcesFromContent(content: string): {
+  cleanedContent: string
+  sources: SourceLink[]
+} {
+  // Only match Sources section at the very end of the message
+  const sourcesMatch = content.match(/### Sources\s*(?:\n((?:- [^\n]+\n?)*))?\s*$/)
+
+  let cleanedContent = content
+  const sources: SourceLink[] = []
+
+  if (sourcesMatch) {
+    // Extract sources
+    const sourcesText = sourcesMatch[1] || ''
+    const sourceLines = sourcesText.split('\n').filter((line) => line.trim().startsWith('- '))
+
+    for (const sourceLine of sourceLines) {
+      const path = sourceLine.replace(/^- /, '').trim()
+      // Only include paths that start with '/'
+      if (path && path.startsWith('/')) {
+        sources.push({
+          path,
+          url: `https://supabase.com/docs${path}`,
+        })
+      }
+    }
+
+    // Remove sources section from content
+    const sourcesIndex = content.lastIndexOf('### Sources')
+    if (sourcesIndex !== -1) {
+      cleanedContent = content.substring(0, sourcesIndex).trim()
+    }
+  }
+
+  return { cleanedContent, sources }
+}
 
 const messageReducer = (state: Message[], messageAction: MessageAction) => {
   let current = [...state]
@@ -36,6 +72,24 @@ const messageReducer = (state: Message[], messageAction: MessageAction) => {
       current[index] = Object.assign({}, messageToEdit, {
         content: (messageToEdit.content += content),
       })
+      break
+    }
+    case 'finalize-with-sources': {
+      const { index } = messageAction
+      const messageToFinalize = current[index]
+      if (messageToFinalize && messageToFinalize.content) {
+        const { cleanedContent, sources } = parseSourcesFromContent(messageToFinalize.content)
+
+        current[index] = Object.assign({}, messageToFinalize, {
+          status: MessageStatus.Complete,
+          content: cleanedContent,
+          sources: sources.length > 0 ? sources : undefined,
+        })
+      } else {
+        current[index] = Object.assign({}, messageToFinalize, {
+          status: MessageStatus.Complete,
+        })
+      }
       break
     }
     case 'reset': {
@@ -114,12 +168,10 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
 
           if (e.data === '[DONE]') {
             setIsResponding(false)
+            // Parse sources from the content and clean the message
             dispatchMessage({
-              type: 'update',
+              type: 'finalize-with-sources',
               index: currentMessageIndex,
-              message: {
-                status: MessageStatus.Complete,
-              },
             })
             setCurrentMessageIndex((x) => x + 2)
             return
@@ -135,7 +187,8 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
 
           setIsResponding(true)
 
-          const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
+          const data = JSON.parse(e.data)
+          const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = data
           const [
             {
               delta: { content },
