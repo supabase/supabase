@@ -10,6 +10,7 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { OPT_IN_TAGS } from 'lib/constants'
 import type { ResponseError } from 'types'
 
@@ -30,6 +31,11 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+
+  // [Joshen] This is to prevent users from changing their opt in levels until the migration
+  // to clean up the existing opt in tags are completed. Once toggled on, users can then change their
+  // opt in levels again and we can clean this feature flag up
+  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
 
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
@@ -95,6 +101,8 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     form,
     onSubmit,
     isUpdating,
-    currentOptInLevel: getAiOptInLevel(selectedOrganization?.opt_in_tags),
+    currentOptInLevel: !newOrgAiOptIn
+      ? 'disabled'
+      : getAiOptInLevel(selectedOrganization?.opt_in_tags),
   }
 }
