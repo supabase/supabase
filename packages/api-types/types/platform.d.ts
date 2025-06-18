@@ -4298,7 +4298,7 @@ export interface components {
       token: string
       token_alias: string
     }
-    CreateBackendParams: {
+    CreateBackendParamsOpenapi: {
       config:
         | {
             hostname: string
@@ -7709,7 +7709,7 @@ export interface components {
         | 'auth_mfa_web_authn_default'
         | 'log_drain_default'
     }
-    UpdateBackendParams: {
+    UpdateBackendParamsOpenapi: {
       config?:
         | {
             hostname: string
@@ -7751,6 +7751,8 @@ export interface components {
           }
       description?: string
       name?: string
+      /** @enum {string} */
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
     }
     UpdateCollectionBody: {
       name: string
@@ -14589,7 +14591,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateBackendParams']
+        'application/json': components['schemas']['CreateBackendParamsOpenapi']
       }
     }
     responses: {
@@ -14630,7 +14632,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateBackendParams']
+        'application/json': components['schemas']['UpdateBackendParamsOpenapi']
       }
     }
     responses: {
