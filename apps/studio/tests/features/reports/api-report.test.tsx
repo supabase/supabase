@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import { beforeAll, test, vi } from 'vitest'
 
 import { ApiReport } from 'pages/project/[ref]/reports/api-overview'
-import { render } from 'tests/helpers'
+import { customRender } from 'tests/lib/custom-render'
 
 // [Joshen] Mock data for ApiReport is in __mocks__/hooks/useApiReport
 // I don't think this is an ideal set up as the mock data is not clear in this file itself
@@ -23,7 +23,7 @@ beforeAll(() => {
 })
 
 test(`Render static elements`, async () => {
-  render(<ApiReport dehydratedState={{}} />)
+  customRender(<ApiReport dehydratedState={{}} />)
   await screen.findByText('Total Requests')
   await screen.findByText('Response Errors')
   await screen.findByText('Response Speed')
