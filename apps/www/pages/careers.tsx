@@ -190,9 +190,10 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                     <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
                       Supabase is the Postgres development platform, built by developers for
                       developers. Supabase adds auth, realtime, storage, restful APIs, and edge
-                      functions to Postgres without a single line of code. Supabase was born-remote.
-                      Having a globally distributed, open source company is our secret weapon to
-                      hiring top-tier talent.
+                    </p>
+                    <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
+                      Supabase was born-remote. Having a globally distributed, open source company
+                      is our secret weapon to hiring top-tier talent.
                     </p>
                   </div>
                   <div className="md:w-full rounded-md mt-10 md:mt-36 lg:mt-40">
@@ -312,7 +313,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
             <SectionContainer className="!pb-0">
               <div className="text-center">
                 <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
-                  1,000 + Contributors building Supabase
+                  1,000+ Contributors building Supabase
                 </h2>
                 <p className="text-foreground-light text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
                   We're building a community of communities, bringing together developers from many
