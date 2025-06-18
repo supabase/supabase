@@ -95,7 +95,7 @@ async function getLatestRelease(after: string | null = null) {
     )
   } catch (error) {
     console.error(`Error fetching release tags for wrappers federated pages: ${error}`)
-    return 'main'
+    return null
   }
 }
 
