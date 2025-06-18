@@ -181,6 +181,43 @@ async function handleFetchResponse<T>(response: Response): Promise<T | ResponseE
   }
 }
 
+async function handleFetchError<T = unknown>(response: Response): Promise<T | ResponseError> {
+  let resJson: { [prop: string]: any }
+
+  const resTxt = await response.text()
+  try {
+    resJson = JSON.parse(resTxt)
+  } catch (_) {
+    resJson = {}
+  }
+
+  if (resJson.error && typeof resJson.error === 'string') {
+    if (resJson.error_description) {
+      const error = {
+        code: response.status,
+        message: resJson.error,
+        description: resJson.error_description,
+      }
+      return { error } as unknown as T | ResponseError
+    } else {
+      const error = { code: response.status, message: resJson.error }
+      return { error } as unknown as T | ResponseError
+    }
+  } else if (resJson.message) {
+    const error = { code: response.status, message: resJson.message }
+    return { error } as unknown as T | ResponseError
+  } else if (resJson.msg) {
+    const error = { code: response.status, message: resJson.msg }
+    return { error } as unknown as T | ResponseError
+  } else if (resJson.error && resJson.error.message) {
+    return { error: { code: response.status, ...resJson.error } } as unknown as T | ResponseError
+  } else {
+    const message = resTxt ?? `An error has occurred: ${response.status}`
+    const error = { code: response.status, message }
+    return { error } as unknown as T | ResponseError
+  }
+}
+
 /**
  * To be used only for dashboard API endpoints. Use `fetch` directly if calling a non dashboard API endpoint
  *
@@ -202,9 +239,9 @@ export async function fetchPost<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleError(response)
+    if (!response.ok) return handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
-    return handleError(error)
+    return handleFetchError(error as any)
   }
 }
