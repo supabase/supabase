@@ -683,10 +683,10 @@ importers:
         version: 0.2.15
       '@graphiql/react':
         specifier: ^0.19.4
-        version: 0.19.4(@codemirror/language@6.11.0)(@types/node@20.12.11)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@5.14.1(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 0.19.4(@codemirror/language@6.11.0)(@types/node@20.12.11)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@graphiql/toolkit':
         specifier: ^0.9.1
-        version: 0.9.1(@types/node@20.12.11)(graphql-ws@5.14.1(graphql@16.10.0))(graphql@16.10.0)
+        version: 0.9.1(@types/node@20.12.11)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)
       '@gregnr/postgres-meta':
         specifier: ^0.82.0-dev.2
         version: 0.82.0-dev.2(encoding@0.1.13)(supports-color@8.1.1)
@@ -727,8 +727,8 @@ importers:
         specifier: 'catalog:'
         version: 2.71.0-rc.4
       '@supabase/mcp-server-supabase':
-        specifier: ^0.4.0
-        version: 0.4.1(supports-color@8.1.1)
+        specifier: ^0.4.4
+        version: 0.4.4(supports-color@8.1.1)
       '@supabase/mcp-utils':
         specifier: ^0.2.0
         version: 0.2.1(supports-color@8.1.1)
@@ -1098,7 +1098,7 @@ importers:
         version: 2.0.7(eslint@8.57.0(supports-color@8.1.1))
       graphql-ws:
         specifier: 5.14.1
-        version: 5.14.1(graphql@16.10.0)
+        version: 5.14.1(graphql@16.11.0)
       import-in-the-middle:
         specifier: ^1.13.1
         version: 1.13.1
@@ -7658,12 +7658,9 @@ packages:
   '@supabase/functions-js@2.4.4':
     resolution: {integrity: sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==}
 
-  '@supabase/mcp-server-supabase@0.4.1':
-    resolution: {integrity: sha512-4oGjcFJz2U/dNLvi+tu7FkCdVbZ5VXgvBqKiLIhDISMEBplh2+TwqlZ0N12a+b8f1+K5VIt/QmwyaLLGUEkJSg==}
+  '@supabase/mcp-server-supabase@0.4.4':
+    resolution: {integrity: sha512-GYgd4R+TTnQICjLxmdW0RRQREqG8Ix+1f9D8kroPASt25p/F60ohD8jPx53l7ym3qjb05Jy5tpJW2pss+ifV5g==}
     hasBin: true
-
-  '@supabase/mcp-utils@0.2.0':
-    resolution: {integrity: sha512-enAUrxkij9+hNgG38Y1HMFHCLCRGbqOGpeTIE5SRxIHN8LXIY7oqP6OmYJgRWDTqEyV4JOP7wXeuJNtMY5Qrdw==}
 
   '@supabase/mcp-utils@0.2.1':
     resolution: {integrity: sha512-T3LEAEKXOxHGVzhPvxqbAYbxluUKNxQpFnYVyRIazQJOQzZ03tCg+pp3LUYQi0HkWPIo+u+AgtULJVEvgeNr/Q==}
@@ -11773,6 +11770,10 @@ packages:
 
   graphql@16.10.0:
     resolution: {integrity: sha512-AjqGKbDGUFRKIRCP9tCKiIGHyriz2oHEbPIbEtcSLSs4YjReZOIPQQWek4+6hjw62H9QShXHyaGivGiYVLeYFQ==}
+    engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
+
+  graphql@16.11.0:
+    resolution: {integrity: sha512-mS1lbMsxgQj6hge1XZ6p7GPhbrtFwUFYi3wRzXAC/FmYnyXMTvvI3td3rjmQ2u8ewXueaSvRPWaEcgVVOT9Jnw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
   gray-matter@2.1.1:
@@ -20073,9 +20074,9 @@ snapshots:
       - graphql
       - graphql-ws
 
-  '@graphiql/react@0.19.4(@codemirror/language@6.11.0)(@types/node@20.12.11)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@5.14.1(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@graphiql/react@0.19.4(@codemirror/language@6.11.0)(@types/node@20.12.11)(@types/react-dom@18.3.0)(@types/react@18.3.3)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@graphiql/toolkit': 0.9.1(@types/node@20.12.11)(graphql-ws@5.14.1(graphql@16.10.0))(graphql@16.10.0)
+      '@graphiql/toolkit': 0.9.1(@types/node@20.12.11)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)
       '@headlessui/react': 1.7.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dialog': 1.0.5(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-dropdown-menu': 2.0.6(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -20084,11 +20085,11 @@ snapshots:
       '@types/codemirror': 5.60.10
       clsx: 1.2.1
       codemirror: 5.65.15
-      codemirror-graphql: 2.0.10(@codemirror/language@6.11.0)(codemirror@5.65.15)(graphql@16.10.0)
+      codemirror-graphql: 2.0.10(@codemirror/language@6.11.0)(codemirror@5.65.15)(graphql@16.11.0)
       copy-to-clipboard: 3.3.3
       framer-motion: 6.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      graphql: 16.10.0
-      graphql-language-service: 5.2.0(graphql@16.10.0)
+      graphql: 16.11.0
+      graphql-language-service: 5.2.0(graphql@16.11.0)
       markdown-it: 12.3.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -20139,13 +20140,13 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@graphiql/toolkit@0.9.1(@types/node@20.12.11)(graphql-ws@5.14.1(graphql@16.10.0))(graphql@16.10.0)':
+  '@graphiql/toolkit@0.9.1(@types/node@20.12.11)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)':
     dependencies:
       '@n1ru4l/push-pull-async-iterable-iterator': 3.2.0
-      graphql: 16.10.0
+      graphql: 16.11.0
       meros: 1.3.0(@types/node@20.12.11)
     optionalDependencies:
-      graphql-ws: 5.14.1(graphql@16.10.0)
+      graphql-ws: 5.14.1(graphql@16.11.0)
     transitivePeerDependencies:
       - '@types/node'
 
@@ -25535,22 +25536,15 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
-  '@supabase/mcp-server-supabase@0.4.1(supports-color@8.1.1)':
+  '@supabase/mcp-server-supabase@0.4.4(supports-color@8.1.1)':
     dependencies:
       '@deno/eszip': 0.84.0
       '@modelcontextprotocol/sdk': 1.12.1(supports-color@8.1.1)
-      '@supabase/mcp-utils': 0.2.0(supports-color@8.1.1)
+      '@supabase/mcp-utils': 0.2.1(supports-color@8.1.1)
       common-tags: 1.8.2
+      graphql: 16.11.0
       openapi-fetch: 0.13.8
       zod: 3.24.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@supabase/mcp-utils@0.2.0(supports-color@8.1.1)':
-    dependencies:
-      '@modelcontextprotocol/sdk': 1.12.1(supports-color@8.1.1)
-      zod: 3.24.2
-      zod-to-json-schema: 3.24.5(zod@3.24.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -28381,13 +28375,13 @@ snapshots:
       estree-walker: 3.0.3
       periscopic: 3.1.0
 
-  codemirror-graphql@2.0.10(@codemirror/language@6.11.0)(codemirror@5.65.15)(graphql@16.10.0):
+  codemirror-graphql@2.0.10(@codemirror/language@6.11.0)(codemirror@5.65.15)(graphql@16.11.0):
     dependencies:
       '@codemirror/language': 6.11.0
       '@types/codemirror': 0.0.90
       codemirror: 5.65.15
-      graphql: 16.10.0
-      graphql-language-service: 5.2.0(graphql@16.10.0)
+      graphql: 16.11.0
+      graphql-language-service: 5.2.0(graphql@16.11.0)
 
   codemirror-graphql@2.2.1(@codemirror/language@6.11.0)(codemirror@5.65.15)(graphql@16.10.0):
     dependencies:
@@ -30646,9 +30640,9 @@ snapshots:
     dependencies:
       graphql: 16.10.0
 
-  graphql-language-service@5.2.0(graphql@16.10.0):
+  graphql-language-service@5.2.0(graphql@16.11.0):
     dependencies:
-      graphql: 16.10.0
+      graphql: 16.11.0
       nullthrows: 1.1.1
       vscode-languageserver-types: 3.17.5
 
@@ -30690,9 +30684,9 @@ snapshots:
       graphql: 16.10.0
       warning: 4.0.3
 
-  graphql-ws@5.14.1(graphql@16.10.0):
+  graphql-ws@5.14.1(graphql@16.11.0):
     dependencies:
-      graphql: 16.10.0
+      graphql: 16.11.0
 
   graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1):
     dependencies:
@@ -30701,6 +30695,8 @@ snapshots:
       ws: 8.18.1
 
   graphql@16.10.0: {}
+
+  graphql@16.11.0: {}
 
   gray-matter@2.1.1:
     dependencies:
