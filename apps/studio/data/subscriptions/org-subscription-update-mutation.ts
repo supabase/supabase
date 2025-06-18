@@ -55,24 +55,29 @@ export const useOrgSubscriptionUpdateMutation = ({
       async onSuccess(data, variables, context) {
         const { slug } = variables
 
-        // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
-        // we are going back to monkey here and delay the invalidation
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+        if (!data.pending_payment_intent_secret) {
+          // [Kevin] Backend can return stale data as it's waiting for the Stripe-sync to complete. Until that's solved in the backend
+          // we are going back to monkey here and delay the invalidation
+          await new Promise((resolve) => setTimeout(resolve, 2000))
 
-        await Promise.all([
-          queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
-          queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
-          queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
-          queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
-          queryClient.invalidateQueries(organizationKeys.detail(slug)),
-          queryClient.invalidateQueries(organizationKeys.list()),
-        ])
+          await Promise.all([
+            queryClient.invalidateQueries(subscriptionKeys.orgSubscription(slug)),
+            queryClient.invalidateQueries(subscriptionKeys.orgPlans(slug)),
+            queryClient.invalidateQueries(usageKeys.orgUsage(slug)),
+            queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
+            queryClient.invalidateQueries(organizationKeys.detail(slug)),
+            queryClient.invalidateQueries(organizationKeys.list()),
+          ])
+        }
 
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to update subscription: ${data.message}`)
+          toast.error(data.message, {
+            dismissible: true,
+            duration: 10_000,
+          })
         } else {
           onError(data, variables, context)
         }
