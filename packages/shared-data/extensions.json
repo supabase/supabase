@@ -479,6 +479,15 @@
     "product_url": null
   },
   {
+    "name": "postgis_topology",
+    "comment": "PostGIS topology spatial types and functions",
+    "tags": ["Geo"],
+    "link": "/guides/database/extensions/postgis",
+    "github_url": null,
+    "product": null,
+    "product_url": null
+  },
+  {
     "name": "postgres_fdw",
     "comment": "foreign-data wrapper for remote PostgreSQL servers",
     "tags": ["Admin"],
