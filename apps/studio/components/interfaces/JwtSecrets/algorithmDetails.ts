@@ -10,6 +10,7 @@ export interface AlgorithmDetail {
 
 export const algorithmDetails: Record<string, AlgorithmDetail> = {
   HS256: {
+    label: 'HS256 (Symmetric)',
     name: 'HMAC with SHA-256',
     description: 'Symmetric algorithm using a shared secret key',
     pros: [
@@ -22,7 +23,6 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
       "Not suitable when the verifier shouldn't be able to sign tokens",
       'Key needs to be kept secret on both sides',
     ],
-    label: 'HS256 (Symmetric)',
     shortDescription: 'HMAC with SHA-256: Fast, simple, requires secure key exchange',
     links: [
       { url: 'https://jwt.io/introduction', label: 'JWT.io Introduction' },
@@ -33,6 +33,7 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
     ],
   },
   RS256: {
+    label: 'RSA 2048',
     name: 'RSA with SHA-256',
     description: 'Asymmetric algorithm using a public/private key pair',
     pros: [
@@ -45,7 +46,6 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
       'Requires more computational power',
       'Keys are larger than ECDSA keys',
     ],
-    label: 'RS256 (RSA)',
     shortDescription: 'RSA with SHA-256: Allows public key distribution, slower',
     links: [
       { url: 'https://jwt.io/introduction', label: 'JWT.io Introduction' },
@@ -56,6 +56,7 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
     ],
   },
   ES256: {
+    label: 'ECC (P-256)',
     name: 'ECDSA with SHA-256',
     description: 'Asymmetric algorithm using elliptic curve cryptography',
     pros: [
@@ -68,7 +69,6 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
       'More complex to implement correctly',
       'Requires careful implementation to avoid timing attacks',
     ],
-    label: 'ES256 (ECC)',
     shortDescription: 'ECDSA with SHA-256: Compact keys, fast, modern alternative to RSA',
     links: [
       { url: 'https://jwt.io/introduction', label: 'JWT.io Introduction' },
@@ -79,3 +79,19 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
     ],
   },
 }
+
+export const algorithmLabels = Object.keys(algorithmDetails).reduce(
+  (a, i) => {
+    a[i] = algorithmDetails[i].label
+    return a
+  },
+  {} as { [name: keyof typeof algorithmDetails]: string }
+)
+
+export const algorithmDescriptions = Object.keys(algorithmDetails).reduce(
+  (a, i) => {
+    a[i] = algorithmDetails[i].shortDescription
+    return a
+  },
+  {} as { [name: keyof typeof algorithmDetails]: string }
+)

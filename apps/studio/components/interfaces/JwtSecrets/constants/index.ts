@@ -13,17 +13,3 @@ export const statusColors: Record<SigningKey['status'], string> = {
   previously_used: 'bg-purple-300 dark:bg-purple-100 text-purple-1200 border-purple-800',
   revoked: 'bg-destructive-200 bg-opacity-100 text-destructive-600 border-destructive-500',
 }
-
-export const algorithmLabels: Record<SigningKey['algorithm'], string> = {
-  HS256: 'HS256 (Symmetric)',
-  RS256: 'RS256 (RSA)',
-  ES256: 'ES256 (ECC)',
-  EdDSA: 'EdDSA (Ed25519)',
-}
-
-export const algorithmDescriptions: Record<JWTAlgorithm, string> = {
-  HS256: 'HMAC with SHA-256: Fast, simple, requires secure key exchange',
-  RS256: 'RSA with SHA-256: Allows public key distribution, slower',
-  ES256: 'ECDSA with SHA-256: Compact keys, fast, modern alternative to RSA',
-  EdDSA: 'EdDSA with Ed25519: Modern, fast, secure digital signature algorithm',
-}

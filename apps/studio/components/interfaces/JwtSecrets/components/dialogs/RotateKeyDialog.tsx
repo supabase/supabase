@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from 'ui/src/components/shadcn/ui/select'
 import { SigningKey, JWTAlgorithm } from 'state/jwt-secrets'
-import { algorithmDescriptions, algorithmLabels } from '../../constants'
+import { algorithmDescriptions, algorithmLabels } from '../../algorithmDetails'
 
 interface RotateKeyDialogProps {
   open: boolean

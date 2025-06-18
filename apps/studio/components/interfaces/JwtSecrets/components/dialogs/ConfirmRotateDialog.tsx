@@ -11,7 +11,8 @@ import {
   DialogTitle,
 } from 'ui/src/components/shadcn/ui/dialog'
 import { SigningKey, JWTAlgorithm } from 'state/jwt-secrets'
-import { algorithmLabels, statusColors } from '../../constants'
+import { statusColors } from '../../constants'
+import { algorithmLabels } from '../../algorithmDetails'
 import { ArrowRight, Key, Timer } from 'lucide-react'
 import DotGrid from 'components/ui/DotGrid'
 

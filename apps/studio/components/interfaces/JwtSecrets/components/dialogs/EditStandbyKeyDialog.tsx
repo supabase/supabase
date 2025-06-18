@@ -17,7 +17,7 @@ import {
 import { Textarea } from 'ui/src/components/shadcn/ui/textarea'
 import { Loader2 } from 'lucide-react'
 import { JWTAlgorithm } from 'state/jwt-secrets'
-import { algorithmDescriptions } from '../../constants'
+import { algorithmDescriptions } from '../../algorithmDetails'
 
 interface EditStandbyKeyDialogProps {
   open: boolean
