@@ -229,6 +229,45 @@ const CodeEditor = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monaco, project, formatDocument.enabled])
 
+  // Update run action when callback changes
+  useEffect(() => {
+    if (!editorRef.current || !monacoRef.current || !runQuery.enabled) return
+
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+
+    // Remove existing action if it exists
+    const action = editor.getAction('run-query')
+
+    if (action) {
+      action.run = async () => {} // Clear the run function to prevent any stale callbacks
+    }
+
+    // Add updated action
+    editor.addAction({
+      id: 'run-query',
+      label: 'Run Query',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: async () => {
+        const selection = editor.getSelection()
+        const model = editor.getModel()
+        if (!model || !selection) return
+
+        const selectedValue = model.getValueInRange(selection)
+        runQuery.callback(selectedValue || editor.getValue())
+      },
+    })
+
+    return () => {
+      const action = editor.getAction('run-query')
+      if (action) {
+        action.run = async () => {} // Clear the run function to prevent any stale callbacks
+      }
+    }
+  }, [runQuery.callback, runQuery.enabled])
+
   return (
     <>
       <Editor

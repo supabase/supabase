@@ -66,7 +66,6 @@ const LogsQueryPanel = ({
   onDataSourceChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
-  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
 
   const {
     projectAuthAll: authEnabled,

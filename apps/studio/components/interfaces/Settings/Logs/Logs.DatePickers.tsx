@@ -47,9 +47,8 @@ export const LogsDatePicker = ({ helpers, defaultHelper }: PropsWithChildren<Pro
         )
       }
     }
-    // Only run on mount or if defaultHelper/helpers change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultHelper, helpers])
+  }, [])
 
   useEffect(() => {
     if (selectedHelperId) {
