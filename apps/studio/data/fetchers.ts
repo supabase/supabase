@@ -181,6 +181,21 @@ async function handleFetchResponse<T>(response: Response): Promise<T | ResponseE
   }
 }
 
+async function handleFetchHeadResponse<T>(
+  response: Response,
+  headers: string[]
+): Promise<T | ResponseError> {
+  try {
+    const res = {} as any
+    headers.forEach((header: string) => {
+      res[header] = response.headers.get(header)
+    })
+    return res
+  } catch (e) {
+    return handleError(response) as T | ResponseError
+  }
+}
+
 async function handleFetchError<T = unknown>(response: Response): Promise<T | ResponseError> {
   let resJson: { [prop: string]: any }
 
@@ -284,7 +299,7 @@ export async function fetchPost<T = any>(
  */
 export async function fetchHeadWithTimeout<T = any>(
   url: string,
-  data: { [prop: string]: any },
+  headersToRetrieve: string[],
   options?: { [prop: string]: any }
 ): Promise<T | ResponseError> {
   try {
@@ -309,7 +324,7 @@ export async function fetchHeadWithTimeout<T = any>(
     clearTimeout(id)
 
     if (!response.ok) return handleFetchError(response)
-    return handleFetchResponse(response)
+    return handleFetchHeadResponse(response, headersToRetrieve)
   } catch (error) {
     return handleFetchError(error as any)
   }
