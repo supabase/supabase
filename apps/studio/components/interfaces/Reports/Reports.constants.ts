@@ -281,7 +281,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       cacheHitRate: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (_filters) => `
+        sql: (filters) => `
         -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
@@ -293,8 +293,10 @@ from edge_logs f
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
 where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
-group by timestamp
-order by timestamp desc
+${generateRegexpWhere(filters)}
+GROUP BY
+ timestamp
+ORDER BY timestamp desc
 `,
       },
       topCacheMisses: {
@@ -318,6 +320,175 @@ group by path, search
 order by count desc
 limit 12
     `,
+      },
+      totalRequests: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-storage-total-requests
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          count(t.id) as count
+        FROM edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRegexpWhere(filters)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC`,
+      },
+      topRoutes: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-storage-top-routes
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRegexpWhere(filters)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          count desc
+        limit 10
+        `,
+      },
+      errorCounts: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-storage-error-counts
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          count(t.id) as count
+        FROM edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        WHERE
+          response.status_code >= 400
+        ${generateRegexpWhere(filters, false)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC
+        `,
+      },
+      topErrorRoutes: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-storage-top-error-routes
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        where
+          response.status_code >= 400
+        ${generateRegexpWhere(filters, false)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          count desc
+        limit 10
+        `,
+      },
+      responseSpeed: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-storage-response-speed
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          avg(response.origin_time) as avg
+        FROM
+          edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          ${generateRegexpWhere(filters)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC
+      `,
+      },
+      topSlowRoutes: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-storage-top-slow-routes
+        select
+          request.path as path,
+          request.method as method,
+          request.search as search,
+          response.status_code as status_code,
+          count(t.id) as count,
+          avg(response.origin_time) as avg
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        ${generateRegexpWhere(filters)}
+        group by
+          request.path, request.method, request.search, response.status_code
+        order by
+          avg desc
+        limit 10
+        `,
+      },
+      networkTraffic: {
+        queryType: 'logs',
+        sql: (filters) => `
+        -- reports-storage-network-traffic
+        select
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          coalesce(
+            safe_divide(
+              sum(
+                cast(coalesce(headers.content_length, "0") as int64)
+              ),
+              1000000
+            ),
+            0
+          ) as ingress_mb,
+          coalesce(
+            safe_divide(
+              sum(
+                cast(coalesce(resp_headers.content_length, "0") as int64)
+              ),
+              1000000
+            ),
+            0
+          ) as egress_mb,
+        FROM
+          edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.response) as response
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+          cross join unnest(response.headers) as resp_headers
+          ${generateRegexpWhere(filters)}
+        GROUP BY
+          timestamp
+        ORDER BY
+          timestamp ASC
+        `,
       },
     },
   },
