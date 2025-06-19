@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight,
-  CircleArrowDown,
   CircleArrowUp,
   Eye,
   FileKey,
@@ -13,9 +12,8 @@ import {
   Timer,
   Trash2,
 } from 'lucide-react'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import type { components } from 'api-types'
 import { useParams } from 'common'
 import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -32,9 +30,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
   cn,
   Dialog,
   DialogContent,
@@ -62,9 +57,13 @@ import {
   TableRow,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { algorithmDescriptions, algorithmLabels } from './algorithm-details'
-import { AlgorithmHoverCard } from './algorithm-hover-card'
-import { statusColors, statusLabels } from './jwt.constants'
+import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
+import { AlgorithmHoverCard } from '../algorithm-hover-card'
+import { statusColors, statusLabels } from '../jwt.constants'
+import { ActionPanel } from './action-panel'
+import { SigningKeyRow } from './signing-key-row'
+
+const MotionTableRow = motion(TableRow)
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
@@ -203,141 +202,6 @@ export default function JWTSecretKeysTable() {
     }
   }
 
-  const MotionTableRow = motion(TableRow)
-
-  const renderKeyRow = (key: components['schemas']['SigningKeyResponse']) => (
-    <MotionTableRow
-      key={key.id}
-      layout
-      initial={{ opacity: 0, height: 0 }}
-      animate={{
-        opacity: 1,
-        height: 'auto',
-        transition: { duration: 0.2 },
-      }}
-      exit={{ opacity: 0, height: 0 }}
-      className={cn(key.status !== 'in_use' ? 'border-b border-dashed border-border' : 'border-b')}
-    >
-      <TableCell className="w-[150px] pr-0 py-2">
-        <div className="flex -space-x-px items-center">
-          <Badge
-            className={cn(
-              statusColors[key.status],
-              'rounded-r-none',
-              'gap-2 w-full h-6',
-              'uppercase font-mono',
-              'border-r-0'
-            )}
-          >
-            {key.status === 'standby' ? <Timer size={13} /> : <Key size={13} />}
-            {statusLabels[key.status]}
-          </Badge>
-        </div>
-      </TableCell>
-      <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
-        <div className="">
-          <Badge
-            className={cn(
-              'bg-opacity-100 bg-200 border-foreground-muted',
-              'rounded-l-none',
-              'gap-2 py-2 h-6'
-            )}
-          >
-            <span className="truncate">{key.id}</span>
-            <button
-              onClick={() => {
-                setSelectedKey(key)
-                setShownDialog('key-details')
-              }}
-            >
-              <Eye size={13} strokeWidth={1.5} />
-            </button>
-          </Badge>
-        </div>
-      </TableCell>
-      <TableCell className="truncate max-w-[100px] py-2">
-        <AlgorithmHoverCard algorithm={key.algorithm} legacy={key.id === legacyKey?.id} />
-      </TableCell>
-      <TableCell className="text-right py-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="text" className="px-2" icon={<MoreVertical />} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onSelect={() => {
-                setSelectedKey(key)
-                setShownDialog('key-details')
-              }}
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              View key details
-            </DropdownMenuItem>
-            {key.status === 'standby' && (
-              <>
-                <DropdownMenuItem
-                  onSelect={() => handlePreviouslyUsedKey(key.id)}
-                  className="text-destructive"
-                >
-                  <CircleArrowDown className="mr-2 h-4 w-4" />
-                  Move to previously used
-                </DropdownMenuItem>
-              </>
-            )}
-            {key.status === 'previously_used' && (
-              <DropdownMenuItem
-                onSelect={() => {
-                  setSelectedKey(key)
-                  setShownDialog('revoke')
-                }}
-                className="text-destructive"
-              >
-                <ShieldOff className="mr-2 h-4 w-4" />
-                Revoke key
-                <span className="text-xs text-foreground-light ml-2">(after 30 days)</span>
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
-    </MotionTableRow>
-  )
-
-  interface ActionPanelProps extends Omit<React.ComponentProps<typeof Card>, 'onClick' | 'type'> {
-    title: string
-    description: string
-    buttonLabel: React.ComponentProps<typeof Button>['children']
-    onClick: React.ComponentProps<typeof Button>['onClick']
-    loading: React.ComponentProps<typeof Button>['loading']
-    icon?: React.ComponentProps<typeof Button>['icon']
-    type?: React.ComponentProps<typeof Button>['type']
-  }
-
-  const ActionPanel = React.forwardRef<HTMLDivElement, ActionPanelProps>(
-    ({ title, description, buttonLabel, onClick, loading, icon, type, ...props }, ref) => {
-      return (
-        <Card
-          className="bg-surface-100 first:rounded-b-none last:rounded-t-none shadow-none only:rounded-lg"
-          ref={ref}
-          {...props}
-        >
-          <CardHeader className="lg:flex-row lg:items-center gap-3 lg:gap-10 py-4 border-0">
-            <div className="flex flex-col gap-0 flex-1 grow">
-              <CardTitle className="text-sm">{title}</CardTitle>
-              <CardDescription className="max-w-xl">{description}</CardDescription>
-            </div>
-            <div className="flex lg:justify-end flex-">
-              <Button onClick={onClick} loading={loading} icon={icon} type={type}>
-                {buttonLabel}
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
-      )
-    }
-  )
-  ActionPanel.displayName = 'ActionPanel'
-
   return (
     <>
       <div className="-space-y-px">
@@ -404,8 +268,26 @@ export default function JWTSecretKeysTable() {
                   </TableHeader>
                   <TableBody>
                     <AnimatePresence>
-                      {standbyKey && renderKeyRow(standbyKey)}
-                      {inUseKey && renderKeyRow(inUseKey)}
+                      {standbyKey && (
+                        <SigningKeyRow
+                          key={standbyKey.id}
+                          signingKey={standbyKey}
+                          setSelectedKey={setSelectedKey}
+                          setShownDialog={setShownDialog}
+                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                          legacyKey={legacyKey}
+                        />
+                      )}
+                      {inUseKey && (
+                        <SigningKeyRow
+                          key={inUseKey.id}
+                          signingKey={inUseKey}
+                          setSelectedKey={setSelectedKey}
+                          setShownDialog={setShownDialog}
+                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                          legacyKey={legacyKey}
+                        />
+                      )}
                     </AnimatePresence>
                   </TableBody>
                 </Table>
