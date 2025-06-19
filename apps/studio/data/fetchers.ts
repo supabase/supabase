@@ -220,6 +220,35 @@ async function handleFetchError<T = unknown>(response: Response): Promise<T | Re
 
 /**
  * To be used only for dashboard API endpoints. Use `fetch` directly if calling a non dashboard API endpoint
+ */
+export async function fetchGet<T = any>(
+  url: string,
+  data: { [prop: string]: any },
+  options?: { [prop: string]: any }
+): Promise<T | ResponseError> {
+  try {
+    const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
+    const headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      ...DEFAULT_HEADERS,
+      ...otherHeaders,
+    })
+    const response = await fetch(url, {
+      headers,
+      method: 'GET',
+      referrerPolicy: 'no-referrer-when-downgrade',
+      ...otherOptions,
+      signal: abortSignal,
+    })
+    if (!response.ok) return handleFetchError(response)
+    return handleFetchResponse(response)
+  } catch (error) {
+    return handleFetchError(error as any)
+  }
+}
+
+/**
+ * To be used only for dashboard API endpoints. Use `fetch` directly if calling a non dashboard API endpoint
  *
  * Exception for `bucket-object-download-mutation` as openapi-fetch doesn't support octet-stream responses
  */
@@ -236,10 +265,10 @@ export async function fetchPost<T = any>(
       ...otherHeaders,
     })
     const response = await fetch(url, {
+      headers,
       method: 'POST',
       body: JSON.stringify(data),
       referrerPolicy: 'no-referrer-when-downgrade',
-      headers,
       ...otherOptions,
       signal: abortSignal,
     })

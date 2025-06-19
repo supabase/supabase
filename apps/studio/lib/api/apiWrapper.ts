@@ -1,7 +1,16 @@
-import { isResponseOk } from 'lib/common/fetch'
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+
+import { ResponseFailure } from 'types'
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
+
+function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
+  return (
+    response !== undefined &&
+    response !== null &&
+    !(typeof response === 'object' && 'error' in response && Boolean(response.error))
+  )
+}
 
 // Purpose of this apiWrapper is to function like a global catchall for ANY errors
 // It's a safety net as the API service should never drop, nor fail
