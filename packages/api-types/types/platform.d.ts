@@ -1007,6 +1007,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/subscription/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm subscription change */
+    post: operations['SubscriptionController_confirmSubscriptionChange']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/subscription/preview': {
     parameters: {
       query?: never
@@ -4252,11 +4269,14 @@ export interface components {
       /** @default 0 */
       recoveryTimeTarget?: number
     }
-    ConfirmSubscriptionChangeBody: {
+    ConfirmCreateSubscriptionChangeBody: {
       kind?: string
       name: string
       payment_intent_id: string
       size?: string
+    }
+    ConfirmSubscriptionChangeBody: {
+      payment_intent_id: string
     }
     CopyObjectBody: {
       from: string
@@ -4555,6 +4575,7 @@ export interface components {
           is_owner: boolean
           name: string
           opt_in_tags: string[]
+          organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
             id: 'free' | 'pro' | 'team' | 'enterprise'
@@ -6152,6 +6173,7 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
+      organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
         id: 'free' | 'pro' | 'team' | 'enterprise'
@@ -7278,8 +7300,9 @@ export interface components {
       }[]
     }
     RunQueryBody: {
-      query: string
+      /** @default false */
       disable_statement_timeout?: boolean
+      query: string
     }
     SearchProfileBody: {
       keywords: string
@@ -8036,7 +8059,11 @@ export interface components {
       /** Format: email */
       billing_email?: string
       name?: string
-      opt_in_tags?: 'AI_SQL_GENERATOR_OPT_IN'[]
+      opt_in_tags?: (
+        | 'AI_SQL_GENERATOR_OPT_IN'
+        | 'AI_DATA_GENERATOR_OPT_IN'
+        | 'AI_LOG_GENERATOR_OPT_IN'
+      )[]
     }
     UpdateOrganizationResponse: {
       billing_email?: string
@@ -8242,6 +8269,9 @@ export interface components {
       payment_method?: string
       /** @enum {string} */
       tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+    }
+    UpdateSubscriptionResponse: {
+      pending_payment_intent_secret: string | null
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
@@ -10698,7 +10728,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['UpdateSubscriptionResponse']
+        }
       }
       403: {
         headers: {
@@ -10707,6 +10739,43 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update subscription change */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SubscriptionController_confirmSubscriptionChange: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConfirmSubscriptionChangeBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to confirm subscription change */
       500: {
         headers: {
           [name: string]: unknown
@@ -12051,7 +12120,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ConfirmSubscriptionChangeBody']
+        'application/json': components['schemas']['ConfirmCreateSubscriptionChangeBody']
       }
     }
     responses: {
@@ -16653,6 +16722,7 @@ export interface operations {
           | 'disk_fs_avail'
           | 'disk_fs_used'
           | 'disk_fs_used_wal'
+          | 'disk_fs_used_system'
           | 'ram_usage'
           | 'ram_usage_total'
           | 'ram_usage_available'
