@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { ComponentType, useCallback, useEffect, useRef } from 'react'
+import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -7,6 +7,7 @@ import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authentica
 import { useAuth, useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { NextPageWithLayout, isNextPageWithLayout } from 'types'
+import { SessionTimeoutModal } from 'components/interfaces/SignIn/SessionTimeoutModal'
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
@@ -30,6 +31,8 @@ export function withAuth<T>(
   const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
     const { isLoading, session } = useAuth()
+    const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = useState(false)
+
     const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
       onError(error) {
         toast.error(
@@ -49,9 +52,12 @@ export function withAuth<T>(
     const signOut = useSignOut()
 
     const isLoggedIn = Boolean(session)
-    const isFinishedLoading = !isLoading && !isAALLoading
+    //const isFinishedLoading = !isLoading && !isAALLoading
+    // for testing on staging
+    // remove before merging
+    const isFinishedLoading = false
     const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
-
+    console.log('isFinishedLoading', isFinishedLoading)
     const redirectToSignIn = useCallback(() => {
       let pathname = location.pathname
       if (process.env.NEXT_PUBLIC_BASE_PATH) {
@@ -75,7 +81,7 @@ export function withAuth<T>(
     useEffect(() => {
       if (!isFinishedLoading) {
         timeoutIdRef.current = setTimeout(() => {
-          redirectToSignIn()
+          setIsSessionTimeoutModalOpen(true)
         }, 10000) // 10 seconds timeout
       } else {
         if (timeoutIdRef.current) {
@@ -110,7 +116,16 @@ export function withAuth<T>(
 
     const InnerComponent = WrappedComponent as any
 
-    return <InnerComponent {...props} />
+    return (
+      <>
+        <SessionTimeoutModal
+          visible={isSessionTimeoutModalOpen}
+          onClose={() => setIsSessionTimeoutModalOpen(false)}
+          redirectToSignIn={redirectToSignIn}
+        />
+        <InnerComponent {...props} />
+      </>
+    )
   }
 
   WithAuthHOC.displayName = `withAuth(${WrappedComponent.displayName})`
