@@ -37,6 +37,7 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   cn,
+  Badge,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
@@ -122,11 +123,20 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
       gitBranchName: z
         .string()
         .refine(
-          (val) => !githubConnection?.id || (val && val.length > 0),
-          'Git branch name is required when Git is connected'
+          (val) => gitlessBranching || (val && val.length > 0),
+          'Git branch name is required'
         ),
     })
     .superRefine(async (val, ctx) => {
+      if (!gitlessBranching && (!githubConnection || !isProdBranchLinked)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Automatic branching must be configured before creating a preview branch',
+          path: ['gitBranchName'],
+        })
+        return
+      }
+
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.id) {
         try {
           await checkGithubBranchValidity({
@@ -195,6 +205,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                         autoComplete="off"
                       />
                     </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
                   </FormItemLayout>
                 )}
               />
@@ -241,6 +252,9 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                         </FormControl_Shadcn_>
                         <div className="absolute top-2.5 right-3 flex items-center gap-2">
                           {isChecking && <Loader2 size={14} className="animate-spin" />}
+                          {field.value && !isChecking && !form.formState.errors.gitBranchName && (
+                            <Check size={14} className="text-brand" strokeWidth={2} />
+                          )}
                         </div>
                       </div>
                     </FormItemLayout>
@@ -258,8 +272,15 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                 <>
                   {(!githubConnection || !isProdBranchLinked) && (
                     <div className="flex items-center gap-2 justify-between">
-                      <div>
-                        <Label>Automatic branching</Label>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <Label>Automatic branching</Label>
+                          {!gitlessBranching && (
+                            <Badge variant="warning" size="small">
+                              Required
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-foreground-light">
                           Automatically create, sync, and merge branches in Supabase when you make
                           changes to your GitHub repository.
