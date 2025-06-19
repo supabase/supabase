@@ -342,10 +342,13 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
         if (!open) sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       }}
     >
-      <SheetContent size="lg" side="right" showClose>
+      <SheetContent size="md" side="right" showClose className="flex flex-col gap-0">
         <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(handleSave)}>
-            <SheetHeader>
+          <form
+            onSubmit={form.handleSubmit(handleSave)}
+            className="flex-1 overflow-hidden flex flex-col"
+          >
+            <SheetHeader className="shrink-0">
               <SheetTitle>Automatic Branching</SheetTitle>
               <SheetDescription>
                 Automatically create, sync, and merge branches in Supabase when you make changes to
@@ -353,7 +356,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
               </SheetDescription>
             </SheetHeader>
 
-            <SheetSection className="py-8">
+            <SheetSection className="py-6 flex-1 overflow-y-auto">
               <FormField_Shadcn_
                 control={form.control}
                 name="autoBranchingEnabled"
@@ -580,7 +583,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                 </div>
               )}
             </SheetSection>
-            <SheetFooter className="flex justify-end gap-2">
+            <SheetFooter className="shrink-0 flex justify-end gap-2">
               <Button
                 type="default"
                 size="small"
