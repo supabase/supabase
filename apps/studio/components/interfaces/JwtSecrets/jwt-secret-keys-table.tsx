@@ -20,7 +20,11 @@ import { useParams } from 'common'
 import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import {
+  JWTAlgorithm,
+  JWTSigningKey,
+  useJWTSigningKeysQuery,
+} from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import {
@@ -58,7 +62,7 @@ import {
   TableRow,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { algorithmDescriptions, algorithmLabels, JWTAlgorithm } from './algorithm-details'
+import { algorithmDescriptions, algorithmLabels } from './algorithm-details'
 import { AlgorithmHoverCard } from './algorithm-hover-card'
 import { statusColors, statusLabels } from './jwt.constants'
 
@@ -123,10 +127,6 @@ export default function JWTSecretKeysTable() {
     () => sortedKeys.filter((key) => key.status === 'revoked'),
     [sortedKeys]
   )
-
-  const resetNewKeyForm = () => {
-    setNewKeyAlgorithm('RS256')
-  }
 
   const handleLegacyMigration = async () => {
     try {

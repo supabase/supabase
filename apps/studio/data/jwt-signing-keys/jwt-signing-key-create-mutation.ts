@@ -4,10 +4,11 @@ import { toast } from 'sonner'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { jwtSigningKeysKeys } from './keys'
+import { JWTAlgorithm } from './jwt-signing-keys-query'
 
 interface JWTSigningKeyCreateVariables {
   projectRef?: string
-  algorithm: 'HS256' | 'RS256' | 'ES256' | 'EdDSA'
+  algorithm: JWTAlgorithm
   status: 'in_use' | 'standby'
 }
 

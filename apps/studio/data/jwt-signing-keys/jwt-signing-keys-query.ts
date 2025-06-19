@@ -6,6 +6,8 @@ import { jwtSigningKeysKeys } from './keys'
 
 export type JWTSigningKey = components['schemas']['SigningKeyResponse']
 
+export type JWTAlgorithm = components['schemas']['SigningKeyResponse']['algorithm']
+
 interface JWTSigningKeysVariables {
   projectRef?: string
 }
