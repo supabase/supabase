@@ -106,11 +106,6 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     return (githubReposData as any[])?.find((r) => r.id.toString() === selectedRepoId)
   }, [githubReposData, selectedRepoId])
 
-  // derived connection & repo values from queries
-  // existingConnection comes from the connections query (see below)
-  // selectedRepo is derived from the repo list using existingConnection
-  const [isGitBranchValid, setIsGitBranchValid] = useState<boolean>(true)
-
   const { mutate: createBranch } = useBranchCreateMutation()
   const { mutate: updateBranch } = useBranchUpdateMutation()
 
@@ -166,27 +161,21 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
               connectionId: Number(existingConnection.id),
               branchName: val.branchName,
             })
-            setIsGitBranchValid(true)
           } catch (error) {
-            setIsGitBranchValid(false)
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `Branch "${val.branchName}" not found in repository`,
               path: ['branchName'],
             })
           }
-        } else {
-          setIsGitBranchValid(true)
         }
-      } else {
-        setIsGitBranchValid(true)
       }
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    mode: 'onBlur',
-    reValidateMode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
     defaultValues: {
       autoBranchingEnabled: false,
       branchName: 'main',
@@ -515,7 +504,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                             {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
                             {field.value &&
                               !isCheckingBranch &&
-                              isGitBranchValid &&
+                              !form.formState.errors.branchName &&
                               autoBranchingEnabled && (
                                 <Check size={14} className="text-brand" strokeWidth={2} />
                               )}

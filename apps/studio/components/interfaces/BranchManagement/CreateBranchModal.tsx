@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { Check, DollarSign, FileText, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -21,7 +21,6 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { BASE_PATH } from 'lib/constants'
 import { sidePanelsState } from 'state/side-panels'
 import {
-  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -54,8 +53,6 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useFlag('gitlessBranching')
-
-  const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -136,58 +133,40 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
             connectionId: githubConnection.id,
             branchName: val.gitBranchName,
           })
-          setIsGitBranchValid(true)
+          // valid – no issues added
         } catch (error) {
-          setIsGitBranchValid(false)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
             path: ['gitBranchName'],
           })
         }
-      } else {
-        setIsGitBranchValid(!val.gitBranchName || val.gitBranchName.length === 0)
       }
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '' },
   })
 
-  // Show validation messages only after a field has been interacted with (touched) or on form submit
-  const { touchedFields, isSubmitted } = form.formState
-
-  const showBranchNameError = touchedFields.branchName || isSubmitted
-  const showGitBranchNameError = touchedFields.gitBranchName || isSubmitted
-
-  const isFormValid =
-    form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
-  const canSubmit = isFormValid && !isCreating && !isChecking && isBranchingEnabled
+  const canSubmit = !isCreating && !isChecking && isBranchingEnabled
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     createBranch({
       projectRef,
       branchName: data.branchName,
-      ...(data.gitBranchName && isGitBranchValid ? { gitBranch: data.gitBranchName } : {}),
+      ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
     })
   }
 
   useEffect(() => {
     if (form && visible) {
-      setIsGitBranchValid(false)
       form.reset()
     }
   }, [form, visible])
-
-  useEffect(() => {
-    setIsGitBranchValid(
-      !form.getValues('gitBranchName') || form.getValues('gitBranchName')?.length === 0
-    )
-  }, [githubConnection?.id, form.getValues('gitBranchName')])
 
   const openLinkerPanel = () => {
     onClose()
@@ -208,7 +187,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
-                  <FormItemLayout label="Preview Branch Name" hideMessage={!showBranchNameError}>
+                  <FormItemLayout label="Preview Branch Name">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
                         {...field}
@@ -225,28 +204,34 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                   control={form.control}
                   name="gitBranchName"
                   render={({ field }) => (
-                    <FormItem_Shadcn_>
-                      <div className="flex items-center justify-between mb-2">
-                        <Label>Sync with Git branch {gitlessBranching ? '(optional)' : ''}</Label>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Image
-                            className={cn('dark:invert')}
-                            src={`${BASE_PATH}/img/icons/github-icon.svg`}
-                            width={16}
-                            height={16}
-                            alt={`GitHub icon`}
-                          />
-                          <Link
-                            href={`https://github.com/${repoOwner}/${repoName}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground hover:underline"
-                          >
-                            {repoOwner}/{repoName}
-                          </Link>
+                    <FormItemLayout
+                      label={
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span className="flex-1">
+                            Sync with Git branch {gitlessBranching ? '(optional)' : ''}
+                          </span>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Image
+                              className={cn('dark:invert')}
+                              src={`${BASE_PATH}/img/icons/github-icon.svg`}
+                              width={16}
+                              height={16}
+                              alt={`GitHub icon`}
+                            />
+                            <Link
+                              href={`https://github.com/${repoOwner}/${repoName}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-foreground hover:underline"
+                            >
+                              {repoOwner}/{repoName}
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                      <div className="relative">
+                      }
+                      description="Migrations from this Git branch will be automatically deployed"
+                    >
+                      <div className="relative w-full">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -254,18 +239,11 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                             autoComplete="off"
                           />
                         </FormControl_Shadcn_>
-                        <div className="absolute top-2 right-3 flex items-center gap-2">
+                        <div className="absolute top-2.5 right-3 flex items-center gap-2">
                           {isChecking && <Loader2 size={14} className="animate-spin" />}
-                          {field.value && !isChecking && isGitBranchValid && (
-                            <Check size={14} className="text-brand" strokeWidth={2} />
-                          )}
                         </div>
                       </div>
-                      <p className="text-sm text-foreground-light mt-2">
-                        Migrations from this Git branch will be automatically deployed
-                      </p>
-                      {showGitBranchNameError && <FormMessage_Shadcn_ />}
-                    </FormItem_Shadcn_>
+                    </FormItemLayout>
                   )}
                 />
               )}
