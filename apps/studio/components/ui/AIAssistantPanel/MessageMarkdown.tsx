@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import {
   DragEvent,
@@ -10,7 +11,6 @@ import {
   useRef,
 } from 'react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -19,7 +19,21 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Dashboards } from 'types'
-import { Badge, cn, CodeBlock, CodeBlockLang } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  CodeBlock,
+  CodeBlockLang,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
@@ -49,6 +63,58 @@ export const InlineCode = memo(
   )
 )
 InlineCode.displayName = 'InlineCode'
+
+export const Hyperlink = memo(({ href, children }: { href?: string; children: ReactNode }) => {
+  const isExternalURL = !href?.startsWith('https://supabase.com/dashboard')
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <span
+          className={cn(
+            '!m-0 text-foreground cursor-pointer transition',
+            'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
+          )}
+        >
+          {children}
+        </span>
+      </DialogTrigger>
+      <DialogContent size="small">
+        <DialogHeader className="border-b">
+          <DialogTitle>Verify the link before navigating</DialogTitle>
+        </DialogHeader>
+
+        <DialogSection className="flex flex-col">
+          <p className="text-sm text-foreground-light">
+            This link will take you to the following URL:
+          </p>
+          <p className="text-sm text-foreground">{href}</p>
+          <p className="text-sm text-foreground-light mt-2">Are you sure you want to head there?</p>
+        </DialogSection>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="default" className="opacity-100">
+              Cancel
+            </Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button asChild type="primary" className="opacity-100">
+              <a
+                href={href}
+                target={isExternalURL ? '_blank' : '_self'}
+                rel={isExternalURL ? 'noreferrer noopener' : undefined}
+              >
+                Head to link
+              </a>
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+})
+Hyperlink.displayName = 'Hyperlink'
 
 const MemoizedQueryBlock = memo(
   ({
