@@ -7,7 +7,7 @@
     "node": "20.*"
   },
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack && pnpm start",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --turbopack",
     "ci": "payload migrate && pnpm build",
     "clean": "rimraf node_modules .next",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --turbopack --port 3030",
@@ -16,7 +16,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
-    "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate --force-accept-warning",
+    "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3030",
     "typecheck_IGNORED": "tsc --noEmit"
