@@ -65,7 +65,7 @@ const DatabaseUsage = () => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
   const isTeamsOrEnterprisePlan =
-    !isOrgPlanLoading && !(orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
+    !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
   const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
