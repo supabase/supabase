@@ -1,17 +1,17 @@
-import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
+import JWTSettings from 'components/interfaces/JwtSecrets/jwt-settings'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import JWTSettings from 'components/interfaces/Settings/API/JWTSettings'
 import type { NextPageWithLayout } from 'types'
 
-import { useParams } from 'common'
-import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
-import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from 'components/interfaces/Settings/API/API.constants'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from 'components/interfaces/JwtSecrets/API.constants'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 
 const JWTKeysLegacyPage: NextPageWithLayout = () => {
   const { ref: projectRef, source } = useParams()

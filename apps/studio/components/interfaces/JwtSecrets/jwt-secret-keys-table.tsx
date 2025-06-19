@@ -60,7 +60,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import { AlgorithmHoverCard } from './AlgorithmHoverCard'
+import { AlgorithmHoverCard } from './algorithm-hover-card'
 
 import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -69,7 +69,7 @@ import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 
-import { algorithmDescriptions, algorithmLabels, JWTAlgorithm } from './algorithmDetails'
+import { algorithmDescriptions, algorithmLabels, JWTAlgorithm } from './algorithm-details'
 import { statusColors, statusLabels } from './constants'
 
 export default function JWTSecretKeysTable() {

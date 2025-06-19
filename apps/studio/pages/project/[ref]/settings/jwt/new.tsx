@@ -1,19 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import JWTSecretKeysTable from 'components/interfaces/JwtSecrets/JWTSecretKeysTable'
+import JWTSecretKeysTable from 'components/interfaces/JwtSecrets/jwt-secret-keys-table'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 
 const JWTSigningKeysPage: NextPageWithLayout = () => {

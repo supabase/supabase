@@ -1,7 +1,7 @@
-import React from 'react'
 import { GlobeLock } from 'lucide-react'
-import { algorithmDetails, AlgorithmDetail } from './algorithmDetails'
+import React from 'react'
 import { InfoPill } from '../../ui/InfoPill'
+import { AlgorithmDetail, algorithmDetails } from './algorithm-details'
 
 interface AlgorithmHoverCardProps {
   algorithm: keyof typeof algorithmDetails
