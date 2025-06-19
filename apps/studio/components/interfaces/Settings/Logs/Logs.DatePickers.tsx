@@ -28,12 +28,28 @@ export type DatePickerValue = {
 
 interface Props {
   helpers: DatetimeHelper[]
+  defaultHelper?: string
 }
 
-export const LogsDatePicker = ({ helpers }: PropsWithChildren<Props>) => {
+export const LogsDatePicker = ({ helpers, defaultHelper }: PropsWithChildren<Props>) => {
   const { timestampStart, timestampEnd, setTimeRange, selectedHelperId, setSelectedHelperId } =
     useLogsUrlState()
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (defaultHelper) {
+      const found = helpers.find((h) => h.id === defaultHelper)
+      if (found) {
+        setSelectedHelperId(defaultHelper)
+      } else {
+        console.warn(
+          `[LogsDatePicker] defaultHelper id '${defaultHelper}' not found in helpers. Ignoring.`
+        )
+      }
+    }
+    // Only run on mount or if defaultHelper/helpers change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultHelper, helpers])
 
   useEffect(() => {
     if (selectedHelperId) {
