@@ -45,7 +45,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       showLegend: true,
       hideChartType: false,
       defaultChartStyle: 'line',
-      showMaxValue: true,
+      showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
@@ -59,36 +59,21 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           label: 'Used',
           tooltip:
-            'Total RAM currently in use by the system and applications. High usage may indicate memory pressure.',
+            'RAM in use by Postgres and the operating system. Sustained high usage may indicate memory pressure',
         },
         {
           attribute: 'ram_usage_cache_and_buffers',
           provider: 'infra-monitoring',
           label: 'Cache + buffers',
           tooltip:
-            'RAM used for caching and buffering disk operations. Higher values improve read performance.',
+            'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes.',
         },
         {
           attribute: 'ram_usage_free',
           provider: 'infra-monitoring',
           label: 'Free',
           tooltip:
-            'Available unused RAM. A small amount is always reserved. High unused RAM present with erratic Used RAM may indicate unoptimized queries disrupting cache.',
-        },
-        {
-          attribute: 'ram_usage_swap',
-          provider: 'infra-monitoring',
-          label: 'Swap',
-          omitFromTotal: false, // we can set this to true if we want to omit the swap from the total
-          tooltip:
-            'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
-        },
-        {
-          attribute: 'ram_usage_total',
-          provider: 'infra-monitoring',
-          label: 'Max',
-          isMaxValue: true,
-          tooltip: 'Total RAM',
+            'Unallocated memory available for use. A small portion is always reserved by the operating system.',
         },
       ],
     },
@@ -161,7 +146,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     },
     {
       id: 'disk-iops',
-      label: 'Disk IOps',
+      label: 'Disk Input/Output operations per second (IOPS)',
       syncId: 'database-reports',
       hide: false,
       showTooltip: true,
@@ -180,14 +165,14 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
         {
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
-          label: 'IOps write/s',
+          label: 'write IOPS',
           tooltip:
             'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity.',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
-          label: 'IOps read/s',
+          label: 'read IOPS',
           tooltip:
             'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching.',
         },
@@ -304,43 +289,6 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
                   1024 *
                   0.9, // reaching 90% of the disk size will trigger a disk resize https://supabase.com/docs/guides/platform/database-size
               }),
-      ],
-    },
-    {
-      id: 'network-traffic',
-      label: 'Network Traffic',
-      syncId: 'database-reports',
-      valuePrecision: 1,
-      showTooltip: true,
-      showLegend: true,
-      showMaxValue: false,
-      showGrid: true,
-      YAxisProps: {
-        width: 65,
-        tickFormatter: (value: any) => formatBytes(value, 1),
-      },
-      hideChartType: false,
-      defaultChartStyle: 'line',
-      hideHighlightedValue: true,
-      showTotal: false,
-      attributes: [
-        {
-          attribute: 'network_receive_bytes',
-          provider: 'infra-monitoring',
-          label: 'Ingress',
-          manipulateValue: (value: number) => value * -1,
-          tooltip:
-            'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
-          stackId: '1',
-        },
-        {
-          attribute: 'network_transmit_bytes',
-          provider: 'infra-monitoring',
-          label: 'Egress',
-          tooltip:
-            'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
-          stackId: '2',
-        },
       ],
     },
     {
