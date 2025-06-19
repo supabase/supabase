@@ -66,14 +66,14 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           label: 'Cache + buffers',
           tooltip:
-            'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes.',
+            'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
         },
         {
           attribute: 'ram_usage_free',
           provider: 'infra-monitoring',
           label: 'Free',
           tooltip:
-            'Unallocated memory available for use. A small portion is always reserved by the operating system.',
+            'Unallocated memory available for use. A small portion is always reserved by the operating system',
         },
       ],
     },
@@ -101,7 +101,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'System',
           format: '%',
           tooltip:
-            'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead.',
+            'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
         },
         {
           attribute: 'cpu_usage_busy_user',
@@ -109,7 +109,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'User',
           format: '%',
           tooltip:
-            'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries.',
+            'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
         },
         {
           attribute: 'cpu_usage_busy_iowait',
@@ -117,7 +117,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'IOwait',
           format: '%',
           tooltip:
-            'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks.',
+            'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
         },
         {
           attribute: 'cpu_usage_busy_irqs',
@@ -132,7 +132,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'Other',
           format: '%',
           tooltip:
-            'CPU time spent on other tasks (e.g., background processes, software interrupts).',
+            'CPU time spent on other tasks (e.g., background processes, software interrupts)',
         },
         {
           attribute: 'cpu_usage_max',
@@ -167,14 +167,14 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           label: 'write IOPS',
           tooltip:
-            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity.',
+            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
           label: 'read IOPS',
           tooltip:
-            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching.',
+            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
         {
           attribute: 'disk_iops_max',
@@ -210,7 +210,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           label: 'IO Usage',
           tooltip:
-            'The actual number of IO operations per second that the database is currently using.',
+            'The actual number of IO operations per second that the database is currently using',
         },
       ],
     },
@@ -237,7 +237,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'System',
-          tooltip: 'Reserved space for the system to ensure your database runs smoothly.',
+          tooltip: 'Reserved space for the system to ensure your database runs smoothly',
         },
         {
           attribute: 'disk_fs_used_wal',
@@ -245,7 +245,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           format: 'bytes',
           label: 'WAL',
           tooltip:
-            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.',
+            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
         },
 
         {
@@ -253,7 +253,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           format: 'bytes',
           label: 'Database',
-          tooltip: 'Disk usage by your database (tables, indexes, data, ...).',
+          tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
         },
         {
           attribute: 'disk_fs_size',
@@ -300,6 +300,8 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       showLegend: true,
       showMaxValue: true,
       hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
       defaultChartStyle: 'line',
       attributes: [
         {
@@ -307,39 +309,37 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           label: 'Postgres',
           tooltip:
-            'Direct connections to the Postgres database from your application and external clients.',
+            'Direct connections to the Postgres database from your application and external clients',
         },
         {
           attribute: 'client_connections_authenticator',
           provider: 'infra-monitoring',
           label: 'PostgREST',
-          tooltip: 'Connections magaged by PostgREST to auto-generate RESTful API.',
+          tooltip: 'Connection pool managed by PostgREST',
         },
         {
           attribute: 'client_connections_supabase_admin',
           provider: 'infra-monitoring',
-          label: 'Admin',
+          label: 'Reserved',
           tooltip:
-            'Administrative connections used by various Supabase services for internal operations and maintenance tasks.',
+            'Administrative connections used by various Supabase services for internal operations and maintenance tasks',
         },
         {
           attribute: 'client_connections_supabase_auth_admin',
           provider: 'infra-monitoring',
           label: 'Auth',
-          tooltip:
-            'Administrative connections used by Supabase Auth service for user management and authentication operations.',
+          tooltip: 'Connection pool managed by Supabase Auth',
         },
         {
           attribute: 'client_connections_supabase_storage_admin',
           provider: 'infra-monitoring',
           label: 'Storage',
-          tooltip:
-            'Administrative connections used by Supabase Storage service for file operations and bucket management.',
+          tooltip: 'Connection pool managed by Supabase Storage',
         },
         {
           attribute: 'client_connections_other',
           provider: 'infra-monitoring',
-          label: 'Other',
+          label: 'Other roles',
           tooltip: "Miscellaneous database connections that don't fall into other categories.",
         },
         {
@@ -354,7 +354,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     },
     {
       id: 'pgbouncer-connections',
-      label: 'Pooler client connections',
+      label: 'Dedicated Pooler client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
       hide: false,
@@ -385,7 +385,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     },
     {
       id: 'supavisor-connections-active',
-      label: 'Supavisor client connections',
+      label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
       hide: isFreePlan,
