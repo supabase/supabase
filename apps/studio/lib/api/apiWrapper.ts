@@ -4,7 +4,7 @@ import { ResponseFailure } from 'types'
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
 
-function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
+export function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
   return (
     response !== undefined &&
     response !== null &&
