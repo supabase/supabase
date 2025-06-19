@@ -1,5 +1,6 @@
 import { GlobeLock } from 'lucide-react'
 import React from 'react'
+
 import { InfoPill } from '../../ui/InfoPill'
 import { AlgorithmDetail, algorithmDetails } from './algorithm-details'
 

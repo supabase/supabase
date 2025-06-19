@@ -1,8 +1,3 @@
-'use client'
-
-import { useParams } from 'common'
-
-import type { components } from 'api-types'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight,
@@ -19,16 +14,24 @@ import {
   Trash2,
 } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
-import { Badge, Button, cn } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+
+import type { components } from 'api-types'
+import { useParams } from 'common'
+import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
+import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
+import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
+import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from 'ui/src/components/shadcn/ui/card'
-import {
+  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -37,39 +40,26 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-} from 'ui/src/components/shadcn/ui/dialog'
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'ui/src/components/shadcn/ui/dropdown-menu'
-import { Label } from 'ui/src/components/shadcn/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'ui/src/components/shadcn/ui/select'
-import {
+  Label_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from 'ui/src/components/shadcn/ui/table'
-import { AlgorithmHoverCard } from './algorithm-hover-card'
-
-import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
-import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
-import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-
+} from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { algorithmDescriptions, algorithmLabels, JWTAlgorithm } from './algorithm-details'
+import { AlgorithmHoverCard } from './algorithm-hover-card'
 import { statusColors, statusLabels } from './jwt.constants'
 
 export default function JWTSecretKeysTable() {
@@ -762,25 +752,25 @@ export default function JWTSecretKeysTable() {
           <DialogSectionSeparator />
           <DialogSection className="space-y-4">
             <div>
-              <Label htmlFor="algorithm">Choose the key type to use:</Label>
-              <Select
+              <Label_Shadcn_ htmlFor="algorithm">Choose the key type to use:</Label_Shadcn_>
+              <Select_Shadcn_
                 value={newKeyAlgorithm}
                 onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
               >
-                <SelectTrigger id="algorithm">
-                  <SelectValue placeholder="Select algorithm" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="HS256">HS256 (Symmetric)</SelectItem>
-                  <SelectItem value="RS256">RS256 (RSA)</SelectItem>
-                  <SelectItem value="ES256" disabled>
+                <SelectTrigger_Shadcn_ id="algorithm">
+                  <SelectValue_Shadcn_ placeholder="Select algorithm" />
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="ES256" disabled>
                     ES256 (ECC)
-                  </SelectItem>
-                  <SelectItem value="EdDSA" disabled>
+                  </SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="EdDSA" disabled>
                     EdDSA (Ed25519)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                  </SelectItem_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
               <p className="text-sm text-muted-foreground mt-1">
                 {algorithmDescriptions[newKeyAlgorithm]}
               </p>
@@ -820,20 +810,20 @@ export default function JWTSecretKeysTable() {
                 <>
                   Since there is no standby key, you need to choose an algorithm for the new key:
                   <div className="mt-4 space-y-4">
-                    <Select
+                    <Select_Shadcn_
                       value={newKeyAlgorithm}
                       onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
                     >
-                      <SelectTrigger id="rotateAlgorithm">
-                        <SelectValue placeholder="Select algorithm" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="HS256">HS256 (Symmetric)</SelectItem>
-                        <SelectItem value="ES256">ES256 (ECC)</SelectItem>
-                        <SelectItem value="RS256">RS256 (RSA)</SelectItem>
-                        <SelectItem value="EdDSA">EdDSA (Ed25519)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <SelectTrigger_Shadcn_ id="rotateAlgorithm">
+                        <SelectValue_Shadcn_ placeholder="Select algorithm" />
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
+                        <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="ES256">ES256 (ECC)</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="EdDSA">EdDSA (Ed25519)</SelectItem_Shadcn_>
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
                     <p className="text-sm text-foreground-light">
                       {algorithmDescriptions[newKeyAlgorithm]}
                     </p>
