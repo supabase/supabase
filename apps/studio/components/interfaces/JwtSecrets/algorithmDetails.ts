@@ -8,6 +8,8 @@ export interface AlgorithmDetail {
   links: { url: string; label: string }[]
 }
 
+export type JWTAlgorithm = 'HS256' | 'RS256' | 'ES256'
+
 export const algorithmDetails: Record<string, AlgorithmDetail> = {
   HS256: {
     label: 'HS256 (Symmetric)',

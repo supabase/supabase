@@ -2,25 +2,25 @@
 
 import { useParams } from 'common'
 
+import type { components } from 'api-types'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowRight,
-  Book,
-  Edit,
+  CircleArrowDown,
+  CircleArrowUp,
   Eye,
   FileKey,
+  Import,
   Key,
   MoreVertical,
   RotateCw,
-  Timer,
   ShieldOff,
+  Timer,
   Trash2,
-  CircleArrowUp,
-  CircleArrowDown,
-  Import,
 } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 import { Badge, Button, cn } from 'ui'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import {
   Card,
   CardContent,
@@ -44,7 +44,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui/src/components/shadcn/ui/dropdown-menu'
-import { Input } from 'ui/src/components/shadcn/ui/input'
 import { Label } from 'ui/src/components/shadcn/ui/label'
 import {
   Select,
@@ -53,7 +52,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui/src/components/shadcn/ui/select'
-import { Separator } from 'ui/src/components/shadcn/ui/separator'
 import {
   Table,
   TableBody,
@@ -62,34 +60,22 @@ import {
   TableHeader,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
-import { Textarea } from 'ui/src/components/shadcn/ui/textarea'
 import { AlgorithmHoverCard } from './AlgorithmHoverCard'
-import DotGrid from 'components/ui/DotGrid'
-import type { components } from 'api-types'
-import {
-  JWTAlgorithm,
-  SigningKey,
-  useJwtSecrets,
-  useSigningKeyDeleteMutation,
-} from 'state/jwt-secrets'
-import { Admonition } from 'ui-patterns'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
-import { useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
-import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
+import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
+import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 
-import { algorithmLabels, algorithmDescriptions } from './algorithmDetails'
-import { statusLabels, statusColors } from './constants'
+import { algorithmDescriptions, algorithmLabels, JWTAlgorithm } from './algorithmDetails'
+import { statusColors, statusLabels } from './constants'
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
-  const { rotateKey } = useJwtSecrets()
 
-  const [selectedKey, setSelectedKey] = useState<SigningKey | null>(null)
+  const [selectedKey, setSelectedKey] = useState<JWTSigningKey | null>(null)
   const [shownDialog, setShownDialog] = useState<
     'legacy' | 'create' | 'rotate' | 'confirm-rotate' | 'key-details' | 'revoke' | 'delete' | null
   >(null)
@@ -123,8 +109,8 @@ export default function JWTSecretKeysTable() {
   const sortedKeys = useMemo(() => {
     if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
 
-    return signingKeys.keys.sort((a: SigningKey, b: SigningKey) => {
-      const order: Record<SigningKey['status'], number> = {
+    return signingKeys.keys.sort((a: JWTSigningKey, b: JWTSigningKey) => {
+      const order: Record<JWTSigningKey['status'], number> = {
         standby: 0,
         in_use: 1,
         previously_used: 2,
