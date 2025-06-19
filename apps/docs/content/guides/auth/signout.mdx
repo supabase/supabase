@@ -65,8 +65,8 @@ supabase.auth.sign_out()
 
 Supabase Auth allows you to specify three different scopes for when a user invokes the [sign out API](/docs/reference/javascript/auth-signout) in your application:
 
-- `global` (default) when all sessions active for the user are terminated.
-- `local` which only terminates the current session for the user but keep sessions on other devices or browsers active.
+- `global` when all sessions active for the user are terminated.
+- `local` (recommended default) which only terminates the current session for the user but keep sessions on other devices or browsers active.
 - `others` to terminate all but the current session for the user.
 
 You can invoke these by providing the `scope` option:
@@ -85,10 +85,14 @@ import { createClient } from '@supabase/supabase-js'
 const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
 
 // ---cut---
-// defaults to the global scope
-await supabase.auth.signOut()
+// For multi-device apps, use local scope (recommended)
+await supabase.auth.signOut({ scope: 'local' })
 
-// sign out from the current session only
+// To sign out from all devices/sessions
+await supabase.auth.signOut({ scope: 'global' })
+
+// Note: Default behavior may vary by client library
+// Always specify scope explicitly for predictable behavior
 await supabase.auth.signOut({ scope: 'local' })
 ```
 
