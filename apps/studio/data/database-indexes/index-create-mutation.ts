@@ -7,7 +7,7 @@ import { databaseIndexesKeys } from './keys'
 
 export type DatabaseIndexCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: {
     schema: string
     entity: string

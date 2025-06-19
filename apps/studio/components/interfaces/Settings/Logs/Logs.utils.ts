@@ -145,7 +145,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code
+select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
 from edge_logs
 ${joins}
 ${where}
@@ -153,7 +153,7 @@ ${orderBy}
 limit ${limit};
 `
       }
-      return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
+      return `select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
   from ${table}
   ${joins}
   ${where}
@@ -629,4 +629,62 @@ function getWarningCondition(table: LogsTableName): string {
     default:
       return 'false'
   }
+}
+
+export function jwtAPIKey(metadata: any) {
+  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.apikey?.[0]
+  if (!apikeyHeader) {
+    return undefined
+  }
+
+  if (apikeyHeader.invalid) {
+    return '<invalid>'
+  }
+
+  const payload = apikeyHeader?.payload?.[0]
+  if (!payload) {
+    return '<unrecognized>'
+  }
+
+  if (
+    payload.algorithm === 'HS256' &&
+    payload.issuer === 'supabase' &&
+    ['anon', 'service_role'].includes(payload.role) &&
+    !payload.subject
+  ) {
+    return payload.role
+  }
+
+  return '<unrecognized>'
+}
+
+export function apiKey(metadata: any) {
+  const apikeyHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.apikey?.[0]?.apikey?.[0]
+  if (!apikeyHeader) {
+    return undefined
+  }
+
+  if (apikeyHeader.error) {
+    return `${apikeyHeader.prefix}... <invalid: ${apikeyHeader.error}>`
+  }
+
+  return `${apikeyHeader.prefix}...`
+}
+
+export function role(metadata: any) {
+  const authorizationHeader = metadata?.[0]?.request?.[0]?.sb?.[0]?.jwt?.[0]?.authorization?.[0]
+  if (!authorizationHeader) {
+    return undefined
+  }
+
+  if (authorizationHeader.invalid) {
+    return undefined
+  }
+
+  const payload = authorizationHeader?.payload?.[0]
+  if (!payload || !payload.role) {
+    return undefined
+  }
+
+  return payload.role
 }

@@ -5,6 +5,7 @@ import { Badge, Button, cn, Loading } from 'ui'
 
 interface PanelProps {
   className?: string
+  id?: string
   footer?: JSX.Element | false
   loading?: boolean
   noMargin?: boolean
@@ -24,6 +25,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
         props.noMargin ? '' : 'mb-4 md:mb-8',
         props.className
       )}
+      id={props.id}
     >
       {props.title && (
         <div

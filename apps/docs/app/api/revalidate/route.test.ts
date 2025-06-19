@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { revalidateTag } from 'next/cache'
 import { headers } from 'next/headers'
 import { NextRequest } from 'next/server'
-import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 
 import { _handleRevalidateRequest } from './route'
 
@@ -68,7 +68,7 @@ describe('_handleRevalidateRequest', () => {
       method: 'POST',
     })
 
-    vi.mocked(headers).mockReturnValue(new Headers(request.headers))
+    vi.mocked(headers).mockReturnValue(Promise.resolve(new Headers(request.headers)))
 
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(401)
@@ -83,7 +83,7 @@ describe('_handleRevalidateRequest', () => {
       },
     })
 
-    vi.mocked(headers).mockReturnValue(new Headers(request.headers))
+    vi.mocked(headers).mockReturnValue(Promise.resolve(new Headers(request.headers)))
 
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(401)
@@ -99,7 +99,7 @@ describe('_handleRevalidateRequest', () => {
       body: JSON.stringify({ invalid: 'body' }),
     })
 
-    vi.mocked(headers).mockReturnValue(new Headers(request.headers))
+    vi.mocked(headers).mockReturnValue(Promise.resolve(new Headers(request.headers)))
 
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(400)
@@ -115,7 +115,7 @@ describe('_handleRevalidateRequest', () => {
       body: JSON.stringify({ tags: ['graphql', 'wrappers'] }),
     })
 
-    vi.mocked(headers).mockReturnValue(new Headers(request.headers))
+    vi.mocked(headers).mockReturnValue(Promise.resolve(new Headers(request.headers)))
 
     mockSupabaseClient.rpc.mockResolvedValue({ data: [] })
 
@@ -135,7 +135,7 @@ describe('_handleRevalidateRequest', () => {
       body: JSON.stringify({ tags: ['graphql'] }),
     })
 
-    vi.mocked(headers).mockReturnValue(new Headers(request.headers))
+    vi.mocked(headers).mockReturnValue(Promise.resolve(new Headers(request.headers)))
 
     const fiveHoursAgo = new Date(mockDate.getTime() - 5 * 60 * 60 * 1000)
     mockSupabaseClient.rpc.mockResolvedValue({
@@ -156,7 +156,7 @@ describe('_handleRevalidateRequest', () => {
       body: JSON.stringify({ tags: ['graphql'] }),
     })
 
-    vi.mocked(headers).mockReturnValue(new Headers(request.headers))
+    vi.mocked(headers).mockReturnValue(Promise.resolve(new Headers(request.headers)))
 
     const sevenHoursAgo = new Date(mockDate.getTime() - 7 * 60 * 60 * 1000)
     mockSupabaseClient.rpc.mockResolvedValue({
@@ -177,7 +177,7 @@ describe('_handleRevalidateRequest', () => {
       body: JSON.stringify({ tags: ['graphql'] }),
     })
 
-    vi.mocked(headers).mockReturnValue(new Headers(request.headers))
+    vi.mocked(headers).mockReturnValue(Promise.resolve(new Headers(request.headers)))
 
     const oneHourAgo = new Date(mockDate.getTime() - 1 * 60 * 60 * 1000)
     mockSupabaseClient.rpc.mockResolvedValue({

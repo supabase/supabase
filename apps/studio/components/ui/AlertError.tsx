@@ -46,8 +46,8 @@ const AlertError = ({
         <div>
           {error?.message && <p className="text-left">Error: {formattedErrorMessage}</p>}
           <p className="text-left">
-            Try refreshing your browser, but if the issue persists, please reach out to us via
-            support.
+            Try refreshing your browser, but if the issue persists for more than a few minutes,
+            please reach out to us via support.
           </p>
         </div>
         {children}

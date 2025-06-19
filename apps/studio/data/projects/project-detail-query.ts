@@ -1,7 +1,7 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
+import { get, handleError, isValidConnString } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
@@ -46,9 +46,15 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
       enabled: enabled && typeof ref !== 'undefined',
       staleTime: 30 * 1000, // 30 seconds
       refetchInterval(data) {
-        const status = data && (data as unknown as ProjectDetailData).status
+        const result = data && (data as unknown as ProjectDetailData)
+        const status = result && result.status
+        const connectionString = result && result.connectionString
 
-        if (status === 'COMING_UP' || status === 'UNKNOWN') {
+        if (
+          status === 'COMING_UP' ||
+          status === 'UNKNOWN' ||
+          !isValidConnString(connectionString)
+        ) {
           return 5 * 1000 // 5 seconds
         }
 

@@ -123,7 +123,7 @@ To authenticate the user making WebSocket requests, you can pass the JWT in URL 
 >
 <TabPanel id="query" label="Using query params">
 ```ts
-  import { createClient } from "jsr:@supabase/supabase-js@2";
+  import { createClient } from "npm:@supabase/supabase-js@2";
 
 const supabase = createClient(
 Deno.env.get("SUPABASE_URL"),
@@ -173,7 +173,7 @@ return new Response("User is not authenticated", { status: 403 });
 </TabPanel>
 <TabPanel id="protocol" label="Using custom protocol">
 ```ts
-  import { createClient } from "jsr:@supabase/supabase-js@2";
+  import { createClient } from "npm:@supabase/supabase-js@2";
 
 const supabase = createClient(
 Deno.env.get("SUPABASE_URL"),
@@ -236,7 +236,6 @@ To prevent that, you can update the `supabase/config.toml` with the following se
 ```toml
 [edge_runtime]
 policy = "per_worker"
-```
+````
 
 When running with `per_worker` policy, Function won't auto-reload on edits. You will need to manually restart it by running `supabase functions serve`.
-````

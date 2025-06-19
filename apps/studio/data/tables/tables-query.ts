@@ -9,7 +9,7 @@ import { tableKeys } from './keys'
 
 export type TablesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
   /**
    * Defaults to false

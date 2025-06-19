@@ -13,8 +13,8 @@ import { useParams } from 'common'
 import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { PostgresEngine, ReleaseChannel } from 'data/config/project-unpause-postgres-versions-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
@@ -42,7 +42,7 @@ export interface ProjectPausedStateProps {
 }
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine
+  postgresEngine: Exclude<PostgresEngine, '13' | '14'>
   releaseChannel: ReleaseChannel
 }
 
@@ -56,7 +56,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const selectedOrganization = useSelectedOrganization()
-  const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
 
@@ -69,12 +68,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     isError,
     isSuccess,
     isLoading,
-  } = useProjectPauseStatusQuery(
-    { ref },
-    {
-      enabled: project?.status === PROJECT_STATUS.INACTIVE && enforceNinetyDayUnpauseExpiry,
-    }
-  )
+  } = useProjectPauseStatusQuery({ ref }, { enabled: project?.status === PROJECT_STATUS.INACTIVE })
 
   const finalDaysRemainingBeforeRestoreDisabled =
     pauseStatus?.remaining_days_till_restore_disabled ??
@@ -82,7 +76,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     0
 
   const isFreePlan = selectedOrganization?.plan?.id === 'free'
-  const isRestoreDisabled = enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
+  const isRestoreDisabled = isSuccess && !pauseStatus.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
@@ -146,7 +140,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
     <>
       <div className="space-y-4">
         <div className="w-full mx-auto mb-8 md:mb-16 max-w-7xl">
-          <div className="mx-6 flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
+          <div className="flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
             <div className="grid w-[550px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
@@ -171,76 +165,64 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </p>
                 </div>
 
-                {enforceNinetyDayUnpauseExpiry && (
+                {isLoading && <GenericSkeletonLoader />}
+                {isError && (
+                  <AlertError error={pauseStatusError} subject="Failed to retrieve pause status" />
+                )}
+                {isSuccess && (
                   <>
-                    {isLoading && <GenericSkeletonLoader />}
-                    {isError && (
-                      <AlertError
-                        error={pauseStatusError}
-                        subject="Failed to retrieve pause status"
-                      />
-                    )}
-                    {isSuccess && (
+                    {isRestoreDisabled ? (
+                      <PauseDisabledState />
+                    ) : isFreePlan ? (
                       <>
-                        {isRestoreDisabled ? (
-                          <PauseDisabledState />
-                        ) : isFreePlan ? (
-                          <>
-                            <p className="text-sm text-foreground-light text-center">
-                              {enableProBenefitWording === 'variant-a'
-                                ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
-                                : 'To prevent future pauses, consider upgrading to Pro.'}
-                            </p>
-                            <Alert_Shadcn_>
-                              <AlertTitle_Shadcn_>
-                                Project can be restored through the dashboard within the next{' '}
-                                {finalDaysRemainingBeforeRestoreDisabled} day
-                                {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
-                              </AlertTitle_Shadcn_>
-                              <AlertDescription_Shadcn_>
-                                Free projects cannot be restored through the dashboard if they are
-                                paused for more than{' '}
-                                <span className="text-foreground">
-                                  {pauseStatus?.max_days_till_restore_disabled} days
-                                </span>
-                                . The latest that your project can be restored is by{' '}
-                                <span className="text-foreground">
-                                  {dayjs()
-                                    .utc()
-                                    .add(
-                                      pauseStatus.remaining_days_till_restore_disabled ?? 0,
-                                      'day'
-                                    )
-                                    .format('DD MMM YYYY')}
-                                </span>
-                                . However, your database backup and Storage objects will still be
-                                available for download thereafter.
-                              </AlertDescription_Shadcn_>
-                              <AlertDescription_Shadcn_ className="mt-3">
-                                <Button asChild type="default" icon={<ExternalLink />}>
-                                  <a
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
-                                  >
-                                    More information
-                                  </a>
-                                </Button>
-                              </AlertDescription_Shadcn_>
-                            </Alert_Shadcn_>
-                          </>
-                        ) : (
-                          <RestorePaidPlanProjectNotice />
-                        )}
+                        <p className="text-sm text-foreground-light text-center">
+                          {enableProBenefitWording === 'variant-a'
+                            ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
+                            : 'To prevent future pauses, consider upgrading to Pro.'}
+                        </p>
+                        <Alert_Shadcn_>
+                          <AlertTitle_Shadcn_>
+                            Project can be restored through the dashboard within the next{' '}
+                            {finalDaysRemainingBeforeRestoreDisabled} day
+                            {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            Free projects cannot be restored through the dashboard if they are
+                            paused for more than{' '}
+                            <span className="text-foreground">
+                              {pauseStatus?.max_days_till_restore_disabled} days
+                            </span>
+                            . The latest that your project can be restored is by{' '}
+                            <span className="text-foreground">
+                              {dayjs()
+                                .utc()
+                                .add(pauseStatus.remaining_days_till_restore_disabled ?? 0, 'day')
+                                .format('DD MMM YYYY')}
+                            </span>
+                            . However, your database backup and Storage objects will still be
+                            available for download thereafter.
+                          </AlertDescription_Shadcn_>
+                          <AlertDescription_Shadcn_ className="mt-3">
+                            <Button asChild type="default" icon={<ExternalLink />}>
+                              <a
+                                target="_blank"
+                                rel="noreferrer"
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+                              >
+                                More information
+                              </a>
+                            </Button>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
                       </>
+                    ) : (
+                      <RestorePaidPlanProjectNotice />
                     )}
                   </>
                 )}
-
-                {!enforceNinetyDayUnpauseExpiry && !isFreePlan && <RestorePaidPlanProjectNotice />}
               </div>
 
-              {(!enforceNinetyDayUnpauseExpiry || (isSuccess && !isRestoreDisabled)) && (
+              {isSuccess && !isRestoreDisabled && (
                 <div className="flex items-center justify-center gap-4">
                   <ButtonTooltip
                     size="tiny"

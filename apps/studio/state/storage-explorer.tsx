@@ -8,7 +8,6 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
@@ -41,6 +40,7 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { listBucketObjects, StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { lookupMime } from 'lib/mime'
@@ -177,17 +177,19 @@ function createStorageExplorerState({
     },
 
     sortBy,
-    setSortBy: (value: STORAGE_SORT_BY) => {
+    setSortBy: async (value: STORAGE_SORT_BY) => {
       state.sortBy = value
       state.updateExplorerPreference()
       state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
     },
 
     sortByOrder,
-    setSortByOrder: (value: STORAGE_SORT_BY_ORDER) => {
+    setSortByOrder: async (value: STORAGE_SORT_BY_ORDER) => {
       state.sortByOrder = value
       state.updateExplorerPreference()
       state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
     },
 
     isSearching: false,
@@ -205,12 +207,6 @@ function createStorageExplorerState({
       localStorage.setItem(localStorageKey, JSON.stringify({ view, sortBy, sortByOrder }))
     },
 
-    openBucket: async (bucket: Bucket) => {
-      const { id, name } = bucket
-      state.setSelectedBucket(bucket)
-      await state.fetchFolderContents({ folderId: id, folderName: name, index: -1 })
-    },
-
     // Functions that manage the UI of the Storage Explorer
 
     getLatestColumnIndex: () => {
@@ -220,6 +216,17 @@ function createStorageExplorerState({
     setColumnIsLoadingMore: (index: number, isLoadingMoreItems: boolean = true) => {
       state.columns = state.columns.map((col, idx) => {
         return idx === index ? { ...col, isLoadingMoreItems } : col
+      })
+    },
+
+    openBucket: async (bucket: Bucket) => {
+      const { id, name } = bucket
+      state.setSelectedBucket(bucket)
+      await state.fetchFolderContents({
+        bucketId: bucket.id,
+        folderId: id,
+        folderName: name,
+        index: -1,
       })
     },
 
@@ -302,11 +309,13 @@ function createStorageExplorerState({
     },
 
     fetchFolderContents: async ({
+      bucketId,
       folderId,
       folderName,
       index,
       searchString,
     }: {
+      bucketId: string
       folderId: string | null
       folderName: string
       index: number
@@ -337,8 +346,8 @@ function createStorageExplorerState({
       try {
         const data = await listBucketObjects(
           {
+            bucketId,
             projectRef: state.projectRef,
-            bucketId: state.selectedBucket.id,
             path: prefix,
             options,
           },
@@ -406,7 +415,7 @@ function createStorageExplorerState({
         )
 
         // Add items to column
-        const formattedItems = formatFolderItems(data)
+        const formattedItems = formatFolderItems(data, prefix)
         state.columns = state.columns.map((col, idx) => {
           if (idx === index) {
             return {
@@ -475,7 +484,8 @@ function createStorageExplorerState({
       )
 
       const formattedFolders = foldersItems.map((folderItems, idx) => {
-        const formattedItems = formatFolderItems(folderItems)
+        const prefix = paths.slice(0, idx).join('/')
+        const formattedItems = formatFolderItems(folderItems, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,
@@ -1706,7 +1716,7 @@ const StorageExplorerStateContext = createContext<StorageExplorerState>(
 )
 
 export const StorageExplorerStateContextProvider = ({ children }: PropsWithChildren) => {
-  const { project } = useProjectContext()
+  const project = useSelectedProject()
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
 
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))

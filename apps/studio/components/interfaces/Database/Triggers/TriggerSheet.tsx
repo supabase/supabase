@@ -50,10 +50,10 @@ const FormSchema = z.object({
     .regex(/^\S+$/, 'Name should not contain spaces or whitespaces'),
   schema: z.string(),
   table: z.string(),
-  activation: z.string(),
-  enabled_mode: z.string(),
-  orientation: z.string(),
-  function_name: z.string(),
+  activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
+  enabled_mode: z.enum(['ORIGIN', 'REPLICA', 'ALWAYS', 'DISABLED']),
+  orientation: z.enum(['ROW', 'STATEMENT']),
+  function_name: z.string().min(1, 'Please select a database function for your trigger to call'),
   function_schema: z.string(),
   events: z.array(z.string()).min(1, 'Please select at least one event'),
 
@@ -61,7 +61,7 @@ const FormSchema = z.object({
   tableId: z.string().optional(),
 })
 
-const defaultValues = {
+const defaultValues: z.infer<typeof FormSchema> = {
   name: '',
   schema: '',
   table: '',
@@ -133,7 +133,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
       updateDatabaseTrigger({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        id: selectedTrigger.id,
+        originalTrigger: selectedTrigger,
         payload: { name: payload.name, enabled_mode: payload.enabled_mode },
       })
     } else {
@@ -151,7 +151,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
       if (isEditing) {
         form.reset(selectedTrigger)
-      } else {
+      } else if (tables.length > 0) {
         form.reset({
           ...defaultValues,
           tableId: tables[0].id.toString(),
@@ -168,7 +168,11 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
-            <SheetTitle>Create a new database trigger</SheetTitle>
+            <SheetTitle>
+              {isEditing
+                ? `Edit database trigger: ${selectedTrigger.name}`
+                : 'Create a new database trigger'}
+            </SheetTitle>
           </SheetHeader>
 
           <Form_Shadcn_ {...form}>
@@ -374,46 +378,62 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
                   <Separator />
 
-                  <div className="px-5 flex flex-col gap-y-2">
-                    <p className="text-smn">Function to trigger</p>
-                    {function_name.length === 0 ? (
-                      <button
-                        type="button"
-                        className={cn(
-                          'relative w-full rounded border border-default',
-                          'bg-surface-200 px-5 py-1 shadow-sm transition-all',
-                          'hover:border-strong hover:bg-overlay-hover'
-                        )}
-                        onClick={() => setShowFunctionSelector(true)}
-                      >
-                        <FormBoxEmpty
-                          icon={<Terminal size={14} strokeWidth={2} />}
-                          text="Choose a function to trigger"
-                        />
-                      </button>
-                    ) : (
-                      <div
-                        className={cn(
-                          'relative w-full flex items-center justify-between',
-                          'space-x-3 px-5 py-4 border border-default',
-                          'rounded shadow-sm transition-shadow'
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
-                            <Terminal size="18" strokeWidth={2} width={14} />
+                  <FormField_Shadcn_
+                    name="function_name"
+                    control={form.control}
+                    render={() => (
+                      <FormItemLayout layout="vertical" className="px-5">
+                        <FormControl_Shadcn_>
+                          <div className="flex flex-col gap-y-2">
+                            <p className="text-smn">Function to trigger</p>
+                            {function_name.length === 0 ? (
+                              <button
+                                type="button"
+                                className={cn(
+                                  'relative w-full rounded border border-default',
+                                  'bg-surface-200 px-5 py-1 shadow-sm transition-all',
+                                  'hover:border-strong hover:bg-overlay-hover'
+                                )}
+                                onClick={() => setShowFunctionSelector(true)}
+                              >
+                                <FormBoxEmpty
+                                  icon={<Terminal size={14} strokeWidth={2} />}
+                                  text="Choose a function to trigger"
+                                />
+                              </button>
+                            ) : (
+                              <div
+                                className={cn(
+                                  'relative w-full flex items-center justify-between',
+                                  'space-x-3 px-5 py-4 border border-default',
+                                  'rounded shadow-sm transition-shadow'
+                                )}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background focus-within:bg-opacity-10">
+                                    <Terminal size="18" strokeWidth={2} width={14} />
+                                  </div>
+                                  <p>
+                                    <span className="text-sm text-foreground-light">
+                                      {function_schema}
+                                    </span>
+                                    .
+                                    <span className="text-sm text-foreground">{function_name}</span>
+                                  </p>
+                                </div>
+                                <Button
+                                  type="default"
+                                  onClick={() => setShowFunctionSelector(true)}
+                                >
+                                  Change function
+                                </Button>
+                              </div>
+                            )}
                           </div>
-                          <p>
-                            <span className="text-sm text-foreground-light">{function_schema}</span>
-                            .<span className="text-sm text-foreground">{function_name}</span>
-                          </p>
-                        </div>
-                        <Button type="default" onClick={() => setShowFunctionSelector(true)}>
-                          Change function
-                        </Button>
-                      </div>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
                     )}
-                  </div>
+                  />
                 </>
               )}
             </form>

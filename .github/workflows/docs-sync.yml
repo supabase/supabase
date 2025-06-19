@@ -1,0 +1,49 @@
+# All syncs from the repo to the DB will eventually be consolidated in a single
+# script run by this workflow.
+
+name: docs_sync
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      # Resync if the content changes
+      - 'apps/docs/content/**'
+      # Resync if the resource definition or sync scripts change
+      - 'apps/docs/resources/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/docs
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Run sync script
+        run: pnpm run -F docs sync

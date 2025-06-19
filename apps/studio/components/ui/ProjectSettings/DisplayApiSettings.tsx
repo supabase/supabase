@@ -1,24 +1,31 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { useMemo } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
-import { AlertCircle, Loader2 } from 'lucide-react'
 import { Input } from 'ui'
+import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
+import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
 
-const DisplayApiSettings = ({
-  legacy,
+export const DisplayApiSettings = ({
+  showTitle = true,
   showNotice = true,
+  showLegacyText = true,
 }: {
-  legacy?: boolean
+  showTitle?: boolean
   showNotice?: boolean
+  showLegacyText?: boolean
 }) => {
   const { ref: projectRef } = useParams()
 
-  const newApiKeysFlag = useFlag('newApiKeys')
+  const newApiKeysInRollOut = useFlag('basicApiKeys')
 
   const {
     data: settings,
@@ -32,21 +39,43 @@ const DisplayApiSettings = ({
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const { isLoading, can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
+  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckProjectPermissions(
     PermissionAction.READ,
     'service_api_keys'
   )
+
+  const isLoading = isProjectSettingsLoading || isLoadingPermissions
+
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
-  const apiKeys = settings?.service_api_keys ?? []
+  const apiKeys = useMemo(() => settings?.service_api_keys ?? [], [settings])
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
+
+  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery(
+    projectRef!
+  )
+
+  const lastUsedAPIKeys = useMemo(() => {
+    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
+      return {}
+    }
+
+    try {
+      return getLastUsedAPIKeys(apiKeys, lastUsedLogData)
+    } catch (e: any) {
+      toast.error('Failed to identify when the anon and service_role keys were last used')
+      console.error(e)
+      return {}
+    }
+  }, [lastUsedLogData, apiKeys])
 
   return (
     <>
       <Panel
+        noMargin
         title={
-          !legacy && (
+          showTitle && (
             <div className="space-y-3">
               <h5 className="text-base">Project API Keys</h5>
               <p className="text-sm text-foreground-light">
@@ -138,16 +167,25 @@ const DisplayApiSettings = ({
                 descriptionText={
                   x.tags === 'service_role'
                     ? 'This key has the ability to bypass Row Level Security. Never share it publicly. If leaked, generate a new JWT secret immediately. ' +
-                      (legacy ? 'Prefer using Publishable API keys instead.' : '')
+                      (showLegacyText ? 'Prefer using Publishable API keys instead.' : '')
                     : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies. ' +
-                      (legacy ? 'Prefer using Secret API keys instead.' : '')
+                      (showLegacyText ? 'Prefer using Secret API keys instead.' : '')
                 }
               />
+
+              <div
+                className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
+                data-invisible={isLoadingLastUsed}
+              >
+                {lastUsedAPIKeys[x.api_key]
+                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                  : 'No requests in the past 24 hours.'}
+              </div>
             </Panel.Content>
           ))
         )}
         {showNotice ? (
-          newApiKeysFlag ? (
+          newApiKeysInRollOut ? (
             <Panel.Notice
               className="border-t"
               title="API keys have moved"
@@ -171,7 +209,7 @@ const DisplayApiSettings = ({
           )
         ) : null}
       </Panel>
+      {newApiKeysInRollOut && !showNotice && <ToggleLegacyApiKeysPanel />}
     </>
   )
 }
-export default DisplayApiSettings

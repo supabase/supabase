@@ -16,7 +16,7 @@ export type OrganizationBillingSubscriptionPreviewResponse = {
     unit_price_desc?: string
     quantity?: number
     total_price: number
-    breakdown: {
+    breakdown?: {
       project_name: string
       project_ref: string
       usage: number
@@ -43,6 +43,7 @@ export type OrganizationBillingSubscriptionPreviewResponse = {
     ref: string
   }[]
   billed_via_partner?: boolean
+  pending_subscription_flow?: boolean
 }
 
 export async function previewOrganizationBillingSubscription({

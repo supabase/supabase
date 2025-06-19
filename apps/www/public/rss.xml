@@ -5,9 +5,44 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 04 Apr 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 10 Jun 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/multigres-vitess-for-postgres</guid>
+  <title>Announcing Multigres: Vitess for Postgres</title>
+  <link>https://supabase.com/blog/multigres-vitess-for-postgres</link>
+  <description>Today we are welcoming Sugu, the co-creator of Vitess, to the Supabase team. He is joining Supabase to build Multigres: Vitess for Postgres.</description>
+  <pubDate>Tue, 10 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/building-on-open-table-formats</guid>
+  <title>Building on open table formats</title>
+  <link>https://supabase.com/blog/building-on-open-table-formats</link>
+  <description>Open table formats like Apache Iceberg, Delta Lake, and Apache Hudi are transforming how developers manage large-scale data on object storage systems.</description>
+  <pubDate>Thu, 29 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</guid>
+  <title>Open Data Standards: Postgres, OTel, and Iceberg</title>
+  <link>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</link>
+  <description>Replace custom CRUD endpoints, reduce infrastructure complexity, and accelerate product delivery.</description>
+  <pubDate>Mon, 26 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/simplify-backend-with-data-api</guid>
+  <title>Simplifying back-end complexity with Supabase Data APIs</title>
+  <link>https://supabase.com/blog/simplify-backend-with-data-api</link>
+  <description>Replace custom CRUD endpoints, reduce infrastructure complexity, and accelerate product delivery.</description>
+  <pubDate>Sat, 17 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/event-triggers-wo-superuser</guid>
+  <title>PostgreSQL Event Triggers without superuser access</title>
+  <link>https://supabase.com/blog/event-triggers-wo-superuser</link>
+  <description>Using Postgres Hooks to allow regular users to create event triggers</description>
+  <pubDate>Thu, 08 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/launch-week-14-top-10</guid>
   <title>Top 10 Launches of Launch Week 14</title>
   <link>https://supabase.com/blog/launch-week-14-top-10</link>

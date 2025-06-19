@@ -13,7 +13,7 @@ import { formatFilterValue } from './utils'
 
 export type TableRowDeleteAllVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: Entity
   filters: Filter[]
   roleImpersonationState?: RoleImpersonationState

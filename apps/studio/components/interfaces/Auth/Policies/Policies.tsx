@@ -99,7 +99,8 @@ const Policies = ({
     updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: selectedTableToToggleRLS.id,
+      name: selectedTableToToggleRLS.name,
       schema: selectedTableToToggleRLS.schema,
       payload: payload,
     })
@@ -110,7 +111,7 @@ const Policies = ({
     deleteDatabasePolicy({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      id: selectedPolicyToDelete.id,
+      originalPolicy: selectedPolicyToDelete,
     })
   }
 

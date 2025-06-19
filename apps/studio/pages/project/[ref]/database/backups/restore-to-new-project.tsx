@@ -188,6 +188,16 @@ const RestoreToNewProject = () => {
     }
   }
 
+  if (organization?.managed_by === 'vercel-marketplace') {
+    return (
+      <Admonition
+        type="default"
+        title="Restore to new project is not available for Vercel Marketplace organizations"
+        description="Restoring project backups to a new project created via Vercel Marketplace is not supported yet."
+      />
+    )
+  }
+
   if (isFreePlan) {
     return (
       <UpgradeToPro

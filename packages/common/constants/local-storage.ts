@@ -15,6 +15,8 @@ export const LOCAL_STORAGE_KEYS = {
   UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
   UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
+  TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
+  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
@@ -50,6 +52,8 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
+  API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
+  MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
 
   // api keys view switcher for new and legacy api keys
@@ -58,6 +62,10 @@ export const LOCAL_STORAGE_KEYS = {
   // last visited logs page
   LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
+
+  // user impersonation selector previous searches
+  USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
+    `user-impersonation-selector-previous-searches-${ref}`,
 
   /**
    * COMMON

@@ -29,7 +29,7 @@ export type DatabaseIndex = {
 
 export type IndexesVariables = GetIndexesArgs & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getIndexes(

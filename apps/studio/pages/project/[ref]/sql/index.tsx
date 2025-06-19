@@ -8,13 +8,13 @@ import { NewTab } from 'components/layouts/Tabs/NewTab'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { getTabsStore } from 'state/tabs'
+import { useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  const store = getTabsStore(projectRef)
+  const store = useTabsStateSnapshot()
   const appSnap = useAppStateSnapshot()
   const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 

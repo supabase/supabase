@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { type Database as DatabaseGenerated } from 'common'
 
 type Database = {
+  content: DatabaseGenerated['content']
   graphql_public: DatabaseGenerated['graphql_public']
   public: {
     Tables: DatabaseGenerated['public']['Tables']
@@ -17,7 +18,12 @@ type Database = {
             DatabaseGenerated['public']['Functions']['search_content']['Returns'][number],
             'subsections' | 'metadata'
           > & {
-            metadata: { language?: string; methodName?: string; platform?: string }
+            metadata: {
+              subtitle?: string
+              language?: string
+              methodName?: string
+              platform?: string
+            }
             subsections: Array<{ title?: string; href?: string; content?: string }>
           }
         >

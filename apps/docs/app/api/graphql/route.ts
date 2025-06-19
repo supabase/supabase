@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { type DocumentNode, graphql, GraphQLError, parse, specifiedRules, validate } from 'graphql'
 import { createComplexityLimitRule } from 'graphql-validation-complexity'
 import { NextResponse } from 'next/server'
@@ -8,8 +9,33 @@ import { rootGraphQLSchema } from '~/resources/rootSchema'
 import { createQueryDepthLimiter } from './validators'
 
 export const runtime = 'edge'
+/* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
+  overlap with the OpenAI API regions.
 
-const MAX_DEPTH = 9
+  Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
+  Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
+  */
+export const preferredRegion = [
+  'arn1',
+  'bom1',
+  'cdg1',
+  'cle1',
+  'cpt1',
+  'dub1',
+  'fra1',
+  'gru1',
+  'hnd1',
+  'iad1',
+  'icn1',
+  'kix1',
+  'lhr1',
+  'pdx1',
+  'sfo1',
+  'sin1',
+  'syd1',
+]
+
+const MAX_DEPTH = 5
 
 const validationRules = [
   ...specifiedRules,
@@ -26,7 +52,7 @@ function isDevGraphiQL(request: Request) {
   const referrer = request.headers.get('Referer')
   return (
     IS_DEV &&
-    origin.startsWith('http://localhost') &&
+    origin?.startsWith('http://localhost') &&
     referrer === `${origin}${BASE_PATH ?? ''}/graphiql`
   )
 }
@@ -88,15 +114,31 @@ function validateGraphQLRequest(query: string, isDevGraphiQL = false): ReadonlyA
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    return await handleGraphQLRequest(request)
+    const result = await handleGraphQLRequest(request)
+    // Do not let Vercel close the process until Sentry has flushed
+    // https://github.com/getsentry/sentry-javascript/issues/9626
+    await Sentry.flush(2000)
+    return result
   } catch (error: unknown) {
     console.error(error)
 
     if (error instanceof ApiError) {
+      if (!error.isUserError()) {
+        Sentry.captureException(error)
+      }
+      // Do not let Vercel close the process until Sentry has flushed
+      // https://github.com/getsentry/sentry-javascript/issues/9626
+      await Sentry.flush(2000)
+
       return NextResponse.json({
         errors: [{ message: error.isPrivate() ? 'Internal Server Error' : error.message }],
       })
     } else {
+      Sentry.captureException(error)
+      // Do not let Vercel close the process until Sentry has flushed
+      // https://github.com/getsentry/sentry-javascript/issues/9626
+      await Sentry.flush(2000)
+
       return NextResponse.json({
         errors: [{ message: 'Internal Server Error' }],
       })
