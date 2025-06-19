@@ -70,7 +70,7 @@ import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/lega
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 
 import { algorithmDescriptions, algorithmLabels, JWTAlgorithm } from './algorithm-details'
-import { statusColors, statusLabels } from './constants'
+import { statusColors, statusLabels } from './jwt.constants'
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()

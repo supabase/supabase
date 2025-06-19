@@ -54,7 +54,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
-} from './API.constants'
+} from './jwt.constants'
 
 const schema = object({
   JWT_EXP: number()
