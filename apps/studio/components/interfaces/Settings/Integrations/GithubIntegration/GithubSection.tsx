@@ -22,7 +22,7 @@ const GitHubSection = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection isFullWidth>
+      <ScaffoldSection isFullWidth className="pb-16">
         <div className="mb-6 flex items-center gap-4">
           <Image
             className={cn('dark:invert')}

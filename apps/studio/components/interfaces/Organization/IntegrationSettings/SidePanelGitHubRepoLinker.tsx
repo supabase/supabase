@@ -1,19 +1,30 @@
 import { useMemo, useState, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import ProjectLinker from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
-import type { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Button, Card, CardContent, cn, SheetDescription, SheetFooter } from 'ui'
+import {
+  Button,
+  cn,
+  SheetDescription,
+  SheetFooter,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -29,23 +40,13 @@ import {
   FormControl_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
-  Label_Shadcn_ as Label,
   Switch,
 } from 'ui'
-import { Github, Loader2, Check } from 'lucide-react'
+import { Github, Loader2, Check, ChevronDown } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-const GITHUB_ICON = (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
-    <path
-      fill="#ffffff"
-      fillRule="evenodd"
-      d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
-      clipRule="evenodd"
-    />
-  </svg>
-)
+import { ForeignProject } from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type SidePanelGitHubRepoLinkerProps = {
   projectRef?: string
@@ -55,6 +56,9 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const selectedOrganization = useSelectedOrganization()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
   const selectedProject = useSelectedProject()
+  const [foreignProjectsComboBoxOpen, setForeignProjectsComboboxOpen] = useState(false)
+  const [selectedRepoId, setSelectedRepoId] = useState<string | undefined>()
+  const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
 
   const visible = sidePanelStateSnapshot.githubConnectionsOpen
 
@@ -67,36 +71,6 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   >({
     enabled: visible && Boolean(gitHubAuthorization),
   })
-
-  /**
-   * Supabase projects available
-   */
-  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjects } = useProjectsQuery({
-    enabled: visible,
-  })
-
-  const supabaseProjects = useMemo(
-    () =>
-      supabaseProjectsData
-        ?.filter((project) => project.organization_id === selectedOrganization?.id)
-        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
-    [selectedOrganization?.id, supabaseProjectsData]
-  )
-
-  const githubRepos = useMemo(
-    () =>
-      githubReposData?.map((repo: any) => ({
-        id: repo.id.toString(),
-        name: repo.name,
-        installation_id: repo.installation_id,
-      })) ?? EMPTY_ARR,
-    [githubReposData]
-  )
-
-  // derived connection & repo values from queries
-  // existingConnection comes from the connections query (see below)
-  // selectedRepo is derived from the repo list using existingConnection
-  const [isGitBranchValid, setIsGitBranchValid] = useState<boolean>(true)
 
   const { data: connections } = useGitHubConnectionsQuery(
     {
@@ -112,13 +86,30 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     [connections, projectRef]
   )
 
-  // selectedRepo is calculated on-the-fly from the latest data
+  useEffect(() => {
+    if (existingConnection) {
+      setSelectedRepoId(existingConnection.repository.id.toString())
+    }
+  }, [existingConnection])
+
+  const githubRepos: ForeignProject[] = useMemo(
+    () =>
+      githubReposData?.map((repo: any) => ({
+        id: repo.id.toString(),
+        name: repo.name,
+        installation_id: repo.installation_id,
+      })) ?? EMPTY_ARR,
+    [githubReposData]
+  )
+
   const selectedRepo = useMemo(() => {
-    if (!existingConnection) return undefined
-    return (githubReposData as any[])?.find(
-      (r) => r.id?.toString() === existingConnection.repository.id?.toString()
-    )
-  }, [existingConnection, githubReposData])
+    return (githubReposData as any[])?.find((r) => r.id.toString() === selectedRepoId)
+  }, [githubReposData, selectedRepoId])
+
+  // derived connection & repo values from queries
+  // existingConnection comes from the connections query (see below)
+  // selectedRepo is derived from the repo list using existingConnection
+  const [isGitBranchValid, setIsGitBranchValid] = useState<boolean>(true)
 
   const { mutate: createBranch } = useBranchCreateMutation()
   const { mutate: updateBranch } = useBranchUpdateMutation()
@@ -131,7 +122,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const isBranchingEnabled = selectedProject?.is_branch_enabled ?? false
 
   const { mutate: createConnection, isLoading: isCreatingConnection } =
-    useGitHubConnectionCreateMutation()
+    useGitHubConnectionCreateMutation({})
 
   const { mutateAsync: deleteConnection } = useGitHubConnectionDeleteMutation()
 
@@ -140,12 +131,11 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     useCheckGithubBranchValidity({ onError: () => {} })
 
   const { mutate: updateConnectionSettings, isLoading: isUpdatingConnection } =
-    useGitHubConnectionUpdateMutation({
-      onSuccess: () => toast.success('Updated connection settings'),
-    })
+    useGitHubConnectionUpdateMutation()
 
   const FormSchema = z
     .object({
+      repo: z.string().optional(),
       autoBranchingEnabled: z.boolean().default(false),
       branchName: z.string(),
       supabaseDirectory: z.string().default(''),
@@ -154,6 +144,13 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     })
     .superRefine(async (val, ctx) => {
       if (val.autoBranchingEnabled) {
+        if (!selectedRepo) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Please select a repository',
+            path: ['repo'],
+          })
+        }
         if (val.branchName.length === 0) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -192,7 +189,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     reValidateMode: 'onChange',
     defaultValues: {
       autoBranchingEnabled: false,
-      branchName: selectedRepo?.default_branch ?? 'main',
+      branchName: 'main',
       supabaseDirectory: '',
       supabaseChangesOnly: false,
       branchLimit: '50',
@@ -200,31 +197,32 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   })
 
   const autoBranchingEnabled = form.watch('autoBranchingEnabled')
-
   const prodBranch = existingBranches?.find((b: any) => b.is_default)
-  const currentGitBranch = prodBranch?.git_branch
-  const isCurrentlyEnabled = prodBranch
-    ? Boolean(currentGitBranch && currentGitBranch.trim().length > 0)
-    : false
+  const isCurrentlyEnabled = Boolean(existingConnection)
 
-  const formDisabled = !(existingConnection && selectedRepo && autoBranchingEnabled)
+  let submitButtonText = 'Save'
+  if (autoBranchingEnabled !== isCurrentlyEnabled) {
+    submitButtonText = autoBranchingEnabled ? 'Enable' : 'Disable'
+  }
 
   // Reset form whenever the repo / connection / branches change
   useEffect(() => {
     if (visible) {
-      const isAutoBranchingEnabled = prodBranch
-        ? Boolean(prodBranch.git_branch && prodBranch.git_branch.trim().length > 0)
-        : false
+      const isAutoBranchingEnabled = Boolean(existingConnection)
 
-      if (selectedRepo) {
+      if (existingConnection) {
         const defaults = {
           autoBranchingEnabled: isAutoBranchingEnabled,
-          branchName: prodBranch?.git_branch ?? selectedRepo.default_branch ?? 'main',
+          repo: existingConnection.repository.name,
+          branchName: prodBranch?.git_branch ?? 'main',
           supabaseDirectory:
             (existingConnection as any)?.workdir ??
             (existingConnection as any)?.metadata?.supabaseConfig?.supabaseDirectory ??
             '',
-          supabaseChangesOnly: false,
+          supabaseChangesOnly:
+            (existingConnection as any)?.supabase_changes_only ??
+            (existingConnection as any)?.metadata?.supabaseConfig?.supabaseChangesOnly ??
+            false,
           branchLimit: String(
             ((existingConnection as any)?.branch_limit as number | undefined) ??
               (existingConnection as any)?.metadata?.supabaseConfig?.branchLimit ??
@@ -233,20 +231,37 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
         }
 
         form.reset(defaults)
+      } else {
+        form.reset({
+          autoBranchingEnabled: isAutoBranchingEnabled,
+          repo: '',
+          branchName: 'main',
+          supabaseDirectory: '',
+          supabaseChangesOnly: false,
+          branchLimit: '50',
+        })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRepo?.id, existingConnection?.id, existingBranches, visible, prodBranch])
+  }, [existingConnection?.id, existingBranches, visible, prodBranch])
+
+  useEffect(() => {
+    if (selectedRepo && !existingConnection) {
+      form.setValue('repo', selectedRepo.name)
+      form.setValue('branchName', selectedRepo.default_branch ?? 'main')
+    }
+  }, [selectedRepo, existingConnection, form])
 
   // This saves connection settings and creates/updates branches which also enables branching if it's not already enabled
-  const handleSave = (data: z.infer<typeof FormSchema>) => {
+  const executeSave = async (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref missing')
-    if (!selectedRepo) return console.error('Repo not selected')
-    if (!existingConnection) return console.error('Connection missing')
+    if (!selectedOrganization) return console.error('Organization not selected')
 
     const defaultBranch = data.branchName
 
     if (data.autoBranchingEnabled) {
+      if (!selectedRepo) return toast.error('Please select a repository to connect to.')
+
       if (!isBranchingEnabled) {
         // create production branch (enables branching)
         createBranch({
@@ -264,60 +279,71 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
           })
         }
       }
-    } else if (isBranchingEnabled) {
-      if (prodBranch?.id) {
-        updateBranch({
-          id: prodBranch.id,
-          projectRef,
-          branchName: prodBranch.name ?? 'main',
-          gitBranch: '',
+
+      if (existingConnection) {
+        if (existingConnection.repository.id.toString() !== selectedRepo.id.toString()) {
+          await deleteConnection({
+            organizationId: selectedOrganization.id,
+            connectionId: existingConnection.id,
+          })
+          createConnection({
+            organizationId: selectedOrganization.id,
+            connection: {
+              installation_id: selectedRepo.installation_id!,
+              project_ref: projectRef,
+              repository_id: Number(selectedRepo.id),
+            },
+          })
+        } else {
+          updateConnectionSettings({
+            connectionId: existingConnection.id,
+            organizationId: selectedOrganization.id,
+            workdir: data.supabaseDirectory,
+            supabaseChangesOnly: data.supabaseChangesOnly,
+            branchLimit: Number(data.branchLimit),
+          })
+        }
+      } else {
+        createConnection({
+          organizationId: selectedOrganization.id,
+          connection: {
+            installation_id: selectedRepo.installation_id!,
+            project_ref: projectRef,
+            repository_id: Number(selectedRepo.id),
+          },
         })
       }
-    }
-
-    if (selectedOrganization?.id) {
-      updateConnectionSettings({
-        connectionId: existingConnection.id,
-        organizationId: selectedOrganization.id,
-        workdir: data.supabaseDirectory,
-        supabaseChangesOnly: data.supabaseChangesOnly,
-        branchLimit: Number(data.branchLimit),
-      })
-    }
-
-    sidePanelStateSnapshot.setGithubConnectionsOpen(false)
-  }
-
-  const createGithubConnection = async (variables: IntegrationConnectionsCreateVariables) => {
-    if (!selectedOrganization?.id) {
-      throw new Error('No organization id')
-    }
-    if (!variables.new) {
-      throw new Error('No new connection')
-    }
-
-    if (existingConnection) {
-      // remove existing connection so we can recreate it or update it
-      try {
+      toast.success('Automatic branching enabled')
+    } else {
+      if (existingConnection) {
         await deleteConnection({
           organizationId: selectedOrganization.id,
           connectionId: existingConnection.id,
         })
-      } catch (_) {
-        /* handled in mutation */
+        toast.success('Automatic branching disabled')
       }
     }
-
-    createConnection({
-      organizationId: selectedOrganization.id,
-      connection: variables.new,
-    })
+    setIsConfirmingBranchChange(false)
+    sidePanelStateSnapshot.setGithubConnectionsOpen(false)
   }
 
-  let submitButtonText = 'Save'
+  const handleSave = (data: z.infer<typeof FormSchema>) => {
+    const originalBranchName = prodBranch?.git_branch
 
-  if (isCurrentlyEnabled !== autoBranchingEnabled) {
-    submitButtonText = autoBranchingEnabled ? 'Save and enable' : 'Save and disable'
+    if (
+      existingConnection &&
+      originalBranchName &&
+      data.branchName !== originalBranchName &&
+      data.autoBranchingEnabled
+    ) {
+      setIsConfirmingBranchChange(true)
+    } else {
+      executeSave(data)
+    }
+  }
+
+  const onConfirmBranchChange = async () => {
+    await executeSave(form.getValues())
   }
 
   return (
@@ -337,9 +363,28 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                 your GitHub repository.
               </SheetDescription>
             </SheetHeader>
+
             <SheetSection className="py-8">
-              {/* Connected repo section */}
-              <Label className="block mb-4">Connected Repo</Label>
+              <FormField_Shadcn_
+                control={form.control}
+                name="autoBranchingEnabled"
+                render={({ field }) => (
+                  <FormItemLayout
+                    className={'mb-4'}
+                    layout="flex-row-reverse"
+                    label="Enable automatic branching"
+                    description="Automatically create and merge preview branches from Pull Requests."
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!gitHubAuthorization}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
 
               {/* GitHub authorization prompt if needed */}
               {gitHubAuthorization === null ? (
@@ -359,96 +404,103 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                     Authorize GitHub
                   </Button>
                 </div>
-              ) : existingConnection ? (
-                <Card>
-                  <CardContent className="flex items-center gap-2 text-sm">
-                    <div className="flex flex-1 items-center gap-2">
-                      <Github size={16} className="text-foreground-light" />
-                      <span>{existingConnection.repository.name}</span>
-                    </div>
-                    <Button
-                      type="default"
-                      loading={isCreatingConnection}
-                      onClick={async () => {
-                        if (!selectedOrganization?.id || !existingConnection || !projectRef) return
-                        try {
-                          await deleteConnection({
-                            organizationId: selectedOrganization.id,
-                            connectionId: existingConnection.id,
-                          })
-                          if (prodBranch?.id && isCurrentlyEnabled) {
-                            updateBranch({
-                              id: prodBranch.id,
-                              projectRef,
-                              branchName: prodBranch.name ?? 'main',
-                              gitBranch: '',
-                            })
-                          }
-                        } catch (_) {
-                          /* handled in mutation */
-                        }
-                      }}
-                    >
-                      Disconnect
-                    </Button>
-                  </CardContent>
-                </Card>
               ) : (
-                <ProjectLinker
-                  defaultSupabaseProjectRef={projectRef}
-                  foreignProjects={githubRepos}
-                  supabaseProjects={supabaseProjects}
-                  onCreateConnections={createGithubConnection}
-                  isLoading={isCreatingConnection}
-                  loadingForeignProjects={isLoadingGitHubRepos}
-                  loadingSupabaseProjects={isLoadingSupabaseProjects}
-                  integrationIcon={GITHUB_ICON}
-                  choosePrompt="Choose GitHub Repo"
-                  showNoEntitiesState={false}
-                  mode="GitHub"
-                />
-              )}
-
-              <div className="mt-4">
-                {/* Global enable toggle which just sets the git branch to empty string if disabled */}
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="autoBranchingEnabled"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      className={cn(
-                        'mb-4',
-                        !existingConnection && 'opacity-25 pointer-events-none'
-                      )}
-                      layout="flex-row-reverse"
-                      label="Enable automatic branching"
-                      description="Automatically create and merge preview branches from Pull Requests."
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={!existingConnection}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
-                {/* Branch / connection settings form */}
                 <div
                   className={cn(
                     'flex flex-col gap-4',
-                    formDisabled && 'opacity-25 pointer-events-none'
+                    !autoBranchingEnabled && 'opacity-25 pointer-events-none'
                   )}
                 >
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="repo"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Connected Repo"
+                        description="The GitHub repository you want to connect to."
+                      >
+                        <FormControl_Shadcn_>
+                          <Popover_Shadcn_
+                            open={foreignProjectsComboBoxOpen}
+                            onOpenChange={setForeignProjectsComboboxOpen}
+                          >
+                            <PopoverTrigger_Shadcn_ asChild>
+                              <Button
+                                type="default"
+                                block
+                                disabled={isLoadingGitHubRepos || !autoBranchingEnabled}
+                                loading={isLoadingGitHubRepos}
+                                className="justify-start h-[34px]"
+                                icon={<Github size={16} className="text-foreground-light" />}
+                                iconRight={
+                                  <span className="grow flex justify-end">
+                                    <ChevronDown />
+                                  </span>
+                                }
+                              >
+                                {selectedRepo?.name ?? 'Choose a repository'}
+                              </Button>
+                            </PopoverTrigger_Shadcn_>
+                            <PopoverContent_Shadcn_
+                              className="p-0 !w-72"
+                              side="bottom"
+                              align="center"
+                            >
+                              <Command_Shadcn_>
+                                <CommandInput_Shadcn_ placeholder="Search for a repository" />
+                                <CommandList_Shadcn_ className="!max-h-[170px]">
+                                  <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+                                  <CommandGroup_Shadcn_>
+                                    {githubRepos.map((repo) => (
+                                      <CommandItem_Shadcn_
+                                        key={repo.id}
+                                        value={repo.name}
+                                        className="flex gap-2 items-center"
+                                        onSelect={() => {
+                                          if (repo.id === selectedRepoId) {
+                                            setForeignProjectsComboboxOpen(false)
+                                            return
+                                          }
+                                          const newRepoData = (githubReposData as any[])?.find(
+                                            (r) => r.id.toString() === repo.id
+                                          )
+                                          form.reset({
+                                            autoBranchingEnabled:
+                                              form.getValues('autoBranchingEnabled'),
+                                            repo: newRepoData.name,
+                                            branchName: newRepoData.default_branch ?? 'main',
+                                            supabaseDirectory: '',
+                                            supabaseChangesOnly: false,
+                                            branchLimit: '50',
+                                          })
+                                          setSelectedRepoId(repo.id)
+                                          setForeignProjectsComboboxOpen(false)
+                                        }}
+                                      >
+                                        <Github size={16} className="text-foreground-light" />
+                                        <span className="truncate" title={repo.name}>
+                                          {repo.name}
+                                        </span>
+                                      </CommandItem_Shadcn_>
+                                    ))}
+                                  </CommandGroup_Shadcn_>
+                                </CommandList_Shadcn_>
+                              </Command_Shadcn_>
+                            </PopoverContent_Shadcn_>
+                          </Popover_Shadcn_>
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+
                   <FormField_Shadcn_
                     control={form.control}
                     name="branchName"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        label="Production branch name"
+                        label="Production git branch name"
                         description="Migrations will be applied to this branch on every commit"
                       >
                         <div className="relative w-full">
@@ -456,7 +508,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                             <Input_Shadcn_
                               {...field}
                               autoComplete="off"
-                              disabled={formDisabled || !autoBranchingEnabled}
+                              disabled={!existingConnection || !autoBranchingEnabled}
                             />
                           </FormControl_Shadcn_>
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
@@ -487,7 +539,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                             {...field}
                             placeholder="supabase"
                             autoComplete="off"
-                            disabled={formDisabled}
+                            disabled={!existingConnection || !autoBranchingEnabled}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
@@ -509,7 +561,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                             {...field}
                             type="number"
                             autoComplete="off"
-                            disabled={formDisabled}
+                            disabled={!existingConnection || !autoBranchingEnabled}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
@@ -530,14 +582,14 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                           <Switch
                             checked={field.value}
                             onCheckedChange={(val) => field.onChange(val)}
-                            disabled={formDisabled}
+                            disabled={!existingConnection || !autoBranchingEnabled}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
                 </div>
-              </div>
+              )}
             </SheetSection>
             <SheetFooter className="flex justify-end gap-2">
               <Button
@@ -551,14 +603,35 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                 type="primary"
                 size="small"
                 htmlType="submit"
-                loading={isUpdatingConnection}
-                disabled={isUpdatingConnection || isCreatingConnection || isCheckingBranch}
+                loading={isUpdatingConnection || isCreatingConnection}
+                disabled={
+                  isUpdatingConnection ||
+                  isCreatingConnection ||
+                  isCheckingBranch ||
+                  isLoadingGitHubAuthorization ||
+                  isLoadingGitHubRepos
+                }
               >
                 {submitButtonText}
               </Button>
             </SheetFooter>
           </form>
         </Form_Shadcn_>
+        <ConfirmationModal
+          variant="warning"
+          visible={isConfirmingBranchChange}
+          title="Changing production git branch"
+          confirmLabel="Confirm"
+          size="medium"
+          onCancel={() => setIsConfirmingBranchChange(false)}
+          onConfirm={onConfirmBranchChange}
+          loading={isUpdatingConnection || isCreatingConnection}
+        >
+          <p className="text-sm text-foreground-light">
+            Open pull requests will only update your Supabase project on merge if the git base
+            branch matches this new production git branch.
+          </p>
+        </ConfirmationModal>
       </SheetContent>
     </Sheet>
   )
