@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import JWTSecretKeysTable from 'components/interfaces/JwtSecrets/jwt-secret-keys-table'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
@@ -10,7 +9,6 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import type { NextPageWithLayout } from 'types'
 
 const JWTSigningKeysPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
   const isPermissionsLoaded = usePermissionsLoaded()
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'auth_signing_keys')
 

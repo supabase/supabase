@@ -15,8 +15,8 @@ const JWTKeysLayout = ({ children }: PropsWithChildren) => {
     },
     {
       label: 'JWT Signing Keys (Coming Soon)',
-      href: `/project/${projectRef}/settings/jwt/new`,
-      id: 'new-jwt-keys',
+      href: `/project/${projectRef}/settings/jwt/signing-keys`,
+      id: 'signing-keys',
     },
   ]
 
