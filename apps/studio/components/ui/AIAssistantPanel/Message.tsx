@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm'
 import { AiIconAnimation, cn, markdownComponents, WarningIcon } from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
-import { Heading3, InlineCode, Link, ListItem, MarkdownPre, OrderedList } from './MessageMarkdown'
+import { Heading3, InlineCode, ListItem, MarkdownPre, OrderedList } from './MessageMarkdown'
 
 interface MessageContextType {
   isLoading: boolean
@@ -21,7 +21,7 @@ const baseMarkdownComponents: Partial<Components> = {
   li: ListItem,
   h3: Heading3,
   code: InlineCode,
-  a: Link,
+  img: ({ src }) => <span className="text-foreground-light font-mono">[Image: {src}]</span>,
 }
 
 interface MessageProps {

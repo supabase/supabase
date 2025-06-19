@@ -50,18 +50,6 @@ export const InlineCode = memo(
 )
 InlineCode.displayName = 'InlineCode'
 
-export const Link = memo(({ href, children }: { href?: string; children: ReactNode }) => (
-  <a
-    target="_blank"
-    rel="noopener noreferrer"
-    href={href}
-    className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-  >
-    {children}
-  </a>
-))
-Link.displayName = 'Link'
-
 const MemoizedQueryBlock = memo(
   ({
     sql,
