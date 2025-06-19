@@ -1,6 +1,5 @@
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import Link from 'next/link'
-import { Button } from 'ui'
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 
@@ -17,15 +16,9 @@ export const SessionTimeoutModal = ({
 }: SessionTimeoutModalProps) => {
   useEffect(() => {
     if (visible) {
-      Sentry.captureMessage('Session error (detected)', 'warning')
-      console.log('logging to sentry now')
+      Sentry.captureMessage('Session error detected', 'warning')
     }
   }, [visible])
-
-  const handleSignIn = () => {
-    Sentry.captureMessage('Session error (user tries logging in)', 'warning')
-    redirectToSignIn()
-  }
 
   return (
     <ConfirmationModal
@@ -33,17 +26,19 @@ export const SessionTimeoutModal = ({
       title="Session timed out"
       confirmLabel="Sign in again"
       onCancel={onClose}
-      onConfirm={handleSignIn}
+      onConfirm={redirectToSignIn}
+      alert={{
+        base: { variant: 'warning' },
+        title: `Your session has timed out`,
+        description: `Please try to sign in again. If you are not able to sign in again, please contact Support.`,
+      }}
     >
       <p className="text-sm text-foreground-light">
-        Your session has timed out. Please try to sign in again.
-      </p>
-      <p className="text-sm text-foreground-light">
-        If you are not able to sign in again, please{' '}
+        Consider{' '}
         <Link href="/support/new" className="underline">
-          contact Support
-        </Link>
-        .
+          generating a HAR file
+        </Link>{' '}
+        from your session to help Support pinpoint the issue.
       </p>
     </ConfirmationModal>
   )
