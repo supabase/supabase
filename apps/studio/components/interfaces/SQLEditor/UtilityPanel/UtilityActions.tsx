@@ -134,32 +134,30 @@ const UtilityActions = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {IS_PLATFORM && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {isFavorite ? (
-                <Button
-                  type="text"
-                  size="tiny"
-                  onClick={removeFavorite}
-                  className="px-1"
-                  icon={<Heart className="fill-brand stroke-none" />}
-                />
-              ) : (
-                <Button
-                  type="text"
-                  size="tiny"
-                  onClick={addFavorite}
-                  className="px-1"
-                  icon={<Heart className="fill-none stroke-foreground-light" />}
-                />
-              )}
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              {isFavorite ? 'Remove from' : 'Add to'} favorites
-            </TooltipContent>
-          </Tooltip>
-        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {isFavorite ? (
+              <Button
+                type="text"
+                size="tiny"
+                onClick={removeFavorite}
+                className="px-1"
+                icon={<Heart className="fill-brand stroke-none" />}
+              />
+            ) : (
+              <Button
+                type="text"
+                size="tiny"
+                onClick={addFavorite}
+                className="px-1"
+                icon={<Heart className="fill-none stroke-foreground-light" />}
+              />
+            )}
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {isFavorite ? 'Remove from' : 'Add to'} favorites
+          </TooltipContent>
+        </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>

@@ -1,6 +1,7 @@
 import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { readAllSnippets, readFolders } from '../_helpers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -22,7 +23,12 @@ type GetResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  return res.status(200).json({ data: { folders: [], contents: [] } })
+  const folders = (await readFolders()).filter((f) => f.parent_id === req.query.id)
+
+  const snippetsData = await readAllSnippets()
+  const snippets = snippetsData.filter((s) => s.folder_id === req.query.id)
+
+  return res.status(200).json({ data: { folders: folders, contents: snippets } })
 }
 
 type PatchResponseData =

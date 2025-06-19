@@ -1,6 +1,7 @@
 import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { createFolder, deleteFolder, readAllSnippets, readFolders } from '../_helpers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -23,44 +24,37 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type GetResponseData =
   paths['/platform/projects/{ref}/content/folders']['get']['responses']['200']['content']['application/json']
 
+type GetRequestData =
+  paths['/platform/projects/{ref}/content/folders']['get']['parameters']['query']
+
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  // Platform specific endpoint
-  const snippets = [
-    {
-      id: '1',
-      owner_id: 1,
-      name: 'SQL Query',
-      description: '',
-      type: 'sql' as const,
-      visibility: 'user' as const,
-      content: {
-        content_id: '1.0',
-        sql: `select * from
-  (select version()) as version,
-  (select current_setting('server_version_num')) as version_number;`,
-        schema_version: '1',
-        favorite: false,
-      },
-      inserted_at: '',
-      updated_at: '',
-      project_id: 0,
-      favorite: false,
-    },
-  ]
-  return res.status(200).json({
-    data: {
-      folders: [],
-      contents: snippets,
-    },
-  })
+  const folders = await readFolders()
+  const snippets = (await readAllSnippets()).filter((s) => s.folder_id === null)
+
+  res.status(200).json({ data: { folders, contents: snippets } })
 }
 
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  return res.status(200).json({})
+type PostResponseData =
+  paths['/platform/projects/{ref}/content/folders']['post']['responses']['201']['content']['application/json']
+
+type PostRequestData =
+  paths['/platform/projects/{ref}/content/folders']['post']['requestBody']['content']['application/json']
+const handlePost = async (req: NextApiRequest, res: NextApiResponse<PostResponseData>) => {
+  const { name, parent_id } = req.body as PostRequestData
+
+  const folder = await createFolder({
+    name,
+    parent_id: parent_id || null,
+    owner_id: 1,
+    project_id: 1,
+  })
+
+  return res.status(200).json(folder)
 }
 
 const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
+  const { id } = req.query
+  await deleteFolder(id as string)
+
   return res.status(200).json({})
 }
