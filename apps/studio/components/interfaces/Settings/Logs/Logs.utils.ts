@@ -342,7 +342,7 @@ SELECT
   timestamp_trunc(t.timestamp, ${trunc}) as timestamp,
   count(CASE WHEN NOT (${errorCondition} OR ${warningCondition}) THEN 1 END) as ok_count,
   count(CASE WHEN ${errorCondition} THEN 1 END) as error_count,
-  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count
+  count(CASE WHEN ${warningCondition} THEN 1 END) as warning_count,
 FROM
   ${table} t
   ${joins}
