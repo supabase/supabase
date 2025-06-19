@@ -58,7 +58,7 @@ jobs:
         working-directory: ./apps/studio
 
       - name: Upload coverage results to Coveralls
-        uses: coverallsapp/github-action@2.3.6
+        uses: coverallsapp/github-action@v2.3.6
         with:
           parallel: true
           flag-name: studio-tests
@@ -73,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
-        uses: coverallsapp/github-action@2.3.6
+        uses: coverallsapp/github-action@v2.3.6
         with:
           parallel-finished: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
