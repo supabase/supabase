@@ -30,12 +30,17 @@ export const SessionTimeoutModal = ({
       alert={{
         base: { variant: 'warning' },
         title: `Your session has timed out`,
-        description: `Please try to sign in again. If you are not able to sign in again, please contact Support.`,
+        description: `Please try signing in again. If you are not able to sign in again, please contact Support.`,
       }}
     >
       <p className="text-sm text-foreground-light">
         Consider{' '}
-        <Link href="/support/new" className="underline">
+        <Link
+          href="https://github.com/orgs/supabase/discussions/36540"
+          target="_blank"
+          rel="noreferrer"
+          className="underline"
+        >
           generating a HAR file
         </Link>{' '}
         from your session to help Support pinpoint the issue.
