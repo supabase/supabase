@@ -182,7 +182,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       }
     },
     onError: (data) => {
-      toast.error(`Failed to create organization: ${data.message}`)
+      toast.error(data.message, { duration: 10_000 })
       resetPaymentMethod()
       setNewOrgLoading(false)
     },
@@ -209,7 +209,9 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       })
     } else {
       // If the payment intent is not successful, we reset the payment method and show an error
-      toast.error(`Could not confirm payment. Please try again or use a different card.`)
+      toast.error(`Could not confirm payment. Please try again or use a different card.`, {
+        duration: 10_000,
+      })
       resetPaymentMethod()
       setNewOrgLoading(false)
     }
@@ -645,7 +647,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
             onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
             paymentMethodId={paymentMethod.id}
             onError={(err) => {
-              toast.error(`Failed to confirm payment: ${err.message}`)
+              toast.error(err.message, { duration: 10_000 })
               setNewOrgLoading(false)
               resetPaymentMethod()
             }}
