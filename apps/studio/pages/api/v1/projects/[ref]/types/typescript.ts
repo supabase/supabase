@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PG_META_URL } from 'lib/constants'
-import apiWrapper from 'lib/api/apiWrapper'
+
+import { fetchGet } from 'data/fetchers'
 import { constructHeaders } from 'lib/api/apiHelpers'
-import { get } from 'lib/common/fetch'
+import apiWrapper from 'lib/api/apiWrapper'
+import { PG_META_URL } from 'lib/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -40,14 +41,15 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const headers = constructHeaders(req.headers)
 
-  const response = await get(
+  const response = await fetchGet(
     `${PG_META_URL}/generators/typescript?included_schema=${includedSchema}&excluded_schemas=${excludedSchema}`,
     { headers }
   )
 
   if (response.error) {
-    return res.status(400).json({ error: response.error })
+    const { code, message } = response.error
+    return res.status(code).json({ message })
+  } else {
+    return res.status(200).json(response)
   }
-
-  return res.status(200).json({ types: response })
 }
