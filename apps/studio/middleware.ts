@@ -1,6 +1,5 @@
 import { IS_PLATFORM } from 'lib/constants'
-import { NextRequest, NextResponse } from 'next/server'
-
+import type { NextRequest } from 'next/server'
 export const config = {
   matcher: '/api/:function*',
 }
@@ -21,17 +20,10 @@ const HOSTED_SUPPORTED_API_URLS = [
 ]
 
 export function middleware(request: NextRequest) {
-  // Use pathname for matching, ignore query parameters
-  const pathname = request.nextUrl.pathname
-
-  if (IS_PLATFORM && !HOSTED_SUPPORTED_API_URLS.includes(pathname)) {
-    // Return a NextResponse for API routes
-    return NextResponse.json(
+  if (IS_PLATFORM && !HOSTED_SUPPORTED_API_URLS.some((url) => request.url.endsWith(url))) {
+    return Response.json(
       { success: false, message: 'Endpoint not supported on hosted' },
       { status: 404 }
     )
   }
-
-  // Allow the request to proceed if it matches or if not IS_PLATFORM
-  return NextResponse.next()
 }

@@ -53,14 +53,12 @@ export const TimestampInfo = ({
   displayAs = 'local',
   format = 'DD MMM  HH:mm:ss',
   labelFormat = 'DD MMM HH:mm:ss',
-  children,
 }: {
   className?: string
   utcTimestamp: string | number
   displayAs?: 'local' | 'utc'
   format?: string
   labelFormat?: string
-  children?: React.ReactNode
 }) => {
   const local = timestampLocalFormatter({ utcTimestamp, format })
   const utc = timestampUtcFormatter({ utcTimestamp, format })
@@ -140,13 +138,11 @@ export const TimestampInfo = ({
         ref={triggerRef}
         className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
       >
-        {children ?? (
-          <span>
-            {displayAs === 'local'
-              ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
-              : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
-          </span>
-        )}
+        <span>
+          {displayAs === 'local'
+            ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
+            : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
+        </span>
       </TooltipTrigger>
       <TooltipContent align={align} side="right" className="font-mono p-0 py-1 min-w-80">
         <TooltipRow label="UTC" value={utc} />

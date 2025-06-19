@@ -12,22 +12,18 @@ import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
 
 interface LogsLayoutProps {
   title?: string
-  hideSidebar?: boolean
 }
 
-const LogsLayout = ({
-  title,
-  children,
-  hideSidebar = false,
-}: PropsWithChildren<LogsLayoutProps>) => {
+const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => {
+  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckProjectPermissions(
+    PermissionAction.ANALYTICS_READ,
+    'logflare'
+  )
+
   const router = useRouter()
   const [_, setLastLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
     router.pathname.split('/logs/')[1] || ''
-  )
-  const { isLoading, can: canUseLogsExplorer } = useAsyncCheckProjectPermissions(
-    PermissionAction.ANALYTICS_READ,
-    'logflare'
   )
 
   useEffect(() => {
@@ -54,11 +50,7 @@ const LogsLayout = ({
   }
 
   return (
-    <ProjectLayout
-      title={title}
-      product="Logs & Analytics"
-      productMenu={hideSidebar ? null : <LogsSidebarMenuV2 />}
-    >
+    <ProjectLayout title={title} product="Logs & Analytics" productMenu={<LogsSidebarMenuV2 />}>
       {children}
     </ProjectLayout>
   )
