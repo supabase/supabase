@@ -22,8 +22,30 @@ function analyticsIntervalToBQGranularity(interval: AnalyticsInterval): BQGranul
   }
 }
 
+type MetricKey =
+  | 'ActiveUsers'
+  | 'SignInAttempts'
+  | 'PasswordResetRequests'
+  | 'TotalSignUpsByProvider'
+  | 'TotalSignInsByProvider'
+  | 'FailedAuthAttempts'
+  | 'NewUserGrowthRate'
+  | 'UserRetention'
+  | 'SessionsCreated'
+  | 'SessionsExpired'
+  | 'SignInLatency'
+  | 'SignUpLatency'
+  | 'TokenRefreshLatency'
+  | 'TokenVerificationSpeed'
+  | 'AuthProviderResponseTimes'
+  | 'SuspiciousActivity'
+  | 'RateLimitedRequests'
+  | 'TokenRevocations'
+  | 'MFAUsage'
+  | 'ErrorsByStatus'
+
 const metricSqlMap: Record<
-  string,
+  MetricKey,
   (start: string, end: string, interval: AnalyticsInterval) => string
 > = {
   ActiveUsers: (start, end, interval) => {
@@ -188,7 +210,11 @@ export function useAuthReport({
   interval: AnalyticsInterval
   enabled?: boolean
 }) {
-  const sql = metricSqlMap[metricKey]?.(startDate, endDate, interval)
+  const sql = metricSqlMap[metricKey as MetricKey]?.(startDate, endDate, interval) || ''
+
+  if (!sql) {
+    console.error('No SQL found for metric:', metricKey)
+  }
 
   const _enabled = Boolean(projectRef && sql && enabled)
 

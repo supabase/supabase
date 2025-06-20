@@ -12,10 +12,10 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
+import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 
-import { useAuthReport } from 'data/reports/auth-report-query'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { getAuthReportAttributes } from 'data/reports/auth-charts'
@@ -164,7 +164,6 @@ const AuthUsage = () => {
               <ComposedChartHandler
                 key={`${attr.id}-${i}`}
                 {...attr}
-                projectRef={ref}
                 attributes={attr.attributes as MultiAttribute[]}
                 interval={dateRange.interval}
                 startDate={dateRange?.period_start?.date}

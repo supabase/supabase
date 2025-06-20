@@ -31,13 +31,16 @@ export interface ReportAttributes {
   hideHighlightedValue?: boolean
 }
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line' | 'combine'
+export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
 
 export type MultiAttribute = {
   attribute: string
   provider: Provider
   label?: string
-  color?: string
+  color?: {
+    light: string
+    dark: string
+  }
   stackId?: string
   format?: string
   description?: string
@@ -65,6 +68,7 @@ export type MultiAttribute = {
   strokeDasharray?: string
   className?: string
   hide?: boolean
+  enabled?: boolean
 }
 
 interface CustomIconProps {
