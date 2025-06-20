@@ -189,7 +189,7 @@ export const BranchRow = ({
             },
           }}
         >
-          <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
+          <Link href={`/project/${branch.project_ref}`} title={branch.name}>
             {branch.name}
           </Link>
         </ButtonTooltip>

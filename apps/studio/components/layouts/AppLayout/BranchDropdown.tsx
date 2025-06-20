@@ -1,4 +1,12 @@
-import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle, Shield } from 'lucide-react'
+import {
+  AlertCircle,
+  Check,
+  ChevronsUpDown,
+  GitMerge,
+  ListTree,
+  MessageCircle,
+  Shield,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -24,6 +32,7 @@ import {
   cn,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const BranchLink = ({
   branch,
@@ -65,6 +74,7 @@ const BranchLink = ({
 export const BranchDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const gitlessBranching = useFlag('gitlessBranching')
   const projectDetails = useSelectedProject()
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
@@ -149,9 +159,33 @@ export const BranchDropdown = () => {
                         className="w-full flex items-center gap-2"
                       >
                         <ListTree size={14} strokeWidth={1.5} />
-                        <p>Manage branches</p>
+                        Manage branches
                       </Link>
                     </CommandItem_Shadcn_>
+                    {/* Show merge button only for non-main branches, gated by feature flag */}
+                    {gitlessBranching &&
+                      isBranch &&
+                      selectedBranch &&
+                      !selectedBranch.is_default && (
+                        <>
+                          <CommandItem_Shadcn_
+                            className="cursor-pointer w-full"
+                            onSelect={() => {
+                              setOpen(false)
+                              router.push(`/project/${ref}/merge`)
+                            }}
+                            onClick={() => setOpen(false)}
+                          >
+                            <Link
+                              href={`/project/${ref}/merge`}
+                              className="w-full flex items-center gap-2"
+                            >
+                              <GitMerge size={14} strokeWidth={1.5} />
+                              Review changes
+                            </Link>
+                          </CommandItem_Shadcn_>
+                        </>
+                      )}
                   </CommandGroup_Shadcn_>
                   <CommandSeparator_Shadcn_ />
                   <CommandGroup_Shadcn_>

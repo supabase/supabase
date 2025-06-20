@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { Check, DollarSign, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -46,6 +47,7 @@ interface CreateBranchModalProps {
 }
 
 export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
+  const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -77,6 +79,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
     onSuccess: (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       onClose()
+      router.push(`/project/${data.project_ref}`)
     },
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)
