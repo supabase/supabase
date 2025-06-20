@@ -4,9 +4,11 @@ import { useParams } from 'common'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
 export const useStorageReport = () => {
   const { ref: projectRef } = useParams()
+  const { timestampStart, timestampEnd } = useLogsUrlState()
 
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.storage.queries>(
     PRESET_CONFIG.storage.queries,
@@ -43,8 +45,16 @@ export const useStorageReport = () => {
       topCacheMisses: topCacheMisses.logData,
     },
     params: {
-      cacheHitRate: cacheHitRate.params,
-      topCacheMisses: topCacheMisses.params,
+      cacheHitRate: {
+        ...cacheHitRate.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
+      topCacheMisses: {
+        ...topCacheMisses.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
     },
     mergeParams: handleSetParams,
     isLoading,

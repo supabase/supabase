@@ -3,7 +3,7 @@ import { useLocalStorage } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
 import { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -12,6 +12,8 @@ import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LOGS_TABLES,
   TEMPLATES,
+  EXPLORER_DATEPICKER_HELPERS,
+  getDefaultHelper,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
 import {
   DatePickerToFrom,
@@ -76,7 +78,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>()
   const [editorId] = useState<string>(uuidv4())
-  const { timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
+  const { timestampStart, timestampEnd } = useLogsUrlState()
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [warehouseEditorId, setWarehouseEditorId] = useState<string>(uuidv4())
@@ -104,8 +106,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     logData,
     error,
     isLoading: logsLoading,
-    changeQuery,
     runQuery,
+    setParams,
   } = useLogsQuery(
     projectRef,
     {
@@ -184,51 +186,68 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
-  const handleRun = (value?: string | React.MouseEvent<HTMLButtonElement>) => {
-    const query = typeof value === 'string' ? value || editorValue : editorValue
+  const handleRun = useCallback(
+    (value?: string) => {
+      const sql = typeof value === 'string' ? value : editorValue
 
-    if (sourceType === 'warehouse') {
-      const whQuery = warehouseEditorValue
+      if (!sql) return
 
-      if (!warehouseCollections?.length) {
-        toast.error('You do not have any collections yet.')
-        return
+      if (sourceType === 'warehouse') {
+        const whQuery = warehouseEditorValue
+
+        if (!warehouseCollections?.length) {
+          toast.error('You do not have any collections yet.')
+          return
+        }
+
+        // Check that a collection name is included in the query
+        const collectionNames = warehouseCollections?.map((collection) => collection.name)
+        const collectionExists = collectionNames?.find((collectionName) =>
+          whQuery.includes(collectionName)
+        )
+
+        if (!collectionExists) {
+          toast.error('Please specify a collection name in the query')
+          return
+        }
+
+        // Check that the user is not trying to query logs tables and warehouse collections at the same time
+        const logsSources = Object.values(LOGS_TABLES)
+        const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
+
+        if (logsSourceExists) {
+          return toast.error('Cannot query logs tables from current query.')
+        }
+
+        runWarehouseQuery()
+        return router.push({
+          pathname: router.pathname,
+          query: { ...router.query, q: sql },
+        })
       }
 
-      // Check that a collection name is included in the query
-      const collectionNames = warehouseCollections?.map((collection) => collection.name)
-      const collectionExists = collectionNames?.find((collectionName) =>
-        whQuery.includes(collectionName)
-      )
-
-      if (!collectionExists) {
-        toast.error('Please specify a collection name in the query')
-        return
+      const currentParams = {
+        project: projectRef,
+        sql,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
       }
 
-      // Check that the user is not trying to query logs tables and warehouse collections at the same time
-      const logsSources = Object.values(LOGS_TABLES)
-      const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
+      setParams(currentParams)
+      runQuery()
 
-      if (logsSourceExists) {
-        return toast.error('Cannot query logs tables from current query.')
-      }
-
-      runWarehouseQuery()
-      return router.push({
-        pathname: router.pathname,
-        query: { ...router.query, q: query },
-      })
-    }
-
-    changeQuery(query)
-    runQuery()
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, q: query },
-    })
-    addRecentLogSqlSnippet({ sql: query })
-  }
+      addRecentLogSqlSnippet({ sql })
+    },
+    [
+      editorValue,
+      warehouseEditorValue,
+      sourceType,
+      warehouseCollections,
+      projectRef,
+      timestampStart,
+      timestampEnd,
+    ]
+  )
 
   const handleInsertSource = (source: string) => {
     if (sourceType === 'warehouse') {
@@ -305,16 +324,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setSaveModalOpen(!saveModalOpen)
   }
 
-  const handleDateChange = ({ to, from }: DatePickerToFrom) => {
-    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from, organization?.plan?.id)
-
-    if (shouldShowUpgradePrompt) {
-      setShowUpgradePrompt(!showUpgradePrompt)
-    } else {
-      setTimeRange(from || '', to || '')
-    }
-  }
-
   useEffect(() => {
     if (warehouseError) toast.error(warehouseError.message)
   }, [warehouseError])
@@ -354,6 +363,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
   }, [timestampStart, organization])
 
+  useEffect(() => {
+    console.log('editorValue', editorValue)
+  }, [editorValue])
+
   return (
     <div className="w-full h-full mx-auto">
       <ResizablePanelGroup
@@ -363,9 +376,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       >
         <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
-            defaultFrom={timestampStart || ''}
-            defaultTo={timestampEnd || ''}
-            onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
             warehouseCollections={warehouseCollections || []}
@@ -401,7 +411,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               editorRef={editorRef}
               language="pgsql"
               defaultValue={editorValue}
-              onInputChange={(v) => setEditorValue(v || '')}
+              onInputChange={(v) => {
+                setEditorValue(v || '')
+              }}
               actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           )}

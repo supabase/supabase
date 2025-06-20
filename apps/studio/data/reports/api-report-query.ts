@@ -8,11 +8,13 @@ import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import type { LogsEndpointParams } from 'components/interfaces/Settings/Logs/Logs.types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 
 export const useApiReport = () => {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+  const { timestampStart, timestampEnd } = useLogsUrlState()
 
   const identifier = state.selectedDatabaseId
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
@@ -121,13 +123,41 @@ export const useApiReport = () => {
       networkTraffic: networkTraffic.logData,
     },
     params: {
-      totalRequests: totalRequests.params,
-      errorCounts: errorCounts.params,
-      responseSpeed: responseSpeed.params,
-      topRoutes: topRoutes.params,
-      topErrorRoutes: topErrorRoutes.params,
-      topSlowRoutes: topSlowRoutes.params,
-      networkTraffic: networkTraffic.params,
+      totalRequests: {
+        ...totalRequests.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
+      errorCounts: {
+        ...errorCounts.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
+      responseSpeed: {
+        ...responseSpeed.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
+      topRoutes: {
+        ...topRoutes.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
+      topErrorRoutes: {
+        ...topErrorRoutes.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
+      topSlowRoutes: {
+        ...topSlowRoutes.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
+      networkTraffic: {
+        ...networkTraffic.params,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+      },
     },
     error: {
       totalRequest: totalRequests.error,

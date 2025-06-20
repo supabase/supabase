@@ -7,6 +7,7 @@ import DatePicker from 'react-datepicker'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -26,22 +27,47 @@ export type DatePickerValue = {
 }
 
 interface Props {
-  value: DatePickerValue
-  onSubmit: (args: DatePickerValue) => void
   helpers: DatetimeHelper[]
+  defaultHelper?: string
 }
 
-export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {
+export const LogsDatePicker = ({ helpers, defaultHelper }: PropsWithChildren<Props>) => {
+  const { timestampStart, timestampEnd, setTimeRange, selectedHelperId, setSelectedHelperId } =
+    useLogsUrlState()
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (defaultHelper) {
+      const found = helpers.find((h) => h.id === defaultHelper)
+      if (found) {
+        setSelectedHelperId(defaultHelper)
+      } else {
+        console.warn(
+          `[LogsDatePicker] defaultHelper id '${defaultHelper}' not found in helpers. Ignoring.`
+        )
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (selectedHelperId) {
+      const helper = helpers.find((h) => h.id === selectedHelperId)
+      if (helper) {
+        setTimeRange(helper.calcFrom(), helper.calcTo())
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedHelperId])
 
   // Reset the state when the popover closes
   useEffect(() => {
     if (!open) {
-      setStartDate(value.from ? new Date(value.from) : null)
-      setEndDate(value.to ? new Date(value.to) : new Date())
+      setStartDate(timestampStart ? new Date(timestampStart) : null)
+      setEndDate(timestampEnd ? new Date(timestampEnd) : new Date())
 
-      const fromDate = value.from ? new Date(value.from) : null
-      const toDate = value.to ? new Date(value.to) : null
+      const fromDate = timestampStart ? new Date(timestampStart) : null
+      const toDate = timestampEnd ? new Date(timestampEnd) : null
 
       setStartTime({
         HH: fromDate?.getHours().toString().padStart(2, '0') || '00',
@@ -60,24 +86,23 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
         ss: toDate?.getSeconds().toString().padStart(2, '0') || nowSS,
       })
     }
-  }, [open, value])
+  }, [open, timestampStart, timestampEnd])
 
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = helpers.find((h) => h.text === newValue)
-    if (onSubmit && selectedHelper) {
-      onSubmit({
-        to: selectedHelper.calcTo(),
-        from: selectedHelper.calcFrom(),
-        isHelper: true,
-        text: selectedHelper.text,
-      })
+    if (selectedHelper) {
+      setTimeRange(selectedHelper.calcFrom(), selectedHelper.calcTo())
+      setSelectedHelperId(selectedHelper.id)
     }
-
     setOpen(false)
   }
 
-  const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
-  const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
+  const [startDate, setStartDate] = useState<Date | null>(
+    timestampStart ? new Date(timestampStart) : null
+  )
+  const [endDate, setEndDate] = useState<Date | null>(
+    timestampEnd ? new Date(timestampEnd) : new Date()
+  )
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',
@@ -105,12 +130,8 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
     const finalFrom = new Date(from.setHours(+startTime.HH, +startTime.mm, +startTime.ss))
     const finalTo = new Date(to.setHours(+endTime.HH, +endTime.mm, +endTime.ss))
 
-    onSubmit({
-      from: finalFrom.toISOString(),
-      to: finalTo.toISOString(),
-      isHelper: false,
-    })
-
+    setTimeRange(finalFrom.toISOString(), finalTo.toISOString())
+    setSelectedHelperId('')
     setOpen(false)
   }
 
@@ -215,13 +236,17 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
+  const selectedHelper = helpers.find((h) => h.id === selectedHelperId)
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button type="default" icon={<Clock size={12} />}>
-          {value.isHelper
-            ? value.text
-            : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
+          {selectedHelper
+            ? selectedHelper.text
+            : timestampStart && timestampEnd
+              ? `${dayjs(timestampStart).format('DD MMM, HH:mm')} - ${dayjs(timestampEnd).format('DD MMM, HH:mm')}`
+              : helpers[0]?.text}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_
@@ -232,7 +257,10 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
       >
         <RadioGroup
           onValueChange={handleHelperChange}
-          value={value.isHelper ? value.text : ''}
+          value={(() => {
+            const selected = helpers.find((h) => h.id === selectedHelperId)
+            return selected ? selected.text : ''
+          })()}
           className="border-r p-2 flex flex-col gap-px"
         >
           {helpers.map((helper) => (
