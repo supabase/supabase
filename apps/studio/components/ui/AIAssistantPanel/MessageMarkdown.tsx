@@ -17,6 +17,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
+import Link from 'next/link'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Dashboards } from 'types'
 import {
@@ -41,6 +42,7 @@ import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
+import { defaultUrlTransform } from './Message.utils'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
@@ -66,6 +68,8 @@ InlineCode.displayName = 'InlineCode'
 
 export const Hyperlink = memo(({ href, children }: { href?: string; children: ReactNode }) => {
   const isExternalURL = !href?.startsWith('https://supabase.com/dashboard')
+  const safeUrl = defaultUrlTransform(href ?? '')
+  const isSafeUrl = safeUrl.length > 0
 
   return (
     <Dialog>
@@ -81,16 +85,33 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children: Re
       </DialogTrigger>
       <DialogContent size="small">
         <DialogHeader className="border-b">
-          <DialogTitle>Verify the link before navigating</DialogTitle>
+          <DialogTitle>
+            {isSafeUrl ? 'Verify the link before navigating' : 'Unsafe URL detected'}
+          </DialogTitle>
         </DialogHeader>
 
-        <DialogSection className="flex flex-col">
-          <p className="text-sm text-foreground-light">
-            This link will take you to the following URL:
-          </p>
-          <p className="text-sm text-foreground">{href}</p>
-          <p className="text-sm text-foreground-light mt-2">Are you sure you want to head there?</p>
-        </DialogSection>
+        {isSafeUrl ? (
+          <DialogSection className="flex flex-col">
+            <p className="text-sm text-foreground-light">
+              This link will take you to the following URL:
+            </p>
+            <p className="text-sm text-foreground">{safeUrl}</p>
+            <p className="text-sm text-foreground-light mt-2">
+              Are you sure you want to head there?
+            </p>
+          </DialogSection>
+        ) : (
+          <DialogSection className="flex flex-col">
+            <p className="text-sm text-foreground-light">
+              We have detected that the following URL is unsafe:
+            </p>
+            <p className="text-sm text-foreground">{href}</p>
+            <p className="text-sm text-foreground-light mt-2">
+              If you'd still like to proceed, you may copy the URL to open it directly in your
+              browser.
+            </p>
+          </DialogSection>
+        )}
 
         <DialogFooter>
           <DialogClose asChild>
@@ -98,17 +119,19 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children: Re
               Cancel
             </Button>
           </DialogClose>
-          <DialogClose asChild>
-            <Button asChild type="primary" className="opacity-100">
-              <a
-                href={href}
-                target={isExternalURL ? '_blank' : '_self'}
-                rel={isExternalURL ? 'noreferrer noopener' : undefined}
-              >
-                Head to link
-              </a>
-            </Button>
-          </DialogClose>
+          {isSafeUrl && (
+            <DialogClose asChild>
+              <Button asChild type="primary" className="opacity-100">
+                {isExternalURL ? (
+                  <a href={safeUrl} target="_blank" rel="noreferrer noopener">
+                    Head to link
+                  </a>
+                ) : (
+                  <Link href={safeUrl}>Head to link</Link>
+                )}
+              </Button>
+            </DialogClose>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
