@@ -60,10 +60,13 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const showChartsV2 = useFlag('reportsDatabaseV2')
+  const isReportsV2 = useFlag('reportsDatabaseV2')
   const org = useSelectedOrganization()
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  const isTeamsOrEnterprisePlan =
+    !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
+  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(1, 'day').toISOString()
