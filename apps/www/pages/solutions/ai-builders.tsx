@@ -21,7 +21,7 @@ const Enterprise: NextPage = () => (
       openGraph={{
         title: content.metadata.metaTitle,
         description: content.metadata.metaDescription,
-        url: `https://supabase.com/enterprise`,
+        url: `https://supabase.com/solutions/ai-builders`,
         images: [
           {
             url: `/images/solutions/ai-builders/ai-builders-og.png`,

@@ -10,9 +10,10 @@ import type {
 const FeaturesSection: FC<FeaturesSectionType> = (props) => {
   return (
     <SectionContainer id={props.id} className="flex flex-col gap-4 md:gap-8">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 max-w-xl">
         <span className="label">{props.label}</span>
         <h2 className="h2 text-foreground-lighter">{props.heading}</h2>
+        {props.subheading && <p className="text-foreground-lighter mb-8">{props.subheading}</p>}
       </div>
       <ul
         className={cn(

@@ -11,6 +11,11 @@ export const data = {
       description: '',
       url: '/solutions/switch-from-neon',
     },
+    {
+      text: 'For beginners',
+      description: '',
+      url: '/solutions/beginners',
+    },
   ],
 }
 

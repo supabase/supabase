@@ -4,7 +4,7 @@ import type { ComponentType, SVGProps } from 'react'
 export type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
 export type IconType = LucideIcon | HeroIcon
 
-interface Metadata {
+export interface Metadata {
   metaTitle: string
   metaDescription: string
 }
@@ -82,7 +82,7 @@ export interface Testimonials {
   }
 }
 
-interface CTASection {
+export interface CTASection {
   id: string
   label: string
   heading: JSX.Element | string
@@ -92,14 +92,4 @@ interface CTASection {
     href: string
     type: string
   }
-}
-
-export interface AIData {
-  metadata: Metadata
-  heroSection: HeroSection
-  quotes: Quotes
-  why: FeaturesSection
-  features: FeaturesSection
-  testimonials: Testimonials
-  'cta-section': CTASection
 }
