@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, del } from 'data/fetchers'
+import { del, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { jwtSigningKeysKeys } from './keys'
 
@@ -41,7 +41,7 @@ export const useJWTSigningKeyDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        await queryClient.invalidateQueries(jwtSigningKeysKeys.delete(projectRef))
+        await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
 
         await onSuccess?.(data, variables, context)
       },

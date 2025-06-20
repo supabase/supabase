@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { jwtSigningKeysKeys } from './keys'
 import { JWTAlgorithm } from './jwt-signing-keys-query'
+import { jwtSigningKeysKeys } from './keys'
 
 interface JWTSigningKeyCreateVariables {
   projectRef?: string
@@ -47,7 +47,7 @@ export const useJWTSigningKeyCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        await queryClient.invalidateQueries(jwtSigningKeysKeys.create(projectRef))
+        await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
 
         await onSuccess?.(data, variables, context)
       },
