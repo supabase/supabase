@@ -154,7 +154,6 @@ export const handleError = (
       'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
 
     if (errorMessage) {
-
       throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
     }
   }
@@ -162,7 +161,6 @@ export const handleError = (
   if (error !== null && typeof error === 'object' && 'stack' in error) {
     console.error(error.stack)
   }
-
 
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
