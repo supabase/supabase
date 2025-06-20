@@ -23,7 +23,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { EnableBranchingModal } from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -37,6 +37,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -91,6 +92,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
+    const projectRefForGitHubLinker = selectedProject?.parent_project_ref ?? selectedProject?.ref
     const {
       editorPanel,
       mobileMenuOpen,
@@ -98,6 +100,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       setMobileMenuOpen,
       toggleEditorPanel,
       setEditorPanel,
+      showCreateBranchModal,
+      setShowCreateBranchModal,
     } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
@@ -267,7 +271,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <EnableBranchingModal />
+        <CreateBranchModal
+          visible={showCreateBranchModal}
+          onClose={() => setShowCreateBranchModal(false)}
+        />
+        <SidePanelGitHubRepoLinker projectRef={projectRefForGitHubLinker} />
         <AISettingsModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

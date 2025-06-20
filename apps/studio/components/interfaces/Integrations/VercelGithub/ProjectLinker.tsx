@@ -164,8 +164,8 @@ const ProjectLinker = ({
   const oppositeMissingEntity = noSupabaseProjects ? mode : 'Supabase'
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative border rounded-lg p-12 bg shadow">
+    <div className="flex flex-col bg border shadow rounded-lg overflow-hidden">
+      <div className="relative p-12 border-b border-muted">
         <div
           className="absolute inset-0 bg-grid-black/5 [mask-image:linear-gradient(0deg,#fff,rgba(255,255,255,0.6))] dark:bg-grid-white/5 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]"
           style={{ backgroundPosition: '10px 10px' }}
@@ -374,7 +374,7 @@ const ProjectLinker = ({
         )}
       </div>
 
-      <div className="flex w-full justify-end gap-2">
+      <div className="flex w-full justify-end gap-2 p-4 bg-surface-75">
         {onSkip !== undefined && (
           <Button
             size="medium"

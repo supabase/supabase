@@ -23,7 +23,7 @@ export const BranchingPlanNotice = () => {
         <Button size="tiny" type="default" className="mt-4">
           <Link
             href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan&source=enableBranchingButton`}
-            onClick={() => snap.setShowEnableBranchingModal(false)}
+            onClick={() => snap.setShowCreateBranchModal(false)}
           >
             Upgrade to Pro
           </Link>

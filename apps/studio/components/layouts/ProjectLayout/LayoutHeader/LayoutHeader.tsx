@@ -8,7 +8,6 @@ import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
 import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
-import { EnableBranchingButton } from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
@@ -61,7 +60,6 @@ const LayoutHeader = ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const { setMobileMenuOpen } = useAppStateSnapshot()
-  const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -135,7 +133,7 @@ const LayoutHeader = ({
                     </div>
                   )}
 
-                  {selectedProject && isBranchingEnabled && (
+                  {selectedProject && (
                     <>
                       <LayoutHeaderDivider />
                       <BranchDropdown />
@@ -177,7 +175,6 @@ const LayoutHeader = ({
                 }}
               >
                 {<Connect />}
-                {!isBranchingEnabled && IS_PLATFORM && <EnableBranchingButton />}
               </motion.div>
             )}
           </AnimatePresence>

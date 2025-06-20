@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Check, DollarSign, Github, Loader2 } from 'lucide-react'
+import { Check, DollarSign, FileText, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -17,10 +17,10 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { BASE_PATH } from 'lib/constants'
 import { sidePanelsState } from 'state/side-panels'
 import {
-  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -31,14 +31,17 @@ import {
   DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   cn,
+  Badge,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
+import { useQueryClient } from '@tanstack/react-query'
+import { projectKeys } from 'data/projects/keys'
 
 interface CreateBranchModalProps {
   visible: boolean
@@ -50,8 +53,6 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useFlag('gitlessBranching')
-
-  const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -68,14 +69,22 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
   })
 
   const { data: branches } = useBranchesQuery({ projectRef })
+  const { data: addons } = useProjectAddonsQuery({ projectRef })
+  const hasPitrEnabled =
+    (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
   const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
     useCheckGithubBranchValidity({
       onError: () => {},
     })
 
+  const queryClient = useQueryClient()
+
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
+      if (projectRef) {
+        await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
+      }
       onClose()
     },
     onError: (error) => {
@@ -84,9 +93,17 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
   })
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+
+  // Fetch production/default branch to inspect git_branch linkage
+  const prodBranch = branches?.find((branch) => branch.is_default)
+
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
-  const isBranchingEnabled = gitlessBranching || !!githubConnection
+  const isProdBranchLinked = Boolean(
+    prodBranch?.git_branch && prodBranch.git_branch.trim().length > 0
+  )
+
+  const isBranchingEnabled = gitlessBranching || (!!githubConnection && isProdBranchLinked)
 
   const formId = 'create-branch-form'
   const FormSchema = z
@@ -105,63 +122,60 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
       gitBranchName: z
         .string()
         .refine(
-          (val) => !githubConnection?.id || (val && val.length > 0),
-          'Git branch name is required when Git is connected'
+          (val) => gitlessBranching || (val && val.length > 0),
+          'Git branch name is required'
         ),
     })
     .superRefine(async (val, ctx) => {
+      if (!gitlessBranching && (!githubConnection || !isProdBranchLinked)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Automatic branching must be configured before creating a preview branch',
+          path: ['gitBranchName'],
+        })
+        return
+      }
+
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.id) {
         try {
           await checkGithubBranchValidity({
             connectionId: githubConnection.id,
             branchName: val.gitBranchName,
           })
-          setIsGitBranchValid(true)
+          // valid – no issues added
         } catch (error) {
-          setIsGitBranchValid(false)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Unable to find branch "${val.gitBranchName}" in ${repoOwner}/${repoName}`,
             path: ['gitBranchName'],
           })
         }
-      } else {
-        setIsGitBranchValid(!val.gitBranchName || val.gitBranchName.length === 0)
       }
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '' },
   })
 
-  const isFormValid =
-    form.formState.isValid && (!form.getValues('gitBranchName') || isGitBranchValid)
-  const canSubmit = isFormValid && !isCreating && !isChecking && isBranchingEnabled
+  const canSubmit = !isCreating && !isChecking && isBranchingEnabled
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     createBranch({
       projectRef,
       branchName: data.branchName,
-      ...(data.gitBranchName && isGitBranchValid ? { gitBranch: data.gitBranchName } : {}),
+      ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
     })
   }
 
   useEffect(() => {
     if (form && visible) {
-      setIsGitBranchValid(false)
       form.reset()
     }
   }, [form, visible])
-
-  useEffect(() => {
-    setIsGitBranchValid(
-      !form.getValues('gitBranchName') || form.getValues('gitBranchName')?.length === 0
-    )
-  }, [githubConnection?.id, form.getValues('gitBranchName')])
 
   const openLinkerPanel = () => {
     onClose()
@@ -190,37 +204,44 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                         autoComplete="off"
                       />
                     </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
                   </FormItemLayout>
                 )}
               />
 
-              {githubConnection && (
+              {githubConnection && isProdBranchLinked && (
                 <FormField_Shadcn_
                   control={form.control}
                   name="gitBranchName"
                   render={({ field }) => (
-                    <FormItem_Shadcn_>
-                      <div className="flex items-center justify-between mb-2">
-                        <Label>Link to Git Branch {gitlessBranching ? '(Optional)' : ''}</Label>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Image
-                            className={cn('dark:invert')}
-                            src={`${BASE_PATH}/img/icons/github-icon.svg`}
-                            width={16}
-                            height={16}
-                            alt={`GitHub icon`}
-                          />
-                          <Link
-                            href={`https://github.com/${repoOwner}/${repoName}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground hover:underline"
-                          >
-                            {repoOwner}/{repoName}
-                          </Link>
+                    <FormItemLayout
+                      label={
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span className="flex-1">
+                            Sync with Git branch {gitlessBranching ? '(optional)' : ''}
+                          </span>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Image
+                              className={cn('dark:invert')}
+                              src={`${BASE_PATH}/img/icons/github-icon.svg`}
+                              width={16}
+                              height={16}
+                              alt={`GitHub icon`}
+                            />
+                            <Link
+                              href={`https://github.com/${repoOwner}/${repoName}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-foreground hover:underline"
+                            >
+                              {repoOwner}/{repoName}
+                            </Link>
+                          </div>
                         </div>
-                      </div>
-                      <div className="relative">
+                      }
+                      description="Migrations from this Git branch will be automatically deployed"
+                    >
+                      <div className="relative w-full">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
                             {...field}
@@ -228,18 +249,14 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                             autoComplete="off"
                           />
                         </FormControl_Shadcn_>
-                        <div className="absolute top-2 right-3 flex items-center gap-2">
+                        <div className="absolute top-2.5 right-3 flex items-center gap-2">
                           {isChecking && <Loader2 size={14} className="animate-spin" />}
-                          {field.value && !isChecking && isGitBranchValid && (
+                          {field.value && !isChecking && !form.formState.errors.gitBranchName && (
                             <Check size={14} className="text-brand" strokeWidth={2} />
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-foreground-light mt-2">
-                        If linked, migrations from this Git branch will be automatically deployed.
-                      </p>
-                      <FormMessage_Shadcn_ />
-                    </FormItem_Shadcn_>
+                    </FormItemLayout>
                   )}
                 />
               )}
@@ -252,11 +269,11 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
               )}
               {isSuccessConnections && (
                 <>
-                  {!githubConnection && (
+                  {(!githubConnection || !isProdBranchLinked) && (
                     <div className="flex items-center gap-2 justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Label>GitHub Repository</Label>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <Label>Automatic branching</Label>
                           {!gitlessBranching && (
                             <Badge variant="warning" size="small">
                               Required
@@ -264,13 +281,12 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
                           )}
                         </div>
                         <p className="text-sm text-foreground-light">
-                          {gitlessBranching
-                            ? 'Optionally connect to a GitHub repository to manage migrations automatically for this branch.'
-                            : 'Connect to a GitHub repository to enable branch creation. This allows you to manage migrations automatically for this branch.'}
+                          Automatically create, sync, and merge branches in Supabase when you make
+                          changes to your GitHub repository.
                         </p>
                       </div>
                       <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
-                        Connect to GitHub
+                        Configure
                       </Button>
                     </div>
                   )}
@@ -278,25 +294,63 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
               )}
             </DialogSection>
 
-            <DialogFooter className="sm:justify-between gap-2" padding="medium">
-              <p className="flex items-center gap-2 text-sm text-foreground">
-                <DollarSign size={16} strokeWidth={1.5} />
-                Each preview branch costs $0.32 per day
-              </p>
-              <div className="flex items-center gap-2">
-                <Button disabled={isCreating} type="default" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button
-                  form={formId}
-                  disabled={!isSuccessConnections || isCreating || !canSubmit || isChecking}
-                  loading={isCreating}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  Create branch
-                </Button>
+            <DialogSectionSeparator />
+
+            <DialogSection padding="medium" className="flex flex-col gap-4">
+              {githubConnection && (
+                <div className="flex flex-row gap-4">
+                  <div>
+                    <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                      <FileText className="text-info" size={20} strokeWidth={2} />
+                    </figure>
+                  </div>
+                  <div className="flex flex-col gap-y-1">
+                    <p className="text-sm text-foreground">
+                      Migrations are applied from your GitHub repository
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      Migration files in your <code className="text-xs">./supabase</code> directory
+                      will run on both Preview Branches and Production when pushing and merging
+                      branches.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-row gap-4">
+                <div>
+                  <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
+                    <DollarSign className="text-info" size={20} strokeWidth={2} />
+                  </figure>
+                </div>
+                <div className="flex flex-col gap-y-1">
+                  <p className="text-sm text-foreground">
+                    Preview branches are billed $0.32 per day
+                  </p>
+                  <p className="text-sm text-foreground-light">
+                    This cost will continue for as long as the branch has not been removed.
+                  </p>
+                </div>
               </div>
+
+              {!hasPitrEnabled && <BranchingPITRNotice />}
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogFooter className="justify-end gap-2" padding="medium">
+              <Button disabled={isCreating} type="default" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                form={formId}
+                disabled={!isSuccessConnections || isCreating || !canSubmit || isChecking}
+                loading={isCreating}
+                type="primary"
+                htmlType="submit"
+              >
+                Create branch
+              </Button>
             </DialogFooter>
           </form>
         </Form_Shadcn_>

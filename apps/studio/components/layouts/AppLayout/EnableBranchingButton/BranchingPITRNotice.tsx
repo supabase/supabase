@@ -49,7 +49,7 @@ export const BranchingPITRNotice = () => {
           <Button size="tiny" type="default" asChild>
             <Link
               href={`/project/${ref}/settings/addons?panel=pitr`}
-              onClick={() => snap.setShowEnableBranchingModal(false)}
+              onClick={() => snap.setShowCreateBranchModal(false)}
             >
               Enable PITR
             </Link>
