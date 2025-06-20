@@ -188,7 +188,7 @@ export const ApiKeysFeedbackBanner = () => {
         <p className="text-sm text-foreground-lighter">
           Having trouble with the new API keys?{' '}
           <a
-            href="/support/new?category=Problem&subject=Help%20with%20API%20keys&message=I'm%20experiencing%20problems%20with%20the%20new%20API%20keys%20feature.%20Please%20describe%20your%20specific%20issue%20here."
+            href="/dashboard/support/new?category=Problem&subject=Help%20with%20API%20keys&message=I'm%20experiencing%20problems%20with%20the%20new%20API%20keys%20feature.%20Please%20describe%20your%20specific%20issue%20here."
             className="inline-flex items-center gap-1 text-foreground"
           >
             Contact support

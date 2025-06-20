@@ -74,7 +74,7 @@ supabase db diff -f create_employees_table
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Start the local database and apply migrations">
-      Start the local database and then apply the migration file to see your schema changes in the local Dashboard.
+      Start the local database first. Then, apply the migration manually to see your schema changes in the local Dashboard.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -82,7 +82,8 @@ supabase db diff -f create_employees_table
 <$CodeTabs>
 
 ```bash name=Terminal
-supabase start && supabase migration up
+supabase start
+supabase migration up
 ```
 
 </$CodeTabs>
