@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { BarChart2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -32,18 +31,15 @@ export const ToggleLegacyApiKeysPanel = () => {
       <Panel>
         <Panel.Content>
           <div className="flex justify-between">
-            <div className="flex space-x-4">
-              <BarChart2 strokeWidth={2} />
-              <div>
-                <p className="text-sm">
-                  {isLegacyKeysEnabled ? 'Disable legacy API keys' : 'Re-enabling legacy API keys'}
-                </p>
-                <p className="text-foreground-light text-sm">
-                  {isLegacyKeysEnabled
-                    ? 'Make sure you are no longer using your legacy API keys before proceeding.'
-                    : 'Ensure that your RLS policies are in place prior to re-enabling legacy keys.'}
-                </p>
-              </div>
+            <div>
+              <p className="text-sm">
+                {isLegacyKeysEnabled ? 'Disable legacy API keys' : 'Re-enabling legacy API keys'}
+              </p>
+              <p className="text-foreground-light text-sm">
+                {isLegacyKeysEnabled
+                  ? 'Make sure you are no longer using your legacy API keys before proceeding.'
+                  : 'Ensure that your RLS policies are in place prior to re-enabling legacy keys.'}
+              </p>
             </div>
             <div className="flex items-center">
               <ButtonTooltip
