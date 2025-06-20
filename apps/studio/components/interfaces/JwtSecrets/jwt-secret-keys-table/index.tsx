@@ -14,14 +14,9 @@ import {
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import {
-  JWTAlgorithm,
-  JWTSigningKey,
-  useJWTSigningKeysQuery,
-} from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import {
@@ -42,12 +37,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   Table,
   TableBody,
   TableCell,
@@ -56,11 +45,12 @@ import {
   TableRow,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
+import { algorithmLabels } from '../algorithm-details'
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
+import { CreateKeyDialog } from './create-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
 
 const MotionTableRow = motion(TableRow)
@@ -88,15 +78,12 @@ export default function JWTSecretKeysTable() {
   })
 
   const legacyMutation = useLegacyJWTSigningKeyCreateMutation()
-  const createMutation = useJWTSigningKeyCreateMutation()
+
   const updateMutation = useJWTSigningKeyUpdateMutation()
   const deleteMutation = useJWTSigningKeyDeleteMutation()
 
   const isLoadingMutation =
-    createMutation.isLoading ||
-    updateMutation.isLoading ||
-    deleteMutation.isLoading ||
-    legacyMutation.isLoading
+    updateMutation.isLoading || deleteMutation.isLoading || legacyMutation.isLoading
   const isLoading = isLoadingSigningKeys || isLoadingLegacyKey
 
   const sortedKeys = useMemo(() => {
@@ -134,19 +121,6 @@ export default function JWTSecretKeysTable() {
       })
     } catch (error) {
       console.error('Failed to migrate legacy JWT secret to new JWT signing keys', error)
-    }
-  }
-
-  const handleAddNewStandbyKey = async () => {
-    try {
-      await createMutation.mutateAsync({
-        projectRef: projectRef!,
-        algorithm: newKeyAlgorithm,
-        status: 'standby',
-      })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to add new standby key', error)
     }
   }
 
@@ -623,45 +597,7 @@ export default function JWTSecretKeysTable() {
 
       <Dialog open={shownDialog === 'create'} onOpenChange={resetDialog}>
         <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Create a new Standby Key</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection className="space-y-4">
-            <div>
-              <Label_Shadcn_ htmlFor="algorithm">Choose the key type to use:</Label_Shadcn_>
-              <Select_Shadcn_
-                value={newKeyAlgorithm}
-                onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
-              >
-                <SelectTrigger_Shadcn_ id="algorithm">
-                  <SelectValue_Shadcn_ placeholder="Select algorithm" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="ES256" disabled>
-                    ES256 (ECC)
-                  </SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="EdDSA" disabled>
-                    EdDSA (Ed25519)
-                  </SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-              <p className="text-sm text-muted-foreground mt-1">
-                {algorithmDescriptions[newKeyAlgorithm]}
-              </p>
-            </div>
-          </DialogSection>
-          <DialogFooter>
-            <Button
-              onClick={() => handleAddNewStandbyKey()}
-              disabled={isLoadingMutation}
-              loading={isLoadingMutation}
-            >
-              Create standby key
-            </Button>
-          </DialogFooter>
+          <CreateKeyDialog projectRef={projectRef!} onClose={resetDialog} />
         </DialogContent>
       </Dialog>
 
