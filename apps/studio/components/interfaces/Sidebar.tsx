@@ -41,10 +41,7 @@ import {
   Sidebar as SidebarPrimitive,
   useSidebar,
 } from 'ui'
-import {
-  useIsAPIDocsSidePanelEnabled,
-  useIsSQLEditorTabsEnabled,
-} from './App/FeaturePreview/FeaturePreviewContext'
+import { useIsAPIDocsSidePanelEnabled } from './App/FeaturePreview/FeaturePreviewContext'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -223,7 +220,6 @@ const ProjectLinks = () => {
   const { securityLints, errorLints } = useLints()
 
   const showWarehouse = useFlag('warehouse')
-  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -239,9 +235,7 @@ const ProjectLinks = () => {
     'realtime:all',
   ])
 
-  const toolRoutes = generateToolRoutes(ref, project, {
-    sqlEditorTabs: isSqlEditorTabsEnabled,
-  })
+  const toolRoutes = generateToolRoutes(ref, project)
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,

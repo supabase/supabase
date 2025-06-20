@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
-import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
@@ -26,7 +25,6 @@ const SqlEditor: NextPageWithLayout = () => {
   const tabs = useTabsStateSnapshot()
   const appSnap = useAppStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const isSqlEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const allSnippets = useSnippets(ref!)
   const snippet = allSnippets.find((x) => x.id === id)
@@ -72,23 +70,21 @@ const SqlEditor: NextPageWithLayout = () => {
 
   // Watch for route changes
   useEffect(() => {
-    if (isSqlEditorTabsEnabled) {
-      if (!router.isReady || !id || id === 'new') return
+    if (!router.isReady || !id || id === 'new') return
 
-      const tabId = createTabId('sql', { id })
-      const snippet = allSnippets.find((x) => x.id === id)
+    const tabId = createTabId('sql', { id })
+    const snippet = allSnippets.find((x) => x.id === id)
 
-      tabs.addTab({
-        id: tabId,
-        type: 'sql',
-        label: snippet?.name || 'Untitled Query',
-        metadata: {
-          sqlId: id,
-          name: snippet?.name,
-        },
-      })
-    }
-  }, [router.isReady, id, isSqlEditorTabsEnabled])
+    tabs.addTab({
+      id: tabId,
+      type: 'sql',
+      label: snippet?.name || 'Untitled Query',
+      metadata: {
+        sqlId: id,
+        name: snippet?.name,
+      },
+    })
+  }, [router.isReady, id])
 
   if (snippetMissing || invalidId) {
     return (
@@ -99,31 +95,27 @@ const SqlEditor: NextPageWithLayout = () => {
             title={`Unable to find snippet with ID ${id}`}
             description="This snippet doesn't exist in your project"
           >
-            {isSqlEditorTabsEnabled && (
-              <>
-                {!!tabId ? (
-                  <Button
-                    type="default"
-                    className="mt-2"
-                    onClick={() => {
-                      tabs.handleTabClose({
-                        id: tabId,
-                        router,
-                        editor,
-                        onClearDashboardHistory: () => {
-                          if (ref) appSnap.setDashboardHistory(ref, 'sql', undefined)
-                        },
-                      })
-                    }}
-                  >
-                    Close tab
-                  </Button>
-                ) : (
-                  <Button asChild type="default" className="mt-2">
-                    <Link href={`/project/${ref}/sql`}>Head back</Link>
-                  </Button>
-                )}
-              </>
+            {!!tabId ? (
+              <Button
+                type="default"
+                className="mt-2"
+                onClick={() => {
+                  tabs.handleTabClose({
+                    id: tabId,
+                    router,
+                    editor,
+                    onClearDashboardHistory: () => {
+                      if (ref) appSnap.setDashboardHistory(ref, 'sql', undefined)
+                    },
+                  })
+                }}
+              >
+                Close tab
+              </Button>
+            ) : (
+              <Button asChild type="default" className="mt-2">
+                <Link href={`/project/${ref}/sql`}>Head back</Link>
+              </Button>
             )}
           </Admonition>
         </div>

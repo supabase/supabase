@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 
 import { useParams } from 'common'
-import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor/TableGridEditor'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
@@ -30,11 +29,9 @@ const TableEditorPage: NextPageWithLayout = () => {
    * - selectedTable changes (when a new table is loaded)
    * - id changes (when URL parameter changes)
    */
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 
   useEffect(() => {
-    // tabs preview flag logic
-    if (isTableEditorTabsEnabled && selectedTable && projectRef) {
+    if (selectedTable && projectRef) {
       const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
       if (!store.tabsMap[tabId]) {
         store.addTab({
@@ -52,7 +49,7 @@ const TableEditorPage: NextPageWithLayout = () => {
         store.makeTabActive(tabId)
       }
     }
-  }, [selectedTable, id, projectRef, isTableEditorTabsEnabled])
+  }, [selectedTable, id, projectRef])
 
   return <TableGridEditor isLoadingSelectedTable={isLoading} selectedTable={selectedTable} />
 }

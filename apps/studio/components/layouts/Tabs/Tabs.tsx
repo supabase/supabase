@@ -12,7 +12,6 @@ import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { TabsUpdateTooltip } from 'components/interfaces/App/FeaturePreview/TableEditorTabs'
 import { useAppStateSnapshot } from 'state/app-state'
 import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import {
@@ -173,43 +172,41 @@ export const EditorTabs = () => {
 
           {/* Non-draggable new tab */}
           {hasNewTab && (
-            <>
-              <TabsTrigger_Shadcn_
-                value="new"
-                className={cn(
-                  'flex items-center gap-2 px-3 text-xs',
-                  'bg-dash-sidebar/50 dark:bg-surface-100/50',
-                  'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                  'relative group h-full border-t-2 !border-b-0',
-                  'hover:bg-surface-300 dark:hover:bg-surface-100'
-                )}
+            <TabsTrigger_Shadcn_
+              value="new"
+              className={cn(
+                'flex items-center gap-2 px-3 text-xs',
+                'bg-dash-sidebar/50 dark:bg-surface-100/50',
+                'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+                'relative group h-full border-t-2 !border-b-0',
+                'hover:bg-surface-300 dark:hover:bg-surface-100'
+              )}
+            >
+              <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+              <div className="flex items-center gap-0">
+                <span>New</span>
+              </div>
+              <span
+                role="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onPointerDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleClose('new')
+                }}
               >
-                <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
-                <div className="flex items-center gap-0">
-                  <span>New</span>
-                </div>
-                <span
-                  role="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onPointerDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleClose('new')
-                  }}
-                >
-                  <X size={12} className="text-foreground-light" />
-                </span>{' '}
-                <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-              </TabsTrigger_Shadcn_>
-            </>
+                <X size={12} className="text-foreground-light" />
+              </span>{' '}
+              <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+            </TabsTrigger_Shadcn_>
           )}
 
           <AnimatePresence initial={false}>
@@ -235,8 +232,6 @@ export const EditorTabs = () => {
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />
         </TabsList_Shadcn_>
-
-        <TabsUpdateTooltip />
       </Tabs_Shadcn_>
 
       <DragOverlay dropAnimation={null}>

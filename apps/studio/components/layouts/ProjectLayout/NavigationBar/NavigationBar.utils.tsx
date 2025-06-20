@@ -19,12 +19,7 @@ import {
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 
-export const generateToolRoutes = (
-  ref?: string,
-  project?: Project,
-  features?: { sqlEditorTabs: boolean }
-): Route[] => {
-  const { sqlEditorTabs } = features ?? {}
+export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -42,8 +37,7 @@ export const generateToolRoutes = (
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
-        : ref &&
-          (isProjectBuilding ? buildingUrl : `/project/${ref}/sql${!!sqlEditorTabs ? '' : '/new'}`),
+        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }

@@ -14,15 +14,11 @@ import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import { InlineEditorPreview } from './InlineEditorPreview'
-import { SqlEditorTabsPreview } from './SqlEditorTabs'
-import { TableEditorTabsPreview } from './TableEditorTabs'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
 } = {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
-  [LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]: <TableEditorTabsPreview />,
-  [LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]: <SqlEditorTabsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
 }
