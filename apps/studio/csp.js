@@ -46,8 +46,14 @@ const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 
 // This is a custom domain for Stape, which isused for GTM servers
 const STAPE_URL = 'https://ss.supabase.com'
-const DOUBLECLICK_URL = 'https://googleads.g.doubleclick.net'
-const GOOGLE_TAG_MANAGER_URL = 'https://www.googletagmanager.com'
+
+// Google Ads related URLs
+const GOOGLE_ANALYTICS_URL = 'https://*.google-analytics.com'
+const GOOGLE_ADS_URL = 'https://*.google.com'
+const GOOGLE_DOUBLECLICK_URL = 'https://*.g.doubleclick.net'
+const GOOGLE_SYNDICATION_URL = 'https://pagead2.googlesyndication.com'
+const GOOGLE_TAG_MANAGER_URL = 'https://*.googletagmanager.com'
+const DOUBLECLICK_TD_URL = 'https://td.doubleclick.net'
 
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
@@ -85,6 +91,12 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_URLS,
     STAPE_URL,
+    // Google Ads connect-src URLs (using default-src since no separate connect-src)
+    GOOGLE_ANALYTICS_URL,
+    GOOGLE_TAG_MANAGER_URL,
+    GOOGLE_DOUBLECLICK_URL,
+    GOOGLE_ADS_URL,
+    GOOGLE_SYNDICATION_URL,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -92,8 +104,17 @@ module.exports.getCSP = function getCSP() {
     STRIPE_JS_URL,
     SUPABASE_ASSETS_URL,
     STAPE_URL,
+    // Google Ads script-src URLs
+    GOOGLE_TAG_MANAGER_URL,
   ]
-  const FRAME_SRC_URLS = [HCAPTCHA_ASSET_URL, STRIPE_JS_URL, STAPE_URL]
+  const FRAME_SRC_URLS = [
+    HCAPTCHA_ASSET_URL,
+    STRIPE_JS_URL,
+    STAPE_URL,
+    // Google Ads frame-src URLs
+    DOUBLECLICK_TD_URL,
+    GOOGLE_TAG_MANAGER_URL,
+  ]
   const IMG_SRC_URLS = [
     SUPABASE_URL,
     SUPABASE_COM_URL,
@@ -103,8 +124,11 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_APP_URL,
     STAPE_URL,
-    DOUBLECLICK_URL,
+    // Google Ads img-src URLs
+    GOOGLE_ANALYTICS_URL,
     GOOGLE_TAG_MANAGER_URL,
+    GOOGLE_DOUBLECLICK_URL,
+    GOOGLE_ADS_URL,
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
