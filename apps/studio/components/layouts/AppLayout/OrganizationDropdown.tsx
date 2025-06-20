@@ -81,6 +81,7 @@ export const OrganizationDropdown = () => {
                     const href = !!routeSlug
                       ? router.pathname.replace('[slug]', org.slug)
                       : `/org/${org.slug}`
+
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}

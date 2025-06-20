@@ -1,24 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { OrganizationBase } from 'data/organizations/organizations-query'
 import { PlanId } from 'data/subscriptions/types'
 import jsonLogic from 'json-logic-js'
 
-export interface Organization {
-  id: number
-  slug: string
-  name: string
-  billing_email: string
-  is_owner?: boolean
-  opt_in_tags: string[]
-  subscription_id?: string | null
-  restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
-  restriction_data: Record<string, string> | null
+export interface Organization extends OrganizationBase {
   managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
   partner_id?: string
-  plan: {
-    id: PlanId
-    name: string
-  }
-  usage_billing_enabled: boolean
+  plan: { id: PlanId; name: string }
 }
 
 /**
