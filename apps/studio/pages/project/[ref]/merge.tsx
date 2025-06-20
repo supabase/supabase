@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
+import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { useParams } from 'common'
@@ -29,6 +30,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
 
   const gitlessBranching = useFlag('gitlessBranching')
 
@@ -107,16 +109,51 @@ const MergePage: NextPageWithLayout = () => {
     }
   )
 
+  // Get edge functions for both branches
+  const {
+    data: currentBranchFunctions,
+    isLoading: isCurrentFunctionsLoading,
+    refetch: refetchCurrentBranchFunctions,
+  } = useEdgeFunctionsQuery(
+    { projectRef: ref },
+    {
+      enabled: gitlessBranching && !!ref,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    }
+  )
+
+  const {
+    data: mainBranchFunctions,
+    isLoading: isMainFunctionsLoading,
+    refetch: refetchMainBranchFunctions,
+  } = useEdgeFunctionsQuery(
+    { projectRef: parentProjectRef },
+    {
+      enabled: gitlessBranching && !!parentProjectRef,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    }
+  )
+
   // Show toast notifications when workflow status changes
   useEffect(() => {
     if (currentWorkflowRun?.status) {
       const status = currentWorkflowRun.status
 
       if (status === 'FUNCTIONS_DEPLOYED') {
-        // Refresh the diff to verify it's empty after successful merge
-        refetchDiff()
-          .then((result) => {
-            const finalDiff = result.data
+        // Refresh both database and edge functions diff to verify changes are empty after successful merge
+        Promise.all([
+          refetchDiff(),
+          refetchCurrentBranchFunctions(),
+          refetchMainBranchFunctions(),
+          // Invalidate edge function body queries used in useEdgeFunctionsDiff
+          queryClient.invalidateQueries({ queryKey: ['edge-function-body'] }),
+        ])
+          .then(([diffResult]) => {
+            const finalDiff = diffResult.data
             if (!finalDiff || finalDiff.trim() === '') {
               toast.success('Branch merged successfully! No remaining changes detected.')
             } else {
@@ -130,29 +167,13 @@ const MergePage: NextPageWithLayout = () => {
         toast.error(`Branch merge failed with status: ${status}`)
       }
     }
-  }, [currentWorkflowRun?.status, refetchDiff])
-
-  // Get edge functions for both branches
-  const { data: currentBranchFunctions, isLoading: isCurrentFunctionsLoading } =
-    useEdgeFunctionsQuery(
-      { projectRef: ref },
-      {
-        enabled: gitlessBranching && !!ref,
-        refetchOnMount: 'always',
-        refetchOnWindowFocus: true,
-        staleTime: 0,
-      }
-    )
-
-  const { data: mainBranchFunctions, isLoading: isMainFunctionsLoading } = useEdgeFunctionsQuery(
-    { projectRef: parentProjectRef },
-    {
-      enabled: gitlessBranching && !!parentProjectRef,
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      staleTime: 0,
-    }
-  )
+  }, [
+    currentWorkflowRun?.status,
+    refetchDiff,
+    refetchCurrentBranchFunctions,
+    refetchMainBranchFunctions,
+    queryClient,
+  ])
 
   // Check if there are any changes (database or edge functions)
   const hasChanges = () => {
