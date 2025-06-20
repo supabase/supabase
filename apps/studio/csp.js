@@ -46,6 +46,7 @@ const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
 
 // This is a custom domain for Stape, which isused for GTM servers
 const STAPE_URL = 'https://ss.supabase.com'
+const DOUBLECLICK_URL = 'https://googleads.g.doubleclick.net'
 
 const VERCEL_LIVE_URL = 'https://vercel.live'
 const SENTRY_URL =
@@ -101,6 +102,7 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_APP_URL,
     STAPE_URL,
+    DOUBLECLICK_URL,
   ]
   const STYLE_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
   const FONT_SRC_URLS = [CLOUDFLARE_CDN_URL, SUPABASE_ASSETS_URL]
