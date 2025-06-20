@@ -80,22 +80,27 @@ export function SidebarCollapsible({
 }
 
 export function LogsSidebarMenuV2() {
+  const router = useRouter()
+  const { ref } = useParams() as { ref: string }
+  const warehouseEnabled = useFlag('warehouse')
+
   const [searchText, setSearchText] = useState('')
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
-  const router = useRouter()
-  const { ref } = useParams() as { ref: string }
+
   const { data: tenantData } = useWarehouseTenantQuery({ projectRef: ref })
+
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
     realtimeAll: realtimeEnabled,
   } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
-  const warehouseEnabled = useFlag('warehouse')
+
   const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef: ref },
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
+
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
