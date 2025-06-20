@@ -1,6 +1,5 @@
 'use client'
 
-import { GoogleTagManager } from '@next/third-parties/google'
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
@@ -28,29 +27,13 @@ export const TelemetryTagManager = () => {
   }
 
   return (
-    <>
-      <Script
-        id="consent"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag() {
-                dataLayer.push(arguments);
-            }
-
-            gtag("consent", "default", {
-                ad_user_data: "denied",
-                ad_personalization: "denied",
-                ad_storage: "denied",
-                analytics_storage: "denied",
-                wait_for_update: 2000 // milliseconds to wait for update
-            });
-            `,
-        }}
-      />
-      <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID!} />
-    </>
+    <Script
+      id="consent"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://ss.supabase.com/4icgbaujh.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','60a389s=aWQ9R1RNLVdDVlJMTU43&page=2');`,
+      }}
+    />
   )
 }
 

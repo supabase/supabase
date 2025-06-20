@@ -11,7 +11,6 @@
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
-    "@next/third-parties": "^15.3.2",
     "@types/dat.gui": "^0.7.12",
     "@usercentrics/cmp-browser-sdk": "^4.42.0",
     "flags": "^4.0.0",
