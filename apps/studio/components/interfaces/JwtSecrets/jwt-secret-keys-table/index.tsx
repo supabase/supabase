@@ -273,13 +273,15 @@ export default function JWTSecretKeysTable() {
             </Card>
           </div>
 
-          <div className="mt-2">
-            <h2 className="text-xl mb-4">Previously used keys</h2>
-            <p className="text-sm text-secondary mb-4">
-              These JWT signing keys are still used to <strong>verify</strong> JWTs already issued.
-              Revoke them once all JWTs have expired.
-            </p>
-            <Card className="w-full overflow-hidden bg-surface-100 border rounded-md">
+          <div className="flex flex-col space-y-2">
+            <div>
+              <h2 className="text-xl">Previously used keys</h2>
+              <p className="text-sm text-foreground-lighter">
+                These JWT signing keys are still used to <strong>verify</strong> JWTs already
+                issued. Revoke them once all JWTs have expired.
+              </p>
+            </div>
+            <Card className="overflow-hidden">
               <CardContent className="p-0">
                 {previouslyUsedKeys.length > 0 ? (
                   <Table className="p-5">
@@ -409,12 +411,14 @@ export default function JWTSecretKeysTable() {
       )}
 
       {revokedKeys.length > 0 && (
-        <div className="mt-2">
-          <h2 className="text-xl mb-4">Revoked keys</h2>
-          <p className="text-sm text-secondary mb-4">
-            These keys are no longer used to verify or sign JWTs.
-          </p>
-          <Card className="w-full overflow-hidden bg-surface-100 border rounded-md">
+        <div className="flex flex-col space-y-2">
+          <div>
+            <h2 className="text-xl">Revoked keys</h2>
+            <p className="text-sm text-foreground-lighter">
+              These keys are no longer used to verify or sign JWTs.
+            </p>
+          </div>
+          <Card className="overflow-hidden">
             <CardContent className="p-0">
               <Table className="p-5">
                 <TableHeader className="bg-200">
