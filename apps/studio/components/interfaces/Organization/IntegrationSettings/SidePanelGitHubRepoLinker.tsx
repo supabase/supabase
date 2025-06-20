@@ -342,7 +342,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
         if (!open) sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       }}
     >
-      <SheetContent size="md" side="right" showClose className="flex flex-col gap-0">
+      <SheetContent side="right" showClose className="flex flex-col gap-0">
         <Form_Shadcn_ {...form}>
           <form
             onSubmit={form.handleSubmit(handleSave)}
