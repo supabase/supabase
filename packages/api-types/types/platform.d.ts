@@ -1007,6 +1007,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/subscription/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm subscription change */
+    post: operations['SubscriptionController_confirmSubscriptionChange']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/subscription/preview': {
     parameters: {
       query?: never
@@ -2089,7 +2106,8 @@ export interface paths {
     /** Gets project's logs */
     get: operations['LogsController_getApiPaths']
     put?: never
-    post?: never
+    /** Post project's logs */
+    post: operations['LogsController_postApiPaths']
     delete?: never
     options?: never
     head?: never
@@ -4256,6 +4274,9 @@ export interface components {
       name: string
       payment_intent_id: string
       size?: string
+    }
+    ConfirmSubscriptionChangeBody: {
+      payment_intent_id: string
     }
     CopyObjectBody: {
       from: string
@@ -6684,6 +6705,9 @@ export interface components {
       name: string
       schema: string
     }
+    PostProjectLogsBody: {
+      sql: string
+    }
     PreviewProjectTransferResponse: {
       errors: {
         key: string
@@ -8245,6 +8269,9 @@ export interface components {
       payment_method?: string
       /** @enum {string} */
       tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+    }
+    UpdateSubscriptionResponse: {
+      pending_payment_intent_secret: string | null
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
@@ -10701,7 +10728,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['UpdateSubscriptionResponse']
+        }
       }
       403: {
         headers: {
@@ -10710,6 +10739,43 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update subscription change */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SubscriptionController_confirmSubscriptionChange: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConfirmSubscriptionChangeBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to confirm subscription change */
       500: {
         headers: {
           [name: string]: unknown
@@ -14414,6 +14480,50 @@ export interface operations {
       }
     }
   }
+  LogsController_postApiPaths: {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        project?: string
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PostProjectLogsBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to POST project's logs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   UsageApiController_getApiCounts: {
     parameters: {
       query?: {
@@ -16612,6 +16722,7 @@ export interface operations {
           | 'disk_fs_avail'
           | 'disk_fs_used'
           | 'disk_fs_used_wal'
+          | 'disk_fs_used_system'
           | 'ram_usage'
           | 'ram_usage_total'
           | 'ram_usage_available'

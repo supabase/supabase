@@ -5,8 +5,67 @@ import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { numberFormatter } from './Charts.utils'
-import { MultiAttribute } from './ComposedChartHandler'
 import { formatBytes } from 'lib/helpers'
+
+export interface ReportAttributes {
+  id?: string
+  label: string
+  attributes?: (MultiAttribute | false)[]
+  defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
+  hide?: boolean
+  hideChartType?: boolean
+  format?: string
+  className?: string
+  showTooltip?: boolean
+  showLegend?: boolean
+  showTotal?: boolean
+  showMaxValue?: boolean
+  valuePrecision?: number
+  docsUrl?: string
+  syncId?: string
+  showGrid?: boolean
+  YAxisProps?: {
+    width?: number
+    tickFormatter?: (value: any) => string
+  }
+  hideHighlightedValue?: boolean
+}
+
+type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line' | 'combine'
+
+export type MultiAttribute = {
+  attribute: string
+  provider: Provider
+  label?: string
+  color?: string
+  stackId?: string
+  format?: string
+  description?: string
+  docsLink?: string
+  isMaxValue?: boolean
+  type?: 'line' | 'area-bar'
+  omitFromTotal?: boolean
+  tooltip?: string
+  customValue?: number
+  /**
+   * Manipulate the value of the attribute before it is displayed on the chart.
+   * @param value - The value of the attribute.
+   * @returns The manipulated value.
+   */
+  manipulateValue?: (value: number) => number
+  /**
+   * Create a virtual attribute by combining values from other attributes.
+   * Expression should use attribute names and basic math operators (+, -, *, /).
+   * Example: 'disk_fs_used - pg_database_size - disk_fs_used_wal'
+   */
+  combine?: string
+  id?: string
+  value?: number
+  isReferenceLine?: boolean
+  strokeDasharray?: string
+  className?: string
+  hide?: boolean
+}
 
 interface CustomIconProps {
   color: string
@@ -78,9 +137,7 @@ const CustomTooltip = ({
     const isDiskSpaceChart = payload?.some((p: any) =>
       p.dataKey.toLowerCase().includes('disk_space_')
     )
-    const isDBSizeChart = payload?.some((p: any) =>
-      p.dataKey.toLowerCase().includes('pg_database_size')
-    )
+    const isDBSizeChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
     const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
 
@@ -120,7 +177,7 @@ const CustomTooltip = ({
             {isPercentage ? '%' : ''}
 
             {/* Show percentage if max value is set */}
-            {!!maxValueData && !isMax && (
+            {!!maxValueData && !isMax && !isPercentage && (
               <span className="text-[11px] text-foreground-light mb-0.5">({percentage}%)</span>
             )}
           </span>
@@ -154,6 +211,7 @@ const CustomTooltip = ({
                   {isPercentage ? '%' : ''}
                 </span>
                 {maxValueAttribute &&
+                  !isPercentage &&
                   !isNaN((total as number) / maxValueData?.value) &&
                   isFinite((total as number) / maxValueData?.value) && (
                     <span className="text-[11px] text-foreground-light mb-0.5">
