@@ -41,7 +41,7 @@ export interface TextConfirmModalProps {
   alert?: {
     base?: React.ComponentProps<typeof Alert_Shadcn_>
     title?: string
-    description?: string
+    description?: string | ReactNode
   }
   input?: React.ComponentProps<typeof Input_Shadcn_>
   label?: React.ComponentProps<typeof FormLabel_Shadcn_>
