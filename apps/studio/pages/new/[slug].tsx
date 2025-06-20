@@ -967,7 +967,7 @@ const Wizard: NextPageWithLayout = () => {
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
               clicking "Confirm", you agree to the additional costs.{' '}
               <Link
-                href="/docs/guides/platform/manage-your-usage/compute"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                 target="_blank"
                 className="underline"
               >
