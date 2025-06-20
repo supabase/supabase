@@ -12,20 +12,21 @@ export async function GET(request: NextRequest) {
 
   if (token_hash && type) {
     const supabase = await createClient()
-
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
-    if (!error) {
-      // redirect user to specified redirect URL or root of app
-      redirect(next)
-    } else {
-      // redirect the user to an error page with some instructions
-      redirect(`/auth/error?error=${error?.message}`)
+    
+    try{
+      const { data, error } = await supabase.auth.verifyOtp({
+        type,
+        token_hash,
+      })
+      if (!error && data?.session) {
+        redirect(next)
+      } else {
+        redirect(`/auth/error?error=${encodeURIComponent(error?.message || 'Failed to verify token')}`)
+      }
+    } catch (err) {
+      redirect(`/auth/error?error=${encodeURIComponent('Unexpected error during verification')}`)
     }
   }
-
   // redirect the user to an error page with some instructions
   redirect(`/auth/error?error=No token hash or type`)
 }
