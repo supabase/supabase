@@ -42,7 +42,7 @@ import {
   Input_Shadcn_,
   Switch,
 } from 'ui'
-import { Github, Loader2, Check, ChevronDown } from 'lucide-react'
+import { Github, Loader2, Check, ChevronDown, DollarSign } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ForeignProject } from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
@@ -584,29 +584,46 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                 </div>
               )}
             </SheetSection>
-            <SheetFooter className="shrink-0 flex justify-end gap-2">
-              <Button
-                type="default"
-                size="small"
-                onClick={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                size="small"
-                htmlType="submit"
-                loading={isUpdatingConnection || isCreatingConnection}
-                disabled={
-                  isUpdatingConnection ||
-                  isCreatingConnection ||
-                  isCheckingBranch ||
-                  isLoadingGitHubAuthorization ||
-                  isLoadingGitHubRepos
-                }
-              >
-                {submitButtonText}
-              </Button>
+            <SheetFooter className="shrink-0 block p-0">
+              {autoBranchingEnabled && (
+                <div className="flex flex-row items-center gap-4 p-4 bg border-b">
+                  <figure className="w-10 h-10 rounded-md border flex items-center justify-center">
+                    <DollarSign className="text-info" size={20} strokeWidth={2} />
+                  </figure>
+                  <div>
+                    <p className="text-sm text-foreground">
+                      Preview branches are billed $0.32 per day
+                    </p>
+                    <p className="text-sm text-foreground-light">
+                      This cost will continue for as long as the branch is active
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="flex justify-end gap-2 p-4">
+                <Button
+                  type="default"
+                  size="small"
+                  onClick={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  size="small"
+                  htmlType="submit"
+                  loading={isUpdatingConnection || isCreatingConnection}
+                  disabled={
+                    isUpdatingConnection ||
+                    isCreatingConnection ||
+                    isCheckingBranch ||
+                    isLoadingGitHubAuthorization ||
+                    isLoadingGitHubRepos
+                  }
+                >
+                  {submitButtonText}
+                </Button>
+              </div>
             </SheetFooter>
           </form>
         </Form_Shadcn_>
