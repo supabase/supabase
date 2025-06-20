@@ -14,6 +14,7 @@ import {
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import {
@@ -23,6 +24,7 @@ import {
 } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
@@ -57,6 +59,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
+import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
 import { CreateKeyDialog } from './create-key-dialog'
@@ -66,6 +69,7 @@ const MotionTableRow = motion(TableRow)
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
+  const newJwtSecrets = useFlag('newJwtSecrets')
 
   const [selectedKey, setSelectedKey] = useState<JWTSigningKey | null>(null)
   const [shownDialog, setShownDialog] = useState<
@@ -183,6 +187,14 @@ export default function JWTSecretKeysTable() {
     } catch (error) {
       console.error('Failed to rotate key', error)
     }
+  }
+
+  if (isLoading) {
+    return <GenericSkeletonLoader />
+  }
+
+  if (!newJwtSecrets) {
+    return <SigningKeysComingSoonBanner />
   }
 
   return (
