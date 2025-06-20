@@ -4,12 +4,12 @@ import { get, isEqual } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import type { PlanId } from 'data/subscriptions/types'
 import logConstants from 'shared-data/logConstants'
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
-import { IS_PLATFORM } from 'common'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
