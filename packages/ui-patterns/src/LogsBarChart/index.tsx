@@ -67,7 +67,6 @@ export const LogsBarChart = ({
               setFocusDataIndex(e.activeTooltipIndex)
             }
           }}
-          onMouseLeave={() => setFocusDataIndex(null)}
           onClick={(tooltipData) => {
             const datum = tooltipData?.activePayload?.[0]?.payload
             if (onBarClick) onBarClick(datum, tooltipData)
