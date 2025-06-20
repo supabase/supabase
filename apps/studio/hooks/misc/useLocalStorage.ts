@@ -71,26 +71,19 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     isSuccess,
     isLoading,
     isError,
-  } = useQuery(
-    queryKey,
-    () => {
-      if (typeof window === 'undefined') {
-        return initialValue
-      }
-
-      const item = window.localStorage.getItem(key)
-
-      if (!item) {
-        return initialValue
-      }
-
-      return JSON.parse(item) as T
-    },
-    {
-      enabled: isClient, // Only run query on client side
-      staleTime: Infinity, // Prevent unnecessary refetches
+  } = useQuery(queryKey, () => {
+    if (typeof window === 'undefined') {
+      return initialValue
     }
-  )
+
+    const item = window.localStorage.getItem(key)
+
+    if (!item) {
+      return initialValue
+    }
+
+    return JSON.parse(item) as T
+  })
 
   const setValue: Dispatch<SetStateAction<T>> = (value) => {
     const valueToStore = value instanceof Function ? value(storedValue) : value
@@ -103,8 +96,5 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     queryClient.invalidateQueries(queryKey)
   }
 
-  // Return initial value during SSR, actual value on client
-  const finalValue = isClient ? storedValue : initialValue
-
-  return [finalValue, setValue, { isSuccess, isLoading, isError, error }] as const
+  return [storedValue, setValue, { isSuccess, isLoading, isError, error }] as const
 }
