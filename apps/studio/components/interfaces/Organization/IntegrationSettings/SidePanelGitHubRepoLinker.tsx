@@ -72,6 +72,8 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     enabled: visible && Boolean(gitHubAuthorization),
   })
 
+  console.log('githubReposData', githubReposData)
+
   const { data: connections } = useGitHubConnectionsQuery(
     {
       organizationId: selectedOrganization?.id,
@@ -351,8 +353,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
             <SheetHeader className="shrink-0">
               <SheetTitle>Automatic Branching</SheetTitle>
               <SheetDescription>
-                Automatically create, sync, and merge branches in Supabase when you make changes to
-                your GitHub repository.
+                Create a Supabase branch for every GitHub branch and sync them on commit and merge.
               </SheetDescription>
             </SheetHeader>
 
@@ -365,7 +366,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                     className={'mb-4'}
                     layout="flex-row-reverse"
                     label="Enable automatic branching"
-                    description="Automatically create and merge preview branches from Pull Requests."
+                    description="Once enabled, new branches will be created for every new GitHub branch"
                   >
                     <FormControl_Shadcn_>
                       <Switch
@@ -493,7 +494,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Production git branch name"
-                        description="Migrations will be applied to this branch on every commit"
+                        description="Sync a git branch to your production Supabase branch"
                       >
                         <div className="relative w-full">
                           <FormControl_Shadcn_>

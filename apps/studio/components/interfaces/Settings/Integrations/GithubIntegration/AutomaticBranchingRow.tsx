@@ -71,10 +71,9 @@ const AutomaticBranchingRow = () => {
       <CardContent className="flex items-center justify-between gap-6">
         {/* Left: label and description */}
         <div className="flex-1">
-          <h5 className="text-foreground mb-1 text-sm">Automatic Branching &amp; Merging</h5>
+          <h5 className="text-foreground mb-1 text-sm">Automatic Branching</h5>
           <p className="text-sm text-foreground-light">
-            Automatically create and merge preview branches in Supabase whenever you open or merge
-            Pull Requests in your connected GitHub repository.
+            Create a Supabase branch for every GitHub branch and sync them on commit and merge.
           </p>
         </div>
 
