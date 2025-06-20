@@ -33,6 +33,7 @@
         "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
+        "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
