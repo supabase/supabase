@@ -1,0 +1,488 @@
+---
+id: 'before-user-created-hook'
+title: 'Before User Created Hook'
+subtitle: 'Prevent unwanted signups by inspecting and rejecting user creation requests'
+---
+
+This hook runs before a new user is created. It allows developers to inspect the incoming user object and optionally reject the request. Use this to enforce custom signup policies that Supabase Auth does not handle natively - such as blocking disposable email domains, restricting access by region or IP, or requiring that users belong to a specific email domain.
+
+The hook is triggered any time a new user would be created - including traditional email signups (signUp()), OAuth flows (signIn(\{ provider \})), SSO (signInWithSSO()), IdP-initiated SAML flows, and anonymous sign-ins. Before the user is inserted into the auth.users table, the payload is passed to your configured hook endpoint for evaluation.
+
+You can implement this hook using an HTTP endpoint or a Postgres function. If the hook returns an error object, the signup is denied and the user is not created. If the hook responds successfully (HTTP 200 or 204 with no error), the request proceeds as usual. This gives you full control over which users are allowed to register — and the flexibility to apply that logic server-side.
+
+**Inputs**
+
+Supabase Auth will send a payload containing these fields to your hook:
+
+| Field    | Type     | Description                                                                               |
+| -------- | -------- | ----------------------------------------------------------------------------------------- |
+| `header` | `object` | Metadata about the request. Includes IP address, request ID, and hook type.               |
+| `user`   | `object` | The user record that is about to be created. Matches the shape of the `auth.users` table. |
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+>
+<TabPanel id="password-verification-attempt-json" label="JSON">
+
+```json
+{
+  "header": {
+    "uuid": "8b34dcdd-9df1-4c10-850a-b3277c653040",
+    "time": "2025-04-29T13:13:24.755552-07:00",
+    "name": "before-user-created",
+    "ip_address": "127.0.0.1",
+  },
+  "user": {
+    "id": "ff7fc9ae-3b1b-4642-9241-64adb9848a03",
+    "aud": "authenticated",
+    "role": "",
+    "email": "valid.email@supabase.com",
+    "phone": "",
+    "app_metadata": {
+      "provider": "email",
+      "providers": ["email"]
+    },
+    "user_metadata": {},
+    "identities": [],
+    "created_at": "0001-01-01T00:00:00Z",
+    "updated_at": "0001-01-01T00:00:00Z",
+    "is_anonymous": false
+  }
+}
+```
+
+</TabPanel>
+<TabPanel id="password-verification-attempt-json-schema" label="JSON Schema">
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "header": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ip_address": {
+          "type": "string",
+          "format": "ipv4"
+        },
+        "name": {
+          "type": "string",
+          "enum": ["before-user-created"]
+        },
+      },
+      "required": ["uuid", "time", "ip_address", "name"]
+    },
+    "user": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "aud": { "type": "string" },
+        "role": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "app_metadata": {
+          "type": "object",
+          "properties": {
+            "provider": { "type": "string" },
+            "providers": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "required": ["provider", "providers"]
+        },
+        "user_metadata": { "type": "object" },
+        "identities": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "is_anonymous": { "type": "boolean" }
+      },
+      "required": [
+        "id", "aud", "role", "email", "phone", "app_metadata",
+        "user_metadata", "identities", "created_at", "updated_at", "is_anonymous"
+      ]
+    }
+  },
+  "required": ["header", "user"]
+}
+```
+
+</TabPanel>
+</Tabs>
+
+**Outputs**
+
+Your hook must return a response that either allows or blocks the signup request.
+
+| Field    | Type      | Description                                                                                           |
+| -------- | --------- | ----------------------------------------------------------------------------------------------------- |
+| `error`  | `object`  | (Optional) Return this to reject the signup. Includes a code, message, and optional HTTP status code. |
+
+Returning an empty object with a `200` or `204` status code allows the request to proceed. Returning a JSON response with an `error` object and a `4xx` status code blocks the request and propagates the error message to the client. See the [error handling documentation](/docs/guides/auth/auth-hooks#error-handling) for more details.
+
+**Allow the signup**
+
+```json
+{}
+```
+
+or with a `204 No Content` response:
+
+```http
+HTTP/1.1 204 No Content
+```
+
+**Reject the signup with an error**
+
+```json
+{
+  "error": {
+    "http_code": 400,
+    "message": "Only company emails are allowed to sign up."
+  }
+}
+```
+
+This response will block the user creation and return the error message to the client that attempted signup.
+
+**Examples**
+
+Each of the following examples shows how to use the `before-user-created` hook to control signup behavior. Each use case includes both a HTTP implementation (e.g. using an Edge Function) and a SQL implementation (Postgres function).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+
+
+<TabPanel id="sql" label="SQL">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql-allow-by-domain"
+>
+
+
+<TabPanel id="sql-allow-by-domain" label="Allow by Domain">
+Allow signups only from specific domains like supabase.com or example.test. Reject all others. This is useful for private/internal apps, enterprise gating, or invite-only beta access.
+
+The `before-user-created` hook solves this by:
+* Detecting that a user is about to be created
+* Providing the email address in the `user.email` field
+
+```sql
+create or replace function public.hook_enforce_email_domain(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+  email text;
+  domain text;
+begin
+  email := event->'user'->>'email';
+  domain := split_part(email, '@', 2);
+
+  if domain not in ('supabase.com', 'example.test') then
+    return jsonb_build_object(
+      'error', jsonb_build_object(
+        'message', 'Please sign up with a company email address.',
+        'http_code', 400
+      )
+    );
+  end if;
+
+  return '{}'::jsonb;
+end;
+$$;
+
+grant execute
+  on function public.hook_enforce_email_domain
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.hook_enforce_email_domain
+  from authenticated, anon, public;
+```
+</TabPanel>
+
+
+<TabPanel id="sql-block-by-cidr" label="Block by IP or CIDR">
+Block user signups originating from IP ranges using CIDR notation. This allows you to restrict access from entire networks (e.g. cloud provider subnets, countries, or VPN exit nodes) as well as individual IP addresses (/32).
+
+The `before-user-created` hook solves this by:
+* Detecting that a user is about to be created
+* Providing the ip address in the `header.ip_address` field
+
+This example uses PostgreSQL’s built-in `inet` and `<<` CIDR operators:
+```sql
+create or replace function public.hook_block_signup_by_cidr(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+  ip inet;
+begin
+  ip := event->'header'->>'ip_address';
+
+  if ip::inet << '192.168.0.0/16'::cidr
+     or ip::inet << '10.0.0.0/8'::cidr
+     or ip::inet << '172.168.1.100/24'::cidr
+     or ip::inet << '172.168.1.210/32'::cidr then
+    return jsonb_build_object(
+      'error', jsonb_build_object(
+        'message', 'Signups are not allowed from your network.',
+        'http_code', 403
+      )
+    );
+  end if;
+
+  return '{}'::jsonb;
+end;
+$$;
+
+grant execute
+  on function public.hook_block_signup_by_cidr
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.hook_block_signup_by_cidr
+  from authenticated, anon, public;
+```
+</TabPanel>
+
+
+<TabPanel id="sql-block-by-oauth-provider" label="Block by OAuth Provider">
+Some applications want to **allow sign-ins with a provider like Discord only for users who already exist**, while blocking new account creation via that provider. This prevents unwanted signups through OAuth flows and enables tighter control over who can join the app.
+
+The `before-user-created` hook solves this by:
+* Detecting that a user is about to be created
+* Allowing you to inspect the `app_metadata.provider`
+* Knowing the request came from an OAuth flow
+
+```sql
+create or replace function public.hook_reject_discord_signups(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+  provider text;
+begin
+  provider := event->'user'->'app_metadata'->>'provider';
+
+  if provider = 'discord' then
+    return jsonb_build_object(
+      'error', jsonb_build_object(
+        'message', 'Signups with Discord are not allowed.',
+        'http_code', 403
+      )
+    );
+  end if;
+
+  return '{}'::jsonb;
+end;
+$$;
+
+grant execute
+  on function public.hook_reject_discord_signups
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.hook_reject_discord_signups
+  from authenticated, anon, public;
+```
+</TabPanel>
+
+
+</Tabs>
+</TabPanel>
+
+
+<TabPanel id="http" label="HTTP">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="http-allow-by-domain"
+>
+
+
+<TabPanel id="http-allow-by-domain" label="Allow by Domain">
+Allow signups only from specific domains like supabase.com or example.test. Reject all others. This is useful for private/internal apps, enterprise gating, or invite-only beta access.
+
+The `before-user-created` hook solves this by:
+* Detecting that a user is about to be created
+* Providing the email address in the `user.email` field
+
+```ts
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+
+const allowedDomains = [
+  'supabase.com',
+  'example.test',
+]
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const secret = Deno.env.get('BEFORE_USER_CREATED_SECRET')?.replace('v1,whsec_', '')
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(secret)
+
+  try {
+    const { user } = wh.verify(payload, headers)
+    const email = user.email || ''
+    const domain = email.split('@')[1] || ''
+
+    if (!allowedDomains.includes(domain)) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: 'Please sign up with a company email address.',
+            http_code: 400
+          }
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: { message: 'Invalid request format' } }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } }
+    )
+  }
+})
+```
+</TabPanel>
+
+
+<TabPanel id="http-block-by-cidr" label="Block by IP or CIDR">
+Block user signups originating from IP ranges using CIDR notation. This allows you to restrict access from entire networks (e.g. cloud provider subnets, countries, or VPN exit nodes) as well as individual IP addresses (/32).
+
+The `before-user-created` hook solves this by:
+* Detecting that a user is about to be created
+* Providing the ip address in the `header.ip_address` field
+
+This example uses the [`ipaddr.js`](https://www.npmjs.com/package/ipaddr.js/v/2.2.0) npm package with the  for CIDR matching.
+```ts
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { ipaddr } from 'npm:ipaddr.js@2.2.0'
+
+const secret = Deno.env.get('BEFORE_USER_CREATED_SECRET')?.replace('v1,whsec_', '')
+
+const blockedCIDRs = [
+  '192.168.0.0/16',
+  '10.0.0.0/8',
+  '172.168.1.100/24',
+  '172.168.1.210/32',
+]
+
+function isBlocked(ip: string): boolean {
+  try {
+    const parsed = ipaddr.parse(ip)
+    return blockedCIDRs.some((cidr) => {
+      const [range, bits] = cidr.split('/')
+      return parsed.match(ipaddr.parse(range), parseInt(bits))
+    })
+  } catch {
+    return false
+  }
+}
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(secret)
+
+  try {
+    const { header } = wh.verify(payload, headers)
+    const ip = header.ip_address
+
+    if (isBlocked(ip)) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: 'Signups are not allowed from your network.',
+            http_code: 403
+          }
+        }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })
+  } catch {
+    return new Response('{}', { status: 400 })
+  }
+})
+```
+</TabPanel>
+
+
+<TabPanel id="http-block-by-oauth-provider" label="Block by OAuth Provider">
+Some applications want to **allow sign-ins with a provider like Discord only for users who already exist**, while blocking new account creation via that provider. This prevents unwanted signups through OAuth flows and enables tighter control over who can join the app.
+
+The `before-user-created` hook solves this by:
+
+* Allowing you to inspect the `app_metadata.provider`
+* Detecting that a user is about to be created
+* Knowing the request came from an OAuth flow
+
+```ts
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+
+const blockedProviders = ['discord']
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const secret = Deno.env.get('BEFORE_USER_CREATED_SECRET')?.replace('v1,whsec_', '')
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(secret)
+
+  try {
+    const { user } = wh.verify(payload, headers)
+    const provider = user.app_metadata?.provider
+
+    if (blockedProviders.includes(provider)) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: `Signups with ${provider} are not allowed.`,
+            http_code: 403
+          }
+        }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })
+  } catch {
+    return new Response('{}', { status: 400 })
+  }
+})
+```
+</TabPanel>
+</Tabs>
+
+
+</TabPanel>
+</Tabs>
+
+
