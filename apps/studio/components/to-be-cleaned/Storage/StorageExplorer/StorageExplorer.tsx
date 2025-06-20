@@ -110,6 +110,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
             folderId: bucket.id,
             folderName: bucket.name,
             index: -1,
+            searchString: itemSearchString,
           })
         }
       }
