@@ -368,7 +368,7 @@ export interface paths {
     /** Get project api keys */
     get: operations['v1-get-project-api-keys']
     put?: never
-    /** [Beta] Creates a new API key for the project */
+    /** Creates a new API key for the project */
     post: operations['createApiKey']
     delete?: never
     options?: never
@@ -383,15 +383,15 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get API key */
+    /** Get API key */
     get: operations['getApiKey']
     put?: never
     post?: never
-    /** [Beta] Deletes an API key for the project */
+    /** Deletes an API key for the project */
     delete: operations['deleteApiKey']
     options?: never
     head?: never
-    /** [Beta] Updates an API key for the project */
+    /** Updates an API key for the project */
     patch: operations['updateApiKey']
     trace?: never
   }
@@ -402,9 +402,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
+    /** Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
     get: operations['checkLegacyApiKeys']
-    /** [Beta] Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
+    /** Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
     put: operations['updateLegacyApiKeys']
     post?: never
     delete?: never
