@@ -26,13 +26,22 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
   workflowRunLogs,
   mainBranchRef,
 }) => {
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to bottom when logs change
+  React.useEffect(() => {
+    if (scrollRef.current && workflowRunLogs?.logs) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [workflowRunLogs?.logs])
+
   // Only show the card when the merge is in progress or has been attempted previously
   if (!isMerging && !attemptedMerge) return null
 
   const showSuccessIcon = currentWorkflowRun?.status === 'FUNCTIONS_DEPLOYED'
 
   return (
-    <Card className="mb-6 bg-background overflow-hidden h-64 flex flex-col">
+    <Card className="my-6 bg-background overflow-hidden h-64 flex flex-col">
       <CardHeader
         className={
           showSuccessIcon
@@ -68,7 +77,10 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
           )}
         </div>
       </CardHeader>
-      <CardContent className="overflow-hidden border-0 overflow-y-auto relative p-0">
+      <CardContent
+        ref={scrollRef}
+        className="overflow-hidden border-0 overflow-y-auto relative p-0"
+      >
         {/* sticky gradient overlay */}
         <div className="sticky top-0 -mb-8 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none z-10" />
         {workflowRunLogs?.logs ? (

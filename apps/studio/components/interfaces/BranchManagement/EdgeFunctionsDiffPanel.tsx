@@ -5,7 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import { Code, Wind } from 'lucide-react'
 import DiffViewer from 'components/ui/DiffViewer'
 import { Loading, EmptyState } from 'components/ui/AsyncState'
-import useEdgeFunctionsDiff from 'hooks/misc/useEdgeFunctionsDiff'
+import useEdgeFunctionsDiff, {
+  type FileInfo,
+  type FileStatus,
+} from 'hooks/misc/useEdgeFunctionsDiff'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { basename } from 'path'
@@ -24,36 +27,46 @@ interface FunctionDiffProps {
   currentBody: EdgeFunctionBodyData
   mainBody: EdgeFunctionBodyData
   currentBranchRef?: string
+  fileInfos: FileInfo[]
 }
 
 // Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
 const fileKey = (fullPath: string) => basename(fullPath)
+
+// Helper to get the status color for file indicators
+const getStatusColor = (status: FileStatus): string => {
+  switch (status) {
+    case 'added':
+      return 'bg-brand'
+    case 'removed':
+      return 'bg-destructive'
+    case 'modified':
+      return 'bg-warning'
+    case 'unchanged':
+      return 'bg-muted'
+    default:
+      return 'bg-muted'
+  }
+}
 
 const FunctionDiff = ({
   functionSlug,
   currentBody,
   mainBody,
   currentBranchRef,
+  fileInfos,
 }: FunctionDiffProps) => {
-  // Determine list of files with differences (by canonical key)
-  const diffFileKeys = useMemo(() => {
-    const keys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
+  // Get all file keys from fileInfos
+  const allFileKeys = fileInfos.map((info) => info.key)
 
-    return Array.from(keys).filter((key) => {
-      const currentFile = currentBody.find((f) => fileKey(f.name) === key)
-      const mainFile = mainBody.find((f) => fileKey(f.name) === key)
-      return (currentFile?.content || '') !== (mainFile?.content || '')
-    })
-  }, [currentBody, mainBody])
+  const [activeFileKey, setActiveFileKey] = useState<string | undefined>(() => allFileKeys[0])
 
-  const [activeFileKey, setActiveFileKey] = useState<string | undefined>(() => diffFileKeys[0])
-
-  // Keep active tab in sync when diffFileKeys changes (e.g. data fetch completes)
+  // Keep active tab in sync when allFileKeys changes (e.g. data fetch completes)
   useEffect(() => {
-    if (!activeFileKey || !diffFileKeys.includes(activeFileKey)) {
-      setActiveFileKey(diffFileKeys[0])
+    if (!activeFileKey || !allFileKeys.includes(activeFileKey)) {
+      setActiveFileKey(allFileKeys[0])
     }
-  }, [diffFileKeys, activeFileKey])
+  }, [allFileKeys, activeFileKey])
 
   const currentFile = currentBody.find((f) => fileKey(f.name) === activeFileKey)
   const mainFile = mainBody.find((f) => fileKey(f.name) === activeFileKey)
@@ -67,7 +80,7 @@ const FunctionDiff = ({
     return 'plaintext'
   }, [activeFileKey])
 
-  if (diffFileKeys.length === 0) return null
+  if (allFileKeys.length === 0) return null
 
   return (
     <Card>
@@ -90,19 +103,25 @@ const FunctionDiff = ({
           {/* Sidebar file list */}
           <div className="w-48 border-r bg-surface-200 flex flex-col overflow-y-auto">
             <ul className="divide-y divide-border">
-              {diffFileKeys.map((key) => (
-                <li key={key} className="flex">
+              {fileInfos.map((fileInfo) => (
+                <li key={fileInfo.key} className="flex">
                   <button
                     type="button"
-                    onClick={() => setActiveFileKey(key)}
+                    onClick={() => setActiveFileKey(fileInfo.key)}
                     className={cn(
                       'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',
-                      activeFileKey === key
+                      activeFileKey === fileInfo.key
                         ? 'bg-surface-300 text-foreground'
                         : 'text-foreground-light hover:bg-surface-300'
                     )}
                   >
-                    {key}
+                    <div
+                      className={cn(
+                        'w-1 h-1 rounded-full flex-shrink-0',
+                        getStatusColor(fileInfo.status)
+                      )}
+                    />
+                    <span className="truncate">{fileInfo.key}</span>
                   </button>
                 </li>
               ))}
@@ -139,6 +158,7 @@ const EdgeFunctionsDiffPanel = ({
     removedBodiesMap,
     currentBodiesMap,
     mainBodiesMap,
+    functionFileInfo,
     isLoading,
     hasChanges,
   } = useEdgeFunctionsDiff({
@@ -174,6 +194,7 @@ const EdgeFunctionsDiffPanel = ({
                 currentBody={addedBodiesMap[slug]!}
                 mainBody={[] as EdgeFunctionBodyData}
                 currentBranchRef={currentBranchRef}
+                fileInfos={functionFileInfo[slug] || []}
               />
             ))}
           </div>
@@ -190,6 +211,7 @@ const EdgeFunctionsDiffPanel = ({
                 currentBody={[] as EdgeFunctionBodyData}
                 mainBody={removedBodiesMap[slug]!}
                 currentBranchRef={mainBranchRef}
+                fileInfos={functionFileInfo[slug] || []}
               />
             ))}
           </div>
@@ -205,6 +227,7 @@ const EdgeFunctionsDiffPanel = ({
               currentBody={currentBodiesMap[slug]!}
               mainBody={mainBodiesMap[slug]!}
               currentBranchRef={currentBranchRef}
+              fileInfos={functionFileInfo[slug] || []}
             />
           ))}
         </div>

@@ -15,6 +15,17 @@ interface UseEdgeFunctionsDiffProps {
   mainBranchRef?: string
 }
 
+export type FileStatus = 'added' | 'removed' | 'modified' | 'unchanged'
+
+export interface FileInfo {
+  key: string
+  status: FileStatus
+}
+
+export interface FunctionFileInfo {
+  [functionSlug: string]: FileInfo[]
+}
+
 export interface EdgeFunctionsDiffResult {
   addedSlugs: string[]
   removedSlugs: string[]
@@ -23,6 +34,7 @@ export interface EdgeFunctionsDiffResult {
   removedBodiesMap: Record<string, EdgeFunctionBodyData | undefined>
   currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined>
   mainBodiesMap: Record<string, EdgeFunctionBodyData | undefined>
+  functionFileInfo: FunctionFileInfo
   isLoading: boolean
   hasChanges: boolean
 }
@@ -138,23 +150,67 @@ export const useEdgeFunctionsDiff = ({
     if (q.data) removedBodiesMap[removedSlugs[idx]] = q.data
   })
 
-  // Determine modified slugs -------------------------------------------------
-  const modifiedSlugs = overlapSlugs.filter((slug) => {
+  // Determine modified slugs and build file info -----------------------------
+  const modifiedSlugs: string[] = []
+  const functionFileInfo: FunctionFileInfo = {}
+
+  // Process overlapping functions to determine modifications and file info
+  overlapSlugs.forEach((slug) => {
     const currentBody = currentBodiesMap[slug]
     const mainBody = mainBodiesMap[slug]
-    if (!currentBody || !mainBody) return false
+    if (!currentBody || !mainBody) return
 
-    const keys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
+    const allFileKeys = new Set([...currentBody, ...mainBody].map((f) => fileKey(f.name)))
+    const fileInfos: FileInfo[] = []
+    let hasModifications = false
 
-    for (const key of keys) {
+    for (const key of allFileKeys) {
       const currentFile = currentBody.find((f) => fileKey(f.name) === key)
       const mainFile = mainBody.find((f) => fileKey(f.name) === key)
-      if ((currentFile?.content || '') !== (mainFile?.content || '')) {
-        return true
+
+      let status: FileStatus = 'unchanged'
+
+      if (!currentFile && mainFile) {
+        status = 'removed'
+        hasModifications = true
+      } else if (currentFile && !mainFile) {
+        status = 'added'
+        hasModifications = true
+      } else if (currentFile && mainFile && currentFile.content !== mainFile.content) {
+        status = 'modified'
+        hasModifications = true
       }
+
+      fileInfos.push({ key, status })
     }
 
-    return false
+    if (hasModifications) {
+      modifiedSlugs.push(slug)
+    }
+
+    functionFileInfo[slug] = fileInfos
+  })
+
+  // Add file info for added functions
+  addedSlugs.forEach((slug) => {
+    const body = addedBodiesMap[slug]
+    if (body) {
+      functionFileInfo[slug] = body.map((file) => ({
+        key: fileKey(file.name),
+        status: 'added' as FileStatus,
+      }))
+    }
+  })
+
+  // Add file info for removed functions
+  removedSlugs.forEach((slug) => {
+    const body = removedBodiesMap[slug]
+    if (body) {
+      functionFileInfo[slug] = body.map((file) => ({
+        key: fileKey(file.name),
+        status: 'removed' as FileStatus,
+      }))
+    }
   })
 
   const hasChanges = addedSlugs.length > 0 || removedSlugs.length > 0 || modifiedSlugs.length > 0
@@ -167,6 +223,7 @@ export const useEdgeFunctionsDiff = ({
     removedBodiesMap,
     currentBodiesMap,
     mainBodiesMap,
+    functionFileInfo,
     isLoading,
     hasChanges,
   }

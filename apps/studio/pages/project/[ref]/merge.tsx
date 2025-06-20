@@ -15,14 +15,15 @@ import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
-import { Badge, Button } from 'ui'
+import { Badge, Button, NavMenu, NavMenuItem, cn } from 'ui'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { GitMerge } from 'lucide-react'
+import { GitBranchIcon, GitMerge, Shield, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useFlag } from 'hooks/ui/useFlag'
 
 const MergePage: NextPageWithLayout = () => {
@@ -30,13 +31,6 @@ const MergePage: NextPageWithLayout = () => {
   const { ref } = useParams()
 
   const gitlessBranching = useFlag('gitlessBranching')
-
-  // Redirect to branches page if feature flag disabled
-  useEffect(() => {
-    if (!gitlessBranching && ref) {
-      router.push(`/project/${ref}/branches`)
-    }
-  }, [gitlessBranching, ref, router])
 
   const project = useSelectedProject()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -47,7 +41,12 @@ const MergePage: NextPageWithLayout = () => {
   // Get branch information
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
-    { enabled: gitlessBranching && !!parentProjectRef }
+    {
+      enabled: gitlessBranching && !!parentProjectRef,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    }
   )
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
@@ -62,6 +61,9 @@ const MergePage: NextPageWithLayout = () => {
     {
       enabled: gitlessBranching && !!parentProjectRef && !!workflowRunId,
       refetchInterval: 3000, // Poll every 3 seconds to check for status changes
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0,
     }
   )
 
@@ -89,6 +91,7 @@ const MergePage: NextPageWithLayout = () => {
   const {
     data: diffContent,
     isLoading: isDiffLoading,
+    isRefetching: isDiffRefetching,
     error: diffError,
     refetch: refetchDiff,
   } = useBranchDiffQuery(
@@ -96,7 +99,12 @@ const MergePage: NextPageWithLayout = () => {
       branchId: currentBranch?.id || '',
       projectRef: parentProjectRef || '',
     },
-    { enabled: gitlessBranching && !!currentBranch?.id }
+    {
+      enabled: gitlessBranching && !!currentBranch?.id && !!parentProjectRef,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    }
   )
 
   // Show toast notifications when workflow status changes
@@ -126,11 +134,24 @@ const MergePage: NextPageWithLayout = () => {
 
   // Get edge functions for both branches
   const { data: currentBranchFunctions, isLoading: isCurrentFunctionsLoading } =
-    useEdgeFunctionsQuery({ projectRef: ref }, { enabled: gitlessBranching && !!ref })
+    useEdgeFunctionsQuery(
+      { projectRef: ref },
+      {
+        enabled: gitlessBranching && !!ref,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: true,
+        staleTime: 0,
+      }
+    )
 
   const { data: mainBranchFunctions, isLoading: isMainFunctionsLoading } = useEdgeFunctionsQuery(
     { projectRef: parentProjectRef },
-    { enabled: gitlessBranching && !!parentProjectRef }
+    {
+      enabled: gitlessBranching && !!parentProjectRef,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    }
   )
 
   // Check if there are any changes (database or edge functions)
@@ -245,6 +266,34 @@ const MergePage: NextPageWithLayout = () => {
     ]
   }, [workflowRunId, currentTab])
 
+  // Show coming soon notice if feature flag is disabled
+  if (!gitlessBranching) {
+    return (
+      <PageLayout>
+        <ScaffoldContainer size="full">
+          <div className="flex items-center flex-col justify-center w-full py-16">
+            <ProductEmptyState title="Branch Merge - Coming Soon">
+              <p className="text-sm text-foreground-light">
+                The branch merge feature is currently in development and will be available soon.
+              </p>
+              <div className="flex items-center space-x-2 !mt-4">
+                <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://supabase.com/docs/guides/platform/branching"
+                  >
+                    View the docs
+                  </a>
+                </Button>
+              </div>
+            </ProductEmptyState>
+          </div>
+        </ScaffoldContainer>
+      </PageLayout>
+    )
+  }
+
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
     return (
@@ -257,8 +306,13 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   if (!gitlessBranching) {
-    // Render nothing while redirecting
-    return null
+    return (
+      <PageLayout title="Merge Request">
+        <div className="p-6">
+          <p>This page is only available for preview branches.</p>
+        </div>
+      </PageLayout>
+    )
   }
 
   const isDataLoaded = !isDiffLoading && !isCurrentFunctionsLoading && !isMainFunctionsLoading
@@ -298,14 +352,20 @@ const MergePage: NextPageWithLayout = () => {
     <span>
       Merge{' '}
       <Link href={`/project/${ref}/editor`}>
-        <Badge className="font-mono text-lg">{currentBranch.name}</Badge>
+        <Badge className="font-mono text-lg gap-1">
+          <GitBranchIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
+          {currentBranch.name}
+        </Badge>
       </Link>{' '}
       into{' '}
       <Link
         href={`/project/${mainBranch?.project_ref}/editor`}
         className="font-mono inline-flex gap-4"
       >
-        <Badge className="font-mono text-lg">{mainBranch?.name || 'main'}</Badge>
+        <Badge className="font-mono text-lg gap-1">
+          <Shield strokeWidth={1.5} size={16} className="text-warning" />
+          {mainBranch?.name || 'main'}
+        </Badge>
       </Link>
     </span>
   )
@@ -324,27 +384,51 @@ const MergePage: NextPageWithLayout = () => {
       breadcrumbs={breadcrumbs}
       primaryActions={primaryActions}
       size="full"
-      navigationItems={navigationItems}
+      className="border-b-0 pb-0"
     >
-      <ScaffoldContainer size="full" className="pt-6 pb-12">
-        {/* Merge workflow logs */}
-        <WorkflowLogsCard
-          attemptedMerge={attemptedMerge}
-          isMerging={isMerging}
-          isPolling={!!isPolling}
-          currentWorkflowRun={currentWorkflowRun}
-          workflowRunLogs={workflowRunLogs}
-          mainBranchRef={mainBranch?.project_ref}
-        />
+      <div className="border-b">
+        <ScaffoldContainer size="full">
+          {/* Merge workflow logs */}
+          <WorkflowLogsCard
+            attemptedMerge={attemptedMerge}
+            isMerging={isMerging}
+            isPolling={!!isPolling}
+            currentWorkflowRun={currentWorkflowRun}
+            workflowRunLogs={workflowRunLogs}
+            mainBranchRef={mainBranch?.project_ref}
+          />
 
+          {/* Tab navigation */}
+          <NavMenu className="mt-4 border-none">
+            {navigationItems.map((item) => {
+              const isActive =
+                item.active !== undefined ? item.active : router.asPath.split('?')[0] === item.href
+              return (
+                <NavMenuItem key={item.label} active={isActive}>
+                  <Link
+                    href={
+                      item.href.includes('[ref]') && !!ref
+                        ? item.href.replace('[ref]', ref)
+                        : item.href
+                    }
+                    className={cn('inline-flex items-center gap-2', isActive && 'text-foreground')}
+                  >
+                    {item.label}
+                  </Link>
+                </NavMenuItem>
+              )
+            })}
+          </NavMenu>
+        </ScaffoldContainer>
+      </div>
+      <ScaffoldContainer size="full" className="pt-6 pb-12">
         {/* Content based on selected tab */}
         {currentTab === 'database' ? (
           <DatabaseDiffPanel
             diffContent={diffContent}
-            isLoading={isDiffLoading}
+            isLoading={isDiffLoading || isDiffRefetching}
             error={diffError}
             showRefreshButton={!isPolling}
-            onRefresh={() => refetchDiff()}
             currentBranchRef={ref}
           />
         ) : (

@@ -57,7 +57,7 @@ export const useBranchDiffQuery = (
     branchKeys.diff(branchId),
     () => getBranchDiff({ branchId, includedSchemas }),
     {
-      enabled: enabled && typeof branchId !== 'undefined',
+      enabled: enabled && typeof branchId !== 'undefined' && branchId !== '',
       ...options,
     }
   )

@@ -11,7 +11,6 @@ interface DatabaseDiffPanelProps {
   error?: any
   showRefreshButton?: boolean
   currentBranchRef?: string
-  onRefresh?: () => void
 }
 
 const DatabaseDiffPanel = ({
@@ -19,7 +18,6 @@ const DatabaseDiffPanel = ({
   isLoading,
   error,
   currentBranchRef,
-  onRefresh,
 }: DatabaseDiffPanelProps) => {
   if (isLoading) return <Loading />
 
