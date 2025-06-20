@@ -16,7 +16,11 @@ import { useMemo, useState } from 'react'
 import { useParams } from 'common'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import {
+  JWTAlgorithm,
+  JWTSigningKey,
+  useJWTSigningKeysQuery,
+} from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import {
@@ -37,6 +41,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
   Table,
   TableBody,
   TableCell,
@@ -45,7 +54,7 @@ import {
   TableRow,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { algorithmLabels } from '../algorithm-details'
+import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
@@ -652,7 +661,7 @@ export default function JWTSecretKeysTable() {
       </Dialog>
 
       <Dialog open={shownDialog === 'confirm-rotate'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-[425px] overflow-hidden">
+        <DialogContent className="sm:max-w-lg overflow-hidden">
           <DialogHeader>
             <DialogTitle>Confirm key rotation</DialogTitle>
             <DialogDescription>
@@ -665,17 +674,19 @@ export default function JWTSecretKeysTable() {
             <div className="relative flex flex-col items-center space-y-6 py-6">
               {standbyKey ? (
                 <div className="flex items-center">
-                  <Badge className={cn(statusColors['standby'], 'px-3 py-1 space-x-1')}>
-                    <Timer size={13} className="mr-1.5" />
-                    STANDBY KEY
+                  <Badge
+                    className={cn(statusColors['standby'], 'px-3 py-1 space-x-1 items-baseline')}
+                  >
+                    <Timer size={13} className="self-center" />
+                    <span>STANDBY KEY</span>
                     <span className="text-xs font-mono text-foreground-light">
-                      {algorithmLabels[standbyKey.algorithm]}
+                      {algorithmLabels[standbyKey!.algorithm]}
                     </span>
                   </Badge>
-                  <ArrowRight className="h-4 w-4 text-foreground-light" />
-                  <Badge className={cn(statusColors['in_use'], 'px-3 py-1')}>
-                    <Key size={13} className="mr-1.5" />
-                    CURRENTLY USED
+                  <ArrowRight className="h-4 w-4 mx-1 text-foreground-light" />
+                  <Badge className={cn(statusColors['in_use'], 'px-3 py-1 space-x-1')}>
+                    <Key size={13} />
+                    <span>CURRENTLY USED</span>
                   </Badge>
                 </div>
               ) : (
@@ -698,17 +709,18 @@ export default function JWTSecretKeysTable() {
                   </Badge>
                 </div>
               )}
+
               <div className="flex items-center">
-                <Badge className={cn(statusColors['in_use'], 'px-3 py-1')}>
-                  <Key size={13} className="mr-1.5" />
-                  CURRENTLY USED
+                <Badge className={cn(statusColors['in_use'], 'px-3 py-1 space-x-1 items-baseline')}>
+                  <Key size={13} className="self-center" />
+                  <span>CURRENTLY USED</span>
                   <span className="text-xs font-mono text-foreground-light">
                     {inUseKey?.algorithm && algorithmLabels[inUseKey.algorithm]}
                   </span>
                 </Badge>
-                <ArrowRight className="h-4 w-4 text-foreground-light" />
+                <ArrowRight className="h-4 w-4 mx-1 text-foreground-light" />
                 <Badge className={cn(statusColors['previously_used'], 'px-3 py-1 space-x-1')}>
-                  <Timer size={13} className="mr-1.5" />
+                  <Timer size={13} />
                   <span>PREVIOUS KEY</span>
                 </Badge>
               </div>
@@ -726,7 +738,7 @@ export default function JWTSecretKeysTable() {
       </Dialog>
 
       <Dialog open={shownDialog === 'key-details'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-lg font-medium">Key Details</DialogTitle>
           </DialogHeader>
