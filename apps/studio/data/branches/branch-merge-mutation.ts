@@ -83,13 +83,7 @@ export const useBranchMergeMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          // Backend currently returns "push" errors for merge operations due to internal routing
           let errorMessage = data.message || 'Unknown error occurred'
-
-          // Replace "push" with "merge" in error messages since we're doing a merge operation
-          if (errorMessage.includes('failed to push branch')) {
-            errorMessage = errorMessage.replace('failed to push branch', 'failed to merge branch')
-          }
 
           toast.error(`Failed to merge branch: ${errorMessage}`)
         } else {
