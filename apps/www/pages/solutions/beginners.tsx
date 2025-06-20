@@ -9,6 +9,9 @@ import getContent from '~/data/solutions/beginners'
 
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('~/components/Solutions/PlatformSection'))
+const PlatformStarterSection = dynamic(
+  () => import('~/components/Solutions/PlatformStarterSection')
+)
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 const CTAForm = dynamic(() => import('~/components/Solutions/CTAForm'))
 
@@ -42,6 +45,7 @@ const Enterprise: NextPage = () => {
         <WhySupabase {...content.why} />
         <PlatformSection {...content.platform} />
         <TwitterSocialSection {...content.twitterSocialSection} />
+        <PlatformStarterSection {...content.platformStarterSection} />
         <CTAForm />
       </Layout>
     </>

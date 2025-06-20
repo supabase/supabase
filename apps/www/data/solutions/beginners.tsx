@@ -8,13 +8,14 @@ import RealtimeVisual from 'components/Products/RealtimeVisual'
 import FunctionsVisual from 'components/Products/FunctionsVisual'
 import ComputePricingCalculator from 'components/Pricing/ComputePricingCalculator'
 
-import type { CTASection, FeaturesSection, HeroSection, Metadata } from './solutions.types'
+import type { FeaturesSection, HeroSection, Metadata } from './solutions.types'
 import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import type { TwitterSocialSectionProps } from 'components/TwitterSocialSection'
-import { useSendTelemetryEvent } from 'lib/telemetry'
 
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { tweets } from 'shared-data'
+import { PlatformStarterSectionProps } from '../../components/Solutions/PlatformStarterSection'
 
 const data: () => {
   metadata: Metadata
@@ -22,7 +23,7 @@ const data: () => {
   why: FeaturesSection
   platform: PlatformSectionProps
   twitterSocialSection: TwitterSocialSectionProps
-  'cta-section': CTASection
+  platformStarterSection: PlatformStarterSectionProps
 } = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -516,17 +517,15 @@ const data: () => {
       ),
       tweets: tweets.slice(0, 18),
     },
-    'cta-section': {
-      id: 'connect-to-supabase',
-      label: '',
-      heading: <>Connect your app to Supabase now</>,
-      subheading:
-        'Set up a Supabase OAuth app so your users can start interacting with their Supabase Project.',
-      cta: {
-        label: 'View docs',
-        href: 'https://supabase.com/docs/guides/auth/auth-google',
-        type: 'text',
-      },
+    platformStarterSection: {
+      id: 'platform-starter',
+      heading: (
+        <>
+          <span className="text-foreground block">Choose your platform</span> to start building in
+          seconds
+        </>
+      ),
+      subheading: 'to start building in seconds',
     },
   }
 }
