@@ -84,9 +84,6 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)
     },
-    onError: (error) => {
-      toast.error(`Failed to create branch: ${error.message}`)
-    },
   })
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
