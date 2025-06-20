@@ -71,7 +71,7 @@ hideToc: true
 
 
       ```ts name=lib/supabase.ts
-      import { AppState } from 'react-native'
+      import { AppState, Platform } from 'react-native'
       import 'react-native-url-polyfill/auto'
       import AsyncStorage from '@react-native-async-storage/async-storage'
       import { createClient, processLock } from '@supabase/supabase-js'
@@ -81,7 +81,7 @@ hideToc: true
 
       export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
-          storage: AsyncStorage,
+          ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: false,
@@ -94,13 +94,15 @@ hideToc: true
       // to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
       // `SIGNED_OUT` event if the user's session is terminated. This should
       // only be registered once.
-      AppState.addEventListener('change', (state) => {
-        if (state === 'active') {
-          supabase.auth.startAutoRefresh()
-        } else {
-          supabase.auth.stopAutoRefresh()
-        }
-      })
+      if (Platform.OS !== "web") {
+        AppState.addEventListener('change', (state) => {
+          if (state === 'active') {
+            supabase.auth.startAutoRefresh()
+          } else {
+            supabase.auth.stopAutoRefresh()
+          }
+        })
+      }
       ```
 
     </StepHikeCompact.Code>
