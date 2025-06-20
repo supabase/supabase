@@ -4,7 +4,6 @@ import {
   CircleArrowUp,
   Eye,
   FileKey,
-  Import,
   Key,
   MoreVertical,
   RotateCw,
@@ -60,6 +59,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
+import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
 import { SigningKeyRow } from './signing-key-row'
 
@@ -232,14 +232,9 @@ export default function JWTSecretKeysTable() {
             )}
           </>
         ) : (
-          <ActionPanel
-            title="Start using JWT signing keys"
-            description="Right now your project is using the legacy JWT secret. To start taking advantage of the new JWT signing keys, migrate your project's secret to the new set up."
-            buttonLabel="Migrate JWT secret"
+          <StartUsingJwtSigningKeysBanner
             onClick={() => setShownDialog('legacy')}
-            loading={isLoadingMutation}
-            type="primary"
-            icon={<Import />}
+            isLoading={isLoadingMutation}
           />
         )}
       </div>
