@@ -134,6 +134,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
 
   useEffect(() => {
     if (visible) {
+      setFocusedEditor(false)
       form.reset({
         name: func?.name ?? '',
         schema: func?.schema ?? 'public',
