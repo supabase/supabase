@@ -128,8 +128,18 @@ export const {
   OPTIONS: options,
 } = client
 
-export const handleError = (error: unknown): never => {
+type HandleErrorOptions = {
+  alwaysCapture?: boolean
+}
+
+export const handleError = (
+  error: unknown,
+  options: HandleErrorOptions = { alwaysCapture: false }
+): never => {
   if (error && typeof error === 'object') {
+    if (options.alwaysCapture) {
+      Sentry.captureException(error)
+    }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
         ? error.msg
@@ -144,6 +154,7 @@ export const handleError = (error: unknown): never => {
       'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
 
     if (errorMessage) {
+
       throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
     }
   }
@@ -151,6 +162,7 @@ export const handleError = (error: unknown): never => {
   if (error !== null && typeof error === 'object' && 'stack' in error) {
     console.error(error.stack)
   }
+
 
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
