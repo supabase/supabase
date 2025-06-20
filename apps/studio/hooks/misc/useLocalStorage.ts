@@ -1,7 +1,7 @@
 // Reference: https://usehooks.com/useLocalStorage/
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useState, useEffect } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
@@ -58,25 +58,39 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
   const queryClient = useQueryClient()
   const queryKey = ['localStorage', key]
 
+  // During SSR, return initial value immediately to prevent hydration mismatch
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const {
     error,
     data: storedValue = initialValue,
     isSuccess,
     isLoading,
     isError,
-  } = useQuery(queryKey, () => {
-    if (typeof window === 'undefined') {
-      return initialValue
+  } = useQuery(
+    queryKey,
+    () => {
+      if (typeof window === 'undefined') {
+        return initialValue
+      }
+
+      const item = window.localStorage.getItem(key)
+
+      if (!item) {
+        return initialValue
+      }
+
+      return JSON.parse(item) as T
+    },
+    {
+      enabled: isClient, // Only run query on client side
+      staleTime: Infinity, // Prevent unnecessary refetches
     }
-
-    const item = window.localStorage.getItem(key)
-
-    if (!item) {
-      return initialValue
-    }
-
-    return JSON.parse(item) as T
-  })
+  )
 
   const setValue: Dispatch<SetStateAction<T>> = (value) => {
     const valueToStore = value instanceof Function ? value(storedValue) : value
@@ -89,5 +103,8 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     queryClient.invalidateQueries(queryKey)
   }
 
-  return [storedValue, setValue, { isSuccess, isLoading, isError, error }] as const
+  // Return initial value during SSR, actual value on client
+  const finalValue = isClient ? storedValue : initialValue
+
+  return [finalValue, setValue, { isSuccess, isLoading, isError, error }] as const
 }
