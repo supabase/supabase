@@ -6,47 +6,6 @@ import { toast } from 'sonner'
 import { useConsentState } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
-
-export const PrivacyUpdateBanner = () => {
-  const [privacyUpdateAcknowledged, setPrivacyUpdateAcknowledged] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.PRIVACY_NOTICE_ACKNOWLEDGED,
-    false
-  )
-
-  if (privacyUpdateAcknowledged) return null
-
-  return (
-    <Alert_Shadcn_ className="mb-4 relative">
-      <AlertTitle_Shadcn_>
-        <Badge variant="default" className="mr-2">
-          NOTICE
-        </Badge>
-        Privacy Policy Update – Effective May 28, 2025
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        We’ve updated our{' '}
-        <a href="https://supabase.com/privacy" target="_blank" className="text hover:text-brand">
-          Privacy Policy
-        </a>{' '}
-        to clarify how we use AI features, marketing tools, cookies, and your data. By continuing to
-        use Supabase after May 28, you agree to the new terms. Questions? Contact{' '}
-        <a href="mailto:privacy@supabase.com" target="_blank" className="text hover:text-brand">
-          our team
-        </a>
-        .
-      </AlertDescription_Shadcn_>
-      <ButtonTooltip
-        type="text"
-        icon={<X />}
-        className="absolute top-2 right-2 px-1"
-        onClick={() => setPrivacyUpdateAcknowledged(true)}
-        tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
-      />
-    </Alert_Shadcn_>
-  )
-}
 
 export const AnalyticsSettings = () => {
   const { hasAccepted, acceptAll, denyAll, categories } = useConsentState()

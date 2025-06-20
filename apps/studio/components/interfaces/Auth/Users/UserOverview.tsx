@@ -25,7 +25,7 @@ import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserHeader } from './UserHeader'
-import { PANEL_PADDING } from './UserPanel'
+import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'

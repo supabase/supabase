@@ -442,34 +442,6 @@ const getSupavisorLogsQuery = () => {
   `
 }
 
-// /**
-//  * Supabase Storage logs query fragment
-//  */
-// const getSupabaseStorageLogsQuery = () => {
-//   return `
-//     select
-//       id,
-//       sl.timestamp as timestamp,
-//       'storage' as log_type,
-//       'undefined' as status,
-//       CASE
-//           WHEN LOWER(sl_metadata.level) = 'error' THEN 'error'
-//           WHEN LOWER(sl_metadata.level) = 'warn' OR LOWER(sl_metadata.level) = 'warning' THEN 'warning'
-//           ELSE 'success'
-//       END as level,
-//       null as path,
-//       null as host,
-//       null as event_message,
-//       null as method,
-//       'api_role' as api_role,
-//       null as auth_user,
-//       null as log_count,
-//       null as logs
-//     from storage_logs as sl
-//     cross join unnest(metadata) as sl_metadata
-//   `
-// }
-
 // WHERE pathname includes `/storage/`
 const getSupabaseStorageLogsQuery = () => {
   return `

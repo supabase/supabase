@@ -2,19 +2,33 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/ui/DataTable/DataTable.constants'
-import { post } from 'data/fetchers'
+import { get } from 'data/fetchers'
 import { getLogsChartQuery, getLogsCountQuery, getUnifiedLogsQuery } from './UnifiedLogs.queries'
-import { type FacetMetadataSchema } from './UnifiedLogs.schema'
-import type {
-  ExtendedColumnSchema,
-  InfiniteQueryResponse,
-  PageParam,
-  SearchParamsType,
-  UnifiedLogsMeta,
-} from './UnifiedLogs.types'
+import { BaseChartSchema, ColumnSchema, type FacetMetadataSchema } from './UnifiedLogs.schema'
+import type { PageParam, SearchParamsType, UnifiedLogsMeta } from './UnifiedLogs.types'
 
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_MODE = false
+
+export type ExtendedColumnSchema = ColumnSchema & {
+  timestamp: string // Original database timestamp
+  date: Date // Date object for display
+}
+
+type InfiniteQueryMeta<TMeta = Record<string, unknown>> = {
+  totalRowCount: number
+  filterRowCount: number
+  chartData: BaseChartSchema[]
+  facets: Record<string, FacetMetadataSchema>
+  metadata?: TMeta
+}
+
+type InfiniteQueryResponse<TData, TMeta = unknown> = {
+  data: TData
+  meta: InfiniteQueryMeta<TMeta>
+  prevCursor: number | null
+  nextCursor: number | null
+}
 
 export function createApiQueryString(params: Record<string, any>): string {
   const queryParams = new URLSearchParams()
@@ -104,22 +118,17 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
         const sql = getLogsChartQuery(search)
 
         // Use the get function from data/fetchers for chart data
-        const { data, error } = await post(
-          `/platform/projects/{ref}/analytics/endpoints/logs.all`,
-          {
-            body: {
+        const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+          params: {
+            path: { ref: projectRef },
+            query: {
+              iso_timestamp_start: dateStart,
+              iso_timestamp_end: dateEnd,
+              project: projectRef,
               sql,
             },
-            params: {
-              path: { ref: projectRef },
-              query: {
-                iso_timestamp_start: dateStart,
-                iso_timestamp_end: dateEnd,
-                project: projectRef,
-              },
-            },
-          }
-        )
+          },
+        })
 
         if (error) {
           if (DEBUG_MODE) console.error('API returned error for chart data:', error)
@@ -305,18 +314,16 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const countsSql = getLogsCountQuery(search)
 
         // First, fetch the counts data
-        const { data: countsData, error: countsError } = await post(
+        const { data: countsData, error: countsError } = await get(
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
           {
-            body: {
-              sql: countsSql,
-            },
             params: {
               path: { ref: projectRef },
               query: {
                 iso_timestamp_start: isoTimestampStart,
                 iso_timestamp_end: isoTimestampEnd,
                 project: projectRef,
+                sql: countsSql,
               },
             },
           }
@@ -405,18 +412,16 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
           console.log('🔍 Raw pageParam received:', pageParam)
         }
 
-        const { data: logsData, error: logsError } = await post(
+        const { data: logsData, error: logsError } = await get(
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
           {
-            body: {
-              sql: logsSql,
-            },
             params: {
               path: { ref: projectRef },
               query: {
                 iso_timestamp_start: timestampStart,
                 iso_timestamp_end: timestampEnd,
                 project: projectRef,
+                sql: logsSql,
               },
             },
           }
@@ -464,7 +469,6 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
             log_type: row.log_type || '',
             latency: row.latency || 0,
             log_count: row.log_count || null,
-            has_trace: Math.random() < 0.5, // Simple 50% random chance
             logs: row.logs || [],
             auth_user: row.auth_user || null,
           }

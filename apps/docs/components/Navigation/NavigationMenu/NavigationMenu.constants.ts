@@ -982,7 +982,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/hypopg',
         },
         {
-          name: 'plv8: Javascript Language',
+          name: 'plv8 (deprecated)',
           url: '/guides/database/extensions/plv8',
         },
         {
@@ -998,7 +998,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgaudit',
         },
         {
-          name: 'pgjwt: JSON Web Tokens',
+          name: 'pgjwt (deprecated)',
           url: '/guides/database/extensions/pgjwt',
         },
         {
@@ -1070,7 +1070,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/plpgsql_check',
         },
         {
-          name: 'timescaledb: Time-series data',
+          name: 'timescaledb (deprecated)',
           url: '/guides/database/extensions/timescaledb',
         },
         {
@@ -2160,6 +2160,16 @@ export const platform: NavMenuConstant = {
         {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
+          items: [
+            {
+              name: 'Enable MFA',
+              url: '/guides/platform/multi-factor-authentication',
+            },
+            {
+              name: 'Require MFA for organization members',
+              url: '/guides/platform/org-mfa-enforcement',
+            },
+          ],
         },
         {
           name: 'Transfer Project',

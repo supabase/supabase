@@ -4,12 +4,12 @@ import { get, isEqual } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import type { PlanId } from 'data/subscriptions/types'
 import logConstants from 'shared-data/logConstants'
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
-import { IS_PLATFORM } from 'common'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -145,7 +145,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters, limit: n
       if (IS_PLATFORM === false) {
         return `
 -- local dev edge_logs query
-select id, edge_logs.timestamp, event_message, request.method, request.path, response.status_code
+select id, edge_logs.timestamp, event_message, request.method, request.path, request.search, response.status_code
 from edge_logs
 ${joins}
 ${where}
@@ -153,7 +153,7 @@ ${orderBy}
 limit ${limit};
 `
       }
-      return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
+      return `select id, identifier, timestamp, event_message, request.method, request.path, request.search, response.status_code
   from ${table}
   ${joins}
   ${where}

@@ -25,6 +25,7 @@
     "postbuild": "pnpm run build:sitemap && pnpm run build:llms && ./../../scripts/upload-static-assets.sh",
     "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "predev": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
+    "preembeddings": "pnpm run codegen:references",
     "preinstall": "npx only-allow pnpm",
     "presync": "pnpm run codegen:graphql",
     "pretest": "pnpm run codegen:examples",
@@ -33,6 +34,7 @@
     "sync": "tsx --conditions=react-server ./resources/rootSync.ts",
     "test": "pnpm supabase start && pnpm run test:local && pnpm supabase stop",
     "test:local": "vitest --exclude \"**/*.smoke.test.ts\"",
+    "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --run",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
     "troubleshooting:sync": "node features/docs/Troubleshooting.script.mjs",
     "typecheck": "tsc --noEmit"
@@ -155,7 +157,7 @@
     "twoslash": "^0.3.1",
     "typescript": "~5.5.0",
     "unist-util-visit-parents": "5.1.3",
-    "vite": "^6.2.6",
+    "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^3.0.5"
   }

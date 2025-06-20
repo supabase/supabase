@@ -43,12 +43,12 @@ type PublishableKeys = {
   updated_at?: string
 }
 
-export interface APIKeysVariables {
+interface APIKeysVariables {
   projectRef?: string
   reveal: boolean
 }
 
-export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
+async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {

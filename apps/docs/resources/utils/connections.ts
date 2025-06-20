@@ -1,5 +1,6 @@
 import {
   GraphQLBoolean,
+  GraphQLError,
   GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
@@ -7,6 +8,7 @@ import {
   type GraphQLOutputType,
   GraphQLString,
 } from 'graphql'
+import { Result } from '~/features/helpers.fn'
 import { nanoId } from '~/features/helpers.misc'
 
 /**
@@ -185,7 +187,7 @@ export function createCollectionType(
 /**
  * Interface for standard pagination arguments for a GraphQL connection
  */
-interface IPaginationArgs {
+export interface IPaginationArgs {
   first?: number | null
   after?: string | null
   last?: number | null
@@ -219,21 +221,26 @@ export const paginationArgs = {
  * GraphQL query. Takes standard pagination args and returns standard page
  * information.
  */
-interface CollectionFetch<ItemType, FetchArgs = unknown> {
+export interface CollectionFetch<ItemType, FetchArgs = unknown, ErrorType = Error> {
   fetch: (
     args?: IPaginationArgs & {
       additionalArgs?: FetchArgs
     }
-  ) => Promise<{
-    items: Array<ItemType>
-    totalCount: number
-    hasNextPage?: boolean
-    hasPreviousPage?: boolean
-  }>
+  ) => Promise<
+    Result<
+      {
+        items: Array<ItemType>
+        totalCount: number
+        hasNextPage?: boolean
+        hasPreviousPage?: boolean
+      },
+      ErrorType
+    >
+  >
   args?: IPaginationArgs & {
     additionalArgs?: FetchArgs
   }
-  getCursor?: (item: ItemType, idx?: number) => string
+  getCursor: (item: ItemType, idx?: number) => string
   items?: never
 }
 
@@ -248,41 +255,59 @@ interface CollectionInMemory<ItemType> {
   getCursor?: never
 }
 
+interface GraphQLCollection<ItemType> {
+  edges: Array<{ node: ItemType; cursor: string }>
+  nodes: Array<ItemType>
+  totalCount: number
+  pageInfo: {
+    hasNextPage: boolean
+    hasPreviousPage: boolean
+    startCursor: string | null
+    endCursor: string | null
+  }
+}
+
 /**
  * Union type for parameters to build a collection. Can be a remote collection
  * that needs to be fetched or a local one in memory.
  */
-type CollectionBuildArgs<ItemType, FetchArgs = unknown> =
-  | CollectionFetch<ItemType, FetchArgs>
+type CollectionBuildArgs<ItemType, FetchArgs = unknown, ErrorType = Error> =
+  | CollectionFetch<ItemType, FetchArgs, ErrorType>
   | CollectionInMemory<ItemType>
 
 export class GraphQLCollectionBuilder {
-  static async create<ItemType, FetchArgs = unknown>(
-    options: CollectionBuildArgs<ItemType, FetchArgs>
-  ) {
+  static async create<ItemType, FetchArgs = unknown, ErrorType = Error>(
+    options: CollectionBuildArgs<ItemType, FetchArgs, ErrorType>
+  ): Promise<Result<GraphQLCollection<ItemType>, GraphQLError | ErrorType>> {
     const { fetch, args = {}, getCursor, items } = options
 
     if (items) {
-      return GraphQLCollectionBuilder.paginateArray({ items, args })
+      return Result.ok(GraphQLCollectionBuilder.paginateArray({ items, args }))
     }
 
-    const result = await fetch(args)
-    const { items: fetchedItems, totalCount, hasNextPage = false, hasPreviousPage = false } = result
-    const edges = fetchedItems.map((item) => {
-      return { node: item, cursor: getCursor?.(item) ?? '' }
-    })
-
-    return {
-      edges,
-      nodes: fetchedItems,
-      totalCount,
-      pageInfo: {
-        hasNextPage,
-        hasPreviousPage,
-        startCursor: edges.length > 0 ? edges[0].cursor : null,
-        endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
-      },
+    if (args.first && args.last) {
+      return Result.error(new GraphQLError('Cannot specify both first and last arguments'))
     }
+
+    return (await fetch(args)).map(
+      ({ items: fetchedItems, totalCount, hasNextPage = false, hasPreviousPage = false }) => {
+        const edges = fetchedItems.map((item) => {
+          return { node: item, cursor: getCursor(item) }
+        })
+
+        return {
+          edges,
+          nodes: fetchedItems,
+          totalCount,
+          pageInfo: {
+            hasNextPage,
+            hasPreviousPage,
+            startCursor: edges.length > 0 ? edges[0].cursor : null,
+            endCursor: edges.length > 0 ? edges[edges.length - 1].cursor : null,
+          },
+        }
+      }
+    )
   }
 
   private static paginateArray<T>({ items, args }: CollectionInMemory<T>) {

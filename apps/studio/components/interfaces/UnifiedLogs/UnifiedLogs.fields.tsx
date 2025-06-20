@@ -5,11 +5,10 @@ import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from 'components/ui/DataTable/DataTable.types'
 import { getLevelColor, getStatusColor } from 'components/ui/DataTable/DataTable.utils'
 import { cn } from 'ui'
-import { METHODS } from './UnifiedLogs.constants'
-import { ColumnSchema, LOG_TYPES } from './UnifiedLogs.schema'
+import { LOG_TYPES, METHODS } from './UnifiedLogs.constants'
+import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta, SheetField } from './UnifiedLogs.types'
 import { getLevelLabel } from './UnifiedLogs.utils'
-import { TraceButton } from './components/TraceButton'
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -136,14 +135,6 @@ export const sheetFields = [
       )
     },
     skeletonClassName: 'w-36',
-  },
-  {
-    id: 'has_trace',
-    label: 'Trace',
-    type: 'readonly',
-    condition: (props) => Boolean(props.has_trace),
-    component: (props) => <TraceButton has_trace={Boolean(props.has_trace)} id={props.id} />,
-    className: 'flex-row items-end justify-end w-full',
   },
   {
     id: 'auth_user',

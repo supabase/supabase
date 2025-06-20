@@ -5,19 +5,7 @@ import {
   LEVELS,
   RANGE_DELIMITER,
 } from 'components/ui/DataTable/DataTable.constants'
-import { METHODS, REGIONS } from './UnifiedLogs.constants'
-
-export const LOG_TYPES = [
-  'edge',
-  'postgrest',
-  'auth',
-  'edge function',
-  'postgres',
-  'function events',
-  'supavisor',
-  'postgres upgrade',
-  'storage',
-] as const
+import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
 
 export const columnSchema = z.object({
   id: z.string(),
@@ -32,7 +20,6 @@ export const columnSchema = z.object({
   timestamp: z.number(),
   event_message: z.string().optional(),
   log_count: z.number().optional(), // used to count function logs for a given execution_id
-  has_trace: z.boolean().optional(),
   logs: z.array(z.any()).optional(), // array of function logs
   auth_user: z.string().optional(),
 })
@@ -67,7 +54,6 @@ export const columnFilterSchema = z.object({
     .transform((val) => val.split(RANGE_DELIMITER).map(Number))
     .pipe(z.coerce.date().array())
     .optional(),
-  has_trace: z.boolean().optional(),
   auth_user: z.string().optional(),
 })
 
