@@ -1,6 +1,7 @@
 import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   DialogFooter,
@@ -31,7 +32,7 @@ export const CreateKeyDialog = ({
       onClose()
     },
     onError: (error) => {
-      console.error('Failed to add new standby key', error)
+      toast.error(`Failed to add new standby key: ${error.message}`)
     },
   })
 
