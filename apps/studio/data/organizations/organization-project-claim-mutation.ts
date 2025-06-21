@@ -10,7 +10,6 @@ type OrganizationProjectClaimVariables = {
 }
 
 async function claimOrganizationProject({ slug, token }: OrganizationProjectClaimVariables) {
-  // @ts-expect-error the endpoint is hidden in the spec for now
   const { data, error } = await post('/v1/organizations/{slug}/project-claim/{token}', {
     params: { path: { slug, token } },
   })

@@ -51,7 +51,6 @@ async function getOrganizationProjectClaim(
 ) {
   if (!slug || !token) throw new Error('Slug and token are required')
 
-  // @ts-expect-error the endpoint is hidden in the spec for now
   const { data, error } = await get(`/v1/organizations/{slug}/project-claim/{token}`, {
     params: { path: { slug, token } },
     signal,

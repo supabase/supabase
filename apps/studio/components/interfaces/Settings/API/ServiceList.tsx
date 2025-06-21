@@ -1,4 +1,3 @@
-import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle } from 'lucide-react'
 import { useEffect, useRef } from 'react'
@@ -9,7 +8,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { configKeys } from 'data/config/keys'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
@@ -17,9 +15,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Badge, Input } from 'ui'
-import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import { ApiKeysMoved } from './ApiKeysMoved'
-import JWTSettings from './JWTSettings'
 import { PostgrestConfig } from './PostgrestConfig'
 
 const ServiceList = () => {
@@ -31,15 +27,6 @@ const ServiceList = () => {
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: databases, isError } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
-
-  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
-  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
-  const jwtSecretUpdateError = data?.jwtSecretUpdateError
-
-  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>()
-  const { Failed, Updated, Updating } = JwtSecretUpdateStatus
-  const jwtSecretUpdateErrorMessage =
-    JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
 
   // Get the API service
   const isCustomDomainActive = customDomainData?.customDomain?.status === 'active'
@@ -53,30 +40,6 @@ const ServiceList = () => {
       : loadBalancerSelected
         ? loadBalancers?.[0].endpoint ?? ''
         : selectedDatabase?.restUrl
-
-  useEffect(() => {
-    if (previousJwtSecretUpdateStatus.current === Updating) {
-      switch (jwtSecretUpdateStatus) {
-        case Updated:
-          client.invalidateQueries(configKeys.api(projectRef))
-          client.invalidateQueries(configKeys.settings(projectRef))
-          client.invalidateQueries(configKeys.postgrest(projectRef))
-          toast.success('Successfully updated JWT secret')
-          break
-        case Failed:
-          toast.error(`JWT secret update failed: ${jwtSecretUpdateErrorMessage}`)
-          break
-      }
-    }
-
-    previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
-  }, [jwtSecretUpdateStatus])
-
-  useEffect(() => {
-    if (source !== undefined) {
-      state.setSelectedDatabaseId('load-balancer')
-    }
-  }, [source])
 
   return (
     <div>
@@ -145,10 +108,6 @@ const ServiceList = () => {
 
           <section className="mb-8">
             <ApiKeysMoved />
-          </section>
-
-          <section id="jwt-settings">
-            <JWTSettings />
           </section>
 
           <section id="postgrest-config">

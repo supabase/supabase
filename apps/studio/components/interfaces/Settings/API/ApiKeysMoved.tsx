@@ -19,6 +19,7 @@ export const ApiKeysMoved = () => {
         { name: 'Infrastructure', key: 'infrastructure', url: '#' },
         { name: 'Integrations', key: 'integrations', url: '#' },
         { name: 'API Keys', key: 'api-keys', url: '#', label: 'NEW' },
+        { name: 'JWT Keys', key: 'jwt-keys', url: '#', label: 'NEW' },
         { name: 'Add Ons', key: 'addons', url: '#' },
         {
           name: 'Vault',
@@ -37,14 +38,19 @@ export const ApiKeysMoved = () => {
 
   return (
     <div className="pb-36 pt-10 relative w-full flex flex-col xl:flex-row border xl:py-10 px-10 rounded-md overflow-hidden">
-      <div className="flex flex-col gap-0 z-[2]">
-        <p className="text-sm text-foreground">API keys have moved</p>
+      <div className="flex flex-col gap-2 z-[2]">
+        <p className="text-sm text-foreground">API keys and JWT settings have moved</p>
         <p className="text-sm text-foreground-lighter mb-4">
-          They can now be found in the new API Keys page
+          They can now be found in their own respective pages.
         </p>
-        <Link href={`/project/${projectRef}/settings/api-keys`}>
-          <Button type="default">Go to API Keys</Button>
-        </Link>
+        <div className="flex flex-row gap-4">
+          <Link href={`/project/${projectRef}/settings/api-keys`}>
+            <Button type="default">Go to API Keys</Button>
+          </Link>
+          <Link href={`/project/${projectRef}/settings/api-keys`}>
+            <Button type="default">Go to JWT Keys</Button>
+          </Link>
+        </div>
       </div>
 
       {/* Menu illustration using the actual ProductMenu component */}
