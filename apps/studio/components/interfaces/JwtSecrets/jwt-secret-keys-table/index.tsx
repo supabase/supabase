@@ -24,6 +24,7 @@ import {
 } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
@@ -54,6 +55,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
@@ -89,6 +98,8 @@ export default function JWTSecretKeysTable() {
   const { data: legacyKey, isLoading: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery({
     projectRef,
   })
+  const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
+    useLegacyAPIKeysStatusQuery({ projectRef })
 
   const legacyMutation = useLegacyJWTSigningKeyCreateMutation()
 
@@ -97,7 +108,7 @@ export default function JWTSecretKeysTable() {
 
   const isLoadingMutation =
     updateMutation.isLoading || deleteMutation.isLoading || legacyMutation.isLoading
-  const isLoading = isLoadingSigningKeys || isLoadingLegacyKey
+  const isLoading = isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
 
   const sortedKeys = useMemo(() => {
     if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
@@ -785,24 +796,47 @@ export default function JWTSecretKeysTable() {
         </DialogContent>
       </Dialog>
 
-      {selectedKey && selectedKey.status === 'previously_used' && (
-        <TextConfirmModal
-          visible={shownDialog === 'revoke'}
-          loading={isLoadingMutation}
-          onConfirm={() => handleRevokeKey(selectedKey.id)}
-          onCancel={resetDialog}
-          title={`Revoke ${selectedKey.id}`}
-          confirmString={selectedKey.id}
-          confirmLabel="Yes, revoke this signing key"
-          confirmPlaceholder="Type the ID of the key to confirm"
-          variant="destructive"
-          alert={{
-            title: 'This key will no longer be trusted!',
-            description:
-              'By revoking a signing key, all applications trusting it will no longer do so. If there are JWTs (access tokens) that are valid at the time of revocation, they will no longer be trusted, causing users with such JWTs to be signed out.',
-          }}
-        />
-      )}
+      {selectedKey &&
+        selectedKey.status === 'previously_used' &&
+        (legacyKey?.id !== selectedKey.id || !(legacyAPIKeysStatus?.enabled ?? false)) && (
+          <TextConfirmModal
+            visible={shownDialog === 'revoke'}
+            loading={isLoadingMutation}
+            onConfirm={() => handleRevokeKey(selectedKey.id)}
+            onCancel={resetDialog}
+            title={`Revoke ${selectedKey.id}`}
+            confirmString={selectedKey.id}
+            confirmLabel="Yes, revoke this signing key"
+            confirmPlaceholder="Type the ID of the key to confirm"
+            variant="destructive"
+            alert={{
+              title: 'This key will no longer be trusted!',
+              description:
+                'By revoking a signing key, all applications trusting it will no longer do so. If there are JWTs (access tokens) that are valid at the time of revocation, they will no longer be trusted, causing users with such JWTs to be signed out.',
+            }}
+          />
+        )}
+
+      {selectedKey &&
+        selectedKey.status === 'previously_used' &&
+        legacyKey?.id === selectedKey.id &&
+        (legacyAPIKeysStatus?.enabled ?? true) && (
+          <AlertDialog open={shownDialog === 'revoke'} onOpenChange={() => resetDialog()}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Disable JWT-based legacy API keys first</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogDescription>
+                It's not possible to revoke the legacy JWT secret unless you have already disabled
+                JWT-based legacy API keys. This is because revoking the JWT secret invalidates the
+                JWT-based legacy API keys.
+              </AlertDialogDescription>
+              <AlertDialogFooter>
+                <AlertDialogCancel>OK</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
 
       {selectedKey && selectedKey.status === 'revoked' && (
         <TextConfirmModal
