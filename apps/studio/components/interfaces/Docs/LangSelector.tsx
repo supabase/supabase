@@ -1,9 +1,11 @@
+import { useMemo } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Key } from 'lucide-react'
 
 import { useParams } from 'common'
 import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
@@ -35,7 +37,18 @@ const LangSelector = ({
   )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { anonKey: anonApiKey, serviceKey: serviceApiKey } = getAPIKeys(settings)
+
+  const { data: apiKeys, isLoading: isLoadingAPIKeys } = useAPIKeysQuery({
+    projectRef,
+    reveal: false,
+  })
+
+  const legacyKeys = useMemo(() => apiKeys?.filter(({ type }) => type === 'legacy'), [apiKeys])
+  const publishableKeys = useMemo(
+    () => apiKeys?.filter(({ type }) => type === 'publishable'),
+    [apiKeys]
+  )
+  const secretKeys = useMemo(() => apiKeys?.filter(({ type }) => type === 'secret'), [apiKeys])
 
   return (
     <div className="p-1 w-1/2 ml-auto">
@@ -62,11 +75,11 @@ const LangSelector = ({
         >
           Bash
         </button>
-        {selectedLang == 'bash' && (
+        {selectedLang == 'bash' && !isLoadingAPIKeys && apiKeys && apiKeys.length > 0 && (
           <div className="flex">
             <div className="flex items-center gap-2 p-1 pl-2 text-xs text-foreground-lighter">
               <Key size={12} strokeWidth={1.5} />
-              <span>Project API key :</span>
+              <span>Project API key:</span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -77,32 +90,63 @@ const LangSelector = ({
                   <DropdownMenuItem key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
                     hide
                   </DropdownMenuItem>
-                  {anonApiKey && (
-                    <DropdownMenuItem
-                      key="anon"
-                      onClick={() =>
-                        setShowApiKey({
-                          key: anonApiKey.api_key ?? '-',
-                          name: 'anon (public)',
-                        })
-                      }
-                    >
-                      <p>anon (public)</p>
-                    </DropdownMenuItem>
+
+                  {publishableKeys && publishableKeys.length > 0 && (
+                    <>
+                      <DropdownMenuItem key="publishable" disabled>
+                        Publishable keys
+                      </DropdownMenuItem>
+                      {publishableKeys.map((key) => (
+                        <DropdownMenuItem
+                          key={key.id}
+                          onClick={() =>
+                            setShowApiKey({
+                              name: `Publishable key: ${key.name}`,
+                              key: key.api_key,
+                            })
+                          }
+                        >
+                          {key.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </>
                   )}
-                  {canReadServiceKey && (
-                    <DropdownMenuItem
-                      key="service"
-                      onClick={() =>
-                        setShowApiKey({
-                          key: serviceApiKey?.api_key ?? '-',
-                          name: 'service_role (secret)',
-                        })
-                      }
-                    >
-                      <p>service_role (secret)</p>
-                    </DropdownMenuItem>
+
+                  {secretKeys && secretKeys.length > 0 && (
+                    <>
+                      <DropdownMenuItem key="secret" disabled>
+                        Secret keys
+                      </DropdownMenuItem>
+                      {secretKeys.map((key) => (
+                        <DropdownMenuItem
+                          key={key.id}
+                          onClick={() =>
+                            setShowApiKey({
+                              name: `Secret key: ${key.name}`,
+                              key: key.prefix + '...',
+                            })
+                          }
+                        >
+                          {key.name}
+                        </DropdownMenuItem>
+                      ))}
+                    </>
                   )}
+
+                  <DropdownMenuItem key="legacy" disabled>
+                    JWT-based legacy keys
+                  </DropdownMenuItem>
+                  {legacyKeys &&
+                    legacyKeys.map((key) => (
+                      <DropdownMenuItem
+                        key={key.id}
+                        onClick={() =>
+                          setShowApiKey({ name: `${key.name} (legacy)`, key: key.api_key })
+                        }
+                      >
+                        {key.name}
+                      </DropdownMenuItem>
+                    ))}
                 </>
               </DropdownMenuContent>
             </DropdownMenu>
