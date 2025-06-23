@@ -30,6 +30,7 @@ import { LiveRow } from 'components/ui/DataTable/LiveRow'
 import { DataTableProvider } from 'components/ui/DataTable/providers/DataTableProvider'
 import { RefreshButton } from 'components/ui/DataTable/RefreshButton'
 import { TimelineChart } from 'components/ui/DataTable/TimelineChart'
+import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import {
   ChartConfig,
@@ -84,6 +85,8 @@ export const UnifiedLogs = () => {
     []
   )
 
+  const { data: counts } = useUnifiedLogsCountQuery({ projectRef, search })
+
   // [Joshen] This needs to move to the data folder to follow our proper RQ structure
   const { data, isFetching, isLoading, fetchNextPage, hasNextPage, fetchPreviousPage, refetch } =
     // @ts-ignore
@@ -99,14 +102,15 @@ export const UnifiedLogs = () => {
 
   // REMINDER: meta data is always the same for all pages as filters do not change(!)
   const lastPage = data?.pages?.[data?.pages.length - 1]
+
   // Use the totalCount from chartDataResult which gives us the actual count of logs in the time period
   // instead of the hardcoded 10000 value
-  const totalDBRowCount = chartDataResult?.totalCount || lastPage?.meta?.totalRowCount
+  const totalDBRowCount = chartDataResult?.totalCount || counts?.totalRowCount
   const filterDBRowCount = lastPage?.meta?.filterRowCount
   const metadata = lastPage?.meta?.metadata
   // Use chart data from the separate query if available, fallback to the default
   const chartData = chartDataResult?.chartData || lastPage?.meta?.chartData
-  const facets = lastPage?.meta?.facets
+  const facets = counts?.facets
   const totalFetched = flatData?.length
 
   // Create a filtered version of the chart config based on selected levels

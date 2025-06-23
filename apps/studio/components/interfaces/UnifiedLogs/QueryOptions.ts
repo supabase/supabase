@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 
 import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/ui/DataTable/DataTable.constants'
 import { get } from 'data/fetchers'
-import { getLogsChartQuery, getLogsCountQuery, getUnifiedLogsQuery } from './UnifiedLogs.queries'
+import { getLogsChartQuery, getUnifiedLogsQuery } from './UnifiedLogs.queries'
 import { BaseChartSchema, ColumnSchema, type FacetMetadataSchema } from './UnifiedLogs.schema'
 import type { PageParam, SearchParamsType, UnifiedLogsMeta } from './UnifiedLogs.types'
 
@@ -310,78 +310,6 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         logsSql += `\nORDER BY timestamp DESC, id DESC`
         logsSql += `\nLIMIT 50`
 
-        // Get SQL query for counts from utility function
-        const countsSql = getLogsCountQuery(search)
-
-        // First, fetch the counts data
-        const { data: countsData, error: countsError } = await get(
-          `/platform/projects/{ref}/analytics/endpoints/logs.all`,
-          {
-            params: {
-              path: { ref: projectRef },
-              query: {
-                iso_timestamp_start: isoTimestampStart,
-                iso_timestamp_end: isoTimestampEnd,
-                project: projectRef,
-                sql: countsSql,
-              },
-            },
-          }
-        )
-
-        if (countsError) {
-          if (DEBUG_MODE) console.error('API returned error for counts data:', countsError)
-          throw countsError
-        }
-
-        // Process count results into facets structure
-        const facets: Record<string, FacetMetadataSchema> = {}
-        const countsByDimension: Record<string, Map<string, number>> = {}
-        let totalCount = 0
-
-        // Group by dimension
-        if (countsData?.result) {
-          countsData.result.forEach((row: any) => {
-            const dimension = row.dimension
-            const value = row.value
-            const count = Number(row.count || 0)
-
-            // Set total count if this is the total dimension
-            if (dimension === 'total' && value === 'all') {
-              totalCount = count
-            }
-
-            // Initialize dimension map if not exists
-            if (!countsByDimension[dimension]) {
-              countsByDimension[dimension] = new Map()
-            }
-
-            // Add count to the dimension map
-            countsByDimension[dimension].set(value, count)
-          })
-        }
-
-        // Convert dimension maps to facets structure
-        Object.entries(countsByDimension).forEach(([dimension, countsMap]) => {
-          // Skip the 'total' dimension as it's not a facet
-          if (dimension === 'total') return
-
-          const dimensionTotal = Array.from(countsMap.values()).reduce(
-            (sum, count) => sum + count,
-            0
-          )
-
-          facets[dimension] = {
-            min: undefined,
-            max: undefined,
-            total: dimensionTotal,
-            rows: Array.from(countsMap.entries()).map(([value, count]) => ({
-              value,
-              total: count,
-            })),
-          }
-        })
-
         // Now, fetch the logs data with pagination
         // ONLY convert to ISO when we're about to send to the API
         let timestampStart: string
@@ -503,11 +431,8 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const response = {
           data: result,
           meta: {
-            // Use the total count from our counts query
-            totalRowCount: totalCount,
             filterRowCount: result.length,
             chartData: buildChartData(result),
-            facets, // Use the facets from the counts query
             metadata: {
               currentPercentiles: {},
               logTypeCounts: calculateLogTypeCounts(result),
