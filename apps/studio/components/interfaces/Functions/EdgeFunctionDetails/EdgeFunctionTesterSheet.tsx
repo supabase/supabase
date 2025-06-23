@@ -5,7 +5,6 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -209,7 +208,8 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
         ...(accessToken && {
           Authorization: `Bearer ${accessToken}`,
         }),
-        'x-test-authorization': testAuthorization ?? `Bearer ${serviceKey?.api_key}`,
+        // [Alaister]: Use testAuthorization ?? `Bearer ${serviceKey?.api_key}` to re-enable role impersonation.
+        'x-test-authorization': `Bearer ${serviceKey?.api_key}`,
         'Content-Type': 'application/json',
         ...customHeaders,
       },
@@ -416,7 +416,10 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover portal={false} />
+                {/* [Alaister]: Disable role impersonation for now. Since most edge function users will try and use Supabase Auth
+                to validate the tokens, they will run into issues. We'll re-enable this when we can ensure our user impersonation
+                works with Supabase Auth APIs. */}
+                {/* <RoleImpersonationPopover portal={false} /> */}
                 <Button
                   type="primary"
                   htmlType="submit"
