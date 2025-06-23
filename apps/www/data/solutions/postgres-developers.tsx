@@ -51,24 +51,20 @@ const data: () => {
 
   return {
     metadata: {
-      metaTitle: 'Supabase for Developers',
+      metaTitle: 'Supabase for Postgres Developers',
       metaDescription:
         'Leading enterprises use Supabase to build faster, better, and more scalable products.',
     },
     heroSection: {
       id: 'hero',
-      title: 'Supabase for Developers',
-      h1: (
-        <>
-          <span className="block text-foreground">Build fast. Scale easily.</span>
-          <span className="block md:ml-0">Trust your stack.</span>
-        </>
-      ),
+      title: 'Supabase for Postgres Developers',
+      h1: <>Get started in seconds with a complete Postgres development platform</>,
       subheader: [
         <>
-          Supabase is the Postgres development platform that includes a developer experience
-          designed for speed, an integrated suite of backend services, and a scalable, trusted
-          foundation for building powerful applications.
+          Supabase is the open-source Postgres development platform. It includes a developer
+          experience designed for speed, an integrated suite of backend services, and a scalable,
+          trusted foundation for building powerful applications. But if all you want is Postgres,
+          Supabase is that, too.
         </>,
       ],
       image: (
@@ -101,28 +97,14 @@ const data: () => {
       label: '',
       heading: (
         <>
-          Why <span className="text-foreground">developers</span> choose Supabase
+          Why <span className="text-foreground">Postrges developers</span> choose Supabase
         </>
       ),
       subheading:
-        'Supabase helps you build and get to market faster and more cost-effectively using a composable platform of application services built on Postgres. Supabase scales as your business grows.',
+        'Supabase provides full access to Postgres. Use additional components, or just use the database. No proprietary tooling, no vendor lock-in. Supabase is Postgres the way you want it.',
       features: [
         {
-          id: 'easy-to-use',
-          icon: Timer,
-          heading: 'Easy to use',
-          subheading:
-            'Spin up a Postgres database in seconds, manage your backend with an intuitive dashboard, and integrate with any framework. No complex setup required.',
-        },
-        {
-          id: 'development-platform',
-          icon: CubeIcon,
-          heading: 'Complete development platform',
-          subheading:
-            'Supabase offers a fully integrated suite of tools including authentication, storage, edge functions, real-time subscriptions, and vector search. Developers don’t have to stitch together multiple services. Use one or all.',
-        },
-        {
-          id: 'scalable-and-dependable',
+          id: 'full-postgres',
           icon: (props: any) => (
             <svg
               width="23"
@@ -144,9 +126,23 @@ const data: () => {
               />
             </svg>
           ),
+          heading: 'Full Postgres',
+          subheading:
+            'Connect to Supabase via sql, pgAdmin, or any standard Postgres client. Use native Postgres extensions. Employ Row-Level Security, not a bolt-on permission system.',
+        },
+        {
+          id: 'development-platform',
+          icon: CubeIcon,
+          heading: 'Complete development platform',
+          subheading:
+            'Supabase offers a fully integrated suite of tools including authentication, storage, edge functions, real-time subscriptions, and vector search. Developers don’t have to stitch together multiple services. Use one or all.',
+        },
+        {
+          id: 'scalable-and-dependable',
+          icon: Timer,
           heading: 'Scalable and dependable',
           subheading:
-            'Built on Postgres, Supabase provides enterprise-grade performance, high availability, and the flexibility to grow without vendor lock-in.',
+            'Keep your workflows, tools, and database expertise. Self-host if you need it. Full deployment if you prefer, including automated backups, Point-in-Time Recovery (PITR), and fine-tuned observability via query logs, pg_stat_activity, and EXPLAIN ANALYZE.',
         },
       ],
     },
@@ -154,7 +150,7 @@ const data: () => {
       id: 'postgres-platform',
       title: (
         <>
-          Supabase helps you <span className="text-foreground">build</span>
+          Supabase is the <span className="text-foreground">Postgres platform</span> you control
         </>
       ),
       subheading:
@@ -373,6 +369,84 @@ const data: () => {
             />
           ),
         },
+        {
+          id: 'row-level-security',
+          title: 'Full SQL access',
+          icon: '',
+          subheading: (
+            <>
+              Supabase supports{' '}
+              <span className="text-foreground">
+                CTEs, triggers, foreign keys, JSONB, full-text search
+              </span>
+              , and more.
+            </>
+          ),
+          image: (
+            <Image
+              draggable={false}
+              src={{
+                dark: '/images/solutions/neon/rls-dark.svg',
+                light: '/images/solutions/neon/rls-light.svg',
+              }}
+              alt="Row Level Security"
+              width={100}
+              height={100}
+              quality={100}
+              containerClassName="-mt-8 sm:mt-0 mb-8"
+            />
+          ),
+        },
+        {
+          id: 'Postgres functions',
+          title: 'Postgres functions',
+          icon: '',
+          subheading: (
+            <>
+              Run backend logic in the database if you prefer using stored procedures, PL/pgSQL, and
+              custom functions.
+            </>
+          ),
+          image: (
+            <Image
+              draggable={false}
+              src={{
+                dark: '/images/solutions/neon/rls-dark.svg',
+                light: '/images/solutions/neon/rls-light.svg',
+              }}
+              alt="Row Level Security"
+              width={100}
+              height={100}
+              quality={100}
+              containerClassName="-mt-8 sm:mt-0 mb-8"
+            />
+          ),
+        },
+        {
+          id: 'Postgres extensions',
+          title: 'Postgres extensions',
+          icon: '',
+          subheading: (
+            <>
+              Tap into the <span className="text-foreground">full Posgres ecosystem</span>,
+              including pgvector, PostGIS, pg_stat_statements, and over XX more Postgres extensions.
+            </>
+          ),
+          image: (
+            <Image
+              draggable={false}
+              src={{
+                dark: '/images/solutions/neon/rls-dark.svg',
+                light: '/images/solutions/neon/rls-light.svg',
+              }}
+              alt="Row Level Security"
+              width={100}
+              height={100}
+              quality={100}
+              containerClassName="-mt-8 sm:mt-0 mb-8"
+            />
+          ),
+        },
       ],
     },
     developerExperience: {
@@ -380,7 +454,7 @@ const data: () => {
       className: '[&_h2]:!max-w-sm',
       title: (
         <>
-          <span className="text-foreground">Build faster</span> with Supabase
+          Developers can <span className="text-foreground">build faster</span> with Supabase
         </>
       ),
       subheading: 'Features that help developers move quickly and focus.',

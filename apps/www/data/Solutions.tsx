@@ -21,6 +21,11 @@ export const data = {
       description: '',
       url: '/solutions/developers',
     },
+    {
+      text: 'For Postgres devs',
+      description: '',
+      url: '/solutions/postgres-developers',
+    },
   ],
 }
 
