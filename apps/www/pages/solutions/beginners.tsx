@@ -12,7 +12,7 @@ const PlatformStarterSection = dynamic(
   () => import('~/components/Solutions/PlatformStarterSection')
 )
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
-const BeginnerMPCSection = dynamic(() => import('~/components/Solutions/BeginnerMPCSection'))
+const BeginnerMPCSection = dynamic(() => import('~/components/Solutions/MPCSection'))
 
 const BeginnersPage: NextPage = () => {
   const content = getContent()

@@ -16,6 +16,11 @@ export const data = {
       description: '',
       url: '/solutions/beginners',
     },
+    {
+      text: 'For developers',
+      description: '',
+      url: '/solutions/developers',
+    },
   ],
 }
 
