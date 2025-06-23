@@ -2,12 +2,14 @@ import { useRouter } from 'next/router'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { SessionTimeoutModal } from 'components/interfaces/SignIn/SessionTimeoutModal'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useAuth, useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { NextPageWithLayout, isNextPageWithLayout } from 'types'
-import { SessionTimeoutModal } from 'components/interfaces/SignIn/SessionTimeoutModal'
+
+const MAX_TIMEOUT = 10000 // 10 seconds
 
 export function withAuth<T>(
   WrappedComponent: ComponentType<T> | NextPageWithLayout<T, T>,
@@ -30,7 +32,10 @@ export function withAuth<T>(
 
   const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
+    const signOut = useSignOut()
     const { isLoading, session } = useAuth()
+
+    const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
     const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = useState(false)
 
     const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
@@ -49,19 +54,13 @@ export function withAuth<T>(
       },
     })
 
-    const signOut = useSignOut()
-
     const isLoggedIn = Boolean(session)
-    //const isFinishedLoading = !isLoading && !isAALLoading
-    // for testing on staging
-    // remove before merging
-    const isFinishedLoading = false
-    const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
-    console.log('isFinishedLoading', isFinishedLoading)
+    const isFinishedLoading = !isLoading && !isAALLoading
+
     const redirectToSignIn = useCallback(() => {
       let pathname = location.pathname
-      if (process.env.NEXT_PUBLIC_BASE_PATH) {
-        pathname = pathname.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
+      if (BASE_PATH) {
+        pathname = pathname.replace(BASE_PATH, '')
       }
 
       if (pathname === '/sign-in') {
@@ -82,7 +81,7 @@ export function withAuth<T>(
       if (!isFinishedLoading) {
         timeoutIdRef.current = setTimeout(() => {
           setIsSessionTimeoutModalOpen(true)
-        }, 10000) // 10 seconds timeout
+        }, MAX_TIMEOUT)
       } else {
         if (timeoutIdRef.current) {
           clearTimeout(timeoutIdRef.current)
