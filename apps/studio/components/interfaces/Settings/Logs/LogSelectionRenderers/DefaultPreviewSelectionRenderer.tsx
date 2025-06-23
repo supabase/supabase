@@ -18,7 +18,7 @@ import { ResponseCodeFormatter } from '../LogsFormatters'
 const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
   <pre
     className={cn(
-      'px-1 bg-surface-300 w-full pt-1 max-w-full border-none text-xs prose-sm transition-all overflow-auto rounded-md',
+      'px-1 bg-surface-300 w-full pt-1 max-w-full border-none text-xs prose-sm transition-all overflow-auto rounded-md whitespace-pre-wrap',
       className
     )}
   >
@@ -47,8 +47,18 @@ const PropertyRow = ({
   const isObject = typeof value === 'object' && value !== null
   const isStatus = keyName === 'status' || keyName === 'status_code'
   const isMethod = keyName === 'method'
-  const isPath = keyName === 'path'
+  const isSearch = keyName === 'search'
   const isUserAgent = keyName === 'user_agent'
+  const isEventMessage = keyName === 'event_message'
+  const isPath = keyName === 'path'
+
+  function getSearchPairs() {
+    if (isSearch && typeof value === 'string') {
+      const str = value.startsWith('?') ? value.slice(1) : value
+      return str.split('&').filter(Boolean)
+    }
+    return []
+  }
 
   const storageKey = `log-viewer-expanded-${keyName}`
   const [isExpanded, setIsExpanded] = useState(() => {
@@ -76,7 +86,7 @@ const PropertyRow = ({
     }, 1000)
   }
 
-  if (isObject) {
+  if (isObject || isEventMessage) {
     return (
       <>
         <div className="flex flex-col gap-1">
@@ -86,17 +96,20 @@ const PropertyRow = ({
               className={cn('px-2.5', {
                 'max-h-[80px]': !isExpanded,
                 'max-h-[400px]': isExpanded,
+                'py-2': isEventMessage,
               })}
               value={value}
             />
-            <Button
-              className="mt-1 w-full"
-              size="tiny"
-              type="outline"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? 'Collapse' : 'Expand'}
-            </Button>
+            {!isEventMessage && (
+              <Button
+                className="mt-1 w-full"
+                size="tiny"
+                type="outline"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {isExpanded ? 'Collapse' : 'Expand'}
+              </Button>
+            )}
           </div>
         </div>
         <LogRowSeparator />
@@ -141,7 +154,7 @@ const PropertyRow = ({
                   <ResponseCodeFormatter value={value} />
                 </div>
               ) : (
-                <div className="truncate">{JSON.stringify(value)}</div>
+                <div className="truncate">{value}</div>
               )}
             </div>
           </div>
@@ -158,7 +171,7 @@ const PropertyRow = ({
             {isExpanded ? 'Collapse' : 'Expand'} value
           </DropdownMenuItem>
         )}
-        {(isPath || isMethod || isUserAgent || isStatus) && (
+        {(isMethod || isUserAgent || isStatus || isPath) && (
           <DropdownMenuItem
             onClick={() => {
               handleSearch('search-input-change', { query: value })
@@ -167,6 +180,18 @@ const PropertyRow = ({
             Search by {keyName}
           </DropdownMenuItem>
         )}
+        {isSearch
+          ? getSearchPairs().map((pair) => (
+              <DropdownMenuItem
+                key={pair}
+                onClick={() => {
+                  handleSearch('search-input-change', { query: pair })
+                }}
+              >
+                Search by {pair}
+              </DropdownMenuItem>
+            ))
+          : null}
       </DropdownMenuContent>
       <LogRowSeparator />
     </DropdownMenu>

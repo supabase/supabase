@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import useLatest from 'hooks/misc/useLatest'
@@ -18,6 +18,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const isLoggedIn = useIsLoggedIn()
   const snap = useAppStateSnapshot()
+  const isUserMFAEnabled = useIsMFAEnabled()
 
   const organization = useSelectedOrganization()
 
@@ -122,7 +123,17 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   }, [isSuccessStorage, ref])
 
   useEffect(() => {
-    if (organization) setLastVisitedOrganization(organization.slug)
+    if (organization) {
+      setLastVisitedOrganization(organization.slug)
+
+      if (
+        organization.organization_requires_mfa &&
+        !isUserMFAEnabled &&
+        router.pathname !== '/org/[slug]'
+      ) {
+        router.push(`/org/${organization.slug}`)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organization])
 

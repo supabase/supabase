@@ -1007,6 +1007,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/subscription/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm subscription change */
+    post: operations['SubscriptionController_confirmSubscriptionChange']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/subscription/preview': {
     parameters: {
       query?: never
@@ -2089,7 +2106,8 @@ export interface paths {
     /** Gets project's logs */
     get: operations['LogsController_getApiPaths']
     put?: never
-    post?: never
+    /** Post project's logs */
+    post: operations['LogsController_postApiPaths']
     delete?: never
     options?: never
     head?: never
@@ -4251,11 +4269,14 @@ export interface components {
       /** @default 0 */
       recoveryTimeTarget?: number
     }
-    ConfirmSubscriptionChangeBody: {
+    ConfirmCreateSubscriptionChangeBody: {
       kind?: string
       name: string
       payment_intent_id: string
       size?: string
+    }
+    ConfirmSubscriptionChangeBody: {
+      payment_intent_id: string
     }
     CopyObjectBody: {
       from: string
@@ -4278,7 +4299,7 @@ export interface components {
       token: string
       token_alias: string
     }
-    CreateBackendParams: {
+    CreateBackendParamsOpenapi: {
       config:
         | {
             hostname: string
@@ -4554,6 +4575,7 @@ export interface components {
           is_owner: boolean
           name: string
           opt_in_tags: string[]
+          organization_requires_mfa: boolean
           plan: {
             /** @enum {string} */
             id: 'free' | 'pro' | 'team' | 'enterprise'
@@ -6151,6 +6173,7 @@ export interface components {
       is_owner: boolean
       name: string
       opt_in_tags: string[]
+      organization_requires_mfa: boolean
       plan: {
         /** @enum {string} */
         id: 'free' | 'pro' | 'team' | 'enterprise'
@@ -6681,6 +6704,9 @@ export interface components {
       is_updatable: boolean
       name: string
       schema: string
+    }
+    PostProjectLogsBody: {
+      sql: string
     }
     PreviewProjectTransferResponse: {
       errors: {
@@ -7274,8 +7300,9 @@ export interface components {
       }[]
     }
     RunQueryBody: {
-      query: string
+      /** @default false */
       disable_statement_timeout?: boolean
+      query: string
     }
     SearchProfileBody: {
       keywords: string
@@ -7686,7 +7713,7 @@ export interface components {
         | 'auth_mfa_web_authn_default'
         | 'log_drain_default'
     }
-    UpdateBackendParams: {
+    UpdateBackendParamsOpenapi: {
       config?:
         | {
             hostname: string
@@ -7728,6 +7755,8 @@ export interface components {
           }
       description?: string
       name?: string
+      /** @enum {string} */
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
     }
     UpdateCollectionBody: {
       name: string
@@ -8032,7 +8061,11 @@ export interface components {
       /** Format: email */
       billing_email?: string
       name?: string
-      opt_in_tags?: 'AI_SQL_GENERATOR_OPT_IN'[]
+      opt_in_tags?: (
+        | 'AI_SQL_GENERATOR_OPT_IN'
+        | 'AI_DATA_GENERATOR_OPT_IN'
+        | 'AI_LOG_GENERATOR_OPT_IN'
+      )[]
     }
     UpdateOrganizationResponse: {
       billing_email?: string
@@ -8238,6 +8271,9 @@ export interface components {
       payment_method?: string
       /** @enum {string} */
       tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
+    }
+    UpdateSubscriptionResponse: {
+      pending_payment_intent_secret: string | null
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
@@ -10694,7 +10730,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['UpdateSubscriptionResponse']
+        }
       }
       403: {
         headers: {
@@ -10703,6 +10741,43 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update subscription change */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  SubscriptionController_confirmSubscriptionChange: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConfirmSubscriptionChangeBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to confirm subscription change */
       500: {
         headers: {
           [name: string]: unknown
@@ -12047,7 +12122,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ConfirmSubscriptionChangeBody']
+        'application/json': components['schemas']['ConfirmCreateSubscriptionChangeBody']
       }
     }
     responses: {
@@ -14407,6 +14482,50 @@ export interface operations {
       }
     }
   }
+  LogsController_postApiPaths: {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        project?: string
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PostProjectLogsBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to POST project's logs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   UsageApiController_getApiCounts: {
     parameters: {
       query?: {
@@ -14520,7 +14639,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateBackendParams']
+        'application/json': components['schemas']['CreateBackendParamsOpenapi']
       }
     }
     responses: {
@@ -14561,7 +14680,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateBackendParams']
+        'application/json': components['schemas']['UpdateBackendParamsOpenapi']
       }
     }
     responses: {
@@ -16605,6 +16724,7 @@ export interface operations {
           | 'disk_fs_avail'
           | 'disk_fs_used'
           | 'disk_fs_used_wal'
+          | 'disk_fs_used_system'
           | 'ram_usage'
           | 'ram_usage_total'
           | 'ram_usage_available'

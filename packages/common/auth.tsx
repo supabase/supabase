@@ -116,6 +116,12 @@ export const useIsLoggedIn = () => {
   return user !== null
 }
 
+export const useIsMFAEnabled = () => {
+  const user = useUser()
+
+  return user !== null && user.factors && user.factors.length > 0
+}
+
 export const signOut = async () => await gotrueClient.signOut()
 
 export const logOut = async () => {
