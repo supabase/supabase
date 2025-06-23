@@ -199,7 +199,7 @@ const ComputePricingCalculator = () => {
         <div className="flex items-center justify-between">
           <span className="text-foreground-muted">Total Compute</span>
           <span className="text-light font-mono">
-            {computeAggregate === null ? 'Contact Us' : `$${computeAggregate}`}
+            {computeAggregate === null ? '-' : `$${computeAggregate}`}
           </span>
         </div>
         <div className="flex items-center justify-between">
@@ -310,7 +310,7 @@ const ComputePricingCalculator = () => {
                   This estimate only includes Plan and Compute add-on monthly costs. Other resources
                   might concur in the final invoice.
                 </InfoTooltip>
-                {activePrice === null ? 'Contact Us' : `$${activePrice}`}
+                {activePrice === null ? '-' : `$${activePrice}`}
               </span>
             </div>
           </div>
