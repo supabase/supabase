@@ -7,11 +7,9 @@ export const PaymentConfirmation = ({
   paymentIntentSecret,
   onPaymentIntentConfirm,
   onLoadingChange,
-  paymentMethodId,
   onError,
 }: {
   paymentIntentSecret: string
-  paymentMethodId: string
   onPaymentIntentConfirm: (response: PaymentIntentResult) => void
   onLoadingChange: (loading: boolean) => void
   onError?: (error: Error) => void
@@ -22,7 +20,7 @@ export const PaymentConfirmation = ({
     if (stripe && paymentIntentSecret) {
       onLoadingChange(true)
       stripe!
-        .confirmCardPayment(paymentIntentSecret, { payment_method: paymentMethodId })
+        .confirmCardPayment(paymentIntentSecret)
         .then((res) => {
           onPaymentIntentConfirm(res)
           onLoadingChange(false)

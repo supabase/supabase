@@ -29,7 +29,7 @@ export const AssistantButton = () => {
         },
       }}
     >
-      <AiIconAnimation allowHoverEffect size={16} />
+      <AiIconAnimation allowHoverEffect={false} size={16} />
     </ButtonTooltip>
   )
 }
