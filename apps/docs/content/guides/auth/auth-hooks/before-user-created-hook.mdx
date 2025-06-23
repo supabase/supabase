@@ -6,8 +6,6 @@ subtitle: 'Prevent unwanted signups by inspecting and rejecting user creation re
 
 This hook runs before a new user is created. It allows developers to inspect the incoming user object and optionally reject the request. Use this to enforce custom signup policies that Supabase Auth does not handle natively - such as blocking disposable email domains, restricting access by region or IP, or requiring that users belong to a specific email domain.
 
-The hook is triggered any time a new user would be created - including traditional email signups (signUp()), OAuth flows (signIn(\{ provider \})), SSO (signInWithSSO()), IdP-initiated SAML flows, and anonymous sign-ins. Before the user is inserted into the auth.users table, the payload is passed to your configured hook endpoint for evaluation.
-
 You can implement this hook using an HTTP endpoint or a Postgres function. If the hook returns an error object, the signup is denied and the user is not created. If the hook responds successfully (HTTP 200 or 204 with no error), the request proceeds as usual. This gives you full control over which users are allowed to register — and the flexibility to apply that logic server-side.
 
 **Inputs**
@@ -16,19 +14,23 @@ Supabase Auth will send a payload containing these fields to your hook:
 
 | Field    | Type     | Description                                                                               |
 | -------- | -------- | ----------------------------------------------------------------------------------------- |
-| `header` | `object` | Metadata about the request. Includes IP address, request ID, and hook type.               |
+| `metadata` | `object` | Metadata about the request. Includes IP address, request ID, and hook type.               |
 | `user`   | `object` | The user record that is about to be created. Matches the shape of the `auth.users` table. |
+
+<Admonition type="note">
+Because the hook is ran just before the insertion into the database, this user will not be found in postgres at the time the hook is called. 
+</Admonition>
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
 >
-<TabPanel id="password-verification-attempt-json" label="JSON">
+<TabPanel id="before-user-created-json" label="JSON">
 
 ```json
 {
-  "header": {
+  "metadata": {
     "uuid": "8b34dcdd-9df1-4c10-850a-b3277c653040",
     "time": "2025-04-29T13:13:24.755552-07:00",
     "name": "before-user-created",
@@ -54,13 +56,13 @@ Supabase Auth will send a payload containing these fields to your hook:
 ```
 
 </TabPanel>
-<TabPanel id="password-verification-attempt-json-schema" label="JSON Schema">
+<TabPanel id="before-user-created-json-schema" label="JSON Schema">
 
 ```json
 {
   "type": "object",
   "properties": {
-    "header": {
+    "metadata": {
       "type": "object",
       "properties": {
         "uuid": {
@@ -116,7 +118,7 @@ Supabase Auth will send a payload containing these fields to your hook:
       ]
     }
   },
-  "required": ["header", "user"]
+  "required": ["metadata", "user"]
 }
 ```
 
@@ -224,13 +226,13 @@ revoke execute
 
 
 <TabPanel id="sql-block-by-cidr" label="Block by IP or CIDR">
-Block user signups originating from IP ranges using CIDR notation. This allows you to restrict access from entire networks (e.g. cloud provider subnets, countries, or VPN exit nodes) as well as individual IP addresses (/32).
+This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
 * Detecting that a user is about to be created
-* Providing the ip address in the `header.ip_address` field
+* Providing the IP address in the `metadata.ip_address` field
 
-This example uses PostgreSQL’s built-in `inet` and `<<` CIDR operators:
 ```sql
 create or replace function public.hook_block_signup_by_cidr(event jsonb)
 returns jsonb
@@ -239,7 +241,7 @@ as $$
 declare
   ip inet;
 begin
-  ip := event->'header'->>'ip_address';
+  ip := event->'metadata'->>'ip_address';
 
   if ip::inet << '192.168.0.0/16'::cidr
      or ip::inet << '10.0.0.0/8'::cidr
@@ -374,13 +376,13 @@ Deno.serve(async (req) => {
 
 
 <TabPanel id="http-block-by-cidr" label="Block by IP or CIDR">
-Block user signups originating from IP ranges using CIDR notation. This allows you to restrict access from entire networks (e.g. cloud provider subnets, countries, or VPN exit nodes) as well as individual IP addresses (/32).
+This example shows how you might restrict sign up from a single IP address or a range of them using the [`ipaddr.js`](https://www.npmjs.com/package/ipaddr.js/v/2.2.0) npm package for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
 * Detecting that a user is about to be created
-* Providing the ip address in the `header.ip_address` field
+* Providing the IP address in the `metadata.ip_address` field
 
-This example uses the [`ipaddr.js`](https://www.npmjs.com/package/ipaddr.js/v/2.2.0) npm package with the  for CIDR matching.
 ```ts
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 import { ipaddr } from 'npm:ipaddr.js@2.2.0'
@@ -412,8 +414,8 @@ Deno.serve(async (req) => {
   const wh = new Webhook(secret)
 
   try {
-    const { header } = wh.verify(payload, headers)
-    const ip = header.ip_address
+    const { metadata } = wh.verify(payload, headers)
+    const ip = metadata.ip_address
 
     if (isBlocked(ip)) {
       return new Response(
