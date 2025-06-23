@@ -645,7 +645,6 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
               paymentIntentConfirmed(paymentIntentConfirmation)
             }
             onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-            paymentMethodId={paymentMethod.id}
             onError={(err) => {
               toast.error(err.message, { duration: 10_000 })
               setNewOrgLoading(false)
