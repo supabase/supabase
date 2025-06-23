@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isUndefined } from 'lodash'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
@@ -18,13 +18,11 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
-import { useIsTableEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
@@ -44,7 +42,6 @@ export const TableGridEditor = ({
   const { ref: projectRef, id } = useParams()
 
   const tabs = useTabsStateSnapshot()
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const { selectedSchema } = useQuerySchemaState()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
@@ -65,9 +62,9 @@ export const TableGridEditor = ({
     connectionString: project?.connectionString,
   })
 
-  const onClearDashboardHistory = () => {
+  const onClearDashboardHistory = useCallback(() => {
     if (projectRef) appSnap.setDashboardHistory(projectRef, 'editor', undefined)
-  }
+  }, [appSnap, projectRef])
 
   const onTableCreated = useCallback(
     (table: { id: number }) => {
@@ -78,19 +75,12 @@ export const TableGridEditor = ({
 
   const onTableDeleted = useCallback(async () => {
     // For simplicity for now, we just open the first table within the same schema
-    if (isTableEditorTabsEnabled && selectedTable) {
+    if (selectedTable) {
       // Close tab
       const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
       tabs.handleTabClose({ id: tabId, router, editor: 'table', onClearDashboardHistory })
-    } else {
-      const tables = await getTables(selectedSchema)
-      if (tables.length > 0) {
-        router.push(`/project/${projectRef}/editor/${tables[0].id}`)
-      } else {
-        router.push(`/project/${projectRef}/editor`)
-      }
     }
-  }, [getTables, isTableEditorTabsEnabled, projectRef, router, selectedSchema])
+  }, [onClearDashboardHistory, router, selectedTable, tabs])
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {
@@ -105,7 +95,7 @@ export const TableGridEditor = ({
     )
   }
 
-  if (isUndefined(selectedTable)) {
+  if (!selectedTable) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="w-[400px]">
@@ -114,45 +104,41 @@ export const TableGridEditor = ({
             title={`Unable to find your table with ID ${id}`}
             description="This table doesn't exist in your database"
           >
-            {isTableEditorTabsEnabled && (
-              <>
-                {!!tabId ? (
-                  <Button
-                    type="default"
-                    className="mt-2"
-                    onClick={() => {
-                      tabs.handleTabClose({
-                        id: tabId,
-                        router,
-                        editor: 'table',
-                        onClearDashboardHistory,
-                      })
-                    }}
-                  >
-                    Close tab
-                  </Button>
-                ) : openTabs.length > 0 ? (
-                  <Button
-                    asChild
-                    type="default"
-                    className="mt-2"
-                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
-                  >
-                    <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
-                      Close tab
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button
-                    asChild
-                    type="default"
-                    className="mt-2"
-                    onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
-                  >
-                    <Link href={`/project/${projectRef}/editor`}>Head back</Link>
-                  </Button>
-                )}
-              </>
+            {!!tabId ? (
+              <Button
+                type="default"
+                className="mt-2"
+                onClick={() => {
+                  tabs.handleTabClose({
+                    id: tabId,
+                    router,
+                    editor: 'table',
+                    onClearDashboardHistory,
+                  })
+                }}
+              >
+                Close tab
+              </Button>
+            ) : openTabs.length > 0 ? (
+              <Button
+                asChild
+                type="default"
+                className="mt-2"
+                onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+              >
+                <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
+                  Close tab
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                asChild
+                type="default"
+                className="mt-2"
+                onClick={() => appSnap.setDashboardHistory(projectRef, 'editor', undefined)}
+              >
+                <Link href={`/project/${projectRef}/editor`}>Head back</Link>
+              </Button>
             )}
           </Admonition>
         </div>
