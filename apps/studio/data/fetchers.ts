@@ -128,8 +128,18 @@ export const {
   OPTIONS: options,
 } = client
 
-export const handleError = (error: unknown): never => {
+type HandleErrorOptions = {
+  alwaysCapture?: boolean
+}
+
+export const handleError = (
+  error: unknown,
+  options: HandleErrorOptions = { alwaysCapture: false }
+): never => {
   if (error && typeof error === 'object') {
+    if (options.alwaysCapture) {
+      Sentry.captureException(error)
+    }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
         ? error.msg
