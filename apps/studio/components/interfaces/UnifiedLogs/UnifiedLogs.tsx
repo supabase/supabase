@@ -1,4 +1,3 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -31,6 +30,7 @@ import { DataTableProvider } from 'components/ui/DataTable/providers/DataTablePr
 import { RefreshButton } from 'components/ui/DataTable/RefreshButton'
 import { TimelineChart } from 'components/ui/DataTable/TimelineChart'
 import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
+import { useUnifiedLogsInfiniteQuery } from 'data/logs/unified-logs-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import {
   ChartConfig,
@@ -47,7 +47,7 @@ import {
 import { COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
-import { dataOptions, useChartData } from './QueryOptions'
+import { useChartData } from './QueryOptions'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields, sheetFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
@@ -85,31 +85,32 @@ export const UnifiedLogs = () => {
     []
   )
 
+  const { data: chartDataResult } = useChartData(search, projectRef ?? '')
+  const {
+    data: unifiedLogsData,
+    isLoading,
+    isFetching,
+    hasNextPage,
+    refetch,
+    fetchNextPage,
+    fetchPreviousPage,
+  } = useUnifiedLogsInfiniteQuery({ projectRef, search })
   const { data: counts } = useUnifiedLogsCountQuery({ projectRef, search })
 
-  // [Joshen] This needs to move to the data folder to follow our proper RQ structure
-  const { data, isFetching, isLoading, fetchNextPage, hasNextPage, fetchPreviousPage, refetch } =
-    // @ts-ignore
-    useInfiniteQuery(dataOptions(search, projectRef ?? ''))
-
   const flatData = useMemo(() => {
-    return data?.pages?.flatMap((page) => page.data ?? []) ?? []
-  }, [data?.pages])
+    return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
+  }, [unifiedLogsData?.pages])
   const liveMode = useLiveMode(flatData)
 
-  // Add the chart data query for the entire time period
-  const { data: chartDataResult } = useChartData(search, projectRef ?? '')
-
   // REMINDER: meta data is always the same for all pages as filters do not change(!)
-  const lastPage = data?.pages?.[data?.pages.length - 1]
+  const lastPage = unifiedLogsData?.pages?.[unifiedLogsData?.pages.length - 1]
 
   // Use the totalCount from chartDataResult which gives us the actual count of logs in the time period
   // instead of the hardcoded 10000 value
   const totalDBRowCount = chartDataResult?.totalCount || counts?.totalRowCount
   const filterDBRowCount = lastPage?.meta?.filterRowCount
-  const metadata = lastPage?.meta?.metadata
-  // Use chart data from the separate query if available, fallback to the default
-  const chartData = chartDataResult?.chartData || lastPage?.meta?.chartData
+
+  const chartData = chartDataResult?.chartData
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
@@ -156,11 +157,6 @@ export const UnifiedLogs = () => {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getTTableFacetedUniqueValues(),
     getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
-    // Here, manually override the filter function for the level column
-    // to prevent client-side filtering since it's already filtered on the server
-    // Always return true to pass all level values
-    // columnFilterFns: { level: () => true },
-    // debugAll: process.env.NEXT_PUBLIC_TABLE_DEBUG === 'true',
   })
 
   const selectedRow = useMemo(() => {
@@ -287,7 +283,6 @@ export const UnifiedLogs = () => {
       enableColumnOrdering={true}
       isLoading={isFetching || isLoading}
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
-      // getFacetedMinMaxValues={getFacetedMinMaxValues(facets)}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
         <FilterSideBar />
@@ -398,8 +393,7 @@ export const UnifiedLogs = () => {
                               totalRows: totalDBRowCount ?? 0,
                               filterRows: filterDBRowCount ?? 0,
                               totalRowsFetched: totalFetched ?? 0,
-                              currentPercentiles: metadata?.currentPercentiles ?? ({} as any),
-                              ...metadata,
+                              currentPercentiles: {} as any,
                             }}
                           />
                         </TabsContent>

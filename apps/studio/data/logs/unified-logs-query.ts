@@ -34,7 +34,8 @@ export const getUnifiedLogsISOStartEnd = (search: SearchParamsType) => {
 
 /**
  * Refactor notes
- * - You shouldn't even need to handle "direction", we store _everything_
+ * - Shouldn't need to handle "direction", we store all data as it gets infinitely feteched
+ * - Shouldn't need to handle fetching previous too i think
  */
 
 async function getUnifiedLogs(
@@ -125,12 +126,12 @@ async function getUnifiedLogs(
 
   // Just use the row timestamps directly for cursors
   const lastRow = result.length > 0 ? result[result.length - 1] : null
-  // const firstRow = result.length > 0 ? result[0] : null
+  const firstRow = result.length > 0 ? result[0] : null
   const nextCursor = lastRow ? lastRow.timestamp : null
 
   // This ensures live mode never breaks the infinite query chain
   // DataTableDemo uses milliseconds, but our timestamps are in microseconds
-  // const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
+  const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
 
   // HACK: Backend uses "timestamp > cursor" which can exclude records with identical timestamps
   // THIS CAN SOMETIMES CAUSE 49 RECORDS INSTEAD OF 50 TO BE RETURNED
@@ -140,6 +141,7 @@ async function getUnifiedLogs(
 
   return {
     data: result,
+    prevCursor,
     nextCursor: hasMore ? nextCursor : null,
   }
 }

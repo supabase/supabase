@@ -11,7 +11,7 @@ export const logsKeys = {
       'unified-logs',
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
-  usersCount: (projectRef: string | undefined, searchParams: SearchParamsType | undefined) =>
+  unifiedLogsCount: (projectRef: string | undefined, searchParams: SearchParamsType | undefined) =>
     [
       'projects',
       projectRef,
