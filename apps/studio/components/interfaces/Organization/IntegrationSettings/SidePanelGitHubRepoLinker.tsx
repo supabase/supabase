@@ -72,8 +72,6 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     enabled: visible && Boolean(gitHubAuthorization),
   })
 
-  console.log('githubReposData', githubReposData)
-
   const { data: connections } = useGitHubConnectionsQuery(
     {
       organizationId: selectedOrganization?.id,
@@ -157,10 +155,10 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
           return
         }
 
-        if (existingConnection?.id && val.branchName && val.branchName.length > 0) {
+        if (selectedRepo?.id && val.branchName && val.branchName.length > 0) {
           try {
             await checkGithubBranchValidity({
-              connectionId: Number(existingConnection.id),
+              repositoryId: Number(selectedRepo.id),
               branchName: val.branchName,
             })
           } catch (error) {
@@ -283,6 +281,9 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
               installation_id: selectedRepo.installation_id!,
               project_ref: projectRef,
               repository_id: Number(selectedRepo.id),
+              workdir: data.supabaseDirectory,
+              supabaseChangesOnly: data.supabaseChangesOnly,
+              branchLimit: Number(data.branchLimit),
             },
           })
         } else {
@@ -301,6 +302,9 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
             installation_id: selectedRepo.installation_id!,
             project_ref: projectRef,
             repository_id: Number(selectedRepo.id),
+            workdir: data.supabaseDirectory,
+            supabaseChangesOnly: data.supabaseChangesOnly,
+            branchLimit: Number(data.branchLimit),
           },
         })
       }
@@ -501,7 +505,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                             <Input_Shadcn_
                               {...field}
                               autoComplete="off"
-                              disabled={!existingConnection || !autoBranchingEnabled}
+                              disabled={!autoBranchingEnabled}
                             />
                           </FormControl_Shadcn_>
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
@@ -532,7 +536,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                             {...field}
                             placeholder="supabase"
                             autoComplete="off"
-                            disabled={!existingConnection || !autoBranchingEnabled}
+                            disabled={!autoBranchingEnabled}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
@@ -554,7 +558,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                             {...field}
                             type="number"
                             autoComplete="off"
-                            disabled={!existingConnection || !autoBranchingEnabled}
+                            disabled={!autoBranchingEnabled}
                           />
                         </FormControl_Shadcn_>
                         <FormMessage_Shadcn_ />
@@ -575,7 +579,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
                           <Switch
                             checked={field.value}
                             onCheckedChange={(val) => field.onChange(val)}
-                            disabled={!existingConnection || !autoBranchingEnabled}
+                            disabled={!autoBranchingEnabled}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>

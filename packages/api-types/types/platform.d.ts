@@ -622,6 +622,44 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/github/repositories/{repositoryId}/branches': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List GitHub repository branches */
+    get: operations['GitHubRepositoriesController_listRepositoryBranches']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/integrations/github/repositories/{repositoryId}/branches/{branchName}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get GitHub repository branch
+     * @deprecated
+     * @description This is a temporary endpoint before dashboard switches to combo box
+     */
+    get: operations['GitHubRepositoriesController_getRepository']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/vercel': {
     parameters: {
       query?: never
@@ -2106,8 +2144,7 @@ export interface paths {
     /** Gets project's logs */
     get: operations['LogsController_getApiPaths']
     put?: never
-    /** Post project's logs */
-    post: operations['LogsController_postApiPaths']
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -4422,10 +4459,22 @@ export interface components {
     CreateGitHubAuthorizationBody: {
       code: string
     }
-    CreateGitHubConnectionsBody: {
+    CreateGitHubConnectionBody: {
+      branch_limit?: number
       installation_id: number
       project_ref: string
       repository_id: number
+      supabase_changes_only?: boolean
+      workdir?: string
+    }
+    CreateGitHubConnectionResponse: {
+      branch_limit: number
+      id: number
+      inserted_at: string
+      installation_id: number
+      supabase_changes_only: boolean
+      updated_at: string
+      workdir: string
     }
     CreateInvitationBody: {
       email: string
@@ -5617,6 +5666,9 @@ export interface components {
       sender_id: number
       user_id: number
     }
+    GitHubBranchResponse: {
+      name: string
+    }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
       DB_MAX_POOL_SIZE: number | null
@@ -5958,6 +6010,14 @@ export interface components {
         workdir: string
       }[]
     }
+    ListGitHubRepositoriesResponse: {
+      repositories: {
+        default_branch: string
+        id: number
+        installation_id: number
+        name: string
+      }[]
+    }
     ListNotificationExceptionsResponse: {
       exceptions: {
         /** Format: uuid */
@@ -5989,6 +6049,11 @@ export interface components {
         id: string
         /** Format: uuid */
         oauth_app_id: string
+      }[]
+    }
+    ListRepositoryBranchesResponse: {
+      branches: {
+        name: string
       }[]
     }
     LoadBalancerDetailResponse: {
@@ -6704,9 +6769,6 @@ export interface components {
       is_updatable: boolean
       name: string
       schema: string
-    }
-    PostProjectLogsBody: {
-      sql: string
     }
     PreviewProjectTransferResponse: {
       errors: {
@@ -9637,7 +9699,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['GitHubBranchResponse'][]
+        }
       }
       /** @description Failed to list GitHub connection branches */
       500: {
@@ -9664,7 +9728,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['GitHubBranchResponse']
+        }
       }
       /** @description Failed to get GitHub connection branch */
       500: {
@@ -9712,7 +9778,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateGitHubConnectionsBody']
+        'application/json': components['schemas']['CreateGitHubConnectionBody']
       }
     }
     responses: {
@@ -9720,7 +9786,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['CreateGitHubConnectionResponse']
+        }
       }
       /** @description Failed to create project connections */
       500: {
@@ -9800,9 +9868,68 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['ListGitHubRepositoriesResponse']
+        }
       }
       /** @description Failed to get GitHub repositories for user */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GitHubRepositoriesController_listRepositoryBranches: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        repositoryId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListRepositoryBranchesResponse']
+        }
+      }
+      /** @description Failed to list GitHub repository branches */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  GitHubRepositoriesController_getRepository: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        branchName: string
+        repositoryId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GitHubBranchResponse']
+        }
+      }
+      /** @description Failed to get GitHub repository branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -14474,50 +14601,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get project's logs */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  LogsController_postApiPaths: {
-    parameters: {
-      query?: {
-        iso_timestamp_end?: string
-        iso_timestamp_start?: string
-        project?: string
-        sql?: string
-      }
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['PostProjectLogsBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to POST project's logs */
       500: {
         headers: {
           [name: string]: unknown

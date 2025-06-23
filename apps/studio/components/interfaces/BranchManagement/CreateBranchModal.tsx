@@ -136,10 +136,10 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
         return
       }
 
-      if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.id) {
+      if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
         try {
           await checkGithubBranchValidity({
-            connectionId: githubConnection.id,
+            repositoryId: githubConnection.repository.id,
             branchName: val.gitBranchName,
           })
           // valid – no issues added
