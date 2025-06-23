@@ -210,6 +210,17 @@ const MergePage: NextPageWithLayout = () => {
     return hasDatabaseChanges || hasEdgeFunctionChanges
   }
 
+  const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
+    onSuccess: () => {
+      toast.success('Branch pushed successfully!')
+      // Refresh the diff after pushing
+      refetchDiff()
+    },
+    onError: (error) => {
+      toast.error(`Failed to push branch: ${error.message}`)
+    },
+  })
+
   const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
       setIsSubmitting(false)
@@ -243,6 +254,14 @@ const MergePage: NextPageWithLayout = () => {
       toast.error(`Failed to merge branch: ${error.message}`)
     },
   })
+
+  const handlePush = () => {
+    if (!currentBranch?.id || !parentProjectRef) return
+    pushBranch({
+      id: currentBranch.id,
+      projectRef: parentProjectRef,
+    })
+  }
 
   const handleMerge = () => {
     if (!currentBranch?.id || !parentProjectRef || !ref) return
@@ -351,6 +370,14 @@ const MergePage: NextPageWithLayout = () => {
 
   const primaryActions = (
     <div className="flex items-end gap-2">
+      <Button
+        type="default"
+        loading={isPushing}
+        onClick={handlePush}
+        icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+      >
+        {isPushing ? 'Pushing...' : 'Push branch'}
+      </Button>
       {isMergeDisabled ? (
         <ButtonTooltip
           tooltip={{
