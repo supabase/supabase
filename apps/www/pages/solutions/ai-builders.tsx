@@ -37,7 +37,7 @@ const Enterprise: NextPage = () => (
         footer={<AIBuildersLogos className="mt-8 lg:max-w-xs xl:max-w-none" />}
         footerPosition="left"
       />
-      <Quotes {...content['quotes']} />
+      <Quotes {...content.quotes} />
       <WhySupabase {...content.why} />
       <FeaturesGrid {...content.features} />
       <VideosSection {...content.testimonials} />
