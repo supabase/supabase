@@ -1,4 +1,4 @@
-import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
+import { createSupabaseApiPlatform, createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { StreamTransport } from '@supabase/mcp-utils'
 import {
   experimental_createMCPClient as createMCPClient,
@@ -27,10 +27,10 @@ export async function createSupabaseMCPClient({
   // Instantiate the MCP server and connect to its transport
   const apiUrl = API_URL?.replace('/platform', '')
   const server = createSupabaseMcpServer({
-    platform: {
+    platform: createSupabaseApiPlatform({
       accessToken,
       apiUrl,
-    },
+    }),
     projectId,
     readOnly: true,
   })
