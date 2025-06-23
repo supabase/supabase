@@ -118,7 +118,7 @@ const AddPaymentMethodForm = ({
         <PaymentElement
           className="[.p-LinkAutofillPrompt]:pt-0"
           options={{
-            defaultValues: { billingDetails: { email: selectedOrganization?.billing_email } },
+            defaultValues: { billingDetails: { email: selectedOrganization?.billing_email ?? '' } },
           }}
         />
         {showSetDefaultCheckbox && (

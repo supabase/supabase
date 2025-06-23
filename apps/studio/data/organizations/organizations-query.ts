@@ -6,9 +6,9 @@ import { useProfile } from 'lib/profile'
 import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
-export function castOrganizationResponseToOrganization(
-  org: components['schemas']['OrganizationResponse']
-): Organization {
+export type OrganizationBase = components['schemas']['OrganizationResponse']
+
+export function castOrganizationResponseToOrganization(org: OrganizationBase): Organization {
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',

@@ -9,20 +9,6 @@ export const FEATURE_PREVIEWS = [
     isPlatformOnly: false,
   },
   {
-    key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
-    name: 'Table Editor Tabs',
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/35636',
-    isNew: true,
-    isPlatformOnly: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
-    name: 'SQL Editor Tabs',
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/35636',
-    isNew: true,
-    isPlatformOnly: true,
-  },
-  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
