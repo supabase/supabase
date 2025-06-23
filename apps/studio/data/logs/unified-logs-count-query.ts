@@ -2,31 +2,37 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { getLogsCountQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { FacetMetadataSchema } from 'components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { handleError, post } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { logsKeys } from './keys'
-import { getUnifiedLogsISOStartEnd, UnifiedLogsVariables } from './unified-logs-query'
+import {
+  getUnifiedLogsISOStartEnd,
+  UNIFIED_LOGS_STALE_TIME,
+  UnifiedLogsVariables,
+} from './unified-logs-query'
 
 export async function getUnifiedLogsCount(
   { projectRef, search }: UnifiedLogsVariables,
   signal?: AbortSignal
 ) {
-  if (typeof projectRef === 'undefined')
-    throw new Error('projectRef is required for getUnifiedLogs')
+  if (typeof projectRef === 'undefined') {
+    throw new Error('projectRef is required for getUnifiedLogsCount')
+  }
 
   const sql = getLogsCountQuery(search)
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
     params: {
       path: { ref: projectRef },
       query: {
         iso_timestamp_start: isoTimestampStart,
         iso_timestamp_end: isoTimestampEnd,
         project: projectRef,
+        sql,
       },
     },
-    body: { sql },
+    // body: { sql },
     signal,
   })
 
@@ -90,6 +96,7 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: UNIFIED_LOGS_STALE_TIME,
       ...options,
     }
   )

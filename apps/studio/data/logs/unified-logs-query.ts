@@ -2,12 +2,13 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 
 import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { PageParam, SearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50
 type LogLevel = 'success' | 'warning' | 'error'
+export const UNIFIED_LOGS_STALE_TIME = 1000 * 60 * 5 // 5 minutes
 
 export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
@@ -73,16 +74,17 @@ async function getUnifiedLogs(
     timestampEnd = isoTimestampEnd
   }
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
     params: {
       path: { ref: projectRef },
       query: {
         iso_timestamp_start: timestampStart,
         iso_timestamp_end: timestampEnd,
         project: projectRef,
+        sql,
       },
     },
-    body: { sql },
+    // body: { sql },
     signal,
   })
 
@@ -170,8 +172,7 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
       refetchOnMount: false,
       refetchOnReconnect: false,
       refetchInterval: 0,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 10, // 10 minutes
+      staleTime: UNIFIED_LOGS_STALE_TIME,
       ...options,
     }
   )

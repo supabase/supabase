@@ -29,6 +29,7 @@ import { LiveRow } from 'components/ui/DataTable/LiveRow'
 import { DataTableProvider } from 'components/ui/DataTable/providers/DataTableProvider'
 import { RefreshButton } from 'components/ui/DataTable/RefreshButton'
 import { TimelineChart } from 'components/ui/DataTable/TimelineChart'
+import { useUnifiedLogsChartQuery } from 'data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from 'data/logs/unified-logs-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -47,7 +48,6 @@ import {
 import { COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
-import { useChartData } from './QueryOptions'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields, sheetFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
@@ -85,7 +85,6 @@ export const UnifiedLogs = () => {
     []
   )
 
-  const { data: chartDataResult } = useChartData(search, projectRef ?? '')
   const {
     data: unifiedLogsData,
     isLoading,
@@ -96,6 +95,7 @@ export const UnifiedLogs = () => {
     fetchPreviousPage,
   } = useUnifiedLogsInfiniteQuery({ projectRef, search })
   const { data: counts } = useUnifiedLogsCountQuery({ projectRef, search })
+  const { data: unifiedLogsChart = [] } = useUnifiedLogsChartQuery({ projectRef, search })
 
   const flatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
@@ -107,10 +107,9 @@ export const UnifiedLogs = () => {
 
   // Use the totalCount from chartDataResult which gives us the actual count of logs in the time period
   // instead of the hardcoded 10000 value
-  const totalDBRowCount = chartDataResult?.totalCount || counts?.totalRowCount
+  const totalDBRowCount = counts?.totalRowCount
   const filterDBRowCount = lastPage?.meta?.filterRowCount
 
-  const chartData = chartDataResult?.chartData
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
@@ -302,7 +301,7 @@ export const UnifiedLogs = () => {
               ]}
             />
             <TimelineChart
-              data={chartData ?? []}
+              data={unifiedLogsChart}
               className="-mb-2"
               columnId="timestamp"
               chartConfig={filteredChartConfig}
