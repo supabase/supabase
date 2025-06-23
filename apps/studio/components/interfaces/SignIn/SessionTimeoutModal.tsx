@@ -1,7 +1,8 @@
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import Link from 'next/link'
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
+
+import { InlineLink } from 'components/ui/InlineLink'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface SessionTimeoutModalProps {
   visible: boolean
@@ -29,20 +30,16 @@ export const SessionTimeoutModal = ({
       onConfirm={redirectToSignIn}
       alert={{
         base: { variant: 'warning' },
-        title: `Your session has timed out`,
-        description: `Please try signing in again. If you are not able to sign in again, please contact Support.`,
+        title: 'Your session has timed out',
+        description:
+          'Please try signing in again. If you are not able to sign in again, please contact Support.',
       }}
     >
       <p className="text-sm text-foreground-light">
         Consider{' '}
-        <Link
-          href="https://github.com/orgs/supabase/discussions/36540"
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-        >
+        <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
           generating a HAR file
-        </Link>{' '}
+        </InlineLink>{' '}
         from your session to help Support pinpoint the issue.
       </p>
     </ConfirmationModal>
