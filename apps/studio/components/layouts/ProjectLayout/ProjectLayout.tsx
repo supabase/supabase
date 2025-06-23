@@ -4,10 +4,6 @@ import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import {
-  useIsSQLEditorTabsEnabled,
-  useIsTableEditorTabsEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -101,14 +97,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
-    const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
-    const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
-
-    // For tabs preview flag logic - only conditionally collapse sidebar for table editor and sql editor if feature flags are on
     const editor = useEditorType()
-    const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
-    const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
-    const forceShowProductMenu = !tableEditorTabsEnabled && !sqlEditorTabsEnabled
+    const forceShowProductMenu = editor === undefined
     const sideBarIsOpen = forceShowProductMenu || showSidebar
 
     const projectName = selectedProject?.name
