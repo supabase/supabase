@@ -11,6 +11,8 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
+import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
+import { useMigrationUpsertMutation } from 'data/database/migration-upsert-mutation'
 import { useWorkflowRunQuery } from 'data/workflow-runs/workflow-run-query'
 import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
@@ -212,7 +214,11 @@ const MergePage: NextPageWithLayout = () => {
     onSuccess: (data) => {
       setIsSubmitting(false)
       if (data.hadChanges) {
-        if (data.migrationCreated) {
+        if (data.hadConflicts && data.migrationCreated) {
+          toast.success('Conflicts resolved, migration created and branch merge initiated!')
+        } else if (data.hadConflicts) {
+          toast.success('Conflicts resolved and branch merge initiated!')
+        } else if (data.migrationCreated) {
           toast.success('Migration created and branch merge initiated!')
         } else {
           toast.success('Branch merge initiated!')
@@ -225,7 +231,11 @@ const MergePage: NextPageWithLayout = () => {
           })
         }
       } else {
-        toast.info('No changes to merge - branch merged successfully!')
+        if (data.hadConflicts) {
+          toast.success('Conflicts resolved - no additional changes to merge!')
+        } else {
+          toast.info('No changes to merge - branch merged successfully!')
+        }
       }
     },
     onError: (error) => {
