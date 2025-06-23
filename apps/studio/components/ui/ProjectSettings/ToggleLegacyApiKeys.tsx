@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
@@ -11,11 +11,11 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {
-  const { project } = useProjectContext()
+  const { ref: projectRef } = useParams()
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
 
   const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
-    useLegacyAPIKeysStatusQuery({ projectRef: project!.ref })
+    useLegacyAPIKeysStatusQuery({ projectRef })
 
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
     useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
@@ -82,7 +82,7 @@ const ToggleApiKeysModal = ({
   onClose: () => void
   legacyAPIKeysStatusData: { enabled: boolean }
 }) => {
-  const { project } = useProjectContext()
+  const { ref: projectRef } = useParams()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
   const { mutate: toggleLegacyAPIKey, isLoading: isTogglingLegacyAPIKey } =
@@ -92,7 +92,7 @@ const ToggleApiKeysModal = ({
     const enabled = !legacyAPIKeysStatusData?.enabled
 
     toggleLegacyAPIKey(
-      { projectRef: project!.ref, enabled },
+      { projectRef, enabled },
       {
         onSuccess: () => {
           toast.success(

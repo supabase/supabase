@@ -1,11 +1,11 @@
 import { expect } from '@playwright/test'
+import { env } from '../env.config'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
-import { env } from '../env.config'
 
 test.describe('SQL Editor', () => {
   test('should check if SQL editor can run simple commands', async ({ page }) => {
-    await page.goto(toUrl(`/project/${env.PROJECT_REF}/sql`))
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/sql/new?skip=true`))
 
     const editor = page.getByRole('code').nth(0)
 
