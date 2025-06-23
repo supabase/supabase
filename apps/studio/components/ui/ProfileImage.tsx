@@ -20,7 +20,7 @@ export const ProfileImage = ({ alt, src, placeholder, className }: ProfileImageP
       src={src}
       width="24"
       height="24"
-      className={cn('bg-foreground rounded-full', className)}
+      className={cn('aspect-square bg-foreground rounded-full object-cover', className)}
       onError={() => setHasInvalidImg(true)}
     />
   ) : (

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ComponentProps, useState } from 'react'
+import { ComponentProps, useState, useMemo } from 'react'
 import {
   Bar,
   CartesianGrid,
@@ -56,6 +56,14 @@ const BarChart = ({
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  // Transform data to ensure yAxisKey values are numbers
+  const transformedData = useMemo(() => {
+    return data.map((item) => ({
+      ...item,
+      [yAxisKey]: typeof item[yAxisKey] === 'string' ? Number(item[yAxisKey]) : item[yAxisKey],
+    }))
+  }, [data, yAxisKey])
 
   // Default props
   const _XAxisProps = XAxisProps || {
@@ -120,7 +128,7 @@ const BarChart = ({
       />
       <Container>
         <RechartBarChart
-          data={data}
+          data={transformedData}
           className="overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {

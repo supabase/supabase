@@ -138,69 +138,11 @@ using (true)
 ```
 
 </TabPanel>
-<TabPanel id="plv8" label="JavaScript (PLV8)">
-
-```sql supabase/migrations/auth_hook.sql
--- Enable the "plv8" extension
-create extension plv8;
-
--- Create the auth hook function
-create or replace function custom_access_token_hook(event jsonb)
-returns jsonb
-language plv8
-as $$
-  var user_role;
-
-  // Fetch the current user's user_role from the public user_roles table.
-  var result = plv8.execute("select role from public.user_roles where user_id = $1", [event.user_id]);
-  if (result.length > 0) {
-    user_role = result[0].role;
-  } else {
-    // Assign null
-    user_role = null;
-  }
-
-  // Check if 'claims' exists in the event object; if not, initialize it
-  if (!event.claims) {
-    event.claims = {};
-  }
-
-  // Update the level in the claims
-  event.claims.user_role = user_role;
-
-  return event;
-$$;
-
-grant usage on schema public to supabase_auth_admin;
-
-grant execute
-  on function public.custom_access_token_hook
-  to supabase_auth_admin;
-
-revoke execute
-  on function public.custom_access_token_hook
-  from authenticated, anon, public;
-
-grant all
-  on table public.user_roles
-to supabase_auth_admin;
-
-revoke all
-  on table public.user_roles
-  from authenticated, anon, public;
-
-create policy "Allow auth admin to read user roles" ON public.user_roles
-as permissive for select
-to supabase_auth_admin
-using (true)
-```
-
-</TabPanel>
 </Tabs>
 
 ### Enable the hook
 
-In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
+In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate Postgres function from the dropdown menu.
 
 When developing locally, follow the [local development](/docs/guides/auth/auth-hooks#local-development) instructions.
 

@@ -51,8 +51,13 @@ const StorageMenu = () => {
     | 'usage'
     | 'logs'
 
-  const { data, error, isLoading, isError, isSuccess } = useBucketsQuery({ projectRef: ref })
-  const buckets = data ?? []
+  const {
+    data: buckets = [],
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useBucketsQuery({ projectRef: ref })
   const sortedBuckets =
     sort === 'alphabetical'
       ? buckets.sort((a, b) =>

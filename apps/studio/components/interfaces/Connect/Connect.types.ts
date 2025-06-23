@@ -9,8 +9,11 @@ export interface ContentFileProps {
     anonKey: string
   }
   connectionStringPooler: {
-    transaction: string
-    session: string
+    transactionShared: string
+    sessionShared: string
+    transactionDedicated?: string
+    sessionDedicated?: string
+    ipv4SupportedForDedicatedPooler: boolean
+    direct?: string
   }
-  connectionStringDirect: string
 }

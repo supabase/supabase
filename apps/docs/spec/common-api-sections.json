@@ -226,6 +226,12 @@
     "title": "Edge Functions",
     "items": [
       {
+        "id": "v1-bulk-update-functions",
+        "title": "Bulk update functions",
+        "slug": "v1-bulk-update-functions",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-function",
         "title": "Create a function",
         "slug": "v1-create-a-function",

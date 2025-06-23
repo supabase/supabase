@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,15 +22,14 @@ import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { GB, PROJECT_STATUS } from 'lib/constants'
+import { CloudProvider } from 'shared-data'
 import {
   Button,
   cn,
@@ -55,11 +53,7 @@ import { IOPSField } from './fields/IOPSField'
 import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
-import {
-  DiskType,
-  IOPS_RANGE,
-  RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
-} from './ui/DiskManagement.constants'
+import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
@@ -69,14 +63,13 @@ export function DiskManagementForm() {
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const diskAndComputeForm = useFlag('diskAndComputeForm')
 
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
+  const isFlyArchitecture = project?.cloud_provider === 'FLY'
 
   /**
    * Permissions
@@ -121,29 +114,37 @@ export function DiskManagementForm() {
             setRefetchInterval(false)
             toast.success('Disk configuration changes have been successfully applied!')
           }
+        } else {
+          setRefetchInterval(2000)
         }
       },
+      enabled: project != null && !isFlyArchitecture,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
+      enabled: project != null && !isFlyArchitecture,
     })
-  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
-    projectRef,
-  })
-  const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
+  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery(
+    {
+      projectRef,
+    },
+    { enabled: project != null && !isFlyArchitecture }
+  )
+
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
-    useDiskAutoscaleCustomConfigQuery({ projectRef })
+    useDiskAutoscaleCustomConfigQuery(
+      { projectRef },
+      { enabled: project != null && !isFlyArchitecture }
+    )
 
   /**
    * Handle default values
    */
   // @ts-ignore
-  const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+  const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0, iops: 0 }
   const { growth_percent, max_size_gb, min_increment_gb } = diskAutoscaleConfig ?? {}
   const defaultValues = {
     storageType: type ?? DiskType.GP3,
@@ -159,7 +160,9 @@ export function DiskManagementForm() {
   }
 
   const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
+    resolver: zodResolver(
+      CreateDiskStorageSchema(defaultValues.totalSize, project?.cloud_provider as CloudProvider)
+    ),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -174,23 +177,23 @@ export function DiskManagementForm() {
     isDiskAttributesSuccess &&
     isDiskUtilizationSuccess &&
     isReadReplicasSuccess &&
-    isSubscriptionSuccess &&
     isDiskAutoscaleConfigSuccess &&
     isCooldownSuccess
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-  const isPlanUpgradeRequired = subscription?.plan.id === 'free'
+  const isPlanUpgradeRequired = org?.plan.id === 'free'
 
   const { formState } = form
   const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
   const totalSize = formState.defaultValues?.totalSize || 0
   const usedPercentage = (usedSize / totalSize) * 100
 
-  const isFlyArchitecture = project?.cloud_provider === 'FLY'
   const disableIopsThroughputConfig =
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-    subscription?.plan.id !== 'free'
+    org?.plan.id !== 'free'
+
+  const isBranch = project?.parent_project_ref !== undefined
 
   const disableDiskInputs =
     isRequestingChanges ||
@@ -209,6 +212,7 @@ export function DiskManagementForm() {
     useUpdateDiskAttributesMutation({
       // this is to suppress to toast message
       onError: () => {},
+      onSuccess: () => setRefetchInterval(2000),
     })
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
@@ -241,15 +245,11 @@ export function DiskManagementForm() {
       ) {
         willUpdateDiskConfiguration = true
 
-        if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)) {
-          payload.provisionedIOPS = IOPS_RANGE[DiskType.GP3].min
-        }
-
         await updateDiskConfiguration({
           ref: projectRef,
-          provisionedIOPS: payload.provisionedIOPS,
+          provisionedIOPS: payload.provisionedIOPS!,
           storageType: payload.storageType,
-          totalSize: payload.totalSize,
+          totalSize: payload.totalSize!,
           throughput: payload.throughput,
         })
       }
@@ -292,17 +292,10 @@ export function DiskManagementForm() {
 
   useEffect(() => {
     // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isSuccess) {
+    if (isDiskAttributesSuccess || isSuccess) {
       form.reset(defaultValues, {})
     }
-  }, [isSuccess])
-
-  // Redirect logic incase disk and compute feature is not live yet
-  useEffect(() => {
-    if (diskAndComputeForm !== undefined && !diskAndComputeForm && projectRef) {
-      router.push(`/project/${projectRef}/settings/addons?panel=computeInstance`)
-    }
-  }, [diskAndComputeForm, projectRef, router])
+  }, [isSuccess, isDiskAttributesSuccess])
 
   return (
     <Form_Shadcn_ {...form}>
@@ -353,7 +346,11 @@ export function DiskManagementForm() {
             type="default"
             visible={isFlyArchitecture}
             title="Disk configuration is not available on Fly Postgres"
-            description="Please contact Fly support if you need to update your disk configuration"
+            description={
+              isBranch
+                ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
+                : 'The Fly Postgres offering is deprecated - please migrate your instance to Supabase to configure your disk.'
+            }
           />
           {!isFlyArchitecture && (
             <>
@@ -423,11 +420,11 @@ export function DiskManagementForm() {
                   </div>
                   <Separator />
                   <div className="px-8 flex flex-col gap-y-8">
-                    <StorageTypeField form={form} disableInput={disableDiskInputs} />
                     <NoticeBar
                       type="default"
                       visible={disableIopsThroughputConfig}
-                      title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
+                      title="Adjusting disk configuration requires LARGE Compute size or above"
+                      description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
                       actions={
                         <Button
                           type="default"
@@ -438,6 +435,10 @@ export function DiskManagementForm() {
                           Change to LARGE Compute
                         </Button>
                       }
+                    />
+                    <StorageTypeField
+                      form={form}
+                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
                     />
                     <IOPSField
                       form={form}

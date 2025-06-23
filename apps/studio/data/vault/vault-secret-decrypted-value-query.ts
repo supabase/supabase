@@ -1,5 +1,5 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 
@@ -15,7 +15,7 @@ export const vaultSecretDecryptedValueQuery = (id: string) => {
 
 export type VaultSecretsDecryptedValueVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 }
 

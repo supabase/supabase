@@ -5,6 +5,7 @@ import { Badge, Button, cn, Loading } from 'ui'
 
 interface PanelProps {
   className?: string
+  id?: string
   footer?: JSX.Element | false
   loading?: boolean
   noMargin?: boolean
@@ -24,6 +25,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
         props.noMargin ? '' : 'mb-4 md:mb-8',
         props.className
       )}
+      id={props.id}
     >
       {props.title && (
         <div
@@ -36,11 +38,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
         </div>
       )}
       {props.children}
-      {props.footer && (
-        <div className="bg-surface-100 border-t border-default">
-          <div className="flex h-12 items-center px-4 md:px-6">{props.footer}</div>
-        </div>
-      )}
+      {props.footer && <Footer>{props.footer}</Footer>}
     </div>
   )
 
@@ -53,6 +51,14 @@ function Panel(props: PropsWithChildren<PanelProps>) {
 
 function Content({ children, className }: { children: ReactNode; className?: string | false }) {
   return <div className={cn('px-4 md:px-6 py-4', className)}>{children}</div>
+}
+
+function Footer({ children }: { children: ReactNode; className?: string }) {
+  return (
+    <div className="bg-surface-100 border-t border-default">
+      <div className="flex h-12 items-center px-4 md:px-6">{children}</div>
+    </div>
+  )
 }
 
 const PanelNotice = forwardRef<
@@ -139,5 +145,6 @@ const PanelNotice = forwardRef<
 PanelNotice.displayName = 'PanelNotice'
 
 Panel.Content = Content
+Panel.Footer = Footer
 Panel.Notice = PanelNotice
 export default Panel

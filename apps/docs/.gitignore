@@ -20,12 +20,19 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+**/__generated__/**/*
 **/*/generated/**/*
 !**/*/generated/.gitkeep
 !**/*/generated/**/.gitkeep
 
 # Sitemap
 public/sitemap.xml
+# llms.txt (generated)
+public/llms.txt
+public/llms/
 
 # Copied examples folder
 /examples/
+
+# Sentry Config File
+.env.sentry-build-plugin

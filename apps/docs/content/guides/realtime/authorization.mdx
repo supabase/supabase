@@ -14,7 +14,7 @@ You can control client access to Realtime [Broadcast](/docs/guides/realtime/broa
 
 <Admonition type="caution">
 
-Realtime Authorization is in Public Alpha. To use Authorization for your Realtime Channels, use `supabase-js` version `v2.44.0` or later.
+Realtime Authorization is in Public Beta. To use Authorization for your Realtime Channels, use `supabase-js` version `v2.44.0` or later.
 
 </Admonition>
 
@@ -132,6 +132,10 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
 >
   <TabPanel id="js" label="JavaScript">
     ```javascript
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
     const channel = supabase.channel('room-1', {
       config: { private: true },
     })

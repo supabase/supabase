@@ -468,6 +468,12 @@ export const examples: Registry = [
     files: ['example/dropdown-menu-radio-group.tsx'],
   },
   {
+    name: 'filter-bar-demo',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/filter-bar-demo.tsx'],
+  },
+  {
     name: 'hover-card-demo',
     type: 'components:example',
     registryDependencies: ['hover-card'],
@@ -1065,6 +1071,16 @@ export const examples: Registry = [
     name: 'inner-side-menu-with-search',
     type: 'components:example',
     files: ['example/inner-side-menu-with-search.tsx'],
+  },
+  {
+    name: 'toc-demo',
+    type: 'components:example',
+    files: ['example/toc-demo.tsx'],
+  },
+  {
+    name: 'toc-single-demo',
+    type: 'components:example',
+    files: ['example/toc-single-demo.tsx'],
   },
   {
     name: 'multi-select-demo',

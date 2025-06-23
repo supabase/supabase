@@ -16,7 +16,6 @@ export async function updateVercelConnection({
       path: { connection_id: id },
     },
     body: {
-      // @ts-expect-error for some reason openapi-typescript doesn't generate
       // the array part of this type correctly
       env_sync_targets: envSyncTargets,
       public_env_var_prefix: publicEnvVarPrefix,

@@ -15,7 +15,7 @@ import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-setti
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
@@ -37,7 +37,7 @@ export const GraphiQLTab = () => {
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
@@ -48,7 +48,7 @@ export const GraphiQLTab = () => {
     const customFetcher: Fetcher = async (graphqlParams, opts) => {
       let userAuthorization: string | undefined
 
-      const role = getImpersonatedRole()
+      const role = getImpersonatedRoleState().role
       if (
         projectRef !== undefined &&
         jwtSecret !== undefined &&
@@ -80,7 +80,7 @@ export const GraphiQLTab = () => {
     }
 
     return customFetcher
-  }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceKey])
+  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken, serviceKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Loading />

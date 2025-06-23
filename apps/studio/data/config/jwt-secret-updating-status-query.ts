@@ -22,14 +22,14 @@ export async function getJwtSecretUpdatingStatus(
     throw new Error('projectRef is required')
   }
 
-  const { data, error } = await get('/platform/props/project/{ref}/jwt-secret-update-status', {
+  const { data, error } = await get('/platform/projects/{ref}/config/secrets/update-status', {
     params: { path: { ref: projectRef } },
     signal,
   })
 
   if (error) handleError(error)
 
-  const meta = data.jwtSecretUpdateStatus
+  const meta = data.update_status
 
   return meta
     ? ({

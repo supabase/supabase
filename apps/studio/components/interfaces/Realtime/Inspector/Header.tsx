@@ -2,7 +2,6 @@ import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -37,7 +36,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
             if (!config.enabled) {
               // the user has clicked to start listening
               sendEvent({
-                action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED,
+                action: 'realtime_inspector_listen_channel_clicked',
                 groups: {
                   project: ref ?? 'Unknown',
                   organization: org?.slug ?? 'Unknown',

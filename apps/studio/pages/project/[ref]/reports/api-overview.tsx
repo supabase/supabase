@@ -2,7 +2,7 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
+import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -15,7 +15,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { NextPageWithLayout } from 'types'
 
@@ -35,8 +34,7 @@ export const ApiReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan
+  const plan = organization?.plan
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
     mergeParams({
@@ -58,10 +56,7 @@ export const ApiReport: NextPageWithLayout = () => {
           onRefresh={refresh}
           isLoading={isLoading}
           filters={filters}
-          datepickerHelpers={REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-            ...helper,
-            disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-          }))}
+          datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
         />
         <div className="h-2 w-full">
           <ShimmerLine active={isLoading} />

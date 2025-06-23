@@ -25,7 +25,8 @@ export async function updateLogDrain(payload: LogDrainUpdateVariables) {
     body: {
       name: payload.name,
       description: payload.description,
-      config: payload.config,
+      type: payload.type,
+      config: payload.config as any,
     },
   })
 

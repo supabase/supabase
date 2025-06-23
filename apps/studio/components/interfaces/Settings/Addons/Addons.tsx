@@ -32,7 +32,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb, useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useIsOrioleDbInAws, useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
@@ -40,7 +40,6 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
-import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
@@ -55,15 +54,14 @@ const Addons = () => {
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
   const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
-  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && settings?.is_sensitive
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
@@ -122,8 +120,8 @@ const Addons = () => {
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
-              Updating addons are not available while you're on a preview branch. To manage your
-              addons, you may return to your{' '}
+              Updating addons here will only apply to this preview branch. To manage your addons,
+              for your main branch, please visit the{' '}
               <Link href={`/project/${parentProject.ref}/settings/general`} className="text-brand">
                 main branch
               </Link>
@@ -234,41 +232,19 @@ const Addons = () => {
                       </div>
                     )}
 
-                    {!diskAndComputeFormEnabled ? (
-                      <ProjectUpdateDisabledTooltip
-                        projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
-                        projectNotActive={!isProjectActive}
-                        tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
-                      >
-                        <Button
-                          type="default"
-                          className="mt-2 pointer-events-auto"
-                          onClick={() => setPanel('computeInstance')}
-                          disabled={
-                            isBranch ||
-                            !isProjectActive ||
-                            projectUpdateDisabled ||
-                            computeSizeChangesDisabled
-                          }
-                        >
-                          Change compute size
+                    <NoticeBar
+                      visible={true}
+                      type="default"
+                      title="Compute size has moved"
+                      description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
+                      actions={
+                        <Button type="default" asChild>
+                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                            Go to Compute and Disk
+                          </Link>
                         </Button>
-                      </ProjectUpdateDisabledTooltip>
-                    ) : (
-                      <NoticeBar
-                        visible={true}
-                        type="default"
-                        title="Compute size has moved"
-                        description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
-                        actions={
-                          <Button type="default" asChild>
-                            <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                              Go to Compute and Disk
-                            </Link>
-                          </Button>
-                        }
-                      />
-                    )}
+                      }
+                    />
 
                     {Number(mostRecentRemainingIOBudget?.disk_io_budget) === 0 ? (
                       <Alert
@@ -347,44 +323,6 @@ const Addons = () => {
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
                       <p className="text-sm">{meta?.connections_pooler ?? '-'}</p>
                     </div>
-                    {!diskAndComputeFormEnabled && (
-                      <>
-                        <div className="w-full flex items-center justify-between border-b py-2">
-                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                            <div className="group flex items-center space-x-2">
-                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                                Max Disk Throughput
-                              </p>
-                              <ChevronRight
-                                strokeWidth={1.5}
-                                size={16}
-                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                              />
-                            </div>
-                          </Link>
-                          <p className="text-sm">
-                            {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                          </p>
-                        </div>
-                        <div className="w-full flex items-center justify-between py-2">
-                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                            <div className="group flex items-center space-x-2">
-                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                                Baseline Disk Throughput
-                              </p>
-                              <ChevronRight
-                                strokeWidth={1.5}
-                                size={16}
-                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                              />
-                            </div>
-                          </Link>
-                          <p className="text-sm">
-                            {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                          </p>
-                        </div>
-                      </>
-                    )}
                   </div>
                 </div>
               </ScaffoldSectionContent>
@@ -447,10 +385,7 @@ const Addons = () => {
                       className="mt-2 pointer-events-auto"
                       onClick={() => setPanel('ipv4')}
                       disabled={
-                        isBranch ||
-                        !isProjectActive ||
-                        projectUpdateDisabled ||
-                        !(canUpdateIPv4 || ipv4)
+                        !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
                       }
                       tooltip={{
                         content: {
@@ -531,7 +466,7 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light">Current option:</p>
                     <p>
                       {pitr !== undefined
-                        ? `Point in time recovery of ${pitr.variant.meta?.backup_duration_days} days is enabled`
+                        ? `Point in time recovery of ${(pitr.variant.meta as any)?.backup_duration_days} days is enabled`
                         : 'Point in time recovery is not enabled'}
                     </p>
                     {!sufficientPgVersion ? (
@@ -545,14 +480,14 @@ const Addons = () => {
                           </p>
                           <Button asChild type="default">
                             <Link
-                              href={`/support/new?ref=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
+                              href={`/support/new?projectRef=${projectRef}&category=sales&subject=Project%20too%20old%20old%20for%20PITR`}
                             >
                               <a>Contact support</a>
                             </Link>
                           </Button>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
-                    ) : isOrioleDb ? (
+                    ) : isOrioleDbInAws ? (
                       <ButtonTooltip
                         disabled
                         type="default"
@@ -576,7 +511,6 @@ const Addons = () => {
                           className="mt-2 pointer-events-auto"
                           onClick={() => setPanel('pitr')}
                           disabled={
-                            isBranch ||
                             !isProjectActive ||
                             projectUpdateDisabled ||
                             !sufficientPgVersion ||
@@ -652,7 +586,7 @@ const Addons = () => {
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => setPanel('customDomain')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                        disabled={!isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain
                       </Button>
@@ -665,7 +599,6 @@ const Addons = () => {
         </>
       )}
 
-      <ComputeInstanceSidePanel />
       <PITRSidePanel />
       <CustomDomainSidePanel />
       <IPv4SidePanel />

@@ -831,7 +831,7 @@ data = client.from_('books').select().text_search('fts', "'little' & 'big'").exe
 
 ## Query operators
 
-Visit [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/current/functions-textsearch.html)
+Visit [Postgres: Text Search Functions and Operators](https://www.postgresql.org/docs/current/functions-textsearch.html)
 to learn about additional query operators you can use to do more advanced `full text queries`, such as:
 
 ### Proximity: `<->` [#proximity]
@@ -1058,4 +1058,4 @@ data = client.from_('books').select().text_search('description', "'big' & !'litt
 
 ## Resources
 
-- [PostgreSQL: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)
+- [Postgres: Text Search Functions and Operators](https://www.postgresql.org/docs/12/functions-textsearch.html)

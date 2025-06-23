@@ -51,13 +51,7 @@ By default, Supabase Postgres use IPv6 addresses. If your system doesn't support
 
 ### Checking your network IPv6 support
 
-Most services are IPv6 compatible, but some exceptions exist (listed below). To verify your personal network supports it, run this command on your server:
-
-```sh
-curl -6 https://ifconfig.co/ip
-```
-
-If it returns an IPv6 address then your system is compatible. An example IPv6 address might look like: `2a05:d014:1c06:5f0c:d7a9:8616:bee2:30df`.
+You can check if your personal network is IPv6 compatible at https://test-ipv6.com.
 
 ### Checking platforms for IPv6 support:
 
@@ -78,7 +72,7 @@ nslookup db.<PROJECT_REF>.supabase.co
 
 ## Identifying your connections
 
-The pooler and direct connection strings can be found in the [database settings](https://supabase.com/dashboard/project/_/settings/database):
+The pooler and direct connection strings can be found in the [project connect page](https://supabase.com/dashboard/project/_?showConnect=true):
 
 #### Direct connection
 

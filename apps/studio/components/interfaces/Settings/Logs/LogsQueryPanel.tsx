@@ -1,22 +1,21 @@
+import dayjs from 'dayjs'
+import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
-import React, { ReactNode, useState } from 'react'
+import { ReactNode, useState } from 'react'
 
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { copyToClipboard } from 'lib/helpers'
-import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
-  Alert,
   Badge,
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover,
   SidePanel,
   Tabs,
   Tooltip,
@@ -28,7 +27,7 @@ import {
   LOGS_SOURCE_DESCRIPTION,
   LogsTableName,
 } from './Logs.constants'
-import DatePickers from './Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
 
@@ -44,7 +43,7 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
   onSelectSource: (source: string) => void
-  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
+  onDateChange: (value: DatePickerValue) => void
   onDataSourceChange: (sourceType: SourceType) => void
 }
 
@@ -91,6 +90,27 @@ const LogsQueryPanel = ({
       return true
     })
     .map(([, value]) => value)
+
+  function getDefaultDatePickerValue() {
+    if (defaultFrom && defaultTo) {
+      return {
+        to: defaultTo,
+        from: defaultFrom,
+        text: `${dayjs(defaultFrom).format('DD MMM, HH:mm')} - ${dayjs(defaultTo).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      }
+    }
+    return {
+      to: EXPLORER_DATEPICKER_HELPERS[0].calcTo(),
+      from: EXPLORER_DATEPICKER_HELPERS[0].calcFrom(),
+      text: EXPLORER_DATEPICKER_HELPERS[0].text,
+      isHelper: true,
+    }
+  }
+
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
+    getDefaultDatePickerValue()
+  )
 
   return (
     <div className="border-b bg-surface-100">
@@ -203,41 +223,42 @@ const LogsQueryPanel = ({
             )}
 
             {dataSource === 'logs' && (
-              <DatePickers
-                to={defaultTo}
-                from={defaultFrom}
-                onChange={onDateChange}
+              <LogsDatePicker
+                value={selectedDatePickerValue}
+                onSubmit={(value) => {
+                  setSelectedDatePickerValue(value)
+                  onDateChange(value)
+                }}
                 helpers={EXPLORER_DATEPICKER_HELPERS}
               />
             )}
 
-            <div className="overflow-hidden">
-              <div
-                className={` transition-all duration-300 ${
-                  warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
-                }`}
-              >
-                <Popover
-                  overlay={
-                    <Alert variant="warning" title="">
-                      <div className="flex flex-col gap-3">
-                        {warnings.map((warning, index) => (
-                          <p key={index}>
-                            {warning.text}{' '}
-                            {warning.link && (
-                              <Link href={warning.link}>{warning.linkText || 'View'}</Link>
-                            )}
-                          </p>
-                        ))}
-                      </div>
-                    </Alert>
-                  }
-                >
+            <div
+              data-testid="log-explorer-warnings"
+              className={`transition-all duration-300 h-full ${
+                warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
+              }`}
+            >
+              <Tooltip>
+                <TooltipTrigger className="flex items-start">
                   <Badge variant="warning">
                     {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
                   </Badge>
-                </Popover>
-              </div>
+                  <TooltipContent className="p-0 divide-y max-w-xs" side="bottom">
+                    {warnings.map((warning, index) => (
+                      <p
+                        key={index}
+                        className="px-3 py-1.5 text-xs text-foreground-light text-left"
+                      >
+                        {warning.text}{' '}
+                        {warning.link && (
+                          <Link href={warning.link}>{warning.linkText || 'View'}</Link>
+                        )}
+                      </p>
+                    ))}
+                  </TooltipContent>
+                </TooltipTrigger>
+              </Tooltip>
             </div>
           </div>
           {dataSource === 'logs' && (

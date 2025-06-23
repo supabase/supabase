@@ -377,6 +377,14 @@
             "type": "function"
           },
           {
+            "id": "overrideTypes",
+            "title": "Partially override or replace type of successful response",
+            "slug": "db-overrideTypes",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
             "id": "explain",
             "title": "Using explain",
             "slug": "explain",
@@ -783,6 +791,12 @@
     "type": "category",
     "title": "Realtime",
     "items": [
+      {
+        "id": "realtime-api",
+        "title": "Overview",
+        "slug": "realtime-api",
+        "type": "function"
+      },
       {
         "id": "stream",
         "title": "Listen to database changes",

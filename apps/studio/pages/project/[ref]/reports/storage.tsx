@@ -1,20 +1,24 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORTS_DATEPICKER_HELPERS } from 'components/interfaces/Reports/Reports.constants'
+import {
+  createFilteredDatePickerHelpers,
+  REPORTS_DATEPICKER_HELPERS,
+} from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useStorageReport } from 'data/reports/storage-report-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
@@ -26,30 +30,33 @@ export const StorageReport: NextPageWithLayout = () => {
 
   const { isLoading, refresh } = report
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const plan = subscription?.plan
+  const plan = organization?.plan
 
-  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
+  const defaultHelper =
+    REPORTS_DATEPICKER_HELPERS.find((h) => h.default) || REPORTS_DATEPICKER_HELPERS[0]
+
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
+    to: defaultHelper.calcTo(),
+    from: defaultHelper.calcFrom(),
+    isHelper: true,
+    text: defaultHelper.text,
+  })
+
+  const datepickerHelpers = createFilteredDatePickerHelpers(plan?.id || 'free')
+
+  const handleDatepickerChange = (vals: DatePickerValue) => {
     report.mergeParams({
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
+      iso_timestamp_start: vals.from || '',
+      iso_timestamp_end: vals.to || '',
     })
+    setSelectedRange(vals)
   }
-
-  const datepickerHelpers = useMemo(
-    () =>
-      REPORTS_DATEPICKER_HELPERS.map((helper, index) => ({
-        ...helper,
-        disabled: (index > 0 && plan?.id === 'free') || (index > 1 && plan?.id !== 'pro'),
-      })),
-    []
-  )
 
   return (
     <ReportPadding>
       <ReportHeader title="Storage" />
       <div className="w-full flex flex-col gap-1">
-        <div className="flex items-center gap-x-2">
+        <div className="flex gap-2 items-center">
           <ButtonTooltip
             type="default"
             disabled={isLoading}
@@ -58,13 +65,14 @@ export const StorageReport: NextPageWithLayout = () => {
             tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
             onClick={() => refresh()}
           />
-          <DatePickers
-            onChange={handleDatepickerChange}
-            to={report.params.cacheHitRate.iso_timestamp_end || ''}
-            from={report.params.cacheHitRate.iso_timestamp_start || ''}
+
+          <LogsDatePicker
+            onSubmit={handleDatepickerChange}
+            value={selectedRange}
             helpers={datepickerHelpers}
           />
         </div>
+
         <div className="h-2 w-full">
           <ShimmerLine active={report.isLoading} />
         </div>

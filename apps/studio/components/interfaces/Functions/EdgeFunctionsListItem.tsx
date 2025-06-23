@@ -8,13 +8,13 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
 }
 
-const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
+export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -46,17 +46,17 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
       </Table.td>
       <Table.td>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          <p className="font-mono truncate hidden md:inline">{endpoint}</p>
+          <p title={endpoint} className="font-mono truncate hidden md:inline max-w-[30rem]">
+            {endpoint}
+          </p>
           <button
             type="button"
             className="text-foreground-lighter hover:text-foreground transition"
             onClick={(event: any) => {
               function onCopy(value: any) {
                 setIsCopied(true)
-                navigator.clipboard.writeText(value).then()
-                setTimeout(function () {
-                  setIsCopied(false)
-                }, 3000)
+                copyToClipboard(value)
+                setTimeout(() => setIsCopied(false), 3000)
               }
               event.stopPropagation()
               onCopy(endpoint)
@@ -99,5 +99,3 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
     </Table.tr>
   )
 }
-
-export default EdgeFunctionsListItem

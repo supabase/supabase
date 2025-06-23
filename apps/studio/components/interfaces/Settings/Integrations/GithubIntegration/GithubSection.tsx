@@ -167,7 +167,6 @@ const GitHubSection = () => {
               ) : (
                 <EmptyIntegrationConnection
                   onClick={onAddGitHubConnection}
-                  orgSlug={org?.slug}
                   showNode={false}
                   disabled={isBranch || !canCreateGitHubConnection}
                 >

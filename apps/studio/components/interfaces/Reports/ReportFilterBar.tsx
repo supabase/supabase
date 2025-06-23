@@ -20,7 +20,7 @@ import {
   Select,
   cn,
 } from 'ui'
-import DatePickers from '../Settings/Logs/Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
 
@@ -30,7 +30,7 @@ interface ReportFilterBarProps {
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
   onRefresh: () => void
-  onDatepickerChange: ComponentProps<typeof DatePickers>['onChange']
+  onDatepickerChange: ComponentProps<typeof LogsDatePicker>['onSubmit']
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
@@ -84,8 +84,6 @@ const ReportFilterBar = ({
   isLoading = false,
   onAddFilter,
   onDatepickerChange,
-  datepickerTo = '',
-  datepickerFrom = '',
   onRemoveFilters,
   onRefresh,
   datepickerHelpers,
@@ -119,6 +117,11 @@ const ReportFilterBar = ({
     })
   }
 
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    onDatepickerChange(vals)
+    setSelectedRange(vals)
+  }
+
   const handleProductFilterChange = async (
     nextProductFilter: null | (typeof PRODUCT_FILTERS)[number]
   ) => {
@@ -141,9 +144,17 @@ const ReportFilterBar = ({
     setCurrentProductFilter(nextProductFilter)
   }
 
+  const defaultHelper = datepickerHelpers[0]
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
+    to: defaultHelper.calcTo(),
+    from: defaultHelper.calcFrom(),
+    isHelper: true,
+    text: defaultHelper.text,
+  })
+
   return (
     <div className="flex items-center justify-between">
-      <div className="flex flex-row justify-start items-center flex-wrap gap-x-2">
+      <div className="flex flex-row justify-start items-center flex-wrap gap-2">
         <ButtonTooltip
           type="default"
           disabled={isLoading}
@@ -152,10 +163,9 @@ const ReportFilterBar = ({
           tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
           onClick={() => onRefresh()}
         />
-        <DatePickers
-          onChange={onDatepickerChange}
-          to={datepickerTo}
-          from={datepickerFrom}
+        <LogsDatePicker
+          onSubmit={handleDatepickerChange}
+          value={selectedRange}
           helpers={datepickerHelpers}
         />
         <DropdownMenu>

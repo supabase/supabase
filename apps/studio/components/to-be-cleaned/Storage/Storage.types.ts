@@ -15,10 +15,12 @@ export interface StorageItem {
   type: STORAGE_ROW_TYPES
   status: STORAGE_ROW_STATUS
   metadata: StorageItemMetadata | null
-  isCorrupted: boolean
   created_at: string | null
   updated_at: string | null
   last_accessed_at: string | null
+  // UI specific properties, not from API
+  isCorrupted: boolean
+  path?: string
 }
 
 export type StorageItemWithColumn = StorageItem & { columnIndex: number }

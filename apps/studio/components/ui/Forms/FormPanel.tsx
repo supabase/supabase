@@ -11,6 +11,7 @@ interface Props {
   disabled?: boolean
 }
 
+/** @deprecated Use Card instead, refer to BasicAuthSettingsForm.tsx for reference */
 const FormPanel = ({ children, header, footer }: Props) => (
   <FormPanelContainer>
     {header && <FormPanelHeader>{header}</FormPanelHeader>}
@@ -66,4 +67,4 @@ const FormPanelFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement
 
 FormPanelFooter.displayName = FormPanelFooter.displayName
 
-export { FormPanel, FormPanelContainer, FormPanelContent, FormPanelHeader, FormPanelFooter }
+export { FormPanel, FormPanelContainer, FormPanelContent, FormPanelFooter, FormPanelHeader }

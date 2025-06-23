@@ -1,4 +1,4 @@
-export type CloudProvider = 'FLY' | 'AWS'
+export type CloudProvider = 'FLY' | 'AWS' | 'AWS_NEW'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
 
 export const AWS_REGIONS = {

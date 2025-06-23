@@ -5,6 +5,8 @@ import ProductIcon from '../ProductIcon'
 import SectionContainer from '../Layouts/SectionContainer'
 import { CTA } from '~/types/common'
 
+// to do: move types to be global
+// then solutions.types.ts should extend this
 interface Props {
   label?: string | React.ReactNode
   h1: string | React.ReactNode
@@ -46,17 +48,18 @@ const ProductHeader = (props: Props) => (
             {props.h1}
           </h1>
         </div>
-        <div>
-          {props.subheader &&
-            props.subheader.map((subheader, i) => {
+        {props.subheader && (
+          <div className="mb-4 md:mb-8">
+            {props.subheader.map((subheader, i) => {
               return (
                 <p className="p lg:text-lg max-w-lg lg:max-w-none" key={i}>
                   {subheader}
                 </p>
               )
             })}
-        </div>
-        <div className="flex flex-row md:flex-row md:items-center gap-2">
+          </div>
+        )}
+        <div className="flex flex-row md:flex-row md:items-center gap-2 mt-2">
           {props.ctas?.map((cta) => (
             <Button key={cta.href} size="medium" type={cta.type ?? 'default'} asChild>
               <Link href={cta.href}>{cta.label ?? 'Start for free'}</Link>
@@ -70,7 +73,7 @@ const ProductHeader = (props: Props) => (
         )}
       </div>
       {props.image && (
-        <div className="relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
+        <div className="image-container relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
           {props.image}
         </div>
       )}

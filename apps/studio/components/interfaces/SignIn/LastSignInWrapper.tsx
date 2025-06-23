@@ -1,5 +1,6 @@
 import { LastSignInType, useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { ReactNode } from 'react'
+
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export function LastSignInWrapper({
@@ -14,10 +15,10 @@ export function LastSignInWrapper({
   return (
     <div className="flex items-center relative">
       {lastSignIn === type && (
-        <Tooltip>
+        <Tooltip key={`last-sign-in-${type}`}>
           <TooltipTrigger asChild className="absolute -right-8">
             <div className="p-2 flex">
-              <span className="w-2.5 h-2.5 bg-brand rounded-full animate-pulse" />
+              <div className="w-2.5 h-2.5 bg-brand rounded-full animate-pulse" />
             </div>
           </TooltipTrigger>
           <TooltipContent>Last used</TooltipContent>

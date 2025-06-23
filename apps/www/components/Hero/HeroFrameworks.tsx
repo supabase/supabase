@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { cn } from 'ui'
 import { EASE_IN, EASE_OUT } from '~/lib/animations'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import SectionContainer from '../Layouts/SectionContainer'
 
@@ -127,7 +126,7 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
               className="transition-opacity group"
               onClick={() =>
                 sendTelemetryEvent({
-                  action: TelemetryActions.HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED,
+                  action: 'homepage_framework_quickstart_clicked',
                   properties: { frameworkName: framework.name },
                 })
               }

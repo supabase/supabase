@@ -15,13 +15,12 @@ import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
   visible: boolean
-  subscription?: OrgSubscription
   projects: ProjectInfo[]
   onClose: (success?: boolean) => void
 }
 
 // [Joshen] For context - Exit survey is only when going to Free Plan from a paid plan
-const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurveyModalProps) => {
+const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) => {
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
 
@@ -42,15 +41,9 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
     useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 
-  const projectsWithComputeDowngrade = projects.filter((project) => {
-    const computeSizesThatDoNotResultInComputeDowngrade = ['nano']
-
-    if (subscription?.nano_enabled === false) {
-      computeSizesThatDoNotResultInComputeDowngrade.push('micro')
-    }
-
-    return !computeSizesThatDoNotResultInComputeDowngrade.includes(project.infra_compute_size!)
-  })
+  const projectsWithComputeDowngrade = projects.filter(
+    (project) => project.infra_compute_size !== 'nano'
+  )
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
 

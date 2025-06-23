@@ -87,7 +87,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
               </p>
             </div>
           </div>
-          <DropdownMenu modal={false}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button type="text" icon={<MoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
@@ -336,7 +336,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             )}
           </div>
         </div>
-        <DropdownMenu modal={false}>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="text" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>

@@ -2,7 +2,6 @@ import { Search } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -69,7 +68,7 @@ export const CronjobsTab = () => {
 
   const onOpenCreateJobSheet = () => {
     sendEvent({
-      action: TelemetryActions.CRON_JOB_CREATE_CLICKED,
+      action: 'cron_job_create_clicked',
       groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
     setCreateCronJobSheetShown(true)

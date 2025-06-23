@@ -4,63 +4,46 @@ import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ExternalLink, PauseCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
+import { PostgresVersionSelector } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import {
-  PostgresEngine,
-  ProjectUnpausePostgresVersion,
-  ReleaseChannel,
-  useProjectUnpausePostgresVersionsQuery,
-} from 'data/config/project-unpause-postgres-versions-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag, usePHFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
+import { AWS_REGIONS, CloudProvider } from 'shared-data'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Badge,
   Button,
-  FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
   Modal,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { PauseDisabledState } from './PauseDisabledState'
-import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
 import { useProjectContext } from '../ProjectContext'
+import { RestorePaidPlanProjectNotice } from '../RestorePaidPlanProjectNotice'
+import { PauseDisabledState } from './PauseDisabledState'
 
 export interface ProjectPausedStateProps {
   product?: string
 }
 
 interface PostgresVersionDetails {
-  postgresEngine: PostgresEngine
+  postgresEngine: Exclude<PostgresEngine, '13' | '14'>
   releaseChannel: ReleaseChannel
-}
-
-const formatValue = ({ postgres_engine, release_channel }: ProjectUnpausePostgresVersion) => {
-  return `${postgres_engine}|${release_channel}`
 }
 
 export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
@@ -73,42 +56,32 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const selectedOrganization = useSelectedOrganization()
-  const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
-  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const enableProBenefitWording = usePHFlag('proBenefitWording')
 
+  const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
+
   const orgSlug = selectedOrganization?.slug
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug })
   const {
     data: pauseStatus,
     error: pauseStatusError,
     isError,
     isSuccess,
     isLoading,
-  } = useProjectPauseStatusQuery(
-    { ref },
-    {
-      enabled: project?.status === PROJECT_STATUS.INACTIVE && enforceNinetyDayUnpauseExpiry,
-    }
-  )
+  } = useProjectPauseStatusQuery({ ref }, { enabled: project?.status === PROJECT_STATUS.INACTIVE })
 
   const finalDaysRemainingBeforeRestoreDisabled =
     pauseStatus?.remaining_days_till_restore_disabled ??
     pauseStatus?.max_days_till_restore_disabled ??
     0
 
-  const isFreePlan = subscription?.plan?.id === 'free'
-  const isRestoreDisabled = enforceNinetyDayUnpauseExpiry && isSuccess && !pauseStatus.can_restore
+  const isFreePlan = selectedOrganization?.plan?.id === 'free'
+  const isRestoreDisabled = isSuccess && !pauseStatus.can_restore
 
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug: orgSlug },
     { enabled: isFreePlan }
   )
-
-  const { data: availablePostgresVersions } = useProjectUnpausePostgresVersionsQuery({
-    projectRef: project?.ref,
-  })
-  const availableVersions = availablePostgresVersions?.available_versions || []
 
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
@@ -138,7 +111,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       return toast.error('Unable to restore: project is required')
     }
 
-    if (projectVersionSelectionDisabled) {
+    if (!showPostgresVersionSelector) {
       restoreProject({ ref: project.ref })
     } else {
       const { postgresVersionSelection } = values
@@ -160,23 +133,14 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     mode: 'onChange',
-    defaultValues: {
-      postgresVersionSelection: '',
-    },
+    defaultValues: { postgresVersionSelection: '' },
   })
-
-  useEffect(() => {
-    const defaultValue = availablePostgresVersions?.available_versions[0]
-      ? formatValue(availablePostgresVersions?.available_versions[0])
-      : ''
-    form.setValue('postgresVersionSelection', defaultValue)
-  }, [availablePostgresVersions, form])
 
   return (
     <>
       <div className="space-y-4">
         <div className="w-full mx-auto mb-8 md:mb-16 max-w-7xl">
-          <div className="mx-6 flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
+          <div className="flex md:h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-4 md:p-8">
             <div className="grid w-[550px] gap-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center space-x-4 lg:space-x-8">
                 <PauseCircle className="text-foreground-light" size={50} strokeWidth={1.5} />
@@ -201,76 +165,64 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   </p>
                 </div>
 
-                {enforceNinetyDayUnpauseExpiry && (
+                {isLoading && <GenericSkeletonLoader />}
+                {isError && (
+                  <AlertError error={pauseStatusError} subject="Failed to retrieve pause status" />
+                )}
+                {isSuccess && (
                   <>
-                    {isLoading && <GenericSkeletonLoader />}
-                    {isError && (
-                      <AlertError
-                        error={pauseStatusError}
-                        subject="Failed to retrieve pause status"
-                      />
-                    )}
-                    {isSuccess && (
+                    {isRestoreDisabled ? (
+                      <PauseDisabledState />
+                    ) : isFreePlan ? (
                       <>
-                        {isRestoreDisabled ? (
-                          <PauseDisabledState />
-                        ) : isFreePlan ? (
-                          <>
-                            <p className="text-sm text-foreground-light text-center">
-                              {enableProBenefitWording === 'variant-a'
-                                ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
-                                : 'To prevent future pauses, consider upgrading to Pro.'}
-                            </p>
-                            <Alert_Shadcn_>
-                              <AlertTitle_Shadcn_>
-                                Project can be restored through the dashboard within the next{' '}
-                                {finalDaysRemainingBeforeRestoreDisabled} day
-                                {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
-                              </AlertTitle_Shadcn_>
-                              <AlertDescription_Shadcn_>
-                                Free projects cannot be restored through the dashboard if they are
-                                paused for more than{' '}
-                                <span className="text-foreground">
-                                  {pauseStatus?.max_days_till_restore_disabled} days
-                                </span>
-                                . The latest that your project can be restored is by{' '}
-                                <span className="text-foreground">
-                                  {dayjs()
-                                    .utc()
-                                    .add(
-                                      pauseStatus.remaining_days_till_restore_disabled ?? 0,
-                                      'day'
-                                    )
-                                    .format('DD MMM YYYY')}
-                                </span>
-                                . However, your database backup and Storage objects will still be
-                                available for download thereafter.
-                              </AlertDescription_Shadcn_>
-                              <AlertDescription_Shadcn_ className="mt-3">
-                                <Button asChild type="default" icon={<ExternalLink />}>
-                                  <a
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
-                                  >
-                                    More information
-                                  </a>
-                                </Button>
-                              </AlertDescription_Shadcn_>
-                            </Alert_Shadcn_>
-                          </>
-                        ) : (
-                          <RestorePaidPlanProjectNotice />
-                        )}
+                        <p className="text-sm text-foreground-light text-center">
+                          {enableProBenefitWording === 'variant-a'
+                            ? 'Upgrade to Pro plan to prevent future pauses and use Pro features like branching, compute upgrades, and daily backups.'
+                            : 'To prevent future pauses, consider upgrading to Pro.'}
+                        </p>
+                        <Alert_Shadcn_>
+                          <AlertTitle_Shadcn_>
+                            Project can be restored through the dashboard within the next{' '}
+                            {finalDaysRemainingBeforeRestoreDisabled} day
+                            {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            Free projects cannot be restored through the dashboard if they are
+                            paused for more than{' '}
+                            <span className="text-foreground">
+                              {pauseStatus?.max_days_till_restore_disabled} days
+                            </span>
+                            . The latest that your project can be restored is by{' '}
+                            <span className="text-foreground">
+                              {dayjs()
+                                .utc()
+                                .add(pauseStatus.remaining_days_till_restore_disabled ?? 0, 'day')
+                                .format('DD MMM YYYY')}
+                            </span>
+                            . However, your database backup and Storage objects will still be
+                            available for download thereafter.
+                          </AlertDescription_Shadcn_>
+                          <AlertDescription_Shadcn_ className="mt-3">
+                            <Button asChild type="default" icon={<ExternalLink />}>
+                              <a
+                                target="_blank"
+                                rel="noreferrer"
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#time-limits"
+                              >
+                                More information
+                              </a>
+                            </Button>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
                       </>
+                    ) : (
+                      <RestorePaidPlanProjectNotice />
                     )}
                   </>
                 )}
-
-                {!enforceNinetyDayUnpauseExpiry && !isFreePlan && <RestorePaidPlanProjectNotice />}
               </div>
 
-              {(!enforceNinetyDayUnpauseExpiry || (isSuccess && !isRestoreDisabled)) && (
+              {isSuccess && !isRestoreDisabled && (
                 <div className="flex items-center justify-center gap-4">
                   <ButtonTooltip
                     size="tiny"
@@ -319,63 +271,23 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       >
         <Form_Shadcn_ {...form}>
           <form onSubmit={form.handleSubmit(onConfirmRestore)}>
-            {!projectVersionSelectionDisabled && (
+            {showPostgresVersionSelector && (
               <Modal.Content>
                 <div className="space-y-2">
                   <FormField_Shadcn_
                     control={form.control}
                     name="postgresVersionSelection"
                     render={({ field }) => (
-                      <FormItemLayout label="Select the version of Postgres to restore to">
-                        <FormControl_Shadcn_>
-                          <Select_Shadcn_
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            disabled={availableVersions.length <= 1}
-                          >
-                            <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-                              <SelectValue_Shadcn_ placeholder="Select a Postgres version" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectGroup_Shadcn_>
-                                {availableVersions.map((value) => {
-                                  const postgresVersion = value.version
-                                    .split('supabase-postgres-')[1]
-                                    ?.replace('-orioledb', '')
-                                  return (
-                                    <SelectItem_Shadcn_
-                                      key={formatValue(value)}
-                                      value={formatValue(value)}
-                                      className="w-full [&>:nth-child(2)]:w-full"
-                                    >
-                                      <div className="flex flex-row items-center justify-between w-full">
-                                        <span className="text-foreground">{postgresVersion}</span>
-                                        <div>
-                                          {value.release_channel !== 'ga' && (
-                                            <Badge variant="warning" className="mr-1 capitalize">
-                                              {value.release_channel}
-                                            </Badge>
-                                          )}
-                                          {value.postgres_engine.includes('oriole-preview') && (
-                                            <span>
-                                              <Badge variant="warning" className="mr-1">
-                                                OrioleDB
-                                              </Badge>
-                                              <Badge variant="warning" className="mr-1">
-                                                Preview
-                                              </Badge>
-                                            </span>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </SelectItem_Shadcn_>
-                                  )
-                                })}
-                              </SelectGroup_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
+                      <PostgresVersionSelector
+                        field={field}
+                        form={form}
+                        type="unpause"
+                        label="Select the version of Postgres to restore to"
+                        layout="vertical"
+                        dbRegion={region?.displayName ?? ''}
+                        cloudProvider={(project?.cloud_provider ?? 'AWS') as CloudProvider}
+                        organizationSlug={selectedOrganization?.slug}
+                      />
                     )}
                   />
                 </div>

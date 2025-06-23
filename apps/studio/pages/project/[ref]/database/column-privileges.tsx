@@ -1,10 +1,10 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlertCircle, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   getDefaultColumnCheckedStates,
   getDefaultTableCheckedStates,
@@ -15,6 +15,7 @@ import PrivilegesHead from 'components/interfaces/Database/Privileges/Privileges
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -26,12 +27,10 @@ import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -39,10 +38,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const { ref, table: paramTable } = useParams()
   const { project } = useProjectContext()
   const snap = useAppStateSnapshot()
-
-  const featurePreviewContext = useFeaturePreviewContext()
-  const { flags } = featurePreviewContext
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
+  const isEnabled = useIsColumnLevelPrivilegesEnabled()
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<string | undefined>(paramTable)

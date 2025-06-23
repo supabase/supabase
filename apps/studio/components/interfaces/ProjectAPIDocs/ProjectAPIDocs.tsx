@@ -36,14 +36,22 @@ import SecondLevelNav from './SecondLevelNav'
 const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
+  const isIntroduction =
+    snap.activeDocsSection.length === 1 && snap.activeDocsSection[0] === 'introduction'
   const isEntityDocs =
     snap.activeDocsSection.length === 2 && snap.activeDocsSection[0] === 'entities'
 
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query(
+    { projectRef: ref },
+    { enabled: snap.showProjectApiDocs }
+  )
+  const { data: customDomainData } = useCustomDomainsQuery(
+    { projectRef: ref },
+    { enabled: snap.showProjectApiDocs }
+  )
 
   const { anonKey } = getAPIKeys(settings)
   const apikey = showKeys
@@ -70,9 +78,11 @@ const ProjectAPIDocs = () => {
             <h4>API Docs</h4>
             <div className="flex items-center space-x-1">
               {!isEntityDocs && <LanguageSelector simplifiedVersion />}
-              <Button type="default" onClick={() => setShowKeys(!showKeys)}>
-                {showKeys ? 'Hide keys' : 'Show keys'}
-              </Button>
+              {isIntroduction && (
+                <Button type="default" onClick={() => setShowKeys(!showKeys)}>
+                  {showKeys ? 'Hide keys' : 'Show keys'}
+                </Button>
+              )}
             </div>
           </div>
 

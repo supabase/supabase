@@ -22,7 +22,7 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Billing is based on the provisioned disk size. Paid plan projects get provisioned with 8 GB of disk by default and autoscale to 1.5x the size once you get close to the limit. The first 8 GB of disk per project comes with no additional fees.\nFree plan customers are limited to 500 MB database size per project.',
   },
   'database.advancedDiskConfig': {
-    main: 'Supabase databases are backed by high performance SSD disks. The disk can be scaled up to 60 TB, 80,000 IOPS and 4,000 Mbps throughput.',
+    main: 'Supabase databases are backed by high performance SSD disks. The disk can be scaled up to 60 TB, 80,000 IOPS and 4,000 MB/s throughput.',
   },
   'database.automaticBackups': {
     main: 'Backups are entire copies of your database that can be restored in the future.',
@@ -179,9 +179,12 @@ export const PricingTableRowDesktop = (props: any) => {
                           )}
                           {typeof planValue === 'string' ? planValue : planValue[0]}
                         </span>
-                        {typeof planValue !== 'string' && (
-                          <span className="text-lighter leading-4">{planValue[1]}</span>
-                        )}
+                        {Array.isArray(planValue) &&
+                          planValue.slice(1).map((val, idx) => (
+                            <span key={`planval_${i}_${idx}`} className="text-lighter leading-4">
+                              {val}
+                            </span>
+                          ))}
                       </div>
                     )}
                   </td>
@@ -246,9 +249,12 @@ export const PricingTableRowMobile = (props: any) => {
                         ? feat.plans[plan]
                         : feat.plans[plan][0]}
                     </span>
-                    {typeof feat.plans[plan] !== 'string' && (
-                      <span className="text-lighter leading-5">{feat.plans[plan][1]}</span>
-                    )}
+                    {Array.isArray(feat.plans[plan]) &&
+                      feat.plans[plan].slice(1).map((val, idx) => (
+                        <span key={`planval_mobile_${i}_${idx}`} className="text-lighter leading-5">
+                          {val}
+                        </span>
+                      ))}
                   </span>
                 )}
               </td>

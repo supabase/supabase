@@ -5,8 +5,10 @@ import {
   Clock,
   ExternalLink,
   GitPullRequest,
+  Github,
   Infinity,
   MoreVertical,
+  Pencil,
   RefreshCw,
   Shield,
   Trash2,
@@ -24,6 +26,7 @@ import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
@@ -37,6 +40,7 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
+import { EditBranchModal } from './EditBranchModal'
 import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
@@ -104,8 +108,10 @@ export const BranchRow = ({
 }: BranchRowProps) => {
   const { ref: projectRef } = useParams()
   const isActive = projectRef === branch?.project_ref
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
+  const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
@@ -133,6 +139,7 @@ export const BranchRow = ({
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+  const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess() {
@@ -178,7 +185,7 @@ export const BranchRow = ({
               text: branch.persistent
                 ? `${branch.name} is a persistent branch and will remain active even after the
                     underlying PR is closed`
-                : undefined,
+                : 'Switch to branch',
             },
           }}
         >
@@ -186,6 +193,8 @@ export const BranchRow = ({
             {branch.name}
           </Link>
         </ButtonTooltip>
+
+        {branch.git_branch && <Github size={14} className="text-foreground-light" />}
 
         {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
@@ -213,7 +222,7 @@ export const BranchRow = ({
                   </Link>
                 </Button>
                 <WorkflowLogs projectRef={branch.project_ref} />
-                <DropdownMenu modal={false}>
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
                   </DropdownMenuTrigger>
@@ -230,13 +239,13 @@ export const BranchRow = ({
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
-            {branch.pr_number === undefined ? (
+            {branch.git_branch && branch.pr_number === undefined ? (
               <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
                 <Link passHref target="_blank" rel="noreferrer" href={createPullRequestURL}>
                   Create Pull Request
                 </Link>
               </Button>
-            ) : (
+            ) : branch.pr_number !== undefined ? (
               <div className="flex items-center">
                 <Link
                   href={`https://github.com/${repo}/pull/${branch.pr_number}`}
@@ -258,9 +267,9 @@ export const BranchRow = ({
                   </Link>
                 </Button>
               </div>
-            )}
+            ) : null}
             <WorkflowLogs projectRef={branch.project_ref} />
-            <DropdownMenu modal={false}>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<MoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
@@ -285,32 +294,60 @@ export const BranchRow = ({
                   )}
                 </Tooltip>
 
-                <Tooltip>
-                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
-                    <DropdownMenuItem
-                      className="gap-x-2"
-                      onSelect={() => setShowBranchModeSwitch(true)}
-                      onClick={() => setShowBranchModeSwitch(true)}
-                      disabled={!isBranchActiveHealthy}
+                {branch.git_branch && (
+                  <Tooltip>
+                    <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        onSelect={() => setShowBranchModeSwitch(true)}
+                        onClick={() => setShowBranchModeSwitch(true)}
+                        disabled={!isBranchActiveHealthy}
+                      >
+                        {branch.persistent ? (
+                          <>
+                            <Clock size={14} /> Switch to ephemeral
+                          </>
+                        ) : (
+                          <>
+                            <Infinity size={14} className="scale-110" /> Switch to persistent
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    {!isBranchActiveHealthy && (
+                      <TooltipContent side="left">
+                        Branch is still initializing. Please wait for the branch to become healthy
+                        before switching modes
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
+
+                {gitlessBranching && (
+                  <Tooltip>
+                    <TooltipTrigger
+                      asChild={canUpdateBranches && isBranchActiveHealthy}
+                      className="w-full"
                     >
-                      {branch.persistent ? (
-                        <>
-                          <Clock size={14} /> Switch to ephemeral
-                        </>
-                      ) : (
-                        <>
-                          <Infinity size={14} className="scale-110" /> Switch to persistent
-                        </>
-                      )}
-                    </DropdownMenuItem>
-                  </TooltipTrigger>
-                  {!isBranchActiveHealthy && (
-                    <TooltipContent side="left">
-                      Branch is still initializing. Please wait for the branch to become healthy
-                      before switching modes
-                    </TooltipContent>
-                  )}
-                </Tooltip>
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdating}
+                        onSelect={() => setShowEditBranchModal(true)}
+                        onClick={() => setShowEditBranchModal(true)}
+                      >
+                        <Pencil size={14} />
+                        Edit Branch
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    {(!canUpdateBranches || !isBranchActiveHealthy) && (
+                      <TooltipContent side="left">
+                        {!canUpdateBranches
+                          ? 'You need additional permissions to edit branches'
+                          : 'Branch is still initializing. Please wait for the branch to become healthy before editing.'}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
 
                 <Tooltip>
                   <TooltipTrigger asChild={canDeleteBranches} className="w-full">
@@ -373,6 +410,12 @@ export const BranchRow = ({
           </div>
         )}
       </div>
+
+      <EditBranchModal
+        branch={branch}
+        visible={showEditBranchModal}
+        onClose={() => setShowEditBranchModal(false)}
+      />
     </div>
   )
 }

@@ -1,4 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronRight, FilePlus, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+
 import { IS_PLATFORM, useParams } from 'common'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
@@ -8,12 +13,9 @@ import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collectio
 import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { ChevronRight, FilePlus, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
 import {
   Button,
   Collapsible_Shadcn_,
@@ -78,22 +80,29 @@ export function SidebarCollapsible({
 }
 
 export function LogsSidebarMenuV2() {
+  const router = useRouter()
+  const { ref } = useParams() as { ref: string }
+  const warehouseEnabled = useFlag('warehouse')
+
   const [searchText, setSearchText] = useState('')
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
-  const router = useRouter()
-  const { ref } = useParams() as { ref: string }
+
   const { data: tenantData } = useWarehouseTenantQuery({ projectRef: ref })
+
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
     realtimeAll: realtimeEnabled,
   } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
-  const warehouseEnabled = useFlag('warehouse')
+
   const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef: ref },
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
+
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -129,13 +138,20 @@ export function LogsSidebarMenuV2() {
     },
     IS_PLATFORM
       ? {
-          name: 'Pooler',
+          name: isFreePlan ? 'Pooler' : 'Shared Pooler',
           key: 'pooler-logs',
           url: `/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
-    ,
+    !isFreePlan && IS_PLATFORM
+      ? {
+          name: 'Dedicated Pooler',
+          key: 'dedicated-pooler-logs',
+          url: `/project/${ref}/logs/dedicated-pooler-logs`,
+          items: [],
+        }
+      : null,
     authEnabled
       ? {
           name: 'Auth',
@@ -172,9 +188,23 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
-  ]
+  ].filter((x) => x !== null)
+
+  const OPERATIONAL_COLLECTIONS = IS_PLATFORM
+    ? [
+        {
+          name: 'Postgres Version Upgrade',
+          key: 'pg-upgrade-logs',
+          url: `/project/${ref}/logs/pg-upgrade-logs`,
+          items: [],
+        },
+      ]
+    : []
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
+    return collection?.name.toLowerCase().includes(searchText.toLowerCase())
+  })
+  const filteredOperationalLogs = OPERATIONAL_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())
   })
   const filteredWarehouse = whCollections?.filter((collection) => {
@@ -193,22 +223,24 @@ export function LogsSidebarMenuV2() {
             onChange={(e) => setSearchText(e.target.value)}
           ></InnerSideBarFilterSearchInput>
         </InnerSideBarFilters>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="default"
-              icon={<Plus className="text-foreground" />}
-              className="w-[26px]"
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem className="gap-x-2" asChild>
-              <Link href={`/project/${ref}/logs/explorer`}>
-                <FilePlus size={14} />
-                Create query
-              </Link>
-            </DropdownMenuItem>
-            {warehouseEnabled && (
+
+        {warehouseEnabled ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="default"
+                icon={<Plus className="text-foreground" />}
+                className="w-[26px]"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem className="gap-x-2" asChild>
+                <Link href={`/project/${ref}/logs/explorer`}>
+                  <FilePlus size={14} />
+                  Create query
+                </Link>
+              </DropdownMenuItem>
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <DropdownMenuItem className="gap-x-2" asChild>
@@ -228,9 +260,17 @@ export function LogsSidebarMenuV2() {
                   </TooltipContent>
                 )}
               </Tooltip>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button
+            type="default"
+            icon={<Plus className="text-foreground" />}
+            className="w-[26px]"
+            onClick={() => router.push(`/project/${ref}/logs/explorer`)}
+          />
+        )}
+
         <CreateWarehouseCollectionModal
           open={createCollectionOpen}
           onOpenChange={setCreateCollectionOpen}
@@ -248,15 +288,18 @@ export function LogsSidebarMenuV2() {
       <Separator className="my-4" />
 
       <SidebarCollapsible title="Collections" defaultOpen={true}>
-        {filteredLogs.map((collection) => (
-          <LogsSidebarItem
-            isActive={isActive(collection?.url ?? '')}
-            href={collection?.url ?? ''}
-            key={collection?.key}
-            icon={<SupaIcon className="text-foreground-light" />}
-            label={collection?.name ?? ''}
-          />
-        ))}
+        {filteredLogs.map((collection) => {
+          const isItemActive = isActive(collection.url)
+          return (
+            <LogsSidebarItem
+              key={collection.key}
+              isActive={isItemActive}
+              href={collection.url}
+              icon={<SupaIcon className="text-foreground-light" />}
+              label={collection.name}
+            />
+          )
+        })}
         {whCollectionsLoading && warehouseEnabled ? (
           <div className="p-4">
             <GenericSkeletonLoader />
@@ -269,6 +312,22 @@ export function LogsSidebarMenuV2() {
           </div>
         ) : null}
       </SidebarCollapsible>
+      {OPERATIONAL_COLLECTIONS.length > 0 && (
+        <>
+          <Separator className="my-4" />
+          <SidebarCollapsible title="Database operations" defaultOpen={true}>
+            {filteredOperationalLogs.map((collection) => (
+              <LogsSidebarItem
+                key={collection.key}
+                isActive={isActive(collection.url)}
+                href={collection.url}
+                icon={<SupaIcon className="text-foreground-light" />}
+                label={collection.name}
+              />
+            ))}
+          </SidebarCollapsible>
+        </>
+      )}
       <Separator className="my-4" />
       <SidebarCollapsible title="Queries" defaultOpen={true}>
         {savedQueriesLoading && (

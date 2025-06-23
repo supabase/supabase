@@ -9,7 +9,7 @@ import { tableKeys } from './keys'
 
 export type TablesVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
   /**
    * Defaults to false
@@ -59,6 +59,7 @@ export async function getTables(
   if (Array.isArray(data) && sortByProperty) {
     return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
   }
+
   return data as Omit<PostgresTable, 'columns'>[]
 }
 

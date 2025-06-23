@@ -3,16 +3,19 @@ import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
+import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getTools } from './tools'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
 const pgMetaSchemasList = pgMeta.schemas.list()
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
-    return res.status(400).json({
+    return res.status(500).json({
       error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
     })
   }
@@ -27,6 +30,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
+  apiWrapper(req, res, handler, { withAuth: true })
+
+export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages, projectRef, connectionString, includeSchemaMetadata, schema, table } = req.body
@@ -53,7 +61,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             'Content-Type': 'application/json',
             ...(cookie && { cookie }),
             ...(authorization && { Authorization: authorization }),
-          }
+          },
+          IS_PLATFORM ? undefined : queryPgMetaSelfHosted
         )
       : { result: [] }
 
@@ -69,9 +78,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         - Always use semicolons
         - Output as markdown
         - Always include code snippets if available
-        - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "runQuery": "false", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
+        - If a code snippet is SQL, the first line of the snippet should always be -- props: {"id": "id", "title": "Query title", "runQuery": "false", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
         - Only include one line of comment props per markdown snippet, even if the snippet has multiple queries
         - Only set chart to true if the query makes sense as a chart. xAxis and yAxis need to be columns or aliases returned by the query.
+        - Set the id to a random uuidv4 value
         - Only set runQuery to true if the query has no risk of writing data and is not a debugging request. Set it to false if there are any values that need to be replaced with real data.
         - Explain what the snippet does in a sentence or two before showing it
         - Use vector(384) data type for any embedding/vector related query
@@ -105,7 +115,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         # You write row level security policies.
   
         Your purpose is to generate a policy with the constraints given by the user.
-        - First, use getSchema to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
+        - First, use getSchemaTables to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
         - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
         - Then write new policies or update existing policies based on the prompt
         - When asked to suggest policies, either alter existing policies or add new ones to the public schema.

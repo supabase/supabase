@@ -5,9 +5,149 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Fri, 20 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 10 Jun 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/multigres-vitess-for-postgres</guid>
+  <title>Announcing Multigres: Vitess for Postgres</title>
+  <link>https://supabase.com/blog/multigres-vitess-for-postgres</link>
+  <description>Today we are welcoming Sugu, the co-creator of Vitess, to the Supabase team. He is joining Supabase to build Multigres: Vitess for Postgres.</description>
+  <pubDate>Tue, 10 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/building-on-open-table-formats</guid>
+  <title>Building on open table formats</title>
+  <link>https://supabase.com/blog/building-on-open-table-formats</link>
+  <description>Open table formats like Apache Iceberg, Delta Lake, and Apache Hudi are transforming how developers manage large-scale data on object storage systems.</description>
+  <pubDate>Thu, 29 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</guid>
+  <title>Open Data Standards: Postgres, OTel, and Iceberg</title>
+  <link>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</link>
+  <description>Replace custom CRUD endpoints, reduce infrastructure complexity, and accelerate product delivery.</description>
+  <pubDate>Mon, 26 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/simplify-backend-with-data-api</guid>
+  <title>Simplifying back-end complexity with Supabase Data APIs</title>
+  <link>https://supabase.com/blog/simplify-backend-with-data-api</link>
+  <description>Replace custom CRUD endpoints, reduce infrastructure complexity, and accelerate product delivery.</description>
+  <pubDate>Sat, 17 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/event-triggers-wo-superuser</guid>
+  <title>PostgreSQL Event Triggers without superuser access</title>
+  <link>https://supabase.com/blog/event-triggers-wo-superuser</link>
+  <description>Using Postgres Hooks to allow regular users to create event triggers</description>
+  <pubDate>Thu, 08 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-14-top-10</guid>
+  <title>Top 10 Launches of Launch Week 14</title>
+  <link>https://supabase.com/blog/launch-week-14-top-10</link>
+  <description>Highlights from Launch Week 14</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/mcp-server</guid>
+  <title>Supabase MCP Server</title>
+  <link>https://supabase.com/blog/mcp-server</link>
+  <description>Connect your AI tools to Supabase using MCP</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/data-api-nearest-read-replica</guid>
+  <title>Data API Routes to Nearest Read Replica</title>
+  <link>https://supabase.com/blog/data-api-nearest-read-replica</link>
+  <description>Route your Data API (PostgREST) requests to the nearest Read Replica</description>
+  <pubDate>Fri, 04 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/declarative-schemas</guid>
+  <title>Declarative Schemas for Simpler Database Management</title>
+  <link>https://supabase.com/blog/declarative-schemas</link>
+  <description>Simplify managing and maintaining complex database schemas</description>
+  <pubDate>Thu, 03 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/realtime-broadcast-from-database</guid>
+  <title>Realtime: Broadcast from Database</title>
+  <link>https://supabase.com/blog/realtime-broadcast-from-database</link>
+  <description>Use Realtime Broadcast to scale sending database changes to clients</description>
+  <pubDate>Wed, 02 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/tabs-dashboard-updates</guid>
+  <title>Keeping Tabs on What&apos;s New in Supabase Studio</title>
+  <link>https://supabase.com/blog/tabs-dashboard-updates</link>
+  <description>Tabs in the Editors! And upgrades to AI Assistant, SQL, and Logs</description>
+  <pubDate>Wed, 02 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-edge-functions-deploy-dashboard-deno-2-1</guid>
+  <title>Edge Functions: Deploy from the Dashboard + Deno 2.1</title>
+  <link>https://supabase.com/blog/supabase-edge-functions-deploy-dashboard-deno-2-1</link>
+  <description>You can create, test, and deploy Edge Functions directly from the Supabase Dashboard.</description>
+  <pubDate>Tue, 01 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/automatic-embeddings</guid>
+  <title>Automatic Embeddings in Postgres</title>
+  <link>https://supabase.com/blog/automatic-embeddings</link>
+  <description>Automatic embeddings move the vector generation step into Postgres</description>
+  <pubDate>Tue, 01 Apr 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-ui-library</guid>
+  <title>Introducing the Supabase UI Library</title>
+  <link>https://supabase.com/blog/supabase-ui-library</link>
+  <description>Drop complex components into your projects in seconds.</description>
+  <pubDate>Mon, 31 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/clerk-tpa-pricing</guid>
+  <title>Supabase Auth: Bring Your Own Clerk</title>
+  <link>https://supabase.com/blog/clerk-tpa-pricing</link>
+  <description>Use Clerk with Supabase via official third-party auth support</description>
+  <pubDate>Mon, 31 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-language-server</guid>
+  <title>Postgres Language Server: Initial Release</title>
+  <link>https://supabase.com/blog/postgres-language-server</link>
+  <description>Language Server Protocol and collection of language tools for Postgres</description>
+  <pubDate>Sat, 29 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/migrating-from-fauna-to-supabase</guid>
+  <title>Migrating from Fauna to Supabase</title>
+  <link>https://supabase.com/blog/migrating-from-fauna-to-supabase</link>
+  <description>A guide to migrating from Fauna to Supabase.</description>
+  <pubDate>Fri, 21 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/migrating-mongodb-data-api-with-supabase</guid>
+  <title>Migrating from the MongoDB Data API to Supabase</title>
+  <link>https://supabase.com/blog/migrating-mongodb-data-api-with-supabase</link>
+  <description>A guide to migrating from the MongoDB Data API to Supabase.</description>
+  <pubDate>Thu, 20 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/dedicated-poolers</guid>
+  <title>Dedicated Poolers</title>
+  <link>https://supabase.com/blog/dedicated-poolers</link>
+  <description>A dedicated pgbouncer instance that&apos;s co-located with your database for maximum performance and reliability.</description>
+  <pubDate>Fri, 07 Mar 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pgrouting-postgres-graph-database</guid>
+  <title>Postgres as a Graph Database: (Ab)using pgRouting</title>
+  <link>https://supabase.com/blog/pgrouting-postgres-graph-database</link>
+  <description>Learn how to use pgRouting as a lightweight graph database solution in Postgres.</description>
+  <pubDate>Tue, 25 Feb 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/ai-hackathon-at-y-combinator</guid>
   <title>AI Hackathon at Y Combinator</title>
   <link>https://supabase.com/blog/ai-hackathon-at-y-combinator</link>
