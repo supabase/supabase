@@ -12,18 +12,21 @@ interface ReportsDatetimeHelper extends DatetimeHelper {
 
 export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
   {
+    id: 'last_10_minutes',
     text: 'Last 10 minutes',
     calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
   {
+    id: 'last_30_minutes',
     text: 'Last 30 minutes',
     calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
   {
+    id: 'last_60_minutes',
     text: 'Last 60 minutes',
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('day').toISOString(),
     calcTo: () => dayjs().toISOString(),
@@ -31,30 +34,35 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
+    id: 'last_3_hours',
     text: 'Last 3 hours',
     calcFrom: () => dayjs().subtract(3, 'hour').startOf('day').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
+    id: 'last_24_hours',
     text: 'Last 24 hours',
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
+    id: 'last_7_days',
     text: 'Last 7 days',
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     availableIn: ['pro', 'team', 'enterprise'],
   },
   {
+    id: 'last_14_days',
     text: 'Last 14 days',
     calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     availableIn: ['team', 'enterprise'],
   },
   {
+    id: 'last_28_days',
     text: 'Last 28 days',
     calcFrom: () => dayjs().subtract(28, 'day').startOf('day').toISOString(),
     calcTo: () => '',

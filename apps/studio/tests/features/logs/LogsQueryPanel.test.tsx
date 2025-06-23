@@ -2,14 +2,11 @@ import { screen } from '@testing-library/react'
 import { expect, test } from 'vitest'
 
 import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
-import { render } from 'tests/helpers'
+import { customRender } from 'tests/lib/custom-render'
 
 test('run and clear', async () => {
-  render(
+  customRender(
     <LogsQueryPanel
-      defaultFrom=""
-      defaultTo=""
-      onDateChange={() => {}}
       onSelectSource={() => {}}
       onSelectTemplate={() => {}}
       warnings={[]}

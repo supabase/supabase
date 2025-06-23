@@ -138,6 +138,7 @@ export type Override = {
 }
 
 export interface DatetimeHelper {
+  id: string
   text: string
   calcTo: () => string
   calcFrom: () => string

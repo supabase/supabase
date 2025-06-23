@@ -65,8 +65,6 @@ const PreviewFilterPanel = ({
   table,
   onSelectedDatabaseChange,
   className,
-  selectedDatePickerValue,
-  setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -181,14 +179,7 @@ const PreviewFilterPanel = ({
           </TooltipContent>
         </Tooltip>
 
-        <LogsDatePicker
-          helpers={PREVIEWER_DATEPICKER_HELPERS}
-          onSubmit={(vals) => {
-            onSearch('datepicker-change', { to: vals.to, from: vals.from })
-            setSelectedDatePickerValue(vals)
-          }}
-          value={selectedDatePickerValue}
-        />
+        <LogsDatePicker helpers={PREVIEWER_DATEPICKER_HELPERS} />
 
         {FILTER_OPTIONS[table] !== undefined && (
           <div className="flex items-center">

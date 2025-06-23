@@ -8,6 +8,7 @@ interface LogsUrlState {
   timestampEnd: string
   selectedLogId: string | null
   filters: Filters
+  selectedHelperId: string
 }
 
 const defaultState: LogsUrlState = {
@@ -16,6 +17,7 @@ const defaultState: LogsUrlState = {
   timestampEnd: '',
   selectedLogId: null,
   filters: {},
+  selectedHelperId: '',
 }
 
 const stringWithDefault = (defaultValue: string) =>
@@ -59,6 +61,10 @@ export function useLogsUrlState() {
     'f',
     jsonWithDefault<Filters>(defaultState.filters)
   )
+  const [selectedHelperIdValue, setSelectedHelperIdValue] = useQueryState(
+    'helper',
+    stringWithDefault(defaultState.selectedHelperId)
+  )
 
   // Ensure we never return null values
   const search = searchValue || defaultState.search
@@ -66,6 +72,7 @@ export function useLogsUrlState() {
   const timestampEnd = timestampEndValue || defaultState.timestampEnd
   const selectedLogId = selectedLogIdValue || null
   const filters = filtersValue || defaultState.filters
+  const selectedHelperId = selectedHelperIdValue || defaultState.selectedHelperId
 
   const setSearch = (value: string) => {
     setSearchValue(value || defaultState.search)
@@ -88,12 +95,17 @@ export function useLogsUrlState() {
     setFilters({ ...filters, [key]: value })
   }
 
+  const setSelectedHelperId = (value: string) => {
+    setSelectedHelperIdValue(value || defaultState.selectedHelperId)
+  }
+
   const reset = () => {
     setSearch(defaultState.search)
     setTimestampStartValue(defaultState.timestampStart)
     setTimestampEndValue(defaultState.timestampEnd)
     setSelectedLogIdValue('')
     setFiltersValue(defaultState.filters)
+    setSelectedHelperIdValue(defaultState.selectedHelperId)
   }
 
   return {
@@ -103,6 +115,7 @@ export function useLogsUrlState() {
     timestampEnd,
     selectedLogId,
     filters,
+    selectedHelperId,
 
     // Setters
     setSearch,
@@ -110,6 +123,7 @@ export function useLogsUrlState() {
     setSelectedLogId,
     setFilters,
     updateFilter,
+    setSelectedHelperId,
     reset,
   }
 }
