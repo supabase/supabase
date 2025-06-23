@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { ARRAY_DELIMITER, SORT_DELIMITER } from 'components/ui/DataTable/DataTable.constants'
-import { get } from 'data/fetchers'
+import { post } from 'data/fetchers'
 import { getLogsChartQuery, getLogsCountQuery, getUnifiedLogsQuery } from './UnifiedLogs.queries'
 import { BaseChartSchema, ColumnSchema, type FacetMetadataSchema } from './UnifiedLogs.schema'
 import type { PageParam, SearchParamsType, UnifiedLogsMeta } from './UnifiedLogs.types'
@@ -118,17 +118,20 @@ export const useChartData = (search: SearchParamsType, projectRef: string) => {
         const sql = getLogsChartQuery(search)
 
         // Use the get function from data/fetchers for chart data
-        const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-          params: {
-            path: { ref: projectRef },
-            query: {
-              iso_timestamp_start: dateStart,
-              iso_timestamp_end: dateEnd,
-              project: projectRef,
-              sql,
+        const { data, error } = await post(
+          `/platform/projects/{ref}/analytics/endpoints/logs.all`,
+          {
+            params: {
+              path: { ref: projectRef },
+              query: {
+                iso_timestamp_start: dateStart,
+                iso_timestamp_end: dateEnd,
+                project: projectRef,
+              },
             },
-          },
-        })
+            body: { sql },
+          }
+        )
 
         if (error) {
           if (DEBUG_MODE) console.error('API returned error for chart data:', error)
@@ -314,7 +317,7 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
         const countsSql = getLogsCountQuery(search)
 
         // First, fetch the counts data
-        const { data: countsData, error: countsError } = await get(
+        const { data: countsData, error: countsError } = await post(
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
           {
             params: {
@@ -323,9 +326,9 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
                 iso_timestamp_start: isoTimestampStart,
                 iso_timestamp_end: isoTimestampEnd,
                 project: projectRef,
-                sql: countsSql,
               },
             },
+            body: { sql: countsSql },
           }
         )
 
@@ -412,7 +415,7 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
           console.log('🔍 Raw pageParam received:', pageParam)
         }
 
-        const { data: logsData, error: logsError } = await get(
+        const { data: logsData, error: logsError } = await post(
           `/platform/projects/{ref}/analytics/endpoints/logs.all`,
           {
             params: {
@@ -421,9 +424,9 @@ export const dataOptions = (search: SearchParamsType, projectRef: string) => {
                 iso_timestamp_start: timestampStart,
                 iso_timestamp_end: timestampEnd,
                 project: projectRef,
-                sql: logsSql,
               },
             },
+            body: { sql: logsSql },
           }
         )
 
