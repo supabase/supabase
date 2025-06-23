@@ -1,12 +1,10 @@
-import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { includes, without } from 'lodash'
-import { useReducer, useRef, useState } from 'react'
+import { useReducer, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import type { OrgSubscription } from 'data/subscriptions/types'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Alert, Button, Input, Modal } from 'ui'
 import type { ProjectInfo } from '../../../../../data/projects/projects-query'
@@ -22,17 +20,14 @@ export interface ExitSurveyModalProps {
 // [Joshen] For context - Exit survey is only when going to Free Plan from a paid plan
 const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) => {
   const { slug } = useParams()
-  const captchaRef = useRef<HCaptcha>(null)
 
   const [message, setMessage] = useState('')
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onError: (error) => {
-        resetCaptcha()
         toast.error(`Failed to downgrade project: ${error.message}`)
       },
     }
@@ -55,23 +50,12 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
     }
   }
 
-  const resetCaptcha = () => {
-    setCaptchaToken(null)
-    captchaRef.current?.resetCaptcha()
-  }
-
   const onSubmit = async () => {
     if (selectedReasons.length === 0) {
       return toast.error('Please select at least one reason for canceling your subscription')
     }
 
-    let token = captchaToken
-
-    if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
-      await downgradeOrganization()
-    }
+    await downgradeOrganization()
   }
 
   const downgradeOrganization = async () => {
@@ -83,7 +67,6 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
       { slug, tier: 'tier_free' },
       {
         onSuccess: async () => {
-          resetCaptcha()
           try {
             await sendExitSurvey({
               orgSlug: slug,
@@ -110,26 +93,6 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
 
   return (
     <>
-      <div className="self-center">
-        <HCaptcha
-          ref={captchaRef}
-          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-          size="invisible"
-          onVerify={(token) => {
-            setCaptchaToken(token)
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
-          }}
-          onExpire={() => setCaptchaToken(null)}
-          onOpen={() => {
-            // [Joshen] This is to ensure that hCaptcha popup remains clickable
-            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
-          }}
-          onClose={() => {
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
-          }}
-        />
-      </div>
-
       <Modal
         hideFooter
         size="xlarge"
