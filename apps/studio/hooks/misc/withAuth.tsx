@@ -55,7 +55,10 @@ export function withAuth<T>(
     })
 
     const isLoggedIn = Boolean(session)
-    const isFinishedLoading = !isLoading && !isAALLoading
+    //const isFinishedLoading = !isLoading && !isAALLoading
+    // for testing on staging
+    // remove before merging
+    const isFinishedLoading = false
 
     const redirectToSignIn = useCallback(() => {
       let pathname = location.pathname

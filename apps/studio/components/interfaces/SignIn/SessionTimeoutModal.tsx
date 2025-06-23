@@ -17,7 +17,7 @@ export const SessionTimeoutModal = ({
 }: SessionTimeoutModalProps) => {
   useEffect(() => {
     if (visible) {
-      Sentry.captureException('Session error detected')
+      Sentry.captureMessage('Session error detected', 'info')
     }
   }, [visible])
 
