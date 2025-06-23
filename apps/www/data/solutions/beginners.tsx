@@ -1,21 +1,22 @@
 import Link from 'next/link'
-import { Check, MessageCircle, Timer } from 'lucide-react'
+import { Check, Timer } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
 import { Button, cn, Image } from 'ui'
+
 import MainProducts from '../MainProducts'
 import AuthVisual from 'components/Products/AuthVisual'
 import RealtimeVisual from 'components/Products/RealtimeVisual'
 import FunctionsVisual from 'components/Products/FunctionsVisual'
 import ComputePricingCalculator from 'components/Pricing/ComputePricingCalculator'
+import { PlatformStarterSectionProps } from 'components/Solutions/PlatformStarterSection'
 
-import type { FeaturesSection, HeroSection, Metadata } from './solutions.types'
 import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import type { TwitterSocialSectionProps } from 'components/TwitterSocialSection'
+import type { FeaturesSection, HeroSection, Metadata } from './solutions.types'
 
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { tweets } from 'shared-data'
-import { PlatformStarterSectionProps } from '../../components/Solutions/PlatformStarterSection'
 
 const data: () => {
   metadata: Metadata
@@ -53,10 +54,11 @@ const data: () => {
       image: (
         <Image
           src={{
-            dark: '/images/solutions/ai-builders/ai-builders-agent-dark.svg',
-            light: '/images/solutions/ai-builders/ai-builders-agent-light.svg',
+            dark: '/images/solutions/beginners/beginners-hero-dark.svg',
+            light: '/images/solutions/beginners/beginners-hero-light.svg',
           }}
-          alt="AI agent for ai builders"
+          alt="Supabase for Beginners"
+          className="not-sr-only"
           width={1000}
           height={1000}
         />
@@ -241,7 +243,6 @@ const data: () => {
           title: 'Role-Based Access Control',
           icon: 'M17.6874 22.888V20.3886C17.6874 17.5888 15.4178 15.3192 12.618 15.3192C9.8182 15.3192 7.54852 17.5888 7.54852 20.3886V22.888M21.5531 11.5235C21.8189 14.1669 20.9393 16.9038 18.9141 18.9289C18.5359 19.3072 18.1328 19.6455 17.7101 19.9438M20.8038 8.70448C20.3598 7.71036 19.7299 6.77911 18.9141 5.96334C15.3338 2.38299 9.52889 2.38299 5.94855 5.96334C4.17501 7.73687 3.28 10.0562 3.26352 12.3807M24.0875 13.1161L23.2046 12.2332C22.3264 11.355 20.9026 11.355 20.0244 12.2332L19.1415 13.1161M0.875198 10.9503L1.75809 11.8331C2.63629 12.7113 4.06012 12.7113 4.93832 11.8331L5.82121 10.9503M7.49904 20.4919C5.77226 19.4557 4.37848 17.8555 3.62143 15.8584M15.6799 12.1942C15.6799 13.9201 14.2808 15.3192 12.5549 15.3192C10.829 15.3192 9.42993 13.9201 9.42993 12.1942C9.42993 10.4683 10.829 9.06917 12.5549 9.06917C14.2808 9.06917 15.6799 10.4683 15.6799 12.1942Z',
           subheading: <>Secure your data properly.</>,
-          // className: '!border-l-0',
           image: (
             <Image
               draggable={false}
@@ -268,7 +269,6 @@ const data: () => {
               more. Secure and trusted.
             </>
           ),
-          // className: '!border-l-0 sm:!border-l sm:!border-t-0',
           image: <AuthVisual className="2xl:!-bottom-20" />,
         },
         {
@@ -281,7 +281,6 @@ const data: () => {
               images you need in your app.
             </>
           ),
-          // className: '!border-l-0 lg:!border-l',
           image: (
             <Image
               draggable={false}
@@ -311,7 +310,6 @@ const data: () => {
               <span className="text-foreground">multi-player, collaborative experiences</span>.
             </>
           ),
-          // className: '!border-l-0 sm:!border-l',
           image: (
             <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
           ),
@@ -327,7 +325,6 @@ const data: () => {
               industry-standard tools to guide you.
             </>
           ),
-          // className: '!border-l-0 lg:!border-l',
           image: (
             <Image
               draggable={false}
@@ -347,7 +344,6 @@ const data: () => {
           title: 'Edge Functions',
           icon: MainProducts[PRODUCT_SHORTNAMES.FUNCTIONS].icon,
           subheading: <>Custom backend logic when you want to dive into code.</>,
-          // className: '!border-l-0 sm:!border-l lg:!border-l-0',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -478,7 +474,7 @@ const data: () => {
         <>
           <Button asChild size="small" type="default">
             <Link
-              href={'https://github.com/supabase/supabase/discussions'}
+              href="https://github.com/supabase/supabase/discussions"
               target="_blank"
               tabIndex={-1}
               onClick={() =>
@@ -517,6 +513,62 @@ const data: () => {
         </>
       ),
       subheading: 'to start building in seconds',
+      docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts',
+      aiPrompts: [
+        {
+          id: 'auth-setup',
+          title: 'Bootstrap Next.js app with Supabase Auth',
+          description:
+            '## Overview of implementing Supabase Auth SSR\n1. Install @supabase/supabase-js and...',
+          code: `1. Install @supabase/supabase-js and @supabase/ssr packages.
+2. Set up environment variables.
+3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client. 
+4. Hook up middleware to refresh auth tokens
+`,
+          language: 'markdown',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth',
+        },
+        {
+          id: 'edge-functions',
+          title: 'Writing Supabase Edge Functions',
+          description:
+            "You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate...",
+          code: `1. Try to use Web APIs and Deno’s core APIs instead of external dependencies (eg: use fetch instead of Axios, use WebSockets API instead of node-ws)
+2. If you are reusing utility methods between Edge Functions, add them to 'supabase/functions/_shared' and import using a relative path. Do NOT have cross dependencies between Edge Functions.
+3. Do NOT use bare specifiers when importing dependecnies. If you need to use an external dependency, make sure it's prefixed with either 'npm:' or 'jsr:'. For example, '@supabase/supabase-js' should be written as 'npm:@supabase/supabase-js'.
+4. For external imports, always define a version. For example, 'npm:@express' should be written as 'npm:express@4.18.2'.
+5. For external dependencies, importing via 'npm:' and 'jsr:' is preferred. Minimize the use of imports from @'deno.land/x' , 'esm.sh' and @'unpkg.com' . If you have a package from one of those CDNs, you can replace the CDN hostname with 'npm:' specifier.
+`,
+          language: 'markdown',
+          docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts/edge-functions',
+        },
+        {
+          id: 'declarative-db-schema',
+          title: 'Declarative Database Schema',
+          description:
+            "You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate...",
+          code: `Mandatory Instructions for Supabase Declarative Schema Management
+## 1. **Exclusive Use of Declarative Schema**
+-**All database schema modifications must be defined within '.sql' files located in the 'supabase/schemas/' directory.`,
+          language: 'markdown',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/declarative-database-schema',
+        },
+        {
+          id: 'rls-policies',
+          title: 'Create RLS policies',
+          description:
+            "You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate...",
+          code: `You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate a policy with the constraints given by the user. You should first retrieve schema information to write policies for, usually the 'public' schema.
+The output should use the following instructions:
+
+- The generated SQL must be valid SQL.`,
+          language: 'markdown',
+          docsUrl:
+            'https://supabase.com/docs/guides/getting-started/ai-prompts/database-rls-policies',
+        },
+      ],
     },
     mcp: {
       id: 'mcp',
