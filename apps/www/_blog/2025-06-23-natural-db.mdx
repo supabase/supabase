@@ -14,7 +14,7 @@ image: 2025-06-10-natural-db/og.png
 thumb: 2025-06-10-natural-db/thumb.png
 ---
 
-Large Language Models are excellent at transforming unstructured text into structured data, but they face challenges when it comes to accurately retrieving that structured data over extended conversations. In this post, we'll leverage this core strength and combine it with Postgres, along with several complementary tools, to build a personalized AI assistant capable of long-term memory retention.
+Large Language Models are excellent at transforming unstructured text into structured data, but they face challenges when it comes to accurately retrieving that data over extended conversations. In this post, we'll leverage this core strength and combine it with Postgres, along with several complementary tools, to build a personalized AI assistant capable of long-term memory retention.
 
 At a high level, the system's flexibility is created by combining these core building blocks: An LLM owned database schema through an execute_sql tool, scheduled tasks for autonomy, web searches for real-time information, and MCP integrations for extended actions that may integrate with external tools.
 
@@ -54,12 +54,12 @@ The system achieves autonomy through scheduled prompts which are powered by pg_c
 2.  The LLM retrieves data from relevant tables in your memories schema, like current portfolio holdings.
 3.  Web search is triggered to find relevant market news and competitor analysis based on data
 4.  Web search results are transformed into structured data and stored in your database
-5.  MCP integration sends a personalized report via Zapier MCP.
+5.  Sends a personalized email report using Zapier MCP.
 6.  Future queries like "How has my portfolio performed compared to market trends?" references this data
 
 ### Web Search
 
-We can make use of certain LLM's built in capability to search the web, such as OpenAI's web search tool, to more up to date information.
+The system leverages built-in web search capabilities from LLMs like OpenAI's web search tool to access real-time information and current events.
 
 ```sql
 -- Auto-generated from web search results
