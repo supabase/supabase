@@ -10,7 +10,6 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
@@ -70,11 +69,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  // For tabs preview flag logic
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const tabId = createTabId(entity.type, { id: entity.id })
   const tabs = useTabsStateSnapshot()
-  const isPreview = isTableEditorTabsEnabled ? tabs.previewTabId === tabId : false
+  const isPreview = tabs.previewTabId === tabId
 
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
