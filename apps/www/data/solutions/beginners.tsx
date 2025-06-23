@@ -24,6 +24,7 @@ const data: () => {
   platform: PlatformSectionProps
   twitterSocialSection: TwitterSocialSectionProps
   platformStarterSection: PlatformStarterSectionProps
+  mcp: any
 } = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -65,16 +66,6 @@ const data: () => {
           label: 'Start your project',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
-        },
-      ],
-      logos: [
-        {
-          name: 'GitHub',
-          image: '/images/enterprise/github.svg',
-        },
-        {
-          name: 'PwC',
-          image: '/images/enterprise/pwc.svg',
         },
       ],
     },
@@ -481,11 +472,11 @@ const data: () => {
       ],
     },
     twitterSocialSection: {
-      heading: 'Join the community',
+      heading: 'Fun projects built with Supabase',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
         <>
-          <Button asChild size="small" iconRight={<MessageCircle size={14} />} type="default">
+          <Button asChild size="small" type="default">
             <Link
               href={'https://github.com/supabase/supabase/discussions'}
               target="_blank"
@@ -499,7 +490,7 @@ const data: () => {
               GitHub discussions
             </Link>
           </Button>
-          <Button asChild type="default" size="small" iconRight={<MessageCircle size={14} />}>
+          <Button asChild type="default" size="small">
             <Link
               href={'https://discord.supabase.com/'}
               target="_blank"
@@ -526,6 +517,17 @@ const data: () => {
         </>
       ),
       subheading: 'to start building in seconds',
+    },
+    mcp: {
+      id: 'mcp',
+      heading: (
+        <>
+          Supabase MCP server works seamlessly with{' '}
+          <span className="text-foreground">your favorite AI code editor</span>
+        </>
+      ),
+      ctaLabel: 'Connect your AI tools',
+      documentationLink: '/docs/guides/getting-started/mcp',
     },
   }
 }

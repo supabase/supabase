@@ -3,12 +3,14 @@ import { Check, Copy, Sparkles } from 'lucide-react'
 import { Button, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { copyToClipboard } from 'ui'
+import { frameworks } from '../Hero/HeroFrameworks'
+import Link from 'next/link'
+import { useBreakpoint } from 'common'
 
-interface Platform {
-  id: string
+interface Framework {
   name: string
-  icon: React.ReactNode
-  color?: string
+  icon: string
+  docs: string
 }
 
 interface AIPrompt {
@@ -25,102 +27,6 @@ export interface PlatformStarterSectionProps {
   id?: string
   className?: string
 }
-
-const platforms: Platform[] = [
-  {
-    id: 'react',
-    name: 'React',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-        <g clipPath="url(#clip0)">
-          <path
-            d="M12 13.5C12.8284 13.5 13.5 12.8284 13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5Z"
-            fill="currentColor"
-          />
-          <path
-            d="M12 1C18.09 2.56 22 6.84 22 12C22 17.16 18.09 21.44 12 23C5.91 21.44 2 17.16 2 12C2 6.84 5.91 2.56 12 1ZM12 3.1C7.14 4.3 4 7.58 4 12C4 16.42 7.14 19.7 12 20.9C16.86 19.7 20 16.42 20 12C20 7.58 16.86 4.3 12 3.1Z"
-            fill="currentColor"
-          />
-        </g>
-        <defs>
-          <clipPath id="clip0">
-            <rect width="24" height="24" fill="white" />
-          </clipPath>
-        </defs>
-      </svg>
-    ),
-    color: '#61dafb',
-  },
-  {
-    id: 'nextjs',
-    name: 'Next.js',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-      </svg>
-    ),
-  },
-  {
-    id: 'nuxt',
-    name: 'Nuxt',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12.146.146a.5.5 0 0 1 .708 0l11 11a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708 0l-11-11a.5.5 0 0 1 0-.708l11-11zM12 2.207L2.207 12 12 21.793 21.793 12 12 2.207z" />
-      </svg>
-    ),
-    color: '#00dc82',
-  },
-  {
-    id: 'angular',
-    name: 'Angular',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2L3 7v10l9 5 9-5V7l-9-5zM5 8.5l7-3.89L19 8.5v7L12 19.39 5 15.5v-7z" />
-      </svg>
-    ),
-    color: '#dd0031',
-  },
-  {
-    id: 'vue',
-    name: 'Vue',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M2 3l10 17L22 3h-4l-6 10L6 3H2z" />
-      </svg>
-    ),
-    color: '#4fc08d',
-  },
-  {
-    id: 'svelte',
-    name: 'Svelte',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-      </svg>
-    ),
-    color: '#ff3e00',
-  },
-  {
-    id: 'flutter',
-    name: 'Flutter',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-      </svg>
-    ),
-    color: '#02569b',
-  },
-  {
-    id: 'kotlin',
-    name: 'Kotlin',
-    icon: (
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-      </svg>
-    ),
-    color: '#7f52ff',
-  },
-]
 
 const aiPrompts: AIPrompt[] = [
   {
@@ -211,32 +117,37 @@ const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
   )
 }
 
-const PlatformButton = ({
-  platform,
-  isActive,
-  onClick,
-}: {
-  platform: Platform
-  isActive?: boolean
-  onClick: () => void
-}) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      'group relative p-4 rounded-lg border border-default transition-all duration-200',
-      'hover:border-stronger hover:bg-surface-100',
-      'flex flex-col items-center gap-2 text-center min-h-[100px] justify-center',
-      isActive && 'border-brand bg-surface-100 ring-1 ring-brand/20'
-    )}
-  >
-    <div className="text-foreground-light group-hover:text-foreground transition-colors">
-      {platform.icon}
-    </div>
-    <span className="text-sm font-medium text-foreground-light group-hover:text-foreground transition-colors">
-      {platform.name}
-    </span>
-  </button>
-)
+const FrameworkLink = ({ framework, isActive }: { framework: Framework; isActive?: boolean }) => {
+  const isXs = useBreakpoint(640)
+  return (
+    <Link
+      href={framework.docs}
+      className={cn(
+        'group relative p-4 transition-colors duration-200',
+        'hover:bg-surface-100 -m-px',
+        'flex flex-col items-center gap-2 text-center aspect-square justify-center',
+        isActive && 'border-brand bg-surface-100 ring-1 ring-brand/20'
+      )}
+    >
+      <div className="text-foreground-lighter group-hover:text-foreground transition-colors">
+        <svg
+          width={isXs ? 35 : 45}
+          height={isXs ? 35 : 45}
+          fillRule="evenodd"
+          clipRule="evenodd"
+          viewBox="0 0 61 61"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d={framework.icon} fill="currentColor" />
+        </svg>
+      </div>
+      <span className="sr-only text-sm font-medium text-foreground-light group-hover:text-foreground transition-colors">
+        {framework.name}
+      </span>
+    </Link>
+  )
+}
 
 const PlatformStarterSection = ({
   heading,
@@ -244,33 +155,24 @@ const PlatformStarterSection = ({
   id,
   className,
 }: PlatformStarterSectionProps) => {
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
-
   return (
     <SectionContainer id={id} className={cn('py-16 md:py-24', className)}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-        <div className="space-y-6">
+        <div className="space-y-6 lg:pr-10">
           <h2 className="h2 text-foreground-lighter">{heading}</h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {platforms.map((platform) => (
-              <PlatformButton
-                key={platform.id}
-                platform={platform}
-                isActive={selectedPlatform === platform.id}
-                onClick={() =>
-                  setSelectedPlatform(selectedPlatform === platform.id ? null : platform.id)
-                }
-              />
+          <div className="grid grid-cols-5 divide-x divide-y rounded-lg overflow-hidden border">
+            {frameworks.map((framework) => (
+              <FrameworkLink key={framework.name} framework={framework} />
             ))}
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="space-y-4">
-            <h2 className="text-2xl md:text-3xl text-foreground-lighter font-normal">
-              Or, start with <span className="text-brand">Supabase AI Prompts</span>{' '}
-              <Sparkles size={24} className="inline text-brand" />
+          <div className="space-y-4 max-w-sm">
+            <h2 className="h2 text-foreground-lighter">
+              Or, start with <span className="text-foreground">Supabase AI Prompts</span>{' '}
+              <Sparkles size={24} className="inline text-foreground" />
             </h2>
           </div>
 
@@ -282,7 +184,7 @@ const PlatformStarterSection = ({
 
           <div className="pt-4">
             <Button
-              type="default"
+              type="text"
               size="small"
               className="group"
               iconRight={

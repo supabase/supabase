@@ -4,7 +4,6 @@ import { NextSeo } from 'next-seo'
 
 import Layout from '~/components/Layouts/Default'
 import ProductHeader from '~/components/Sections/ProductHeader2'
-import AIBuildersLogos from '~/components/Solutions/AIBuildersLogos'
 import getContent from '~/data/solutions/beginners'
 
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
@@ -13,9 +12,9 @@ const PlatformStarterSection = dynamic(
   () => import('~/components/Solutions/PlatformStarterSection')
 )
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
-const CTAForm = dynamic(() => import('~/components/Solutions/CTAForm'))
+const BeginnerMPCSection = dynamic(() => import('~/components/Solutions/BeginnerMPCSection'))
 
-const Enterprise: NextPage = () => {
+const BeginnersPage: NextPage = () => {
   const content = getContent()
 
   return (
@@ -39,17 +38,15 @@ const Enterprise: NextPage = () => {
           {...content.heroSection}
           className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
           sectionContainerClassName="lg:gap-4"
-          footer={<AIBuildersLogos className="mt-8 lg:max-w-xs xl:max-w-none" />}
-          footerPosition="left"
         />
         <WhySupabase {...content.why} />
         <PlatformSection {...content.platform} />
         <TwitterSocialSection {...content.twitterSocialSection} />
         <PlatformStarterSection {...content.platformStarterSection} />
-        <CTAForm />
+        <BeginnerMPCSection {...content.mcp} />
       </Layout>
     </>
   )
 }
 
-export default Enterprise
+export default BeginnersPage

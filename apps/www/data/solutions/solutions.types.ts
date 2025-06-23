@@ -23,12 +23,12 @@ export interface HeroSection {
     href: string
     type: 'primary' | 'default'
   }[]
-  logos: {
+  logos?: {
     name: string
     image: string
   }[]
   footer?: React.ReactNode
-  footerPosition?: 'left' | 'right'
+  footerPosition?: 'left' | 'right' | 'bottom'
 }
 
 export interface Quote {
