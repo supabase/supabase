@@ -9,7 +9,7 @@ import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_STALE_TIME,
   UnifiedLogsVariables,
-} from './unified-logs-query'
+} from './unified-logs-infinite-query'
 
 export async function getUnifiedLogsCount(
   { projectRef, search }: UnifiedLogsVariables,

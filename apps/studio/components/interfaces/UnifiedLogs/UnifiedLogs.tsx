@@ -31,7 +31,7 @@ import { RefreshButton } from 'components/ui/DataTable/RefreshButton'
 import { TimelineChart } from 'components/ui/DataTable/TimelineChart'
 import { useUnifiedLogsChartQuery } from 'data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from 'data/logs/unified-logs-query'
+import { useUnifiedLogsInfiniteQuery } from 'data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import {
   ChartConfig,
