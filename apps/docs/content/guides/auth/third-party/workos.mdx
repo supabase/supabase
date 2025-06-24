@@ -8,7 +8,7 @@ WorkOS can be used as a third-party authentication provider alongside Supabase A
 
 ## Getting started
 
-1. First you need to add an integration to connect your Supabase project with your WorkOS tenant. You will need your WorkOS client ID.
+1. First you need to add an integration to connect your Supabase project with your WorkOS tenant. You will need your WorkOS issuer. The issuer is `https://api.workos.com/user_management/<your-client-id>`. Substitute your [custom auth domain](https://workos.com/docs/custom-domains/auth-api) for "api.workos.com" if configured.
 2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
 3. Set up a JWT template to assign the `role: 'authenticated'` claim to your access token.
 
