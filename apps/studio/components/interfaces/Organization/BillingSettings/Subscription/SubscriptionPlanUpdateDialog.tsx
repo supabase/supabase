@@ -554,7 +554,7 @@ export const SubscriptionPlanUpdateDialog = ({
                   <PaymentMethodSelection
                     ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
-                    onSelectPaymentMethod={() => {}}
+                    onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
                     createPaymentMethodInline={
                       subscriptionPreview.pending_subscription_flow === true
                     }
