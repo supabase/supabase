@@ -20,7 +20,9 @@
     "typecheck": "tsc --noEmit",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
-    "build:deno-types": "tsx scripts/deno-types.ts"
+    "build:deno-types": "tsx scripts/deno-types.ts",
+    "build:graphql-types": "tsx scripts/download-graphql-schema.mts && pnpm graphql-codegen --config scripts/codegen.ts",
+    "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.72",
@@ -136,6 +138,8 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.5",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@radix-ui/react-use-escape-keydown": "^1.0.3",
     "@supabase/postgres-meta": "^0.64.4",
     "@tailwindcss/container-queries": "^0.1.1",
