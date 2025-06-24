@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Check, DollarSign, FileText, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
@@ -8,19 +9,23 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { projectKeys } from 'data/projects/keys'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { BASE_PATH } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { sidePanelsState } from 'state/side-panels'
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -36,23 +41,16 @@ import {
   Input_Shadcn_,
   Label_Shadcn_ as Label,
   cn,
-  Badge,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
-import { useQueryClient } from '@tanstack/react-query'
-import { projectKeys } from 'data/projects/keys'
 
-interface CreateBranchModalProps {
-  visible: boolean
-  onClose: () => void
-}
-
-export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
+export const CreateBranchModal = () => {
   const { ref } = useParams()
+  const queryClient = useQueryClient()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useFlag('gitlessBranching')
+  const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -77,15 +75,13 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
       onError: () => {},
     })
 
-  const queryClient = useQueryClient()
-
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
         await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
       }
-      onClose()
+      setShowCreateBranchModal(false)
     },
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)
@@ -171,19 +167,19 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
     })
   }
 
-  useEffect(() => {
-    if (form && visible) {
-      form.reset()
-    }
-  }, [form, visible])
-
   const openLinkerPanel = () => {
-    onClose()
+    setShowCreateBranchModal(false)
     sidePanelsState.setGithubConnectionsOpen(true)
   }
 
+  useEffect(() => {
+    if (form && showCreateBranchModal) {
+      form.reset()
+    }
+  }, [form, showCreateBranchModal])
+
   return (
-    <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={showCreateBranchModal} onOpenChange={(open) => setShowCreateBranchModal(open)}>
       <DialogContent size="large" hideClose>
         <DialogHeader padding="small">
           <DialogTitle>Create a new preview branch</DialogTitle>
@@ -336,10 +332,12 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
               {!hasPitrEnabled && <BranchingPITRNotice />}
             </DialogSection>
 
-            <DialogSectionSeparator />
-
             <DialogFooter className="justify-end gap-2" padding="medium">
-              <Button disabled={isCreating} type="default" onClick={onClose}>
+              <Button
+                disabled={isCreating}
+                type="default"
+                onClick={() => setShowCreateBranchModal(false)}
+              >
                 Cancel
               </Button>
               <Button

@@ -2,11 +2,11 @@ import {
   AlertCircle,
   Check,
   ChevronsUpDown,
+  GitBranch,
   ListTree,
   MessageCircle,
-  Shield,
-  GitBranch,
   Plus,
+  Shield,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -238,7 +238,7 @@ export const BranchDropdown = () => {
         </>
       )}
 
-      {isSuccess && (!isBranchingEnabled || branches.length === 0) && (
+      {isSuccess && !isBranchingEnabled && (
         <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger_Shadcn_ asChild>
             <Button type="text" icon={<GitBranch strokeWidth={1.5} />}>

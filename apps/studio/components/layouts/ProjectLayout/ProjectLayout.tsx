@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -19,7 +21,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -33,7 +34,6 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -96,8 +96,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       setMobileMenuOpen,
       toggleEditorPanel,
       setEditorPanel,
-      showCreateBranchModal,
-      setShowCreateBranchModal,
     } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
@@ -261,10 +259,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <CreateBranchModal
-          visible={showCreateBranchModal}
-          onClose={() => setShowCreateBranchModal(false)}
-        />
+        <CreateBranchModal />
         <SidePanelGitHubRepoLinker projectRef={projectRefForGitHubLinker} />
         <AISettingsModal />
         <ProjectAPIDocs />

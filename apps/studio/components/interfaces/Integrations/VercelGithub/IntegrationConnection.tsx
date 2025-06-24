@@ -12,6 +12,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -21,14 +22,13 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
-const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
+export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const router = useRouter()
     const org = useSelectedOrganization()
@@ -166,5 +166,3 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
 )
 
 IntegrationConnectionItem.displayName = 'IntegrationConnectionItem'
-
-export { IntegrationConnectionItem, IntegrationConnection }

@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import { useParams } from 'common'
-import { Badge, Button, Card, CardContent } from 'ui'
+import { useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import React from 'react'
+import { Badge, Button, Card, CardContent } from 'ui'
 
-const AutomaticBranchingRow = () => {
+export const AutomaticBranchingRow = () => {
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
@@ -97,5 +97,3 @@ const AutomaticBranchingRow = () => {
     </Card>
   )
 }
-
-export default AutomaticBranchingRow

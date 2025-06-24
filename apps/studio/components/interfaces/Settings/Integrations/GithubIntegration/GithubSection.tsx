@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Image from 'next/image'
 
-import { useParams } from 'common'
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -9,10 +9,9 @@ import {
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { cn } from 'ui'
 import { BASE_PATH } from 'lib/constants'
-import AutomaticBranchingRow from './AutomaticBranchingRow'
-import Image from 'next/image'
+import { cn } from 'ui'
+import { AutomaticBranchingRow } from './AutomaticBranchingRow'
 
 const GitHubSection = () => {
   const canReadGitHubConnection = useCheckPermissions(
