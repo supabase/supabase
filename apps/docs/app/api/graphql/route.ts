@@ -9,6 +9,31 @@ import { rootGraphQLSchema } from '~/resources/rootSchema'
 import { createQueryDepthLimiter } from './validators'
 
 export const runtime = 'edge'
+/* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
+  overlap with the OpenAI API regions.
+
+  Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
+  Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
+  */
+export const preferredRegion = [
+  'arn1',
+  'bom1',
+  'cdg1',
+  'cle1',
+  'cpt1',
+  'dub1',
+  'fra1',
+  'gru1',
+  'hnd1',
+  'iad1',
+  'icn1',
+  'kix1',
+  'lhr1',
+  'pdx1',
+  'sfo1',
+  'sin1',
+  'syd1',
+]
 
 const MAX_DEPTH = 5
 
@@ -129,7 +154,11 @@ export async function OPTIONS(request: Request): Promise<NextResponse> {
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    return await handleGraphQLRequest(request)
+    const result = await handleGraphQLRequest(request)
+    // Do not let Vercel close the process until Sentry has flushed
+    // https://github.com/getsentry/sentry-javascript/issues/9626
+    await Sentry.flush(2000)
+    return result
   } catch (error: unknown) {
     console.error(error)
 
@@ -137,6 +166,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       if (!error.isUserError()) {
         Sentry.captureException(error)
       }
+      // Do not let Vercel close the process until Sentry has flushed
+      // https://github.com/getsentry/sentry-javascript/issues/9626
+      await Sentry.flush(2000)
 
       return NextResponse.json(
         {
@@ -148,6 +180,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     } else {
       Sentry.captureException(error)
+      // Do not let Vercel close the process until Sentry has flushed
+      // https://github.com/getsentry/sentry-javascript/issues/9626
+      await Sentry.flush(2000)
 
       return NextResponse.json(
         {

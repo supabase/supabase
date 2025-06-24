@@ -25,6 +25,7 @@
     "postbuild": "pnpm run build:sitemap && pnpm run build:llms && ./../../scripts/upload-static-assets.sh",
     "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "predev": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
+    "preembeddings": "pnpm run codegen:references",
     "preinstall": "npx only-allow pnpm",
     "presync": "pnpm run codegen:graphql",
     "pretest": "pnpm run codegen:examples",
@@ -156,7 +157,7 @@
     "twoslash": "^0.3.1",
     "typescript": "~5.5.0",
     "unist-util-visit-parents": "5.1.3",
-    "vite": "^6.2.6",
+    "vite": "catalog:",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^3.0.5"
   }

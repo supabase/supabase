@@ -6,7 +6,7 @@ import React, {
   forwardRef,
   useState,
 } from 'react'
-import { Button, Input_Shadcn_, cn } from 'ui'
+import { Button, Input_Shadcn_, cn, copyToClipboard } from 'ui'
 import styleHandler from 'ui/src/lib/theme/styleHandler'
 import InputIconContainer from '../form/Layout/InputIconContainer'
 
@@ -47,20 +47,14 @@ const Input = forwardRef<
     const __styles = styleHandler('input')
 
     function _onCopy(value: any) {
-      navigator.clipboard.writeText(value)?.then(
-        function () {
-          /* clipboard successfully set */
-          setCopyLabel('Copied')
-          setTimeout(function () {
-            setCopyLabel('Copy')
-          }, 3000)
-          onCopy?.()
-        },
-        function () {
-          /* clipboard write failed */
-          setCopyLabel('Failed to copy')
-        }
-      )
+      copyToClipboard(value, () => {
+        /* clipboard successfully set */
+        setCopyLabel('Copied')
+        setTimeout(function () {
+          setCopyLabel('Copy')
+        }, 3000)
+        onCopy?.()
+      })
     }
 
     function onReveal() {
