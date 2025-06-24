@@ -214,7 +214,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const hasMessages = chatMessages.length > 0
 
   const sendMessageToAssistant = (content: string) => {
-    const payload = { role: 'user', createdAt: new Date(), content } as MessageType
+    const payload = { role: 'user', createdAt: new Date(), content, id: uuidv4() } as MessageType
     snap.clearSqlSnippets()
 
     // Store the user message in the ref before appending
