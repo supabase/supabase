@@ -119,12 +119,10 @@ export const UnifiedLogs = () => {
   const liveMode = useLiveMode(flatData)
 
   // REMINDER: meta data is always the same for all pages as filters do not change(!)
-  const lastPage = unifiedLogsData?.pages?.[unifiedLogsData?.pages.length - 1]
+  // const lastPage = unifiedLogsData?.pages?.[unifiedLogsData?.pages.length - 1]
 
-  // Use the totalCount from chartDataResult which gives us the actual count of logs in the time period
-  // instead of the hardcoded 10000 value
   const totalDBRowCount = counts?.totalRowCount
-  const filterDBRowCount = lastPage?.meta?.filterRowCount
+  const filterDBRowCount = flatData.length
 
   const facets = counts?.facets
   const totalFetched = flatData?.length

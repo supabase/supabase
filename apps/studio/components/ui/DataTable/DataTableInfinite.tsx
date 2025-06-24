@@ -50,17 +50,18 @@ export function DataTableInfinite<TData, TValue, TMeta>({
 
   const headerGroups = table.getHeaderGroups()
 
+  // [Joshen] This is not even getting triggered that's why infinite scrolling not working
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
       const onPageBottom =
         Math.ceil(e.currentTarget.scrollTop + e.currentTarget.clientHeight) >=
         e.currentTarget.scrollHeight
 
-      if (onPageBottom && !isFetching && totalRowsFetched < filterRows) {
+      if (onPageBottom && !isFetching && totalRows > totalRowsFetched) {
         fetchNextPage()
       }
     },
-    [fetchNextPage, isFetching, filterRows, totalRowsFetched]
+    [fetchNextPage, isFetching, totalRows, totalRowsFetched]
   )
 
   useHotKey(() => {
@@ -69,115 +70,105 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   }, 'u')
 
   return (
-    <>
-      <Table
-        containerProps={{ onScroll }}
-        ref={tableRef} // REMINDER: https://stackoverflow.com/questions/50361698/border-style-do-not-work-with-sticky-position-element
-      >
-        <TableHeader>
-          {headerGroups.map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="bg-surface-75">
-              {headerGroup.headers.map((header) => {
-                const sort = header.column.getIsSorted()
-                const canResize = header.column.getCanResize()
-                const onResize = header.getResizeHandler()
-                const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
+    <Table ref={tableRef} onScroll={onScroll}>
+      <TableHeader>
+        {headerGroups.map((headerGroup) => (
+          <TableRow key={headerGroup.id} className="bg-surface-75">
+            {headerGroup.headers.map((header) => {
+              const sort = header.column.getIsSorted()
+              const canResize = header.column.getCanResize()
+              const onResize = header.getResizeHandler()
+              const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
 
-                return (
-                  <TableHead
-                    key={header.id}
-                    className={headerClassName}
-                    aria-sort={
-                      sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'
-                    }
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                    {canResize && (
-                      <div
-                        onDoubleClick={() => header.column.resetSize()}
-                        onMouseDown={onResize}
-                        onTouchStart={onResize}
-                        className={cn(
-                          'user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center',
-                          'before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border'
-                        )}
-                      />
-                    )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody
-          id="content"
-          tabIndex={-1}
-          // REMINDER: avoids scroll (skipping the table header) when using skip to content
-          style={{ scrollMarginTop: 'calc(var(--top-bar-height))' }}
-        >
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
-              <Fragment key={row.id}>
-                {renderLiveRow?.({ row: row as any })}
-                <MemoizedRow
-                  row={row}
-                  table={table}
-                  searchParamsParser={searchParamsParser}
-                  selected={row.getIsSelected()}
-                />
-              </Fragment>
-            ))
-          ) : (
-            <Fragment>
-              {renderLiveRow?.()}
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            </Fragment>
-          )}
-          <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
-            <TableCell colSpan={columns.length} className="text-center">
-              {hasNextPage || isFetching || isLoading ? (
-                <div className="flex flex-col items-center gap-2">
-                  <Button
-                    disabled={isFetching || isLoading}
-                    onClick={() => fetchNextPage()}
-                    size="small"
-                    type="outline"
-                    icon={
-                      isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
-                    }
-                  >
-                    Load More
-                  </Button>
-                  <p className="text-xs text-foreground-lighter">
-                    Showing{' '}
-                    <span className="font-mono font-medium">
-                      {formatCompactNumber(totalRowsFetched)}
-                    </span>{' '}
-                    of{' '}
-                    <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
-                    rows
-                  </p>
-                </div>
-              ) : (
-                <p className="text-sm text-foreground-lighter py-4">
-                  No more data to load (
-                  <span className="font-mono font-medium">{formatCompactNumber(filterRows)}</span>{' '}
-                  of <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
-                  rows)
-                </p>
-              )}
-            </TableCell>
+              return (
+                <TableHead
+                  key={header.id}
+                  className={headerClassName}
+                  aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                  {canResize && (
+                    <div
+                      onDoubleClick={() => header.column.resetSize()}
+                      onMouseDown={onResize}
+                      onTouchStart={onResize}
+                      className={cn(
+                        'user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center',
+                        'before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border'
+                      )}
+                    />
+                  )}
+                </TableHead>
+              )
+            })}
           </TableRow>
-        </TableBody>
-      </Table>
-    </>
+        ))}
+      </TableHeader>
+      <TableBody
+        id="content"
+        tabIndex={-1}
+        // REMINDER: avoids scroll (skipping the table header) when using skip to content
+        style={{ scrollMarginTop: 'calc(var(--top-bar-height))' }}
+      >
+        {table.getRowModel().rows?.length ? (
+          table.getRowModel().rows.map((row) => (
+            // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
+            <Fragment key={row.id}>
+              {renderLiveRow?.({ row: row as any })}
+              <MemoizedRow
+                row={row}
+                table={table}
+                searchParamsParser={searchParamsParser}
+                selected={row.getIsSelected()}
+              />
+            </Fragment>
+          ))
+        ) : (
+          <Fragment>
+            {renderLiveRow?.()}
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          </Fragment>
+        )}
+        <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
+          <TableCell colSpan={columns.length} className="text-center">
+            {hasNextPage || isFetching || isLoading ? (
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  disabled={isFetching || isLoading}
+                  onClick={() => fetchNextPage()}
+                  size="small"
+                  type="outline"
+                  icon={isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null}
+                >
+                  Load More
+                </Button>
+                <p className="text-xs text-foreground-lighter">
+                  Showing{' '}
+                  <span className="font-mono font-medium">
+                    {formatCompactNumber(totalRowsFetched)}
+                  </span>{' '}
+                  of <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
+                  rows
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-foreground-lighter py-4">
+                No more data to load (
+                <span className="font-mono font-medium">{formatCompactNumber(filterRows)}</span> of{' '}
+                <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
+                rows)
+              </p>
+            )}
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
   )
 }
 

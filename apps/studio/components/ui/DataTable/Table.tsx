@@ -13,17 +13,16 @@ import {
 
 // Only create a custom component for Table with the added props
 const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof ShadcnTable>>(
-  ({ className, ...props }, ref) => (
+  ({ className, onScroll, ...props }, ref) => (
     <ShadcnTable
       ref={ref}
       {...props}
-      className={cn('', className)}
+      className={cn(className)}
       containerProps={{
+        onScroll,
         className:
-          'table-fixed min-w-max caption-bottom text-sm max-h-[calc(100vh_-_var(--top-bar-height))]',
-        ...props.containerProps,
+          'w-full overflow-auto table-fixed min-w-max caption-bottom text-sm max-h-[calc(100vh_-_var(--top-bar-height))]',
       }}
-      // REMINDER: we are not scrolling the table, but the container
     />
   )
 )
