@@ -1,5 +1,3 @@
-import type { components } from 'data/api'
-
 export type VercelFramework =
   | (
       | 'blitzjs'
@@ -257,16 +255,4 @@ export type IntegrationConnectionsCreateVariables = {
   }
 }
 
-export type GitHubConnectionCreateVariables = {
-  organizationId: number
-  connection: components['schemas']['CreateGitHubConnectionBody']
-}
-
 export type EnvironmentTargets = 'production' | 'preview' | 'development'
-
-export type UpdateConnectionPayload = {
-  id: string
-  organizationIntegrationId: string
-  envSyncTargets: EnvironmentTargets[]
-  publicEnvVarPrefix?: string
-}

@@ -1,52 +1,54 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ForeignProject } from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
+import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
+import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
+import { Check, ChevronDown, DollarSign, Github, Loader2 } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
   Button,
   cn,
-  SheetDescription,
-  SheetFooter,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormMessage_Shadcn_,
+  Input_Shadcn_,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-} from 'ui'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
-import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
-import {
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  FormControl_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
   Switch,
 } from 'ui'
-import { Github, Loader2, Check, ChevronDown, DollarSign } from 'lucide-react'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetSection } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { ForeignProject } from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 export type SidePanelGitHubRepoLinkerProps = {
   projectRef?: string
@@ -282,8 +284,8 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
               project_ref: projectRef,
               repository_id: Number(selectedRepo.id),
               workdir: data.supabaseDirectory,
-              supabaseChangesOnly: data.supabaseChangesOnly,
-              branchLimit: Number(data.branchLimit),
+              supabase_changes_only: data.supabaseChangesOnly,
+              branch_limit: Number(data.branchLimit),
             },
           })
         } else {
@@ -303,8 +305,8 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
             project_ref: projectRef,
             repository_id: Number(selectedRepo.id),
             workdir: data.supabaseDirectory,
-            supabaseChangesOnly: data.supabaseChangesOnly,
-            branchLimit: Number(data.branchLimit),
+            supabase_changes_only: data.supabaseChangesOnly,
+            branch_limit: Number(data.branchLimit),
           },
         })
       }
