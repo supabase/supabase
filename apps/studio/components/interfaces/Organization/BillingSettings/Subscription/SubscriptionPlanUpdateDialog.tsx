@@ -43,7 +43,7 @@ const getRandomTweet = () => {
 
 const PLAN_HEADINGS = {
   tier_pro:
-    'the Pro plan and create unlimited projects, daily backups and premium support when you need it',
+    'the Pro plan to unlock unlimited projects, daily backups, and email support whenever you need it',
   tier_team: 'the Team plan for SOC2, SSO, priority support and greater data and log retention',
   default: 'to a new plan',
 } as const
@@ -85,7 +85,6 @@ export const SubscriptionPlanUpdateDialog = ({
   projects,
 }: Props) => {
   const { resolvedTheme } = useTheme()
-  const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
@@ -182,23 +181,6 @@ export const SubscriptionPlanUpdateDialog = ({
       return
     }
 
-    if (paymentMethod) {
-      queryClient.setQueriesData(
-        organizationKeys.paymentMethods(selectedOrganization.slug),
-        (prev: any) => {
-          if (!prev) return prev
-          return {
-            ...prev,
-            defaultPaymentMethodId: paymentMethod?.id,
-            data: prev.data.map((pm: any) => ({
-              ...pm,
-              is_default: pm.id === paymentMethod?.id,
-            })),
-          }
-        }
-      )
-    }
-
     // If the user is downgrading from team, should have spend cap disabled by default
     const tier =
       subscription?.plan?.id === 'team' && selectedTier === PRICING_TIER_PRODUCT_IDS.PRO
@@ -253,6 +235,10 @@ export const SubscriptionPlanUpdateDialog = ({
     <Dialog
       open={selectedTier !== undefined && selectedTier !== 'tier_free'}
       onOpenChange={(open) => {
+        // Do not allow closing mid-change
+        if (isUpdating || paymentConfirmationLoading || isConfirming) {
+          return
+        }
         if (!open) onClose()
       }}
     >
@@ -561,16 +547,16 @@ export const SubscriptionPlanUpdateDialog = ({
             </div>
 
             <div className="pt-4">
-              {!billingViaPartner && !subscriptionPreviewIsLoading && changeType === 'upgrade' && (
+              {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
                 <div className="space-y-2 mb-4">
                   <BillingCustomerDataExistingOrgDialog />
 
                   <PaymentMethodSelection
                     ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
-                    onSelectPaymentMethod={setSelectedPaymentMethod}
+                    onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
                     createPaymentMethodInline={
-                      subscriptionPreview?.pending_subscription_flow === true
+                      subscriptionPreview.pending_subscription_flow === true
                     }
                     readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                   />
@@ -700,7 +686,6 @@ export const SubscriptionPlanUpdateDialog = ({
                 paymentIntentConfirmed(paymentIntentConfirmation)
               }
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-              paymentMethodId={selectedPaymentMethod!}
             />
           </Elements>
         )}

@@ -49,12 +49,12 @@ import {
   Modal,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
-} from './API.constants'
+} from './jwt.constants'
 
 const schema = object({
   JWT_EXP: number()
@@ -155,7 +155,6 @@ const JWTSettings = () => {
 
           return (
             <Panel
-              title={<h5 className="mb-0">JWT Settings</h5>}
               footer={
                 <div className="flex py-4 w-full">
                   <FormActions

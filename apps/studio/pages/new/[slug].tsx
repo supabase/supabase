@@ -368,7 +368,7 @@ const Wizard: NextPageWithLayout = () => {
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
-      organizationId: currentOrg.id,
+      organizationSlug: currentOrg.slug,
       name: projectName,
       dbPass: dbPass,
       dbRegion: dbRegion,
@@ -951,8 +951,8 @@ const Wizard: NextPageWithLayout = () => {
           size="large"
           loading={false}
           visible={isComputeCostsConfirmationModalVisible}
-          title={<>Confirm compute costs</>}
-          confirmLabel="Confirm"
+          title="Confirm compute costs"
+          confirmLabel="I understand"
           onCancel={() => setIsComputeCostsConfirmationModalVisible(false)}
           onConfirm={async () => {
             const values = form.getValues()
@@ -965,9 +965,9 @@ const Wizard: NextPageWithLayout = () => {
             <p>
               Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
-              clicking "Confirm", you agree to the additional costs.{' '}
+              clicking "I understand", you agree to the additional costs.{' '}
               <Link
-                href="/docs/guides/platform/manage-your-usage/compute"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                 target="_blank"
                 className="underline"
               >
