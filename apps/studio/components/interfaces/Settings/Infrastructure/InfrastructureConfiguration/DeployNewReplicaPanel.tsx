@@ -267,7 +267,7 @@ const DeployNewReplicaPanel = ({
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
-              Read replicas are not supported for AWS Revamped projects
+              Read replicas are not supported for AWS (Revamped) projects
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               <span>
