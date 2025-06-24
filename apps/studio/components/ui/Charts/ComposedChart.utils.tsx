@@ -43,6 +43,7 @@ export type MultiAttribute = {
   }
   statusCode?: string
   grantType?: string
+  providerType?: string
   stackId?: string
   format?: string
   description?: string
@@ -173,7 +174,7 @@ const CustomTooltip = ({
       return (
         <div key={entry.name} className="flex items-center w-full">
           {getIcon(entry.color, isMax)}
-          <span className="text-foreground-lighter ml-1 flex-grow">
+          <span className="text-foreground-lighter ml-1 flex-grow cursor-default select-none">
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
@@ -279,7 +280,7 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
         {getIcon(entry.name, entry.color)}
         <span
           className={cn(
-            'text-nowrap text-foreground-lighter',
+            'text-nowrap text-foreground-lighter cursor-default select-none',
             hoveredLabel && !isHovered && 'opacity-50'
           )}
         >

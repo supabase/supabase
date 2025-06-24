@@ -215,7 +215,7 @@ const ComposedChartHandler = ({
             return
           }
 
-          const query = regularAttributeQueries.find((q) => q.data.attribute === attr.attribute)
+          const query = regularAttributeQueries.find((q) => q.data?.attribute === attr.attribute)
           const matchingPoint = query?.data?.data?.find((p: any) => p.period_start === timestamp)
           point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
         })
@@ -260,7 +260,7 @@ const ComposedChartHandler = ({
         ? firstData.total
         : shouldHighlightTotalGroupedValue
           ? firstData.totalGrouped?.[firstAttr.attribute as keyof typeof firstData.totalGrouped]
-          : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
+          : (firstData.data?.[firstData.data?.length - 1] as any)?.[firstAttr.attribute]
   }, [highlightedValue, attributes, attributeQueries])
 
   if (loading) {
@@ -322,9 +322,6 @@ const ComposedChartHandler = ({
           titleTooltip={titleTooltip}
           {...otherProps}
         />
-        <pre className="text-xs text-foreground-lighter overflow-x-auto max-h-40">
-          {JSON.stringify(combinedData, null, 2)}
-        </pre>
       </Panel.Content>
     </Panel>
   )

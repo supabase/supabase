@@ -96,9 +96,20 @@ const metricSqlMap: Record<
     `
   },
 
-  TotalSignUpsByProvider: (start, end, interval) => `
-    -- TODO: Return total sign-ups by provider (email, social, etc.)
-  `,
+  TotalSignUpsByProvider: (start, end, interval) => {
+    const granularity = analyticsIntervalToBQGranularity(interval)
+    return `
+    --total-signups-by-provider
+    select 
+      timestamp_trunc(timestamp, ${granularity}) as timestamp,
+      json_value(event_message, "$.auth_event.traits.provider") as provider,
+      count(*) as count
+    from auth_logs
+    where json_value(event_message, "$.auth_event.action") = 'user_signedup'
+    group by timestamp, provider
+    order by timestamp desc, provider
+    `
+  },
   TotalSignInsByProvider: (start, end, interval) => `
     -- TODO: Return total sign-ins by provider (email, social, etc.)
   `,
@@ -130,9 +141,9 @@ const metricSqlMap: Record<
         round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms,
         round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_latency_ms,
         round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_latency_ms,
-        round((approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000), 2) as p50_latency_ms,
-        round((approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000), 2) as p95_latency_ms,
-        round((approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000), 2) as p99_latency_ms
+        round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_latency_ms,
+        round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_latency_ms,
+        round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_latency_ms
       from auth_logs
       where json_value(event_message, "$.path") = '/token'
       group by timestamp, grant_type
@@ -173,9 +184,22 @@ const metricSqlMap: Record<
   SuspiciousActivity: (start, end, interval) => `
     -- TODO: Return suspicious activity (multiple failed attempts, unusual locations, etc.)
   `,
-  RateLimitedRequests: (start, end, interval) => `
-    -- TODO: Return rate limited requests over time
-  `,
+  RateLimitedRequests: (start, end, interval) => {
+    const granularity = analyticsIntervalToBQGranularity(interval)
+    return `
+    --rate-limited-requests
+SELECT 
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
+  json_value(event_message, "$.path") AS path,
+  json_value(event_message, "$.method") AS method,
+  json_value(event_message, "$.error_code") AS error_code,
+  COUNT(*) AS count
+FROM auth_logs
+WHERE json_value(event_message, "$.status") = '429'
+GROUP BY timestamp, path, method, error_code
+ORDER BY timestamp DESC, path, method, error_code
+  `
+  },
   TokenRevocations: (start, end, interval) => `
     -- TODO: Return token revocations over time
   `,
@@ -268,6 +292,9 @@ export function useAuthLogsReport({
       if (attr.attribute === 'SignInAttempts' && attr.grantType) {
         return { ...attr, attribute: `${attr.attribute}_${attr.grantType}` }
       }
+      if (attr.attribute === 'TotalSignUpsByProvider' && attr.providerType) {
+        return { ...attr, attribute: `${attr.attribute}_${attr.providerType}` }
+      }
       return attr
     })
 
@@ -304,6 +331,9 @@ export function useAuthLogsReport({
 
     return { data, chartAttributes }
   }, [rawData, attributes, logsMetric])
+
+  console.log(`----- ${logsMetric} -----`)
+  console.log(logsMetric, data)
 
   return {
     data,
