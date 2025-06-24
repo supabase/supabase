@@ -137,8 +137,8 @@ const CreateProject = () => {
   async function onCreateProject() {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
-    if (!foreignProjectId) return console.error('No foreignProjectId ID set')
-    if (!organization) return console.error('No organization ID set')
+    if (!foreignProjectId) return console.error('No foreignProjectId set')
+    if (!organization) return console.error('No organization set')
 
     snapshot.setLoading(true)
 
@@ -150,7 +150,7 @@ const CreateProject = () => {
     }
 
     createProject({
-      organizationId: organization.id,
+      organizationSlug: organization.slug,
       name: projectName,
       dbPass,
       dbRegion,

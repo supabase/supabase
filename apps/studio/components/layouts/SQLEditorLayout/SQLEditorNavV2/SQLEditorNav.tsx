@@ -1,5 +1,9 @@
+import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useIsSQLEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
@@ -19,10 +23,6 @@ import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
-import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import {
   SnippetWithContent,
   useSnippetFolders,
@@ -59,7 +59,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const tabs = useTabsStateSnapshot()
-  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
@@ -293,12 +292,10 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => {
-      if (isSQLEditorTabsEnabled) {
-        // Update Tabs state - currently unknown how to differentiate between sql and non-sql content
-        // so we're just deleting all tabs for with matching IDs
-        const tabIds = data.map((id) => createTabId('sql', { id }))
-        tabs.removeTabs(tabIds)
-      }
+      // Update Tabs state - currently unknown how to differentiate between sql and non-sql content
+      // so we're just deleting all tabs for with matching IDs
+      const tabIds = data.map((id) => createTabId('sql', { id }))
+      tabs.removeTabs(tabIds)
     },
     onError: (error, data) => {
       if (error.message.includes('Contents not found')) {
@@ -541,10 +538,10 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   const sqlEditorTabsCleanup = useSqlEditorTabsCleanup()
   useEffect(() => {
-    if (isSuccess && isSQLEditorTabsEnabled) {
+    if (isSuccess) {
       sqlEditorTabsCleanup({ snippets: allSnippetsInView as any })
     }
-  }, [allSnippetsInView, isSQLEditorTabsEnabled, isSuccess, sqlEditorTabsCleanup])
+  }, [allSnippetsInView, isSuccess, sqlEditorTabsCleanup])
 
   return (
     <>
@@ -572,15 +569,13 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               data={projectSnippetsTreeState}
               aria-label="project-level-snippets"
               nodeRenderer={({ element, ...props }) => {
-                const isOpened =
-                  isSQLEditorTabsEnabled &&
-                  Object.values(tabs.tabsMap).some(
-                    (tab) => tab.metadata?.sqlId === element.metadata?.id
-                  )
+                const isOpened = Object.values(tabs.tabsMap).some(
+                  (tab) => tab.metadata?.sqlId === element.metadata?.id
+                )
                 const tabId = createTabId('sql', {
                   id: element?.metadata?.id as unknown as Snippet['id'],
                 })
-                const isPreview = isSQLEditorTabsEnabled && tabs.previewTabId === tabId
+                const isPreview = tabs.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
                 const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 
@@ -656,15 +651,13 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               data={favoritesTreeState}
               aria-label="favorite-snippets"
               nodeRenderer={({ element, ...props }) => {
-                const isOpened =
-                  isSQLEditorTabsEnabled &&
-                  Object.values(tabs.tabsMap).some(
-                    (tab) => tab.metadata?.sqlId === element.metadata?.id
-                  )
+                const isOpened = Object.values(tabs.tabsMap).some(
+                  (tab) => tab.metadata?.sqlId === element.metadata?.id
+                )
                 const tabId = createTabId('sql', {
                   id: element?.metadata?.id as unknown as Snippet['id'],
                 })
-                const isPreview = isSQLEditorTabsEnabled && tabs.previewTabId === tabId
+                const isPreview = tabs.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
                 const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 
@@ -746,15 +739,13 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
               }}
               expandedIds={expandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
-                const isOpened =
-                  isSQLEditorTabsEnabled &&
-                  Object.values(tabs.tabsMap).some(
-                    (tab) => tab.metadata?.sqlId === element.metadata?.id
-                  )
+                const isOpened = Object.values(tabs.tabsMap).some(
+                  (tab) => tab.metadata?.sqlId === element.metadata?.id
+                )
                 const tabId = createTabId('sql', {
                   id: element?.metadata?.id as unknown as Snippet['id'],
                 })
-                const isPreview = isSQLEditorTabsEnabled && tabs.previewTabId === tabId
+                const isPreview = tabs.previewTabId === tabId
                 const isActive = !isPreview && element.metadata?.id === id
                 const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
 

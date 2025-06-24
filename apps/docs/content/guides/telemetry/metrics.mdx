@@ -22,10 +22,18 @@ The endpoint discussed in this article is not available on self-hosted.
 
 ## Accessing the metrics endpoint
 
-Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`. Access to the endpoint is secured via HTTP Basic Auth; the username is `service_role`, while the password is the service role JWT available through the Supabase dashboard.
+Your project's metrics endpoint is accessible at `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`.
+
+Access to the endpoint is secured via HTTP Basic Auth:
+
+- username: `service_role`
+- password: the service role JWT from the [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/api-keys)
+
+<ProjectConfigVariables variable="url" />
 
 ```shell
-> curl https://<project-ref>.supabase.co/customer/v1/privileged/metrics --user 'service_role:<service-role-jwt>'
+curl <project-url>/customer/v1/privileged/metrics \
+    --user 'service_role:<service-role-jwt>'
 ```
 
 ## Supabase Grafana

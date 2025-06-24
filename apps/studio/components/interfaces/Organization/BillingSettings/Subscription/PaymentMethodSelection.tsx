@@ -287,7 +287,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             <NewPaymentMethodElement
               ref={paymentRef}
               pending_subscription_flow_enabled={true}
-              email={selectedOrganization?.billing_email}
+              email={selectedOrganization?.billing_email ?? undefined}
               readOnly={readOnly}
             />
           </Elements>
