@@ -34,6 +34,13 @@ export function useProjectByRef(
   }, [project, projects, ref])
 }
 
+export const useIsAws = () => {
+  const project = useSelectedProject()
+  const isAws = project?.cloud_provider === PROVIDERS.AWS.id
+
+  return isAws
+}
+
 export const useIsAwsK8s = () => {
   const project = useSelectedProject()
   const isAwsK8s = project?.cloud_provider === PROVIDERS.AWS_K8S.id
