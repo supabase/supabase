@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic'
 import {
   Check,
   ClipboardCheck,
@@ -9,6 +10,7 @@ import {
   Lock,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   Timer,
   Users,
   UserX,
@@ -17,22 +19,30 @@ import { CubeIcon } from '@heroicons/react/outline'
 import { Image } from 'ui'
 
 import MainProducts from '../MainProducts'
-import AuthVisual from 'components/Products/AuthVisual'
-import RealtimeVisual from 'components/Products/RealtimeVisual'
-import FunctionsVisual from 'components/Products/FunctionsVisual'
-import { PlatformStarterSectionProps } from 'components/Solutions/PlatformStarterSection'
+import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
 import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
+import { frameworks } from 'components/Hero/HeroFrameworks'
 
 import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
 import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
 import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { FeaturesSection, HeroSection, Metadata } from './solutions.types'
+import {
+  FrameworkLink,
+  type FrameworkLinkProps,
+  type FeaturesSection,
+  type HeroSection,
+  type Metadata,
+} from './solutions.utils'
 import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
 import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { FrameworkLinkProps, MPCSectionProps } from 'components/Solutions/MPCSection'
+import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
+
+const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
+const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
+const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'))
 
 const data: () => {
   metadata: Metadata
@@ -43,7 +53,7 @@ const data: () => {
   resultsSection: ResultsSectionProps
   featureGrid: FeatureGridProps
   securitySection: SecuritySectionProps
-  platformStarterSection: PlatformStarterSectionProps
+  platformStarterSection: TwoColumnsSectionProps
   mcp: MPCSectionProps
 } = () => {
   const isXs = useBreakpoint(640)
@@ -728,8 +738,20 @@ const data: () => {
           seconds
         </>
       ),
-      subheading: 'to start building in seconds',
+      headingRight: (
+        <>
+          Or, start with <span className="text-foreground">Supabase AI Prompts</span>{' '}
+          <Sparkles size={24} className="inline text-foreground" />
+        </>
+      ),
       docsUrl: 'https://supabase.com/docs/guides/getting-started/ai-prompts',
+      leftFooter: (
+        <div className="grid grid-cols-5 divide-x divide-y rounded-lg overflow-hidden border">
+          {frameworks.map((framework) => (
+            <FrameworkLink key={framework.name} framework={framework} />
+          ))}
+        </div>
+      ),
       aiPrompts: [
         {
           id: 'auth-setup',

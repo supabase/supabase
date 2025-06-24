@@ -8,7 +8,7 @@ import type {
   Metadata,
   Quotes,
   Testimonials,
-} from './solutions.types'
+} from './solutions.utils'
 
 const data: {
   metadata: Metadata

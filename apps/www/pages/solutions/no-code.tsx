@@ -9,9 +9,7 @@ import getContent from 'data/solutions/no-code'
 
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('~/components/Solutions/PlatformSection'))
-const PlatformStarterSection = dynamic(
-  () => import('~/components/Solutions/PlatformStarterSection')
-)
+const PlatformStarterSection = dynamic(() => import('~/components/Solutions/TwoColumnsSection'))
 
 const BeginnersPage: NextPage = () => {
   const content = getContent()

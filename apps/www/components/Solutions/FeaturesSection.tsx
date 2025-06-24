@@ -5,7 +5,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import type {
   Feature,
   FeaturesSection as FeaturesSectionType,
-} from '~/data/solutions/solutions.types'
+} from '~/data/solutions/solutions.utils'
 
 const FeaturesSection: FC<FeaturesSectionType> = (props) => {
   return (

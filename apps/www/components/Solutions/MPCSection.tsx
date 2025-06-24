@@ -1,10 +1,12 @@
-import { Badge } from 'lucide-react'
 import React from 'react'
+import Link from 'next/link'
+
 import SectionContainer from '../Layouts/SectionContainer'
 import APISection, { type APIExample } from '../Sections/APISection'
-import Link from 'next/link'
 import { cn } from 'ui'
 import { useBreakpoint } from 'common'
+
+import type { FrameworkLinkProps } from 'data/solutions/solutions.utils'
 
 export interface MPCSectionProps {
   id: string
@@ -45,13 +47,13 @@ const MPCSection = ({
   )
 }
 
-export interface FrameworkLinkProps {
-  name: string
-  icon: string | React.ReactNode
-  docs: string
-}
-
-const FrameworkLink = ({ framework }: { framework: FrameworkLinkProps }) => {
+const FrameworkLink = ({
+  framework,
+  className,
+}: {
+  framework: FrameworkLinkProps
+  className?: string
+}) => {
   const isXs = useBreakpoint(640)
 
   return (
@@ -60,7 +62,8 @@ const FrameworkLink = ({ framework }: { framework: FrameworkLinkProps }) => {
       className={cn(
         'group relative p-4 transition-colors duration-200',
         'hover:bg-surface-100 -m-px rounded-lg',
-        'flex flex-col items-center gap-2 text-center aspect-square justify-center'
+        'flex flex-col items-center gap-2 text-center aspect-square justify-center',
+        className
       )}
     >
       <div className="text-foreground-lighter group-hover:text-foreground transition-colors">

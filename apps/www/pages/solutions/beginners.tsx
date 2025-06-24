@@ -8,11 +8,9 @@ import getContent from '~/data/solutions/beginners'
 
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('~/components/Solutions/PlatformSection'))
-const PlatformStarterSection = dynamic(
-  () => import('~/components/Solutions/PlatformStarterSection')
-)
+const PlatformStarterSection = dynamic(() => import('~/components/Solutions/TwoColumnsSection'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
-const BeginnerMPCSection = dynamic(() => import('~/components/Solutions/MPCSection'))
+const MPCSection = dynamic(() => import('~/components/Solutions/MPCSection'))
 
 const BeginnersPage: NextPage = () => {
   const content = getContent()
@@ -43,7 +41,7 @@ const BeginnersPage: NextPage = () => {
         <PlatformSection {...content.platform} />
         <TwitterSocialSection {...content.twitterSocialSection} />
         <PlatformStarterSection {...content.platformStarterSection} />
-        <BeginnerMPCSection {...content.mcp} />
+        <MPCSection {...content.mcp} />
       </Layout>
     </>
   )

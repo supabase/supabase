@@ -17,14 +17,15 @@ import {
   Check,
   InfoIcon,
 } from 'lucide-react'
-import AuthVisual from '~/components/Products/AuthVisual'
-import FunctionsVisual from '~/components/Products/FunctionsVisual'
-import RealtimeVisual from '~/components/Products/RealtimeVisual'
 import RealtimeLogs from '~/components/Products/Functions/RealtimeLogs'
-import DataAPIsVisual from '~/components/Products/DataAPIsVisual'
 
 import MainProducts from '~/data/MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import dynamic from 'next/dynamic'
+
+const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
+const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
+const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'))
 
 const data = {
   metadata: {

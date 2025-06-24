@@ -9,9 +9,7 @@ import getContent from '~/data/solutions/postgres-developers'
 
 const WhySupabase = dynamic(() => import('~/components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('~/components/Solutions/PlatformSection'))
-const PlatformStarterSection = dynamic(
-  () => import('~/components/Solutions/PlatformStarterSection')
-)
+const PlatformStarterSection = dynamic(() => import('~/components/Solutions/TwoColumnsSection'))
 const DXSection = dynamic(() => import('~/components/Solutions/DeveloperExperienceSection'))
 const ResultsSection = dynamic(() => import('~/components/Solutions/ResultsSection'))
 const FeatureGrid = dynamic(() => import('~/components/Solutions/FeatureGrid'))
