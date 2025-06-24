@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { getLogsChartQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { get, handleError } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { logsKeys } from './keys'
 import { UNIFIED_LOGS_STALE_TIME, UnifiedLogsVariables } from './unified-logs-infinite-query'
@@ -36,16 +36,9 @@ export async function getUnifiedLogsChart(
   // Get SQL query from utility function (with dynamic bucketing)
   const sql = getLogsChartQuery(search)
 
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        iso_timestamp_start: dateStart,
-        iso_timestamp_end: dateEnd,
-        project: projectRef,
-        sql,
-      },
-    },
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+    params: { path: { ref: projectRef } },
+    body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
     signal,
   })
 
