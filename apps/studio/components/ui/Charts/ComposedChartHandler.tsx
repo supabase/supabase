@@ -127,9 +127,11 @@ const ComposedChartHandler = ({
   const chartAttributes = useMemo(
     () =>
       attributes.map((attr) => {
-        // Handle ErrorsByStatus attributes with statusCode
-        if ('statusCode' in attr && attr.attribute === 'ErrorsByStatus' && attr.statusCode) {
+        if (attr.attribute === 'ErrorsByStatus' && attr.statusCode) {
           return { ...attr, attribute: `${attr.attribute}_${attr.statusCode}` }
+        }
+        if (attr.attribute === 'SignInAttempts' && attr.grantType) {
+          return { ...attr, attribute: `${attr.attribute}_${attr.grantType}` }
         }
         return attr
       }),

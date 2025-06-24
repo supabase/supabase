@@ -42,6 +42,7 @@ export type MultiAttribute = {
     dark: string
   }
   statusCode?: string
+  grantType?: string
   stackId?: string
   format?: string
   description?: string

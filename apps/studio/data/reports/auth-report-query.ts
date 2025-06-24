@@ -71,11 +71,12 @@ const metricSqlMap: Record<
       --sign-in-attempts
       select 
         timestamp_trunc(timestamp, ${granularity}) as timestamp,
+        json_value(event_message, "$.grant_type") as grant_type,
         count(*) as count
-      from auth_logs f
-      where json_value(f.event_message, "$.action") = 'login'
-      group by timestamp
-      order by timestamp desc
+      from auth_logs
+      where json_value(event_message, "$.path") = '/token'
+      group by timestamp, grant_type
+      order by timestamp desc, grant_type
     `
   },
 
@@ -256,6 +257,12 @@ export function useAuthReport({
           return {
             period_start: row.timestamp,
             [`${metricKey}_${row.status_code}`]: row.count,
+          }
+        }
+        if (metricKey === 'SignInAttempts') {
+          return {
+            period_start: row.timestamp,
+            [`${metricKey}_${row.grant_type}`]: row.count,
           }
         }
         return {
