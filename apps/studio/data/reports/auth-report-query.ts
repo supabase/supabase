@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { useMemo } from 'react'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 
 type BQGranularity = 'second' | 'minute' | 'hour' | 'day' | 'week'
 function analyticsIntervalToBQGranularity(interval: AnalyticsInterval): BQGranularity {
@@ -212,6 +214,103 @@ const metricSqlMap: Record<
       order by timestamp desc, status_code
     `
   },
+}
+
+export function useAuthLogsReport({
+  projectRef,
+  attributes,
+  startDate,
+  endDate,
+  interval,
+  enabled = true,
+}: {
+  projectRef: string
+  attributes: MultiAttribute[]
+  startDate: string
+  endDate: string
+  interval: AnalyticsInterval
+  enabled?: boolean
+}) {
+  const logsMetric = attributes.length > 0 ? attributes[0].attribute : ''
+  const sql = metricSqlMap[logsMetric as MetricKey]?.(startDate, endDate, interval) || ''
+
+  const {
+    data: rawData,
+    error,
+    isLoading,
+  } = useQuery(
+    ['auth-logs-report', projectRef, logsMetric, startDate, endDate, interval, sql],
+    async () => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: {
+            sql,
+            iso_timestamp_start: startDate,
+            iso_timestamp_end: endDate,
+          },
+        },
+      })
+      if (error) throw error
+      return data
+    },
+    {
+      enabled: Boolean(projectRef && sql && enabled),
+      refetchOnWindowFocus: false,
+    }
+  )
+
+  const { data, chartAttributes } = useMemo(() => {
+    const chartAttributes = attributes.map((attr) => {
+      if (attr.attribute === 'ErrorsByStatus' && attr.statusCode) {
+        return { ...attr, attribute: `${attr.attribute}_${attr.statusCode}` }
+      }
+      if (attr.attribute === 'SignInAttempts' && attr.grantType) {
+        return { ...attr, attribute: `${attr.attribute}_${attr.grantType}` }
+      }
+      return attr
+    })
+
+    if (!rawData) {
+      return { data: undefined, chartAttributes }
+    }
+
+    const result = rawData.result || []
+    const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
+
+    const data = Array.from(timestamps)
+      .sort()
+      .map((timestamp) => {
+        const point: any = { period_start: timestamp }
+
+        chartAttributes.forEach((attr) => {
+          point[attr.attribute] = 0
+        })
+
+        const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
+
+        matchingPoints.forEach((p: any) => {
+          if (logsMetric === 'ErrorsByStatus') {
+            point[`${logsMetric}_${p.status_code}`] = p.count
+          } else if (logsMetric === 'SignInAttempts') {
+            point[`${logsMetric}_${p.grant_type}`] = p.count
+          } else {
+            point[logsMetric] = p.count
+          }
+        })
+
+        return point
+      })
+
+    return { data, chartAttributes }
+  }, [rawData, attributes, logsMetric])
+
+  return {
+    data,
+    attributes: chartAttributes,
+    isLoading,
+    error,
+  }
 }
 
 export function useAuthReport({
