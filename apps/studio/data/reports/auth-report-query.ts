@@ -123,11 +123,13 @@ const metricSqlMap: Record<
       select 
         timestamp_trunc(timestamp, ${granularity}) as timestamp,
         json_value(event_message, "$.grant_type") as grant_type,
+        count(*) as request_count,
         round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_latency_ms,
         round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_latency_ms,
         round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_latency_ms,
-        round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_latency_ms,
-        round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_latency_ms
+        round((approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000), 2) as p50_latency_ms,
+        round((approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000), 2) as p95_latency_ms,
+        round((approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000), 2) as p99_latency_ms
       from auth_logs
       where json_value(event_message, "$.path") = '/token'
       group by timestamp, grant_type
@@ -179,6 +181,22 @@ const metricSqlMap: Record<
   `,
   ErrorsByStatus: (start, end, interval) => {
     const granularity = analyticsIntervalToBQGranularity(interval)
+
+    const ERROR_CODES = [
+      '400', // Bad Request
+      '401', // Unauthorized
+      '403', // Forbidden
+      '404', // Not Found
+      '409', // Conflict
+      '410', // Gone
+      '422', // Unprocessable Entity
+      '429', // Too Many Requests
+      '500', // Internal Server Error
+      '502', // Bad Gateway
+      '503', // Service Unavailable
+      '504', // Gateway Timeout
+    ]
+
     return `
       --auth-errors-by-status
       select 
@@ -188,7 +206,7 @@ const metricSqlMap: Record<
         json_value(event_message, "$.method") as method,
         count(*) as count
       from auth_logs
-      where json_value(event_message, "$.status") in ('403', '404', '422', '429', '500')
+      where json_value(event_message, "$.status") in (${ERROR_CODES.map((code) => `'${code}'`).join(',')})
       group by timestamp, status_code, path, method
       order by timestamp desc, status_code
     `
@@ -226,7 +244,6 @@ export function useAuthReport({
           path: { ref: projectRef },
           query: {
             sql,
-            project: projectRef,
             iso_timestamp_start: startDate,
             iso_timestamp_end: endDate,
           },
@@ -234,10 +251,26 @@ export function useAuthReport({
       })
       if (error) throw error
       // Format result for chart: [{ period_start, [metricKey]: count }]
-      const formatted = (data?.result || []).map((row: any) => ({
-        period_start: row.timestamp,
-        [metricKey]: row.count,
-      }))
+      const formatted = (data?.result || []).map((row: any) => {
+        if (metricKey === 'ErrorsByStatus') {
+          return {
+            period_start: row.timestamp,
+            [`${metricKey}_${row.status_code}`]: row.count,
+          }
+        }
+        return {
+          period_start: row.timestamp,
+          count: row.count,
+          [metricKey]: row.count,
+        }
+      })
+
+      console.log(`--------${metricKey.toUpperCase()}---------- \n
+      from: ${startDate} \n
+      to: ${endDate}`)
+      console.log(`${metricKey} RAW`, data)
+      console.log(`${metricKey} FORMATTED`, formatted)
+
       return formatted
     },
     {

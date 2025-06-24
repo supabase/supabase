@@ -56,25 +56,6 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     ],
   },
   {
-    id: 'password-reset-requests',
-    label: 'Password Reset Requests',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: false,
-    showLegend: false,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    attributes: [
-      {
-        attribute: 'PasswordResetRequests',
-        provider: 'logs',
-        label: 'Password Reset Requests',
-        enabled: true,
-      },
-    ],
-  },
-  {
     id: 'auth-errors',
     label: 'Auth Errors',
     valuePrecision: 0,
@@ -86,6 +67,28 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
     defaultChartStyle: 'bar',
     titleTooltip: 'The total number of auth errors by status code.',
     attributes: [
+      {
+        attribute: 'ErrorsByStatus',
+        provider: 'logs',
+        label: '400 Bad Request',
+        statusCode: '400',
+        enabled: true,
+        color: {
+          light: '#FFD54F',
+          dark: '#FFF176',
+        },
+      },
+      {
+        attribute: 'ErrorsByStatus',
+        provider: 'logs',
+        label: '401 Unauthorized',
+        statusCode: '401',
+        enabled: true,
+        color: {
+          light: '#FF8A65',
+          dark: '#FFAB91',
+        },
+      },
       {
         attribute: 'ErrorsByStatus',
         provider: 'logs',
@@ -106,6 +109,28 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
         color: {
           light: '#90A4AE',
           dark: '#B0BEC5',
+        },
+      },
+      {
+        attribute: 'ErrorsByStatus',
+        provider: 'logs',
+        label: '409 Conflict',
+        statusCode: '409',
+        enabled: true,
+        color: {
+          light: '#BA68C8',
+          dark: '#CE93D8',
+        },
+      },
+      {
+        attribute: 'ErrorsByStatus',
+        provider: 'logs',
+        label: '410 Gone',
+        statusCode: '410',
+        enabled: true,
+        color: {
+          light: '#A1887F',
+          dark: '#BCAAA4',
         },
       },
       {
@@ -140,6 +165,58 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
           light: '#B71C1C',
           dark: '#D32F2F',
         },
+      },
+      {
+        attribute: 'ErrorsByStatus',
+        provider: 'logs',
+        label: '502 Bad Gateway',
+        statusCode: '502',
+        enabled: true,
+        color: {
+          light: '#9575CD',
+          dark: '#B39DDB',
+        },
+      },
+      {
+        attribute: 'ErrorsByStatus',
+        provider: 'logs',
+        label: '503 Service Unavailable',
+        statusCode: '503',
+        enabled: true,
+        color: {
+          light: '#0097A7',
+          dark: '#4DD0E1',
+        },
+      },
+      {
+        attribute: 'ErrorsByStatus',
+        provider: 'logs',
+        label: '504 Gateway Timeout',
+        statusCode: '504',
+        enabled: true,
+        color: {
+          light: '#C0CA33',
+          dark: '#D4E157',
+        },
+      },
+    ],
+  },
+  {
+    id: 'password-reset-requests',
+    label: 'Password Reset Requests',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: false,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    attributes: [
+      {
+        attribute: 'PasswordResetRequests',
+        provider: 'logs',
+        label: 'Password Reset Requests',
+        enabled: true,
       },
     ],
   },

@@ -41,10 +41,8 @@ export default AuthReport
 
 const AuthUsage = () => {
   const { ref } = useParams()
-  const { project } = useProjectContext()
 
-  const state = useDatabaseSelectorStateSnapshot()
-  const defaultStart = dayjs().subtract(7, 'day').toISOString()
+  const defaultStart = dayjs().subtract(1, 'day').toISOString()
   const defaultEnd = dayjs().toISOString()
   const [dateRange, setDateRange] = useState<any>({
     period_start: { date: defaultStart, time_period: '1d' },

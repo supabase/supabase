@@ -124,6 +124,18 @@ const ComposedChartHandler = ({
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const chartHighlight = useChartHighlight()
 
+  const chartAttributes = useMemo(
+    () =>
+      attributes.map((attr) => {
+        // Handle ErrorsByStatus attributes with statusCode
+        if ('statusCode' in attr && attr.attribute === 'ErrorsByStatus' && attr.statusCode) {
+          return { ...attr, attribute: `${attr.attribute}_${attr.statusCode}` }
+        }
+        return attr
+      }),
+    [attributes]
+  )
+
   const databaseIdentifier = state.selectedDatabaseId
 
   // Use the custom hook at the top level of the component
@@ -172,21 +184,24 @@ const ComposedChartHandler = ({
       .map((timestamp) => {
         const point: any = { period_start: timestamp }
 
-        // Add regular attributes
-        attributes.forEach((attr, index) => {
+        const mergedPointForTimestamp: any = { period_start: timestamp }
+        attributeQueries.forEach((query) => {
+          if (!query.data?.data) return
+          query.data.data.forEach((p: any) => {
+            if (p.period_start === timestamp) {
+              Object.assign(mergedPointForTimestamp, p)
+            }
+          })
+        })
+
+        chartAttributes.forEach((attr) => {
           if (!attr) return
-          // Handle custom value attributes (like disk size)
+          if (attr.provider === 'reference-line') return
           if (attr.customValue !== undefined) {
             point[attr.attribute] = attr.customValue
             return
           }
-
-          // Skip reference line attributes here, we'll add them below
-          if (attr.provider === 'reference-line') return
-
-          const queryData = attributeQueries[index]?.data?.data
-          const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
-          point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
+          point[attr.attribute] = mergedPointForTimestamp[attr.attribute] ?? 0
         })
 
         // Add reference line values for each timestamp
@@ -200,7 +215,7 @@ const ComposedChartHandler = ({
       })
 
     return combined as DataPoint[]
-  }, [data, attributeQueries, attributes])
+  }, [data, attributeQueries, attributes, chartAttributes])
 
   const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
 
@@ -269,7 +284,7 @@ const ComposedChartHandler = ({
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
-          attributes={attributes}
+          attributes={chartAttributes}
           data={combinedData as DataPoint[]}
           format={format}
           xAxisKey="period_start"
@@ -290,6 +305,9 @@ const ComposedChartHandler = ({
           titleTooltip={titleTooltip}
           {...otherProps}
         />
+        <pre className="text-xs text-foreground-lighter overflow-x-auto max-h-40">
+          {JSON.stringify(combinedData, null, 2)}
+        </pre>
       </Panel.Content>
     </Panel>
   )
