@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { SearchParamsType } from './UnifiedLogs.types'
+import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
 // Pagination and control parameters
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
@@ -17,7 +17,7 @@ const BASE_CONDITIONS_EXCLUDED_PARAMS = [...PAGINATION_PARAMS, 'date', 'level'] 
  * @param search SearchParamsType object containing query parameters
  * @returns Object with whereConditions array and formatted WHERE clause
  */
-const buildQueryConditions = (search: SearchParamsType) => {
+const buildQueryConditions = (search: QuerySearchParamsType) => {
   const whereConditions: string[] = []
 
   // Process all search parameters for filtering
@@ -465,7 +465,7 @@ WITH unified_logs AS (
 /**
  * Unified logs SQL query
  */
-export const getUnifiedLogsQuery = (search: SearchParamsType): string => {
+export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
   // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
 
@@ -497,7 +497,7 @@ ${finalWhere}
  * Get a count query for the total logs within the timeframe
  * Also returns facets for all filter dimensions
  */
-export const getLogsCountQuery = (search: SearchParamsType): string => {
+export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
 
@@ -542,9 +542,9 @@ GROUP BY method
  * Enhanced logs chart query with dynamic bucketing based on time range
  * Incorporates dynamic bucketing from the older implementation
  */
-export const getLogsChartQuery = (search: SearchParamsType | Record<string, any>): string => {
+export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
   // Use the buildQueryConditions helper
-  const { finalWhere } = buildQueryConditions(search as SearchParamsType)
+  const { finalWhere } = buildQueryConditions(search)
 
   // Determine appropriate bucketing level based on time range
   const truncationLevel = calculateChartBucketing(search)
