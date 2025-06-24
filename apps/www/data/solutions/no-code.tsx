@@ -169,9 +169,11 @@ const data: () => {
         'Supabase includes everything you need to create the perfect app for your brand, business, or just for fun.',
       className: cn(
         '[&_div.grid]:sm:divide-x [&_div.grid]:divide-y',
-        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-l-0',
+        '[&_div.grid>div:nth-child(2n+1)]:sm:!border-l-0',
+        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-l',
         '[&_div.grid>div:nth-child(2n+2)]:lg:!border-l',
         '[&_div.grid>div:nth-child(3n+3)]:lg:!border-l-0',
+        '[&_div.grid>div:nth-child(2n+3)]:lg:!border-l',
         '[&_div.grid>div:nth-child(2)]:lg:!border-t-0'
       ),
       features: [
@@ -186,10 +188,10 @@ const data: () => {
               <span className="text-foreground">trusted by enterprises</span>.
             </>
           ),
-          className: 'lg:col-span-2 flex-col lg:flex-row',
+          className: 'lg:col-span-2 flex-col lg:flex-row px-4 lg:pr-0',
           image: (
             <div className="relative w-full max-w-xl pt-8">
-              <div className="w-full h-full rounded-tl-lg overflow-hidden border-t border-l bg-surface-75">
+              <div className="w-full h-full rounded-t-lg lg:rounded-tr-none overflow-hidden border-t border-l border-r lg:border-r-0 bg-surface-75">
                 <table className="min-w-full m-0">
                   <thead className="p-0">
                     <tr className="border-b">

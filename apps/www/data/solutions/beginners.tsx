@@ -168,10 +168,10 @@ const data: () => {
               <span className="text-foreground">trusted by enterprises</span>.
             </>
           ),
-          className: 'sm:col-span-2 flex-col lg:flex-row',
+          className: 'sm:col-span-2 flex-col lg:flex-row px-4 lg:pr-0',
           image: (
             <div className="relative w-full max-w-xl pt-8">
-              <div className="w-full h-full rounded-tl-lg overflow-hidden border-t border-l bg-surface-75">
+              <div className="w-full h-full rounded-t-lg lg:rounded-tr-none overflow-hidden border-t border-l border-r lg:border-r-0 bg-surface-75">
                 <table className="min-w-full m-0">
                   <thead className="p-0">
                     <tr className="border-b">
@@ -205,11 +205,11 @@ const data: () => {
               </div>
               <div
                 className="
-                absolute pointer-events-none
-                w-full h-full
-                inset-0 top-auto
-                bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
-              "
+                  absolute pointer-events-none
+                  w-full h-full
+                  inset-0 top-auto
+                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                "
               />
             </div>
           ),

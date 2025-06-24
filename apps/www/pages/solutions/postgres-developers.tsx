@@ -4,7 +4,7 @@ import { NextSeo } from 'next-seo'
 
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
-import SubStickyNav from '~/components/SolutionsStickyNav'
+import SubStickyNav from 'components/SolutionsStickyNav'
 import getContent from 'data/solutions/postgres-developers'
 import { Solutions } from 'data/Solutions'
 

@@ -1,4 +1,5 @@
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
+import { data as solutions } from 'data/Solutions'
 
 const footerData = [
   {
@@ -41,13 +42,13 @@ const footerData = [
         url: '/launch-week',
       },
       {
-        text: 'AI Builders',
-        url: '/solutions/ai-builders',
-      },
-      {
         text: 'Switch from Neon',
         url: '/solutions/switch-from-neon',
       },
+      ...solutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: `/solutions/${solution.id}`,
+      })),
     ],
   },
   {

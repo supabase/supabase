@@ -15,7 +15,7 @@ import {
   UserX,
 } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import { cn, Image, Input_Shadcn_, Switch } from 'ui'
 
 import MainProducts from '../MainProducts'
 import AuthVisual from 'components/Products/AuthVisual'
@@ -42,6 +42,10 @@ import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
 import DatabaseVisual from '../../components/Products/DatabaseVisual'
+import Logos from '../../components/logos'
+import { useState } from 'react'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 const data: () => {
   metadata: Metadata
@@ -76,23 +80,24 @@ const data: () => {
           Supabase is that, too.
         </>,
       ],
+      footer: <Logos showHeading={false} className="mt-12" />,
       image: (
         <DatabaseVisual
           className="group
-        [&>span]:!w-[150%]
-        [&>span]:!h-[150%]
-        [&>span]:!inset-auto
-        [&>span]:!-mx-auto
-        [&>span]:!-left-28
-        [&>span]:sm:!-left-40
-        [&>span]:lg:!-left-20
-        [&>span]:xl:!-left-40
-        [&>span]:!-top-16
-        [&>span]:md:!-top-28
-        [&>span]:!flex
-        [&>span]:!items-center
-        [&>span]:!justify-center
-        "
+            [&>span]:!w-[120%]
+            [&>span]:!h-[120%]
+            [&>span]:!inset-auto
+            [&>span]:!-mx-auto
+            [&>span]:!-left-10
+            [&>span]:sm:!-left-20
+            [&>span]:lg:!-left-10
+            [&>span]:!-top-16
+            [&>span]:md:!-top-28
+            [&>span]:xl:!-top-32
+            [&>span]:!flex
+            [&>span]:!items-center
+            [&>span]:!justify-center
+          "
           hasGlow={false}
         />
       ),
@@ -172,6 +177,14 @@ const data: () => {
       ),
       subheading:
         'Supabase includes everything you need to create the perfect app for your brand, business, or just for fun.',
+      className: cn(
+        '[&_div.grid>div:first-child]:sm:!border-l-0',
+        '[&_div.grid>div]:sm:-m-px',
+        '[&_div.grid>div:nth-child(2n+1)]:sm:!border-l',
+        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-t',
+        '[&_div.grid>div:nth-child(3n+3)]:lg:!border-l-0',
+        '[&_div.grid>div:nth-child(2)]:lg:!border-t-0'
+      ),
       features: [
         {
           id: 'database',
@@ -184,10 +197,10 @@ const data: () => {
               <br /> No forks: 100% pure Postgres.
             </>
           ),
-          className: 'lg:col-span-2 flex-col lg:flex-row',
+          className: 'sm:col-span-2 flex-col px-4 lg:pr-0 lg:flex-row',
           image: (
             <div className="relative w-full max-w-xl pt-8">
-              <div className="w-full h-full rounded-tl-lg overflow-hidden border-t border-l bg-surface-75">
+              <div className="w-full h-full rounded-t-lg lg:rounded-tr-none overflow-hidden border-t border-l border-r lg:border-r-0 bg-surface-75">
                 <table className="min-w-full m-0">
                   <thead className="p-0">
                     <tr className="border-b">
@@ -399,18 +412,19 @@ const data: () => {
               , and more.
             </>
           ),
+          className: 'sm:!border-l-0',
           image: (
             <Image
               draggable={false}
               src={{
-                dark: '/images/solutions/neon/rls-dark.svg',
-                light: '/images/solutions/neon/rls-light.svg',
+                dark: '/images/solutions/postgres-developers/sql-editor-dark.jpg',
+                light: '/images/solutions/postgres-developers/sql-editor-light.jpg',
               }}
               alt="Row Level Security"
               width={100}
               height={100}
               quality={100}
-              containerClassName="-mt-8 sm:mt-0 mb-8"
+              containerClassName="ml-4 md:ml-6 xl:ml-8 border-t border-l !rounded-none !rounded-tl-lg"
             />
           ),
         },
@@ -425,18 +439,27 @@ const data: () => {
             </>
           ),
           image: (
-            <Image
-              draggable={false}
-              src={{
-                dark: '/images/solutions/neon/rls-dark.svg',
-                light: '/images/solutions/neon/rls-light.svg',
-              }}
-              alt="Row Level Security"
-              width={100}
-              height={100}
-              quality={100}
-              containerClassName="-mt-8 sm:mt-0 mb-8"
-            />
+            <div className="w-full p-4 lg:p-6 xl:p-8 h-full flex items-center justify-center">
+              <div className="left-4 lg:left-6 xl:left-8 absolute w-full md:w-[600px] bg-surface-100 border border-overlay flex flex-col overflow-hidden rounded shadow-sm">
+                <div className="border-b border-overlay flex justify-between w-full py-3 px-5">
+                  <div className="max-w-[85%] flex items-center space-x-3 truncate">
+                    <div className="h-5 m-0 text-sm truncate cursor-pointer text-foreground">
+                      Add a new Function
+                    </div>
+                  </div>
+                </div>
+                <div className="border-b mb-8 py-4 px-5 flex flex-col md:flex-row gap-4">
+                  <p className="text-sm text-foreground-light">Name of function</p>
+
+                  <div className="flex flex-col gap-2">
+                    <Input_Shadcn_ placeholder="Name of function" />
+                    <span className="text-foreground-muted text-sm">
+                      Name will also be used for the function name in postgres
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           ),
         },
         {
@@ -450,18 +473,22 @@ const data: () => {
             </>
           ),
           image: (
-            <Image
-              draggable={false}
-              src={{
-                dark: '/images/solutions/neon/rls-dark.svg',
-                light: '/images/solutions/neon/rls-light.svg',
-              }}
-              alt="Row Level Security"
-              width={100}
-              height={100}
-              quality={100}
-              containerClassName="-mt-8 sm:mt-0 mb-8"
-            />
+            <div className="w-full p-4 lg:p-6 xl:p-8 h-full flex items-center justify-center">
+              <div className="w-full bg-surface-100 border border-overlay flex flex-col overflow-hidden rounded shadow-sm">
+                <div className="border-b border-overlay flex justify-between w-full py-3 px-5">
+                  <div className="max-w-[85%] flex items-center space-x-3 truncate">
+                    <h3 className="h-5 m-0 text-sm truncate cursor-pointer text-foreground">
+                      PGTAP
+                    </h3>
+                  </div>
+
+                  <ControlledSwitch />
+                </div>
+                <div className="py-2 px-5">
+                  <p className="text-foreground-light text-sm">Unit testing for PostreSQL</p>
+                </div>
+              </div>
+            </div>
           ),
         },
       ],
@@ -1074,5 +1101,10 @@ export const getEditors: (isXs: boolean) => FrameworkLinkProps[] = (isXs) => [
     docs: '/docs/guides/getting-started/mcp#visual-studio-code-copilot',
   },
 ]
+
+const ControlledSwitch = () => {
+  const [isOn, setIsOn] = useState(true)
+  return <Switch checked={isOn} onCheckedChange={() => setIsOn(!isOn)} />
+}
 
 export default data

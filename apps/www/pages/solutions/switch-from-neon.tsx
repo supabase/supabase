@@ -3,9 +3,7 @@ import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 
 import Layout from 'components/Layouts/Default'
-import SubStickyNav from '~/components/SolutionsStickyNav'
 import content from 'data/solutions/neon'
-import { Solutions } from 'data/Solutions'
 
 const ProductHeader = dynamic(() => import('components/Sections/ProductHeader2'))
 const SingleQuote = dynamic(() => import('components/Sections/SingleQuote'))
@@ -32,7 +30,6 @@ const Neon: NextPage = () => {
         nofollow={true}
       />
       <Layout className="overflow-visible">
-        <SubStickyNav activeItem={Solutions.neon} />
         <ProductHeader {...content.heroSection} />
         <SingleQuote
           quote={{

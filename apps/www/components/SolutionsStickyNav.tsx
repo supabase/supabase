@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import SectionContainer from 'components/Layouts/SectionContainer'
 import { SolutionTypes, data as solutions } from 'data/Solutions'
 
 interface Props {
