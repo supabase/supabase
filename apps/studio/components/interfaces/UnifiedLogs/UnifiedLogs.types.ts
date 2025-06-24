@@ -26,6 +26,7 @@ export type LogsMeta = {
 export type PageParam = { cursor: number; direction: 'next' | 'prev' }
 
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
+export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'>
 
 export type SearchParams = {
   [key: string]: string | string[] | undefined

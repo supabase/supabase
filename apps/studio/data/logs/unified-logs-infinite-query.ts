@@ -1,7 +1,10 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 
 import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { PageParam, SearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import {
+  PageParam,
+  QuerySearchParamsType,
+} from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { logsKeys } from './keys'
@@ -12,9 +15,9 @@ export const UNIFIED_LOGS_STALE_TIME = 1000 * 60 * 5 // 5 minutes
 
 export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
-export type UnifiedLogsVariables = { projectRef?: string; search: SearchParamsType }
+export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 
-export const getUnifiedLogsISOStartEnd = (search: SearchParamsType) => {
+export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
   // Extract date range from search or use default (last hour)
   let isoTimestampStart: string
   let isoTimestampEnd: string

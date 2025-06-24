@@ -51,6 +51,7 @@ import { FunctionLogsTab } from './components/FunctionLogsTab'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields, sheetFields } from './UnifiedLogs.fields'
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName, logEventBus } from './UnifiedLogs.utils'
 
 // Debug mode flag - set to true to enable detailed logs
@@ -85,6 +86,18 @@ export const UnifiedLogs = () => {
     []
   )
 
+  // Create a stable query key object by removing nulls/undefined, uuid, and live
+  // Mainly to prevent the react queries from unnecessarily re-fetching
+  const searchParameters = Object.entries(search).reduce(
+    (acc, [key, value]) => {
+      if (!['uuid', 'live'].includes(key) && value !== null && value !== undefined) {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as Record<string, any>
+  ) as QuerySearchParamsType
+
   const {
     data: unifiedLogsData,
     isLoading,
@@ -93,9 +106,12 @@ export const UnifiedLogs = () => {
     refetch,
     fetchNextPage,
     fetchPreviousPage,
-  } = useUnifiedLogsInfiniteQuery({ projectRef, search })
-  const { data: counts } = useUnifiedLogsCountQuery({ projectRef, search })
-  const { data: unifiedLogsChart = [] } = useUnifiedLogsChartQuery({ projectRef, search })
+  } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+  const { data: counts } = useUnifiedLogsCountQuery({ projectRef, search: searchParameters })
+  const { data: unifiedLogsChart = [] } = useUnifiedLogsChartQuery({
+    projectRef,
+    search: searchParameters,
+  })
 
   const flatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
@@ -162,7 +178,7 @@ export const UnifiedLogs = () => {
     if ((isLoading || isFetching) && !flatData.length) return
     const selectedRowKey = Object.keys(rowSelection)?.[0]
     return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-  }, [rowSelection, table, isLoading, isFetching, flatData])
+  }, [rowSelection, flatData])
 
   const selectedRowKey = Object.keys(rowSelection)?.[0]
 
@@ -246,7 +262,6 @@ export const UnifiedLogs = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sorting])
 
-  // TODO: can only share uuid within the first batch
   useEffect(() => {
     if (isLoading || isFetching) return
     if (Object.keys(rowSelection)?.length && !selectedRow) {

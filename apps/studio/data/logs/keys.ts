@@ -1,9 +1,9 @@
-import { SearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 
 export const logsKeys = {
   unifiedLogsInfinite: (
     projectRef: string | undefined,
-    searchParams: SearchParamsType | undefined
+    searchParams: QuerySearchParamsType | undefined
   ) =>
     [
       'projects',
@@ -12,7 +12,10 @@ export const logsKeys = {
       'logs-data',
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
-  unifiedLogsCount: (projectRef: string | undefined, searchParams: SearchParamsType | undefined) =>
+  unifiedLogsCount: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType | undefined
+  ) =>
     [
       'projects',
       projectRef,
@@ -20,7 +23,10 @@ export const logsKeys = {
       'count-data',
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
-  unifiedLogsChart: (projectRef: string | undefined, searchParams: SearchParamsType | undefined) =>
+  unifiedLogsChart: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType | undefined
+  ) =>
     [
       'projects',
       projectRef,
