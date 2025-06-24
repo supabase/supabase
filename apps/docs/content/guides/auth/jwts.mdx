@@ -192,15 +192,18 @@ Your tokens should include the following claims:
   "role": "authenticated"
 }
 
-Explanation of claims:
-- `aud`: Audience – typically set to `"authenticated"` for Supabase projects
-- `sub`: Subject – the user's unique ID
-- `iss`: Issuer – identifies who created the token (your app name)
-- `exp`: Expiration time in UNIX timestamp
-- `email`: Optional – used for user identification
-- `role`: Supabase uses this for role-based access
-
 ```
+
+**Explanation of claims:**
+
+- `aud`: Audience – typically set to `"authenticated"` for Supabase projects  
+- `sub`: Subject – the user's unique ID  
+- `iss`: Issuer – identifies who created the token (your app name)  
+- `exp`: Expiration time in UNIX timestamp  
+- `email`: Optional – used for user identification  
+- `role`: Supabase uses this for role-based access  
+
+
 
 
 To make Supabase validate your tokens correctly, ensure your `.env` or environment config includes:
