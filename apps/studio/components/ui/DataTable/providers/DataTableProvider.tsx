@@ -7,7 +7,7 @@ import type {
   Table,
   VisibilityState,
 } from '@tanstack/react-table'
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, ReactNode, useContext, useMemo } from 'react'
 
 import { DataTableFilterField } from '../DataTable.types'
 import { ControlsProvider } from './ControlsProvider'
@@ -45,7 +45,7 @@ export function DataTableProvider<TData, TValue>({
   ...props
 }: Partial<DataTableStateContextType> &
   DataTableBaseContextType<TData, TValue> & {
-    children: React.ReactNode
+    children: ReactNode
   }) {
   const value = useMemo(
     () => ({
