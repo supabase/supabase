@@ -26,12 +26,14 @@ import {
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { useIsAwsK8s } from 'hooks/misc/useSelectedProject'
 
 const RestartServerButton = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const isProjectActive = useIsProjectActive()
+  const isAwsK8s = useIsAwsK8s()
   const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
 
   const projectRef = project?.ref ?? ''
@@ -101,7 +103,8 @@ const RestartServerButton = () => {
                 project === undefined ||
                 !canRestartProject ||
                 !isProjectActive ||
-                projectRestartDisabled
+                projectRestartDisabled ||
+                isAwsK8s
               }
               onClick={() => setServiceToRestart('project')}
             >
