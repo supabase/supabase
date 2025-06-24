@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 import { FeedbackWidget } from './FeedbackWidget'
 
-const FeedbackDropdown = () => {
+const FeedbackDropdown = ({ className }: { className?: string }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [screenshot, setScreenshot] = useState<string>()
@@ -29,8 +29,9 @@ const FeedbackDropdown = () => {
             setStage('select')
           }}
           type="outline"
+          className="rounded-full h-[32px] border-border"
         >
-          <span className="hidden md:flex">Feedback</span>
+          <span className={className}>Feedback</span>
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_

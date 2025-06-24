@@ -53,9 +53,8 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       confirmString={name || ''}
       text={
         <>
-          This will delete the webhook
-          <span className="text-bold text-foreground">{name}</span> rom the schema
-          <span className="text-bold text-foreground">{schema}</span>
+          This will delete the webhook <span className="text-bold text-foreground">{name}</span>{' '}
+          from the schema <span className="text-bold text-foreground">{schema}</span>
         </>
       }
       alert={{ title: 'You cannot recover this webhook once deleted.' }}

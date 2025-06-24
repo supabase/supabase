@@ -3,8 +3,7 @@ import { useMemo } from 'react'
 
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { copyToClipboard } from 'lib/helpers'
-import { Badge } from 'ui'
+import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,

@@ -17,10 +17,9 @@ import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -52,8 +51,6 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
-import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -94,10 +91,9 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const isOptedInToAI = useOrgOptedIntoAi()
+  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+  const includeSchemaMetadata = (isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM
 
   const {
     sourceSqlDiff,
@@ -140,10 +136,6 @@ export const SQLEditor = () => {
   const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   useAddDefinitions(id, monacoRef.current)
-
-  /** React query data fetching  */
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
@@ -218,10 +210,8 @@ export const SQLEditor = () => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
         snapV2.renameSnippet({ id, name })
-        if (isSQLEditorTabsEnabled && ref) {
-          const tabId = createTabId('sql', { id })
-          tabs.updateTab(tabId, { label: name })
-        }
+        const tabId = createTabId('sql', { id })
+        tabs.updateTab(tabId, { label: name })
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
@@ -295,7 +285,7 @@ export const SQLEditor = () => {
           return
         }
 
-        if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
+        if (!isHipaaProjectDisallowed && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -322,6 +312,7 @@ export const SQLEditor = () => {
           sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
           autoLimit: appendAutoLimit ? limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+          isStatementTimeoutDisabled: true,
           contextualInvalidation: true,
           handleError: (error) => {
             throw error
@@ -340,7 +331,7 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
-      hasHipaaAddon,
+      isHipaaProjectDisallowed,
       execute,
       getImpersonatedRoleState,
       setAiTitle,

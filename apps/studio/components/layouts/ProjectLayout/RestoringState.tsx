@@ -1,16 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { projectKeys } from 'data/projects/keys'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { getWithTimeout } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
@@ -18,7 +17,6 @@ const RestoringState = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
-  const checkServerInterval = useRef<number>()
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -26,6 +24,23 @@ const RestoringState = () => {
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
   const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
+
+  useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+      },
+      onSuccess: async (res) => {
+        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+          setIsCompleted(true)
+        } else {
+          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+        }
+      },
+    }
+  )
 
   const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -47,34 +62,12 @@ const RestoringState = () => {
     downloadBackup({ ref, backup: logicalBackups[0] })
   }
 
-  async function checkServer() {
-    if (!project) return
-
-    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
-      timeout: 2000,
-    })
-    if (projectStatus && !projectStatus.error) {
-      const { status } = projectStatus
-      if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-        clearInterval(checkServerInterval.current)
-        setIsCompleted(true)
-      } else {
-        queryClient.invalidateQueries(projectKeys.detail(ref))
-      }
-    }
-  }
-
   const onConfirm = async () => {
     if (!project) return console.error('Project is required')
 
     setLoading(true)
     if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
-
-  useEffect(() => {
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => clearInterval(checkServerInterval.current)
-  }, [])
 
   return (
     <div className="flex items-center justify-center h-full">

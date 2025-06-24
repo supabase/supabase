@@ -1,4 +1,4 @@
-import { ExternalLink, Github, Mail } from 'lucide-react'
+import { ExternalLink, Github } from 'lucide-react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { FeatureBanner } from 'components/ui/FeatureBanner'
@@ -119,7 +119,13 @@ export const ApiKeysComingSoonBanner = () => {
         </p>
         <div className="mt-4">
           <Button type="default" icon={<Github />}>
-            Learn more
+            <a
+              href="https://github.com/orgs/supabase/discussions/29260"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more
+            </a>
           </Button>
         </div>
       </div>
@@ -188,7 +194,7 @@ export const ApiKeysFeedbackBanner = () => {
         <p className="text-sm text-foreground-lighter">
           Having trouble with the new API keys?{' '}
           <a
-            href="/support/new?category=Problem&subject=Help%20with%20API%20keys&message=I'm%20experiencing%20problems%20with%20the%20new%20API%20keys%20feature.%20Please%20describe%20your%20specific%20issue%20here."
+            href="/dashboard/support/new?category=Problem&subject=Help%20with%20API%20keys&message=I'm%20experiencing%20problems%20with%20the%20new%20API%20keys%20feature.%20Please%20describe%20your%20specific%20issue%20here."
             className="inline-flex items-center gap-1 text-foreground"
           >
             Contact support

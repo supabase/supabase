@@ -14,8 +14,10 @@ import { APIKeysData } from 'data/api-keys/api-keys-query'
 
 export const APIKeyRow = ({
   apiKey,
+  lastSeen,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
+  lastSeen?: { timestamp: string }
 }) => {
   const MotionTableRow = motion(TableRow)
 
@@ -39,6 +41,7 @@ export const APIKeyRow = ({
         </div>
       </TableCell>
       <TableCell className="py-2">{apiKey.description || '/'}</TableCell>
+      <TableCell className="py-2">{lastSeen?.timestamp ?? '/'}</TableCell>
 
       <TableCell className="flex justify-end">
         <DropdownMenu>
@@ -52,7 +55,7 @@ export const APIKeyRow = ({
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
-            <APIKeyDeleteDialog apiKey={apiKey} />
+            <APIKeyDeleteDialog apiKey={apiKey} lastSeen={lastSeen} />
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>
