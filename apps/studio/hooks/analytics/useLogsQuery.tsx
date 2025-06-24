@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useState, useEffect } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { IS_PLATFORM } from 'common'
 import {
@@ -37,7 +37,6 @@ const useLogsQuery = (
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
-    project: projectRef,
     iso_timestamp_start: initialParams.iso_timestamp_start
       ? initialParams.iso_timestamp_start
       : defaultHelper.calcFrom(),
