@@ -2,9 +2,9 @@ import { noop } from 'lodash'
 import { Button } from 'ui'
 
 import type { Branch } from 'data/branches/branches-query'
+import { ChevronRight } from 'lucide-react'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { PreviewBranchesEmptyState } from './EmptyStates'
-import { ChevronRight } from 'lucide-react'
 
 const MAX_BRANCHES_OVERVIEW = 10
 
@@ -21,7 +21,7 @@ interface OverviewProps {
   showProductionBranch?: boolean
 }
 
-const Overview = ({
+export const Overview = ({
   isLoading,
   isSuccess,
   repo,
@@ -76,5 +76,3 @@ const Overview = ({
     </>
   )
 }
-
-export default Overview
