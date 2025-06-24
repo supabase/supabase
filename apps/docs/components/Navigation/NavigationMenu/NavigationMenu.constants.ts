@@ -1335,20 +1335,20 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Quickstart',
+          name: 'Quickstart (CLI)',
           url: '/guides/functions/quickstart',
         },
         {
-          name: 'Create an Edge Function Locally',
-          url: '/guides/functions/local-quickstart',
+          name: 'Quickstart (Dashboard)',
+          url: '/guides/functions/quickstart-dashboard',
+        },
+        {
+          name: 'Development Environment',
+          url: '/guides/functions/development-environment',
         },
         {
           name: 'Deploy to Production',
           url: '/guides/functions/deploy',
-        },
-        {
-          name: 'Setting up your editor',
-          url: '/guides/functions/local-development',
         },
         {
           name: 'Development tips',
