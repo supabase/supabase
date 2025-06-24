@@ -15,7 +15,8 @@ import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const project = useSelectedProject()
-  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI =
+    project?.cloud_provider === 'AWS' || project?.cloud_provider === 'AWS_K8S'
 
   return (
     <>
