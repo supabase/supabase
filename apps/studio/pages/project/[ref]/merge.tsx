@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/router'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -7,27 +7,26 @@ import { useParams } from 'common'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
-import { useMigrationUpsertMutation } from 'data/database/migration-upsert-mutation'
-import { useWorkflowRunQuery } from 'data/workflow-runs/workflow-run-query'
-import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
+import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
-import { Badge, Button, NavMenu, NavMenuItem, cn } from 'ui'
+import { Badge, Button, NavMenu, NavMenuItem, cn, Alert } from 'ui'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { GitBranchIcon, GitMerge, Shield, ExternalLink } from 'lucide-react'
+import { GitBranchIcon, GitMerge, Shield, ExternalLink, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useFlag } from 'hooks/ui/useFlag'
+import { Admonition } from 'ui-patterns'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -39,8 +38,13 @@ const MergePage: NextPageWithLayout = () => {
   const project = useSelectedProject()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // State to track related workflow runs with their project refs
+  const [relatedWorkflowRunIds, setRelatedWorkflowRunIds] = useState<Record<string, string>>({})
+
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
+
+  const parentProject = useProjectByRef(parentProjectRef)
 
   // Get branch information
   const { data: branches } = useBranchesQuery(
@@ -55,41 +59,68 @@ const MergePage: NextPageWithLayout = () => {
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
-  // Get workflow run ID from URL query parameter
-  const workflowRunId = router.query.workflow_run_id as string | undefined
-  const attemptedMerge = !!workflowRunId
+  // Get migrations for both current branch and main branch
+  const { data: currentBranchMigrations, refetch: refetchCurrentBranchMigrations } =
+    useMigrationsQuery(
+      {
+        projectRef: ref,
+        connectionString: project?.connectionString,
+      },
+      {
+        enabled: gitlessBranching && !!ref,
+        staleTime: 30000, // 30 seconds
+      }
+    )
 
-  // Get workflow runs to find the specific workflow run for status
-  const { data: workflowRuns } = useWorkflowRunsQuery(
-    { projectRef: parentProjectRef },
+  const { data: mainBranchMigrations, refetch: refetchMainBranchMigrations } = useMigrationsQuery(
     {
-      enabled: gitlessBranching && !!parentProjectRef && !!workflowRunId,
-      refetchInterval: 3000, // Poll every 3 seconds to check for status changes
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
+      projectRef: parentProjectRef,
+      // @ts-ignore - connectionString property exists but TypeScript doesn't recognize it
+      connectionString: parentProject?.connectionString,
+    },
+    {
+      enabled: gitlessBranching && !!parentProjectRef,
       staleTime: 0,
     }
   )
 
-  // Find the specific workflow run by ID
-  const currentWorkflowRun = workflowRuns?.find((run) => run.id === workflowRunId)
+  console.log('migrations:', currentBranchMigrations, mainBranchMigrations)
 
-  // Determine if we should be polling based on workflow status
-  const isPolling = Boolean(
-    currentWorkflowRun &&
-      currentWorkflowRun.status !== 'FUNCTIONS_DEPLOYED' &&
-      currentWorkflowRun.status !== 'MIGRATIONS_FAILED' &&
-      currentWorkflowRun.status !== 'FUNCTIONS_FAILED'
-  )
+  // Check if current branch is out of date with main branch
+  const isBranchOutOfDate = useMemo(() => {
+    if (!currentBranchMigrations || !mainBranchMigrations) return false
 
-  // Get logs for the specific workflow run and poll until completion
-  const { data: workflowRunLogs } = useWorkflowRunQuery(
-    { workflowRunId },
-    {
-      enabled: gitlessBranching && !!workflowRunId,
-      refetchInterval: isPolling ? 2000 : false, // Poll logs every 2 seconds until complete
+    // Get the latest migration version from main branch
+    const latestMainMigration = mainBranchMigrations[0] // migrations are ordered by version desc
+    if (!latestMainMigration) return false
+
+    // Check if current branch has this latest migration
+    const hasLatestMigration = currentBranchMigrations.some(
+      (migration) => migration.version === latestMainMigration.version
+    )
+
+    return !hasLatestMigration
+  }, [currentBranchMigrations, mainBranchMigrations])
+
+  // Get the count of migrations that the branch is missing
+  const missingMigrationsCount = useMemo(() => {
+    if (!currentBranchMigrations || !mainBranchMigrations || !isBranchOutOfDate) return 0
+
+    const currentVersions = new Set(currentBranchMigrations.map((m) => m.version))
+    return mainBranchMigrations.filter((m) => !currentVersions.has(m.version)).length
+  }, [currentBranchMigrations, mainBranchMigrations, isBranchOutOfDate])
+
+  // Get workflow run ID from URL query parameter and initialize state
+  useEffect(() => {
+    const workflowRunId = router.query.workflow_run_id as string | undefined
+    if (workflowRunId && !relatedWorkflowRunIds[workflowRunId]) {
+      // Default to current branch project ref if not specified
+      setRelatedWorkflowRunIds((prev) => ({
+        ...prev,
+        [workflowRunId]: ref || '',
+      }))
     }
-  )
+  }, [router.query.workflow_run_id, ref, relatedWorkflowRunIds])
 
   // Get diff using the new endpoint
   const {
@@ -106,76 +137,44 @@ const MergePage: NextPageWithLayout = () => {
     {
       enabled: gitlessBranching && !!currentBranch?.id && !!parentProjectRef,
       refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       staleTime: 0,
     }
   )
 
   // Get edge functions for both branches
-  const {
-    data: currentBranchFunctions,
-    isLoading: isCurrentFunctionsLoading,
-    refetch: refetchCurrentBranchFunctions,
-  } = useEdgeFunctionsQuery(
-    { projectRef: ref },
-    {
-      enabled: gitlessBranching && !!ref,
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      staleTime: 0,
-    }
-  )
+  const { data: currentBranchFunctions, isLoading: isCurrentFunctionsLoading } =
+    useEdgeFunctionsQuery(
+      { projectRef: ref },
+      {
+        enabled: gitlessBranching && !!ref,
+        staleTime: 30000, // 30 seconds
+      }
+    )
 
-  const {
-    data: mainBranchFunctions,
-    isLoading: isMainFunctionsLoading,
-    refetch: refetchMainBranchFunctions,
-  } = useEdgeFunctionsQuery(
+  const { data: mainBranchFunctions, isLoading: isMainFunctionsLoading } = useEdgeFunctionsQuery(
     { projectRef: parentProjectRef },
     {
       enabled: gitlessBranching && !!parentProjectRef,
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      staleTime: 0,
+      staleTime: 30000, // 30 seconds
     }
   )
 
-  // Show toast notifications when workflow status changes
-  useEffect(() => {
-    if (currentWorkflowRun?.status) {
-      const status = currentWorkflowRun.status
+  // Handle workflow completion - refetch diff once when workflow completes or fails
+  const handleWorkflowStatusChange = useCallback(
+    (status: string, workflowRunId: string) => {
+      const isComplete =
+        status === 'FUNCTIONS_DEPLOYED' ||
+        status === 'MIGRATIONS_FAILED' ||
+        status === 'FUNCTIONS_FAILED'
 
-      if (status === 'FUNCTIONS_DEPLOYED') {
-        // Refresh both database and edge functions diff to verify changes are empty after successful merge
-        Promise.all([
-          refetchDiff(),
-          refetchCurrentBranchFunctions(),
-          refetchMainBranchFunctions(),
-          // Invalidate edge function body queries used in useEdgeFunctionsDiff
-          queryClient.invalidateQueries({ queryKey: ['edge-function-body'] }),
-        ])
-          .then(([diffResult]) => {
-            const finalDiff = diffResult.data
-            if (!finalDiff || finalDiff.trim() === '') {
-              toast.success('Branch merged successfully! No remaining changes detected.')
-            } else {
-              toast.success('Branch merged successfully, but some changes may remain.')
-            }
-          })
-          .catch(() => {
-            toast.success('Branch merged successfully!')
-          })
-      } else if (status === 'MIGRATIONS_FAILED' || status === 'FUNCTIONS_FAILED') {
-        toast.error(`Branch merge failed with status: ${status}`)
+      if (isComplete) {
+        // Refetch diff once when workflow completes
+        refetchDiff()
       }
-    }
-  }, [
-    currentWorkflowRun?.status,
-    refetchDiff,
-    refetchCurrentBranchFunctions,
-    refetchMainBranchFunctions,
-    queryClient,
-  ])
+    },
+    [refetchDiff]
+  )
 
   // Check if there are any changes (database or edge functions)
   const hasChanges = () => {
@@ -211,13 +210,22 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
-    onSuccess: () => {
-      toast.success('Branch pushed successfully!')
-      // Refresh the diff after pushing
-      refetchDiff()
+    onSuccess: (data) => {
+      toast.success('Branch update initiated!')
+      // Add workflow run ID to URL for persistence and track it (push workflows run on current branch)
+      if (data?.workflow_run_id) {
+        setRelatedWorkflowRunIds((prev) => ({
+          ...prev,
+          [data.workflow_run_id]: ref || '',
+        }))
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, workflow_run_id: data.workflow_run_id },
+        })
+      }
     },
     onError: (error) => {
-      toast.error(`Failed to push branch: ${error.message}`)
+      toast.error(`Failed to update branch: ${error.message}`)
     },
   })
 
@@ -225,28 +233,24 @@ const MergePage: NextPageWithLayout = () => {
     onSuccess: (data) => {
       setIsSubmitting(false)
       if (data.hadChanges) {
-        if (data.hadConflicts && data.migrationCreated) {
-          toast.success('Conflicts resolved, migration created and branch merge initiated!')
-        } else if (data.hadConflicts) {
-          toast.success('Conflicts resolved and branch merge initiated!')
-        } else if (data.migrationCreated) {
+        if (data.migrationCreated) {
           toast.success('Migration created and branch merge initiated!')
         } else {
           toast.success('Branch merge initiated!')
         }
-        // Add workflow run ID to URL for persistence
+        // Add workflow run ID to URL for persistence and track it (merge workflows run on parent branch)
         if (data.workflowRunId) {
+          setRelatedWorkflowRunIds((prev) => ({
+            ...prev,
+            [data.workflowRunId]: parentProjectRef || '',
+          }))
           router.push({
             pathname: router.pathname,
             query: { ...router.query, workflow_run_id: data.workflowRunId },
           })
         }
       } else {
-        if (data.hadConflicts) {
-          toast.success('Conflicts resolved - no additional changes to merge!')
-        } else {
-          toast.info('No changes to merge - branch merged successfully!')
-        }
+        toast.info('No changes to merge - branch merged successfully!')
       }
     },
     onError: (error) => {
@@ -293,11 +297,17 @@ const MergePage: NextPageWithLayout = () => {
   // Determine current active tab via query param (defaults to 'database')
   const currentTab = (router.query.tab as string) || 'database'
 
+  // Get the current workflow run ID from URL
+  const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
+
+  // Check if we have any active workflow runs
+  const hasActiveWorkflowRuns = Object.keys(relatedWorkflowRunIds).length > 0
+
   // Navigation items for PageLayout - updates the `tab` query param
   const navigationItems = useMemo(() => {
     const buildHref = (tab: string) => {
       const query: Record<string, string> = { tab }
-      if (workflowRunId) query.workflow_run_id = workflowRunId
+      if (currentWorkflowRunId) query.workflow_run_id = currentWorkflowRunId
       const qs = new URLSearchParams(query).toString()
       return `/project/[ref]/merge?${qs}`
     }
@@ -314,7 +324,7 @@ const MergePage: NextPageWithLayout = () => {
         active: currentTab === 'edge-functions',
       },
     ]
-  }, [workflowRunId, currentTab])
+  }, [currentWorkflowRunId, currentTab])
 
   // Show coming soon notice if feature flag is disabled
   if (!gitlessBranching) {
@@ -368,16 +378,9 @@ const MergePage: NextPageWithLayout = () => {
   const isDataLoaded = !isDiffLoading && !isCurrentFunctionsLoading && !isMainFunctionsLoading
   const isMergeDisabled = hasAnyChanges && isDataLoaded
 
+  // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
     <div className="flex items-end gap-2">
-      <Button
-        type="default"
-        loading={isPushing}
-        onClick={handlePush}
-        icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
-      >
-        {isPushing ? 'Pushing...' : 'Push branch'}
-      </Button>
       {isMergeDisabled ? (
         <ButtonTooltip
           tooltip={{
@@ -386,21 +389,22 @@ const MergePage: NextPageWithLayout = () => {
             },
           }}
           type="primary"
-          loading={isMerging || isSubmitting || isPolling}
+          loading={isMerging || isSubmitting}
           disabled={isMergeDisabled}
           onClick={handleMerge}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
         >
-          {isPolling ? 'Merging...' : 'Merge branch'}
+          Merge branch
         </ButtonTooltip>
       ) : (
         <Button
           type="primary"
-          loading={isMerging || isSubmitting || isPolling}
+          loading={isMerging || isSubmitting}
           onClick={handleMerge}
+          disabled={isBranchOutOfDate}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
         >
-          {isPolling ? 'Merging...' : 'Merge branch'}
+          Merge branch
         </Button>
       )}
     </div>
@@ -435,6 +439,32 @@ const MergePage: NextPageWithLayout = () => {
     return `Branch created ${createdTime}`
   }
 
+  // Out of date notice component
+  const OutOfDateNotice = () => (
+    <Admonition type="warning" className="my-4">
+      <div className="w-full flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-medium">
+            Missing {missingMigrationsCount} migration{missingMigrationsCount !== 1 ? 's' : ''} from
+            main branch
+          </h3>
+          <p className="text-sm text-foreground-light">
+            Update this branch or create a new one to review and merge your changes.
+          </p>
+        </div>
+        <Button
+          type="default"
+          loading={isPushing}
+          onClick={handlePush}
+          icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+          className="shrink-0"
+        >
+          {isPushing ? 'Updating...' : 'Update branch'}
+        </Button>
+      </div>
+    </Admonition>
+  )
+
   return (
     <PageLayout
       title={pageTitle()}
@@ -446,15 +476,25 @@ const MergePage: NextPageWithLayout = () => {
     >
       <div className="border-b">
         <ScaffoldContainer size="full">
-          {/* Merge workflow logs */}
-          <WorkflowLogsCard
-            attemptedMerge={attemptedMerge}
-            isMerging={isMerging}
-            isPolling={!!isPolling}
-            currentWorkflowRun={currentWorkflowRun}
-            workflowRunLogs={workflowRunLogs}
-            mainBranchRef={mainBranch?.project_ref}
-          />
+          {/* Show out of date notice or workflow logs */}
+          {isBranchOutOfDate && !currentWorkflowRunId ? (
+            <OutOfDateNotice />
+          ) : currentWorkflowRunId ? (
+            <WorkflowLogsCard
+              workflowRunId={currentWorkflowRunId}
+              projectRef={relatedWorkflowRunIds[currentWorkflowRunId] || ref || ''}
+              onClose={() => {
+                const { workflow_run_id, ...queryWithoutWorkflowId } = router.query
+                router.push({
+                  pathname: router.pathname,
+                  query: queryWithoutWorkflowId,
+                })
+              }}
+              onStatusChange={handleWorkflowStatusChange}
+              statusComplete="FUNCTIONS_DEPLOYED"
+              statusFailed={['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED']}
+            />
+          ) : null}
 
           {/* Tab navigation */}
           <NavMenu className="mt-4 border-none">
@@ -486,7 +526,7 @@ const MergePage: NextPageWithLayout = () => {
             diffContent={diffContent}
             isLoading={isDiffLoading || isDiffRefetching}
             error={diffError}
-            showRefreshButton={!isPolling}
+            showRefreshButton={true}
             currentBranchRef={ref}
           />
         ) : (

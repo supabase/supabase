@@ -1,32 +1,59 @@
 import React from 'react'
-import { Card, CardHeader, CardContent, CardTitle } from 'ui'
+import { Card, CardHeader, CardContent, CardTitle, Button } from 'ui'
 import { motion } from 'framer-motion'
-import { CircleDotDashed, GitMerge } from 'lucide-react'
+import { CircleDotDashed, GitMerge, X } from 'lucide-react'
 import Link from 'next/link'
+import { useWorkflowRunQuery } from 'data/workflow-runs/workflow-run-query'
+import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
 
 interface WorkflowLogsCardProps {
-  attemptedMerge: boolean
-  isMerging: boolean
-  isPolling: boolean
-  currentWorkflowRun?: {
-    status?: string
-    id?: string
-  } | null
-  workflowRunLogs?: {
-    logs?: string
-  } | null
-  mainBranchRef?: string
+  workflowRunId: string
+  projectRef: string
+  onClose?: () => void
+  onStatusChange?: (status: string, workflowRunId: string) => void
+  statusComplete?: string // Status that indicates completion (e.g., 'FUNCTIONS_DEPLOYED')
+  statusFailed?: string[] // Statuses that indicate failure (e.g., ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'])
 }
 
 const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
-  attemptedMerge,
-  isMerging,
-  isPolling,
-  currentWorkflowRun,
-  workflowRunLogs,
-  mainBranchRef,
+  workflowRunId,
+  projectRef,
+  onClose,
+  onStatusChange,
+  statusComplete = 'FUNCTIONS_DEPLOYED',
+  statusFailed = ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'],
 }) => {
   const scrollRef = React.useRef<HTMLDivElement>(null)
+
+  // Get workflow runs for the specified project to find the workflow run
+  const { data: workflowRuns } = useWorkflowRunsQuery(
+    { projectRef },
+    {
+      enabled: !!projectRef,
+      refetchInterval: 3000, // Always poll
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+    }
+  )
+
+  // Find the current workflow run
+  const currentWorkflowRun = React.useMemo(() => {
+    if (!workflowRunId) return null
+    return workflowRuns?.find((run) => run.id === workflowRunId)
+  }, [workflowRuns, workflowRunId])
+
+  // Query for workflow run logs with continuous polling
+  const { data: workflowRunLogs } = useWorkflowRunQuery(
+    { workflowRunId },
+    {
+      enabled: !!workflowRunId,
+      refetchInterval: 2000, // Always poll every 2 seconds
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      staleTime: 0, // Always fetch fresh data
+    }
+  )
 
   // Auto-scroll to bottom when logs change
   React.useEffect(() => {
@@ -35,27 +62,26 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
     }
   }, [workflowRunLogs?.logs])
 
-  // Only show the card when the merge is in progress or has been attempted previously
-  if (!isMerging && !attemptedMerge) return null
+  // Call onStatusChange when status changes
+  React.useEffect(() => {
+    if (currentWorkflowRun?.status && onStatusChange) {
+      onStatusChange(currentWorkflowRun.status, workflowRunId)
+    }
+  }, [currentWorkflowRun?.status, onStatusChange, workflowRunId])
 
-  const showSuccessIcon = currentWorkflowRun?.status === 'FUNCTIONS_DEPLOYED'
+  const showSuccessIcon = currentWorkflowRun?.status === statusComplete
+  const isFailed = currentWorkflowRun?.status && statusFailed.includes(currentWorkflowRun.status)
+  const isPolling =
+    currentWorkflowRun?.status !== statusComplete &&
+    (!currentWorkflowRun?.status || !statusFailed.includes(currentWorkflowRun.status))
 
   return (
     <Card className="my-6 bg-background overflow-hidden h-64 flex flex-col">
-      <CardHeader
-        className={
-          showSuccessIcon
-            ? 'text-brand'
-            : currentWorkflowRun?.status === 'MIGRATIONS_FAILED' ||
-                currentWorkflowRun?.status === 'FUNCTIONS_FAILED'
-              ? 'text-warning'
-              : ''
-        }
-      >
+      <CardHeader className={showSuccessIcon ? 'text-brand' : isFailed ? 'text-warning' : ''}>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-3">
             {/* Activity / success indicator */}
-            {isPolling || isMerging ? (
+            {isPolling ? (
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
@@ -66,14 +92,27 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
               showSuccessIcon && <GitMerge size={16} strokeWidth={1.5} className="text-brand" />
             )}
             {/* Status text */}
-            {isPolling || isMerging
-              ? 'Merging...'
+            {isPolling
+              ? 'Processing...'
               : showSuccessIcon
-                ? 'Branch successfully merged'
-                : 'Branch failed to merge'}
+                ? 'Workflow completed successfully'
+                : isFailed
+                  ? 'Workflow failed'
+                  : 'Workflow completed'}
           </CardTitle>
           {currentWorkflowRun?.id && (
-            <div className="text-xs text-foreground-light">#{currentWorkflowRun.id}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-xs text-foreground-light">#{currentWorkflowRun.id}</div>
+              {onClose && (
+                <Button
+                  type="text"
+                  size="tiny"
+                  icon={<X size={12} strokeWidth={1.5} />}
+                  onClick={onClose}
+                  className="h-5 w-5 p-0"
+                />
+              )}
+            </div>
           )}
         </div>
       </CardHeader>
@@ -86,15 +125,10 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
         {workflowRunLogs?.logs ? (
           <pre className="p-6 text-xs text-foreground-light p-0 rounded">
             {workflowRunLogs.logs}
-            {showSuccessIcon && <span className="text-brand">Merge complete</span>}
           </pre>
         ) : (
           <pre className="p-6 text-sm text-foreground-light rounded">
-            {isMerging
-              ? 'Merge started - initializing workflow...'
-              : isPolling
-                ? 'Initializing merge workflow...'
-                : 'Waiting for logs...'}
+            {isPolling ? 'Initializing workflow...' : 'Waiting for logs...'}
           </pre>
         )}
       </CardContent>
