@@ -71,11 +71,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   return (
     <>
       <Table
-        containerProps={{
-          onScroll,
-        }}
+        containerProps={{ onScroll }}
         ref={tableRef} // REMINDER: https://stackoverflow.com/questions/50361698/border-style-do-not-work-with-sticky-position-element
-        className="z-0"
       >
         <TableHeader>
           {headerGroups.map((headerGroup) => (

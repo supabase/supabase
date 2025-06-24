@@ -33,7 +33,7 @@ const TableHeader = forwardRef<
   HTMLTableSectionElement,
   ComponentPropsWithRef<typeof ShadcnTableHeader>
 >(({ className, ...props }, ref) => (
-  <ShadcnTableHeader ref={ref} className={cn('sticky top-0', className)} {...props} />
+  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-20', className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
@@ -63,12 +63,7 @@ const TableRow = forwardRef<HTMLTableRowElement, ComponentPropsWithRef<typeof Sh
   ({ className, ...props }, ref) => (
     <ShadcnTableRow
       ref={ref}
-      className={cn(
-        'bg-background hover:bg-muted/50',
-        //   '[&>*]:border-t [&>:not(:last-child)]:border-r',
-        'border-b-0',
-        className
-      )}
+      className={cn('bg-background hover:bg-surface-100 border-b-0', className)}
       {...props}
     />
   )

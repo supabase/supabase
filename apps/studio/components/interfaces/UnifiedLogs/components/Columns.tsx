@@ -55,7 +55,7 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
     cell: ({ row }) => {
       const logType = row.getValue<ColumnSchema['log_type']>('log_type')
       return (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-right flex items-center gap-1">
+        <div className="flex items-center justify-end gap-1">
           <LogTypeIcon type={logType} size={16} className="text-foreground/70" />
         </div>
       )
