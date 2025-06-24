@@ -41,6 +41,7 @@ import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
+import DatabaseVisual from '../../components/Products/DatabaseVisual'
 
 const data: () => {
   metadata: Metadata
@@ -76,15 +77,23 @@ const data: () => {
         </>,
       ],
       image: (
-        <Image
-          src={{
-            dark: '/images/solutions/developers/developers-hero-dark.svg',
-            light: '/images/solutions/developers/developers-hero-light.svg',
-          }}
-          alt="Supabase for Developers"
-          className="not-sr-only"
-          width={1000}
-          height={1000}
+        <DatabaseVisual
+          className="group
+        [&>span]:!w-[150%]
+        [&>span]:!h-[150%]
+        [&>span]:!inset-auto
+        [&>span]:!-mx-auto
+        [&>span]:!-left-28
+        [&>span]:sm:!-left-40
+        [&>span]:lg:!-left-20
+        [&>span]:xl:!-left-40
+        [&>span]:!-top-16
+        [&>span]:md:!-top-28
+        [&>span]:!flex
+        [&>span]:!items-center
+        [&>span]:!justify-center
+        "
+          hasGlow={false}
         />
       ),
       ctas: [

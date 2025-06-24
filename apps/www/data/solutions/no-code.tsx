@@ -46,8 +46,8 @@ const data: () => {
         <>
           You don’t need to be a developer to build something incredible. Supabase provides a
           complete backend that’s easy to use with your favorite app builder tools. When you’re
-          ready to scale, Supabase is there to scale with you. Build in a weekend, scale to
-          millions.
+          ready to scale, Supabase is there to scale with you. <br />
+          Build in a weekend, scale to millions.
         </>,
       ],
       image: (
