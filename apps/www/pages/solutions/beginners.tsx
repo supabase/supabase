@@ -26,11 +26,6 @@ const BeginnersPage: NextPage = () => {
           title: content.metadata.metaTitle,
           description: content.metadata.metaDescription,
           url: `https://supabase.com/solutions/beginners`,
-          images: [
-            {
-              url: `/images/solutions/ai-builders/ai-builders-og.png`,
-            },
-          ],
         }}
       />
       <Layout className="overflow-visible">
