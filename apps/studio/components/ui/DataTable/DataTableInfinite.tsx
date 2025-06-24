@@ -33,8 +33,6 @@ export interface DataTableInfiniteProps<TData, TValue, TMeta> {
 export function DataTableInfinite<TData, TValue, TMeta>({
   columns,
   defaultColumnVisibility = {},
-  isFetching,
-  isLoading,
   fetchNextPage,
   hasNextPage,
   totalRows = 0,
@@ -45,7 +43,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
-  const { table } = useDataTable()
+  const { table, isLoading, isFetching } = useDataTable()
   const tableRef = useRef<HTMLTableElement>(null)
 
   const headerGroups = table.getHeaderGroups()
@@ -130,13 +128,13 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             {renderLiveRow?.()}
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                No results
               </TableCell>
             </TableRow>
           </Fragment>
         )}
         <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
-          <TableCell colSpan={columns.length} className="text-center">
+          <TableCell colSpan={columns.length} className="text-center !py-2">
             {hasNextPage || isFetching || isLoading ? (
               <div className="flex flex-col items-center gap-2">
                 <Button
@@ -146,7 +144,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                   type="outline"
                   icon={isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null}
                 >
-                  Load More
+                  Load more
                 </Button>
                 <p className="text-xs text-foreground-lighter">
                   Showing{' '}
@@ -158,7 +156,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-foreground-lighter py-4">
+              <p className="text-xs text-foreground-lighter">
                 No more data to load (
                 <span className="font-mono font-medium">{formatCompactNumber(filterRows)}</span> of{' '}
                 <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}

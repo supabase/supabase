@@ -14,7 +14,9 @@ export function DataTableFilterCheckbox<TData>({
 }: DataTableCheckboxFilterField<TData>) {
   const value = _value as string
   const [inputValue, setInputValue] = useState('')
-  const { table, columnFilters, isLoading, getFacetedUniqueValues } = useDataTable()
+  const { table, columnFilters, isLoading, isLoadingCounts, getFacetedUniqueValues } =
+    useDataTable()
+
   const column = table.getColumn(value)
   // REMINDER: avoid using column?.getFilterValue()
   const filterValue = columnFilters.find((i) => i.id === value)?.value
@@ -92,7 +94,7 @@ export function DataTableFilterCheckbox<TData>({
                     <span className="truncate font-normal">{option.label}</span>
                   )}
                   <span className="ml-auto flex items-center justify-center font-mono text-xs">
-                    {isLoading ? (
+                    {isLoadingCounts ? (
                       <Skeleton className="h-4 w-4" />
                     ) : facetedValue?.has(option.value) ? (
                       formatCompactNumber(facetedValue.get(option.value) || 0)

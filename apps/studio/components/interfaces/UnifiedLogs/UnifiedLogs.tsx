@@ -107,7 +107,10 @@ export const UnifiedLogs = () => {
     fetchNextPage,
     fetchPreviousPage,
   } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
-  const { data: counts } = useUnifiedLogsCountQuery({ projectRef, search: searchParameters })
+  const { data: counts, isLoading: isLoadingCounts } = useUnifiedLogsCountQuery({
+    projectRef,
+    search: searchParameters,
+  })
   const { data: unifiedLogsChart = [] } = useUnifiedLogsChartQuery({
     projectRef,
     search: searchParameters,
@@ -293,7 +296,9 @@ export const UnifiedLogs = () => {
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       enableColumnOrdering={true}
-      isLoading={isFetching || isLoading}
+      isFetching={isFetching}
+      isLoading={isLoading}
+      isLoadingCounts={isLoadingCounts}
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
@@ -327,26 +332,22 @@ export const UnifiedLogs = () => {
             <ResizablePanel defaultSize={selectedRowKey ? 60 : 100} minSize={30} className="h-full">
               <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
                 <ResizablePanel defaultSize={100} minSize={30}>
-                  <div className="h-full overflow-auto">
-                    <DataTableInfinite
-                      columns={COLUMNS}
-                      totalRows={totalDBRowCount}
-                      filterRows={filterDBRowCount}
-                      totalRowsFetched={totalFetched}
-                      isFetching={isFetching}
-                      isLoading={isLoading}
-                      fetchNextPage={fetchNextPage}
-                      hasNextPage={hasNextPage}
-                      renderLiveRow={(props) => {
-                        if (!liveMode.timestamp) return null
-                        if ((props?.row as any).original.uuid !== liveMode?.row?.uuid) return null
-                        return <LiveRow colSpan={COLUMNS.length - 1} />
-                      }}
-                      setColumnOrder={setColumnOrder}
-                      setColumnVisibility={setColumnVisibility}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
-                  </div>
+                  <DataTableInfinite
+                    columns={COLUMNS}
+                    totalRows={totalDBRowCount}
+                    filterRows={filterDBRowCount}
+                    totalRowsFetched={totalFetched}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    renderLiveRow={(props) => {
+                      if (!liveMode.timestamp) return null
+                      if ((props?.row as any).original.uuid !== liveMode?.row?.uuid) return null
+                      return <LiveRow colSpan={COLUMNS.length - 1} />
+                    }}
+                    setColumnOrder={setColumnOrder}
+                    setColumnVisibility={setColumnVisibility}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
                 </ResizablePanel>
                 {selectedRow?.original?.logs && selectedRow?.original?.logs?.length > 0 && (
                   <>
