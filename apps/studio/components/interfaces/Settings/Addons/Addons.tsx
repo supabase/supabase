@@ -32,11 +32,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDbInAws,
-  useProjectByRef,
-} from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDbInAws, useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
@@ -57,7 +53,6 @@ const Addons = () => {
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
-  const isAws = useIsAwsCloudProvider()
   const isOrioleDbInAws = useIsOrioleDbInAws()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -335,84 +330,80 @@ const Addons = () => {
 
           <ScaffoldDivider />
 
-          {isAws && (
-            <>
-              <ScaffoldContainer>
-                <ScaffoldSection>
-                  <ScaffoldSectionDetail>
-                    <div className="space-y-6">
-                      <p className="m-0">Dedicated IPv4 address</p>
-                      <div className="space-y-2">
-                        <p className="text-sm text-foreground-light m-0">More information</p>
-                        <div>
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/ipv4-address"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
-                              <p className="text-sm m-0">About IPv4 deprecation</p>
-                              <ExternalLink size={16} strokeWidth={1.5} />
-                            </div>
-                          </Link>
+          <ScaffoldContainer>
+            <ScaffoldSection>
+              <ScaffoldSectionDetail>
+                <div className="space-y-6">
+                  <p className="m-0">Dedicated IPv4 address</p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-foreground-light m-0">More information</p>
+                    <div>
+                      <Link
+                        href="https://supabase.com/docs/guides/platform/ipv4-address"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
+                          <p className="text-sm m-0">About IPv4 deprecation</p>
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
-                      </div>
+                      </Link>
                     </div>
-                  </ScaffoldSectionDetail>
-                  <ScaffoldSectionContent>
-                    <div className="flex space-x-6">
-                      <div>
-                        <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
-                          <img
-                            alt="IPv4"
-                            width={160}
-                            height={96}
-                            src={
-                              ipv4 !== undefined
-                                ? `${BASE_PATH}/img/ipv4-on${
-                                    resolvedTheme?.includes('dark') ? '' : '--light'
-                                  }.svg?v=2`
-                                : `${BASE_PATH}/img/ipv4-off${
-                                    resolvedTheme?.includes('dark') ? '' : '--light'
-                                  }.svg?v=2`
-                            }
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-foreground-light">Current option:</p>
-                        <p>
-                          {ipv4 !== undefined
-                            ? 'Dedicated IPv4 address is enabled'
-                            : 'Dedicated IPv4 address is not enabled'}
-                        </p>
-                        <ButtonTooltip
-                          type="default"
-                          className="mt-2 pointer-events-auto"
-                          onClick={() => setPanel('ipv4')}
-                          disabled={
-                            !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
-                          }
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !(canUpdateIPv4 || ipv4)
-                                ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
-                                : undefined,
-                            },
-                          }}
-                        >
-                          Change dedicated IPv4 address
-                        </ButtonTooltip>
-                      </div>
+                  </div>
+                </div>
+              </ScaffoldSectionDetail>
+              <ScaffoldSectionContent>
+                <div className="flex space-x-6">
+                  <div>
+                    <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
+                      <img
+                        alt="IPv4"
+                        width={160}
+                        height={96}
+                        src={
+                          ipv4 !== undefined
+                            ? `${BASE_PATH}/img/ipv4-on${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                            : `${BASE_PATH}/img/ipv4-off${
+                                resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.svg?v=2`
+                        }
+                      />
                     </div>
-                  </ScaffoldSectionContent>
-                </ScaffoldSection>
-              </ScaffoldContainer>
+                  </div>
+                  <div>
+                    <p className="text-sm text-foreground-light">Current option:</p>
+                    <p>
+                      {ipv4 !== undefined
+                        ? 'Dedicated IPv4 address is enabled'
+                        : 'Dedicated IPv4 address is not enabled'}
+                    </p>
+                    <ButtonTooltip
+                      type="default"
+                      className="mt-2 pointer-events-auto"
+                      onClick={() => setPanel('ipv4')}
+                      disabled={
+                        !isProjectActive || projectUpdateDisabled || !(canUpdateIPv4 || ipv4)
+                      }
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !(canUpdateIPv4 || ipv4)
+                            ? 'Temporarily disabled while we are migrating to IPv6, please check back later.'
+                            : undefined,
+                        },
+                      }}
+                    >
+                      Change dedicated IPv4 address
+                    </ButtonTooltip>
+                  </div>
+                </div>
+              </ScaffoldSectionContent>
+            </ScaffoldSection>
+          </ScaffoldContainer>
 
-              <ScaffoldDivider />
-            </>
-          )}
+          <ScaffoldDivider />
 
           <ScaffoldContainer>
             <ScaffoldSection>

@@ -38,14 +38,14 @@ export const useIsAwsCloudProvider = () => {
   const project = useSelectedProject()
   const isAws = project?.cloud_provider === PROVIDERS.AWS.id
 
-  return isAws
+  return false // isAws
 }
 
 export const useIsAwsK8sCloudProvider = () => {
   const project = useSelectedProject()
   const isAwsK8s = project?.cloud_provider === PROVIDERS.AWS_K8S.id
 
-  return isAwsK8s
+  return true // isAwsK8s
 }
 
 export const useIsOrioleDb = () => {
