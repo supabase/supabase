@@ -89,7 +89,9 @@ async function getUnifiedLogs(
 
   // Transform results to expected schema
   const result = resultData.map((row: any) => {
-    // Create a unique ID using the timestamp
+    // WORKAROUND: Create a unique ID using the timestamp to handle repeated logs issue
+    // TODO: Remove this once we fix the repeated logs problem in the backend
+    // The real database ID is stored separately in 'original_log_id' for service flow queries
     const uniqueId = `${row.id || 'id'}-${row.timestamp}-${new Date().getTime()}`
 
     // Create a date object for display purposes
@@ -102,6 +104,7 @@ async function getUnifiedLogs(
     return {
       id: uniqueId,
       uuid: uniqueId,
+      log_id: row.id, // Store the real database ID for service flow queries
       date, // Date object for display purposes
       timestamp: row.timestamp, // Original timestamp from the database
       level,

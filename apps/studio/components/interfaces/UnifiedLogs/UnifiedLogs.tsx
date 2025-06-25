@@ -9,6 +9,7 @@ import {
   Row,
   RowSelectionState,
   SortingState,
+  Table,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
@@ -54,6 +55,8 @@ import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName, logEventBus } from './UnifiedLogs.utils'
 
+import { ServiceFlowPanel } from './ServiceFlowPanel'
+
 // Debug mode flag - set to true to enable detailed logs
 const DEBUG_FILTER_PROCESSING = false
 
@@ -72,7 +75,7 @@ export const UnifiedLogs = () => {
     .filter(({ value }) => value ?? undefined)
 
   const [topBarHeight, setTopBarHeight] = useState(0)
-  const [activeTab, setActiveTab] = useState('details')
+
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>(defaultRowSelection)
@@ -90,7 +93,7 @@ export const UnifiedLogs = () => {
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = Object.entries(search).reduce(
     (acc, [key, value]) => {
-      if (!['uuid', 'live'].includes(key) && value !== null && value !== undefined) {
+      if (!['uuid', 'live', 'logId'].includes(key) && value !== null && value !== undefined) {
         acc[key] = value
       }
       return acc
@@ -146,7 +149,7 @@ export const UnifiedLogs = () => {
     return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100')
   }
 
-  const table = useReactTable({
+  const table: Table<any> = useReactTable({
     data: flatData,
     columns: COLUMNS,
     state: {
@@ -265,24 +268,32 @@ export const UnifiedLogs = () => {
   useEffect(() => {
     if (isLoading || isFetching) return
     if (Object.keys(rowSelection)?.length && !selectedRow) {
-      setSearch({ uuid: null })
+      // Clear both uuid and logId when no row is selected
+      setSearch({ uuid: null, logId: null })
       setRowSelection({})
     } else {
-      setSearch({ uuid: Object.keys(rowSelection)?.[0] || null })
+      // WORKAROUND: Store both the fabricated UUID and real database logId in URL params
+      // This is needed because we create fake UUIDs to handle repeated logs issue
+      // TODO: Remove this once we fix the repeated logs problem - should only need real logId
+      const selectedRowData = selectedRow?.original
+      setSearch({
+        uuid: Object.keys(rowSelection)?.[0] || null,
+        logId: selectedRowData?.log_id || null,
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection, selectedRow, isLoading, isFetching])
 
-  // Set up event listener for trace tab selection
-  useEffect(() => {
-    const unsubscribe = logEventBus.on('selectTraceTab', (rowId) => {
-      setRowSelection({ [rowId]: true })
-      setActiveTab('trace')
-    })
-    return () => {
-      unsubscribe()
-    }
-  }, [setRowSelection])
+  // // Set up event listener for trace tab selection
+  // useEffect(() => {
+  //   const unsubscribe = logEventBus.on('selectTraceTab', (rowId) => {
+  //     setRowSelection({ [rowId]: true })
+  //     setActiveTab('trace')
+  //   })
+  //   return () => {
+  //     unsubscribe()
+  //   }
+  // }, [setRowSelection])
 
   return (
     <DataTableProvider
@@ -376,46 +387,17 @@ export const UnifiedLogs = () => {
             </ResizablePanel>
 
             {selectedRowKey && (
-              <>
-                <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={45} minSize={45}>
-                  <div className="h-full overflow-auto">
-                    <DataTableSheetDetails
-                      title={selectedRow?.original?.pathname}
-                      titleClassName="font-mono text-sm"
-                    >
-                      <Tabs
-                        defaultValue="details"
-                        value={activeTab}
-                        onValueChange={setActiveTab}
-                        className="w-full h-full flex flex-col pt-2"
-                      >
-                        <TabsList className="flex gap-3 px-5">
-                          <TabsTrigger value="details">Log Details</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent
-                          value="details"
-                          className="flex-grow overflow-auto data-[state=active]:flex-grow px-5"
-                        >
-                          <MemoizedDataTableSheetContent
-                            table={table}
-                            data={selectedRow?.original}
-                            filterFields={filterFields}
-                            fields={sheetFields}
-                            metadata={{
-                              totalRows: totalDBRowCount ?? 0,
-                              filterRows: filterDBRowCount ?? 0,
-                              totalRowsFetched: totalFetched ?? 0,
-                              currentPercentiles: {} as any,
-                            }}
-                          />
-                        </TabsContent>
-                      </Tabs>
-                    </DataTableSheetDetails>
-                  </div>
-                </ResizablePanel>
-              </>
+              <ServiceFlowPanel
+                selectedRow={selectedRow?.original}
+                selectedRowKey={selectedRowKey}
+                // these can be added to Table Provider
+                totalDBRowCount={totalDBRowCount}
+                filterDBRowCount={filterDBRowCount}
+                totalFetched={totalFetched}
+                metadata={lastPage?.meta?.metadata}
+                searchParameters={searchParameters}
+                search={search}
+              />
             )}
           </ResizablePanelGroup>
         </div>

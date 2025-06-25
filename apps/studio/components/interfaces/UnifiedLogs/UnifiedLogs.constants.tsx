@@ -87,4 +87,7 @@ export const SEARCH_PARAMS_PARSER = {
 
   // REQUIRED FOR SELECTION
   uuid: parseAsString,
+  // WORKAROUND: Store real database log ID for service flow queries
+  // TODO: Remove once repeated logs issue is fixed
+  logId: parseAsString,
 }
