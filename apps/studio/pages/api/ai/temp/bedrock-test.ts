@@ -1,7 +1,6 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
-import { CoreMessage, Message } from 'ai'
-import { streamText } from 'ai-4'
+import { CoreMessage, streamText } from 'ai-4'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
