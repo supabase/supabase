@@ -237,6 +237,7 @@ allow_list = [
     "ProGuard",
     "PubSub",
     "Prisma",
+	"Qodo",
     "README",
     "Redis",
     "RedwoodJS",
