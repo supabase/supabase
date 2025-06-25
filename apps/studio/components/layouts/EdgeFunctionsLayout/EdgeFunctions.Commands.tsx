@@ -16,6 +16,12 @@ export function useFunctionsGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/functions`,
         defaultHidden: true,
       },
+      {
+        id: 'nav-functions-secrets',
+        name: 'Edge Functions Secrets',
+        route: `/project/${ref}/functions/secrets`,
+        defaultHidden: true,
+      },
     ],
     { ...options, deps: [ref] }
   )
