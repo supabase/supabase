@@ -89,16 +89,12 @@ const data: () => {
             [&>span]:!w-[120%]
             [&>span]:!h-[120%]
             [&>span]:!inset-auto
-            [&>span]:!-mx-auto
             [&>span]:!-left-10
             [&>span]:sm:!-left-20
             [&>span]:lg:!-left-10
             [&>span]:!-top-16
             [&>span]:md:!-top-28
-            [&>span]:xl:!-top-32
-            [&>span]:!flex
-            [&>span]:!items-center
-            [&>span]:!justify-center
+            [&>span]:lg:!-top-52
           "
           hasGlow={false}
         />
