@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { match } from 'path-to-regexp'
-
+console.log('test this loading')
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   const errors = event.exception?.values ?? []
@@ -45,15 +45,17 @@ function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
+  debug: process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod',
   beforeSend(event, hint) {
     const consent = hasConsented()
 
     if (!consent) {
+      console.log('[Sentry beforeSend] Dropped: no consent')
       return null
     }
 
     if (!IS_PLATFORM) {
+      console.log('[Sentry beforeSend] Dropped: not platform')
       return null
     }
 
@@ -62,18 +64,22 @@ Sentry.init({
       `Failed to construct 'URL': Invalid URL`
     )
     if (isInvalidUrlEvent && Math.random() > 0.01) {
+      console.log('[Sentry beforeSend] Dropped: invalid URL event (quota throttle)')
       return null
     }
 
     if (isHCaptchaRelatedError(event)) {
+      console.log('[Sentry beforeSend] Dropped: hCaptcha related error')
       return null
     }
 
     const frames = event.exception?.values?.[0].stacktrace?.frames || []
     if (isThirdPartyError(frames)) {
+      console.log('[Sentry beforeSend] Dropped: third party error')
       return null
     }
 
+    console.log('[Sentry beforeSend] Event sent', { event })
     return event
   },
   ignoreErrors: [
