@@ -474,8 +474,7 @@ export const fillTimeseries = (
   defaultValue: number,
   min?: string,
   max?: string,
-  minPointsToFill: number = 20,
-  defaultTruncation?: 'second' | 'minute' | 'hour' | 'day'
+  minPointsToFill: number = 20
 ) => {
   // If we have more points than minPointsToFill, just normalize timestamps and return
   if (timeseriesData.length > minPointsToFill) {
@@ -494,8 +493,7 @@ export const fillTimeseries = (
 
   // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
-  const truncation = defaultTruncation || getTimestampTruncation(truncationSamples as Dayjs[])
-  console.log('truncation', truncation)
+  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
 
   const newData = timeseriesData.map((datum) => {
     const iso = dayjs.utc(datum[timestampKey]).toISOString()
