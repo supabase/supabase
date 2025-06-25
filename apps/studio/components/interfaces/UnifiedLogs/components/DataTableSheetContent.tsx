@@ -1,5 +1,5 @@
 import { Table } from '@tanstack/react-table'
-import { memo } from 'react'
+import { HTMLAttributes, memo } from 'react'
 
 import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
@@ -30,7 +30,7 @@ const SheetDetailsContentSkeleton = <TData, TMeta>({
   )
 }
 
-interface DataTableSheetContentProps<TData, TMeta> extends React.HTMLAttributes<HTMLDListElement> {
+interface DataTableSheetContentProps<TData, TMeta> extends HTMLAttributes<HTMLDListElement> {
   data?: TData
   table: Table<TData>
   fields: SheetField<TData, TMeta>[]

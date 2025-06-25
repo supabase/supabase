@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 10 Jun 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 25 Jun 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/natural-db</guid>
+  <title>Build a Personalized AI Assistant with Postgres</title>
+  <link>https://supabase.com/blog/natural-db</link>
+  <description>Learn how to build a Supabase powered AI assistant that combines PostgreSQL with scheduling and external tools for long-term memory, structured data management and autonomous actions.</description>
+  <pubDate>Wed, 25 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/multigres-vitess-for-postgres</guid>
   <title>Announcing Multigres: Vitess for Postgres</title>
   <link>https://supabase.com/blog/multigres-vitess-for-postgres</link>

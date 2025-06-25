@@ -325,7 +325,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   paymentIntentConfirmed(paymentIntentConfirmation)
                 }
                 onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-                paymentMethodId={form.getValues().paymentMethod}
               />
             </Elements>
           )}

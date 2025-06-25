@@ -63,43 +63,17 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         const currentFolderIdx = openedFolders.length - 1
         const currentFolder = openedFolders[currentFolderIdx]
 
-        if (itemSearchString) {
-          if (!currentFolder) {
-            // At root of bucket
-            await fetchFolderContents({
-              bucketId: bucket.id,
-              folderId: bucket.id,
-              folderName: bucket.name,
-              index: -1,
-              searchString: itemSearchString,
-            })
-          } else {
-            await fetchFolderContents({
-              bucketId: bucket.id,
-              folderId: currentFolder.id,
-              folderName: currentFolder.name,
-              index: currentFolderIdx,
-              searchString: itemSearchString,
-            })
-          }
-        } else {
-          if (!currentFolder) {
-            // At root of bucket
-            await fetchFolderContents({
-              bucketId: bucket.id,
-              folderId: bucket.id,
-              folderName: bucket.name,
-              index: -1,
-            })
-          } else {
-            await fetchFolderContents({
-              bucketId: bucket.id,
-              folderId: currentFolder.id,
-              folderName: currentFolder.name,
-              index: currentFolderIdx,
-            })
-          }
-        }
+        const folderId = !currentFolder ? bucket.id : currentFolder.id
+        const folderName = !currentFolder ? bucket.name : currentFolder.name
+        const index = !currentFolder ? -1 : currentFolderIdx
+
+        await fetchFolderContents({
+          bucketId: bucket.id,
+          folderId,
+          folderName,
+          index,
+          searchString: itemSearchString,
+        })
       } else if (view === STORAGE_VIEWS.COLUMNS) {
         if (openedFolders.length > 0) {
           const paths = openedFolders.map((folder) => folder.name)
@@ -110,6 +84,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
             folderId: bucket.id,
             folderName: bucket.name,
             index: -1,
+            searchString: itemSearchString,
           })
         }
       }
