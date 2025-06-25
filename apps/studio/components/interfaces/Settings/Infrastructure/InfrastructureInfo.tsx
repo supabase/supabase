@@ -193,6 +193,7 @@ const InfrastructureInfo = () => {
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )}
+                    {/* TODO(bobbie): once extension_dependent_objects is removed on the backend, remove this block and the ts-ignores below */}
                     {!data?.eligible && (data?.extension_dependent_objects || []).length > 0 && (
                       <Alert_Shadcn_
                         variant="warning"
@@ -222,7 +223,6 @@ const InfrastructureInfo = () => {
                               ? 'These extensions are not supported in newer versions of Supabase Postgres. If you are not using them, it is safe to remove them.'
                               : 'Check the docs for which ones might need to be removed.'}
                           </p>
-
                           <div>
                             <Button size="tiny" type="default" asChild>
                               <a
@@ -237,6 +237,93 @@ const InfrastructureInfo = () => {
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )}
+                    {!data?.eligible &&
+                      // @ts-ignore
+                      (data?.objects_to_be_dropped || []).length > 0 && (
+                        <Alert_Shadcn_
+                          variant="warning"
+                          title="A new version of Postgres is available for your project"
+                        >
+                          <AlertTitle_Shadcn_>
+                            A new version of Postgres is available
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <div>
+                              <p className="mb-1">
+                                You'll need to remove the following objects before upgrading:
+                              </p>
+
+                              <ul className="pl-4">
+                                {
+                                  // @ts-ignore
+                                  (data?.objects_to_be_dropped || []).map((obj: string) => (
+                                    <li className="list-disc" key={obj}>
+                                      {obj}
+                                    </li>
+                                  ))
+                                }
+                              </ul>
+                            </div>
+                            <p>Check the docs for which objects need to be removed.</p>
+                            <div>
+                              <Button size="tiny" type="default" asChild>
+                                <a
+                                  href="https://supabase.com/docs/guides/platform/upgrading#extensions"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View docs
+                                </a>
+                              </Button>
+                            </div>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
+                    {!data?.eligible &&
+                      // @ts-ignore
+                      (data?.unsupported_extensions || []).length > 0 && (
+                        <Alert_Shadcn_
+                          variant="warning"
+                          title="A new version of Postgres is available for your project"
+                        >
+                          <AlertTitle_Shadcn_>
+                            A new version of Postgres is available
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <div>
+                              <p className="mb-1">
+                                You'll need to remove the following extensions before upgrading:
+                              </p>
+
+                              <ul className="pl-4">
+                                {
+                                  // @ts-ignore
+                                  (data?.unsupported_extensions || []).map((obj: string) => (
+                                    <li className="list-disc" key={obj}>
+                                      {obj}
+                                    </li>
+                                  ))
+                                }
+                              </ul>
+                            </div>
+                            <p>
+                              These extensions are not supported in newer versions of Supabase
+                              Postgres. If you are not using them, it is safe to remove them.
+                            </p>
+                            <div>
+                              <Button size="tiny" type="default" asChild>
+                                <a
+                                  href="https://supabase.com/docs/guides/platform/upgrading#extensions"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View docs
+                                </a>
+                              </Button>
+                            </div>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
                   </>
                 )}
               </>
