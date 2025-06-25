@@ -14,7 +14,7 @@ import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8s } from 'hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -33,7 +33,7 @@ const PauseProjectButton = () => {
     'queue_jobs.projects.pause'
   )
 
-  const isAwsK8s = useIsAwsK8s()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
   const isFreePlan = organization?.plan.id === 'free'
   const isPaidAndNotAwsK8s = !isFreePlan && !isAwsK8s
 

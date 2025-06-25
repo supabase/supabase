@@ -25,7 +25,7 @@ import {
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8s, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
@@ -85,7 +85,7 @@ const DeployNewReplicaPanel = ({
     (x) => x.organization_id === project?.organization_id
   )
   const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
-  const isAwsK8s = useIsAwsK8s()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(

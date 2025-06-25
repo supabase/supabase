@@ -56,7 +56,7 @@ import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { useIsAws, useIsAwsK8s } from 'hooks/misc/useSelectedProject'
+import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 
 export function DiskManagementForm() {
   // isLoading is used to avoid a useCheckPermissions() race condition
@@ -70,8 +70,8 @@ export function DiskManagementForm() {
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
-  const isAws = useIsAws()
-  const isAwsK8s = useIsAwsK8s()
+  const isAws = useIsAwsCloudProvider()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   /**
    * Permissions

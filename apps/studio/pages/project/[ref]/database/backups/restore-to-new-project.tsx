@@ -27,7 +27,7 @@ import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8s, useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
@@ -63,7 +63,7 @@ const RestoreToNewProject = () => {
   const organization = useSelectedOrganization()
   const isFreePlan = organization?.plan?.id === 'free'
   const isOrioleDb = useIsOrioleDb()
-  const isAwsK8s = useIsAwsK8s()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
