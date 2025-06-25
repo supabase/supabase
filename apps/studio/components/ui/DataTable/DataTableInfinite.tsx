@@ -128,7 +128,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             {renderLiveRow?.()}
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results
+                {isLoading ? 'Retrieving logs...' : 'No results'}
               </TableCell>
             </TableRow>
           </Fragment>

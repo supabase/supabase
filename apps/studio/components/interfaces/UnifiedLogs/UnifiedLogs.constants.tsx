@@ -86,5 +86,5 @@ export const SEARCH_PARAMS_PARSER = {
   live: parseAsBoolean.withDefault(false),
 
   // REQUIRED FOR SELECTION
-  uuid: parseAsString,
+  id: parseAsString,
 }

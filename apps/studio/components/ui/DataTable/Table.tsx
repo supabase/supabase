@@ -31,7 +31,7 @@ const TableHeader = forwardRef<
   HTMLTableSectionElement,
   ComponentPropsWithRef<typeof ShadcnTableHeader>
 >(({ className, ...props }, ref) => (
-  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-20', className)} {...props} />
+  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-[1]', className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
@@ -88,10 +88,7 @@ const TableCell = forwardRef<HTMLTableCellElement, ComponentPropsWithRef<typeof 
   ({ className, ...props }, ref) => (
     <ShadcnTableCell
       ref={ref}
-      className={cn(
-        'text-[0.8rem] !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate',
-        className
-      )}
+      className={cn('text-xs !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate', className)}
       {...props}
     />
   )

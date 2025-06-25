@@ -4,7 +4,7 @@ import { getLogsChartQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs
 import { handleError, post } from 'data/fetchers'
 import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { logsKeys } from './keys'
-import { UNIFIED_LOGS_STALE_TIME, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
 
 export async function getUnifiedLogsChart(
   { projectRef, search }: UnifiedLogsVariables,
@@ -150,7 +150,7 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     ({ signal }) => getUnifiedLogsChart({ projectRef, search }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: UNIFIED_LOGS_STALE_TIME,
+      ...UNIFIED_LOGS_QUERY_OPTIONS,
       ...options,
     }
   )

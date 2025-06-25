@@ -106,7 +106,7 @@ export const filterFields = [
 
 export const sheetFields = [
   {
-    id: 'uuid',
+    id: 'id',
     label: 'Request ID',
     type: 'readonly',
     skeletonClassName: 'w-64',

@@ -63,10 +63,10 @@ export const UnifiedLogs = () => {
   const { ref: projectRef } = useParams()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
-  const { sort, start, size, uuid, cursor, direction, live, ...filter } = search
+  const { sort, start, size, id, cursor, direction, live, ...filter } = search
   const defaultColumnSorting = sort ? [sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultRowSelection = search.uuid ? { [search.uuid]: true } : {}
+  const defaultRowSelection = search.id ? { [search.id]: true } : {}
   const defaultColumnFilters = Object.entries(filter)
     .map(([key, value]) => ({ id: key, value }))
     .filter(({ value }) => value ?? undefined)
@@ -86,11 +86,11 @@ export const UnifiedLogs = () => {
     []
   )
 
-  // Create a stable query key object by removing nulls/undefined, uuid, and live
+  // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = Object.entries(search).reduce(
     (acc, [key, value]) => {
-      if (!['uuid', 'live'].includes(key) && value !== null && value !== undefined) {
+      if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
         acc[key] = value
       }
       return acc
@@ -116,9 +116,15 @@ export const UnifiedLogs = () => {
     search: searchParameters,
   })
 
-  const flatData = useMemo(() => {
+  const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
+  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
+  const flatData = useMemo(() => {
+    return rawFlatData.filter((value, idx) => {
+      return idx === rawFlatData.findIndex((x) => x.id === value.id)
+    })
+  }, [rawFlatData])
   const liveMode = useLiveMode(flatData)
 
   // REMINDER: meta data is always the same for all pages as filters do not change(!)
@@ -161,7 +167,7 @@ export const UnifiedLogs = () => {
     columnResizeMode: 'onChange',
     filterFns: { inDateRange, arrSome },
     meta: { getRowClassName },
-    getRowId: (row) => row.uuid,
+    getRowId: (row) => row.id,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
@@ -266,10 +272,10 @@ export const UnifiedLogs = () => {
   useEffect(() => {
     if (isLoading || isFetching) return
     if (Object.keys(rowSelection)?.length && !selectedRow) {
-      setSearch({ uuid: null })
+      setSearch({ id: null })
       setRowSelection({})
     } else {
-      setSearch({ uuid: Object.keys(rowSelection)?.[0] || null })
+      setSearch({ id: Object.keys(rowSelection)?.[0] || null })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection, selectedRow, isLoading, isFetching])
@@ -341,7 +347,7 @@ export const UnifiedLogs = () => {
                     hasNextPage={hasNextPage}
                     renderLiveRow={(props) => {
                       if (!liveMode.timestamp) return null
-                      if ((props?.row as any).original.uuid !== liveMode?.row?.uuid) return null
+                      if (props?.row?.original.id !== liveMode?.row?.id) return null
                       return <LiveRow colSpan={COLUMNS.length - 1} />
                     }}
                     setColumnOrder={setColumnOrder}
