@@ -14,6 +14,7 @@ The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP)
 - [Cline](#cline) (VS Code extension)
 - [Claude desktop](#claude-desktop)
 - [Claude code](#claude-code)
+- [Qodo Gen](#qodo-gen)
 
 Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
 
@@ -121,6 +122,17 @@ You can also add the Supabase MCP server as a locally-scoped server, which will 
    ```
 
 Locally-scoped servers take precedence over project-scoped servers with the same name and are stored in your project-specific user settings.
+
+### Qodo Gen
+
+1. Open [Qodo Gen](https://docs.qodo.ai/qodo-documentation/qodo-gen) chat panel in VSCode or IntelliJ.
+1. Click `Connect more tools`.
+1. Click `+ Add new MCP`.
+1. Add the following configuration:
+
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Qodo Gen" }} />
+
+1. Click `Save`.
 
 ### Next steps
 
