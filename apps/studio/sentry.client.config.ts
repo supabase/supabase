@@ -73,6 +73,12 @@ Sentry.init({
       return null
     }
 
+    // remove after debugging
+    if (event.tags?.alwaysSend) {
+      console.log('[Sentry beforeSend] Bypassing third party check for alwaysSend tag')
+      return event
+    }
+
     const frames = event.exception?.values?.[0].stacktrace?.frames || []
     console.log('[Sentry beforeSend] Frames for event:', frames)
     if (isThirdPartyError(frames)) {
