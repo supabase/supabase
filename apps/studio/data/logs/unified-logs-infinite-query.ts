@@ -71,10 +71,28 @@ async function getUnifiedLogs(
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
   const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
 
-  const cursorTimestampEnd = pageParam?.cursor
-  const timestampEnd = cursorTimestampEnd
-    ? new Date(Number(cursorTimestampEnd) / 1000).toISOString()
-    : isoTimestampEnd
+  const cursorValue = pageParam?.cursor
+  const cursorDirection = pageParam?.direction
+
+  let timestampStart: string
+  let timestampEnd: string
+
+  if (cursorDirection === 'prev') {
+    // Live mode: fetch logs newer than the cursor
+    timestampStart = cursorValue
+      ? new Date(Number(cursorValue) / 1000).toISOString()
+      : isoTimestampStart
+    timestampEnd = new Date().toISOString()
+  } else if (cursorDirection === 'next') {
+    // Regular pagination: fetch logs older than the cursor
+    timestampStart = isoTimestampStart
+    timestampEnd = cursorValue
+      ? new Date(Number(cursorValue) / 1000).toISOString()
+      : isoTimestampEnd
+  } else {
+    timestampStart = isoTimestampStart
+    timestampEnd = isoTimestampEnd
+  }
 
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
     params: { path: { ref: projectRef } },
@@ -111,13 +129,20 @@ async function getUnifiedLogs(
     }
   })
 
+  const firstRow = result.length > 0 ? result[0] : null
   const lastRow = result.length > 0 ? result[result.length - 1] : null
-  const nextCursor = lastRow ? lastRow.timestamp : null
   const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
+
+  const nextCursor = lastRow ? lastRow.timestamp : null
+  // FIXED: Always provide prevCursor like DataTableDemo does
+  // This ensures live mode never breaks the infinite query chain
+  // DataTableDemo uses milliseconds, but our timestamps are in microseconds
+  const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
 
   return {
     data: result,
     nextCursor: hasMore ? nextCursor : null,
+    prevCursor,
   }
 }
 
@@ -135,9 +160,14 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     },
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      getPreviousPageParam: (firstPage) => {
+        if (!firstPage.prevCursor) return null
+        const result = { cursor: firstPage.prevCursor, direction: 'prev' } as PageParam
+        return result
+      },
       getNextPageParam(lastPage) {
         if (!lastPage.nextCursor || lastPage.data.length === 0) return null
-        return { cursor: lastPage.nextCursor } as PageParam
+        return { cursor: lastPage.nextCursor, direction: 'next' } as PageParam
       },
       ...UNIFIED_LOGS_QUERY_OPTIONS,
       ...options,

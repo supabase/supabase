@@ -47,6 +47,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   const tableRef = useRef<HTMLTableElement>(null)
 
   const headerGroups = table.getHeaderGroups()
+  const headers = headerGroups[0].headers
+  const rows = table.getRowModel().rows ?? []
 
   // [Joshen] This is not even getting triggered that's why infinite scrolling not working
   const onScroll = useCallback(
@@ -70,39 +72,37 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   return (
     <Table ref={tableRef} onScroll={onScroll}>
       <TableHeader>
-        {headerGroups.map((headerGroup) => (
-          <TableRow key={headerGroup.id} className="bg-surface-75">
-            {headerGroup.headers.map((header) => {
-              const sort = header.column.getIsSorted()
-              const canResize = header.column.getCanResize()
-              const onResize = header.getResizeHandler()
-              const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
+        <TableRow className="bg-surface-75">
+          {headers.map((header) => {
+            const sort = header.column.getIsSorted()
+            const canResize = header.column.getCanResize()
+            const onResize = header.getResizeHandler()
+            const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
 
-              return (
-                <TableHead
-                  key={header.id}
-                  className={headerClassName}
-                  aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                  {canResize && (
-                    <div
-                      onDoubleClick={() => header.column.resetSize()}
-                      onMouseDown={onResize}
-                      onTouchStart={onResize}
-                      className={cn(
-                        'user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center',
-                        'before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border'
-                      )}
-                    />
-                  )}
-                </TableHead>
-              )
-            })}
-          </TableRow>
-        ))}
+            return (
+              <TableHead
+                key={header.id}
+                className={headerClassName}
+                aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
+              >
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+                {canResize && (
+                  <div
+                    onDoubleClick={() => header.column.resetSize()}
+                    onMouseDown={onResize}
+                    onTouchStart={onResize}
+                    className={cn(
+                      'user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center',
+                      'before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border'
+                    )}
+                  />
+                )}
+              </TableHead>
+            )
+          })}
+        </TableRow>
       </TableHeader>
       <TableBody
         id="content"
@@ -110,8 +110,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         // REMINDER: avoids scroll (skipping the table header) when using skip to content
         style={{ scrollMarginTop: 'calc(var(--top-bar-height))' }}
       >
-        {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row) => (
+        {rows.length ? (
+          rows.map((row) => (
             // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
             <Fragment key={row.id}>
               {renderLiveRow?.({ row: row as any })}
@@ -191,6 +191,7 @@ function DataTableRow<TData>({
   // via the `getRowClassName` prop - but for some reasons it wil render the row on data fetch
   useQueryState('live', searchParamsParser.live)
   const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
+  const cells = row.getVisibleCells()
 
   return (
     <TableRow
@@ -206,7 +207,7 @@ function DataTableRow<TData>({
       }}
       className={cn(rowClassName)}
     >
-      {row.getVisibleCells().map((cell) => {
+      {cells.map((cell) => {
         const cellClassName = (cell.column.columnDef.meta as any)?.cellClassName
         return (
           <TableCell key={cell.id} className={cn(cellClassName)}>

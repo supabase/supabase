@@ -10,7 +10,7 @@ import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
 
-export const COLUMNS: ColumnDef<ColumnSchema>[] = [
+export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
   {
     accessorKey: 'level',
     header: '',

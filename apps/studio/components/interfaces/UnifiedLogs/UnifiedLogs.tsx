@@ -45,7 +45,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import { COLUMNS } from './components/Columns'
+import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -144,12 +144,12 @@ export const UnifiedLogs = () => {
     const rowTimestamp = row.original.timestamp
     const isPast = rowTimestamp <= (liveMode.timestamp || -1)
     const levelClassName = getLevelRowClassName(row.original.level as any)
-    return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100')
+    return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
   }
 
   const table = useReactTable({
     data: flatData,
-    columns: COLUMNS,
+    columns: UNIFIED_LOGS_COLUMNS,
     state: {
       columnFilters,
       sorting,
@@ -258,7 +258,7 @@ export const UnifiedLogs = () => {
   return (
     <DataTableProvider
       table={table}
-      columns={COLUMNS}
+      columns={UNIFIED_LOGS_COLUMNS}
       filterFields={filterFields}
       columnFilters={columnFilters}
       sorting={sorting}
@@ -303,7 +303,7 @@ export const UnifiedLogs = () => {
               <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
                 <ResizablePanel defaultSize={100} minSize={30}>
                   <DataTableInfinite
-                    columns={COLUMNS}
+                    columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}
                     filterRows={filterDBRowCount}
                     totalRowsFetched={totalFetched}
@@ -312,7 +312,7 @@ export const UnifiedLogs = () => {
                     renderLiveRow={(props) => {
                       if (!liveMode.timestamp) return null
                       if (props?.row?.original.id !== liveMode?.row?.id) return null
-                      return <LiveRow colSpan={COLUMNS.length - 1} />
+                      return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
                     }}
                     setColumnOrder={setColumnOrder}
                     setColumnVisibility={setColumnVisibility}
