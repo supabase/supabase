@@ -40,7 +40,7 @@ export const FunctionLogsTab = ({ logs = [] }: FunctionLogsTabProps) => {
                     className="min-w-20"
                   />
                 </div>
-                <div className="mt-1 whitespace-pre-wrap break-all pl-2 text-xs">
+                <div className="mt-1 whitespace-pre-wrap break-all pl-2 text-[0.8rem]">
                   {log.event_message}
                 </div>
               </div>

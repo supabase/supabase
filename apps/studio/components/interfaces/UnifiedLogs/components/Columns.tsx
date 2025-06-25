@@ -163,7 +163,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
           {logCount && (
             <Tooltip>
               <TooltipTrigger>
-                <span className="text-foreground-lighter bg-surface-400 px-[6px] py-[2px] h-fit rounded-md text-xs leading-none">
+                <span className="text-foreground-lighter bg-surface-400 px-[6px] py-[2px] h-fit rounded-md text-[0.8rem] leading-none">
                   {logCount}
                 </span>
               </TooltipTrigger>
