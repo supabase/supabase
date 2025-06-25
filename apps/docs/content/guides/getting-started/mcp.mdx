@@ -118,7 +118,7 @@ You can also add the Supabase MCP server as a locally-scoped server, which will 
 1. Run the following command in your terminal:
 
    ```bash
-   claude mcp add supabase -s local -e SUPABASE_ACCESS_TOKEN=your_token_here npx -y @supabase/mcp-server-supabase@latest
+   claude mcp add supabase -s local -e SUPABASE_ACCESS_TOKEN=your_token_here -- npx -y @supabase/mcp-server-supabase@latest
    ```
 
 Locally-scoped servers take precedence over project-scoped servers with the same name and are stored in your project-specific user settings.
@@ -184,6 +184,17 @@ You can add the Supabase MCP server to Amp in two ways:
 
 1. Save the configuration file.
 1. Restart Amp to apply the new configuration.
+
+### Qodo Gen
+
+1. Open [Qodo Gen](https://docs.qodo.ai/qodo-documentation/qodo-gen) chat panel in VSCode or IntelliJ.
+1. Click `Connect more tools`.
+1. Click `+ Add new MCP`.
+1. Add the following configuration:
+
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Qodo Gen" }} />
+
+1. Click `Save`.
 
 ### Next steps
 
