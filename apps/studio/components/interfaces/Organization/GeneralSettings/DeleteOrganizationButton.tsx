@@ -37,7 +37,7 @@ export const DeleteOrganizationButton = () => {
     if (!values.orgName) {
       errors.orgName = 'Enter the name of the organization.'
     }
-    if (values.orgName !== orgSlug) {
+    if (values.orgName.trim() !== orgSlug?.trim()) {
       errors.orgName = 'Value entered does not match the value above.'
     }
     return errors
