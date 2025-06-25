@@ -271,6 +271,7 @@ When implementing JWT validation on your server:
 
 ## Security Considerations
 
+- **Always validate the JWT signature** before trusting any claims
 - **Never expose service role tokens** to client-side code
 - **Validate all claims** before trusting the JWT
 - **Check token expiration** on every request
