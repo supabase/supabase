@@ -985,6 +985,12 @@ importers:
         specifier: ^4.4.2
         version: 4.4.2
     devDependencies:
+      '@graphql-codegen/cli':
+        specifier: 5.0.5
+        version: 5.0.5(@parcel/watcher@2.5.1)(@types/node@22.13.14)(encoding@0.1.13)(graphql-sock@1.0.1(graphql@16.10.0))(graphql@16.10.0)(supports-color@8.1.1)(typescript@5.5.2)
+      '@graphql-typed-document-node/core':
+        specifier: ^3.2.0
+        version: 3.2.0(graphql@16.10.0)
       '@radix-ui/react-use-escape-keydown':
         specifier: ^1.0.3
         version: 1.1.0(@types/react@18.3.3)(react@18.3.1)
@@ -12611,9 +12617,6 @@ packages:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
 
-  jose@5.2.1:
-    resolution: {integrity: sha512-qiaQhtQRw6YrOaOj0v59h3R6hUY9NvxBmmnMfKemkqYmBB0tEc97NbLP7ix44VP5p9/0YHG8Vyhzuo5YBNwviA==}
-
   jose@5.9.6:
     resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
 
@@ -20381,12 +20384,12 @@ snapshots:
       '@whatwg-node/fetch': 0.10.6
       chalk: 4.1.2
       debug: 4.4.0(supports-color@8.1.1)
-      dotenv: 16.4.7
+      dotenv: 16.5.0
       graphql: 16.10.0
       graphql-request: 6.1.0(encoding@0.1.13)(graphql@16.10.0)
       http-proxy-agent: 7.0.2(supports-color@8.1.1)
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
-      jose: 5.2.1
+      jose: 5.9.6
       js-yaml: 4.1.0
       lodash: 4.17.21
       scuid: 1.1.0
@@ -31463,8 +31466,6 @@ snapshots:
   jiti@1.21.7: {}
 
   jiti@2.4.2: {}
-
-  jose@5.2.1: {}
 
   jose@5.9.6: {}
 
