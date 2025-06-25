@@ -164,32 +164,20 @@ const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval) => string> = {
   },
   ErrorsByStatus: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
-    const ERROR_CODES = [
-      '400', // Bad Request
-      '401', // Unauthorized
-      '403', // Forbidden
-      '404', // Not Found
-      '409', // Conflict
-      '410', // Gone
-      '422', // Unprocessable Entity
-      '429', // Too Many Requests
-      '500', // Internal Server Error
-      '502', // Bad Gateway
-      '503', // Service Unavailable
-      '504', // Gateway Timeout
-    ]
     return `
       --auth-errors-by-status
-      select 
-        timestamp_trunc(timestamp, ${granularity}) as timestamp,
-        json_value(event_message, "$.status") as status_code,
-        json_value(event_message, "$.path") as path,
-        json_value(event_message, "$.method") as method,
-        count(*) as count
-      from auth_logs
-      where json_value(event_message, "$.status") in (${ERROR_CODES.map((code) => `'${code}'`).join(',')})
-      group by timestamp, status_code, path, method
-      order by timestamp desc, status_code
+select 
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
+  count(*) as count,
+  response.status_code
+from edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) as request
+  cross join unnest(m.response) as response
+where path like '%/auth%'
+  and response.status_code >= 400 and response.status_code <= 599
+group by timestamp, status_code
+order by timestamp desc
     `
   },
 }
