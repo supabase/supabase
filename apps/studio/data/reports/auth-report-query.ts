@@ -344,10 +344,6 @@ export function useAuthLogsReport({
   const formatter = METRIC_FORMATTER[logsMetric as MetricKey] || defaultFormatter
   const { data, chartAttributes } = formatter(rawData, attributes, logsMetric)
 
-  console.log(`----- ${logsMetric} -----`)
-  console.log(logsMetric, data)
-  console.log(logsMetric, sql)
-
   return {
     data,
     attributes: chartAttributes,
