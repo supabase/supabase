@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
 
 /**
  * UTILS.
@@ -42,6 +43,22 @@ const METRIC_KEYS = [
   'RateLimitedRequests',
   'ErrorsByStatus',
 ]
+
+const STATUS_CODE_COLORS: { [key: string]: { light: string; dark: string } } = {
+  '400': { light: '#FFD54F', dark: '#FFF176' },
+  '401': { light: '#FF8A65', dark: '#FFAB91' },
+  '403': { light: '#FFB74D', dark: '#FFCC80' },
+  '404': { light: '#90A4AE', dark: '#B0BEC5' },
+  '409': { light: '#BA68C8', dark: '#CE93D8' },
+  '410': { light: '#A1887F', dark: '#BCAAA4' },
+  '422': { light: '#FF9800', dark: '#FFB74D' },
+  '429': { light: '#E65100', dark: '#F57C00' },
+  '500': { light: '#B71C1C', dark: '#D32F2F' },
+  '502': { light: '#9575CD', dark: '#B39DDB' },
+  '503': { light: '#0097A7', dark: '#4DD0E1' },
+  '504': { light: '#C0CA33', dark: '#D4E157' },
+  default: { light: '#757575', dark: '#9E9E9E' },
+}
 
 type MetricKey = (typeof METRIC_KEYS)[number]
 
@@ -248,14 +265,25 @@ const METRIC_FORMATTER: Record<
   SignUpLatency: (rawData, attributes) => defaultFormatter(rawData, attributes),
   RateLimitedRequests: (rawData, attributes) => defaultFormatter(rawData, attributes),
   ErrorsByStatus: (rawData, attributes) => {
-    const chartAttributes = attributes.map((attr) => {
-      if (attr.attribute === 'ErrorsByStatus' && attr.statusCode) {
-        return { ...attr, attribute: `${attr.attribute}_${attr.statusCode}` }
-      }
-      return attr
-    })
-    if (!rawData) return { data: undefined, chartAttributes }
+    if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
+
+    const statusCodes = Array.from(new Set(result.map((p: any) => p.status_code)))
+
+    const chartAttributes = statusCodes.map((statusCode) => {
+      const statusCodeInfo = getHttpStatusCodeInfo(Number(statusCode))
+      const color = STATUS_CODE_COLORS[String(statusCode)] || STATUS_CODE_COLORS.default
+
+      return {
+        attribute: `status_${statusCode}`,
+        label: `${statusCode} ${statusCodeInfo.label}`,
+        provider: 'logs',
+        enabled: true,
+        color: color,
+        statusCode: String(statusCode),
+      }
+    })
+
     const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
     const data = Array.from(timestamps)
       .sort()
@@ -266,10 +294,11 @@ const METRIC_FORMATTER: Record<
         })
         const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
         matchingPoints.forEach((p: any) => {
-          point[`ErrorsByStatus_${p.status_code}`] = p.count
+          point[`status_${p.status_code}`] = p.count
         })
         return point
       })
+
     return { data, chartAttributes }
   },
 }
