@@ -181,15 +181,24 @@ After this step, you should have your local project authenticated and linked to 
 
 ## Step 6: Deploy to production
 
-Deploy your function to Supabase's global edge network. Make sure Docker Desktop is installed and running!
+Deploy your function to Supabase's global edge network:
 
 ```bash
 supabase functions deploy hello-world
 
 # If you want to deploy all functions, run the `deploy` command without specifying a function name:
 supabase functions deploy
-
 ```
+
+<Admonition type="tip" label="Docker not required">
+
+The CLI automatically falls back to API-based deployment if Docker isn't available. You can also explicitly use API deployment with the `--use-api` flag:
+
+```bash
+supabase functions deploy hello-world --use-api
+```
+
+</Admonition>
 
 If you want to skip JWT verification, you can add the `--no-verify-jwt` flag for webhooks that don't need authentication:
 
