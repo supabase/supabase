@@ -58,32 +58,11 @@ The standard `.vscode/settings.json` setup works perfectly for projects where yo
 
 For this development workflow, create `edge-functions.code-workspace`:
 
-```json
-{
-  "folders": [
-    {
-      "name": "project-root",
-      "path": "./"
-    },
-    {
-      "name": "client",
-      "path": "app"
-    },
-    {
-      "name": "supabase-functions",
-      "path": "supabase/functions"
-    }
-  ],
-  "settings": {
-    "files.exclude": {
-      "node_modules/": true,
-      "app/": true,
-      "supabase/functions/": true
-    },
-    "deno.importMap": "./supabase/functions/import_map.json"
-  }
-}
-```
+<$CodeSample
+path="/edge-functions/edge-functions.code-workspace"
+meta="edge-functions.code-workspace"
+language="json"
+/>
 
 You can find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions).
 
