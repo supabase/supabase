@@ -132,24 +132,26 @@ You can add the Supabase MCP server to Amp in two ways:
 1. Open "Preferences: Open User Settings (JSON)"
 2. Add the following configuration:
 
-```json
-{
-  "amp.mcpServers": {
-    "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--read-only",
-        "--project-ref=<project-ref>"
-      ],
-      "env": {
-        "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-      }
-    }
-  }
-}
-```
+   ```json
+   {
+     "amp.mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "@supabase/mcp-server-supabase@latest",
+           "--read-only",
+           "--project-ref=<project-ref>"
+         ],
+         "env": {
+           "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+         }
+       }
+     }
+   }
+   ```
+
+   Replace `project-ref` and `personal-access-token` with your project ref and personal access token.
 
 1. Save the configuration file.
 1. Restart VS Code to apply the new configuration.
@@ -159,24 +161,26 @@ You can add the Supabase MCP server to Amp in two ways:
 1. Edit `~/.config/amp/settings.json`
 1. Add the following configuration:
 
-```json
-{
-  "amp.mcpServers": {
-    "supabase": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--read-only",
-        "--project-ref=<project-ref>"
-      ],
-      "env": {
-        "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
-      }
-    }
-  }
-}
-```
+   ```json
+   {
+     "amp.mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "@supabase/mcp-server-supabase@latest",
+           "--read-only",
+           "--project-ref=<project-ref>"
+         ],
+         "env": {
+           "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+         }
+       }
+     }
+   }
+   ```
+
+   Replace `project-ref` and `personal-access-token` with your project ref and personal access token.
 
 1. Save the configuration file.
 1. Restart Amp to apply the new configuration.
