@@ -34,35 +34,16 @@ We recommend using hyphens to name functions because hyphens are the most URL-fr
 ### Organizing your Edge Functions
 
 We recommend developing "fat functions". This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We also recommend a separate folder for [Unit Tests](/docs/guides/functions/unit-test) including the name of the function followed by a `-test` suffix.
-We recommend this folder structure:
 
-```bash
-└── supabase
-    ├── functions
-    │   ├── import_map.json # A top-level import map to use across functions.
-    │   ├── _shared
-    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key.
-    │   │   └── supabaseClient.ts # Supabase client with ANON key.
-    │   │   └── cors.ts # Reusable CORS headers.
-    │   ├── function-one # Use hyphens to name functions.
-    │   │   └── index.ts
-    │   └── function-two
-    │   │   └── index.ts
-    │   └── tests
-    │       └── function-one-test.ts
-    │       └── function-two-test.ts
-    ├── migrations
-    └── config.toml
-```
+<$Partial path="edge_functions_file_structure.mdx" />
 
 ### Using config.toml
 
-Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) can be set via the `config.toml` file.
 
 ```toml supabase/config.toml
 [functions.hello-world]
 verify_jwt = false
-import_map = './import_map.json'
 ```
 
 ### Not using TypeScript
