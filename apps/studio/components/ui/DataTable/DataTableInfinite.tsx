@@ -30,6 +30,7 @@ export interface DataTableInfiniteProps<TData, TValue, TMeta> {
   searchParamsParser: any
 }
 
+// [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
 export function DataTableInfinite<TData, TValue, TMeta>({
   columns,
   defaultColumnVisibility = {},
@@ -115,7 +116,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
             <Fragment key={row.id}>
               {renderLiveRow?.({ row: row as any })}
-              <MemoizedRow
+              <DataTableRow
                 row={row}
                 table={table}
                 searchParamsParser={searchParamsParser}
@@ -187,8 +188,6 @@ function DataTableRow<TData>({
   selected?: boolean
   searchParamsParser: any
 }) {
-  // REMINDER: rerender the row when live mode is toggled - used to opacity the row
-  // via the `getRowClassName` prop - but for some reasons it wil render the row on data fetch
   useQueryState('live', searchParamsParser.live)
   const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
   const cells = row.getVisibleCells()
@@ -219,6 +218,7 @@ function DataTableRow<TData>({
   )
 }
 
+// [Joshen] Using MemoizedRow will cause the column visibility to break as the rows aren't getting re-rendered
 const MemoizedRow = memo(
   DataTableRow,
   (prev, next) => prev.row.id === next.row.id && prev.selected === next.selected
