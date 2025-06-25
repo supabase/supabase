@@ -51,7 +51,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   const headers = headerGroups[0].headers
   const rows = table.getRowModel().rows ?? []
 
-  // [Joshen] This is not even getting triggered that's why infinite scrolling not working
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
       const onPageBottom =
