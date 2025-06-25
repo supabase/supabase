@@ -16,7 +16,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
@@ -216,9 +215,7 @@ const RestoreToNewProject = () => {
         type="default"
         title="Restoring to new projects are not available for OrioleDB"
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
-      >
-        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
-      </Admonition>
+      />
     )
   }
 
@@ -227,9 +224,7 @@ const RestoreToNewProject = () => {
       <Admonition
         type="default"
         title="Restoring to new projects is temporarily not available for AWS (Revamped) projects"
-      >
-        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
-      </Admonition>
+      />
     )
   }
 
