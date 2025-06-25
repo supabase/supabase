@@ -83,8 +83,8 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
       return <span className="text-foreground-lighter">{value}</span>
     },
     enableResizing: false,
-    size: 60,
-    minSize: 60,
+    size: 70,
+    minSize: 70,
     meta: {
       cellClassName:
         'font-mono text-muted-foreground w-[--col-method-size] max-w-[--col-method-size] min-w-[--col-method-size]',
