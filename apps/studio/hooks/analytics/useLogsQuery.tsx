@@ -49,17 +49,11 @@ const useLogsQuery = (
     setParams((prev) => ({
       ...prev,
       ...initialParams,
-      project: projectRef,
       sql: initialParams?.sql ?? prev.sql,
       iso_timestamp_start: initialParams.iso_timestamp_start ?? prev.iso_timestamp_start,
       iso_timestamp_end: initialParams.iso_timestamp_end ?? prev.iso_timestamp_end,
     }))
-  }, [
-    projectRef,
-    initialParams.sql,
-    initialParams.iso_timestamp_start,
-    initialParams.iso_timestamp_end,
-  ])
+  }, [initialParams.sql, initialParams.iso_timestamp_start, initialParams.iso_timestamp_end])
 
   const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 

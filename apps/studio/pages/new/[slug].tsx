@@ -368,7 +368,7 @@ const Wizard: NextPageWithLayout = () => {
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
-      organizationId: currentOrg.id,
+      organizationSlug: currentOrg.slug,
       name: projectName,
       dbPass: dbPass,
       dbRegion: dbRegion,

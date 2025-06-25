@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { getLogsCountQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { FacetMetadataSchema } from 'components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { get, handleError } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { logsKeys } from './keys'
 import {
@@ -22,17 +22,9 @@ export async function getUnifiedLogsCount(
   const sql = getLogsCountQuery(search)
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        iso_timestamp_start: isoTimestampStart,
-        iso_timestamp_end: isoTimestampEnd,
-        project: projectRef,
-        sql,
-      },
-    },
-    // body: { sql },
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+    params: { path: { ref: projectRef } },
+    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
     signal,
   })
 

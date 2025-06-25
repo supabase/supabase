@@ -5,7 +5,7 @@ import {
   PageParam,
   QuerySearchParamsType,
 } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { get, handleError } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { logsKeys } from './keys'
 
@@ -77,17 +77,9 @@ async function getUnifiedLogs(
     timestampEnd = isoTimestampEnd
   }
 
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        iso_timestamp_start: timestampStart,
-        iso_timestamp_end: timestampEnd,
-        project: projectRef,
-        sql,
-      },
-    },
-    // body: { sql },
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+    params: { path: { ref: projectRef } },
+    body: { iso_timestamp_start: timestampStart, iso_timestamp_end: timestampEnd, sql },
     signal,
   })
 
