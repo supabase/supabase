@@ -1,6 +1,6 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -9,7 +9,19 @@ import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
-import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
+import { APISidePanelPreview } from './APISidePanelPreview'
+import { CLSPreview } from './CLSPreview'
+import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
+import { useFeaturePreviewContext } from './FeaturePreviewContext'
+import { InlineEditorPreview } from './InlineEditorPreview'
+
+const FEATURE_PREVIEW_KEY_TO_CONTENT: {
+  [key: string]: ReactNode
+} = {
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
+}
 
 const FeaturePreviewModal = () => {
   const { ref } = useParams()
@@ -128,7 +140,7 @@ const FeaturePreviewModal = () => {
                 </Button>
               </div>
             </div>
-            {selectedFeature?.content}
+            {FEATURE_PREVIEW_KEY_TO_CONTENT[selectedFeatureKey]}
           </div>
         </div>
       ) : (

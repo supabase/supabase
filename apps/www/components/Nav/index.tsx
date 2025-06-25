@@ -24,7 +24,8 @@ import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import useDropdownMenu from './useDropdownMenu'
-import { AuthenticatedDropdownMenu } from 'ui-patterns'
+import { AnnouncementBanner, AuthenticatedDropdownMenu } from 'ui-patterns'
+import Announcement from '../LaunchWeek/7/LaunchSection/Announcement'
 
 interface Props {
   hideNavbar: boolean
@@ -71,6 +72,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
+      <AnnouncementBanner />
       <div
         className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}

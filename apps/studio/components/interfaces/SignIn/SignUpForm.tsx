@@ -1,5 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import * as yup from 'yup'
@@ -28,6 +29,11 @@ const SignUpForm = () => {
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
+  const [searchParams] = useQueryStates({
+    auth_id: parseAsString.withDefault(''),
+    token: parseAsString.withDefault(''),
+  })
+
   const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
@@ -47,15 +53,21 @@ const SignUpForm = () => {
       token = captchaResponse?.response ?? null
     }
 
+    const isInsideOAuthFlow = !!searchParams.auth_id
+    const redirectUrlBase = `${
+      process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+        ? location.origin
+        : process.env.NEXT_PUBLIC_SITE_URL
+    }${BASE_PATH}`
+    const redirectTo = isInsideOAuthFlow
+      ? `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+      : `${redirectUrlBase}/sign-in`
+
     signup({
       email,
       password,
       hcaptchaToken: token ?? null,
-      redirectTo: `${
-        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? location.origin
-          : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/sign-in`,
+      redirectTo,
     })
   }
 

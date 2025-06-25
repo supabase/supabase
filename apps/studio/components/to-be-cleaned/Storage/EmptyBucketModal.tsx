@@ -19,7 +19,12 @@ export const EmptyBucketModal = ({ visible = false, bucket, onClose }: EmptyBuck
   const { mutate: emptyBucket, isLoading } = useBucketEmptyMutation({
     onSuccess: async () => {
       if (bucket === undefined) return
-      await fetchFolderContents({ folderId: bucket.id, folderName: bucket.name, index: -1 })
+      await fetchFolderContents({
+        bucketId: bucket.id,
+        folderId: bucket.id,
+        folderName: bucket.name,
+        index: -1,
+      })
       toast.success(`Successfully deleted bucket ${bucket!.name}`)
       onClose()
     },

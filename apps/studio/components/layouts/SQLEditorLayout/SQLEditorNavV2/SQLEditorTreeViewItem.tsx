@@ -260,13 +260,12 @@ export const SQLEditorTreeViewItem = ({
               <ContextMenuItem_Shadcn_
                 asChild
                 className="gap-x-2"
-                onSelect={() => {}}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
                 <Link
-                  href={`/project/${projectRef}/sql/${element.id}`}
-                  target="_blank"
+                  target="_self"
                   rel="noreferrer"
+                  href={`/project/${projectRef}/sql/${element.id}`}
                 >
                   <ExternalLink size={14} />
                   Open in new tab

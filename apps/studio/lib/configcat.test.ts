@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import * as configcat from 'configcat-js'
 import { getFlags } from './configcat'
 
+vi.mock('data/fetchers', () => ({
+  fetchHandler: vi.fn(),
+}))
+
 vi.mock('configcat-js', () => ({
   getClient: vi.fn(),
   PollingMode: {
@@ -29,6 +33,14 @@ describe('configcat', () => {
     const email = 'test@example.com'
     const mockValues = { flag1: true, flag2: false }
     mockClient.getAllValuesAsync.mockResolvedValue(mockValues)
+
+    const { fetchHandler } = await import('data/fetchers')
+    const mockFetchHandler = fetchHandler as unknown as ReturnType<typeof vi.fn>
+    mockFetchHandler.mockResolvedValueOnce(
+      new Response(JSON.stringify({}), {
+        status: 200,
+      })
+    )
 
     const result = await getFlags(email)
 

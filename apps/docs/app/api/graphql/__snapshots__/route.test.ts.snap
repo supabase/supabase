@@ -85,6 +85,20 @@ type CLICommandReference implements SearchResult {
 }
 
 """
+A reference document containing a description of a Supabase Management API endpoint
+"""
+type ManagementApiReference implements SearchResult {
+  """The title of the document"""
+  title: String
+
+  """The URL of the document"""
+  href: String
+
+  """The content of the reference document, as text"""
+  content: String
+}
+
+"""
 A reference document containing a description of a function from a Supabase client library
 """
 type ClientLibraryFunctionReference implements SearchResult {
@@ -134,6 +148,27 @@ type RootQueryType {
 
   """Get the details of an error code returned from a Supabase service"""
   error(code: String!, service: Service!): Error
+
+  """Get error codes that can potentially be returned by Supabase services"""
+  errors(
+    """Returns the first n elements from the list"""
+    first: Int
+
+    """Returns elements that come after the specified cursor"""
+    after: String
+
+    """Returns the last n elements from the list"""
+    last: Int
+
+    """Returns elements that come before the specified cursor"""
+    before: String
+
+    """Filter errors by a specific Supabase service"""
+    service: Service
+
+    """Filter errors by a specific error code"""
+    code: String
+  ): ErrorCollection
 }
 
 """A collection of search results containing content from Supabase docs"""
@@ -177,5 +212,44 @@ enum Service {
   AUTH
   REALTIME
   STORAGE
+}
+
+"""A collection of Errors"""
+type ErrorCollection {
+  """A list of edges containing nodes in this collection"""
+  edges: [ErrorEdge!]!
+
+  """The nodes in this collection, directly accessible"""
+  nodes: [Error!]!
+
+  """Pagination information"""
+  pageInfo: PageInfo!
+
+  """The total count of items available in this collection"""
+  totalCount: Int!
+}
+
+"""An edge in a collection of Errors"""
+type ErrorEdge {
+  """The Error at the end of the edge"""
+  node: Error!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Pagination information for a collection"""
+type PageInfo {
+  """Whether there are more items after the current page"""
+  hasNextPage: Boolean!
+
+  """Whether there are more items before the current page"""
+  hasPreviousPage: Boolean!
+
+  """Cursor pointing to the start of the current page"""
+  startCursor: String
+
+  """Cursor pointing to the end of the current page"""
+  endCursor: String
 }"
 `;

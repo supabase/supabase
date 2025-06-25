@@ -4,10 +4,6 @@ import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import {
-  useIsSQLEditorTabsEnabled,
-  useIsTableEditorTabsEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -23,7 +19,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { EnableBranchingModal } from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -91,17 +87,18 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { editorPanel, mobileMenuOpen, showSidebar, setMobileMenuOpen } = useAppStateSnapshot()
+    const {
+      editorPanel,
+      mobileMenuOpen,
+      showSidebar,
+      setMobileMenuOpen,
+      toggleEditorPanel,
+      setEditorPanel,
+    } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
-    const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
-    const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
-
-    // For tabs preview flag logic - only conditionally collapse sidebar for table editor and sql editor if feature flags are on
     const editor = useEditorType()
-    const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
-    const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
-    const forceShowProductMenu = !tableEditorTabsEnabled && !sqlEditorTabsEnabled
+    const forceShowProductMenu = editor === undefined
     const sideBarIsOpen = forceShowProductMenu || showSidebar
 
     const projectName = selectedProject?.name
@@ -124,8 +121,17 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
+        // Cmd+I: Open AI Assistant, close Editor Panel
         if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
-          aiSnap.openAssistant()
+          setEditorPanel({ open: false })
+          aiSnap.toggleAssistant()
+          e.preventDefault()
+          e.stopPropagation()
+        }
+        // Cmd+E: Toggle Editor Panel, always close AI Assistant
+        if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
+          aiSnap.closeAssistant()
+          toggleEditorPanel()
           e.preventDefault()
           e.stopPropagation()
         }
@@ -133,7 +139,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       window.addEventListener('keydown', handler)
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [aiSnap.open])
+    }, [setEditorPanel, aiSnap, editorPanel.open])
 
     return (
       <>

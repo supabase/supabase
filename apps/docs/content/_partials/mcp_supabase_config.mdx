@@ -16,15 +16,18 @@
           "args": [
             "-y",
             "@supabase/mcp-server-supabase@latest",
-            "--access-token",
-            "<personal-access-token>"
-          ]
+            "--read-only",
+            "--project-ref=<project-ref>"
+          ],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+          }
         }
       }
     }
     ```
 
-    Replace `<personal-access-token>` with your personal access token.
+    Replace `<project-ref>` with your project ref, and `<personal-access-token>` with your personal access token.
 
   </TabPanel>
 
@@ -40,15 +43,18 @@
             "npx",
             "-y",
             "@supabase/mcp-server-supabase@latest",
-            "--access-token",
-            "<personal-access-token>"
-          ]
+            "--read-only",
+            "--project-ref=<project-ref>"
+          ],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+          }
         }
       }
     }
     ```
 
-    Replace `<personal-access-token>` with your personal access token.
+    Replace `<project-ref>` with your project ref, and `<personal-access-token>` with your personal access token.
 
     <Admonition type="note">
 
@@ -83,15 +89,18 @@
             "npx",
             "-y",
             "@supabase/mcp-server-supabase@latest",
-            "--access-token",
-            "<personal-access-token>"
-          ]
+            "--read-only",
+            "--project-ref=<project-ref>"
+          ],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+          }
         }
       }
     }
     ```
 
-    Replace `<personal-access-token>` with your personal access token.
+    Replace `<project-ref>` with your project ref, and `<personal-access-token>` with your personal access token.
 
     This assumes you have Windows Subsystem for Linux (WSL) enabled and `node`/`npx` are installed within the WSL environment.
 
@@ -107,15 +116,18 @@
           "args": [
             "-y",
             "@supabase/mcp-server-supabase@latest",
-            "--access-token",
-            "<personal-access-token>"
-          ]
+            "--read-only",
+            "--project-ref=<project-ref>"
+          ],
+          "env": {
+            "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+          }
         }
       }
     }
     ```
 
-    Replace `<personal-access-token>` with your personal access token.
+    Replace `<project-ref>` with your project ref, and `<personal-access-token>` with your personal access token.
 
   </TabPanel>
 

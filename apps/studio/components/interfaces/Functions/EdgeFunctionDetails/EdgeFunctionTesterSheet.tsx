@@ -15,7 +15,10 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { prettifyJSON } from 'lib/helpers'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import {
+  RoleImpersonationStateContextProvider,
+  useGetImpersonatedRoleState,
+} from 'state/role-impersonation-state'
 import {
   Badge,
   Button,
@@ -159,7 +162,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
     // Validate that the body is valid JSON
     try {
-      JSON.parse(values.body)
+      JSON.parse(JSON.stringify(values.body))
     } catch (e) {
       form.setError('body', { message: 'Must be a valid JSON string' })
       return
@@ -416,7 +419,12 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                <RoleImpersonationPopover portal={false} />
+                {/* [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users. */}
+                <RoleImpersonationStateContextProvider
+                  key={`role-impersonation-state-${projectRef}`}
+                >
+                  <RoleImpersonationPopover portal={false} disallowAuthenticatedOption={true} />
+                </RoleImpersonationStateContextProvider>
                 <Button
                   type="primary"
                   htmlType="submit"
