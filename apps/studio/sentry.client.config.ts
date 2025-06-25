@@ -74,6 +74,7 @@ Sentry.init({
     }
 
     const frames = event.exception?.values?.[0].stacktrace?.frames || []
+    console.log('[Sentry beforeSend] Frames for event:', frames)
     if (isThirdPartyError(frames)) {
       console.log('[Sentry beforeSend] Dropped: third party error')
       return null
