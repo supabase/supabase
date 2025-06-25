@@ -5,9 +5,11 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -31,6 +33,11 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+
+  const [_, setUpdatedOptInSinceMCP] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+    false
+  )
 
   // [Joshen] This is to prevent users from changing their opt in levels until the migration
   // to clean up the existing opt in tags are completed. Once toggled on, users can then change their
@@ -88,6 +95,7 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
         onSuccess: () => {
           invalidateOrganizationsQuery(queryClient)
           toast.success('Successfully updated AI opt-in settings')
+          setUpdatedOptInSinceMCP(true)
           onSuccessCallback?.() // Call optional callback on success
         },
         onError: (error: ResponseError) => {
