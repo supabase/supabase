@@ -14,7 +14,6 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/title',
   '/ai/sql/cron',
   '/ai/feedback/classify',
-  '/ai/temp/bedrock-test',
   '/get-ip-address',
   '/get-utc-time',
   '/edge-functions/test',
