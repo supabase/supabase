@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
@@ -43,7 +42,6 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const router = useRouter()
   const org = useSelectedOrganization()
 
   const canReadGithubConnection = useCheckPermissions(
@@ -71,8 +69,8 @@ const IntegrationSettings = () => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const onAddGitHubConnection = useCallback(() => {
-    router.push('/project/_/settings/integrations')
-  }, [router])
+    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+  }, [sidePanelsStateSnapshot])
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {

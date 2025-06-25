@@ -35,6 +35,8 @@ import {
   Card,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
   cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -115,13 +117,24 @@ const GitHubSection = () => {
 
   const GitHubTitle = `GitHub Integration`
 
-  // Production Branch Form
-  const ProductionBranchSchema = z
+  // Combined GitHub Settings Form
+  const GitHubSettingsSchema = z
     .object({
+      enableProductionSync: z.boolean().default(false),
       branchName: z.string(),
+      new_branch_per_pr: z.boolean().default(false),
+      supabaseDirectory: z.string().default(''),
+      supabaseChangesOnly: z.boolean().default(false),
+      branchLimit: z.string().default('50'),
     })
     .superRefine(async (val, ctx) => {
-      if (isConnected && existingConnection && val.branchName && val.branchName.length > 0) {
+      if (
+        val.enableProductionSync &&
+        isConnected &&
+        existingConnection &&
+        val.branchName &&
+        val.branchName.length > 0
+      ) {
         try {
           await checkGithubBranchValidity({
             repositoryId: existingConnection.repository.id,
@@ -137,104 +150,80 @@ const GitHubSection = () => {
       }
     })
 
-  const productionBranchForm = useForm<z.infer<typeof ProductionBranchSchema>>({
-    resolver: zodResolver(ProductionBranchSchema),
+  const githubSettingsForm = useForm<z.infer<typeof GitHubSettingsSchema>>({
+    resolver: zodResolver(GitHubSettingsSchema),
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
     defaultValues: {
+      enableProductionSync: false,
       branchName: 'main',
-    },
-  })
-
-  // Automatic Branching Form
-  const AutomaticBranchingSchema = z.object({
-    autoBranchingEnabled: z.boolean().default(false),
-    supabaseDirectory: z.string().default(''),
-    supabaseChangesOnly: z.boolean().default(false),
-    branchLimit: z.string().default('50'),
-  })
-
-  const automaticBranchingForm = useForm<z.infer<typeof AutomaticBranchingSchema>>({
-    resolver: zodResolver(AutomaticBranchingSchema),
-    defaultValues: {
-      autoBranchingEnabled: false,
+      new_branch_per_pr: false,
       supabaseDirectory: '',
       supabaseChangesOnly: false,
       branchLimit: '50',
     },
   })
 
-  const autoBranchingEnabled = automaticBranchingForm.watch('autoBranchingEnabled')
+  const enableProductionSync = githubSettingsForm.watch('enableProductionSync')
+  const newBranchPerPr = githubSettingsForm.watch('new_branch_per_pr')
 
-  const onSubmitProductionBranch = async (data: z.infer<typeof ProductionBranchSchema>) => {
+  const onSubmitGitHubSettings = async (data: z.infer<typeof GitHubSettingsSchema>) => {
     const originalBranchName = prodBranch?.git_branch
 
-    if (originalBranchName && data.branchName !== originalBranchName) {
+    if (originalBranchName && data.branchName !== originalBranchName && data.enableProductionSync) {
       setIsConfirmingBranchChange(true)
     } else {
-      await executeProductionBranchSave(data)
+      await executeGitHubSettingsSave(data)
     }
   }
 
-  const executeProductionBranchSave = async (data: z.infer<typeof ProductionBranchSchema>) => {
-    if (!projectRef) return
+  const executeGitHubSettingsSave = async (data: z.infer<typeof GitHubSettingsSchema>) => {
+    if (!projectRef || !selectedOrganization) return
 
-    if (!isBranchingEnabled) {
-      // create production branch (enables branching)
+    // Handle automatic branching validation
+    if (data.new_branch_per_pr && !selectedOrganization) {
+      return console.error('Organization not selected')
+    }
+
+    if (data.new_branch_per_pr && !existingConnection) {
+      return toast.error('Please connect to a repository first.')
+    }
+
+    // Handle branch creation/update
+    if (!isBranchingEnabled || !prodBranch?.id) {
+      // Create production branch (enables branching)
       createBranch({
         projectRef,
         branchName: data.branchName,
         gitBranch: data.branchName,
       })
-    } else {
-      if (prodBranch?.id) {
-        updateBranch({
-          id: prodBranch.id,
-          projectRef,
-          branchName: prodBranch.name,
-          gitBranch: data.branchName,
-        })
-      }
+    } else if (prodBranch?.id) {
+      // Update existing branch
+      updateBranch({
+        id: prodBranch.id,
+        projectRef,
+        gitBranch: data.enableProductionSync ? data.branchName : '',
+      })
     }
 
-    toast.success('Production branch configuration updated')
+    // Update connection settings if connection exists
+    if (existingConnection) {
+      updateConnectionSettings({
+        connectionId: existingConnection.id,
+        organizationId: selectedOrganization.id,
+        workdir: data.supabaseDirectory,
+        supabaseChangesOnly: data.supabaseChangesOnly,
+        branchLimit: Number(data.branchLimit),
+        new_branch_per_pr: data.new_branch_per_pr,
+      })
+    }
+
+    toast.success('GitHub integration updated successfully')
     setIsConfirmingBranchChange(false)
   }
 
   const onConfirmBranchChange = async () => {
-    await executeProductionBranchSave(productionBranchForm.getValues())
-  }
-
-  const onSubmitAutomaticBranching = async (data: z.infer<typeof AutomaticBranchingSchema>) => {
-    if (!projectRef || !selectedOrganization) return console.error('Missing required data')
-    if (!existingConnection) return toast.error('Please connect to a repository first.')
-
-    if (data.autoBranchingEnabled) {
-      const defaultBranch = productionBranchForm.getValues().branchName
-
-      if (!isBranchingEnabled) {
-        // create production branch (enables branching)
-        createBranch({
-          projectRef,
-          branchName: defaultBranch,
-          gitBranch: defaultBranch,
-        })
-      }
-    }
-
-    updateConnectionSettings({
-      connectionId: existingConnection.id,
-      organizationId: selectedOrganization.id,
-      workdir: data.supabaseDirectory,
-      supabaseChangesOnly: data.supabaseChangesOnly,
-      branchLimit: Number(data.branchLimit),
-    })
-
-    if (data.autoBranchingEnabled) {
-      toast.success('Automatic branching enabled')
-    } else {
-      toast.success('Automatic branching disabled')
-    }
+    await executeGitHubSettingsSave(githubSettingsForm.getValues())
   }
 
   const openLinkerPanel = () => {
@@ -257,44 +246,37 @@ const GitHubSection = () => {
   )
 
   useEffect(() => {
-    if (existingConnection) {
-      automaticBranchingForm.reset({
-        autoBranchingEnabled: true,
-        supabaseDirectory:
-          (existingConnection as any)?.workdir ??
-          (existingConnection as any)?.metadata?.supabaseConfig?.supabaseDirectory ??
-          '',
-        supabaseChangesOnly:
-          (existingConnection as any)?.supabase_changes_only ??
-          (existingConnection as any)?.metadata?.supabaseConfig?.supabaseChangesOnly ??
-          false,
-        branchLimit: String(
-          ((existingConnection as any)?.branch_limit as number | undefined) ??
-            (existingConnection as any)?.metadata?.supabaseConfig?.branchLimit ??
-            50
-        ),
-      })
-    } else {
-      automaticBranchingForm.reset({
-        autoBranchingEnabled: false,
-        supabaseDirectory: '',
-        supabaseChangesOnly: false,
-        branchLimit: '50',
-      })
-    }
-  }, [existingConnection, automaticBranchingForm])
+    const hasGitBranch = Boolean(prodBranch?.git_branch?.trim())
+    const hasConnection = Boolean(existingConnection)
 
+    githubSettingsForm.reset({
+      enableProductionSync: hasGitBranch,
+      branchName: prodBranch?.git_branch || 'main',
+      new_branch_per_pr: (existingConnection as any)?.new_branch_per_pr ?? false,
+      supabaseDirectory:
+        (existingConnection as any)?.workdir ??
+        (existingConnection as any)?.metadata?.supabaseConfig?.supabaseDirectory ??
+        '',
+      supabaseChangesOnly:
+        (existingConnection as any)?.supabase_changes_only ??
+        (existingConnection as any)?.metadata?.supabaseConfig?.supabaseChangesOnly ??
+        false,
+      branchLimit: String(
+        ((existingConnection as any)?.branch_limit as number | undefined) ??
+          (existingConnection as any)?.metadata?.supabaseConfig?.branchLimit ??
+          50
+      ),
+    })
+  }, [existingConnection, prodBranch, githubSettingsForm])
+
+  // Handle clearing branch name when production sync is disabled
   useEffect(() => {
-    if (prodBranch?.git_branch) {
-      productionBranchForm.reset({
-        branchName: prodBranch.git_branch,
-      })
-    } else {
-      productionBranchForm.reset({
-        branchName: 'main',
-      })
+    if (!enableProductionSync) {
+      githubSettingsForm.setValue('branchName', '')
+    } else if (enableProductionSync && !githubSettingsForm.getValues().branchName) {
+      githubSettingsForm.setValue('branchName', 'main')
     }
-  }, [prodBranch, productionBranchForm])
+  }, [enableProductionSync, githubSettingsForm])
 
   if (!canReadGitHubConnection) {
     return (
@@ -360,48 +342,183 @@ const GitHubSection = () => {
               )}
             </div>
 
-            {/* Section 2: Production Branch Configuration */}
-            <Form_Shadcn_ {...productionBranchForm}>
-              <form onSubmit={productionBranchForm.handleSubmit(onSubmitProductionBranch)}>
+            {/* Section 2: GitHub Settings Configuration */}
+            <Form_Shadcn_ {...githubSettingsForm}>
+              <form onSubmit={githubSettingsForm.handleSubmit(onSubmitGitHubSettings)}>
                 <Card className={cn(!isConnected && 'opacity-50')}>
                   <CardContent>
                     <FormField_Shadcn_
-                      control={productionBranchForm.control}
-                      name="branchName"
+                      control={githubSettingsForm.control}
+                      name="supabaseDirectory"
                       render={({ field }) => (
                         <FormItemLayout
                           layout="flex-row-reverse"
-                          label="Production git branch name"
-                          description="Sync a git branch to your production Supabase branch"
+                          label="Supabase directory"
+                          description="Relative path to your supabase directory."
                         >
-                          <div className="relative w-full">
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                {...field}
-                                autoComplete="off"
-                                disabled={!isConnected || !canUpdateGitHubConnection}
-                              />
-                            </FormControl_Shadcn_>
-                            <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                              {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
-                              {field.value &&
-                                !isCheckingBranch &&
-                                !productionBranchForm.formState.errors.branchName &&
-                                isConnected && (
-                                  <Check size={14} className="text-brand" strokeWidth={2} />
-                                )}
-                            </div>
-                          </div>
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              placeholder="supabase"
+                              autoComplete="off"
+                              disabled={
+                                !newBranchPerPr || !isConnected || !canUpdateGitHubConnection
+                              }
+                            />
+                          </FormControl_Shadcn_>
                           <FormMessage_Shadcn_ />
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
+                  <CardContent className="space-y-6">
+                    {/* Production Branch Sync Section */}
+                    <div className="space-y-4">
+                      <FormField_Shadcn_
+                        control={githubSettingsForm.control}
+                        name="enableProductionSync"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="flex-row-reverse"
+                            label="Enable production sync"
+                            description="Sync a git branch to your production Supabase branch"
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!isConnected || !canUpdateGitHubConnection}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <div
+                        className={cn(
+                          'space-y-4 pl-8 border-l',
+                          (!enableProductionSync || !isConnected) &&
+                            'opacity-25 pointer-events-none'
+                        )}
+                      >
+                        <FormField_Shadcn_
+                          control={githubSettingsForm.control}
+                          name="branchName"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Production git branch name"
+                              description="The git branch that will be synced to your production Supabase branch"
+                            >
+                              <div className="relative w-full">
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_
+                                    {...field}
+                                    autoComplete="off"
+                                    disabled={
+                                      !isConnected ||
+                                      !canUpdateGitHubConnection ||
+                                      !enableProductionSync
+                                    }
+                                  />
+                                </FormControl_Shadcn_>
+                                <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                                  {isCheckingBranch && (
+                                    <Loader2 size={14} className="animate-spin" />
+                                  )}
+                                  {field.value &&
+                                    !isCheckingBranch &&
+                                    !githubSettingsForm.formState.errors.branchName &&
+                                    isConnected && (
+                                      <Check size={14} className="text-brand" strokeWidth={2} />
+                                    )}
+                                </div>
+                              </div>
+                              <FormMessage_Shadcn_ />
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardContent>
+                    {/* Automatic Branching Section */}
+                    <div className="space-y-4">
+                      <FormField_Shadcn_
+                        control={githubSettingsForm.control}
+                        name="new_branch_per_pr"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="flex-row-reverse"
+                            label="Enable automatic branching"
+                            description="New branches will be created for every GitHub pull request"
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!canCreateGitHubConnection}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <div
+                        className={cn(
+                          'space-y-4 pl-8 border-l',
+                          !newBranchPerPr && 'opacity-25 pointer-events-none'
+                        )}
+                      >
+                        <FormField_Shadcn_
+                          control={githubSettingsForm.control}
+                          name="branchLimit"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Branch limit"
+                              description="Maximum preview branches that can be created automatically."
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  type="number"
+                                  autoComplete="off"
+                                  disabled={!newBranchPerPr || !canUpdateGitHubConnection}
+                                />
+                              </FormControl_Shadcn_>
+                              <FormMessage_Shadcn_ />
+                            </FormItemLayout>
+                          )}
+                        />
+
+                        <FormField_Shadcn_
+                          control={githubSettingsForm.control}
+                          name="supabaseChangesOnly"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Supabase changes only"
+                              description="Only trigger branch creation when files inside the Supabase directory change."
+                            >
+                              <FormControl_Shadcn_>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={(val) => field.onChange(val)}
+                                  disabled={!newBranchPerPr || !canUpdateGitHubConnection}
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
                   <CardFooter className="justify-end space-x-2">
-                    {productionBranchForm.formState.isDirty && (
+                    {githubSettingsForm.formState.isDirty && (
                       <Button
                         type="default"
-                        onClick={() => productionBranchForm.reset()}
+                        onClick={() => githubSettingsForm.reset()}
                         disabled={!isConnected || !canUpdateGitHubConnection}
                       >
                         Cancel
@@ -414,152 +531,13 @@ const GitHubSection = () => {
                         !isConnected ||
                         !canUpdateGitHubConnection ||
                         isCheckingBranch ||
-                        !productionBranchForm.formState.isDirty
-                      }
-                      loading={isCheckingBranch}
-                    >
-                      Save changes
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </form>
-            </Form_Shadcn_>
-
-            {/* Section 3: Automatic Branching Configuration */}
-            <Form_Shadcn_ {...automaticBranchingForm}>
-              <form onSubmit={automaticBranchingForm.handleSubmit(onSubmitAutomaticBranching)}>
-                <Card className={cn(!isConnected && 'opacity-50')}>
-                  <CardContent className="space-y-4">
-                    <FormField_Shadcn_
-                      control={automaticBranchingForm.control}
-                      name="autoBranchingEnabled"
-                      render={({ field }) => (
-                        <FormItemLayout
-                          layout="flex-row-reverse"
-                          label="Enable automatic branching"
-                          description="New branches will be created for every GitHub pull request"
-                        >
-                          <FormControl_Shadcn_>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={!isConnected || !canCreateGitHubConnection}
-                            />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-
-                    <div
-                      className={cn(
-                        'space-y-4',
-                        (!autoBranchingEnabled || !isConnected) && 'opacity-25 pointer-events-none'
-                      )}
-                    >
-                      <FormField_Shadcn_
-                        control={automaticBranchingForm.control}
-                        name="supabaseDirectory"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Supabase directory"
-                            description="Relative path to your supabase directory."
-                          >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                {...field}
-                                placeholder="supabase"
-                                autoComplete="off"
-                                disabled={
-                                  !autoBranchingEnabled ||
-                                  !isConnected ||
-                                  !canUpdateGitHubConnection
-                                }
-                              />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItemLayout>
-                        )}
-                      />
-
-                      <FormField_Shadcn_
-                        control={automaticBranchingForm.control}
-                        name="branchLimit"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Branch limit"
-                            description="Maximum preview branches that can be created automatically."
-                          >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                {...field}
-                                type="number"
-                                autoComplete="off"
-                                disabled={
-                                  !autoBranchingEnabled ||
-                                  !isConnected ||
-                                  !canUpdateGitHubConnection
-                                }
-                              />
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItemLayout>
-                        )}
-                      />
-
-                      <FormField_Shadcn_
-                        control={automaticBranchingForm.control}
-                        name="supabaseChangesOnly"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Supabase changes only"
-                            description="Only trigger branch creation when files inside the Supabase directory change."
-                          >
-                            <FormControl_Shadcn_>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={(val) => field.onChange(val)}
-                                disabled={
-                                  !autoBranchingEnabled ||
-                                  !isConnected ||
-                                  !canUpdateGitHubConnection
-                                }
-                              />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </div>
-                  </CardContent>
-                  <CardFooter className="justify-end space-x-2">
-                    {automaticBranchingForm.formState.isDirty && (
-                      <Button
-                        type="default"
-                        onClick={() => automaticBranchingForm.reset()}
-                        disabled={!isConnected || !canCreateGitHubConnection}
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      disabled={
-                        !isConnected ||
-                        !canCreateGitHubConnection ||
                         isUpdatingConnection ||
                         isCreatingConnection ||
-                        !automaticBranchingForm.formState.isDirty
+                        !githubSettingsForm.formState.isDirty
                       }
-                      loading={isUpdatingConnection || isCreatingConnection}
+                      loading={isCheckingBranch || isUpdatingConnection || isCreatingConnection}
                     >
-                      {automaticBranchingForm.watch('autoBranchingEnabled') !== isConnected
-                        ? automaticBranchingForm.watch('autoBranchingEnabled')
-                          ? 'Enable'
-                          : 'Disable'
-                        : 'Save'}
+                      Save changes
                     </Button>
                   </CardFooter>
                 </Card>
