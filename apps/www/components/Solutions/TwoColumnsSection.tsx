@@ -1,17 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
-import { ArrowUpRight, Sparkles } from 'lucide-react'
-import { cn, TextLink } from 'ui'
-import { useBreakpoint } from 'common'
+import { ArrowUpRight, Check, Copy } from 'lucide-react'
+import { Button, cn, TextLink, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import SectionContainer from 'components/Layouts/SectionContainer'
 
 interface AIPrompt {
   id: string
   title: string
-  description: string
   code: string
   language: string
-  docsUrl: string
+  docsUrl?: string
+  copyable?: boolean
 }
 
 export interface TwoColumnsSectionProps {
@@ -25,21 +24,53 @@ export interface TwoColumnsSectionProps {
   headingRight?: string | React.ReactNode
 }
 
-const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => (
-  <div className="relative group bg-surface-75 border border-default rounded-lg">
-    <div className="flex items-center justify-between px-4 py-3 border-b border-default bg-surface-100">
-      <h3 className="text-sm text-foreground truncate">{prompt.title}</h3>
-      <Link href={prompt.docsUrl} className="relative">
-        <ArrowUpRight className="w-4 h-4 not-sr-only stroke-1 opacity-80 transition-opacity group-hover:opacity-100" />
-      </Link>
+const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
+  const [text, setText] = useState('copy')
+
+  function updateCopyStatus() {
+    if (text === 'copy') {
+      setText(() => 'copied')
+      setTimeout(() => {
+        setText(() => 'copy')
+      }, 1000)
+    }
+  }
+
+  return (
+    <div className="relative group bg-surface-75 border border-default rounded-lg">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-default bg-surface-100">
+        <h3 className="text-sm text-foreground truncate">{prompt.title}</h3>
+        {prompt.docsUrl && (
+          <Link href={prompt.docsUrl} className="relative">
+            <ArrowUpRight className="w-4 h-4 not-sr-only stroke-1 opacity-80 transition-opacity group-hover:opacity-100" />
+          </Link>
+        )}
+      </div>
+      <div className="p-4 relative">
+        {prompt.copyable && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="default"
+                className="text-foreground-light hover:text-foreground absolute top-2 right-2 w-7 h-7 p-1 shadow-lg"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(prompt.code)
+                  updateCopyStatus()
+                }}
+              >
+                {text === 'copy' ? <Copy className="w-3 h-3" /> : <Check className="w-3 h-3" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Copy to clipboard</TooltipContent>
+          </Tooltip>
+        )}
+        <pre className="text-xs text-foreground-light whitespace-pre-wrap font-mono leading-relaxed line-clamp-4">
+          {prompt.code}
+        </pre>
+      </div>
     </div>
-    <div className="p-4">
-      <pre className="text-xs text-foreground-light whitespace-pre-wrap font-mono leading-relaxed line-clamp-4">
-        {prompt.code}
-      </pre>
-    </div>
-  </div>
-)
+  )
+}
 
 const TwoColumnsSection = ({
   heading,
@@ -61,10 +92,7 @@ const TwoColumnsSection = ({
         </div>
 
         <div className="col-right space-y-6">
-          <div className="space-y-4 max-w-sm">
-            <h2 className="h2 text-foreground-lighter">{headingRight}</h2>
-          </div>
-
+          {headingRight && <h2 className="h2 text-foreground-lighter max-w-sm">{headingRight}</h2>}
           <div className="grid md:grid-cols-2 gap-2">
             {aiPrompts.map((prompt) => (
               <CodeSnippet key={prompt.id} prompt={prompt} />

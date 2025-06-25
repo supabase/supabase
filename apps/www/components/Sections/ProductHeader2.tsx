@@ -61,7 +61,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
         )}
         <div className="flex flex-row md:flex-row md:items-center gap-2 mt-2">
           {props.ctas?.map((cta) => (
-            <Button key={cta.href} size="medium" type={cta.type ?? 'default'} asChild>
+            <Button key={cta.href} size="medium" type={cta.type ?? 'default'} onClick={cta.onClick} asChild>
               <Link href={cta.href}>{cta.label ?? 'Start for free'}</Link>
             </Button>
           ))}

@@ -4,7 +4,7 @@ import { NextSeo } from 'next-seo'
 
 import Layout from 'components/Layouts/Default'
 import ProductHeader from 'components/Sections/ProductHeader2'
-import SubStickyNav from '~/components/SolutionsStickyNav'
+import SolutionsStickyNav from 'components/SolutionsStickyNav'
 import getContent from 'data/solutions/beginners'
 import { Solutions } from 'data/Solutions'
 
@@ -29,7 +29,7 @@ const BeginnersPage: NextPage = () => {
         }}
       />
       <Layout className="overflow-visible">
-        <SubStickyNav activeItem={Solutions.beginners} />
+        <SolutionsStickyNav activeItem={Solutions.beginners} />
         <ProductHeader
           {...content.heroSection}
           className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"

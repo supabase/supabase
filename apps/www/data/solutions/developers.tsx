@@ -39,6 +39,7 @@ import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -56,6 +57,7 @@ const data: () => {
   platformStarterSection: TwoColumnsSectionProps
   mcp: MPCSectionProps
 } = () => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
   const isXs = useBreakpoint(640)
   const editors = getEditors(isXs)
 
@@ -98,11 +100,21 @@ const data: () => {
           label: 'Start your project',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
+          onClick: () =>
+            sendTelemetryEvent({
+              action: 'start_project_button_clicked',
+              properties: { buttonLocation: 'Solutions: Developers page hero' },
+            }),
         },
         {
           label: 'Request a demo',
-          href: 'https://supabase.com/dashboard',
+          href: 'https://supabase.com/contact/sales',
           type: 'default' as any,
+          onClick: () =>
+            sendTelemetryEvent({
+              action: 'request_demo_button_clicked',
+              properties: { buttonLocation: 'Solutions: Developers page hero' },
+            }),
         },
       ],
     },

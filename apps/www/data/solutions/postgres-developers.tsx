@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import {
   Check,
   ClipboardCheck,
@@ -18,12 +20,9 @@ import { CubeIcon } from '@heroicons/react/outline'
 import { cn, Image, Input_Shadcn_, Switch } from 'ui'
 
 import MainProducts from '../MainProducts'
-import AuthVisual from 'components/Products/AuthVisual'
-import RealtimeVisual from 'components/Products/RealtimeVisual'
-import FunctionsVisual from 'components/Products/FunctionsVisual'
 import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
 import { frameworks } from 'components/Hero/HeroFrameworks'
+import Logos from 'components/logos'
 
 import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
 import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
@@ -41,11 +40,13 @@ import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
-import DatabaseVisual from '../../components/Products/DatabaseVisual'
-import Logos from '../../components/logos'
-import { useState } from 'react'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { useSendTelemetryEvent } from 'lib/telemetry'
+
+const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
+const DatabaseVisual = dynamic(() => import('components/Products/DatabaseVisual'))
+const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
+const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'))
+const RealtimeLogs = dynamic(() => import('components/Products/Functions/RealtimeLogs'))
 
 const data: () => {
   metadata: Metadata
@@ -61,6 +62,7 @@ const data: () => {
 } = () => {
   const isXs = useBreakpoint(640)
   const editors = getEditors(isXs)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return {
     metadata: {
@@ -106,11 +108,21 @@ const data: () => {
           label: 'Start your project',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
+          onClick: () =>
+            sendTelemetryEvent({
+              action: 'start_project_button_clicked',
+              properties: { buttonLocation: 'Solutions: Postgres Developers page hero' },
+            }),
         },
         {
           label: 'Request a demo',
-          href: 'https://supabase.com/dashboard',
+          href: 'https://supabase.com/contact/sales',
           type: 'default' as any,
+          onClick: () =>
+            sendTelemetryEvent({
+              action: 'request_demo_button_clicked',
+              properties: { buttonLocation: 'Solutions: Postgres Developers page hero' },
+            }),
         },
       ],
     },

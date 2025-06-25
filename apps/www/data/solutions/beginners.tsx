@@ -22,6 +22,7 @@ import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { tweets } from 'shared-data'
 import { useBreakpoint } from 'common'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(
@@ -41,6 +42,7 @@ const data: () => {
 } = () => {
   const isXs = useBreakpoint(640)
   const editors = getEditors(isXs)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return {
     metadata: {
@@ -81,6 +83,11 @@ const data: () => {
           label: 'Start your project',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
+          onClick: () =>
+            sendTelemetryEvent({
+              action: 'start_project_button_clicked',
+              properties: { buttonLocation: 'Solutions: Beginners page hero' },
+            }),
         },
       ],
     },
@@ -529,8 +536,6 @@ const data: () => {
         {
           id: 'auth-setup',
           title: 'Bootstrap Next.js app with Supabase Auth',
-          description:
-            '## Overview of implementing Supabase Auth SSR\n1. Install @supabase/supabase-js and...',
           code: `1. Install @supabase/supabase-js and @supabase/ssr packages.
 2. Set up environment variables.
 3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client. 
@@ -543,8 +548,6 @@ const data: () => {
         {
           id: 'edge-functions',
           title: 'Writing Supabase Edge Functions',
-          description:
-            "You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate...",
           code: `1. Try to use Web APIs and Deno’s core APIs instead of external dependencies (eg: use fetch instead of Axios, use WebSockets API instead of node-ws)
 2. If you are reusing utility methods between Edge Functions, add them to 'supabase/functions/_shared' and import using a relative path. Do NOT have cross dependencies between Edge Functions.
 3. Do NOT use bare specifiers when importing dependecnies. If you need to use an external dependency, make sure it's prefixed with either 'npm:' or 'jsr:'. For example, '@supabase/supabase-js' should be written as 'npm:@supabase/supabase-js'.
@@ -557,8 +560,6 @@ const data: () => {
         {
           id: 'declarative-db-schema',
           title: 'Declarative Database Schema',
-          description:
-            "You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate...",
           code: `Mandatory Instructions for Supabase Declarative Schema Management
 ## 1. **Exclusive Use of Declarative Schema**
 -**All database schema modifications must be defined within '.sql' files located in the 'supabase/schemas/' directory.`,
@@ -569,8 +570,6 @@ const data: () => {
         {
           id: 'rls-policies',
           title: 'Create RLS policies',
-          description:
-            "You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate...",
           code: `You're a Supabase Postgres expert in writing row level security policies. Your purpose is to generate a policy with the constraints given by the user. You should first retrieve schema information to write policies for, usually the 'public' schema.
 The output should use the following instructions:
 

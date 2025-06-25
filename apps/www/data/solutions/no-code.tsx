@@ -3,7 +3,6 @@ import { Check, PointerIcon, TrendingUp, ZapIcon } from 'lucide-react'
 import { cn, Image } from 'ui'
 
 import MainProducts from '../MainProducts'
-import AIBuildersLogos from 'components/Solutions/AIBuildersLogos'
 
 import type { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
 import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
@@ -11,6 +10,7 @@ import type { FeaturesSection, HeroSection, Metadata } from './solutions.utils'
 import type { Quotes } from './solutions.utils'
 
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(
@@ -18,6 +18,7 @@ const ComputePricingCalculator = dynamic(
 )
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
 const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'))
+const AIBuildersLogos = dynamic(() => import('components/Solutions/AIBuildersLogos'))
 
 const data: () => {
   metadata: Metadata
@@ -27,6 +28,8 @@ const data: () => {
   platform: PlatformSectionProps
   platformStarterSection: TwoColumnsSectionProps
 } = () => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
+
   return {
     metadata: {
       metaTitle: 'Supabase for building Apps',
@@ -67,6 +70,11 @@ const data: () => {
           label: 'Start your project',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
+          onClick: () =>
+            sendTelemetryEvent({
+              action: 'start_project_button_clicked',
+              properties: { buttonLocation: 'Solutions: No Code page hero' },
+            }),
         },
       ],
     },
@@ -396,10 +404,55 @@ const data: () => {
       id: 'platform-starter',
       heading: <span className="text-foreground">Start building in seconds</span>,
       subheading: 'Choose your platform to get started:',
-      leftFooter: <AIBuildersLogos className="lg:pt-4 md:!flex lg:!flex max-w-none 2xl:gap-12" />,
+      leftFooter: (
+        <AIBuildersLogos className="lg:pt-4 xl:grid xl:grid-cols-3 max-w-none xl:gap-8 2xl:gap-x-20" />
+      ),
       className:
-        'lg:mb-24 [&_.col-left]:!col-span-full [&_.col-left]:flex [&_.col-left]:flex-col md:[&_.col-left]:text-center md:[&_.col-left]:items-center [&_.col-right]:hidden',
-      aiPrompts: [],
+        'lg:mb-24 [&>div.grid]:lg:grid-cols-5 [&_.col-left]:lg:col-span-2 [&_.col-right]:lg:col-span-3',
+      aiPrompts: [
+        {
+          id: 'internal-crm',
+          title: 'Internal CRM for High-Touch Client Services',
+          code: `Build an internal CRM that tracks interactions with clients in a service business (e.g. agency, law firm, consultancy). Include a client directory with contact info and tags, a timeline of interactions (calls, meetings, emails), and a task management feature per client. Add a pipeline view for sales or project stages. Use Supabase Auth for role-based access and row-level security to restrict views by user.`,
+          language: 'markdown',
+          copyable: true,
+        },
+        {
+          id: 'customer-feedback',
+          title: 'Customer Feedback Collection and Tagging System',
+          code: `Create a tool to collect and tag customer feedback from multiple sources like support tickets, surveys, and interviews. Allow team members to log new feedback with sentiment, category, and product area. Summarize trends in charts (e.g. top requests, most common bugs). Use Supabase as the backend with triggers to notify product owners when thresholds are met. Optional: add AI-powered tagging for fast triage.`,
+          language: 'markdown',
+          copyable: true,
+        },
+        {
+          id: 'onboarding-portal',
+          title: 'Automated Onboarding Portal for New Hires',
+          code: `Build a customizable portal for onboarding new employees in a remote company. Show personalized checklists by role, with links to key docs, Slack channels, and tool logins. Let managers monitor completion status. Include a welcome board where coworkers can leave greetings. Use Supabase to manage checklists, users, and messages. Add role-based views for HR vs. employee.`,
+          language: 'markdown',
+          copyable: true,
+        },
+        {
+          id: 'recurring-revenue',
+          title: 'Recurring Revenue Dashboard for Indie SaaS',
+          code: `Create a financial dashboard for indie founders to track recurring revenue. Include metrics like MRR, ARR, churn, and LTV. Add charts for monthly trends. Let users manually enter Stripe or PayPal data, or auto-sync via webhook. Use Supabase to store data with per-user access control. Configure Slack integration for daily digests.`,
+          language: 'markdown',
+          copyable: true,
+        },
+        {
+          id: 'custom-client-portal',
+          title: 'Custom Client Portal for Freelancers',
+          code: `Build a secure portal where freelancers can share files, invoices, and project updates with clients. Each client should log in and only see their own dashboard. Include a file upload section, embedded payment buttons, and a timeline of status updates. Use Supabase for data storage and row-level security.`,
+          language: 'markdown',
+          copyable: true,
+        },
+        {
+          id: 'compliance-tracker',
+          title: 'Compliance Tracker for Early-Stage Startups',
+          code: `Create a dashboard for startups to track legal, security, and HR compliance tasks. Let users define tasks, assign owners, set due dates, and upload supporting documents. Group tasks by category (e.g. Security, Legal) and show progress bars. Use Supabase for storing task data and documents.`,
+          language: 'markdown',
+          copyable: true,
+        },
+      ],
     },
   }
 }

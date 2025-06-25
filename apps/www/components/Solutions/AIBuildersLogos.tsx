@@ -69,7 +69,7 @@ const EnterpriseLogos: React.FC<Props> = ({ className }) => {
               h-10 !min-h-10
               md:h-10 md:!min-h-10
               lg:h-7 lg:!min-h-7
-              2xl:h-12 2xl:!min-h-12
+              2xl:h-10 2xl:!min-h-10
             "
             draggable={false}
           />
