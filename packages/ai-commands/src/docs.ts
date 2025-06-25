@@ -63,7 +63,7 @@ export async function clippy(
 
   const [{ embedding }] = embeddingResponse.data
 
-  const { error: matchError, data: pageSections } = await supabaseClient
+  const { error: matchError, data: pageSections } = (await supabaseClient
     .rpc('match_page_sections_v2', {
       embedding,
       match_threshold: 0.78,
@@ -71,7 +71,7 @@ export async function clippy(
     })
     .neq('rag_ignore', true)
     .select('content,page!inner(path),rag_ignore')
-    .limit(10) as { error: any; data: PageSection[] | null }
+    .limit(10)) as { error: any; data: PageSection[] | null }
 
   if (matchError || !pageSections) {
     throw new ApplicationError('Failed to match page sections', matchError)
@@ -93,10 +93,10 @@ export async function clippy(
     }
 
     const pagePath = pageSection.page.path
-    
+
     // Include source reference with each section
     contextText += `[Source ${sourceIndex}: ${pagePath}]\n${content.trim()}\n---\n`
-    
+
     // Track sources for later reference
     if (!sourcesMap.has(pagePath)) {
       sourcesMap.set(pagePath, content)
