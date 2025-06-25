@@ -79,22 +79,25 @@ function SolutionsStickyNav({ activeItem, className }: Props) {
                   )}
                   href={item.href}
                 >
-                  {item.icon && (
-                    <svg
-                      className="h-4 w-4 group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 18 18"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="1"
-                        d={item.icon}
-                        stroke="currentColor"
-                      />
-                    </svg>
-                  )}
+                  {item.icon &&
+                    (typeof item.icon === 'string' ? (
+                      <svg
+                        className="h-4 w-4 group-hover/menu-item:text-foreground group-focus-visible/menu-item:text-foreground"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 18"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1"
+                          d={item.icon}
+                          stroke="currentColor"
+                        />
+                      </svg>
+                    ) : (
+                      <item.icon className="h-4 w-4" />
+                    ))}
                   <p>{item.name}</p>
                 </Link>
               )
