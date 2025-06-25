@@ -20,7 +20,7 @@ WorkOS can be used as a third-party authentication provider alongside Supabase A
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
-import { createClient as createAuthKitClient } from "@workos-inc/authkit-js";
+import { createClient as createAuthKitClient } from '@workos-inc/authkit-js'
 
 const authkit = await createAuthKitClient('WORKOS_CLIENT_ID', {
   apiHostname: '<WORKOS_AUTH_DOMAIN>',
