@@ -349,7 +349,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
         if (!open) sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       }}
     >
-      <SheetContent side="right" showClose className="flex flex-col gap-0">
+      <SheetContent side="right" size="content" showClose className="flex flex-col gap-0">
         <Form_Shadcn_ {...form}>
           <form
             onSubmit={form.handleSubmit(handleSave)}
@@ -358,7 +358,8 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
             <SheetHeader className="shrink-0">
               <SheetTitle>Automatic Branching</SheetTitle>
               <SheetDescription>
-                Create a Supabase branch for every GitHub branch and sync them on commit and merge.
+                Create a Supabase branch for every GitHub pull request and sync them on every commit
+                and merge.
               </SheetDescription>
             </SheetHeader>
 

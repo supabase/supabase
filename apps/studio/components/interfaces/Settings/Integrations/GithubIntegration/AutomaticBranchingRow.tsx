@@ -73,7 +73,8 @@ export const AutomaticBranchingRow = () => {
         <div className="flex-1">
           <h5 className="text-foreground mb-1 text-sm">Automatic Branching</h5>
           <p className="text-sm text-foreground-light">
-            Create a Supabase branch for every GitHub branch and sync them on commit and merge.
+            Create a Supabase branch for every GitHub pull request and sync them on every commit and
+            merge.
           </p>
         </div>
 

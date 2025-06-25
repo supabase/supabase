@@ -247,9 +247,6 @@ export const CreateBranchModal = () => {
                         </FormControl_Shadcn_>
                         <div className="absolute top-2.5 right-3 flex items-center gap-2">
                           {isChecking && <Loader2 size={14} className="animate-spin" />}
-                          {field.value && !isChecking && !form.formState.errors.gitBranchName && (
-                            <Check size={14} className="text-brand" strokeWidth={2} />
-                          )}
                         </div>
                       </div>
                     </FormItemLayout>
