@@ -3,7 +3,6 @@ import { get } from 'data/fetchers'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useMemo } from 'react'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { fillTimeseries } from 'components/interfaces/Settings/Logs/Logs.utils'
 
 type Granularity = 'second' | 'minute' | 'hour' | 'day' | 'week'
 function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {
@@ -25,33 +24,33 @@ function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularit
   }
 }
 
-type MetricKey =
-  | 'ActiveUsers'
-  | 'SignInAttempts'
-  | 'PasswordResetRequests'
-  | 'TotalSignUps'
-  | 'TotalSignInsByProvider'
-  | 'FailedAuthAttempts'
-  | 'NewUserGrowthRate'
-  | 'UserRetention'
-  | 'SessionsCreated'
-  | 'SessionsExpired'
-  | 'SignInLatency'
-  | 'SignUpLatency'
-  | 'TokenRefreshLatency'
-  | 'TokenVerificationSpeed'
-  | 'AuthProviderResponseTimes'
-  | 'SuspiciousActivity'
-  | 'RateLimitedRequests'
-  | 'TokenRevocations'
-  | 'MFAUsage'
-  | 'ErrorsByStatus'
+const METRIC_KEYS = [
+  'ActiveUsers',
+  'SignInAttempts',
+  'PasswordResetRequests',
+  'TotalSignUps',
+  'TotalSignInsByProvider',
+  'FailedAuthAttempts',
+  'NewUserGrowthRate',
+  'UserRetention',
+  'SessionsCreated',
+  'SessionsExpired',
+  'SignInLatency',
+  'SignUpLatency',
+  'TokenRefreshLatency',
+  'TokenVerificationSpeed',
+  'AuthProviderResponseTimes',
+  'SuspiciousActivity',
+  'RateLimitedRequests',
+  'TokenRevocations',
+  'MFAUsage',
+  'ErrorsByStatus',
+]
 
-const metricSqlMap: Record<
-  MetricKey,
-  (start: string, end: string, interval: AnalyticsInterval) => string
-> = {
-  ActiveUsers: (start, end, interval) => {
+type MetricKey = (typeof METRIC_KEYS)[number]
+
+const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval) => string> = {
+  ActiveUsers: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
       --active-users
@@ -68,7 +67,7 @@ const metricSqlMap: Record<
   `
   },
 
-  SignInAttempts: (start, end, interval) => {
+  SignInAttempts: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
       --sign-in-attempts
@@ -83,7 +82,7 @@ const metricSqlMap: Record<
     `
   },
 
-  PasswordResetRequests: (start, end, interval) => {
+  PasswordResetRequests: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
       --password-reset-requests
@@ -97,7 +96,7 @@ const metricSqlMap: Record<
     `
   },
 
-  TotalSignUps: (start, end, interval) => {
+  TotalSignUps: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     console.log('granularity', interval, granularity)
     return `
@@ -111,28 +110,7 @@ const metricSqlMap: Record<
     order by timestamp desc
     `
   },
-
-  TotalSignInsByProvider: (start, end, interval) => `
-    -- TODO: Return total sign-ins by provider (email, social, etc.)
-  `,
-  FailedAuthAttempts: (start, end, interval) => `
-    -- TODO: Return time series of failed authentication attempts
-  `,
-
-  NewUserGrowthRate: (start, end, interval) => `
-    -- TODO: Return new user growth rate over time
-  `,
-  UserRetention: (start, end, interval) => `
-    -- TODO: Return user retention/churn metrics
-  `,
-  SessionsCreated: (start, end, interval) => `
-    -- TODO: Return sessions created over time
-  `,
-  SessionsExpired: (start, end, interval) => `
-    -- TODO: Return sessions expired over time
-  `,
-
-  SignInLatency: (start, end, interval) => {
+  SignInLatency: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
       --signin-latency
@@ -153,7 +131,7 @@ const metricSqlMap: Record<
     `
   },
 
-  SignUpLatency: (start, end, interval) => {
+  SignUpLatency: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
       --signup-latency
@@ -172,21 +150,7 @@ const metricSqlMap: Record<
       order by timestamp desc, provider
     `
   },
-
-  TokenRefreshLatency: (start, end, interval) => `
-    -- TODO: Return token refresh operation latency over time
-  `,
-  TokenVerificationSpeed: (start, end, interval) => `
-    -- TODO: Return token verification speed over time
-  `,
-  AuthProviderResponseTimes: (start, end, interval) => `
-    -- TODO: Return auth provider response times (by provider)
-  `,
-
-  SuspiciousActivity: (start, end, interval) => `
-    -- TODO: Return suspicious activity (multiple failed attempts, unusual locations, etc.)
-  `,
-  RateLimitedRequests: (start, end, interval) => {
+  RateLimitedRequests: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
     --rate-limited-requests
@@ -202,13 +166,8 @@ GROUP BY timestamp, path, method, error_code
 ORDER BY timestamp DESC, path, method, error_code
   `
   },
-  TokenRevocations: (start, end, interval) => `
-    -- TODO: Return token revocations over time
-  `,
-  MFAUsage: (start, end, interval) => `
-    -- TODO: Return MFA usage statistics over time
-  `,
-  ErrorsByStatus: (start, end, interval) => {
+
+  ErrorsByStatus: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
 
     const ERROR_CODES = [
@@ -242,6 +201,10 @@ ORDER BY timestamp DESC, path, method, error_code
   },
 }
 
+const METRIC_FORMATTER: Record<MetricKey, (data: any) => any> = {
+  ErrorsByStatus: (data) => {},
+}
+
 export function useAuthLogsReport({
   projectRef,
   attributes,
@@ -258,7 +221,12 @@ export function useAuthLogsReport({
   enabled?: boolean
 }) {
   const logsMetric = attributes.length > 0 ? attributes[0].attribute : ''
-  const sql = metricSqlMap[logsMetric as MetricKey]?.(startDate, endDate, interval) || ''
+
+  if (!METRIC_KEYS.includes(logsMetric as MetricKey)) {
+    throw new Error(`Invalid metric key: ${logsMetric}`)
+  }
+
+  const sql = METRIC_SQL[logsMetric](interval)
 
   const {
     data: rawData,
@@ -358,11 +326,11 @@ export function useAuthReport({
   interval: AnalyticsInterval
   enabled?: boolean
 }) {
-  const sql = metricSqlMap[metricKey as MetricKey]?.(startDate, endDate, interval) || ''
-
-  if (!sql) {
-    console.error('No SQL found for metric:', metricKey)
+  if (!METRIC_KEYS.includes(metricKey as MetricKey)) {
+    throw new Error(`Invalid metric key: ${metricKey}`)
   }
+
+  const sql = METRIC_SQL[metricKey](interval)
 
   const _enabled = Boolean(projectRef && sql && enabled)
 
