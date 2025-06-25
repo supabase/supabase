@@ -69,6 +69,36 @@ You can find the complete example on [GitHub](https://github.com/supabase/supaba
 
 ---
 
+## Recommended Project Structure
+
+It's recommended to organize your functions according to the following structure:
+
+```bash
+└── supabase
+    ├── functions
+    │   ├── import_map.json     # Top-level import map
+    │   ├── _shared             # Shared code (underscore prefix)
+    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key
+    │   │   ├── supabaseClient.ts # Supabase client with ANON key
+    │   │   └── cors.ts         # Reusable CORS headers
+    │   ├── function-one        # Use hyphens for function names
+    │   │   └── index.ts
+    │   └── function-two
+    │       └── index.ts
+    ├── tests
+    │   ├── function-one-test.ts
+    │   └── function-two-test.ts
+    ├── migrations
+    └── config.toml
+```
+
+- **Use "fat functions"**. Develop few, large functions by combining related functionality. This minimizes cold starts.
+- **Name functions with hyphens (`-`)**. This is the most URL-friendly approach
+- **Store shared code in `_shared`**. Store any shared code in a folder prefixed with an underscore (`_`).
+- **Separate tests**. Use a separate folder for [Unit Tests](https://supabase.com/docs/guides/functions/unit-test) that includes the name of the function followed by a `-test` suffix.
+
+---
+
 ## Essential CLI Commands
 
 Get familiar with the most commonly used CLI commands for developing and deploying Edge Functions.
