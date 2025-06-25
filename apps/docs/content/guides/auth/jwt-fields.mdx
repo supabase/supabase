@@ -6,95 +6,96 @@ subtitle: 'Complete reference for JWT fields in Supabase'
 
 This page provides a comprehensive reference for all JWT fields used in Supabase authentication tokens. This information is essential for server-side JWT validation and serialization, especially when implementing authentication in languages like Rust where field names like `ref` are reserved keywords.
 
-## JWT Structure Overview
+## JWT structure overview
 
 Supabase JWTs follow the standard JWT structure with three parts:
+
 - **Header**: Contains algorithm and key information
 - **Payload**: Contains the claims (user data and metadata)
 - **Signature**: Cryptographic signature for verification
 
 The payload contains various claims that provide user identity, authentication level, and authorization information.
 
-## Required Claims
+## Required claims
 
 These claims are always present in Supabase JWTs and cannot be removed:
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `iss` | `string` | **Issuer** - The entity that issued the JWT | `"https://project-ref.supabase.co/auth/v1"` |
-| `aud` | `string \| string[]` | **Audience** - The intended recipient of the JWT | `"authenticated"` or `"anon"` |
-| `exp` | `number` | **Expiration Time** - Unix timestamp when the token expires | `1640995200` |
-| `iat` | `number` | **Issued At** - Unix timestamp when the token was issued | `1640991600` |
-| `sub` | `string` | **Subject** - The user ID (UUID) | `"123e4567-e89b-12d3-a456-426614174000"` |
-| `role` | `string` | **Role** - User's role in the system | `"authenticated"`, `"anon"`, `"service_role"` |
-| `aal` | `string` | **Authenticator Assurance Level** - Authentication strength | `"aal1"`, `"aal2"` |
-| `session_id` | `string` | **Session ID** - Unique session identifier | `"session-uuid"` |
-| `email` | `string` | **Email** - User's email address | `"user@example.com"` |
-| `phone` | `string` | **Phone** - User's phone number | `"+1234567890"` |
-| `is_anonymous` | `boolean` | **Anonymous Flag** - Whether the user is anonymous | `false` |
+| Field          | Type                 | Description                                                 | Example                                       |
+| -------------- | -------------------- | ----------------------------------------------------------- | --------------------------------------------- |
+| `iss`          | `string`             | **Issuer** - The entity that issued the JWT                 | `"https://project-ref.supabase.co/auth/v1"`   |
+| `aud`          | `string \| string[]` | **Audience** - The intended recipient of the JWT            | `"authenticated"` or `"anon"`                 |
+| `exp`          | `number`             | **Expiration Time** - Unix timestamp when the token expires | `1640995200`                                  |
+| `iat`          | `number`             | **Issued At** - Unix timestamp when the token was issued    | `1640991600`                                  |
+| `sub`          | `string`             | **Subject** - The user ID (UUID)                            | `"123e4567-e89b-12d3-a456-426614174000"`      |
+| `role`         | `string`             | **Role** - User's role in the system                        | `"authenticated"`, `"anon"`, `"service_role"` |
+| `aal`          | `string`             | **Authenticator Assurance Level** - Authentication strength | `"aal1"`, `"aal2"`                            |
+| `session_id`   | `string`             | **Session ID** - Unique session identifier                  | `"session-uuid"`                              |
+| `email`        | `string`             | **Email** - User's email address                            | `"user@example.com"`                          |
+| `phone`        | `string`             | **Phone** - User's phone number                             | `"+1234567890"`                               |
+| `is_anonymous` | `boolean`            | **Anonymous Flag** - Whether the user is anonymous          | `false`                                       |
 
-## Optional Claims
+## Optional claims
 
 These claims may be present depending on the authentication context:
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `jti` | `string` | **JWT ID** - Unique identifier for the JWT | `"jwt-uuid"` |
-| `nbf` | `number` | **Not Before** - Unix timestamp before which the token is invalid | `1640991600` |
-| `app_metadata` | `object` | **App Metadata** - Application-specific user data | `{"provider": "email"}` |
-| `user_metadata` | `object` | **User Metadata** - User-specific data | `{"name": "John Doe"}` |
-| `amr` | `array` | **Authentication Methods Reference** - List of authentication methods used | `[{"method": "password", "timestamp": 1640991600}]` |
+| Field           | Type     | Description                                                                | Example                                             |
+| --------------- | -------- | -------------------------------------------------------------------------- | --------------------------------------------------- |
+| `jti`           | `string` | **JWT ID** - Unique identifier for the JWT                                 | `"jwt-uuid"`                                        |
+| `nbf`           | `number` | **Not Before** - Unix timestamp before which the token is invalid          | `1640991600`                                        |
+| `app_metadata`  | `object` | **App Metadata** - Application-specific user data                          | `{"provider": "email"}`                             |
+| `user_metadata` | `object` | **User Metadata** - User-specific data                                     | `{"name": "John Doe"}`                              |
+| `amr`           | `array`  | **Authentication Methods Reference** - List of authentication methods used | `[{"method": "password", "timestamp": 1640991600}]` |
 
-## Special Fields
+## Special fields
 
-| Field | Type | Description | Example | Context |
-|-------|------|-------------|---------|---------|
+| Field | Type     | Description                                         | Example                  | Context                       |
+| ----- | -------- | --------------------------------------------------- | ------------------------ | ----------------------------- |
 | `ref` | `string` | **Project Reference** - Supabase project identifier | `"abcdefghijklmnopqrst"` | Anon/Service role tokens only |
 
-## Field Value Constraints
+## Field value constraints
 
-### Authenticator Assurance Level (`aal`)
+### Authenticator assurance level (`aal`)
 
-| Value | Description |
-|-------|-------------|
+| Value    | Description                                          |
+| -------- | ---------------------------------------------------- |
 | `"aal1"` | Single-factor authentication (password, OAuth, etc.) |
-| `"aal2"` | Multi-factor authentication (password + TOTP, etc.) |
+| `"aal2"` | Multi-factor authentication (password + TOTP, etc.)  |
 
-### Role Values (`role`)
+### Role values (`role`)
 
-| Value | Description | Use Case |
-|-------|-------------|----------|
-| `"anon"` | Anonymous user | Public access with RLS policies |
-| `"authenticated"` | Authenticated user | Standard user access |
-| `"service_role"` | Service role | Admin privileges (server-side only) |
+| Value             | Description        | Use Case                            |
+| ----------------- | ------------------ | ----------------------------------- |
+| `"anon"`          | Anonymous user     | Public access with RLS policies     |
+| `"authenticated"` | Authenticated user | Standard user access                |
+| `"service_role"`  | Service role       | Admin privileges (server-side only) |
 
-### Audience Values (`aud`)
+### Audience values (`aud`)
 
-| Value | Description |
-|-------|-------------|
+| Value             | Description                   |
+| ----------------- | ----------------------------- |
 | `"authenticated"` | For authenticated user tokens |
-| `"anon"` | For anonymous user tokens |
+| `"anon"`          | For anonymous user tokens     |
 
-### Authentication Methods (`amr.method`)
+### Authentication methods (`amr.method`)
 
-| Value | Description |
-|-------|-------------|
-| `"oauth"` | OAuth provider authentication |
-| `"password"` | Email/password authentication |
-| `"otp"` | One-time password |
-| `"totp"` | Time-based one-time password |
-| `"recovery"` | Account recovery |
-| `"invite"` | Invitation-based signup |
-| `"sso/saml"` | SAML single sign-on |
-| `"magiclink"` | Magic link authentication |
-| `"email/signup"` | Email signup |
-| `"email_change"` | Email change |
-| `"token_refresh"` | Token refresh |
-| `"anonymous"` | Anonymous authentication |
+| Value             | Description                   |
+| ----------------- | ----------------------------- |
+| `"oauth"`         | OAuth provider authentication |
+| `"password"`      | Email/password authentication |
+| `"otp"`           | One-time password             |
+| `"totp"`          | Time-based one-time password  |
+| `"recovery"`      | Account recovery              |
+| `"invite"`        | Invitation-based signup       |
+| `"sso/saml"`      | SAML single sign-on           |
+| `"magiclink"`     | Magic link authentication     |
+| `"email/signup"`  | Email signup                  |
+| `"email_change"`  | Email change                  |
+| `"token_refresh"` | Token refresh                 |
+| `"anonymous"`     | Anonymous authentication      |
 
-## JWT Examples
+## JWT examples
 
-### Authenticated User Token
+### Authenticated user token
 
 ```json
 {
@@ -125,7 +126,7 @@ These claims may be present depending on the authentication context:
 }
 ```
 
-### Anonymous User Token
+### Anonymous user token
 
 ```json
 {
@@ -137,7 +138,7 @@ These claims may be present depending on the authentication context:
 }
 ```
 
-### Service Role Token
+### Service role token
 
 ```json
 {
@@ -149,7 +150,7 @@ These claims may be present depending on the authentication context:
 }
 ```
 
-## Language-Specific Considerations
+## Language-Specific considerations
 
 ### Rust
 
@@ -174,26 +175,26 @@ struct JwtClaims {
 
 ```typescript
 interface JwtClaims {
-  iss: string;
-  aud: string | string[];
-  exp: number;
-  iat: number;
-  sub: string;
-  role: string;
-  aal: 'aal1' | 'aal2';
-  session_id: string;
-  email: string;
-  phone: string;
-  is_anonymous: boolean;
-  jti?: string;
-  nbf?: number;
-  app_metadata?: Record<string, any>;
-  user_metadata?: Record<string, any>;
+  iss: string
+  aud: string | string[]
+  exp: number
+  iat: number
+  sub: string
+  role: string
+  aal: 'aal1' | 'aal2'
+  session_id: string
+  email: string
+  phone: string
+  is_anonymous: boolean
+  jti?: string
+  nbf?: number
+  app_metadata?: Record<string, any>
+  user_metadata?: Record<string, any>
   amr?: Array<{
-    method: string;
-    timestamp: number;
-  }>;
-  ref?: string; // Only in anon/service role tokens
+    method: string
+    timestamp: number
+  }>
+  ref?: string // Only in anon/service role tokens
 }
 ```
 
@@ -258,7 +259,7 @@ type JwtClaims struct {
 }
 ```
 
-## Validation Guidelines
+## Validation guidelines
 
 When implementing JWT validation on your server:
 
@@ -269,7 +270,7 @@ When implementing JWT validation on your server:
 5. **Check Audience**: Validate `aud` matches expected audience
 6. **Handle Reserved Keywords**: Use field renaming for languages like Rust
 
-## Security Considerations
+## Security considerations
 
 - **Always validate the JWT signature** before trusting any claims
 - **Never expose service role tokens** to client-side code
@@ -279,9 +280,9 @@ When implementing JWT validation on your server:
 - **Rotate JWT secrets** regularly
 - **Implement proper error handling** for invalid tokens
 
-## Related Documentation
+## Related documentation
 
 - [JWT Overview](/docs/guides/auth/jwts)
 - [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/custom-access-token-hook)
 - [Row Level Security](/docs/guides/database/postgres/row-level-security)
-- [Server-Side Auth](/docs/guides/auth/server-side) 
+- [Server-Side Auth](/docs/guides/auth/server-side)
