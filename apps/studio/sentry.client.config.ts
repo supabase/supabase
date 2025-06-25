@@ -82,9 +82,7 @@ Sentry.init({
 
     // remove after debugging
     if (event.tags?.alwaysSend) {
-      console.log('[Sentry beforeSend] Bypassing third party check for alwaysSend tag', {
-        tags: event.tags,
-      })
+      console.log('[Sentry beforeSend] Returning event:', event)
       return event
     }
 
