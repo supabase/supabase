@@ -54,9 +54,6 @@ import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName, logEventBus } from './UnifiedLogs.utils'
 
-// Debug mode flag - set to true to enable detailed logs
-const DEBUG_FILTER_PROCESSING = false
-
 export const UnifiedLogs = () => {
   useResetFocus()
 
@@ -126,9 +123,6 @@ export const UnifiedLogs = () => {
     })
   }, [rawFlatData])
   const liveMode = useLiveMode(flatData)
-
-  // REMINDER: meta data is always the same for all pages as filters do not change(!)
-  // const lastPage = unifiedLogsData?.pages?.[unifiedLogsData?.pages.length - 1]
 
   const totalDBRowCount = counts?.totalRowCount
   const filterDBRowCount = flatData.length
@@ -214,37 +208,14 @@ export const UnifiedLogs = () => {
   }, [facets])
 
   useEffect(() => {
-    if (DEBUG_FILTER_PROCESSING) console.log('========== FILTER CHANGE DETECTED ==========')
-    if (DEBUG_FILTER_PROCESSING) console.log('Raw columnFilters:', JSON.stringify(columnFilters))
-
-    // Check for level filters specifically
-    const levelColumnFilter = columnFilters.find((filter) => filter.id === 'level')
-    if (DEBUG_FILTER_PROCESSING) console.log('Level column filter:', levelColumnFilter)
-
     const columnFiltersWithNullable = filterFields.map((field) => {
       const filterValue = columnFilters.find((filter) => filter.id === field.value)
-      if (DEBUG_FILTER_PROCESSING) console.log(`Processing field ${field.value}:`, filterValue)
       if (!filterValue) return { id: field.value, value: null }
       return { id: field.value, value: filterValue.value }
     })
 
-    // Debug level filter specifically
-    const levelFilter = columnFiltersWithNullable.find((f) => f.id === 'level')
-    if (DEBUG_FILTER_PROCESSING) console.log('Level filter after mapping:', levelFilter)
-
-    if (DEBUG_FILTER_PROCESSING)
-      console.log('All column filters after mapping:', columnFiltersWithNullable)
-
     const search = columnFiltersWithNullable.reduce(
       (prev, curr) => {
-        if (DEBUG_FILTER_PROCESSING)
-          console.log(`Processing filter for URL: ${curr.id}`, {
-            value: curr.value,
-            type: Array.isArray(curr.value) ? 'array' : typeof curr.value,
-            isEmpty: Array.isArray(curr.value) && curr.value.length === 0,
-            isNull: curr.value === null,
-          })
-
         // Add to search parameters
         prev[curr.id as string] = curr.value
         return prev
@@ -252,14 +223,7 @@ export const UnifiedLogs = () => {
       {} as Record<string, unknown>
     )
 
-    if (DEBUG_FILTER_PROCESSING) console.log('Final search object to be set in URL:', search)
-    if (DEBUG_FILTER_PROCESSING) console.log('Level value in final search:', search.level)
-    if (DEBUG_FILTER_PROCESSING) console.log('Is level in search object:', 'level' in search)
-
-    // Set the search state without any console logs
-    if (DEBUG_FILTER_PROCESSING) console.log('CALLING setSearch with:', JSON.stringify(search))
     setSearch(search)
-    if (DEBUG_FILTER_PROCESSING) console.log('========== END FILTER PROCESSING ==========')
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columnFilters])
