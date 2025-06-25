@@ -197,26 +197,6 @@ export const getAuthReportAttributes = (isFreePlan: boolean) => [
       },
     ],
   },
-  {
-    id: 'ratelimited-requests',
-    label: 'Rate Limited Requests',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    titleTooltip: 'The total number of rate limited requests by status code.',
-    attributes: [
-      {
-        attribute: 'RateLimitedRequests',
-        provider: 'logs',
-        label: 'Rate Limited Requests',
-        enabled: true,
-      },
-    ],
-  },
 ]
 
 /**

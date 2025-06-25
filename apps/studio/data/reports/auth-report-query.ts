@@ -40,7 +40,6 @@ const METRIC_KEYS = [
   'TotalSignUps',
   'SignInLatency',
   'SignUpLatency',
-  'RateLimitedRequests',
   'ErrorsByStatus',
 ]
 
@@ -163,22 +162,6 @@ const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval) => string> = {
       order by timestamp desc, provider
     `
   },
-  RateLimitedRequests: (interval) => {
-    const granularity = analyticsIntervalToGranularity(interval)
-    return `
-      --rate-limited-requests
-      SELECT 
-        timestamp_trunc(timestamp, ${granularity}) as timestamp,
-        json_value(event_message, "$.path") AS path,
-        json_value(event_message, "$.method") AS method,
-        json_value(event_message, "$.error_code") AS error_code,
-        COUNT(*) AS count
-      FROM auth_logs
-      WHERE json_value(event_message, "$.status") = '429'
-      GROUP BY timestamp, path, method, error_code
-      ORDER BY timestamp DESC, path, method, error_code
-    `
-  },
   ErrorsByStatus: (interval) => {
     const granularity = analyticsIntervalToGranularity(interval)
     return `
@@ -263,7 +246,6 @@ const METRIC_FORMATTER: Record<
   TotalSignUps: (rawData, attributes) => defaultFormatter(rawData, attributes),
   SignInLatency: (rawData, attributes) => defaultFormatter(rawData, attributes),
   SignUpLatency: (rawData, attributes) => defaultFormatter(rawData, attributes),
-  RateLimitedRequests: (rawData, attributes) => defaultFormatter(rawData, attributes),
   ErrorsByStatus: (rawData, attributes) => {
     if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
