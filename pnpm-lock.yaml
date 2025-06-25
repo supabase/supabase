@@ -1270,7 +1270,7 @@ importers:
         version: 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-start':
         specifier: ^1.114.25
-        version: 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
+        version: 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
       '@types/lodash':
         specifier: ^4.17.16
         version: 4.17.16
@@ -2431,12 +2431,12 @@ packages:
   '@aws-crypto/util@5.2.0':
     resolution: {integrity: sha512-4RkU9EsI6ZpBve5fseQlGNUWKMa1RLPQ1dnjnQoe07ldfIzcsGb5hC5W0Dm7u423KWzawlrpbjXBrXCEv9zazQ==}
 
-  '@aws-sdk/client-cognito-identity@3.821.0':
-    resolution: {integrity: sha512-c6TpvrRAb4hVcbGMCPjTWU2IRNBzfEz2qZ1v6DGViW0i8vN4+zXY/DcVOL2P3ZA9MDXjFRiiA8RdIy1/zsi3YQ==}
+  '@aws-sdk/client-cognito-identity@3.823.0':
+    resolution: {integrity: sha512-zCTr4gemGm2bvbeOvXFa0g1SPyra+WlZvGQ7Vc/snFwOlZ/OLAH1OugYD357k9pMqh1DyElFbHlj2rY5I8JeUA==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/client-s3@3.821.0':
-    resolution: {integrity: sha512-enlFiONQD+oCaV+C6hMsAJvyQRT3wZmCtXXq7qjxX8BiLgXsHQ9HHS+Nhoq08Ya6mtd1Y1qHOOYpnD8yyUzTMQ==}
+  '@aws-sdk/client-s3@3.823.0':
+    resolution: {integrity: sha512-cTp1Lkyv5NuHr6aUin5FCARY02o2jiOcRKnWnAahEQrlvgzOAe4SrjjOVVTH67wHdcB9zGeNDNCK/132+zaRow==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/client-secrets-manager@3.468.0':
@@ -2447,8 +2447,8 @@ packages:
     resolution: {integrity: sha512-NabkDaiFsMP8lBR3+JzdtOVarH8kCJst30fQyBIs2PI0uMfajFJ+SK9JTg1J1YZY6aNJBxo2Bxu3dl0fjZ5N/g==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/client-sso@3.821.0':
-    resolution: {integrity: sha512-aDEBZUKUd/+Tvudi0d9KQlqt2OW2P27LATZX0jkNC8yVk4145bAPS04EYoqdKLuyUn/U33DibEOgKUpxZB12jQ==}
+  '@aws-sdk/client-sso@3.823.0':
+    resolution: {integrity: sha512-dBWdsbyGw8rPfdCsZySNtTOGQK4EZ8lxB/CneSQWRBPHgQ+Ys88NXxImO8xfWO7Itt1eh8O7UDTZ9+smcvw2pw==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/client-sts@3.468.0':
@@ -2459,75 +2459,75 @@ packages:
     resolution: {integrity: sha512-ezUJR9VvknKoXzNZ4wvzGi1jdkmm+/1dUYQ9Sw4r8bzlJDTsUnWbyvaDlBQh81RuhLtVkaUfTnQKoec0cwlZKQ==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/core@3.821.0':
-    resolution: {integrity: sha512-8eB3wKbmfciQFmxFq7hAjy7mXdUs7vBOR5SwT0ZtQBg0Txc18Lc9tMViqqdO6/KU7OukA6ib2IAVSjIJJEN7FQ==}
+  '@aws-sdk/core@3.823.0':
+    resolution: {integrity: sha512-1Cf4w8J7wYexz0KU3zpaikHvldGXQEjFldHOhm0SBGRy7qfYNXecfJAamccF7RdgLxKGgkv5Pl9zX/Z/DcW9zg==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/credential-provider-cognito-identity@3.821.0':
-    resolution: {integrity: sha512-8ZdFwmSxvQv8QindA0DJ3YUT9FD8T9sA5hQWp3B9+Znkze29IiIadnsXY0Heo2/FOFygxh8jRXiCWEie7/YpzA==}
+  '@aws-sdk/credential-provider-cognito-identity@3.823.0':
+    resolution: {integrity: sha512-mpP6slEenKRjRpTnGMUBbZLdAJa8GszgnQ6Vep+7Z8YwLNeGWsTFRZkavGMnGsQ5K5KdqxYgdHe0SZ9j8oIoWw==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/credential-provider-env@3.468.0':
     resolution: {integrity: sha512-k/1WHd3KZn0EQYjadooj53FC0z24/e4dUZhbSKTULgmxyO62pwh9v3Brvw4WRa/8o2wTffU/jo54tf4vGuP/ZA==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/credential-provider-env@3.821.0':
-    resolution: {integrity: sha512-C+s/A72pd7CXwEsJj9+Uq9T726iIfIF18hGRY8o82xcIEfOyakiPnlisku8zZOaAu+jm0CihbbYN4NyYNQ+HZQ==}
+  '@aws-sdk/credential-provider-env@3.823.0':
+    resolution: {integrity: sha512-AIrLLwumObge+U1klN4j5ToIozI+gE9NosENRyHe0GIIZgTLOG/8jxrMFVYFeNHs7RUtjDTxxewislhFyGxJ/w==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/credential-provider-http@3.821.0':
-    resolution: {integrity: sha512-gIRzTLnAsRfRSNarCag7G7rhcHagz4x5nNTWRihQs5cwTOghEExDy7Tj5m4TEkv3dcTAsNn+l4tnR4nZXo6R+Q==}
+  '@aws-sdk/credential-provider-http@3.823.0':
+    resolution: {integrity: sha512-u4DXvB/J/o2bcvP1JP6n3ch7V3/NngmiJFPsM0hKUyRlLuWM37HEDEdjPRs3/uL/soTxrEhWKTA9//YVkvzI0w==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/credential-provider-ini@3.468.0':
     resolution: {integrity: sha512-DBYsptYBq0xC+GTh+3dN3Q9/wRZiPpsHA4yCC1mskEbJfMy7EIZZKtZ8lOkZ24NOI5oea4o3L+wFTxOeFSKntA==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/credential-provider-ini@3.821.0':
-    resolution: {integrity: sha512-VRTrmsca8kBHtY1tTek1ce+XkK/H0fzodBKcilM/qXjTyumMHPAzVAxKZfSvGC+28/pXyQzhOEyxZfw7giCiWA==}
+  '@aws-sdk/credential-provider-ini@3.823.0':
+    resolution: {integrity: sha512-C0o63qviK5yFvjH9zKWAnCUBkssJoQ1A1XAHe0IAQkurzoNBSmu9oVemqwnKKHA4H6QrmusaEERfL00yohIkJA==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/credential-provider-node@3.468.0':
     resolution: {integrity: sha512-iZlWWZXp6zAH4sP3VrqF7RpAmzl8Qr8tuVkF7ubUZhzyWzKfhLVzqRJqbMYCBPGmfZLAZWjsziPHaBErYkG/5g==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/credential-provider-node@3.821.0':
-    resolution: {integrity: sha512-oBgbcgOXWMgknAfhIdTeHSSVIv+k2LXN9oTbxu1r++o4WWBWrEQ8mHU0Zo9dfr7Uaoqi3pezYZznsBkXnMLEOg==}
+  '@aws-sdk/credential-provider-node@3.823.0':
+    resolution: {integrity: sha512-nfSxXVuZ+2GJDpVFlflNfh55Yb4BtDsXLGNssXF5YU6UgSPsi8j2YkaE92Jv2s7dlUK07l0vRpLyPuXMaGeiRQ==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/credential-provider-process@3.468.0':
     resolution: {integrity: sha512-OYSn1A/UsyPJ7Z8Q2cNhTf55O36shPmSsvOfND04nSfu1nPaR+VUvvsP7v+brhGpwC/GAKTIdGAo4blH31BS6A==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/credential-provider-process@3.821.0':
-    resolution: {integrity: sha512-e18ucfqKB3ICNj5RP/FEdvUfhVK6E9MALOsl8pKP13mwegug46p/1BsZWACD5n+Zf9ViiiHxIO7td03zQixfwA==}
+  '@aws-sdk/credential-provider-process@3.823.0':
+    resolution: {integrity: sha512-U/A10/7zu2FbMFFVpIw95y0TZf+oYyrhZTBn9eL8zgWcrYRqxrxdqtPj/zMrfIfyIvQUhuJSENN4dx4tfpCMWQ==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/credential-provider-sso@3.468.0':
     resolution: {integrity: sha512-eIdGoIw10xyBm7TDcV5Y/W7tzNs2f4H+2G5ZdjG2XGLAELsKCoixe+9ZB662MLtLCxvm7eE1GjOjKsSua6MImQ==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/credential-provider-sso@3.821.0':
-    resolution: {integrity: sha512-Dt+pheBLom4O/egO4L75/72k9C1qtUOLl0F0h6lmqZe4Mvhz+wDtjoO/MdGC/P1q0kcIX/bBKr0NQ3cIvAH8pA==}
+  '@aws-sdk/credential-provider-sso@3.823.0':
+    resolution: {integrity: sha512-ff8IM80Wqz1V7VVMaMUqO2iR417jggfGWLPl8j2l7uCgwpEyop1ZZl5CFVYEwSupRBtwp+VlW1gTCk7ke56MUw==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/credential-provider-web-identity@3.468.0':
     resolution: {integrity: sha512-rexymPmXjtkwCPfhnUq3EjO1rSkf39R4Jz9CqiM7OsqK2qlT5Y/V3gnMKn0ZMXsYaQOMfM3cT5xly5R+OKDHlw==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/credential-provider-web-identity@3.821.0':
-    resolution: {integrity: sha512-FF5wnRJkxSQaCVVvWNv53K1MhTMgH8d+O+MHTbkv51gVIgVATrtfFQMKBLcEAxzXrgAliIO3LiNv+1TqqBZ+BA==}
+  '@aws-sdk/credential-provider-web-identity@3.823.0':
+    resolution: {integrity: sha512-lzoZdJMQq9w7i4lXVka30cVBe/dZoUDZST8Xz/soEd73gg7RTKgG+0szL4xFWgdBDgcJDWLfZfJzlbyIVyAyOA==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/credential-providers@3.821.0':
-    resolution: {integrity: sha512-ZkV7KlKD+rSW/AP5zjSgMi+0xJ5TL5J6XVaP3IG5qyqBYTREJ8DbB/9YVUpYt2qtzpWUh/K43nmDEyfLd2YJog==}
+  '@aws-sdk/credential-providers@3.823.0':
+    resolution: {integrity: sha512-S2iWP7+/lmaGJnGMoAipRlwRqOvd+5aWEJwdCSUCipR7cH+u/biRSbynBGrYvxjqqhyIagxjYn5gGYCX+x1v4g==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/lib-storage@3.821.0':
-    resolution: {integrity: sha512-79N58EjrNOFbbegxJoeR1d9TH3MTV8gfpob5gIpXnZWl27gSJYPaD5K7vNS1wbwFEnIWMp9esRO3TtEMb/UAPg==}
+  '@aws-sdk/lib-storage@3.823.0':
+    resolution: {integrity: sha512-KuBn4F9dNBXlSHxnkCL/FZitVX0HR5QzbrLJ0c29/mJBIz2rB2Yj0q8u2WFKOo6jCZwdHZhFvQjJvVj61ptIBQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      '@aws-sdk/client-s3': ^3.821.0
+      '@aws-sdk/client-s3': ^3.823.0
 
   '@aws-sdk/middleware-bucket-endpoint@3.821.0':
     resolution: {integrity: sha512-cebgeytKlWOgGczLo3BPvNY9XlzAzGZQANSysgJ2/8PSldmUpXRIF+GKPXDVhXeInWYHIfB8zZi3RqrPoXcNYQ==}
@@ -2537,8 +2537,8 @@ packages:
     resolution: {integrity: sha512-zAOoSZKe1njOrtynvK6ZORU57YGv5I7KP4+rwOvUN3ZhJbQ7QPf8gKtFUCYAPRMegaXCKF/ADPtDZBAmM+zZ9g==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/middleware-flexible-checksums@3.821.0':
-    resolution: {integrity: sha512-C56sBHXq1fEsLfIAup+w/7SKtb6d8Mb3YBec94r2ludVn1s3ypYWRovFE/6VhUzvwUbTQaxfrA2ewy5GQ1/DJQ==}
+  '@aws-sdk/middleware-flexible-checksums@3.823.0':
+    resolution: {integrity: sha512-Elt6G1ryEEdkrppqbyJON0o2x4x9xKknimJtMLdfG1b4YfO9X+UB31pk4R2SHvMYfrJ+p8DE2jRAhvV4g/dwIQ==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/middleware-host-header@3.468.0':
@@ -2569,8 +2569,8 @@ packages:
     resolution: {integrity: sha512-efmaifbhBoqKG3bAoEfDdcM8hn1psF+4qa7ykWuYmfmah59JBeqHLfz5W9m9JoTwoKPkFcVLWZxnyZzAnVBOIg==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/middleware-sdk-s3@3.821.0':
-    resolution: {integrity: sha512-D469De1d4NtcCTVHzUL2Q0tGvPFr7mk2j4+oCYpVyd5awSSOyl8Adkxse8qayZj9ROmuMlsoU5VhBvcc9Hoo2w==}
+  '@aws-sdk/middleware-sdk-s3@3.823.0':
+    resolution: {integrity: sha512-UV755wt2HDru8PbxLn2S0Fvwgdn9mYamexn31Q6wyUGQ6rkpjKNEzL+oNDGQQmDQAOcQO+nLubKFsCwtBM02fQ==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/middleware-sdk-sts@3.468.0':
@@ -2589,12 +2589,12 @@ packages:
     resolution: {integrity: sha512-lmqaEChVWK6MvNpM/LH504pRsP3p/IuZugWwxCbelKw4bGVU4IgG3mbjfATiIlHo4rW8ttHh1bTsZIGjWOqNeA==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/middleware-user-agent@3.821.0':
-    resolution: {integrity: sha512-rw8q3TxygMg3VrofN04QyWVCCyGwz3bVthYmBZZseENPWG3Krz1OCKcyqjkTcAxMQlEywOske+GIiOasGKnJ3w==}
+  '@aws-sdk/middleware-user-agent@3.823.0':
+    resolution: {integrity: sha512-TKRQK09ld1LrIPExC9rIDpqnMsWcv+eq8ABKFHVo8mDLTSuWx/IiQ4eCh9T5zDuEZcLY4nNYCSzXKqw6XKcMCA==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/nested-clients@3.821.0':
-    resolution: {integrity: sha512-2IuHcUsWw44ftSEDYU4dvktTEqgyDvkOcfpoGC/UmT4Qo6TVCP3U5tWEGpNK9nN+7nLvekruxxG/jaMt5/oWVw==}
+  '@aws-sdk/nested-clients@3.823.0':
+    resolution: {integrity: sha512-/BcyOBubrJnd2gxlbbmNJR1w0Z3OVN/UE8Yz20e+ou+Mijjv7EbtVwmWvio1e3ZjphwdA8tVfPYZKwXmrvHKmQ==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/region-config-resolver@3.468.0':
@@ -2605,20 +2605,20 @@ packages:
     resolution: {integrity: sha512-t8og+lRCIIy5nlId0bScNpCkif8sc0LhmtaKsbm0ZPm3sCa/WhCbSZibjbZ28FNjVCV+p0D9RYZx0VDDbtWyjw==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/s3-request-presigner@3.821.0':
-    resolution: {integrity: sha512-VLM0pWQxEBf80uKirU4B1hQz3ZYX5OaPFrRSciUkkKYdqPFrnjQ7NyIQRjF1MVmXwsKgBxJVWl+p0BKcsHR+rQ==}
+  '@aws-sdk/s3-request-presigner@3.823.0':
+    resolution: {integrity: sha512-sHyLreWpeePB5TgKbepbUpGSpzU7lLVRaSGv8JC8dg/rVeXlw+vyIBhKFviggkszDT0KSeD6pJ4DPqCsFCtTGA==}
     engines: {node: '>=18.0.0'}
 
-  '@aws-sdk/signature-v4-multi-region@3.821.0':
-    resolution: {integrity: sha512-UjfyVR/PB/TP9qe1x6tv7qLlD8/0eiSLDkkBUgBmddkkX0l17oy9c2SJINuV3jy1fbx6KORZ6gyvRZ2nb8dtMw==}
+  '@aws-sdk/signature-v4-multi-region@3.823.0':
+    resolution: {integrity: sha512-FAvtmR7G0ppNLa4O2yN8koFYUmUmPuL60UBIFrVb3BBeZvBIFLln69lB8EGtTBpAvVbxknudRZCzYtnOhE4QXg==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/token-providers@3.468.0':
     resolution: {integrity: sha512-IpLbthZmFXotwtgkE1Bw4HcKjwpAsGM+6iTXs4amZJqllJClOgyV/sV5Cze+8AqanfCZoPIFTmXyg8LfJTYwbw==}
     engines: {node: '>=14.0.0'}
 
-  '@aws-sdk/token-providers@3.821.0':
-    resolution: {integrity: sha512-qJ7wgKhdxGbPg718zWXbCYKDuSWZNU3TSw64hPRW6FtbZrIyZxObpiTKC6DKwfsVoZZhHEoP/imGykN1OdOTJA==}
+  '@aws-sdk/token-providers@3.823.0':
+    resolution: {integrity: sha512-vz6onCb/+g4y+owxGGPMEMdN789dTfBOgz/c9pFv0f01840w9Rrt46l+gjQlnXnx+0KG6wNeBIVhFdbCfV3HyQ==}
     engines: {node: '>=18.0.0'}
 
   '@aws-sdk/types@3.468.0':
@@ -2664,8 +2664,8 @@ packages:
       aws-crt:
         optional: true
 
-  '@aws-sdk/util-user-agent-node@3.821.0':
-    resolution: {integrity: sha512-YwMXc9EvuzJgnLBTyiQly2juPujXwDgcMHB0iSN92tHe7Dd1jJ1feBmTgdClaaqCeHFUaFpw+3JU/ZUJ6LjR+A==}
+  '@aws-sdk/util-user-agent-node@3.823.0':
+    resolution: {integrity: sha512-WvNeRz7HV3JLBVGTXW4Qr5QvvWY0vtggH5jW/NqHFH+ZEliVQaUIJ/HNLMpMoCSiu/DlpQAyAjRZXAptJ0oqbw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       aws-crt: '>=1.0.0'
@@ -9209,6 +9209,9 @@ packages:
   awesome-only-resolves-last-promise@1.0.3:
     resolution: {integrity: sha512-7q4WPsYiD8Omvi/yHL314DkvsD/lM//Z2/KcU1vWk0xJotiV0GMJTgHTpWl3n90HJqpXKg7qX+VVNs5YbQyPRQ==}
     engines: {node: '>=8', npm: '>=5'}
+
+  aws4fetch@1.0.20:
+    resolution: {integrity: sha512-/djoAN709iY65ETD6LKCtyyEI04XIBP5xVvfmNxsEP0uJB5tyaGBztSryRr4HqMStr9R06PisQE7m9zDTXKu6g==}
 
   axe-core@4.10.3:
     resolution: {integrity: sha512-Xm7bpRXnDSX2YE2YFfBk2FnF0ep6tmG7xPh8iHee8MIcrgq762Nkce856dYtJYLkuIoYZvGfTs/PbZhideTcEg==}
@@ -17908,7 +17911,7 @@ snapshots:
   '@aws-crypto/crc32@5.2.0':
     dependencies:
       '@aws-crypto/util': 5.2.0
-      '@aws-sdk/types': 3.821.0
+      '@aws-sdk/types': 3.468.0
       tslib: 2.8.1
 
   '@aws-crypto/crc32c@5.2.0':
@@ -17995,21 +17998,21 @@ snapshots:
       '@smithy/util-utf8': 2.0.2
       tslib: 2.8.1
 
-  '@aws-sdk/client-cognito-identity@3.821.0':
+  '@aws-sdk/client-cognito-identity@3.823.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.821.0
-      '@aws-sdk/credential-provider-node': 3.821.0
+      '@aws-sdk/core': 3.823.0
+      '@aws-sdk/credential-provider-node': 3.823.0
       '@aws-sdk/middleware-host-header': 3.821.0
       '@aws-sdk/middleware-logger': 3.821.0
       '@aws-sdk/middleware-recursion-detection': 3.821.0
-      '@aws-sdk/middleware-user-agent': 3.821.0
+      '@aws-sdk/middleware-user-agent': 3.823.0
       '@aws-sdk/region-config-resolver': 3.821.0
       '@aws-sdk/types': 3.821.0
       '@aws-sdk/util-endpoints': 3.821.0
       '@aws-sdk/util-user-agent-browser': 3.821.0
-      '@aws-sdk/util-user-agent-node': 3.821.0
+      '@aws-sdk/util-user-agent-node': 3.823.0
       '@smithy/config-resolver': 4.1.4
       '@smithy/core': 3.5.1
       '@smithy/fetch-http-handler': 5.0.4
@@ -18039,29 +18042,29 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-s3@3.821.0':
+  '@aws-sdk/client-s3@3.823.0':
     dependencies:
       '@aws-crypto/sha1-browser': 5.2.0
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.821.0
-      '@aws-sdk/credential-provider-node': 3.821.0
+      '@aws-sdk/core': 3.823.0
+      '@aws-sdk/credential-provider-node': 3.823.0
       '@aws-sdk/middleware-bucket-endpoint': 3.821.0
       '@aws-sdk/middleware-expect-continue': 3.821.0
-      '@aws-sdk/middleware-flexible-checksums': 3.821.0
+      '@aws-sdk/middleware-flexible-checksums': 3.823.0
       '@aws-sdk/middleware-host-header': 3.821.0
       '@aws-sdk/middleware-location-constraint': 3.821.0
       '@aws-sdk/middleware-logger': 3.821.0
       '@aws-sdk/middleware-recursion-detection': 3.821.0
-      '@aws-sdk/middleware-sdk-s3': 3.821.0
+      '@aws-sdk/middleware-sdk-s3': 3.823.0
       '@aws-sdk/middleware-ssec': 3.821.0
-      '@aws-sdk/middleware-user-agent': 3.821.0
+      '@aws-sdk/middleware-user-agent': 3.823.0
       '@aws-sdk/region-config-resolver': 3.821.0
-      '@aws-sdk/signature-v4-multi-region': 3.821.0
+      '@aws-sdk/signature-v4-multi-region': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@aws-sdk/util-endpoints': 3.821.0
       '@aws-sdk/util-user-agent-browser': 3.821.0
-      '@aws-sdk/util-user-agent-node': 3.821.0
+      '@aws-sdk/util-user-agent-node': 3.823.0
       '@aws-sdk/xml-builder': 3.821.0
       '@smithy/config-resolver': 4.1.4
       '@smithy/core': 3.5.1
@@ -18186,20 +18189,20 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sso@3.821.0':
+  '@aws-sdk/client-sso@3.823.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/middleware-host-header': 3.821.0
       '@aws-sdk/middleware-logger': 3.821.0
       '@aws-sdk/middleware-recursion-detection': 3.821.0
-      '@aws-sdk/middleware-user-agent': 3.821.0
+      '@aws-sdk/middleware-user-agent': 3.823.0
       '@aws-sdk/region-config-resolver': 3.821.0
       '@aws-sdk/types': 3.821.0
       '@aws-sdk/util-endpoints': 3.821.0
       '@aws-sdk/util-user-agent-browser': 3.821.0
-      '@aws-sdk/util-user-agent-node': 3.821.0
+      '@aws-sdk/util-user-agent-node': 3.823.0
       '@smithy/config-resolver': 4.1.4
       '@smithy/core': 3.5.1
       '@smithy/fetch-http-handler': 5.0.4
@@ -18279,9 +18282,10 @@ snapshots:
       '@smithy/smithy-client': 2.1.18
       tslib: 2.8.1
 
-  '@aws-sdk/core@3.821.0':
+  '@aws-sdk/core@3.823.0':
     dependencies:
       '@aws-sdk/types': 3.821.0
+      '@aws-sdk/xml-builder': 3.821.0
       '@smithy/core': 3.5.1
       '@smithy/node-config-provider': 4.1.3
       '@smithy/property-provider': 4.0.4
@@ -18289,13 +18293,16 @@ snapshots:
       '@smithy/signature-v4': 5.1.2
       '@smithy/smithy-client': 4.4.1
       '@smithy/types': 4.3.1
+      '@smithy/util-base64': 4.0.0
+      '@smithy/util-body-length-browser': 4.0.0
       '@smithy/util-middleware': 4.0.4
+      '@smithy/util-utf8': 4.0.0
       fast-xml-parser: 4.4.1
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-cognito-identity@3.821.0':
+  '@aws-sdk/credential-provider-cognito-identity@3.823.0':
     dependencies:
-      '@aws-sdk/client-cognito-identity': 3.821.0
+      '@aws-sdk/client-cognito-identity': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/property-provider': 4.0.4
       '@smithy/types': 4.3.1
@@ -18310,17 +18317,17 @@ snapshots:
       '@smithy/types': 2.7.0
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-env@3.821.0':
+  '@aws-sdk/credential-provider-env@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/property-provider': 4.0.4
       '@smithy/types': 4.3.1
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-http@3.821.0':
+  '@aws-sdk/credential-provider-http@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/fetch-http-handler': 5.0.4
       '@smithy/node-http-handler': 4.0.6
@@ -18346,15 +18353,15 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/credential-provider-ini@3.821.0':
+  '@aws-sdk/credential-provider-ini@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
-      '@aws-sdk/credential-provider-env': 3.821.0
-      '@aws-sdk/credential-provider-http': 3.821.0
-      '@aws-sdk/credential-provider-process': 3.821.0
-      '@aws-sdk/credential-provider-sso': 3.821.0
-      '@aws-sdk/credential-provider-web-identity': 3.821.0
-      '@aws-sdk/nested-clients': 3.821.0
+      '@aws-sdk/core': 3.823.0
+      '@aws-sdk/credential-provider-env': 3.823.0
+      '@aws-sdk/credential-provider-http': 3.823.0
+      '@aws-sdk/credential-provider-process': 3.823.0
+      '@aws-sdk/credential-provider-sso': 3.823.0
+      '@aws-sdk/credential-provider-web-identity': 3.823.0
+      '@aws-sdk/nested-clients': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/credential-provider-imds': 4.0.6
       '@smithy/property-provider': 4.0.4
@@ -18380,14 +18387,14 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/credential-provider-node@3.821.0':
+  '@aws-sdk/credential-provider-node@3.823.0':
     dependencies:
-      '@aws-sdk/credential-provider-env': 3.821.0
-      '@aws-sdk/credential-provider-http': 3.821.0
-      '@aws-sdk/credential-provider-ini': 3.821.0
-      '@aws-sdk/credential-provider-process': 3.821.0
-      '@aws-sdk/credential-provider-sso': 3.821.0
-      '@aws-sdk/credential-provider-web-identity': 3.821.0
+      '@aws-sdk/credential-provider-env': 3.823.0
+      '@aws-sdk/credential-provider-http': 3.823.0
+      '@aws-sdk/credential-provider-ini': 3.823.0
+      '@aws-sdk/credential-provider-process': 3.823.0
+      '@aws-sdk/credential-provider-sso': 3.823.0
+      '@aws-sdk/credential-provider-web-identity': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/credential-provider-imds': 4.0.6
       '@smithy/property-provider': 4.0.4
@@ -18405,9 +18412,9 @@ snapshots:
       '@smithy/types': 2.7.0
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-process@3.821.0':
+  '@aws-sdk/credential-provider-process@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/property-provider': 4.0.4
       '@smithy/shared-ini-file-loader': 4.0.4
@@ -18426,11 +18433,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/credential-provider-sso@3.821.0':
+  '@aws-sdk/credential-provider-sso@3.823.0':
     dependencies:
-      '@aws-sdk/client-sso': 3.821.0
-      '@aws-sdk/core': 3.821.0
-      '@aws-sdk/token-providers': 3.821.0
+      '@aws-sdk/client-sso': 3.823.0
+      '@aws-sdk/core': 3.823.0
+      '@aws-sdk/token-providers': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/property-provider': 4.0.4
       '@smithy/shared-ini-file-loader': 4.0.4
@@ -18446,10 +18453,10 @@ snapshots:
       '@smithy/types': 2.7.0
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-web-identity@3.821.0':
+  '@aws-sdk/credential-provider-web-identity@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
-      '@aws-sdk/nested-clients': 3.821.0
+      '@aws-sdk/core': 3.823.0
+      '@aws-sdk/nested-clients': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/property-provider': 4.0.4
       '@smithy/types': 4.3.1
@@ -18457,19 +18464,19 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/credential-providers@3.821.0':
+  '@aws-sdk/credential-providers@3.823.0':
     dependencies:
-      '@aws-sdk/client-cognito-identity': 3.821.0
-      '@aws-sdk/core': 3.821.0
-      '@aws-sdk/credential-provider-cognito-identity': 3.821.0
-      '@aws-sdk/credential-provider-env': 3.821.0
-      '@aws-sdk/credential-provider-http': 3.821.0
-      '@aws-sdk/credential-provider-ini': 3.821.0
-      '@aws-sdk/credential-provider-node': 3.821.0
-      '@aws-sdk/credential-provider-process': 3.821.0
-      '@aws-sdk/credential-provider-sso': 3.821.0
-      '@aws-sdk/credential-provider-web-identity': 3.821.0
-      '@aws-sdk/nested-clients': 3.821.0
+      '@aws-sdk/client-cognito-identity': 3.823.0
+      '@aws-sdk/core': 3.823.0
+      '@aws-sdk/credential-provider-cognito-identity': 3.823.0
+      '@aws-sdk/credential-provider-env': 3.823.0
+      '@aws-sdk/credential-provider-http': 3.823.0
+      '@aws-sdk/credential-provider-ini': 3.823.0
+      '@aws-sdk/credential-provider-node': 3.823.0
+      '@aws-sdk/credential-provider-process': 3.823.0
+      '@aws-sdk/credential-provider-sso': 3.823.0
+      '@aws-sdk/credential-provider-web-identity': 3.823.0
+      '@aws-sdk/nested-clients': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/config-resolver': 4.1.4
       '@smithy/core': 3.5.1
@@ -18481,9 +18488,9 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/lib-storage@3.821.0(@aws-sdk/client-s3@3.821.0)':
+  '@aws-sdk/lib-storage@3.823.0(@aws-sdk/client-s3@3.823.0)':
     dependencies:
-      '@aws-sdk/client-s3': 3.821.0
+      '@aws-sdk/client-s3': 3.823.0
       '@smithy/abort-controller': 4.0.4
       '@smithy/middleware-endpoint': 4.1.9
       '@smithy/smithy-client': 4.4.1
@@ -18509,12 +18516,12 @@ snapshots:
       '@smithy/types': 4.3.1
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-flexible-checksums@3.821.0':
+  '@aws-sdk/middleware-flexible-checksums@3.823.0':
     dependencies:
       '@aws-crypto/crc32': 5.2.0
       '@aws-crypto/crc32c': 5.2.0
       '@aws-crypto/util': 5.2.0
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/is-array-buffer': 4.0.0
       '@smithy/node-config-provider': 4.1.3
@@ -18571,9 +18578,9 @@ snapshots:
       '@smithy/types': 4.3.1
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-sdk-s3@3.821.0':
+  '@aws-sdk/middleware-sdk-s3@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@aws-sdk/util-arn-parser': 3.804.0
       '@smithy/core': 3.5.1
@@ -18619,9 +18626,9 @@ snapshots:
       '@smithy/types': 2.7.0
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-user-agent@3.821.0':
+  '@aws-sdk/middleware-user-agent@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@aws-sdk/util-endpoints': 3.821.0
       '@smithy/core': 3.5.1
@@ -18629,20 +18636,20 @@ snapshots:
       '@smithy/types': 4.3.1
       tslib: 2.8.1
 
-  '@aws-sdk/nested-clients@3.821.0':
+  '@aws-sdk/nested-clients@3.823.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.821.0
+      '@aws-sdk/core': 3.823.0
       '@aws-sdk/middleware-host-header': 3.821.0
       '@aws-sdk/middleware-logger': 3.821.0
       '@aws-sdk/middleware-recursion-detection': 3.821.0
-      '@aws-sdk/middleware-user-agent': 3.821.0
+      '@aws-sdk/middleware-user-agent': 3.823.0
       '@aws-sdk/region-config-resolver': 3.821.0
       '@aws-sdk/types': 3.821.0
       '@aws-sdk/util-endpoints': 3.821.0
       '@aws-sdk/util-user-agent-browser': 3.821.0
-      '@aws-sdk/util-user-agent-node': 3.821.0
+      '@aws-sdk/util-user-agent-node': 3.823.0
       '@smithy/config-resolver': 4.1.4
       '@smithy/core': 3.5.1
       '@smithy/fetch-http-handler': 5.0.4
@@ -18689,9 +18696,9 @@ snapshots:
       '@smithy/util-middleware': 4.0.4
       tslib: 2.8.1
 
-  '@aws-sdk/s3-request-presigner@3.821.0':
+  '@aws-sdk/s3-request-presigner@3.823.0':
     dependencies:
-      '@aws-sdk/signature-v4-multi-region': 3.821.0
+      '@aws-sdk/signature-v4-multi-region': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@aws-sdk/util-format-url': 3.821.0
       '@smithy/middleware-endpoint': 4.1.9
@@ -18700,9 +18707,9 @@ snapshots:
       '@smithy/types': 4.3.1
       tslib: 2.8.1
 
-  '@aws-sdk/signature-v4-multi-region@3.821.0':
+  '@aws-sdk/signature-v4-multi-region@3.823.0':
     dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.821.0
+      '@aws-sdk/middleware-sdk-s3': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/protocol-http': 5.1.2
       '@smithy/signature-v4': 5.1.2
@@ -18751,10 +18758,10 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/token-providers@3.821.0':
+  '@aws-sdk/token-providers@3.823.0':
     dependencies:
-      '@aws-sdk/core': 3.821.0
-      '@aws-sdk/nested-clients': 3.821.0
+      '@aws-sdk/core': 3.823.0
+      '@aws-sdk/nested-clients': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/property-provider': 4.0.4
       '@smithy/shared-ini-file-loader': 4.0.4
@@ -18822,9 +18829,9 @@ snapshots:
       '@smithy/types': 2.7.0
       tslib: 2.8.1
 
-  '@aws-sdk/util-user-agent-node@3.821.0':
+  '@aws-sdk/util-user-agent-node@3.823.0':
     dependencies:
-      '@aws-sdk/middleware-user-agent': 3.821.0
+      '@aws-sdk/middleware-user-agent': 3.823.0
       '@aws-sdk/types': 3.821.0
       '@smithy/node-config-provider': 4.1.3
       '@smithy/types': 4.3.1
@@ -22299,10 +22306,10 @@ snapshots:
 
   '@payloadcms/payload-cloud@3.33.0(encoding@0.1.13)(payload@3.33.0(graphql@16.10.0)(typescript@5.7.3))':
     dependencies:
-      '@aws-sdk/client-cognito-identity': 3.821.0
-      '@aws-sdk/client-s3': 3.821.0
-      '@aws-sdk/credential-providers': 3.821.0
-      '@aws-sdk/lib-storage': 3.821.0(@aws-sdk/client-s3@3.821.0)
+      '@aws-sdk/client-cognito-identity': 3.823.0
+      '@aws-sdk/client-s3': 3.823.0
+      '@aws-sdk/credential-providers': 3.823.0
+      '@aws-sdk/lib-storage': 3.823.0(@aws-sdk/client-s3@3.823.0)
       '@payloadcms/email-nodemailer': 3.33.0(payload@3.33.0(graphql@16.10.0)(typescript@5.7.3))
       amazon-cognito-identity-js: 6.3.15(encoding@0.1.13)
       nodemailer: 6.9.16
@@ -22402,9 +22409,9 @@ snapshots:
 
   '@payloadcms/storage-s3@3.33.0(@types/react@18.3.3)(monaco-editor@0.52.2)(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(payload@3.33.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)(typescript@5.7.3)':
     dependencies:
-      '@aws-sdk/client-s3': 3.821.0
-      '@aws-sdk/lib-storage': 3.821.0(@aws-sdk/client-s3@3.821.0)
-      '@aws-sdk/s3-request-presigner': 3.821.0
+      '@aws-sdk/client-s3': 3.823.0
+      '@aws-sdk/lib-storage': 3.823.0(@aws-sdk/client-s3@3.823.0)
+      '@aws-sdk/s3-request-presigner': 3.823.0
       '@payloadcms/plugin-cloud-storage': 3.33.0(@types/react@18.3.3)(monaco-editor@0.52.2)(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(payload@3.33.0(graphql@16.10.0)(typescript@5.7.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(supports-color@8.1.1)(typescript@5.7.3)
       payload: 3.33.0(graphql@16.10.0)(typescript@5.7.3)
     transitivePeerDependencies:
@@ -25680,7 +25687,7 @@ snapshots:
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
 
-  '@tanstack/react-start-client@1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
+  '@tanstack/react-start-client@1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
     dependencies:
       '@tanstack/react-router': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/router-core': 1.114.25
@@ -25691,7 +25698,7 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -25735,7 +25742,7 @@ snapshots:
       - xml2js
       - yaml
 
-  '@tanstack/react-start-config@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
+  '@tanstack/react-start-config@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
     dependencies:
       '@tanstack/react-start-plugin': 1.114.12(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       '@tanstack/router-core': 1.114.25
@@ -25745,11 +25752,11 @@ snapshots:
       '@tanstack/start-server-functions-handler': 1.114.25
       '@vitejs/plugin-react': 4.3.4(supports-color@8.1.1)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))
       import-meta-resolve: 4.1.0
-      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
+      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
       ofetch: 1.4.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
       vite: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       zod: 3.24.2
     transitivePeerDependencies:
@@ -25827,11 +25834,11 @@ snapshots:
       - tsx
       - yaml
 
-  '@tanstack/react-start-router-manifest@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
+  '@tanstack/react-start-router-manifest@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
     dependencies:
       '@tanstack/router-core': 1.114.25
       tiny-invariant: 1.3.3
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -25890,13 +25897,13 @@ snapshots:
       tiny-warning: 1.0.3
       unctx: 2.4.1
 
-  '@tanstack/react-start@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
+  '@tanstack/react-start@1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)':
     dependencies:
-      '@tanstack/react-start-client': 1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
-      '@tanstack/react-start-config': 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
-      '@tanstack/react-start-router-manifest': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      '@tanstack/react-start-client': 1.114.27(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      '@tanstack/react-start-config': 1.114.27(@electric-sql/pglite@0.2.15)(@tanstack/react-router@1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/node@22.13.14)(aws4fetch@1.0.20)(babel-plugin-macros@3.1.0)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(vite@6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5))(webpack@5.94.0(esbuild@0.25.2))(yaml@2.4.5)
+      '@tanstack/react-start-router-manifest': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
       '@tanstack/react-start-server': 1.114.27(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tanstack/start-api-routes': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      '@tanstack/start-api-routes': 1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
       '@tanstack/start-server-functions-client': 1.114.25(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       '@tanstack/start-server-functions-handler': 1.114.25
       '@tanstack/start-server-functions-server': 1.114.12(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
@@ -26047,11 +26054,11 @@ snapshots:
       - tsx
       - yaml
 
-  '@tanstack/start-api-routes@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
+  '@tanstack/start-api-routes@1.114.25(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)':
     dependencies:
       '@tanstack/router-core': 1.114.25
       '@tanstack/start-server-core': 1.114.25
-      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
+      vinxi: 0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -26613,7 +26620,7 @@ snapshots:
 
   '@types/pg-pool@2.0.6':
     dependencies:
-      '@types/pg': 8.11.11
+      '@types/pg': 8.6.1
 
   '@types/pg@8.10.2':
     dependencies:
@@ -27647,6 +27654,9 @@ snapshots:
   awesome-only-resolves-last-promise@1.0.3:
     dependencies:
       awesome-imperative-promise: 1.0.1
+
+  aws4fetch@1.0.20:
+    optional: true
 
   axe-core@4.10.3: {}
 
@@ -33404,7 +33414,7 @@ snapshots:
 
   nice-try@1.0.5: {}
 
-  nitropack@2.11.7(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2):
+  nitropack@2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
       '@netlify/functions': 3.0.4
@@ -33473,7 +33483,7 @@ snapshots:
       unenv: 2.0.0-rc.15
       unimport: 4.1.2
       unplugin-utils: 0.2.4
-      unstorage: 1.15.0(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1))
+      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1))
       untyped: 2.0.0
       unwasm: 0.3.9
       youch: 4.1.0-beta.6
@@ -34173,7 +34183,7 @@ snapshots:
 
   periscopic@3.1.0:
     dependencies:
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.5
       estree-walker: 3.0.3
       is-reference: 3.0.3
 
@@ -37519,7 +37529,7 @@ snapshots:
       acorn: 8.14.1
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.15.0(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1)):
+  unstorage@1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1)):
     dependencies:
       anymatch: 3.1.3
       chokidar: 4.0.3
@@ -37530,6 +37540,7 @@ snapshots:
       ofetch: 1.4.1
       ufo: 1.5.4
     optionalDependencies:
+      aws4fetch: 1.0.20
       db0: 0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))
       ioredis: 5.6.0(supports-color@8.1.1)
 
@@ -37752,7 +37763,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vinxi@0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5):
+  vinxi@0.5.3(@electric-sql/pglite@0.2.15)(@types/node@22.13.14)(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(ioredis@5.6.0(supports-color@8.1.1))(jiti@2.4.2)(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.19.3)(typescript@5.5.2)(yaml@2.4.5):
     dependencies:
       '@babel/core': 7.26.10(supports-color@8.1.1)
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10(supports-color@8.1.1))
@@ -37774,7 +37785,7 @@ snapshots:
       hookable: 5.5.3
       http-proxy: 1.18.1
       micromatch: 4.0.8
-      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
+      nitropack: 2.11.7(@electric-sql/pglite@0.2.15)(aws4fetch@1.0.20)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1))(encoding@0.1.13)(supports-color@8.1.1)(typescript@5.5.2)
       node-fetch-native: 1.6.6
       path-to-regexp: 6.3.0
       pathe: 1.1.2
@@ -37785,7 +37796,7 @@ snapshots:
       ufo: 1.5.4
       unctx: 2.4.1
       unenv: 1.10.0
-      unstorage: 1.15.0(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1))
+      unstorage: 1.15.0(aws4fetch@1.0.20)(db0@0.3.1(@electric-sql/pglite@0.2.15)(drizzle-orm@0.36.1(@electric-sql/pglite@0.2.15)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(@types/react@18.3.3)(pg@8.13.1)(react@18.3.1)))(ioredis@5.6.0(supports-color@8.1.1))
       vite: 6.3.5(@types/node@22.13.14)(jiti@2.4.2)(sass@1.77.4)(terser@5.39.0)(tsx@4.19.3)(yaml@2.4.5)
       zod: 3.23.8
     transitivePeerDependencies:
