@@ -46,60 +46,60 @@ Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod',
-  beforeSend(event, hint) {
-    const consent = hasConsented()
-    console.log('[Sentry beforeSend] Consent:', consent)
+  // beforeSend(event, hint) {
+  //   const consent = hasConsented()
+  //   console.log('[Sentry beforeSend] Consent:', consent)
 
-    if (!consent) {
-      console.log('[Sentry beforeSend] Dropped: no consent', { consent })
-      return null
-    }
+  //   if (!consent) {
+  //     console.log('[Sentry beforeSend] Dropped: no consent', { consent })
+  //     return null
+  //   }
 
-    console.log('[Sentry beforeSend] IS_PLATFORM:', IS_PLATFORM)
-    if (!IS_PLATFORM) {
-      console.log('[Sentry beforeSend] Dropped: not platform', { IS_PLATFORM })
-      return null
-    }
+  //   console.log('[Sentry beforeSend] IS_PLATFORM:', IS_PLATFORM)
+  //   if (!IS_PLATFORM) {
+  //     console.log('[Sentry beforeSend] Dropped: not platform', { IS_PLATFORM })
+  //     return null
+  //   }
 
-    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
-    const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-      `Failed to construct 'URL': Invalid URL`
-    )
-    console.log('[Sentry beforeSend] isInvalidUrlEvent:', isInvalidUrlEvent)
-    if (isInvalidUrlEvent && Math.random() > 0.01) {
-      console.log('[Sentry beforeSend] Dropped: invalid URL event (quota throttle)', {
-        isInvalidUrlEvent,
-      })
-      return null
-    }
+  //   // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+  //   const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
+  //     `Failed to construct 'URL': Invalid URL`
+  //   )
+  //   console.log('[Sentry beforeSend] isInvalidUrlEvent:', isInvalidUrlEvent)
+  //   if (isInvalidUrlEvent && Math.random() > 0.01) {
+  //     console.log('[Sentry beforeSend] Dropped: invalid URL event (quota throttle)', {
+  //       isInvalidUrlEvent,
+  //     })
+  //     return null
+  //   }
 
-    const isHCaptcha = isHCaptchaRelatedError(event)
-    console.log('[Sentry beforeSend] isHCaptchaRelatedError:', isHCaptcha)
-    if (isHCaptcha) {
-      console.log('[Sentry beforeSend] Dropped: hCaptcha related error', { isHCaptcha })
-      return null
-    }
+  //   const isHCaptcha = isHCaptchaRelatedError(event)
+  //   console.log('[Sentry beforeSend] isHCaptchaRelatedError:', isHCaptcha)
+  //   if (isHCaptcha) {
+  //     console.log('[Sentry beforeSend] Dropped: hCaptcha related error', { isHCaptcha })
+  //     return null
+  //   }
 
-    // remove after debugging
-    if (event.tags?.alwaysSend) {
-      console.log('[Sentry beforeSend] Bypassing third party check for alwaysSend tag', {
-        tags: event.tags,
-      })
-      return event
-    }
+  //   // remove after debugging
+  //   if (event.tags?.alwaysSend) {
+  //     console.log('[Sentry beforeSend] Bypassing third party check for alwaysSend tag', {
+  //       tags: event.tags,
+  //     })
+  //     return event
+  //   }
 
-    const frames = event.exception?.values?.[0].stacktrace?.frames || []
-    console.log('[Sentry beforeSend] Frames for event:', frames)
-    const isThirdParty = isThirdPartyError(frames)
-    console.log('[Sentry beforeSend] isThirdPartyError:', isThirdParty)
-    if (isThirdParty) {
-      console.log('[Sentry beforeSend] Dropped: third party error', { isThirdParty })
-      return null
-    }
+  //   const frames = event.exception?.values?.[0].stacktrace?.frames || []
+  //   console.log('[Sentry beforeSend] Frames for event:', frames)
+  //   const isThirdParty = isThirdPartyError(frames)
+  //   console.log('[Sentry beforeSend] isThirdPartyError:', isThirdParty)
+  //   if (isThirdParty) {
+  //     console.log('[Sentry beforeSend] Dropped: third party error', { isThirdParty })
+  //     return null
+  //   }
 
-    console.log('[Sentry beforeSend] Event sent', { event })
-    return event
-  },
+  //   console.log('[Sentry beforeSend] Event sent', { event })
+  //   return event
+  // },
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
     'ResizeObserver',
