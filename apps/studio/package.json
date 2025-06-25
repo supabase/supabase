@@ -25,6 +25,7 @@
     "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^2.2.10",
     "@ai-sdk/openai": "^0.0.72",
     "@dagrejs/dagre": "^1.0.4",
     "@deno/eszip": "0.83.0",
@@ -60,9 +61,11 @@
     "@tanstack/react-query-devtools": "4.35.7",
     "@tanstack/react-table": "^8.21.3",
     "@uidotdev/usehooks": "^2.4.1",
+    "@vercel/functions": "^2.2.2",
     "@vitejs/plugin-react": "^4.3.4",
     "@zip.js/zip.js": "^2.7.29",
     "ai": "^3.4.33",
+    "ai-4": "npm:ai@4",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
     "common": "workspace:*",
