@@ -266,7 +266,7 @@ export const CreateBranchModal = () => {
                     <div className="flex items-center gap-2 justify-between">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <Label>Automatic branching</Label>
+                          <Label>Git branch</Label>
                           {!gitlessBranching && (
                             <Badge variant="warning" size="small">
                               Required
@@ -274,8 +274,7 @@ export const CreateBranchModal = () => {
                           )}
                         </div>
                         <p className="text-sm text-foreground-light">
-                          Automatically create, sync, and merge branches in Supabase when you make
-                          changes to your GitHub repository.
+                          Keep this Supabase branch in sync with a Git branch
                         </p>
                       </div>
                       <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
