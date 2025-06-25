@@ -216,7 +216,7 @@ export const S3Connection = () => {
         </form>
       </Form_Shadcn_>
 
-      <div>
+      <div id="s3-access-keys">
         <FormHeader
           title="S3 Access Keys"
           description="Manage your access keys for this project."
