@@ -1335,12 +1335,12 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Quickstart (CLI)',
-          url: '/guides/functions/quickstart',
-        },
-        {
           name: 'Quickstart (Dashboard)',
           url: '/guides/functions/quickstart-dashboard',
+        },
+        {
+          name: 'Quickstart (CLI)',
+          url: '/guides/functions/quickstart',
         },
         {
           name: 'Development Environment',
