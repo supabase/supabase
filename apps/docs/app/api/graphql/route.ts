@@ -37,6 +37,31 @@ export const preferredRegion = [
 
 const MAX_DEPTH = 5
 
+function isAllowedCorsOrigin(origin: string): boolean {
+  const exactMatches = IS_DEV
+    ? ['http://localhost:8082', 'https://supabase.com']
+    : ['https://supabase.com']
+  if (exactMatches.includes(origin)) {
+    return true
+  }
+
+  return /^https:\/\/[\w-]+\w-supabase.vercel.app$/.test(origin)
+}
+
+function getCorsHeaders(request: Request): Record<string, string> {
+  const origin = request.headers.get('Origin')
+
+  if (origin && isAllowedCorsOrigin(origin)) {
+    return {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Accept',
+    }
+  }
+
+  return {}
+}
+
 const validationRules = [
   ...specifiedRules,
   createQueryDepthLimiter(MAX_DEPTH),
@@ -78,13 +103,18 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
   const { query, variables, operationName } = parsedBody.data
   const validationErrors = validateGraphQLRequest(query, isDevGraphiQL(request))
   if (validationErrors.length > 0) {
-    return NextResponse.json({
-      errors: validationErrors.map((error) => ({
-        message: error.message,
-        locations: error.locations,
-        path: error.path,
-      })),
-    })
+    return NextResponse.json(
+      {
+        errors: validationErrors.map((error) => ({
+          message: error.message,
+          locations: error.locations,
+          path: error.path,
+        })),
+      },
+      {
+        headers: getCorsHeaders(request),
+      }
+    )
   }
 
   const result = await graphql({
@@ -94,7 +124,9 @@ async function handleGraphQLRequest(request: Request): Promise<NextResponse> {
     variableValues: variables,
     operationName,
   })
-  return NextResponse.json(result)
+  return NextResponse.json(result, {
+    headers: getCorsHeaders(request),
+  })
 }
 
 function validateGraphQLRequest(query: string, isDevGraphiQL = false): ReadonlyArray<GraphQLError> {
@@ -110,6 +142,14 @@ function validateGraphQLRequest(query: string, isDevGraphiQL = false): ReadonlyA
   }
   const rules = isDevGraphiQL ? specifiedRules : validationRules
   return validate(rootGraphQLSchema, documentAST, rules)
+}
+
+export async function OPTIONS(request: Request): Promise<NextResponse> {
+  const corsHeaders = getCorsHeaders(request)
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  })
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
@@ -130,18 +170,28 @@ export async function POST(request: Request): Promise<NextResponse> {
       // https://github.com/getsentry/sentry-javascript/issues/9626
       await Sentry.flush(2000)
 
-      return NextResponse.json({
-        errors: [{ message: error.isPrivate() ? 'Internal Server Error' : error.message }],
-      })
+      return NextResponse.json(
+        {
+          errors: [{ message: error.isPrivate() ? 'Internal Server Error' : error.message }],
+        },
+        {
+          headers: getCorsHeaders(request),
+        }
+      )
     } else {
       Sentry.captureException(error)
       // Do not let Vercel close the process until Sentry has flushed
       // https://github.com/getsentry/sentry-javascript/issues/9626
       await Sentry.flush(2000)
 
-      return NextResponse.json({
-        errors: [{ message: 'Internal Server Error' }],
-      })
+      return NextResponse.json(
+        {
+          errors: [{ message: 'Internal Server Error' }],
+        },
+        {
+          headers: getCorsHeaders(request),
+        }
+      )
     }
   }
 }

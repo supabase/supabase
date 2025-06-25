@@ -49,7 +49,12 @@ interface FinalizeWithSourcesAction {
   index: number
 }
 
-type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction | ResetAction | FinalizeWithSourcesAction
+type MessageAction =
+  | NewMessageAction
+  | UpdateMessageAction
+  | AppendContentAction
+  | ResetAction
+  | FinalizeWithSourcesAction
 
 export { MessageRole, MessageStatus }
 export type { Message, MessageAction, SourceLink }
