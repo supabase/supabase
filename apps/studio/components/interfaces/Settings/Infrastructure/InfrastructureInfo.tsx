@@ -324,6 +324,55 @@ const InfrastructureInfo = () => {
                           </AlertDescription_Shadcn_>
                         </Alert_Shadcn_>
                       )}
+                    {!data?.eligible &&
+                      // @ts-ignore
+                      (data?.user_defined_objects_in_internal_schemas || []).length > 0 && (
+                        <Alert_Shadcn_
+                          variant="warning"
+                          title="A new version of Postgres is available for your project"
+                        >
+                          <AlertTitle_Shadcn_>
+                            A new version of Postgres is available
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                            <div>
+                              <p className="mb-1">
+                                You'll need to move these objects out of auth/realtime/storage
+                                schemas before upgrading:
+                              </p>
+
+                              <ul className="pl-4">
+                                {
+                                  // @ts-ignore
+                                  (data?.user_defined_objects_in_internal_schemas || []).map(
+                                    (obj: string) => (
+                                      <li className="list-disc" key={obj}>
+                                        {obj}
+                                      </li>
+                                    )
+                                  )
+                                }
+                              </ul>
+                            </div>
+                            <p>
+                              These schemas are Supabase-managed and creating custom objects in them
+                              is no longer supported. Check the changelog to see how to move them to
+                              your own schemas.
+                            </p>
+                            <div>
+                              <Button size="tiny" type="default" asChild>
+                                <a
+                                  href="https://github.com/orgs/supabase/discussions/34270"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  View changelog
+                                </a>
+                              </Button>
+                            </div>
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
                   </>
                 )}
               </>
