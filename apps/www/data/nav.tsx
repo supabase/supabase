@@ -4,7 +4,7 @@ import SolutionsDropdown from 'components/Nav/SolutionsDropdown'
 
 import { data as DevelopersData } from 'data/Developers'
 import MainProductsData from 'data/MainProducts'
-import { data as SolutionsData } from 'data/Solutions'
+import { navData as SolutionsData } from 'data/Solutions'
 
 export const getMenu = () => ({
   primaryNav: [
