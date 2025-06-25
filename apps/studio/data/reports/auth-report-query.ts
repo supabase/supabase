@@ -3,9 +3,10 @@ import { get } from 'data/fetchers'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useMemo } from 'react'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { fillTimeseries } from 'components/interfaces/Settings/Logs/Logs.utils'
 
-type BQGranularity = 'second' | 'minute' | 'hour' | 'day' | 'week'
-function analyticsIntervalToBQGranularity(interval: AnalyticsInterval): BQGranularity {
+type Granularity = 'second' | 'minute' | 'hour' | 'day' | 'week'
+function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {
   switch (interval) {
     case '1m':
       return 'minute'
@@ -28,7 +29,7 @@ type MetricKey =
   | 'ActiveUsers'
   | 'SignInAttempts'
   | 'PasswordResetRequests'
-  | 'TotalSignUpsByProvider'
+  | 'TotalSignUps'
   | 'TotalSignInsByProvider'
   | 'FailedAuthAttempts'
   | 'NewUserGrowthRate'
@@ -51,7 +52,7 @@ const metricSqlMap: Record<
   (start: string, end: string, interval: AnalyticsInterval) => string
 > = {
   ActiveUsers: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+    const granularity = analyticsIntervalToGranularity(interval)
     return `
       --active-users
     select 
@@ -68,7 +69,7 @@ const metricSqlMap: Record<
   },
 
   SignInAttempts: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+    const granularity = analyticsIntervalToGranularity(interval)
     return `
       --sign-in-attempts
       select 
@@ -83,7 +84,7 @@ const metricSqlMap: Record<
   },
 
   PasswordResetRequests: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+    const granularity = analyticsIntervalToGranularity(interval)
     return `
       --password-reset-requests
       select 
@@ -96,20 +97,21 @@ const metricSqlMap: Record<
     `
   },
 
-  TotalSignUpsByProvider: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+  TotalSignUps: (start, end, interval) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    console.log('granularity', interval, granularity)
     return `
-    --total-signups-by-provider
+    --total-signups
     select 
       timestamp_trunc(timestamp, ${granularity}) as timestamp,
-      json_value(event_message, "$.auth_event.traits.provider") as provider,
       count(*) as count
     from auth_logs
     where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-    group by timestamp, provider
-    order by timestamp desc, provider
+    group by timestamp
+    order by timestamp desc
     `
   },
+
   TotalSignInsByProvider: (start, end, interval) => `
     -- TODO: Return total sign-ins by provider (email, social, etc.)
   `,
@@ -131,7 +133,7 @@ const metricSqlMap: Record<
   `,
 
   SignInLatency: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+    const granularity = analyticsIntervalToGranularity(interval)
     return `
       --signin-latency
       select 
@@ -152,7 +154,7 @@ const metricSqlMap: Record<
   },
 
   SignUpLatency: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+    const granularity = analyticsIntervalToGranularity(interval)
     return `
       --signup-latency
       select 
@@ -185,7 +187,7 @@ const metricSqlMap: Record<
     -- TODO: Return suspicious activity (multiple failed attempts, unusual locations, etc.)
   `,
   RateLimitedRequests: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+    const granularity = analyticsIntervalToGranularity(interval)
     return `
     --rate-limited-requests
 SELECT 
@@ -207,7 +209,7 @@ ORDER BY timestamp DESC, path, method, error_code
     -- TODO: Return MFA usage statistics over time
   `,
   ErrorsByStatus: (start, end, interval) => {
-    const granularity = analyticsIntervalToBQGranularity(interval)
+    const granularity = analyticsIntervalToGranularity(interval)
 
     const ERROR_CODES = [
       '400', // Bad Request
@@ -292,9 +294,6 @@ export function useAuthLogsReport({
       if (attr.attribute === 'SignInAttempts' && attr.grantType) {
         return { ...attr, attribute: `${attr.attribute}_${attr.grantType}` }
       }
-      if (attr.attribute === 'TotalSignUpsByProvider' && attr.providerType) {
-        return { ...attr, attribute: `${attr.attribute}_${attr.providerType}` }
-      }
       return attr
     })
 
@@ -334,6 +333,7 @@ export function useAuthLogsReport({
 
   console.log(`----- ${logsMetric} -----`)
   console.log(logsMetric, data)
+  console.log(logsMetric, sql)
 
   return {
     data,
