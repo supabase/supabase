@@ -32,9 +32,13 @@ import {
 interface DataTableFilterCommandProps {
   // TODO: maybe use generics for the parser
   searchParamsParser: Record<string, ParserBuilder<any>>
+  placeholder?: string
 }
 
-export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCommandProps) {
+export function DataTableFilterCommand({
+  searchParamsParser,
+  placeholder = 'Search data table...',
+}: DataTableFilterCommandProps) {
   const { table, isLoading, filterFields: _filterFields, getFacetedUniqueValues } = useDataTable()
   const columnFilters = table.getState().columnFilters
   const inputRef = useRef<HTMLInputElement>(null)
@@ -139,7 +143,7 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
             trimmedInputValue ? 'text-foreground' : 'text-foreground-light'
           )}
         >
-          {trimmedInputValue ? inputValue : 'Search data table...'}
+          {trimmedInputValue ? inputValue : placeholder}
         </span>
         {/* [Joshen] Temporarily disabling as this conflicts with existing CMD K shortcut */}
         {/* <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
@@ -187,7 +191,7 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
             const word = getWordByCaretPosition({ value, caretPosition })
             setCurrentWord(word)
           }}
-          placeholder="Search data table..."
+          placeholder={placeholder}
           className="text-foreground"
         />
         <div className="relative">

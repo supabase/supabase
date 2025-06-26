@@ -275,7 +275,10 @@ export const UnifiedLogs = () => {
         <FilterSideBar />
         <div className="flex max-w-full flex-1 flex-col border-border sm:border-l overflow-hidden">
           <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
-            <DataTableFilterCommand searchParamsParser={SEARCH_PARAMS_PARSER} />
+            <DataTableFilterCommand
+              placeholder="Search logs..."
+              searchParamsParser={SEARCH_PARAMS_PARSER}
+            />
             <DataTableToolbar
               renderActions={() => [
                 <RefreshButton key="refresh" onClick={refetch} />,
