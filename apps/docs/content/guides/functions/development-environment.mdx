@@ -6,10 +6,10 @@ subtitle: 'Set up your local development environment for Edge Functions.'
 tocVideo: 'lFhU3L8VoSQ'
 ---
 
-<Admonition type="info">
-  Before getting started, make sure you have the Supabase CLI installed. Check out the [CLI
-  installation guide](https://supabase.com/docs/guides/cli) for installation methods and
-  troubleshooting.
+<Admonition type="note">
+
+  Before getting started, make sure you have the Supabase CLI installed. Check out the [CLI installation guide](https://supabase.com/docs/guides/cli) for installation methods and troubleshooting.
+
 </Admonition>
 
 ---
@@ -30,7 +30,7 @@ After installing, you should have Deno installed and available in your terminal.
 
 Set up your editor environment for proper TypeScript support, autocompletion, and error detection.
 
-### VS Code/Cursor (Recommended)
+### VSCode/Cursor (recommended)
 
 1. **Install the Deno extension** from the VSCode marketplace
 2. **Option 1: Auto-generate (easiest)**
@@ -50,7 +50,7 @@ This configuration enables the Deno language server only for the `supabase/funct
 
 ---
 
-### Multi-root Workspaces
+### Multi-root workspaces
 
 The standard `.vscode/settings.json` setup works perfectly for projects where your Edge Functions live alongside your main application code. However, you might need multi-root workspaces if your development setup involves:
 
@@ -69,7 +69,7 @@ You can find the complete example on [GitHub](https://github.com/supabase/supaba
 
 ---
 
-## Recommended Project Structure
+## Recommended project structure
 
 It's recommended to organize your functions according to the following structure:
 
@@ -99,7 +99,7 @@ It's recommended to organize your functions according to the following structure
 
 ---
 
-## Essential CLI Commands
+## Essential CLI commands
 
 Get familiar with the most commonly used CLI commands for developing and deploying Edge Functions.
 
@@ -117,9 +117,9 @@ Alternatively, use `supabase functions serve` to serve all functions at once.
 
 If you want to serve an Edge Function without the default JWT verification. This is important for webhooks from Stripe, GitHub, etc. These services don't have your JWT tokens, so you need to skip auth verification.
 
-<Admonition type="warning">
+<Admonition type="caution">
 
-Be careful when disabling JWT verificaiton, as it allows anyone to call your function, so only use it for functions that are meant to be publicly accessible.
+Be careful when disabling JWT verification, as it allows anyone to call your function, so only use it for functions that are meant to be publicly accessible.
 
 </Admonition>
 
