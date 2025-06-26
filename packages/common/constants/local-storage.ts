@@ -11,12 +11,10 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-  UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
-  UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
-  UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
   PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged',
+  AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
@@ -100,14 +98,11 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-  LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
-  LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
-  LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
+  LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
 ]
 
 export function clearLocalStorage() {
