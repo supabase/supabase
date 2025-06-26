@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { useIsLoggedIn } from 'common'
+import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -30,6 +30,7 @@ export const ProfileContext = createContext<ProfileContextType>({
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
+  const user = useUser()
   const isLoggedIn = useIsLoggedIn()
   const router = useRouter()
   const signOut = useSignOut()
@@ -38,6 +39,16 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
       sendEvent({ action: 'sign_up', properties: { category: 'conversion' } })
+
+      if (user) {
+        // Send an event to GTM, will do nothing if GTM is not enabled
+        const thisWindow = window as any
+        thisWindow.dataLayer = thisWindow.dataLayer || []
+        thisWindow.dataLayer.push({
+          event: 'sign_up',
+          email: user.email,
+        })
+      }
     },
     onError: (error) => {
       if (error.code === 409) {

@@ -9,6 +9,7 @@ import {
   PageTelemetry,
   ThemeProvider,
   useThemeSandbox,
+  TelemetryTagManager,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
@@ -107,6 +108,7 @@ export default function App({ Component, pageProps }: AppProps) {
           </ThemeProvider>
         </FeatureFlagProvider>
       </AuthProvider>
+      <TelemetryTagManager />
     </>
   )
 }
