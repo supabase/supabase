@@ -1373,6 +1373,16 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
+      name: 'Deployment',
+      url: undefined,
+      items: [
+        {
+          name: 'Deploy to Production',
+          url: '/guides/functions/deploy',
+        },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
