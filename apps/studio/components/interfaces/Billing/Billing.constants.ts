@@ -1,18 +1,15 @@
 export const USAGE_APPROACHING_THRESHOLD = 0.8
 
 export const CANCELLATION_REASONS = [
-  'Pricing',
-  "My project isn't getting traction",
-  'Poor customer service',
-  'Missing feature',
-  "I didn't see the value",
-  "Supabase didn't meet my needs",
-  'Dashboard is too complicated',
-  'Postgres is too complicated',
-  'Problem not solved',
-  'Too many bugs/issues',
-  'I decided to use something else',
-  'My work has finished/discontinued',
-  'I’m migrating to/starting a new project',
+  'I was just exploring, or it was a hobby/student project.',
+  'I was not satisfied with the customer support I received.',
+  'Supabase is missing a specific feature I need.',
+  'I found it difficult to use or build with.',
+  'Performance or reliability insufficient.',
+  'My project was cancelled or put on hold.',
+  'Too expensive',
+  'The pricing is unpredictable and hard to budget for.',
+  'My company went out of business or was acquired.',
+  'I lost trust in the company or its future direction.',
   'None of the above',
 ]
