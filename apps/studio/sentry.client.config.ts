@@ -48,16 +48,12 @@ Sentry.init({
   debug: process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod',
   beforeSend(event, hint) {
     const consent = hasConsented()
-    console.log('[Sentry beforeSend] Consent:', consent)
 
     if (!consent) {
-      console.log('[Sentry beforeSend] Dropped: no consent', { consent })
       return null
     }
 
-    console.log('[Sentry beforeSend] IS_PLATFORM:', IS_PLATFORM)
     if (!IS_PLATFORM) {
-      console.log('[Sentry beforeSend] Dropped: not platform', { IS_PLATFORM })
       return null
     }
 
@@ -65,37 +61,27 @@ Sentry.init({
     const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
       `Failed to construct 'URL': Invalid URL`
     )
-    console.log('[Sentry beforeSend] isInvalidUrlEvent:', isInvalidUrlEvent)
+
     if (isInvalidUrlEvent && Math.random() > 0.01) {
-      console.log('[Sentry beforeSend] Dropped: invalid URL event (quota throttle)', {
-        isInvalidUrlEvent,
-      })
       return null
     }
 
     const isHCaptcha = isHCaptchaRelatedError(event)
-    console.log('[Sentry beforeSend] isHCaptchaRelatedError:', isHCaptcha)
     if (isHCaptcha) {
-      console.log('[Sentry beforeSend] Dropped: hCaptcha related error', { isHCaptcha })
       return null
     }
 
-    // remove after debugging
     if (event.tags?.alwaysSend) {
-      console.log('[Sentry beforeSend] Returning event:', event)
       return event
     }
 
     const frames = event.exception?.values?.[0].stacktrace?.frames || []
-    console.log('[Sentry beforeSend] Frames for event:', frames)
     const isThirdParty = isThirdPartyError(frames)
-    console.log('[Sentry beforeSend] isThirdPartyError:', isThirdParty)
     if (isThirdParty) {
-      console.log('[Sentry beforeSend] Dropped: third party error', { isThirdParty })
+      console.log('sentry error sending: isThirdParty')
       return null
     }
 
-    console.log('[Sentry beforeSend] Event sent', { event })
     return event
   },
   ignoreErrors: [
