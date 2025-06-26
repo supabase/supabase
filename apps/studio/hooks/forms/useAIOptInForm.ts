@@ -34,6 +34,8 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const selectedOrganization = useSelectedOrganization()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
+
   const [_, setUpdatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
     false
@@ -61,48 +63,67 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
       console.error('Organization slug is required')
       return toast.error('Failed to update settings: Organization not found.')
     }
-
     const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
-    let updatedOptInTags = existingOptInTags.filter(
-      (tag: string) =>
-        tag !== OPT_IN_TAGS.AI_SQL &&
-        tag !== (OPT_IN_TAGS.AI_DATA ?? 'AI_DATA') &&
-        tag !== (OPT_IN_TAGS.AI_LOG ?? 'AI_LOG')
-    )
 
-    if (
-      values.aiOptInLevel === 'schema' ||
-      values.aiOptInLevel === 'schema_and_log' ||
-      values.aiOptInLevel === 'schema_and_log_and_data'
-    ) {
-      updatedOptInTags.push(OPT_IN_TAGS.AI_SQL)
-    }
-    if (
-      values.aiOptInLevel === 'schema_and_log' ||
-      values.aiOptInLevel === 'schema_and_log_and_data'
-    ) {
-      updatedOptInTags.push(OPT_IN_TAGS.AI_LOG)
-    }
-    if (values.aiOptInLevel === 'schema_and_log_and_data') {
-      updatedOptInTags.push(OPT_IN_TAGS.AI_DATA)
-    }
+    if (!useBedrockAssistant) {
+      const updatedOptInTags = values.aiOptInLevel === 'schema' ? [OPT_IN_TAGS.AI_SQL] : []
 
-    updatedOptInTags = [...new Set(updatedOptInTags)]
+      updateOrganization(
+        { slug: selectedOrganization.slug, opt_in_tags: updatedOptInTags },
+        {
+          onSuccess: () => {
+            invalidateOrganizationsQuery(queryClient)
+            toast.success('Successfully updated AI opt-in settings')
+            setUpdatedOptInSinceMCP(true)
+            onSuccessCallback?.() // Call optional callback on success
+          },
+          onError: (error: ResponseError) => {
+            toast.error(`Failed to update settings: ${error.message}`)
+          },
+        }
+      )
+    } else {
+      let updatedOptInTags = existingOptInTags.filter(
+        (tag: string) =>
+          tag !== OPT_IN_TAGS.AI_SQL &&
+          tag !== (OPT_IN_TAGS.AI_DATA ?? 'AI_DATA') &&
+          tag !== (OPT_IN_TAGS.AI_LOG ?? 'AI_LOG')
+      )
 
-    updateOrganization(
-      { slug: selectedOrganization.slug, opt_in_tags: updatedOptInTags },
-      {
-        onSuccess: () => {
-          invalidateOrganizationsQuery(queryClient)
-          toast.success('Successfully updated AI opt-in settings')
-          setUpdatedOptInSinceMCP(true)
-          onSuccessCallback?.() // Call optional callback on success
-        },
-        onError: (error: ResponseError) => {
-          toast.error(`Failed to update settings: ${error.message}`)
-        },
+      if (
+        values.aiOptInLevel === 'schema' ||
+        values.aiOptInLevel === 'schema_and_log' ||
+        values.aiOptInLevel === 'schema_and_log_and_data'
+      ) {
+        updatedOptInTags.push(OPT_IN_TAGS.AI_SQL)
       }
-    )
+      if (
+        values.aiOptInLevel === 'schema_and_log' ||
+        values.aiOptInLevel === 'schema_and_log_and_data'
+      ) {
+        updatedOptInTags.push(OPT_IN_TAGS.AI_LOG)
+      }
+      if (values.aiOptInLevel === 'schema_and_log_and_data') {
+        updatedOptInTags.push(OPT_IN_TAGS.AI_DATA)
+      }
+
+      updatedOptInTags = [...new Set(updatedOptInTags)]
+
+      updateOrganization(
+        { slug: selectedOrganization.slug, opt_in_tags: updatedOptInTags },
+        {
+          onSuccess: () => {
+            invalidateOrganizationsQuery(queryClient)
+            toast.success('Successfully updated AI opt-in settings')
+            setUpdatedOptInSinceMCP(true)
+            onSuccessCallback?.() // Call optional callback on success
+          },
+          onError: (error: ResponseError) => {
+            toast.error(`Failed to update settings: ${error.message}`)
+          },
+        }
+      )
+    }
   }
 
   return {

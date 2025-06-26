@@ -47,14 +47,16 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
             <DialogHeader padding="small">
               <DialogTitle>Update Supabase Assistant Opt-in Level</DialogTitle>
             </DialogHeader>
+
             <DialogSectionSeparator />
-            <DialogSection className="space-y-4" padding="small">
+
+            <DialogSection className="space-y-4 pb-0" padding="small">
               <AIOptInLevelSelector
                 control={form.control}
                 disabled={!canUpdateOrganization || !newOrgAiOptIn || isUpdating}
               />
             </DialogSection>
-            <DialogSectionSeparator />
+
             <DialogFooter padding="small">
               <Button type="default" disabled={isUpdating} onClick={onCancel}>
                 Cancel
