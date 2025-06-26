@@ -14,6 +14,7 @@ import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
 import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import useEdgeFunctionsDiff from 'hooks/misc/useEdgeFunctionsDiff'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { Badge, Button, NavMenu, NavMenuItem, cn, Alert } from 'ui'
@@ -40,6 +41,9 @@ const MergePage: NextPageWithLayout = () => {
 
   // State to track related workflow runs with their project refs
   const [relatedWorkflowRunIds, setRelatedWorkflowRunIds] = useState<Record<string, string>>({})
+
+  // State to track failed workflows
+  const [failedWorkflowIds, setFailedWorkflowIds] = useState<Set<string>>(new Set())
 
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
@@ -83,8 +87,6 @@ const MergePage: NextPageWithLayout = () => {
       staleTime: 0,
     }
   )
-
-  console.log('migrations:', currentBranchMigrations, mainBranchMigrations)
 
   // Check if current branch is out of date with main branch
   const isBranchOutOfDate = useMemo(() => {
@@ -143,22 +145,37 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   // Get edge functions for both branches
-  const { data: currentBranchFunctions, isLoading: isCurrentFunctionsLoading } =
-    useEdgeFunctionsQuery(
-      { projectRef: ref },
-      {
-        enabled: gitlessBranching && !!ref,
-        staleTime: 30000, // 30 seconds
-      }
-    )
+  const {
+    data: currentBranchFunctions,
+    isLoading: isCurrentFunctionsLoading,
+    refetch: refetchCurrentBranchFunctions,
+  } = useEdgeFunctionsQuery(
+    { projectRef: ref },
+    {
+      enabled: gitlessBranching && !!ref,
+      staleTime: 30000, // 30 seconds
+    }
+  )
 
-  const { data: mainBranchFunctions, isLoading: isMainFunctionsLoading } = useEdgeFunctionsQuery(
+  const {
+    data: mainBranchFunctions,
+    isLoading: isMainFunctionsLoading,
+    refetch: refetchMainBranchFunctions,
+  } = useEdgeFunctionsQuery(
     { projectRef: parentProjectRef },
     {
       enabled: gitlessBranching && !!parentProjectRef,
       staleTime: 30000, // 30 seconds
     }
   )
+
+  // Get edge functions diff
+  const edgeFunctionsDiff = useEdgeFunctionsDiff({
+    currentBranchFunctions,
+    mainBranchFunctions,
+    currentBranchRef: ref,
+    mainBranchRef: parentProjectRef,
+  })
 
   // Handle workflow completion - refetch diff once when workflow completes or fails
   const handleWorkflowStatusChange = useCallback(
@@ -168,12 +185,20 @@ const MergePage: NextPageWithLayout = () => {
         status === 'MIGRATIONS_FAILED' ||
         status === 'FUNCTIONS_FAILED'
 
+      const isFailed = status === 'MIGRATIONS_FAILED' || status === 'FUNCTIONS_FAILED'
+
+      if (isFailed) {
+        setFailedWorkflowIds((prev) => new Set(prev).add(workflowRunId))
+      }
+
       if (isComplete) {
-        // Refetch diff once when workflow completes
+        // Refetch diff and edge functions once when workflow completes
         refetchDiff()
+        refetchCurrentBranchFunctions()
+        refetchMainBranchFunctions()
       }
     },
-    [refetchDiff]
+    [refetchDiff, refetchCurrentBranchFunctions, refetchMainBranchFunctions]
   )
 
   // Check if there are any changes (database or edge functions)
@@ -181,30 +206,8 @@ const MergePage: NextPageWithLayout = () => {
     // Check database changes
     const hasDatabaseChanges = diffContent && diffContent.trim() !== ''
 
-    // Check edge function changes
-    const hasEdgeFunctionChanges = (() => {
-      if (!currentBranchFunctions || !mainBranchFunctions) return false
-
-      const currentFuncs = currentBranchFunctions || []
-      const mainFuncs = mainBranchFunctions || []
-
-      // Check for added functions
-      const added = currentFuncs.filter(
-        (currentFunc) => !mainFuncs.find((mainFunc) => mainFunc.slug === currentFunc.slug)
-      )
-
-      // Check for removed functions
-      const removed = mainFuncs.filter(
-        (mainFunc) => !currentFuncs.find((currentFunc) => currentFunc.slug === mainFunc.slug)
-      )
-
-      // Check for modified functions (functions present in both branches)
-      const modified = currentFuncs.filter((currentFunc) =>
-        mainFuncs.some((f) => f.slug === currentFunc.slug)
-      )
-
-      return added.length > 0 || removed.length > 0 || modified.length > 0
-    })()
+    // Check edge function changes using the diff hook
+    const hasEdgeFunctionChanges = edgeFunctionsDiff.hasChanges
 
     return hasDatabaseChanges || hasEdgeFunctionChanges
   }
@@ -289,10 +292,7 @@ const MergePage: NextPageWithLayout = () => {
   )
 
   // `hasAnyChanges` should be true only when there are *no* pending changes
-  const hasAnyChanges = useMemo(
-    () => !hasChanges(),
-    [diffContent, currentBranchFunctions, mainBranchFunctions]
-  )
+  const hasAnyChanges = useMemo(() => !hasChanges(), [diffContent, edgeFunctionsDiff.hasChanges])
 
   // Determine current active tab via query param (defaults to 'database')
   const currentTab = (router.query.tab as string) || 'database'
@@ -302,6 +302,10 @@ const MergePage: NextPageWithLayout = () => {
 
   // Check if we have any active workflow runs
   const hasActiveWorkflowRuns = Object.keys(relatedWorkflowRunIds).length > 0
+
+  // Check if current workflow run has failed
+  const hasCurrentWorkflowFailed =
+    currentWorkflowRunId && failedWorkflowIds.has(currentWorkflowRunId)
 
   // Navigation items for PageLayout - updates the `tab` query param
   const navigationItems = useMemo(() => {
@@ -375,7 +379,11 @@ const MergePage: NextPageWithLayout = () => {
     )
   }
 
-  const isDataLoaded = !isDiffLoading && !isCurrentFunctionsLoading && !isMainFunctionsLoading
+  const isDataLoaded =
+    !isDiffLoading &&
+    !isCurrentFunctionsLoading &&
+    !isMainFunctionsLoading &&
+    !edgeFunctionsDiff.isLoading
   const isMergeDisabled = hasAnyChanges && isDataLoaded
 
   // Update primary actions - remove push button if branch is out of date (it will be in the notice)
@@ -465,6 +473,31 @@ const MergePage: NextPageWithLayout = () => {
     </Admonition>
   )
 
+  // Workflow failure notice component
+  const WorkflowFailureNotice = () => (
+    <Admonition type="danger" className="my-4">
+      <div className="w-full flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-medium">Workflow failed</h3>
+          <p className="text-sm text-foreground-light">
+            The deployment workflow encountered an error. Consider creating a fresh branch from the
+            latest production branch to resolve potential conflicts.
+          </p>
+        </div>
+        <Button
+          type="default"
+          asChild
+          icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+          className="shrink-0"
+        >
+          <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
+        </Button>
+      </div>
+    </Admonition>
+  )
+
+  console.log('workflow:', currentWorkflowRunId)
+
   return (
     <PageLayout
       title={pageTitle()}
@@ -476,9 +509,11 @@ const MergePage: NextPageWithLayout = () => {
     >
       <div className="border-b">
         <ScaffoldContainer size="full">
-          {/* Show out of date notice or workflow logs */}
+          {/* Show out of date notice, workflow failure notice, or workflow logs */}
           {isBranchOutOfDate && !currentWorkflowRunId ? (
             <OutOfDateNotice />
+          ) : hasCurrentWorkflowFailed ? (
+            <WorkflowFailureNotice />
           ) : currentWorkflowRunId ? (
             <WorkflowLogsCard
               workflowRunId={currentWorkflowRunId}
@@ -531,10 +566,7 @@ const MergePage: NextPageWithLayout = () => {
           />
         ) : (
           <EdgeFunctionsDiffPanel
-            currentBranchFunctions={currentBranchFunctions}
-            mainBranchFunctions={mainBranchFunctions}
-            isCurrentFunctionsLoading={isCurrentFunctionsLoading}
-            isMainFunctionsLoading={isMainFunctionsLoading}
+            diffResults={edgeFunctionsDiff}
             currentBranchRef={ref}
             mainBranchRef={parentProjectRef}
           />

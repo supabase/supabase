@@ -5,19 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import { Code, Wind } from 'lucide-react'
 import DiffViewer from 'components/ui/DiffViewer'
 import { Loading, EmptyState } from 'components/ui/AsyncState'
-import useEdgeFunctionsDiff, {
-  type FileInfo,
-  type FileStatus,
-} from 'hooks/misc/useEdgeFunctionsDiff'
+import type { EdgeFunctionsDiffResult, FileInfo, FileStatus } from 'hooks/misc/useEdgeFunctionsDiff'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { basename } from 'path'
 
 interface EdgeFunctionsDiffPanelProps {
-  currentBranchFunctions?: EdgeFunctionsData
-  mainBranchFunctions?: EdgeFunctionsData
-  isCurrentFunctionsLoading: boolean
-  isMainFunctionsLoading: boolean
+  diffResults: EdgeFunctionsDiffResult
   currentBranchRef?: string
   mainBranchRef?: string
 }
@@ -143,36 +137,15 @@ const FunctionDiff = ({
 }
 
 const EdgeFunctionsDiffPanel = ({
-  currentBranchFunctions,
-  mainBranchFunctions,
-  isCurrentFunctionsLoading,
-  isMainFunctionsLoading,
+  diffResults,
   currentBranchRef,
   mainBranchRef,
 }: EdgeFunctionsDiffPanelProps) => {
-  const {
-    addedSlugs,
-    removedSlugs,
-    modifiedSlugs,
-    addedBodiesMap,
-    removedBodiesMap,
-    currentBodiesMap,
-    mainBodiesMap,
-    functionFileInfo,
-    isLoading,
-    hasChanges,
-  } = useEdgeFunctionsDiff({
-    currentBranchFunctions,
-    mainBranchFunctions,
-    currentBranchRef,
-    mainBranchRef,
-  })
-
-  if (isCurrentFunctionsLoading || isMainFunctionsLoading || isLoading) {
+  if (diffResults.isLoading) {
     return <Loading />
   }
 
-  if (!hasChanges) {
+  if (!diffResults.hasChanges) {
     return (
       <EmptyState
         title="No changes detected between branches"
@@ -184,50 +157,50 @@ const EdgeFunctionsDiffPanel = ({
 
   return (
     <div className="space-y-6">
-      {addedSlugs.length > 0 && (
+      {diffResults.addedSlugs.length > 0 && (
         <div>
           <div className="space-y-4">
-            {addedSlugs.map((slug) => (
+            {diffResults.addedSlugs.map((slug) => (
               <FunctionDiff
                 key={slug}
                 functionSlug={slug}
-                currentBody={addedBodiesMap[slug]!}
+                currentBody={diffResults.addedBodiesMap[slug]!}
                 mainBody={[] as EdgeFunctionBodyData}
                 currentBranchRef={currentBranchRef}
-                fileInfos={functionFileInfo[slug] || []}
+                fileInfos={diffResults.functionFileInfo[slug] || []}
               />
             ))}
           </div>
         </div>
       )}
 
-      {removedSlugs.length > 0 && (
+      {diffResults.removedSlugs.length > 0 && (
         <div>
           <div className="space-y-4">
-            {removedSlugs.map((slug) => (
+            {diffResults.removedSlugs.map((slug) => (
               <FunctionDiff
                 key={slug}
                 functionSlug={slug}
                 currentBody={[] as EdgeFunctionBodyData}
-                mainBody={removedBodiesMap[slug]!}
+                mainBody={diffResults.removedBodiesMap[slug]!}
                 currentBranchRef={mainBranchRef}
-                fileInfos={functionFileInfo[slug] || []}
+                fileInfos={diffResults.functionFileInfo[slug] || []}
               />
             ))}
           </div>
         </div>
       )}
 
-      {modifiedSlugs.length > 0 && (
+      {diffResults.modifiedSlugs.length > 0 && (
         <div className="space-y-4">
-          {modifiedSlugs.map((slug) => (
+          {diffResults.modifiedSlugs.map((slug) => (
             <FunctionDiff
               key={slug}
               functionSlug={slug}
-              currentBody={currentBodiesMap[slug]!}
-              mainBody={mainBodiesMap[slug]!}
+              currentBody={diffResults.currentBodiesMap[slug]!}
+              mainBody={diffResults.mainBodiesMap[slug]!}
               currentBranchRef={currentBranchRef}
-              fileInfos={functionFileInfo[slug] || []}
+              fileInfos={diffResults.functionFileInfo[slug] || []}
             />
           ))}
         </div>
