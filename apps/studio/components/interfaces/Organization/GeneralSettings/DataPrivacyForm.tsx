@@ -10,6 +10,8 @@ import { AIOptInLevelSelector } from './AIOptInLevelSelector'
 
 export const DataPrivacyForm = () => {
   const newOrgAiOptIn = useFlag('newOrgAiOptIn')
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
+
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -28,7 +30,9 @@ export const DataPrivacyForm = () => {
           <CardContent className="pt-6">
             <AIOptInLevelSelector
               control={form.control}
-              disabled={!canUpdateOrganization || !newOrgAiOptIn || isUpdating}
+              disabled={
+                !canUpdateOrganization || (useBedrockAssistant && !newOrgAiOptIn) || isUpdating
+              }
               layout="flex-row-reverse"
               label="Supabase Assistant Opt-in Level"
             />

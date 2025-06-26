@@ -24,6 +24,8 @@ interface AIOptInModalProps {
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   const newOrgAiOptIn = useFlag('newOrgAiOptIn')
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
+
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -53,7 +55,9 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
             <DialogSection className="space-y-4 pb-0" padding="small">
               <AIOptInLevelSelector
                 control={form.control}
-                disabled={!canUpdateOrganization || !newOrgAiOptIn || isUpdating}
+                disabled={
+                  !canUpdateOrganization || (useBedrockAssistant && !newOrgAiOptIn) || isUpdating
+                }
               />
             </DialogSection>
 
