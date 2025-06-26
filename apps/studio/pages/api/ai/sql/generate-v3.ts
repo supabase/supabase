@@ -21,6 +21,10 @@ import {
 
 export const maxDuration = 120
 
+export const config = {
+  api: { bodyParser: true },
+}
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
@@ -61,13 +65,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(500).json({ error: modelError.message })
   }
 
-  const { data, error: parseError } = requestBodySchema.safeParse(JSON.parse(req.body))
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+  const { data, error: parseError } = requestBodySchema.safeParse(body)
 
   if (parseError) {
-    return res.status(400).json({
-      error: 'Invalid request body',
-      issues: parseError.issues,
-    })
+    return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
   const { messages, projectRef, connectionString, aiOptInLevel } = data
