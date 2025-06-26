@@ -38,7 +38,7 @@ export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages, projectRef, connectionString, includeSchemaMetadata, schema, table } =
-    JSON.parse(req.body)
+    typeof req.body === 'string' ? JSON.parse(req.body) : req.body
 
   if (!projectRef) {
     return res.status(400).json({
