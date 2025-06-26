@@ -116,7 +116,7 @@ export const Message = function Message({
                           <ReactMarkdown
                             key={`${id}-part-${index}`}
                             className={cn(
-                              'prose prose-sm [&_h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 [&_li>p]:mt-0 space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4',
+                              'prose prose-sm max-w-full [&_h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 [&_li>p]:mt-0 space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4',
                               isUser && 'text-foreground font-semibold'
                             )}
                             remarkPlugins={[remarkGfm]}
