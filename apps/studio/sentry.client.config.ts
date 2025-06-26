@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { match } from 'path-to-regexp'
-console.log('test this loading')
+
 // This is a workaround to ignore hCaptcha related errors.
 function isHCaptchaRelatedError(event: Sentry.Event): boolean {
   const errors = event.exception?.values ?? []
@@ -45,7 +45,7 @@ function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod',
+  debug: false,
   beforeSend(event, hint) {
     const consent = hasConsented()
 
@@ -66,8 +66,7 @@ Sentry.init({
       return null
     }
 
-    const isHCaptcha = isHCaptchaRelatedError(event)
-    if (isHCaptcha) {
+    if (isHCaptchaRelatedError(event)) {
       return null
     }
 
@@ -76,9 +75,7 @@ Sentry.init({
     }
 
     const frames = event.exception?.values?.[0].stacktrace?.frames || []
-    const isThirdParty = isThirdPartyError(frames)
-    if (isThirdParty) {
-      console.log('sentry error sending: isThirdParty')
+    if (isThirdPartyError(frames)) {
       return null
     }
 
