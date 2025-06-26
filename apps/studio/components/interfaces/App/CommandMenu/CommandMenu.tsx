@@ -4,6 +4,7 @@ import {
   useQueryTableCommands,
   useSnippetCommands,
 } from 'components/layouts/SQLEditorLayout/SqlEditor.Commands'
+import { useGenerateSqlCommand } from 'components/interfaces/SqlGenerator/SqlGenerator.Commands'
 import { useProjectLevelTableEditorCommands } from 'components/layouts/TableEditorLayout/TableEditor.Commands'
 import { useLayoutNavCommands } from 'components/layouts/useLayoutNavCommands'
 import { CommandHeader, CommandInput, CommandList, CommandMenu } from 'ui-patterns/CommandMenu'
@@ -18,6 +19,7 @@ import { useSupportCommands } from './Support'
 import { orderCommandSectionsByPriority } from './ordering'
 
 export default function StudioCommandMenu() {
+  useGenerateSqlCommand()
   useApiKeysCommands()
   useApiUrlCommand()
   useProjectLevelTableEditorCommands()
