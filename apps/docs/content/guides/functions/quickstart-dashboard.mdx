@@ -15,7 +15,7 @@ You can also create and deploy functions using the Supabase CLI. Check out our [
 
 </Admonition>
 
-<Admonition type="info" label="New to Supabase?">
+<Admonition type="note" label="New to Supabase?">
 
 You'll need a Supabase project to get started. If you don't have one yet, create a new project at [database.new](https://database.new/).
 
@@ -48,8 +48,9 @@ Click the **"Deploy a new function"** button and select **"Via Editor"** to crea
   zoomable
 />
 
-<Admonition type="info" label="Pre-built templates">
-The dashboard offers several pre-built templates for common use cases, such as Stripe WebHooks, OpenAI proxying, uploading files to Supabase Storage, and sending emails.
+<Admonition type="note" label="Pre-built templates">
+
+The dashboard offers several pre-built templates for common use cases, such as Stripe Webhooks, OpenAI proxying, uploading files to Supabase Storage, and sending emails.
 
 For this guide, we’ll select the **"Hello World"** template. If you’d rather start from scratch, you can ignore the pre-built templates.
 
@@ -132,7 +133,7 @@ To invoke this Edge Function from within your application, you'll need API keys.
 
 If you’d like to update the deployed function code, click on the function you want to edit, modify the code as needed, then click Deploy updates. This will overwrite the existing deployment with the newly edited function code.
 
-<Admonition type="warning" label="No version control">
+<Admonition type="caution" label="No version control">
 
 There is currently **no version control** for edits! The Dashboard's Edge Function editor currently does not support version control, versioning, or rollbacks. We recommend using it only for quick testing and prototypes.
 
@@ -230,7 +231,7 @@ Now that your function is deployed, you can access it from your local developmen
 
 ### CLI
 
-<Admonition type="info" label="CLI not installed?">
+<Admonition type="note" label="CLI not installed?">
 
 Before getting started, make sure you have the **Supabase CLI installed**. Check out the [CLI installation guide](/docs/guides/cli) for installation methods and troubleshooting.
 
