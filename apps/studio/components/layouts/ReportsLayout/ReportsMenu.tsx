@@ -99,27 +99,26 @@ const ReportsMenu = () => {
           key: 'api-overview',
           url: `/project/${ref}/reports/api-overview`,
         },
-        ...(storageEnabled
-          ? [
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/reports/storage`,
-              },
-            ]
-          : []),
-
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/reports/database`,
-        },
         ...(authEnabled
           ? [
               {
                 name: 'Auth',
                 key: 'auth',
                 url: `/project/${ref}/reports/auth`,
+              },
+            ]
+          : []),
+        {
+          name: 'Database',
+          key: 'database',
+          url: `/project/${ref}/reports/database`,
+        },
+        ...(storageEnabled
+          ? [
+              {
+                name: 'Storage',
+                key: 'storage',
+                url: `/project/${ref}/reports/storage`,
               },
             ]
           : []),
