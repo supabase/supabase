@@ -98,14 +98,10 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
         size="xlarge"
         visible={visible}
         onCancel={onClose}
-        header="Help us improve."
+        header="What could we have done better?"
       >
         <Modal.Content>
           <div className="space-y-4">
-            <p className="text-sm text-foreground-light">
-              We always strive to improve Supabase as much as we can. Please let us know the reasons
-              you are canceling your subscription so that we can improve in the future.
-            </p>
             <div className="space-y-8 mt-6">
               <div className="flex flex-wrap gap-2" data-toggle="buttons">
                 {CANCELLATION_REASONS.map((option) => {
@@ -142,7 +138,7 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
                   name="message"
                   value={message}
                   onChange={(event: any) => setMessage(event.target.value)}
-                  label="Anything else that we can improve on?"
+                  label="What can we improve on?"
                 />
               </div>
             </div>
