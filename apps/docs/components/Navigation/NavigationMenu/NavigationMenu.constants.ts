@@ -1380,6 +1380,10 @@ export const functions: NavMenuConstant = {
           name: 'Deploy to Production',
           url: '/guides/functions/deploy',
         },
+        {
+          name: 'Deploying with CI/CD pipelines',
+          url: '/guides/functions/cicd-workflow',
+        },
       ],
     },
     {
@@ -1422,10 +1426,7 @@ export const functions: NavMenuConstant = {
           name: 'Wasm modules',
           url: '/guides/functions/wasm',
         },
-        {
-          name: 'Deploying with CI / CD pipelines',
-          url: '/guides/functions/cicd-workflow',
-        },
+
         {
           name: 'Integrating with Log Drains',
           url: '/guides/platform/log-drains',
