@@ -1387,6 +1387,32 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Local Debugging with DevTools',
+          url: '/guides/functions/debugging-tools',
+        },
+        {
+          name: 'Testing your Functions',
+          url: '/guides/functions/unit-test',
+        },
+        {
+          name: 'Logging',
+          url: '/guides/functions/logging',
+        },
+        {
+          name: 'Log Drains',
+          url: '/guides/telemetry/log-drains',
+        },
+        {
+          name: 'Troubleshooting',
+          url: '/guides/functions/troubleshooting',
+        },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
@@ -1433,32 +1459,7 @@ export const functions: NavMenuConstant = {
         },
       ],
     },
-    {
-      name: 'Debugging',
-      url: undefined,
-      items: [
-        {
-          name: 'Local Debugging with DevTools',
-          url: '/guides/functions/debugging-tools',
-        },
-        {
-          name: 'Logging',
-          url: '/guides/functions/logging',
-        },
-        {
-          name: 'Troubleshooting Common Issues',
-          url: '/guides/functions/troubleshooting',
-        },
-        {
-          name: 'Testing your Edge Functions',
-          url: '/guides/functions/unit-test',
-        },
-        {
-          name: 'Monitoring with Sentry',
-          url: '/guides/functions/examples/sentry-monitoring',
-        },
-      ],
-    },
+
     {
       name: 'Platform',
       url: undefined,
