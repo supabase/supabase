@@ -159,7 +159,7 @@ const ComposedChartHandler = ({
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
-          data={data as DataPoint[]}
+          data={data as any}
           format={format}
           xAxisKey="period_start"
           yAxisKey={attributes[0].attribute}
