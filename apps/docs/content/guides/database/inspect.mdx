@@ -289,7 +289,7 @@ Advanced Database monitoring charts are currently available only for Teams and E
 This chart shows memory allocation across:
 
 - **Used**: RAM actively used by Postgres and the operating system
-- **Cache + buffers**: Memory used for page cache and PostgreSQL buffers
+- **Cache + buffers**: Memory used for page cache and Postgres buffers
 - **Free**: Available unallocated memory
 
 **How it helps debug issues:**
@@ -302,7 +302,7 @@ This chart shows memory allocation across:
 
 - [Upgrade compute size](https://supabase.com/docs/guides/platform/compute-and-disk#compute-size) for more memory
 - Optimize queries that consume excessive memory
-- Tune PostgreSQL configuration for better memory management
+- Tune Postgres configuration for better memory management
 - Implement query result caching at the application level
 
 ### CPU usage
@@ -320,20 +320,20 @@ This chart breaks down CPU usage by category:
 
 - **System**: CPU time for kernel operations
 - **User**: CPU time for database queries and user processes
-- **IOwait**: CPU time waiting for disk/network IO
+- **IOWait**: CPU time waiting for disk/network IO
 - **IRQs**: CPU time handling interrupts
 - **Other**: CPU time for miscellaneous tasks
 
 **How it helps debug issues:**
 
 - Identify CPU-intensive queries when User CPU is high
-- Detect IO bottlenecks when IOwait is elevated
+- Detect IO bottlenecks when IOWait is elevated
 - Monitor system overhead and resource contention
 
 **Actions you can take:**
 
 - Optimize CPU-intensive queries identified through high User CPU
-- Address IO bottlenecks if IOwait is consistently high
+- Address IO bottlenecks if IOWait is consistently high
 - [Upgrade compute size](/docs/guides/platform/compute-and-disk) for more CPU capacity
 - Use query optimization techniques and [proper indexing](/docs/guides/database/postgres/indexes)
 
