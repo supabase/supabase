@@ -1420,10 +1420,6 @@ export const functions: NavMenuConstant = {
           name: 'Integrating with Log Drains',
           url: '/guides/platform/log-drains',
         },
-        {
-          name: 'Using Deno 2',
-          url: '/guides/functions/deno2',
-        },
       ],
     },
     {
