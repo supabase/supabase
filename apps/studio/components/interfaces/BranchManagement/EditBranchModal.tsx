@@ -106,7 +106,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.id) {
         try {
           await checkGithubBranchValidity({
-            connectionId: githubConnection.id,
+            repositoryId: githubConnection.id,
             branchName: val.gitBranchName,
           })
           setIsGitBranchValid(true)

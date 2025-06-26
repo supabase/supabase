@@ -23,7 +23,7 @@ export const BranchingPostgresVersionNotice = () => {
         <Button size="tiny" type="default" className="mt-4">
           <Link
             href={`/project/${ref}/settings/infrastructure`}
-            onClick={() => snap.setShowEnableBranchingModal(false)}
+            onClick={() => snap.setShowCreateBranchModal(false)}
           >
             Head to project settings
           </Link>
