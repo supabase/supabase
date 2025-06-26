@@ -263,3 +263,190 @@ Using the query plan analyzer to optimize your queries is a large topic, with a 
 - [Enterprise DB.](https://www.enterprisedb.com/blog/postgresql-query-optimization-performance-tuning-with-explain-analyze)
 
 You can pair the information available from `pg_stat_statements` with the detailed system metrics available [via your metrics endpoint](../platform/metrics) to better understand the behavior of your DB and the queries you're executing against it.
+
+## Using the Dashboard
+
+The Supabase Dashboard provides historical monitoring charts that visualize key database metrics. These charts help you identify performance bottlenecks, resource constraints, and optimization opportunities at a glance.
+
+<Admonition type="note">
+
+Advanced Database monitoring charts are currently available only for Teams and Enterprise plans.
+[Upgrade your plan](https://supabase.com/dashboard/org/_/billing) to access these features.
+
+</Admonition>
+
+### Memory usage
+
+<Image
+  alt="Memory usage chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/memory-usage-chart-dark.png',
+    light: '/docs/img/database/reports/memory-usage-chart-light.png',
+  }}
+/>
+
+This chart shows memory allocation across:
+
+- **Used**: RAM actively used by Postgres and the operating system
+- **Cache + buffers**: Memory used for page cache and PostgreSQL buffers
+- **Free**: Available unallocated memory
+
+**How it helps debug issues:**
+
+- Identify memory pressure when free memory is consistently low
+- Monitor cache effectiveness for query performance
+- Detect memory leaks or inefficient memory usage
+
+**Actions you can take:**
+
+- [Upgrade compute size](https://supabase.com/docs/guides/platform/compute-and-disk#compute-size) for more memory
+- Optimize queries that consume excessive memory
+- Tune PostgreSQL configuration for better memory management
+- Implement query result caching at the application level
+
+### CPU usage
+
+<Image
+  alt="CPU usage chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/cpu-usage-chart-dark.png',
+    light: '/docs/img/database/reports/cpu-usage-chart-light.png',
+  }}
+/>
+
+This chart breaks down CPU usage by category:
+
+- **System**: CPU time for kernel operations
+- **User**: CPU time for database queries and user processes
+- **IOwait**: CPU time waiting for disk/network IO
+- **IRQs**: CPU time handling interrupts
+- **Other**: CPU time for miscellaneous tasks
+
+**How it helps debug issues:**
+
+- Identify CPU-intensive queries when User CPU is high
+- Detect IO bottlenecks when IOwait is elevated
+- Monitor system overhead and resource contention
+
+**Actions you can take:**
+
+- Optimize CPU-intensive queries identified through high User CPU
+- Address IO bottlenecks if IOwait is consistently high
+- [Upgrade compute size](/docs/guides/platform/compute-and-disk) for more CPU capacity
+- Use query optimization techniques and [proper indexing](/docs/guides/database/postgres/indexes)
+
+### Disk Input/Output operations per second (IOPS)
+
+<Image
+  alt="Disk IOPS chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/disk-iops-chart-dark.png',
+    light: '/docs/img/database/reports/disk-iops-chart-light.png',
+  }}
+/>
+
+This chart displays read and write IOPS with a reference line showing your compute size's maximum IOPS capacity.
+
+**How it helps debug issues:**
+
+- Identify when disk IO becomes a bottleneck
+- Distinguish between read-heavy vs write-heavy workloads
+- Spot spikes in disk activity that correlate with performance issues
+
+**Actions you can take:**
+
+- Optimize queries causing high read IOPS through better indexing
+- Consider read replicas for read-heavy workloads
+- Batch write operations to reduce write IOPS
+- [Upgrade compute size](https://supabase.com/docs/guides/platform/compute-and-disk) for higher IOPS limits
+
+### Disk IO Usage
+
+<Image
+  alt="Disk IO Usage chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/disk-io-chart-dark.png',
+    light: '/docs/img/database/reports/disk-io-chart-light.png',
+  }}
+/>
+
+This chart displays the percentage of your allocated IOPS (Input/Output Operations Per Second) currently being used.
+
+**How it helps debug issues:**
+
+- Identify when you're approaching your IOPS limits
+- Correlate high IO usage with performance issues
+- Monitor the impact of database operations on disk performance
+
+**Actions you can take:**
+
+- Optimize queries that perform excessive disk reads/writes
+- Add appropriate indexes to reduce sequential scans
+- Consider upgrading to a [larger compute size](https://supabase.com/docs/guides/platform/compute-and-disk) for higher IOPS limits
+- Review and optimize your database schema and query patterns
+
+### Disk Size
+
+<Image
+  alt="Disk Size chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/disk-size-chart-dark.png',
+    light: '/docs/img/database/reports/disk-size-chart-light.png',
+  }}
+/>
+
+This chart shows disk usage breakdown including:
+
+- **Database**: Space used by your actual database data (tables, indexes)
+- **WAL**: Space used by Write-Ahead Logging
+- **System**: Reserved space for system operations
+
+**How it helps debug issues:**
+
+- Monitor disk space consumption trends
+- Identify rapid growth that may require attention
+- Plan for disk space upgrades before hitting limits
+
+**Actions you can take:**
+
+- Run [VACUUM](https://www.postgresql.org/docs/current/sql-vacuum.html) operations to reclaim dead tuple space
+- Identify and optimize large tables using the CLI commands like `table-sizes`
+- Consider data archival strategies for historical data
+- [Upgrade disk size](https://supabase.com/docs/guides/platform/database-size) when approaching capacity
+
+### Database client connections
+
+<Image
+  alt="Database client connections chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/db-client-connections-chart-dark.png',
+    light: '/docs/img/database/reports/db-client-connections-chart-light.png',
+  }}
+/>
+
+This chart shows the number of active connections to your database broken down by connection type:
+
+- **Postgres**: Direct connections from your application
+- **PostgREST**: Connections from the PostgREST API layer
+- **Reserved**: Administrative connections for Supabase services
+- **Auth**: Connections from Supabase Auth service
+- **Storage**: Connections from Supabase Storage service
+- **Other roles**: Miscellaneous database connections
+
+**How it helps debug issues:**
+
+- Identify connection pool exhaustion when approaching max connections
+- Spot connection leaks from applications not properly closing connections
+- Monitor connection distribution across different services
+
+**Actions you can take:**
+
+- [Upgrade your compute size](https://supabase.com/docs/guides/platform/compute-and-disk#compute-size) to increase connection limits
+- Implement [connection pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#shared-pooler) for better connection management in your application if you see high direct connections
+- Review your application code for proper connection handling
