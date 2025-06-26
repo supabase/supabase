@@ -39,7 +39,6 @@ import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { GlobalErrorBoundaryState } from 'components/ui/GlobalErrorBoundaryState'
 import { useRootQueryClient } from 'data/query-client'
 import { customFont, sourceCodePro } from 'fonts'
@@ -131,7 +130,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             <FeaturePreviewContextProvider>
                               {getLayout(<Component {...pageProps} />)}
                               <StudioCommandMenu />
-                              <GenerateSql />
                               <FeaturePreviewModal />
                             </FeaturePreviewContextProvider>
                             <SonnerToaster position="top-right" />
