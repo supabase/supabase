@@ -281,7 +281,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
             <DialogFooter className="sm:justify-between gap-2" padding="medium">
               <p className="flex items-center gap-2 text-sm text-foreground">
                 <DollarSign size={16} strokeWidth={1.5} />
-                Each preview branch costs $0.32 per day
+                Each preview branch costs $0.01344 per hour
               </p>
               <div className="flex items-center gap-2">
                 <Button disabled={isCreating} type="default" onClick={onClose}>
