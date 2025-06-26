@@ -307,11 +307,9 @@ export function useAuthLogsReport({
 }) {
   const logsMetric = attributes.length > 0 ? attributes[0].attribute : ''
 
-  if (!METRIC_KEYS.includes(logsMetric as MetricKey)) {
-    throw new Error(`Invalid metric key: ${logsMetric}`)
-  }
+  const isAuthMetric = METRIC_KEYS.includes(logsMetric)
 
-  const sql = METRIC_SQL[logsMetric](interval)
+  const sql = isAuthMetric ? METRIC_SQL[logsMetric](interval) : ''
 
   const {
     data: rawData,
@@ -334,13 +332,14 @@ export function useAuthLogsReport({
       return data
     },
     {
-      enabled: Boolean(projectRef && sql && enabled),
+      enabled: Boolean(projectRef && sql && enabled && isAuthMetric),
       refetchOnWindowFocus: false,
     }
   )
 
   // Use formatter if available
-  const formatter = METRIC_FORMATTER[logsMetric as MetricKey] || defaultFormatter
+  const formatter =
+    (isAuthMetric ? METRIC_FORMATTER[logsMetric as MetricKey] : undefined) || defaultFormatter
   const { data, chartAttributes } = formatter(rawData, attributes, logsMetric)
 
   return {
