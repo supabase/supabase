@@ -112,6 +112,11 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
+        {
+          name: 'Edge Functions',
+          key: 'functions',
+          url: `/project/${ref}/reports/edge-functions`,
+        },
       ],
     },
   ]

@@ -7,6 +7,7 @@ export enum Presets {
   AUTH = 'auth',
   QUERY_PERFORMANCE = 'query_performance',
   DATABASE = 'database',
+  FUNCTIONS = 'functions',
 }
 
 export type MetaQueryResponse = any & { error: ResponseError }

@@ -22,14 +22,14 @@ import {
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { useStorageReport } from 'data/reports/storage-report-query'
+import { useFunctionsReport } from 'data/reports/edge-functions-report-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 import type { NextPageWithLayout } from 'types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 
-export const StorageReport: NextPageWithLayout = () => {
-  const report = useStorageReport()
+export const FunctionsReport: NextPageWithLayout = () => {
+  const report = useFunctionsReport()
   const organization = useSelectedOrganization()
 
   const {
@@ -66,20 +66,20 @@ export const StorageReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="Storage" />
+      <ReportHeader title="Edge Functions" />
       <section className="relative pt-20 -mt-2 flex flex-col gap-3">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
           <div className="sticky top-0 bg-200 pt-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}
-              datepickerFrom={params.totalRequests.iso_timestamp_start}
-              datepickerTo={params.totalRequests.iso_timestamp_end}
+              datepickerFrom={selectedRange.from}
+              datepickerTo={selectedRange.to}
               onAddFilter={addFilter}
               onRefresh={refresh}
               isLoading={isLoading}
               filters={filters}
-              productFilter="storage"
+              productFilter="functions"
               datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
               className="w-full"
             />
@@ -88,7 +88,6 @@ export const StorageReport: NextPageWithLayout = () => {
             </div>
           </div>
         </div>
-
         <ReportWidget
           isLoading={isLoading}
           params={params.totalRequests}
@@ -99,6 +98,7 @@ export const StorageReport: NextPageWithLayout = () => {
           append={TopApiRoutesRenderer}
           appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
         />
+        {/* 
         <ReportWidget
           isLoading={isLoading}
           params={params.errorCounts}
@@ -144,39 +144,16 @@ export const StorageReport: NextPageWithLayout = () => {
           renderer={CacheHitRateChartRenderer}
           append={TopCacheMissesRenderer}
           appendProps={{ data: data.topCacheMisses || [] }}
-        />
-        {/* 
-      {true && (
-        <div className="grid grid-cols-1 gap-4">
-          {selectedRange &&
-            STORAGE_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-              <LazyComposedChartHandler
-                key={chart.id}
-                {...chart}
-                attributes={chart.attributes as MultiAttribute[]}
-                interval={'hour'}
-                startDate={selectedRange?.from}
-                endDate={selectedRange?.to}
-                // updateDateRange={updateDateRange}
-                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                showMaxValue={
-                  chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                    ? true
-                    : chart.showMaxValue
-                }
-              />
-            ))}
-        </div>
-      )} */}
+        /> */}
       </section>
     </ReportPadding>
   )
 }
 
-StorageReport.getLayout = (page) => (
+FunctionsReport.getLayout = (page) => (
   <DefaultLayout>
     <ReportsLayout>{page}</ReportsLayout>
   </DefaultLayout>
 )
 
-export default StorageReport
+export default FunctionsReport
