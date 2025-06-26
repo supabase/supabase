@@ -498,8 +498,9 @@ ${finalWhere}
  * Also returns facets for all filter dimensions
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
+  const methodWhere =
+    finalWhere.length > 0 ? `${finalWhere} AND method is NOT NULL` : 'WHERE method IS NOT NULL'
 
   // Create a count query using the same unified logs CTE
   const sql = `
@@ -530,8 +531,7 @@ UNION ALL
 -- Get counts by method
 SELECT 'method' as dimension, method as value, COUNT(*) as count
 FROM unified_logs
-${finalWhere}
-WHERE method IS NOT NULL
+${methodWhere}
 GROUP BY method
 `
 
