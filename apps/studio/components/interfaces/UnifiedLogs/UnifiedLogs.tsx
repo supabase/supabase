@@ -45,7 +45,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import { COLUMNS } from './components/Columns'
+import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -54,19 +54,16 @@ import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getFacetedUniqueValues, getLevelRowClassName, logEventBus } from './UnifiedLogs.utils'
 
-// Debug mode flag - set to true to enable detailed logs
-const DEBUG_FILTER_PROCESSING = false
-
 export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
 
-  const { sort, start, size, uuid, cursor, direction, live, ...filter } = search
+  const { sort, start, size, id, cursor, direction, live, ...filter } = search
   const defaultColumnSorting = sort ? [sort] : []
   const defaultColumnVisibility = { uuid: false }
-  const defaultRowSelection = search.uuid ? { [search.uuid]: true } : {}
+  const defaultRowSelection = search.id ? { [search.id]: true } : {}
   const defaultColumnFilters = Object.entries(filter)
     .map(([key, value]) => ({ id: key, value }))
     .filter(({ value }) => value ?? undefined)
@@ -86,11 +83,11 @@ export const UnifiedLogs = () => {
     []
   )
 
-  // Create a stable query key object by removing nulls/undefined, uuid, and live
+  // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = Object.entries(search).reduce(
     (acc, [key, value]) => {
-      if (!['uuid', 'live'].includes(key) && value !== null && value !== undefined) {
+      if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
         acc[key] = value
       }
       return acc
@@ -107,24 +104,28 @@ export const UnifiedLogs = () => {
     fetchNextPage,
     fetchPreviousPage,
   } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
-  const { data: counts } = useUnifiedLogsCountQuery({ projectRef, search: searchParameters })
+  const { data: counts, isLoading: isLoadingCounts } = useUnifiedLogsCountQuery({
+    projectRef,
+    search: searchParameters,
+  })
   const { data: unifiedLogsChart = [] } = useUnifiedLogsChartQuery({
     projectRef,
     search: searchParameters,
   })
 
-  const flatData = useMemo(() => {
+  const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
+  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
+  const flatData = useMemo(() => {
+    return rawFlatData.filter((value, idx) => {
+      return idx === rawFlatData.findIndex((x) => x.id === value.id)
+    })
+  }, [rawFlatData])
   const liveMode = useLiveMode(flatData)
 
-  // REMINDER: meta data is always the same for all pages as filters do not change(!)
-  const lastPage = unifiedLogsData?.pages?.[unifiedLogsData?.pages.length - 1]
-
-  // Use the totalCount from chartDataResult which gives us the actual count of logs in the time period
-  // instead of the hardcoded 10000 value
   const totalDBRowCount = counts?.totalRowCount
-  const filterDBRowCount = lastPage?.meta?.filterRowCount
+  const filterDBRowCount = flatData.length
 
   const facets = counts?.facets
   const totalFetched = flatData?.length
@@ -143,12 +144,12 @@ export const UnifiedLogs = () => {
     const rowTimestamp = row.original.timestamp
     const isPast = rowTimestamp <= (liveMode.timestamp || -1)
     const levelClassName = getLevelRowClassName(row.original.level as any)
-    return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100')
+    return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
   }
 
   const table = useReactTable({
     data: flatData,
-    columns: COLUMNS,
+    columns: UNIFIED_LOGS_COLUMNS,
     state: {
       columnFilters,
       sorting,
@@ -160,7 +161,7 @@ export const UnifiedLogs = () => {
     columnResizeMode: 'onChange',
     filterFns: { inDateRange, arrSome },
     meta: { getRowClassName },
-    getRowId: (row) => row.uuid,
+    getRowId: (row) => row.id,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
@@ -207,37 +208,14 @@ export const UnifiedLogs = () => {
   }, [facets])
 
   useEffect(() => {
-    if (DEBUG_FILTER_PROCESSING) console.log('========== FILTER CHANGE DETECTED ==========')
-    if (DEBUG_FILTER_PROCESSING) console.log('Raw columnFilters:', JSON.stringify(columnFilters))
-
-    // Check for level filters specifically
-    const levelColumnFilter = columnFilters.find((filter) => filter.id === 'level')
-    if (DEBUG_FILTER_PROCESSING) console.log('Level column filter:', levelColumnFilter)
-
     const columnFiltersWithNullable = filterFields.map((field) => {
       const filterValue = columnFilters.find((filter) => filter.id === field.value)
-      if (DEBUG_FILTER_PROCESSING) console.log(`Processing field ${field.value}:`, filterValue)
       if (!filterValue) return { id: field.value, value: null }
       return { id: field.value, value: filterValue.value }
     })
 
-    // Debug level filter specifically
-    const levelFilter = columnFiltersWithNullable.find((f) => f.id === 'level')
-    if (DEBUG_FILTER_PROCESSING) console.log('Level filter after mapping:', levelFilter)
-
-    if (DEBUG_FILTER_PROCESSING)
-      console.log('All column filters after mapping:', columnFiltersWithNullable)
-
     const search = columnFiltersWithNullable.reduce(
       (prev, curr) => {
-        if (DEBUG_FILTER_PROCESSING)
-          console.log(`Processing filter for URL: ${curr.id}`, {
-            value: curr.value,
-            type: Array.isArray(curr.value) ? 'array' : typeof curr.value,
-            isEmpty: Array.isArray(curr.value) && curr.value.length === 0,
-            isNull: curr.value === null,
-          })
-
         // Add to search parameters
         prev[curr.id as string] = curr.value
         return prev
@@ -245,14 +223,7 @@ export const UnifiedLogs = () => {
       {} as Record<string, unknown>
     )
 
-    if (DEBUG_FILTER_PROCESSING) console.log('Final search object to be set in URL:', search)
-    if (DEBUG_FILTER_PROCESSING) console.log('Level value in final search:', search.level)
-    if (DEBUG_FILTER_PROCESSING) console.log('Is level in search object:', 'level' in search)
-
-    // Set the search state without any console logs
-    if (DEBUG_FILTER_PROCESSING) console.log('CALLING setSearch with:', JSON.stringify(search))
     setSearch(search)
-    if (DEBUG_FILTER_PROCESSING) console.log('========== END FILTER PROCESSING ==========')
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columnFilters])
@@ -265,10 +236,10 @@ export const UnifiedLogs = () => {
   useEffect(() => {
     if (isLoading || isFetching) return
     if (Object.keys(rowSelection)?.length && !selectedRow) {
-      setSearch({ uuid: null })
+      setSearch({ id: null })
       setRowSelection({})
     } else {
-      setSearch({ uuid: Object.keys(rowSelection)?.[0] || null })
+      setSearch({ id: Object.keys(rowSelection)?.[0] || null })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowSelection, selectedRow, isLoading, isFetching])
@@ -287,7 +258,7 @@ export const UnifiedLogs = () => {
   return (
     <DataTableProvider
       table={table}
-      columns={COLUMNS}
+      columns={UNIFIED_LOGS_COLUMNS}
       filterFields={filterFields}
       columnFilters={columnFilters}
       sorting={sorting}
@@ -295,7 +266,9 @@ export const UnifiedLogs = () => {
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       enableColumnOrdering={true}
-      isLoading={isFetching || isLoading}
+      isFetching={isFetching}
+      isLoading={isLoading}
+      isLoadingCounts={isLoadingCounts}
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
@@ -329,26 +302,22 @@ export const UnifiedLogs = () => {
             <ResizablePanel defaultSize={selectedRowKey ? 60 : 100} minSize={30} className="h-full">
               <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
                 <ResizablePanel defaultSize={100} minSize={30}>
-                  <div className="h-full overflow-auto">
-                    <DataTableInfinite
-                      columns={COLUMNS}
-                      totalRows={totalDBRowCount}
-                      filterRows={filterDBRowCount}
-                      totalRowsFetched={totalFetched}
-                      isFetching={isFetching}
-                      isLoading={isLoading}
-                      fetchNextPage={fetchNextPage}
-                      hasNextPage={hasNextPage}
-                      renderLiveRow={(props) => {
-                        if (!liveMode.timestamp) return null
-                        if ((props?.row as any).original.uuid !== liveMode?.row?.uuid) return null
-                        return <LiveRow colSpan={COLUMNS.length - 1} />
-                      }}
-                      setColumnOrder={setColumnOrder}
-                      setColumnVisibility={setColumnVisibility}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
-                  </div>
+                  <DataTableInfinite
+                    columns={UNIFIED_LOGS_COLUMNS}
+                    totalRows={totalDBRowCount}
+                    filterRows={filterDBRowCount}
+                    totalRowsFetched={totalFetched}
+                    fetchNextPage={fetchNextPage}
+                    hasNextPage={hasNextPage}
+                    renderLiveRow={(props) => {
+                      if (!liveMode.timestamp) return null
+                      if (props?.row?.original.id !== liveMode?.row?.id) return null
+                      return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
+                    }}
+                    setColumnOrder={setColumnOrder}
+                    setColumnVisibility={setColumnVisibility}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
                 </ResizablePanel>
                 {selectedRow?.original?.logs && selectedRow?.original?.logs?.length > 0 && (
                   <>

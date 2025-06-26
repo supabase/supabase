@@ -30,11 +30,10 @@ export interface DataTableInfiniteProps<TData, TValue, TMeta> {
   searchParamsParser: any
 }
 
+// [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
 export function DataTableInfinite<TData, TValue, TMeta>({
   columns,
   defaultColumnVisibility = {},
-  isFetching,
-  isLoading,
   fetchNextPage,
   hasNextPage,
   totalRows = 0,
@@ -45,10 +44,12 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
-  const { table } = useDataTable()
+  const { table, isLoading, isFetching } = useDataTable()
   const tableRef = useRef<HTMLTableElement>(null)
 
   const headerGroups = table.getHeaderGroups()
+  const headers = headerGroups[0].headers
+  const rows = table.getRowModel().rows ?? []
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
@@ -56,11 +57,11 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         Math.ceil(e.currentTarget.scrollTop + e.currentTarget.clientHeight) >=
         e.currentTarget.scrollHeight
 
-      if (onPageBottom && !isFetching && totalRowsFetched < filterRows) {
+      if (onPageBottom && !isFetching && totalRows > totalRowsFetched) {
         fetchNextPage()
       }
     },
-    [fetchNextPage, isFetching, filterRows, totalRowsFetched]
+    [fetchNextPage, isFetching, totalRows, totalRowsFetched]
   )
 
   useHotKey(() => {
@@ -69,118 +70,103 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   }, 'u')
 
   return (
-    <>
-      <Table
-        containerProps={{
-          onScroll,
-        }}
-        ref={tableRef} // REMINDER: https://stackoverflow.com/questions/50361698/border-style-do-not-work-with-sticky-position-element
-        className="z-0"
-      >
-        <TableHeader>
-          {headerGroups.map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="bg-surface-75">
-              {headerGroup.headers.map((header) => {
-                const sort = header.column.getIsSorted()
-                const canResize = header.column.getCanResize()
-                const onResize = header.getResizeHandler()
-                const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
+    <Table ref={tableRef} onScroll={onScroll}>
+      <TableHeader>
+        <TableRow className="bg-surface-75">
+          {headers.map((header) => {
+            const sort = header.column.getIsSorted()
+            const canResize = header.column.getCanResize()
+            const onResize = header.getResizeHandler()
+            const headerClassName = (header.column.columnDef.meta as any)?.headerClassName
 
-                return (
-                  <TableHead
-                    key={header.id}
-                    className={headerClassName}
-                    aria-sort={
-                      sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'
-                    }
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                    {canResize && (
-                      <div
-                        onDoubleClick={() => header.column.resetSize()}
-                        onMouseDown={onResize}
-                        onTouchStart={onResize}
-                        className={cn(
-                          'user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center',
-                          'before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border'
-                        )}
-                      />
+            return (
+              <TableHead
+                key={header.id}
+                className={headerClassName}
+                aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
+              >
+                {header.isPlaceholder
+                  ? null
+                  : flexRender(header.column.columnDef.header, header.getContext())}
+                {canResize && (
+                  <div
+                    onDoubleClick={() => header.column.resetSize()}
+                    onMouseDown={onResize}
+                    onTouchStart={onResize}
+                    className={cn(
+                      'user-select-none absolute -right-2 top-0 z-10 flex h-full w-4 cursor-col-resize touch-none justify-center',
+                      'before:absolute before:inset-y-0 before:w-px before:translate-x-px before:bg-border'
                     )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody
-          id="content"
-          tabIndex={-1}
-          // REMINDER: avoids scroll (skipping the table header) when using skip to content
-          style={{ scrollMarginTop: 'calc(var(--top-bar-height))' }}
-        >
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
-              <Fragment key={row.id}>
-                {renderLiveRow?.({ row: row as any })}
-                <MemoizedRow
-                  row={row}
-                  table={table}
-                  searchParamsParser={searchParamsParser}
-                  selected={row.getIsSelected()}
-                />
-              </Fragment>
-            ))
-          ) : (
-            <Fragment>
-              {renderLiveRow?.()}
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
+                  />
+                )}
+              </TableHead>
+            )
+          })}
+        </TableRow>
+      </TableHeader>
+      <TableBody
+        id="content"
+        tabIndex={-1}
+        // REMINDER: avoids scroll (skipping the table header) when using skip to content
+        style={{ scrollMarginTop: 'calc(var(--top-bar-height))' }}
+      >
+        {rows.length ? (
+          rows.map((row) => (
+            // REMINDER: if we want to add arrow navigation https://github.com/TanStack/table/discussions/2752#discussioncomment-192558
+            <Fragment key={row.id}>
+              {renderLiveRow?.({ row: row as any })}
+              <DataTableRow
+                row={row}
+                table={table}
+                searchParamsParser={searchParamsParser}
+                selected={row.getIsSelected()}
+              />
             </Fragment>
-          )}
-          <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
-            <TableCell colSpan={columns.length} className="text-center">
-              {hasNextPage || isFetching || isLoading ? (
-                <div className="flex flex-col items-center gap-2">
-                  <Button
-                    disabled={isFetching || isLoading}
-                    onClick={() => fetchNextPage()}
-                    size="small"
-                    type="outline"
-                    icon={
-                      isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
-                    }
-                  >
-                    Load More
-                  </Button>
-                  <p className="text-xs text-foreground-lighter">
-                    Showing{' '}
-                    <span className="font-mono font-medium">
-                      {formatCompactNumber(totalRowsFetched)}
-                    </span>{' '}
-                    of{' '}
-                    <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
-                    rows
-                  </p>
-                </div>
-              ) : (
-                <p className="text-sm text-foreground-lighter py-4">
-                  No more data to load (
-                  <span className="font-mono font-medium">{formatCompactNumber(filterRows)}</span>{' '}
+          ))
+        ) : (
+          <Fragment>
+            {renderLiveRow?.()}
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                {isLoading ? 'Retrieving logs...' : 'No results'}
+              </TableCell>
+            </TableRow>
+          </Fragment>
+        )}
+        <TableRow className="hover:bg-transparent data-[state=selected]:bg-transparent">
+          <TableCell colSpan={columns.length} className="text-center !py-2">
+            {hasNextPage || isFetching || isLoading ? (
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  disabled={isFetching || isLoading}
+                  onClick={() => fetchNextPage()}
+                  size="small"
+                  type="outline"
+                  icon={isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null}
+                >
+                  Load more
+                </Button>
+                <p className="text-xs text-foreground-lighter">
+                  Showing{' '}
+                  <span className="font-mono font-medium">
+                    {formatCompactNumber(totalRowsFetched)}
+                  </span>{' '}
                   of <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
-                  rows)
+                  rows
                 </p>
-              )}
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </>
+              </div>
+            ) : (
+              <p className="text-xs text-foreground-lighter">
+                No more data to load (
+                <span className="font-mono font-medium">{formatCompactNumber(filterRows)}</span> of{' '}
+                <span className="font-mono font-medium">{formatCompactNumber(totalRows)}</span>{' '}
+                rows)
+              </p>
+            )}
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
   )
 }
 
@@ -201,10 +187,9 @@ function DataTableRow<TData>({
   selected?: boolean
   searchParamsParser: any
 }) {
-  // REMINDER: rerender the row when live mode is toggled - used to opacity the row
-  // via the `getRowClassName` prop - but for some reasons it wil render the row on data fetch
   useQueryState('live', searchParamsParser.live)
   const rowClassName = (table.options.meta as any)?.getRowClassName?.(row)
+  const cells = row.getVisibleCells()
 
   return (
     <TableRow
@@ -220,7 +205,7 @@ function DataTableRow<TData>({
       }}
       className={cn(rowClassName)}
     >
-      {row.getVisibleCells().map((cell) => {
+      {cells.map((cell) => {
         const cellClassName = (cell.column.columnDef.meta as any)?.cellClassName
         return (
           <TableCell key={cell.id} className={cn(cellClassName)}>
@@ -232,6 +217,7 @@ function DataTableRow<TData>({
   )
 }
 
+// [Joshen] Using MemoizedRow will cause the column visibility to break as the rows aren't getting re-rendered
 const MemoizedRow = memo(
   DataTableRow,
   (prev, next) => prev.row.id === next.row.id && prev.selected === next.selected

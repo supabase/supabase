@@ -8,21 +8,25 @@ export interface InputWithAddonsProps extends InputHTMLAttributes<HTMLInputEleme
   containerClassName?: string
 }
 
-const InputWithAddons = forwardRef<HTMLInputElement, InputWithAddonsProps>(
+export const InputWithAddons = forwardRef<HTMLInputElement, InputWithAddonsProps>(
   ({ leading, trailing, containerClassName, className, ...props }, ref) => {
     return (
       <div
         className={cn(
-          'border-input ring-offset-background focus-within:ring-ring group flex h-10 w-full rounded-md border bg-transparent text-sm focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 overflow-hidden',
+          'group border-input ring-offset-background flex h-10 w-full rounded border bg-transparent text-sm overflow-hidden',
+          'focus-within:ring-ring focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2',
           containerClassName
         )}
       >
         {leading ? (
-          <div className="border-input bg-muted/50 border-r px-3 py-2">{leading}</div>
+          <div className="border-input bg-muted/50 border-r px-2.5 py-2 flex items-center justify-center">
+            {leading}
+          </div>
         ) : null}
         <input
           className={cn(
-            'placeholder:text-muted-foreground bg-background w-full rounded-md px-3 py-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+            'bg-background w-full px-3 py-2 focus:outline-none border-0 placeholder:text-muted-foreground ',
+            'disabled:cursor-not-allowed disabled:opacity-50 text-sm',
             className
           )}
           ref={ref}
@@ -36,5 +40,3 @@ const InputWithAddons = forwardRef<HTMLInputElement, InputWithAddonsProps>(
   }
 )
 InputWithAddons.displayName = 'InputWithAddons'
-
-export { InputWithAddons }
