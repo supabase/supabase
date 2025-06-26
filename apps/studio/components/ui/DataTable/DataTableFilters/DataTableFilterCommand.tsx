@@ -4,7 +4,6 @@ import { ParserBuilder } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import {
   cn,
   Command_Shadcn_ as Command,
@@ -59,7 +58,8 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
 
   const trimmedInputValue = inputValue.trim()
 
-  useHotKey(() => setOpen((open) => !open), 'k')
+  // [Joshen] Temporarily disabling as this conflicts with our current CMD K behaviour
+  // useHotKey(() => setOpen((open) => !open), 'k')
 
   useEffect(() => {
     // TODO: we could check for ARRAY_DELIMITER or SLIDER_DELIMITER to auto-set filter when typing
@@ -141,11 +141,13 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
         >
           {trimmedInputValue ? inputValue : 'Search data table...'}
         </span>
-        <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
+        {/* [Joshen] Temporarily disabling as this conflicts with existing CMD K shortcut */}
+        {/* <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
           <span className="mr-1">⌘</span>
           <span>K</span>
-        </Kbd>
+        </Kbd> */}
       </button>
+
       <Command
         className={cn(
           'overflow-visible rounded-lg border border-border shadow-md [&>div]:border-none bg',
