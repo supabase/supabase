@@ -62,10 +62,7 @@ export const ReportBlockContainer = ({
                 <GripHorizontal size={16} strokeWidth={1.5} />
               </div>
             )}
-            <h3
-              title={label}
-              className="!text-xs font-medium text-foreground-light flex-1 truncate"
-            >
+            <h3 title={label} className="text-xs font-medium text-foreground-light flex-1 truncate">
               {label}
             </h3>
             <div className="flex items-center">{actions}</div>

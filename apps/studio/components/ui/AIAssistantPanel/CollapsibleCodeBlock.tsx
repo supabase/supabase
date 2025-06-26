@@ -1,13 +1,12 @@
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useState } from 'react'
-
 import { Button, CodeBlock, CodeBlockProps, cn } from 'ui'
 
 interface CollapsibleCodeBlockProps extends CodeBlockProps {
   onRemove?: () => void
 }
 
-export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBlockProps) => {
+const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBlockProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const codeString = (props.value || props.children) as string
@@ -58,3 +57,5 @@ export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBloc
     </div>
   )
 }
+
+export default CollapsibleCodeBlock

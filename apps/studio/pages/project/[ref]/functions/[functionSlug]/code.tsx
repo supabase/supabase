@@ -15,17 +15,17 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { LogoLoader } from 'ui'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
   const project = useSelectedProject()
-  const { includeSchemaMetadata } = useOrgAiOptInLevel()
-
+  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
+  const includeSchemaMetadata = (isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
