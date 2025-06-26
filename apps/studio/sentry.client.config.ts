@@ -38,7 +38,9 @@ function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
   }
 
   return !frames.some((frame, index) => {
-    frame.abs_path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
+    // Check both abs_path and filename for paths starting with app:///_next.
+    const path = frame.abs_path || frame.filename
+    return path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
   })
 }
 
