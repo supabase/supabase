@@ -2,14 +2,17 @@ import { CheckIcon } from '@heroicons/react/outline'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
+import supabase from '~/lib/supabase'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import footerData from 'data/Footer'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
+import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
 
 interface Props {
   className?: string
@@ -22,6 +25,21 @@ const Footer = (props: Props) => {
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeek = pathname.includes('/ga-week')
   const forceDark = isDarkLaunchWeek
+  const channel = supabase.channel('footer')
+
+  useEffect(() => {
+    if (channel.state === REALTIME_CHANNEL_STATES.closed) {
+      channel.subscribe((status: string) => {
+        if (status == 'SUBSCRIBED') {
+          channel.send({
+            type: 'broadcast',
+            event: 'footer_subscribed',
+            payload: { ts: Date.now() },
+          })
+        }
+      })
+    }
+  }, [])
 
   if (props.hideFooter) {
     return null
