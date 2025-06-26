@@ -90,6 +90,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const useBedRockAssistant = useFlag('useBedrockAssistant')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
 
@@ -105,7 +106,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const showMetadataWarning =
     IS_PLATFORM &&
     !!selectedOrganization &&
-    (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
+    ((!useBedRockAssistant && aiOptInLevel === 'disabled') ||
+      (useBedRockAssistant && (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')))
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -157,7 +159,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages,
   } = useChat({
     id: snap.activeChatId,
-    api: `${BASE_PATH}/api/ai/sql/generate-v3`,
+    api: useBedRockAssistant
+      ? `${BASE_PATH}/api/ai/sql/generate-v4`
+      : `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
@@ -175,6 +179,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         connectionString: project?.connectionString,
         schema: currentSchema,
         table: currentTable?.name,
+        includeSchemaMetadata: !useBedRockAssistant
+          ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
+          : undefined,
       })
     },
     fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
