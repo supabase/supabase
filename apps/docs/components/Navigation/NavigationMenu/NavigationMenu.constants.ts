@@ -1364,6 +1364,11 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
+      name: 'Development',
+      url: undefined,
+      items: [{ name: 'Error Handling', url: '/guides/functions/error-handling' }],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
