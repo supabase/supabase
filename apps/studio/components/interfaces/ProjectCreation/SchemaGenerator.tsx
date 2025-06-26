@@ -2,6 +2,7 @@ import { useChat } from 'ai/react'
 import { useEffect, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { onErrorChat } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
@@ -44,6 +45,7 @@ export const SchemaGenerator = ({
     api: `${BASE_PATH}/api/ai/onboarding/design`,
     id: 'schema-generator',
     maxSteps: 7,
+    onError: onErrorChat,
     onFinish: () => {
       setInput('')
     },
