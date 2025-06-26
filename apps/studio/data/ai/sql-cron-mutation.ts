@@ -9,11 +9,16 @@ export type SqlCronGenerateResponse = string
 
 export type SqlCronGenerateVariables = {
   prompt: string
+  useBedrockAssistant?: boolean
 }
 
-export async function generateSqlCron({ prompt }: SqlCronGenerateVariables) {
+export async function generateSqlCron({ prompt, useBedrockAssistant }: SqlCronGenerateVariables) {
+  const url = useBedrockAssistant
+    ? `${BASE_PATH}/api/ai/sql/cron-v2`
+    : `${BASE_PATH}/api/ai/sql/cron`
+
   const headers = await constructHeaders({ 'Content-Type': 'application/json' })
-  const response = await fetchHandler(`${BASE_PATH}/api/ai/sql/cron`, {
+  const response = await fetchHandler(url, {
     headers,
     method: 'POST',
     body: JSON.stringify({ prompt }),
