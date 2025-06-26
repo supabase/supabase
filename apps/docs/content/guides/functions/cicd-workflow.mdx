@@ -3,7 +3,6 @@ id: 'cicd-workflow'
 title: 'Deploying with CI / CD pipelines'
 description: 'Use GitHub Actions, Bitbucket, and GitLab CI to deploy your Edge Functions.'
 subtitle: 'Use GitHub Actions, Bitbucket, and GitLab CI to deploy your Edge Functions.'
-tocVideo: '6OMVWiiycLs'
 ---
 
 You can use popular CI / CD tools like GitHub Actions, Bitbucket, and GitLab CI to automate Edge Function deployments.
@@ -41,6 +40,8 @@ jobs:
       - run: supabase functions deploy --project-ref $PROJECT_ID
 ```
 
+---
+
 ## GitLab CI
 
 Here is the sample pipeline configuration to deploy via GitLab CI.
@@ -77,6 +78,8 @@ deploy-function:
     DOCKER_HOST: tcp://docker:2375
 ```
 
+---
+
 ## Bitbucket Pipelines
 
 Here is the sample pipeline configuration to deploy via Bitbucket.
@@ -102,7 +105,9 @@ pipelines:
               - docker
 ```
 
-## Declarative configuration
+---
+
+## Function Configuration
 
 Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
@@ -111,6 +116,15 @@ Individual function configuration like [JWT verification](/docs/guides/cli/confi
 verify_jwt = false
 ```
 
-## Resources
+This ensures your function configurations are consistent across all environments and deployments.
 
-- See the [example on GitHub](https://github.com/supabase/supabase/blob/master/examples/edge-functions/.github/workflows/deploy.yaml).
+---
+
+## Example
+
+This example shows a GitHub Actions workflow that deploys all Edge Functions when code is merged into the `main` branch.
+
+<$CodeSample
+meta="deploy.yaml"
+path="/edge-functions/.github/workflows/deploy.yaml"
+/>
