@@ -370,7 +370,23 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       tools,
     })
 
-    result.pipeDataStreamToResponse(res)
+    result.pipeDataStreamToResponse(res, {
+      getErrorMessage: (error) => {
+        if (error == null) {
+          return 'unknown error'
+        }
+
+        if (typeof error === 'string') {
+          return error
+        }
+
+        if (error instanceof Error) {
+          return error.message
+        }
+
+        return JSON.stringify(error)
+      },
+    })
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {
