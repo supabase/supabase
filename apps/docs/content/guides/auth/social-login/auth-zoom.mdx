@@ -57,6 +57,24 @@ Under `Scopes`
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Zoom" }} />
 
+You can also configure the Zoom auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Zoom auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_zoom_enabled": true,
+    "external_zoom_client_id": "your-zoom-client-id",
+    "external_zoom_secret": "your-zoom-client-secret"
+  }'
+```
+
 ## Add login code to your client app
 
 <Tabs

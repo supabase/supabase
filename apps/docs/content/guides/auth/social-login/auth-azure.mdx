@@ -44,6 +44,25 @@ Setting up OAuth with Azure consists of four broad steps:
 
 ![Obtain the client secret](/docs/img/guides/auth-azure/azure-client-secret.png)
 
+You can also configure the Azure auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Azure auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_azure_enabled": true,
+    "external_azure_client_id": "your-azure-client-id",
+    "external_azure_secret": "your-azure-client-secret",
+    "external_azure_url": "your-azure-url"
+  }'
+```
+
 ## Guarding against unverified email domains
 
 Microsoft Entra ID can send out unverified email domains in certain cases. This may open up your project to a vulnerability where a malicious user can impersonate already existing accounts on your project.
