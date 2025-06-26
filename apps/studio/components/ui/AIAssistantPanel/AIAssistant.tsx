@@ -5,6 +5,7 @@ import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
@@ -12,6 +13,7 @@ import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -86,9 +88,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
 
+  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
+
+  const [updatedOptInSinceMCP] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+    false
+  )
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
@@ -356,20 +364,26 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               <Admonition
                 type="default"
                 title={
-                  aiOptInLevel === 'disabled'
-                    ? 'Project metadata is not shared'
-                    : 'Limited metadata is shared'
+                  newOrgAiOptIn && !updatedOptInSinceMCP
+                    ? 'The Assistant has just been updated to help you better!'
+                    : isHipaaProjectDisallowed
+                      ? 'Project metadata is not shared due to HIPAA'
+                      : aiOptInLevel === 'disabled'
+                        ? 'Project metadata is currently not shared'
+                        : 'Limited metadata is shared to the Assistant'
                 }
                 description={
-                  isHipaaProjectDisallowed
-                    ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
-                    : aiOptInLevel === 'disabled'
-                      ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
-                      : aiOptInLevel === 'schema'
-                        ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
-                        : ''
+                  newOrgAiOptIn && !updatedOptInSinceMCP
+                    ? 'You may now opt-in to share schema metadata and even logs for better results'
+                    : isHipaaProjectDisallowed
+                      ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
+                      : aiOptInLevel === 'disabled'
+                        ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
+                        : aiOptInLevel === 'schema'
+                          ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                          : ''
                 }
-                className="border-0 border-b rounded-none bg-background"
+                className="border-0 border-b rounded-none bg-background mb-0"
               >
                 {!isHipaaProjectDisallowed && (
                   <Button
