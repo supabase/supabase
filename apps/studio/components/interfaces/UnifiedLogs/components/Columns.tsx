@@ -10,7 +10,7 @@ import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
 
-export const COLUMNS: ColumnDef<ColumnSchema>[] = [
+export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
   {
     accessorKey: 'level',
     header: '',
@@ -39,9 +39,9 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
     },
     filterFn: (row, columnId, filterValue) => true,
     enableResizing: false,
-    size: 190,
-    minSize: 190,
-    maxSize: 190,
+    size: 130,
+    minSize: 130,
+    maxSize: 130,
     meta: {
       headerClassName:
         'w-[--header-date-size] max-w-[--header-date-size] min-w-[--header-date-size]',
@@ -55,16 +55,16 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
     cell: ({ row }) => {
       const logType = row.getValue<ColumnSchema['log_type']>('log_type')
       return (
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-right flex items-center gap-1">
+        <div className="flex items-center justify-end gap-1">
           <LogTypeIcon type={logType} size={16} className="text-foreground/70" />
         </div>
       )
     },
     enableHiding: false,
     filterFn: (row, columnId, filterValue) => true,
-    size: 48,
-    minSize: 48,
-    maxSize: 48,
+    size: 40,
+    minSize: 40,
+    maxSize: 40,
     enableResizing: false,
     meta: {
       headerClassName:
@@ -83,8 +83,8 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
       return <span className="text-foreground-lighter">{value}</span>
     },
     enableResizing: false,
-    size: 69,
-    minSize: 69,
+    size: 70,
+    minSize: 70,
     meta: {
       cellClassName:
         'font-mono text-muted-foreground w-[--col-method-size] max-w-[--col-method-size] min-w-[--col-method-size]',
@@ -113,8 +113,8 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
     },
     filterFn: (row, columnId, filterValue) => true,
     enableResizing: false,
-    size: 60,
-    minSize: 60,
+    size: 50,
+    minSize: 50,
     meta: {
       headerClassName:
         'w-[--header-status-size] max-w-[--header-status-size] min-w-[--header-status-size]',
@@ -181,8 +181,8 @@ export const COLUMNS: ColumnDef<ColumnSchema>[] = [
       )
     },
     enableResizing: true,
-    size: 400,
-    minSize: 400,
+    size: 200,
+    minSize: 200,
     meta: {
       headerClassName:
         'w-[--header-event_message-size] max-w-[--header-event_message-size] min-w-[--header-event_message-size]',

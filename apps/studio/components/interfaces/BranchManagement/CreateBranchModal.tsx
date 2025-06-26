@@ -317,7 +317,7 @@ export const CreateBranchModal = () => {
                 </div>
                 <div className="flex flex-col gap-y-1">
                   <p className="text-sm text-foreground">
-                    Preview branches are billed $0.32 per day
+                    Preview branches are billed $0.01344 per hour
                   </p>
                   <p className="text-sm text-foreground-light">
                     This cost will continue for as long as the branch has not been removed.

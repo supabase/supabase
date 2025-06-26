@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Checkbox_Shadcn_ as Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
-import { InputWithAddons } from '../InputWithAddons'
+import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
 
 export function DataTableFilterCheckbox<TData>({
@@ -14,7 +14,9 @@ export function DataTableFilterCheckbox<TData>({
 }: DataTableCheckboxFilterField<TData>) {
   const value = _value as string
   const [inputValue, setInputValue] = useState('')
-  const { table, columnFilters, isLoading, getFacetedUniqueValues } = useDataTable()
+  const { table, columnFilters, isLoading, isLoadingCounts, getFacetedUniqueValues } =
+    useDataTable()
+
   const column = table.getColumn(value)
   // REMINDER: avoid using column?.getFilterValue()
   const filterValue = columnFilters.find((i) => i.id === value)?.value
@@ -33,7 +35,7 @@ export function DataTableFilterCheckbox<TData>({
   // REMINDER: if no options are defined, while fetching data, we should show a skeleton
   if (isLoading && !filterOptions?.length)
     return (
-      <div className="grid divide-y rounded-lg border border-border">
+      <div className="grid divide-y rounded border border-border">
         {Array.from({ length: 3 }).map((_, index) => (
           <div key={index} className="flex items-center justify-between gap-2 px-2 py-2.5">
             <Skeleton className="h-4 w-4 rounded-sm" />
@@ -51,13 +53,13 @@ export function DataTableFilterCheckbox<TData>({
         <InputWithAddons
           placeholder="Search"
           leading={<Search className="mt-0.5 h-4 w-4" />}
-          containerClassName="h-9 rounded-lg"
+          containerClassName="h-9 rounded"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />
       ) : null}
       {/* FIXME: due to the added max-h and overflow-y-auto, the hover state and border is laying on top of the scroll bar */}
-      <div className="max-h-[200px] overflow-y-auto rounded-lg border border-border empty:border-none">
+      <div className="max-h-[200px] overflow-y-auto rounded border border-border empty:border-none">
         {filterOptions
           // TODO: we shoudn't sort the options here, instead filterOptions should be sorted by default
           // .sort((a, b) => a.label.localeCompare(b.label))
@@ -92,7 +94,7 @@ export function DataTableFilterCheckbox<TData>({
                     <span className="truncate font-normal">{option.label}</span>
                   )}
                   <span className="ml-auto flex items-center justify-center font-mono text-xs">
-                    {isLoading ? (
+                    {isLoadingCounts ? (
                       <Skeleton className="h-4 w-4" />
                     ) : facetedValue?.has(option.value) ? (
                       formatCompactNumber(facetedValue.get(option.value) || 0)
