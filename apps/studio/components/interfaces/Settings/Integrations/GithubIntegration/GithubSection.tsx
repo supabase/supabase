@@ -396,7 +396,7 @@ const GitHubSection = () => {
 
                       <div
                         className={cn(
-                          'space-y-4 pl-8 border-l',
+                          'space-y-4 pl-6 border-l',
                           (!enableProductionSync || !isConnected) &&
                             'opacity-25 pointer-events-none'
                         )}
@@ -459,7 +459,7 @@ const GitHubSection = () => {
 
                       <div
                         className={cn(
-                          'space-y-4 pl-8 border-l',
+                          'space-y-4 pl-6 border-l',
                           !newBranchPerPr && 'opacity-25 pointer-events-none'
                         )}
                       >
