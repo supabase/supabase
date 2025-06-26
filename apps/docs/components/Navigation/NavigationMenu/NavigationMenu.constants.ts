@@ -1366,7 +1366,11 @@ export const functions: NavMenuConstant = {
     {
       name: 'Development',
       url: undefined,
-      items: [{ name: 'Error Handling', url: '/guides/functions/error-handling' }],
+      items: [
+        { name: 'Error Handling', url: '/guides/functions/error-handling' },
+        { name: 'HTTP Methods', url: '/guides/functions/http-methods' },
+        { name: 'Using Deno 2', url: '/guides/functions/deno2' },
+      ],
     },
     {
       name: 'Guides',
