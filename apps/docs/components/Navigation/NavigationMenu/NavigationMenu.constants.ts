@@ -1355,14 +1355,18 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
+      name: 'Configuration',
+      url: undefined,
+      items: [
+        { name: 'Environment Variables', url: '/guides/functions/secrets' },
+        { name: 'Managing Dependencies', url: '/guides/functions/dependencies' },
+        { name: 'Function Configuration', url: '/guides/functions/function-configuration' },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Managing dependencies', url: '/guides/functions/dependencies' },
-        {
-          name: 'Managing environment variables',
-          url: '/guides/functions/secrets',
-        },
         {
           name: 'Integrating with Supabase Auth',
           url: '/guides/functions/auth',
