@@ -17,6 +17,13 @@ import { MemoizedDataTableSheetContent } from './components/DataTableSheetConten
 import { sheetFields } from './UnifiedLogs.fields'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta } from './UnifiedLogs.types'
+import {
+  MemoizedOriginBlock,
+  MemoizedNetworkBlock,
+  MemoizedPostgRESTBlock,
+  MemoizedPostgresBlock,
+  MemoizedResponseBlock,
+} from './ServiceFlow/ServiceFlowBlocks'
 
 interface ServiceFlowPanelProps {
   selectedRow: any
@@ -125,24 +132,45 @@ export function ServiceFlowPanel({
                 {shouldShowServiceFlow && (
                   <TabsContent value="service-flow">
                     <div className="p-4">
-                      {isLoading ? (
-                        <div>Loading service flow...</div>
-                      ) : error ? (
-                        <div>Error: {error.toString()}</div>
-                      ) : serviceFlowData?.result ? (
-                        <div>
-                          <h3 className="font-medium mb-3">
-                            PostgREST Service Flow ({serviceFlowData.result.length} result
-                            {serviceFlowData.result.length !== 1 ? 's' : ''})
-                          </h3>
-                          <pre className="text-xs bg-muted p-2 rounded overflow-auto">
-                            {JSON.stringify(serviceFlowData.result, null, 2)}
-                          </pre>
+                      {error ? (
+                        <div className="text-center py-8 text-destructive">
+                          Error: {error.toString()}
                         </div>
                       ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                          No service flow data found for this request
-                        </div>
+                        <>
+                          <div className="text-sm text-foreground-light mb-4">
+                            PostgREST Service Flow
+                            {serviceFlowData?.result &&
+                              ` (${serviceFlowData.result.length} enriched)`}
+                          </div>
+
+                          <MemoizedOriginBlock
+                            data={selectedRow}
+                            enrichedData={serviceFlowData?.result?.[0]}
+                            isLoading={isLoading}
+                          />
+
+                          <MemoizedNetworkBlock
+                            data={selectedRow}
+                            enrichedData={serviceFlowData?.result?.[0]}
+                            isLoading={isLoading}
+                          />
+
+                          <MemoizedPostgRESTBlock
+                            data={selectedRow}
+                            enrichedData={serviceFlowData?.result?.[0]}
+                            isLoading={isLoading}
+                          />
+
+                          <MemoizedPostgresBlock
+                            data={selectedRow}
+                            enrichedData={serviceFlowData?.result?.[0]}
+                            isLoading={isLoading}
+                            isLast={false}
+                          />
+
+                          <MemoizedResponseBlock data={selectedRow} />
+                        </>
                       )}
                     </div>
                   </TabsContent>
