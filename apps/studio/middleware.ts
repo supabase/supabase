@@ -17,6 +17,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/complete-v2',
   '/ai/sql/cron-v2',
   '/ai/sql/title-v2',
+  '/ai/edge-function/complete-v2',
   // Others
   '/ai/edge-function/complete',
   '/ai/onboarding/design',
