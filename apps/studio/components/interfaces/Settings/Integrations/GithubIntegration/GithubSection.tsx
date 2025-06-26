@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, Github, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -30,18 +30,14 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
-  Badge,
   Button,
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
   cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
   Input_Shadcn_,
   Switch,
 } from 'ui'
@@ -305,7 +301,12 @@ const GitHubSection = () => {
           <div className="space-y-6">
             {/* Section 1: GitHub Connection */}
             <div>
-              <h5 className="text-foreground mb-3 text-sm">GitHub Repository</h5>
+              <h5 className="text-foreground mb-2">How does the GitHub integration work?</h5>
+              <p className="text-foreground-light text-sm mb-6">
+                Connecting to GitHub allows you to sync preview branches with a chosen GitHub
+                branch, keep your production branch in sync, and automatically create preview
+                branches for every pull request.
+              </p>
               {existingConnection ? (
                 <ul className="flex flex-col gap-y-2">
                   <IntegrationConnectionItem
@@ -366,7 +367,6 @@ const GitHubSection = () => {
                               }
                             />
                           </FormControl_Shadcn_>
-                          <FormMessage_Shadcn_ />
                         </FormItemLayout>
                       )}
                     />
@@ -426,15 +426,8 @@ const GitHubSection = () => {
                                   {isCheckingBranch && (
                                     <Loader2 size={14} className="animate-spin" />
                                   )}
-                                  {field.value &&
-                                    !isCheckingBranch &&
-                                    !githubSettingsForm.formState.errors.branchName &&
-                                    isConnected && (
-                                      <Check size={14} className="text-brand" strokeWidth={2} />
-                                    )}
                                 </div>
                               </div>
-                              <FormMessage_Shadcn_ />
                             </FormItemLayout>
                           )}
                         />
@@ -487,7 +480,6 @@ const GitHubSection = () => {
                                   disabled={!newBranchPerPr || !canUpdateGitHubConnection}
                                 />
                               </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
                             </FormItemLayout>
                           )}
                         />
