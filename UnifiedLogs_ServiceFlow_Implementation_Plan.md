@@ -20,12 +20,15 @@ The Service Flow feature enhances the UnifiedLogs inspection panel by showing ho
 3. **No UI Reloading**: Fixed infinite re-render issue by excluding `logId` from main query params
 4. **Real Data**: Returns actual log data for selected PostgREST requests
 5. **Proper Correlation**: Uses same timestamp range as main logs table (not manual time windows)
+6. **Rich Data Extraction**: SQL query extracts 35+ useful fields with flattened naming
+7. **Filtering Integration**: BlockField components integrate with existing filter system
 
 ### Current Display
 
-- Shows raw JSON data in a `<pre>` tag
-- Displays result count: "PostgREST Service Flow (1 result)"
-- Basic loading/error states
+- Shows service flow blocks with real data from flattened SQL query
+- Displays enriched data from 35+ extracted fields
+- Includes complete raw log data for debugging
+- All fields properly integrated with filtering system
 
 ## Architecture Design
 
@@ -34,41 +37,43 @@ The Service Flow feature enhances the UnifiedLogs inspection panel by showing ho
 The system is designed around **modular blocks** that can be reused across different service types:
 
 ```
-Service Type "postgrest" = 4 blocks:
-┌─────────────┐
-│ OriginBlock │ ← Region, time, status
-├─────────────┤
-│ NetworkBlock│ ← Request ID, path, host, user agent
-├─────────────┤
-│PostgRESTBlck│ ← Query, status
-├─────────────┤
-│PostgresBlock│ ← SQL query, query ID
-└─────────────┘
+Service Type "postgrest" = 5 blocks:
+┌─────────────────┐
+│ RequestStarted  │ ← Simple timeline marker
+├─────────────────┤
+│ NetworkBlock    │ ← Request metadata (host, path, method, location)
+├─────────────────┤
+│ PostgRESTBlock  │ ← API layer (status, message)
+├─────────────────┤
+│ PostgresBlock   │ ← Database layer (execution time, version, etc.)
+├─────────────────┤
+│ ResponseCompleted│ ← Simple completion marker
+└─────────────────┘
 ```
 
 ### Future Service Types (Planned)
 
-- **"auth"**: `OriginBlock` + `NetworkBlock` + `AuthBlock` + `PostgresBlock`
-- **"storage"**: `OriginBlock` + `NetworkBlock` + `StorageBlock`
-- **"functions"**: `OriginBlock` + `NetworkBlock` + `FunctionsBlock` + `ExternalAPIsBlock`
-- **"realtime"**: `OriginBlock` + `NetworkBlock` + `RealtimeBlock` + `PostgresBlock`
+- **"auth"**: `RequestStarted` + `NetworkBlock` + `AuthBlock` + `PostgresBlock` + `ResponseCompleted`
+- **"storage"**: `RequestStarted` + `NetworkBlock` + `StorageBlock` + `ResponseCompleted`
+- **"functions"**: `RequestStarted` + `NetworkBlock` + `FunctionsBlock` + `ExternalAPIsBlock` + `ResponseCompleted`
+- **"realtime"**: `RequestStarted` + `NetworkBlock` + `RealtimeBlock` + `PostgresBlock` + `ResponseCompleted`
 
 ### Block Component Architecture
 
-**Reusable Memoized Components:**
+**Timeline Markers (Simple):**
 
 ```typescript
-// Universal blocks (used by all service types)
-MemoizedOriginBlock // Region, continent, timestamp, status
-MemoizedNetworkBlock // Request metadata (ID, path, host, user agent)
+MemoizedRequestStartedBlock // Shows request initiation time
+MemoizedResponseCompletedBlock // Shows completion status and time
+```
 
-// Service-specific blocks
-MemoizedPostgRESTBlock // API layer (query, status)
-MemoizedPostgresBlock // Database layer (SQL, query ID)
-MemoizedAuthBlock // Auth service specific data
-MemoizedStorageBlock // Storage service specific data
-MemoizedFunctionsBlock // Edge functions specific data
-// etc...
+**Service Blocks (Detailed with filtering):**
+
+```typescript
+MemoizedNetworkBlock // Request metadata, client location, headers
+MemoizedPostgRESTBlock // API layer status, messages
+MemoizedPostgresBlock // Database layer execution details
+// Future: MemoizedAuthBlock, MemoizedStorageBlock, etc.
 ```
 
 **Service Flow Configuration:**
@@ -76,16 +81,62 @@ MemoizedFunctionsBlock // Edge functions specific data
 ```typescript
 const SERVICE_FLOW_CONFIGS = {
   postgrest: {
-    blocks: [OriginBlock, NetworkBlock, PostgRESTBlock, PostgresBlock],
+    blocks: [
+      RequestStartedBlock,
+      NetworkBlock,
+      PostgRESTBlock,
+      PostgresBlock,
+      ResponseCompletedBlock,
+    ],
     query: getPostgrestServiceFlowQuery,
   },
   auth: {
-    blocks: [OriginBlock, NetworkBlock, AuthBlock, PostgresBlock],
+    blocks: [RequestStartedBlock, NetworkBlock, AuthBlock, PostgresBlock, ResponseCompletedBlock],
     query: getAuthServiceFlowQuery,
   },
   // etc...
 }
 ```
+
+## Data Extraction & Structure
+
+### SQL Query Data Flattening
+
+The SQL query extracts nested JSON into flat, meaningful field names:
+
+```sql
+-- Instead of: metadata.request.cf.country
+-- We get: "client.country"
+
+select
+  -- Request data
+  edge_logs_request.path as "request.path",
+  edge_logs_request.host as "request.host",
+  edge_logs_request.method as "request.method",
+  -- Client location
+  edge_logs_request.cf.country as "client.country",
+  edge_logs_request.cf.city as "client.city",
+  edge_logs_request.cf.latitude as "client.latitude",
+  edge_logs_request.cf.longitude as "client.longitude",
+  -- Headers
+  edge_logs_request.headers.user_agent as "headers.user_agent",
+  edge_logs_request.headers.x_client_info as "headers.x_client_info",
+  -- JWT data
+  sb.jwt.apikey.payload.role as "jwt.apikey_role",
+  sb.jwt.authorization.payload.role as "jwt.auth_role",
+  -- Raw data for debugging
+  el as raw_log_data;
+```
+
+### Extracted Fields (35+ total)
+
+**Request Data**: `request.path`, `request.host`, `request.method`, `request.url`
+**Response Data**: `response.origin_time`, `response.content_type`, `response.cache_status`
+**Client Location**: `client.continent`, `client.country`, `client.city`, `client.latitude`, `client.longitude`, `client.timezone`
+**Network Data**: `network.protocol`, `network.datacenter`
+**Headers**: `headers.user_agent`, `headers.x_client_info`, `headers.x_forwarded_proto`, `headers.x_real_ip`
+**JWT Data**: `jwt.apikey_role`, `jwt.auth_role`, `jwt.apikey_expires_at`, etc.
+**Raw Data**: `raw_log_data` (complete original log entry)
 
 ## Current Data Flow
 
@@ -128,150 +179,137 @@ await post('/platform/projects/{ref}/analytics/endpoints/logs.all', {
 ### 4. SQL Query
 
 ```sql
--- ServiceFlow.sql.ts
+-- ServiceFlow.sql.ts - Extracts 35+ flattened fields
 select
   id,
   timestamp,
-  'postgrest' as log_type,
-  cast(edge_logs_response.status_code as string) as status
--- ... other fields
+  edge_logs_request.host as "request.host",
+  edge_logs_request.cf.country as "client.country",
+  -- ... 30+ more fields
+  el as raw_log_data
 from edge_logs
 where el.id = '${logId}' and edge_logs_request.path like '%/rest/%';
 ```
 
-## Data Structure
+## Filtering Integration
 
-### Current Query Response
+### BlockField Component
+
+Each field in service blocks integrates with the existing filtering system:
 
 ```typescript
-interface UnifiedLogInspectionEntry {
-  id: string
-  timestamp: string
-  service_name: string
-  method: string
-  path: string
-  host: string
-  status_code: string
-  level: string
-  response_time_ms?: number
-  auth_user?: string | null
-  api_role?: string | null
-  service_specific_data: Record<string, any>
+const BlockField = ({ config, data, enrichedData, filterFields, table }) => {
+  // Check if field is filterable
+  const filterField = filterFields.find((field) => field.value === config.id)
+  const isFilterable = !!filterField
+
+  if (isFilterable) {
+    return (
+      <DataTableSheetRowAction
+        fieldValue={config.id}
+        filterFields={filterFields}
+        value={stringValue}
+        table={table}
+        className="hover:bg-accent/50 cursor-pointer" // Full row clickable
+      >
+        {fieldContent}
+      </DataTableSheetRowAction>
+    )
+  }
+  // ... non-filterable display
 }
 ```
 
-### Block Data Requirements
+### Filterable Fields
 
-**Data Sourcing Strategy:**
+Fields that match existing `filterFields` become clickable with right-click context menus:
 
-- **Base Data**: Available immediately from `selectedRow` (main logs table data)
-- **Enriched Data**: Fetched via service flow query for additional service-specific details
-- **Note**: Current service flow query is minimal - will be expanded to include more enrichment data
+- **host** → Input filter
+- **pathname** → Input filter
+- **method** → Checkbox filter
+- **status** → Checkbox filter
+- **date** → Time range filter
 
-**OriginBlock Data:**
+## Future Enhancements
 
-- Region/continent _(enriched - from edge log metadata)_
-- Timestamp _(base - from selectedRow.timestamp)_
-- Overall request status _(base - from selectedRow.status)_
+### Phase 1: User Agent Parsing & Icons 🎯
 
-**NetworkBlock Data:**
+**Problem**: Raw user agent strings are hard to read
 
-- Request ID _(base - selectedRow.id or enriched)_
-- Path _(base - selectedRow.path/pathname)_
-- Host _(base - selectedRow.host)_
-- User Agent _(enriched - from request headers)_
+```
+"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
+```
 
-**PostgRESTBlock Data:**
+**Solution**: Parse and display with intuitive icons
 
-- SQL Query being executed _(enriched - not in main logs)_
-- Status code _(base - selectedRow.status)_
-- Response time _(enriched - service-specific metrics)_
-- Auth role/user _(base - selectedRow.api_role, selectedRow.auth_user)_
+```typescript
+function parseUserAgent(userAgent: string) {
+  return {
+    type: 'browser' | 'mobile' | 'server' | 'bot',
+    browser: string, // 'Chrome', 'Safari', 'Node.js'
+    os: string, // 'macOS', 'iOS', 'Windows', 'Linux'
+    device: string, // 'Desktop', 'iPhone', 'Android', 'Server'
+    displayName: string, // 'Chrome on macOS', 'Safari on iPhone'
+  }
+}
+```
 
-**PostgresBlock Data:**
+**Display with Icons**:
 
-- Raw SQL query _(enriched - from postgres logs correlation)_
-- Query ID _(enriched - if available)_
-- Execution time _(enriched - from postgres logs)_
-- Database connection info _(enriched - from postgres logs)_
+- 🖥️ Chrome on macOS (browser + desktop)
+- 📱 Safari on iPhone (browser + mobile)
+- ⚙️ Node.js Server (server icon)
+- 🤖 Googlebot (bot icon)
+- 📱 React Native App (mobile app)
 
-## Next Implementation Steps
+**Icon Categories**:
 
-### Phase 1: Block Components (Immediate)
+- **Browsers**: Chrome, Safari, Firefox, Edge logos
+- **Devices**: 🖥️ Desktop, 📱 Phone, 📱 Tablet
+- **Platforms**: 🍎 Apple, 🪟 Windows, 🐧 Linux, ⚙️ Server
+- **Special**: 🤖 Bot, 📱 Mobile App, ⚡ API Client
 
-1. **Create base block component structure**
+**Benefits**: Instantly identify client types for debugging browser-specific, mobile-specific, or server-side issues.
 
-   ```typescript
-   interface ServiceFlowBlockProps {
-     data: any
-     isLoading?: boolean
-     error?: string
-   }
-   ```
-
-2. **Implement the 4 PostgREST blocks:**
-
-   - `MemoizedOriginBlock`
-   - `MemoizedNetworkBlock`
-   - `MemoizedPostgRESTBlock`
-   - `MemoizedPostgresBlock`
-
-3. **Replace JSON display with block layout**
-
-### Phase 2: Data Enhancement (Next)
-
-1. **Expand SQL query to include enrichment data:**
-
-   - Cross-service correlation (PostgREST → Postgres)
-   - Request headers for user agent, region data
-   - Performance metrics and timing data
-   - SQL query extraction from PostgREST/Postgres logs
-
-2. **Implement base + enriched data merging logic**
-3. **Add proper error handling for missing enriched data**
-4. **Handle cases where correlation fails gracefully**
-
-### Phase 3: Polish (Later)
-
-1. **Add click-to-filter functionality** (only for fields that exist in `filterFields`)
-2. **Add loading states per block**
-3. **Add expand/collapse for complex data**
-4. **Add copy-to-clipboard for query text**
-
-### Phase 4: Additional Service Types (Future)
+### Phase 2: Additional Service Types (Next)
 
 1. **Implement auth service flow**
 2. **Implement storage service flow**
 3. **Add service type detection logic**
 
+### Phase 3: Advanced Features (Later)
+
+1. **Geographic visualization** (using lat/lng data)
+2. **Performance timeline** (request → response timing)
+3. **Error correlation** (link errors across service layers)
+4. **Export/share service flow** (for support tickets)
+
 ## Technical Considerations
 
 ### Performance
 
-- All blocks should be memoized to prevent unnecessary re-renders
-- Follow the pattern from `MemoizedDataTableSheetContent`
+- All blocks are memoized to prevent unnecessary re-renders
+- SQL query extracts data once, flattened for easy access
 - Only re-render when data actually changes
 
 ### Error Handling
 
-- Each block should handle missing data gracefully
-- Show "Data not available" states
-- Don't break the entire flow if one service layer fails
+- Each block handles missing data gracefully (shows "N/A")
+- No hardcoded fallback values (removed all fake data)
+- Raw log data available for debugging edge cases
 
 ### Filtering Integration
 
-- Block field items are clickable **only if** that field exists in the existing filter system
-- Need to check each field against `filterFields` to determine if it should be clickable
-- Fields like status code, host, method, Request ID are likely filterable
-- Timestamps might be filterable (e.g., set time range filters)
-- Actual filterability depends on what's available in the existing `filterFields` system
-- Integration should use existing filter mechanisms, not create new ones
+- Block fields are clickable only if they exist in `filterFields`
+- Uses existing `DataTableSheetRowAction` component
+- Full row hover/click states for better UX
+- Integrates with existing filter mechanisms
 
 ### Extensibility
 
-- Design blocks to be reusable across service types
-- Keep service-specific logic contained within blocks
-- Make it easy to add new service types
+- Blocks designed to be reusable across service types
+- Service-specific logic contained within blocks
+- Easy to add new service types via configuration
 
 ## Files Modified
 
@@ -281,6 +319,7 @@ interface UnifiedLogInspectionEntry {
 - `apps/studio/components/interfaces/UnifiedLogs/UnifiedLogs.tsx` - Integration point
 - `apps/studio/data/logs/unified-log-inspection-query.ts` - React Query hook
 - `apps/studio/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql.ts` - SQL queries
+- `apps/studio/components/interfaces/UnifiedLogs/ServiceFlow/ServiceFlowBlocks.tsx` - Block components
 
 ### Supporting Files
 
@@ -289,30 +328,32 @@ interface UnifiedLogInspectionEntry {
 
 ## Key Lessons Learned
 
-1. **Don't manually create timestamps** - Use existing search parameters that contain user's date filters
-2. **Exclude logId from main query params** - Prevents infinite re-renders
-3. **Follow existing patterns** - Use same timestamp logic as `getUnifiedLogsISOStartEnd()`
-4. **Use POST with body for complex queries** - Follow `unified-logs-infinite-query` pattern
-5. **Real log IDs vs fabricated UUIDs** - Handle the workaround for repeated logs issue
+1. **Flatten data in SQL, not in components** - Better performance and simpler access patterns
+2. **No hardcoded fallbacks** - Show real data or "N/A", never fake data
+3. **Integrate with existing systems** - Reuse filtering infrastructure instead of rebuilding
+4. **Separate timeline markers from service blocks** - Different components for different purposes
+5. **Extract meaningful field names** - `client.country` not `cf.country`
+6. **Include raw data for debugging** - Power users need access to complete log structure
 
 ## Success Criteria
 
 ✅ **Phase 1 Complete When:**
 
-- Service Flow tab shows blocks instead of JSON
-- Each block displays appropriate data
-- No performance regressions
-- Proper loading/error states
+- Service Flow tab shows blocks with real data
+- Filtering integration works (clickable fields)
+- No hardcoded values, all real data
+- Raw log data available for debugging
+- Performance optimized with memoization
 
-**Phase 2 Complete When:**
+🎯 **User Agent Enhancement Complete When:**
 
-- Data correlation works reliably
-- Missing data handled gracefully
-- Query returns structured data for all blocks
+- User agents display as clean text with icons
+- Easy to identify client types at a glance
+- Icons help distinguish browser/mobile/server requests
 
 **Full Feature Complete When:**
 
 - Multiple service types supported
-- Click-to-filter functionality
-- Professional UI matching design mockups
-- Comprehensive error handling
+- Geographic and performance visualizations
+- Export/sharing capabilities
+- Comprehensive debugging toolkit

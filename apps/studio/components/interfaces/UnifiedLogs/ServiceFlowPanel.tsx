@@ -87,6 +87,16 @@ export function ServiceFlowPanel({
   console.log('🔍 selectedRow.id value:', selectedRow?.id, 'type:', typeof selectedRow?.id)
   console.log('🔍 realLogId value:', selectedRow?.log_id, 'type:', typeof selectedRow?.log_id)
 
+  // Log the enriched service flow data
+  if (serviceFlowData?.result?.[0]) {
+    console.log('📋 Service Flow Enriched Data:', serviceFlowData.result[0])
+  }
+
+  // Log the raw log data if available
+  if (serviceFlowData?.result?.[0]?.raw_log_data) {
+    console.log('🗂️ Complete Raw Log Data:', serviceFlowData.result[0].raw_log_data)
+  }
+
   if (selectedRowKey) {
     return (
       <>
