@@ -45,6 +45,7 @@
       "env": [
         "ANALYZE",
         "NEXT_PUBLIC_SUPPORT_API_URL",
+        "NEXT_PUBLIC_CONTENT_API_URL",
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_STRIPE_PUBLIC_KEY",
         "NEXT_PUBLIC_SUPPORT_ANON_KEY",
@@ -88,6 +89,9 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "AWS_BEDROCK_REGION",
+        "AWS_BEDROCK_PROFILE",
+        "AWS_BEDROCK_ROLE_ARN",
         "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
         "FORCE_ASSET_CDN",

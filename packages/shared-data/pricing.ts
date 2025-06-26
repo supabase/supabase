@@ -175,8 +175,8 @@ export const pricing: Pricing = {
         title: 'Branching',
         plans: {
           free: false,
-          pro: '$0.32 per branch, per day',
-          team: '$0.32 per branch, per day',
+          pro: '$0.01344 per branch, per hour',
+          team: '$0.01344 per branch, per hour',
           enterprise: 'Custom',
         },
         usage_based: true,

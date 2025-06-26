@@ -21,6 +21,11 @@ const SUPABASE_DOCS_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
   : ''
 
+// Needed to test docs content API in local dev
+const SUPABASE_CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_CONTENT_API_URL).origin
+  : ''
+
 const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
 const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
 const SUPABASE_COM_URL = 'https://supabase.com'
@@ -147,6 +152,7 @@ module.exports.getCSP = function getCSP() {
           SUPABASE_STAGING_PROJECTS_URL_WS,
           VERCEL_LIVE_URL,
           SUPABASE_DOCS_PROJECT_URL,
+          SUPABASE_CONTENT_API_URL,
         ]
       : []),
     PUSHER_URL_WS,
