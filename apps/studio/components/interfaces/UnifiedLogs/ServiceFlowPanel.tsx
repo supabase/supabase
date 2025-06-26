@@ -18,11 +18,11 @@ import { sheetFields } from './UnifiedLogs.fields'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta } from './UnifiedLogs.types'
 import {
-  MemoizedOriginBlock,
+  MemoizedRequestStartedBlock,
   MemoizedNetworkBlock,
   MemoizedPostgRESTBlock,
   MemoizedPostgresBlock,
-  MemoizedResponseBlock,
+  MemoizedResponseCompletedBlock,
 } from './ServiceFlow/ServiceFlowBlocks'
 
 interface ServiceFlowPanelProps {
@@ -144,22 +144,22 @@ export function ServiceFlowPanel({
                               ` (${serviceFlowData.result.length} enriched)`}
                           </div>
 
-                          <MemoizedOriginBlock
-                            data={selectedRow}
-                            enrichedData={serviceFlowData?.result?.[0]}
-                            isLoading={isLoading}
-                          />
+                          <MemoizedRequestStartedBlock data={selectedRow} />
 
                           <MemoizedNetworkBlock
                             data={selectedRow}
                             enrichedData={serviceFlowData?.result?.[0]}
                             isLoading={isLoading}
+                            filterFields={filterFields}
+                            table={table}
                           />
 
                           <MemoizedPostgRESTBlock
                             data={selectedRow}
                             enrichedData={serviceFlowData?.result?.[0]}
                             isLoading={isLoading}
+                            filterFields={filterFields}
+                            table={table}
                           />
 
                           <MemoizedPostgresBlock
@@ -167,9 +167,11 @@ export function ServiceFlowPanel({
                             enrichedData={serviceFlowData?.result?.[0]}
                             isLoading={isLoading}
                             isLast={false}
+                            filterFields={filterFields}
+                            table={table}
                           />
 
-                          <MemoizedResponseBlock data={selectedRow} />
+                          <MemoizedResponseCompletedBlock data={selectedRow} />
                         </>
                       )}
                     </div>

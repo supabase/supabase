@@ -1,6 +1,9 @@
 import { memo } from 'react'
 import { Badge, Skeleton, cn } from 'ui'
 import { Clock, Globe, Database, Server } from 'lucide-react'
+import { Table } from '@tanstack/react-table'
+import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
+import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
 
 interface ServiceFlowBlockProps {
   data: any
@@ -8,13 +11,14 @@ interface ServiceFlowBlockProps {
   isLoading?: boolean
   error?: string
   isLast?: boolean
+  filterFields: DataTableFilterField<any>[]
+  table: Table<any>
 }
 
 interface BlockFieldConfig {
   id: string
   label: string
   getValue: (data: any, enrichedData?: any) => string | number | null | undefined
-  isClickable?: boolean
   skeletonClassName?: string
   requiresEnrichedData?: boolean
 }
@@ -24,17 +28,29 @@ interface BlockFieldProps {
   data: any
   enrichedData?: any
   isLoading?: boolean
-  onClick?: () => void
+  filterFields: DataTableFilterField<any>[]
+  table: Table<any>
 }
 
-const BlockField = ({ config, data, enrichedData, isLoading, onClick }: BlockFieldProps) => {
+const BlockField = ({
+  config,
+  data,
+  enrichedData,
+  isLoading,
+  filterFields,
+  table,
+}: BlockFieldProps) => {
   const value = config.getValue(data, enrichedData)
   const displayValue = value ?? 'N/A'
+  const stringValue = String(displayValue)
 
   const shouldShowSkeleton = config.requiresEnrichedData && isLoading && !value
 
-  return (
-    <div className="flex justify-between items-center py-1">
+  const filterField = filterFields.find((field) => field.value === config.id)
+  const isFilterable = !!filterField
+
+  const fieldContent = (
+    <>
       <dt className="text-[13.5px] text-foreground-light">{config.label}</dt>
       <dd className="text-right">
         {shouldShowSkeleton ? (
@@ -42,16 +58,31 @@ const BlockField = ({ config, data, enrichedData, isLoading, onClick }: BlockFie
         ) : (
           <span
             className={`text-sm font-mono ${
-              config.isClickable ? 'text-brand cursor-pointer hover:underline' : 'text-foreground'
+              isFilterable ? 'text-foreground cursor-pointer hover:underline' : 'text-foreground'
             } ${displayValue === 'N/A' ? 'text-foreground-light' : ''}`}
-            onClick={config.isClickable ? onClick : undefined}
           >
             {displayValue}
           </span>
         )}
       </dd>
-    </div>
+    </>
   )
+
+  if (isFilterable && !shouldShowSkeleton && displayValue !== 'N/A') {
+    return (
+      <DataTableSheetRowAction
+        fieldValue={config.id}
+        filterFields={filterFields}
+        value={stringValue}
+        table={table}
+        className="flex justify-between items-center py-1 px-2  rounded hover:bg-accent/50 cursor-pointer w-full hover:bg-surface-400"
+      >
+        {fieldContent}
+      </DataTableSheetRowAction>
+    )
+  }
+
+  return <div className="flex justify-between items-center py-1 px-2">{fieldContent}</div>
 }
 
 const TimelineStep = ({
@@ -134,7 +165,7 @@ const TimelineStep = ({
       {/* Main section box */}
       <div className={cn(' border rounded-b', hasError ? 'border-destructive' : 'border-border')}>
         {/* Content */}
-        <dl className="space-y-0 divide-y px-3 py-2 bg-surface-100/50">{children}</dl>
+        <dl className="space-y-0 divide-y px-1 py-1 bg-surface-100/50">{children}</dl>
         {/* Timeline connector and completion time - only if not last */}
         {/* {!isLast && (
           <div className="px-3 border-t py-0.5">
@@ -151,10 +182,10 @@ const TimelineStep = ({
   </>
 )
 
-// Field configurations - simplified to match the design
+// Field configurations - using filterable field IDs where possible
 const originFields: BlockFieldConfig[] = [
   {
-    id: 'time',
+    id: 'date', // Matches filterFields 'date' (timerange) - FILTERABLE
     label: 'Time',
     getValue: (data) => {
       if (!data?.timestamp && !data?.date) return null
@@ -170,33 +201,33 @@ const originFields: BlockFieldConfig[] = [
 
 const networkFields: BlockFieldConfig[] = [
   {
-    id: 'user_agent',
-    label: 'User Agent',
-    getValue: (data, enrichedData) => {
-      const ua = enrichedData?.user_agent || data?.user_agent
-      return ua ? `v${ua.split('/')[1]?.split(' ')[0] || ua}` : 'v2.45'
-    },
-    requiresEnrichedData: true,
+    id: 'host', // Matches filterFields 'host' (input) - FILTERABLE
+    label: 'Host',
+    getValue: (data, enrichedData) => enrichedData?.host || data?.host || 'supabase.co',
   },
   {
-    id: 'library',
-    label: 'Library',
-    getValue: (data, enrichedData) => {
-      const ua = enrichedData?.user_agent || data?.user_agent
-      if (ua?.includes('supabase-js')) return 'supabase-js v2.45'
-      return 'supabase-js v2.45'
-    },
-    requiresEnrichedData: true,
+    id: 'pathname', // Matches filterFields 'pathname' (input) - FILTERABLE
+    label: 'Path',
+    getValue: (data, enrichedData) => enrichedData?.pathname || data?.pathname || '/rest/v1/todos',
   },
   {
-    id: 'authorization',
-    label: 'Authorization',
-    getValue: (data) =>
-      data?.api_role === 'anon' ? 'PUBLIC API KEY' : data?.api_role || 'PUBLIC API KEY',
+    id: 'method', // Matches filterFields 'method' (checkbox) - FILTERABLE
+    label: 'Method',
+    getValue: (data, enrichedData) => enrichedData?.method || data?.method || 'GET',
+  },
+  {
+    id: 'auth_user', // Matches filterFields 'auth_user' (input) - FILTERABLE
+    label: 'User',
+    getValue: (data, enrichedData) => enrichedData?.auth_user || data?.auth_user || null,
   },
 ]
 
 const postgrestFields: BlockFieldConfig[] = [
+  {
+    id: 'status', // Matches filterFields 'status' (checkbox) - FILTERABLE
+    label: 'Status',
+    getValue: (data, enrichedData) => enrichedData?.status || data?.status || '200',
+  },
   {
     id: 'message',
     label: 'Message',
@@ -247,91 +278,108 @@ const postgresFields: BlockFieldConfig[] = [
   },
 ]
 
-// Request Started
-export const OriginBlock = memo(({ data, enrichedData, isLoading }: ServiceFlowBlockProps) => {
+// Request Started - Simple timeline marker
+export const RequestStartedBlock = memo(({ data }: { data: any }) => {
+  const timestamp = data?.timestamp || data?.date
+  const formattedTime = timestamp ? new Date(timestamp).toLocaleString() : 'Unknown time'
+
   return (
-    <TimelineStep title="Request started" completionTime="2ms">
-      {originFields.map((field) => (
-        <BlockField
-          key={field.id}
-          config={field}
-          data={data}
-          enrichedData={enrichedData}
-          isLoading={isLoading}
-        />
-      ))}
+    <TimelineStep title="Request started" completionTime="0ms">
+      <div className="text-sm text-foreground-light py-2">Request initiated at {formattedTime}</div>
     </TimelineStep>
   )
 })
 
 // Network/Cloudflare
-export const NetworkBlock = memo(({ data, enrichedData, isLoading }: ServiceFlowBlockProps) => {
-  return (
-    <TimelineStep title="Network" statusText="CLOUDFLARE" completionTime="2ms">
-      {networkFields.map((field) => (
-        <BlockField
-          key={field.id}
-          config={field}
-          data={data}
-          enrichedData={enrichedData}
-          isLoading={isLoading}
-        />
-      ))}
-    </TimelineStep>
-  )
-})
+export const NetworkBlock = memo(
+  ({ data, enrichedData, isLoading, filterFields, table }: ServiceFlowBlockProps) => {
+    return (
+      <TimelineStep title="Network" statusText="CLOUDFLARE" completionTime="2ms">
+        {networkFields.map((field) => (
+          <BlockField
+            key={field.id}
+            config={field}
+            data={data}
+            enrichedData={enrichedData}
+            isLoading={isLoading}
+            filterFields={filterFields}
+            table={table}
+          />
+        ))}
+      </TimelineStep>
+    )
+  }
+)
 
 // PostgREST
-export const PostgRESTBlock = memo(({ data, enrichedData, isLoading }: ServiceFlowBlockProps) => {
-  const hasError = data?.status && Number(data.status) >= 400
+export const PostgRESTBlock = memo(
+  ({ data, enrichedData, isLoading, filterFields, table }: ServiceFlowBlockProps) => {
+    const hasError = data?.status && Number(data.status) >= 400
 
-  return (
-    <TimelineStep title="PostgREST" status={data?.status} completionTime="2ms" hasError={hasError}>
-      {postgrestFields.map((field) => (
-        <BlockField
-          key={field.id}
-          config={field}
-          data={data}
-          enrichedData={enrichedData}
-          isLoading={isLoading}
-        />
-      ))}
+    return (
+      <TimelineStep
+        title="PostgREST"
+        status={data?.status}
+        completionTime="2ms"
+        hasError={hasError}
+      >
+        {postgrestFields.map((field) => (
+          <BlockField
+            key={field.id}
+            config={field}
+            data={data}
+            enrichedData={enrichedData}
+            isLoading={isLoading}
+            filterFields={filterFields}
+            table={table}
+          />
+        ))}
 
-      {hasError && (
-        <>
-          <div className="flex justify-between items-center py-1">
-            <dt className="text-xs text-foreground-light uppercase tracking-wide">Error Code</dt>
-            <dd className="text-right">
-              <span className="text-sm font-mono text-foreground">POSTGREST 54*</span>
-            </dd>
-          </div>
-          <div className="flex justify-between items-center py-1">
-            <dt className="text-xs text-foreground-light uppercase tracking-wide">Error Message</dt>
-            <dd className="text-right">
-              <span className="text-sm font-mono text-foreground">"too complex"</span>
-            </dd>
-          </div>
-          <div className="flex justify-between items-center py-1">
-            <dt className="text-xs text-foreground-light uppercase tracking-wide">Details</dt>
-            <dd className="text-right">
-              <span className="text-sm font-mono text-foreground-light">N/A</span>
-            </dd>
-          </div>
-          <div className="flex justify-between items-center py-1">
-            <dt className="text-xs text-foreground-light uppercase tracking-wide">Hint</dt>
-            <dd className="text-right">
-              <span className="text-sm font-mono text-foreground-light">N/A</span>
-            </dd>
-          </div>
-        </>
-      )}
-    </TimelineStep>
-  )
-})
+        {hasError && (
+          <>
+            <div className="flex justify-between items-center py-1">
+              <dt className="text-xs text-foreground-light uppercase tracking-wide">Error Code</dt>
+              <dd className="text-right">
+                <span className="text-sm font-mono text-foreground">POSTGREST 54*</span>
+              </dd>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <dt className="text-xs text-foreground-light uppercase tracking-wide">
+                Error Message
+              </dt>
+              <dd className="text-right">
+                <span className="text-sm font-mono text-foreground">"too complex"</span>
+              </dd>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <dt className="text-xs text-foreground-light uppercase tracking-wide">Details</dt>
+              <dd className="text-right">
+                <span className="text-sm font-mono text-foreground-light">N/A</span>
+              </dd>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <dt className="text-xs text-foreground-light uppercase tracking-wide">Hint</dt>
+              <dd className="text-right">
+                <span className="text-sm font-mono text-foreground-light">N/A</span>
+              </dd>
+            </div>
+          </>
+        )}
+      </TimelineStep>
+    )
+  }
+)
 
 // Postgres
 export const PostgresBlock = memo(
-  ({ data, enrichedData, isLoading, isLast = true }: ServiceFlowBlockProps) => {
+  ({
+    data,
+    enrichedData,
+    isLoading,
+    isLast = true,
+    filterFields,
+    table,
+  }: ServiceFlowBlockProps) => {
     const hasError = data?.status && Number(data.status) >= 400
     const isSkipped = hasError
 
@@ -352,6 +400,8 @@ export const PostgresBlock = memo(
               data={data}
               enrichedData={enrichedData}
               isLoading={isLoading}
+              filterFields={filterFields}
+              table={table}
             />
           ))}
 
@@ -363,33 +413,34 @@ export const PostgresBlock = memo(
   }
 )
 
-// Response (final step)
-export const ResponseBlock = memo(({ data }: { data: any }) => {
+// Response (final step) - Simple completion marker
+export const ResponseCompletedBlock = memo(({ data }: { data: any }) => {
   const hasError = data?.status && Number(data.status) >= 400
+  const responseTime = data?.response_time_ms || data?.duration_ms || '2'
 
   return (
     <TimelineStep title="Response" status={data?.status} isLast={true} hasError={hasError}>
-      <div className="text-sm text-foreground-light">
-        {hasError ? 'Error response sent to client' : 'Response sent to client'}
+      <div className="text-sm text-foreground-light py-2">
+        {hasError
+          ? `Error response sent to client in ${responseTime}ms`
+          : `Response sent to client in ${responseTime}ms`}
       </div>
     </TimelineStep>
   )
 })
 
 // Memoized exports
-export const MemoizedOriginBlock = memo(OriginBlock, (prev, next) => {
-  return (
-    prev.data === next.data &&
-    prev.enrichedData === next.enrichedData &&
-    prev.isLoading === next.isLoading
-  )
-}) as typeof OriginBlock
+export const MemoizedRequestStartedBlock = memo(RequestStartedBlock, (prev, next) => {
+  return prev.data === next.data
+}) as typeof RequestStartedBlock
 
 export const MemoizedNetworkBlock = memo(NetworkBlock, (prev, next) => {
   return (
     prev.data === next.data &&
     prev.enrichedData === next.enrichedData &&
-    prev.isLoading === next.isLoading
+    prev.isLoading === next.isLoading &&
+    prev.filterFields === next.filterFields &&
+    prev.table === next.table
   )
 }) as typeof NetworkBlock
 
@@ -397,7 +448,9 @@ export const MemoizedPostgRESTBlock = memo(PostgRESTBlock, (prev, next) => {
   return (
     prev.data === next.data &&
     prev.enrichedData === next.enrichedData &&
-    prev.isLoading === next.isLoading
+    prev.isLoading === next.isLoading &&
+    prev.filterFields === next.filterFields &&
+    prev.table === next.table
   )
 }) as typeof PostgRESTBlock
 
@@ -405,10 +458,12 @@ export const MemoizedPostgresBlock = memo(PostgresBlock, (prev, next) => {
   return (
     prev.data === next.data &&
     prev.enrichedData === next.enrichedData &&
-    prev.isLoading === next.isLoading
+    prev.isLoading === next.isLoading &&
+    prev.filterFields === next.filterFields &&
+    prev.table === next.table
   )
 }) as typeof PostgresBlock
 
-export const MemoizedResponseBlock = memo(ResponseBlock, (prev, next) => {
+export const MemoizedResponseCompletedBlock = memo(ResponseCompletedBlock, (prev, next) => {
   return prev.data === next.data
-}) as typeof ResponseBlock
+}) as typeof ResponseCompletedBlock
