@@ -113,7 +113,7 @@ const AuthUsage = () => {
       </div>
       <section className="relative pt-16 -mt-2">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+          <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
