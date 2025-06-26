@@ -203,22 +203,22 @@ const networkFields: BlockFieldConfig[] = [
   {
     id: 'host', // Matches filterFields 'host' (input) - FILTERABLE
     label: 'Host',
-    getValue: (data, enrichedData) => enrichedData?.host || data?.host || 'supabase.co',
+    getValue: (data, enrichedData) => enrichedData?.host || data?.host,
   },
   {
     id: 'pathname', // Matches filterFields 'pathname' (input) - FILTERABLE
     label: 'Path',
-    getValue: (data, enrichedData) => enrichedData?.pathname || data?.pathname || '/rest/v1/todos',
+    getValue: (data, enrichedData) => enrichedData?.pathname || data?.pathname,
   },
   {
     id: 'method', // Matches filterFields 'method' (checkbox) - FILTERABLE
     label: 'Method',
-    getValue: (data, enrichedData) => enrichedData?.method || data?.method || 'GET',
+    getValue: (data, enrichedData) => enrichedData?.method || data?.method,
   },
   {
     id: 'auth_user', // Matches filterFields 'auth_user' (input) - FILTERABLE
     label: 'User',
-    getValue: (data, enrichedData) => enrichedData?.auth_user || data?.auth_user || null,
+    getValue: (data, enrichedData) => enrichedData?.auth_user || data?.auth_user,
   },
 ]
 
@@ -226,12 +226,12 @@ const postgrestFields: BlockFieldConfig[] = [
   {
     id: 'status', // Matches filterFields 'status' (checkbox) - FILTERABLE
     label: 'Status',
-    getValue: (data, enrichedData) => enrichedData?.status || data?.status || '200',
+    getValue: (data, enrichedData) => enrichedData?.status || data?.status,
   },
   {
     id: 'message',
     label: 'Message',
-    getValue: (data, enrichedData) => enrichedData?.message || 'N/A',
+    getValue: (data, enrichedData) => enrichedData?.message,
     requiresEnrichedData: true,
   },
 ]
@@ -241,7 +241,7 @@ const postgresFields: BlockFieldConfig[] = [
     id: 'run_statement',
     label: 'Run statement',
     getValue: (data, enrichedData) =>
-      enrichedData?.statement_count ? `${enrichedData.statement_count} spans` : '60 spans',
+      enrichedData?.statement_count ? `${enrichedData.statement_count} spans` : null,
     requiresEnrichedData: true,
   },
   {
@@ -249,31 +249,32 @@ const postgresFields: BlockFieldConfig[] = [
     label: 'Execution time',
     getValue: (data, enrichedData) => {
       const time = enrichedData?.execution_time || enrichedData?.query_duration
-      return time ? `${time}s` : '0.4s'
+      return time ? `${time}s` : null
     },
     requiresEnrichedData: true,
   },
   {
     id: 'postgres_version',
     label: 'Postgres version',
-    getValue: (data, enrichedData) => enrichedData?.postgres_version || '16.2.1',
+    getValue: (data, enrichedData) => enrichedData?.postgres_version,
     requiresEnrichedData: true,
   },
   {
     id: 'environment',
     label: 'Environment',
-    getValue: () => 'Production',
+    getValue: (data, enrichedData) => enrichedData?.environment,
+    requiresEnrichedData: true,
   },
   {
     id: 'region',
     label: 'Region',
-    getValue: (data, enrichedData) => enrichedData?.region || 'us-west-1',
+    getValue: (data, enrichedData) => enrichedData?.region,
     requiresEnrichedData: true,
   },
   {
     id: 'memory_used',
     label: 'Estimated memory used',
-    getValue: (data, enrichedData) => enrichedData?.memory_used || 'N/A',
+    getValue: (data, enrichedData) => enrichedData?.memory_used,
     requiresEnrichedData: true,
   },
 ]
@@ -281,11 +282,13 @@ const postgresFields: BlockFieldConfig[] = [
 // Request Started - Simple timeline marker
 export const RequestStartedBlock = memo(({ data }: { data: any }) => {
   const timestamp = data?.timestamp || data?.date
-  const formattedTime = timestamp ? new Date(timestamp).toLocaleString() : 'Unknown time'
+  const formattedTime = timestamp ? new Date(timestamp).toLocaleString() : null
 
   return (
-    <TimelineStep title="Request started" completionTime="0ms">
-      <div className="text-sm text-foreground-light py-2">Request initiated at {formattedTime}</div>
+    <TimelineStep title="Request started">
+      <div className="text-sm text-foreground-light py-2">
+        {formattedTime ? `Request initiated at ${formattedTime}` : 'Request initiated'}
+      </div>
     </TimelineStep>
   )
 })
@@ -294,7 +297,7 @@ export const RequestStartedBlock = memo(({ data }: { data: any }) => {
 export const NetworkBlock = memo(
   ({ data, enrichedData, isLoading, filterFields, table }: ServiceFlowBlockProps) => {
     return (
-      <TimelineStep title="Network" statusText="CLOUDFLARE" completionTime="2ms">
+      <TimelineStep title="Network">
         {networkFields.map((field) => (
           <BlockField
             key={field.id}
@@ -317,12 +320,7 @@ export const PostgRESTBlock = memo(
     const hasError = data?.status && Number(data.status) >= 400
 
     return (
-      <TimelineStep
-        title="PostgREST"
-        status={data?.status}
-        completionTime="2ms"
-        hasError={hasError}
-      >
+      <TimelineStep title="PostgREST" status={data?.status} hasError={hasError}>
         {postgrestFields.map((field) => (
           <BlockField
             key={field.id}
@@ -336,34 +334,9 @@ export const PostgRESTBlock = memo(
         ))}
 
         {hasError && (
-          <>
-            <div className="flex justify-between items-center py-1">
-              <dt className="text-xs text-foreground-light uppercase tracking-wide">Error Code</dt>
-              <dd className="text-right">
-                <span className="text-sm font-mono text-foreground">POSTGREST 54*</span>
-              </dd>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <dt className="text-xs text-foreground-light uppercase tracking-wide">
-                Error Message
-              </dt>
-              <dd className="text-right">
-                <span className="text-sm font-mono text-foreground">"too complex"</span>
-              </dd>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <dt className="text-xs text-foreground-light uppercase tracking-wide">Details</dt>
-              <dd className="text-right">
-                <span className="text-sm font-mono text-foreground-light">N/A</span>
-              </dd>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <dt className="text-xs text-foreground-light uppercase tracking-wide">Hint</dt>
-              <dd className="text-right">
-                <span className="text-sm font-mono text-foreground-light">N/A</span>
-              </dd>
-            </div>
-          </>
+          <div className="text-sm text-foreground-light py-2 italic">
+            Error occurred in PostgREST layer
+          </div>
         )}
       </TimelineStep>
     )
@@ -386,9 +359,8 @@ export const PostgresBlock = memo(
     return (
       <TimelineStep
         title="Postgres"
-        status={isSkipped ? undefined : data?.status || 200}
+        status={isSkipped ? undefined : data?.status}
         statusText={isSkipped ? 'SKIPPED' : undefined}
-        completionTime={isSkipped ? undefined : '2ms'}
         isLast={isLast}
         hasError={false}
       >
@@ -416,14 +388,18 @@ export const PostgresBlock = memo(
 // Response (final step) - Simple completion marker
 export const ResponseCompletedBlock = memo(({ data }: { data: any }) => {
   const hasError = data?.status && Number(data.status) >= 400
-  const responseTime = data?.response_time_ms || data?.duration_ms || '2'
+  const responseTime = data?.response_time_ms || data?.duration_ms
 
   return (
     <TimelineStep title="Response" status={data?.status} isLast={true} hasError={hasError}>
       <div className="text-sm text-foreground-light py-2">
         {hasError
-          ? `Error response sent to client in ${responseTime}ms`
-          : `Response sent to client in ${responseTime}ms`}
+          ? responseTime
+            ? `Error response sent to client in ${responseTime}ms`
+            : 'Error response sent to client'
+          : responseTime
+            ? `Response sent to client in ${responseTime}ms`
+            : 'Response sent to client'}
       </div>
     </TimelineStep>
   )
