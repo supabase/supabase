@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
@@ -7,19 +7,16 @@ import { useParams } from 'common'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
-import { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { getAuthReportAttributes } from 'data/reports/auth-charts'
 
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import type { NextPageWithLayout } from 'types'
 
 const AuthReport: NextPageWithLayout = () => {
@@ -159,15 +156,13 @@ const AuthUsage = () => {
         <div className="grid grid-cols-1 gap-4">
           {dateRange &&
             AUTH_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
-              <ComposedChartHandler
+              <ReportChart
                 key={`${attr.id}-${i}`}
-                {...attr}
-                attributes={attr.attributes as MultiAttribute[]}
+                chart={attr}
                 interval={dateRange.interval}
                 startDate={dateRange?.period_start?.date}
                 endDate={dateRange?.period_end?.date}
                 updateDateRange={updateDateRange}
-                defaultChartStyle={attr.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
               />
             ))}
         </div>

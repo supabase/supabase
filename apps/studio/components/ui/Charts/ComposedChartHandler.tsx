@@ -1,5 +1,11 @@
-import React, { PropsWithChildren, useState, useMemo, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
+/**
+ * ComposedChartHandler
+ *
+ * A presentational component for rendering charts.
+ * It is responsible only for rendering the chart UI based on the data and loading state passed to it as props.
+ * All the complex data fetching logic has been moved to the useChartData hook.
+ */
+import React, { PropsWithChildren, useState, useEffect, useRef } from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn, WarningIcon } from 'ui'
 
@@ -11,10 +17,8 @@ import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
 import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
 import { getMockDataForAttribute } from 'data/reports/auth-charts'
-import { useAuthLogsReport } from 'data/reports/auth-report-query'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
@@ -94,9 +98,6 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
 const ComposedChartHandler = ({
   label,
   attributes,
-  startDate,
-  endDate,
-  interval,
   customDateFormat,
   children = null,
   defaultChartStyle = 'bar',
@@ -112,158 +113,14 @@ const ComposedChartHandler = ({
   showTotal,
   updateDateRange,
   valuePrecision,
-  isVisible = true,
   titleTooltip,
   id,
   ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const state = useDatabaseSelectorStateSnapshot()
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const chartHighlight = useChartHighlight()
 
-  const logsAttributes = attributes.filter((attr) => attr.provider === 'logs')
-  const nonLogsAttributes = attributes.filter((attr) => attr.provider !== 'logs')
-
-  const {
-    data: logsData,
-    attributes: logsChartAttributes,
-    isLoading: isLogsLoading,
-  } = useAuthLogsReport({
-    projectRef: ref as string,
-    attributes: logsAttributes,
-    startDate,
-    endDate,
-    interval: interval as AnalyticsInterval,
-    enabled: logsAttributes.length > 0,
-  })
-
-  const chartAttributes = useMemo(
-    () => nonLogsAttributes.concat(logsChartAttributes || []),
-    [nonLogsAttributes, logsChartAttributes]
-  )
-
-  const databaseIdentifier = state.selectedDatabaseId
-
-  // Use the custom hook at the top level of the component
-  const attributeQueries = useAttributeQueries(
-    attributes,
-    ref,
-    startDate,
-    endDate,
-    interval as AnalyticsInterval,
-    databaseIdentifier,
-    data,
-    isVisible
-  )
-
-  // Combine all the data into a single dataset
-  const combinedData = useMemo(() => {
-    if (data) return data
-
-    const regularAttributeQueries = attributeQueries.filter(
-      (q) => q.data?.provider !== 'logs' && q.data?.provider !== 'reference-line'
-    )
-    const isLoading = isLogsLoading || regularAttributeQueries.some((query: any) => query.isLoading)
-    if (isLoading) {
-      return undefined
-    }
-
-    const hasError = regularAttributeQueries.some((query: any) => !query.data)
-    if (hasError) {
-      return undefined
-    }
-
-    // Get all unique timestamps from all datasets
-    const timestamps = new Set<string>()
-    if (logsData) {
-      logsData.forEach((point: any) => {
-        if (point?.period_start) {
-          timestamps.add(point.period_start)
-        }
-      })
-    }
-    regularAttributeQueries.forEach((query: any) => {
-      query.data?.data?.forEach((point: any) => {
-        if (point?.period_start) {
-          timestamps.add(point.period_start)
-        }
-      })
-    })
-
-    const referenceLineQueries = attributeQueries.filter(
-      (q) => q.data?.provider === 'reference-line'
-    )
-
-    // Combine data points for each timestamp
-    const combined = Array.from(timestamps)
-      .sort()
-      .map((timestamp) => {
-        const point: any = { period_start: timestamp }
-
-        const logPoint = logsData?.find((p: any) => p.period_start === timestamp) || {}
-        Object.assign(point, logPoint)
-
-        chartAttributes.forEach((attr) => {
-          if (!attr) return
-          if (attr.provider === 'logs') return
-          if (attr.provider === 'reference-line') return
-          if (attr.customValue !== undefined) {
-            point[attr.attribute] = attr.customValue
-            return
-          }
-
-          const query = regularAttributeQueries.find((q) => q.data?.attribute === attr.attribute)
-          const matchingPoint = query?.data?.data?.find((p: any) => p.period_start === timestamp)
-          point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
-        })
-
-        // Add reference line values for each timestamp
-        referenceLineQueries.forEach((query: any) => {
-          const attr = query.data.attribute
-          const value = query.data.total
-          point[attr] = value
-        })
-
-        return point as DataPoint
-      })
-
-    return combined as DataPoint[]
-  }, [data, attributeQueries, attributes, chartAttributes, isLogsLoading, logsData])
-
-  const loading =
-    isLoading || isLogsLoading || attributeQueries.some((query: any) => query.isLoading)
-
-  // Calculate highlighted value based on the first attribute's data
-  const _highlightedValue = useMemo(() => {
-    if (highlightedValue !== undefined) return highlightedValue
-
-    const firstAttr = attributes[0]
-    const firstQuery = attributeQueries[0]
-    const firstData = firstQuery?.data
-
-    if (!firstData) return undefined
-
-    const shouldHighlightMaxValue =
-      firstAttr.provider === 'daily-stats' &&
-      !firstAttr.attribute.includes('ingress') &&
-      !firstAttr.attribute.includes('egress') &&
-      'maximum' in firstData
-
-    const shouldHighlightTotalGroupedValue = 'totalGrouped' in firstData
-
-    return shouldHighlightMaxValue
-      ? firstData.maximum
-      : firstAttr.provider === 'daily-stats'
-        ? firstData.total
-        : shouldHighlightTotalGroupedValue
-          ? firstData.totalGrouped?.[firstAttr.attribute as keyof typeof firstData.totalGrouped]
-          : (firstData.data?.[firstData.data?.length - 1] as any)?.[firstAttr.attribute]
-  }, [highlightedValue, attributes, attributeQueries])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Panel
         className={cn(
@@ -280,7 +137,7 @@ const ComposedChartHandler = ({
     )
   }
 
-  if (!combinedData) {
+  if (!data) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
         <WarningIcon />
@@ -301,12 +158,12 @@ const ComposedChartHandler = ({
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
-          attributes={chartAttributes}
-          data={combinedData as DataPoint[]}
+          attributes={attributes}
+          data={data as DataPoint[]}
           format={format}
           xAxisKey="period_start"
           yAxisKey={attributes[0].attribute}
-          highlightedValue={_highlightedValue}
+          highlightedValue={highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
           chartHighlight={chartHighlight}
@@ -327,7 +184,7 @@ const ComposedChartHandler = ({
   )
 }
 
-const useAttributeQueries = (
+export const useAttributeQueries = (
   attributes: MultiAttribute[],
   ref: string | string[] | undefined,
   startDate: string,

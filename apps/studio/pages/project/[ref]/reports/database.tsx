@@ -21,7 +21,6 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
@@ -37,8 +36,8 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import type { NextPageWithLayout } from 'types'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -259,20 +258,13 @@ const DatabaseUsage = () => {
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
               REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
+                <ReportChart
                   key={chart.id}
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={dateRange.interval}
+                  chart={chart}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  interval={dateRange.interval}
                   updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  showMaxValue={
-                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
                 />
               ))}
           </div>
