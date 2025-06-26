@@ -96,9 +96,9 @@ export const RealtimeSettings = () => {
   useEffect(() => {
     // [Joshen] Temp typed with any - API typing marks all the properties as nullable,
     // but checked with Filipe that they're not supposed to
-    if (data) form.reset({ ...data, allow_public: !data.private_only } as any)
-
-    if (data) form.reset({ ...data } as any)
+    if (isSuccess) {
+      form.reset({ ...data, allow_public: !data.private_only } as any)
+    }
   }, [isSuccess])
 
   return (
