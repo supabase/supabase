@@ -11,7 +11,14 @@ import { logsKeys } from './keys'
 
 const LOGS_PAGE_LIMIT = 50
 type LogLevel = 'success' | 'warning' | 'error'
-export const UNIFIED_LOGS_STALE_TIME = 1000 * 60 * 5 // 5 minutes
+
+export const UNIFIED_LOGS_QUERY_OPTIONS = {
+  refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  refetchOnReconnect: false,
+  refetchInterval: 0,
+  staleTime: 1000 * 60 * 5, // 5 minutes,
+}
 
 export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
@@ -26,7 +33,6 @@ export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
     isoTimestampStart = new Date(search.date[0]).toISOString()
     isoTimestampEnd = new Date(search.date[1]).toISOString()
   } else {
-    // Default to last hour
     const now = new Date()
     isoTimestampEnd = now.toISOString()
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
@@ -36,12 +42,6 @@ export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
   return { isoTimestampStart, isoTimestampEnd }
 }
 
-/**
- * Refactor notes
- * - Shouldn't need to handle "direction", we store all data as it gets infinitely feteched
- * - Shouldn't need to handle fetching previous too i think
- */
-
 async function getUnifiedLogs(
   { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam },
   signal?: AbortSignal
@@ -49,62 +49,70 @@ async function getUnifiedLogs(
   if (typeof projectRef === 'undefined')
     throw new Error('projectRef is required for getUnifiedLogs')
 
-  const cursorValue = pageParam?.cursor // Already in microseconds
-  const direction = pageParam?.direction
-  const isPagination = pageParam !== undefined
-  const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
+  /**
+   * [Joshen] RE infinite loading pagination logic for unified logs, these all really should live in the API
+   * but for now we're doing these on the FE to move quickly while figuring out what data we need before we
+   * migrate this logic to the BE. Just thought to leave a small explanation on the logic here:
+   *
+   * We're leveraging on the log's timestamp to essentially fetch the next page
+   * Given that the logs are ordered descending (latest logs come first, and we're fetching older logs as we scroll down)
+   * Hence why the cursor is basically the last row's timestamp from the latest page
+   *
+   * iso_timestamp_start will always be the current timestamp
+   * iso_timestamp_end will default to the last hour for the first page, followed by the last row's timestamp from
+   * the previous page.
+   *
+   * However, just note that this isn't a perfect solution as there's always the edge case where by there's multiple rows
+   * with identical timestamps, hence why FE will need a de-duping logic (in UnifiedLogs.tsx) unless we can figure a cleaner
+   * solution when we move all this logic to the BE (e.g using composite columns for the cursor like timestamp + id)
+   *
+   */
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${LOGS_PAGE_LIMIT}`
+
+  const cursorValue = pageParam?.cursor
+  const cursorDirection = pageParam?.direction
 
   let timestampStart: string
   let timestampEnd: string
 
-  if (isPagination && direction === 'prev') {
+  if (cursorDirection === 'prev') {
     // Live mode: fetch logs newer than the cursor
     timestampStart = cursorValue
-      ? new Date(Number(cursorValue) / 1000).toISOString() // Convert microseconds to ISO for API
+      ? new Date(Number(cursorValue) / 1000).toISOString()
       : isoTimestampStart
-    timestampEnd = new Date().toISOString() // Current time as ISO for API
-  } else if (isPagination && direction === 'next') {
+    timestampEnd = new Date().toISOString()
+  } else if (cursorDirection === 'next') {
     // Regular pagination: fetch logs older than the cursor
     timestampStart = isoTimestampStart
     timestampEnd = cursorValue
-      ? new Date(Number(cursorValue) / 1000).toISOString() // Convert microseconds to ISO for API
+      ? new Date(Number(cursorValue) / 1000).toISOString()
       : isoTimestampEnd
   } else {
-    // Initial load: use the original date range
     timestampStart = isoTimestampStart
     timestampEnd = isoTimestampEnd
   }
 
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
     params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: timestampStart, iso_timestamp_end: timestampEnd, sql },
+    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
     signal,
   })
 
   if (error) handleError(error)
 
-  const resultData = data?.result || []
+  const resultData = data?.result ?? []
 
-  // Transform results to expected schema
   const result = resultData.map((row: any) => {
-    // Create a unique ID using the timestamp
-    const uniqueId = `${row.id || 'id'}-${row.timestamp}-${new Date().getTime()}`
-
     // Create a date object for display purposes
-    // The timestamp is in microseconds, need to convert to milliseconds for JS Date
     const date = new Date(Number(row.timestamp) / 1000)
 
-    // Use the level directly from SQL rather than determining it in TypeScript
-    const level = row.level as LogLevel
-
     return {
-      id: uniqueId,
-      uuid: uniqueId,
-      date, // Date object for display purposes
-      timestamp: row.timestamp, // Original timestamp from the database
-      level,
+      id: row.id,
+      date,
+      timestamp: row.timestamp,
+      level: row.level as LogLevel,
       status: row.status || 200,
       method: row.method,
       host: row.host,
@@ -121,25 +129,20 @@ async function getUnifiedLogs(
     }
   })
 
-  // Just use the row timestamps directly for cursors
-  const lastRow = result.length > 0 ? result[result.length - 1] : null
   const firstRow = result.length > 0 ? result[0] : null
-  const nextCursor = lastRow ? lastRow.timestamp : null
+  const lastRow = result.length > 0 ? result[result.length - 1] : null
+  const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
 
+  const nextCursor = lastRow ? lastRow.timestamp : null
+  // FIXED: Always provide prevCursor like DataTableDemo does
   // This ensures live mode never breaks the infinite query chain
   // DataTableDemo uses milliseconds, but our timestamps are in microseconds
   const prevCursor = result.length > 0 ? firstRow!.timestamp : new Date().getTime() * 1000
 
-  // HACK: Backend uses "timestamp > cursor" which can exclude records with identical timestamps
-  // THIS CAN SOMETIMES CAUSE 49 RECORDS INSTEAD OF 50 TO BE RETURNED
-  // TODO: Revisit this - ideally the backend should use composite cursors (timestamp+id) for proper pagination
-  // For now, we consider either 49 or 50 records as a "full page" to ensure pagination works correctly
-  const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
-
   return {
     data: result,
-    prevCursor,
     nextCursor: hasMore ? nextCursor : null,
+    prevCursor,
   }
 }
 
@@ -157,17 +160,16 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     },
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage, pages) {
-        // Only return a cursor if we actually have more data to fetch
+      getPreviousPageParam: (firstPage) => {
+        if (!firstPage.prevCursor) return null
+        const result = { cursor: firstPage.prevCursor, direction: 'prev' } as PageParam
+        return result
+      },
+      getNextPageParam(lastPage) {
         if (!lastPage.nextCursor || lastPage.data.length === 0) return null
-        // Only trigger fetch when specifically requested, not during column resizing
         return { cursor: lastPage.nextCursor, direction: 'next' } as PageParam
       },
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchInterval: 0,
-      staleTime: UNIFIED_LOGS_STALE_TIME,
+      ...UNIFIED_LOGS_QUERY_OPTIONS,
       ...options,
     }
   )

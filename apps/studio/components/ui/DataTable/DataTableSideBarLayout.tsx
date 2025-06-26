@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react'
+import { CSSProperties, ReactNode, useMemo } from 'react'
 
 import { cn } from 'ui'
 import { useDataTable } from './providers/DataTableProvider'
@@ -42,23 +42,9 @@ export function DataTableSideBarLayout({
 
   return (
     <div
-      className={cn(
-        'flex flex-row w-full h-full',
-        // 'min-h-screen w-full flex-col sm:flex-row',
-        className
-      )}
-      style={
-        {
-          '--top-bar-height': `${
-            // topBarHeight is the height of the chart and search bar
-            topBarHeight +
-            // 64px is the height of the top bar
-            64
-            //
-          }px`,
-          ...columnSizeVars,
-        } as React.CSSProperties
-      }
+      className={cn('flex flex-row w-full h-full', className)}
+      // topBarHeight is the height of the chart and search bar, and 64px is the height of the top bar
+      style={{ '--top-bar-height': `${topBarHeight + 64}px`, ...columnSizeVars } as CSSProperties}
     >
       {children}
     </div>

@@ -27,7 +27,6 @@ export const FunctionLogsTab = ({ logs = [] }: FunctionLogsTabProps) => {
       <div className="text-sm font-mono">
         {logs.map((log) => {
           const date = new Date(Number(log.timestamp) / 1000)
-          // Map the log level to our standard levels
 
           return (
             <div key={log.id} className="py-1 border-b border-border last:border-0">
@@ -40,7 +39,6 @@ export const FunctionLogsTab = ({ logs = [] }: FunctionLogsTabProps) => {
                     level={log.level}
                     className="min-w-20"
                   />
-                  {/* <span className="text-foreground">{log.event_type || 'Log'}</span> */}
                 </div>
                 <div className="mt-1 whitespace-pre-wrap break-all pl-2 text-[0.8rem]">
                   {log.event_message}
