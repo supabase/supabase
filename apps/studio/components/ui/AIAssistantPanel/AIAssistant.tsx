@@ -90,7 +90,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const useBedRockAssistant = useFlag('useBedrockAssistant')
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
 
@@ -106,8 +106,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const showMetadataWarning =
     IS_PLATFORM &&
     !!selectedOrganization &&
-    ((!useBedRockAssistant && aiOptInLevel === 'disabled') ||
-      (useBedRockAssistant && (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')))
+    ((!useBedrockAssistant && aiOptInLevel === 'disabled') ||
+      (useBedrockAssistant && (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')))
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -159,7 +159,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages,
   } = useChat({
     id: snap.activeChatId,
-    api: useBedRockAssistant
+    api: useBedrockAssistant
       ? `${BASE_PATH}/api/ai/sql/generate-v4`
       : `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
@@ -179,7 +179,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         connectionString: project?.connectionString,
         schema: currentSchema,
         table: currentTable?.name,
-        includeSchemaMetadata: !useBedRockAssistant
+        includeSchemaMetadata: !useBedrockAssistant
           ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
           : undefined,
       })

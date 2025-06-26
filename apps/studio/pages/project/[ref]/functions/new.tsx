@@ -17,6 +17,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
@@ -104,6 +105,8 @@ const NewFunctionPage = () => {
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
+
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -323,7 +326,11 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+        aiEndpoint={
+          useBedrockAssistant
+            ? `${BASE_PATH}/api/ai/edge-function/complete-v2`
+            : `${BASE_PATH}/api/ai/edge-function/complete`
+        }
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,

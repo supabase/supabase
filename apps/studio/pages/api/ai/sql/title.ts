@@ -1,21 +1,18 @@
-import { generateObject } from 'ai'
-import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
-import { getModel } from 'lib/ai/model'
+import { ContextLengthError, titleSql } from 'ai-commands'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { OpenAI } from 'openai'
 
-const titleSchema = z.object({
-  title: z
-    .string()
-    .describe(
-      'The generated title for the SQL snippet (short and concise). Omit these words: "SQL", "Postgres", "Query", "Database"'
-    ),
-  description: z.string().describe('The generated description for the SQL snippet.'),
-})
+const openAiKey = process.env.OPENAI_API_KEY
+const openai = new OpenAI({ apiKey: openAiKey })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!openAiKey) {
+    return res.status(500).json({
+      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+    })
+  }
+
   const { method } = req
 
   switch (method) {
@@ -32,42 +29,17 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     body: { sql },
   } = req
 
-  if (!sql) {
-    return res.status(400).json({
-      error: 'SQL query is required',
-    })
-  }
-
   try {
-    const { model, error: modelError } = await getModel()
-
-    if (modelError) {
-      return res.status(500).json({ error: modelError.message })
-    }
-
-    const result = await generateObject({
-      model,
-      schema: titleSchema,
-      prompt: source`
-        Generate a short title and summarized description for this Postgres SQL snippet:
-
-        ${sql}
-
-        The description should describe why this table was created (eg. "Table to track todos") or what the query does.
-      `,
-      temperature: 0,
-    })
-
-    return res.json(result.object)
+    const result = await titleSql(openai, sql)
+    return res.json(result)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI title generation failed: ${error.message}`)
 
-      // Check for context length error
-      if (error.message.includes('context_length') || error.message.includes('too long')) {
+      if (error instanceof ContextLengthError) {
         return res.status(400).json({
           error:
-            'Your SQL query is too large for Supabase Assistant to ingest. Try splitting it into smaller queries.',
+            'Your SQL query is too large for Supabase AI to ingest. Try splitting it into smaller queries.',
         })
       }
     } else {
