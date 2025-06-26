@@ -116,7 +116,7 @@ async function getUnifiedLogs(
       status: row.status || 200,
       method: row.method,
       host: row.host,
-      pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.path || '',
+      pathname: (row.url || '').replace(/^https?:\/\/[^\/]+/, '') || row.pathname || '',
       event_message: row.event_message || row.body || '',
       headers:
         typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
