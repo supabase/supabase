@@ -63,7 +63,7 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
   const textareaLabel = getReasonLabel(selectedReason[0])
 
   const onSubmit = async () => {
-    if (!selectedReason) {
+    if (selectedReason.length === 0) {
       return toast.error('Please select a reason for canceling your subscription')
     }
 

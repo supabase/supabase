@@ -94,7 +94,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
   async function handleDeleteProject() {
     if (project === undefined) return
     if (!isFree && selectedReason.length === 0) {
-      return toast.error('Please select at least one reason for deleting your project')
+      return toast.error('Please select a reason for deleting your project')
     }
 
     deleteProject({ projectRef: project.ref, organizationSlug: organization?.slug })
