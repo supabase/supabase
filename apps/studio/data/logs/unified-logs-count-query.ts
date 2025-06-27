@@ -35,8 +35,6 @@ export async function getUnifiedLogsCount(
   const countsByDimension: Record<string, Map<string, number>> = {}
   let totalRowCount = 0
 
-  console.log({ data })
-
   // Group by dimension
   if (data?.result) {
     data.result.forEach((row: any) => {

@@ -1,21 +1,18 @@
 import { LoaderCircle, RefreshCcw } from 'lucide-react'
 import { Button } from 'ui'
 
-import { useDataTable } from './providers/DataTableProvider'
-
 interface RefreshButtonProps {
-  onClick: () => void
+  isLoading: boolean
+  onRefresh: () => void
 }
 
-export function RefreshButton({ onClick }: RefreshButtonProps) {
-  const { isLoading } = useDataTable()
-
+export const RefreshButton = ({ isLoading, onRefresh }: RefreshButtonProps) => {
   return (
     <Button
       size="tiny"
       type="outline"
       disabled={isLoading}
-      onClick={onClick}
+      onClick={onRefresh}
       className="w-[26px]"
       icon={
         isLoading ? (
