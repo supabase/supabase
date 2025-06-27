@@ -68,7 +68,8 @@ export const useChartData = ({
     endDate,
     interval as AnalyticsInterval,
     databaseIdentifier,
-    data
+    data,
+    true
   )
 
   // Combine all the data into a single dataset
