@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, CardHeader, CardContent, CardTitle, Button } from 'ui'
 import { motion } from 'framer-motion'
-import { CircleDotDashed, GitMerge, X } from 'lucide-react'
+import { CircleDotDashed, GitMerge, X, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useWorkflowRunQuery } from 'data/workflow-runs/workflow-run-query'
 import { useWorkflowRunsQuery } from 'data/workflow-runs/workflow-runs-query'
@@ -13,6 +13,10 @@ interface WorkflowLogsCardProps {
   onStatusChange?: (status: string, workflowRunId: string) => void
   statusComplete?: string // Status that indicates completion (e.g., 'FUNCTIONS_DEPLOYED')
   statusFailed?: string[] // Statuses that indicate failure (e.g., ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'])
+  headerTitle?: string // Additional header title
+  headerDescription?: string // Additional header description
+  headerIcon?: React.ReactNode // Additional header icon
+  headerAction?: React.ReactNode // Additional header action button
 }
 
 const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
@@ -22,6 +26,10 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
   onStatusChange,
   statusComplete = 'FUNCTIONS_DEPLOYED',
   statusFailed = ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'],
+  headerTitle,
+  headerDescription,
+  headerIcon,
+  headerAction,
 }) => {
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
@@ -76,12 +84,14 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
     (!currentWorkflowRun?.status || !statusFailed.includes(currentWorkflowRun.status))
 
   return (
-    <Card className="my-6 bg-background overflow-hidden h-64 flex flex-col">
-      <CardHeader className={showSuccessIcon ? 'text-brand' : isFailed ? 'text-warning' : ''}>
+    <Card className="bg-background overflow-hidden h-64 flex flex-col">
+      <CardHeader className={showSuccessIcon ? 'text-brand' : isFailed ? 'text-destructive' : ''}>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-3">
-            {/* Activity / success indicator */}
-            {isPolling ? (
+          <div className="flex items-center gap-4">
+            {/* Custom icon or activity / success indicator */}
+            {headerIcon ? (
+              headerIcon
+            ) : isPolling ? (
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
@@ -91,29 +101,39 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
             ) : (
               showSuccessIcon && <GitMerge size={16} strokeWidth={1.5} className="text-brand" />
             )}
-            {/* Status text */}
-            {isPolling
-              ? 'Processing...'
-              : showSuccessIcon
-                ? 'Workflow completed successfully'
-                : isFailed
-                  ? 'Workflow failed'
-                  : 'Workflow completed'}
-          </CardTitle>
-          {currentWorkflowRun?.id && (
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-foreground-light">#{currentWorkflowRun.id}</div>
-              {onClose && (
-                <Button
-                  type="text"
-                  size="tiny"
-                  icon={<X size={12} strokeWidth={1.5} />}
-                  onClick={onClose}
-                  className="h-5 w-5 p-0"
-                />
+            <div>
+              {/* Custom title or default status text */}
+              <CardTitle className="text-sm font-medium">
+                {headerTitle ||
+                  (isPolling
+                    ? 'Processing...'
+                    : showSuccessIcon
+                      ? 'Workflow completed successfully'
+                      : isFailed
+                        ? 'Workflow failed'
+                        : 'Workflow completed')}
+              </CardTitle>
+              {/* Custom description */}
+              {headerDescription && (
+                <div className="text-sm text-foreground-light font-normal mt-0">
+                  {headerDescription}
+                </div>
               )}
             </div>
-          )}
+          </div>
+          <div className="flex items-center gap-4">
+            {/* Custom action or default close button */}
+            {headerAction && headerAction}
+            {onClose && (
+              <Button
+                type="text"
+                size="tiny"
+                icon={<X size={12} strokeWidth={1.5} />}
+                onClick={onClose}
+                className="h-5 w-5 p-0"
+              />
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent

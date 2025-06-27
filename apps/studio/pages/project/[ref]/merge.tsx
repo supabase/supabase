@@ -473,29 +473,6 @@ const MergePage: NextPageWithLayout = () => {
     </Admonition>
   )
 
-  // Workflow failure notice component
-  const WorkflowFailureNotice = () => (
-    <Admonition type="danger" className="my-4">
-      <div className="w-full flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-medium">Workflow failed</h3>
-          <p className="text-sm text-foreground-light">
-            The deployment workflow encountered an error. Consider creating a fresh branch from the
-            latest production branch to resolve potential conflicts.
-          </p>
-        </div>
-        <Button
-          type="default"
-          asChild
-          icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
-          className="shrink-0"
-        >
-          <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
-        </Button>
-      </div>
-    </Admonition>
-  )
-
   console.log('workflow:', currentWorkflowRunId)
 
   return (
@@ -509,26 +486,53 @@ const MergePage: NextPageWithLayout = () => {
     >
       <div className="border-b">
         <ScaffoldContainer size="full">
-          {/* Show out of date notice, workflow failure notice, or workflow logs */}
+          {/* Show out of date notice or workflow logs */}
           {isBranchOutOfDate && !currentWorkflowRunId ? (
             <OutOfDateNotice />
-          ) : hasCurrentWorkflowFailed ? (
-            <WorkflowFailureNotice />
           ) : currentWorkflowRunId ? (
-            <WorkflowLogsCard
-              workflowRunId={currentWorkflowRunId}
-              projectRef={relatedWorkflowRunIds[currentWorkflowRunId] || ref || ''}
-              onClose={() => {
-                const { workflow_run_id, ...queryWithoutWorkflowId } = router.query
-                router.push({
-                  pathname: router.pathname,
-                  query: queryWithoutWorkflowId,
-                })
-              }}
-              onStatusChange={handleWorkflowStatusChange}
-              statusComplete="FUNCTIONS_DEPLOYED"
-              statusFailed={['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED']}
-            />
+            <div className="my-6">
+              <WorkflowLogsCard
+                workflowRunId={currentWorkflowRunId}
+                projectRef={relatedWorkflowRunIds[currentWorkflowRunId] || ref || ''}
+                onClose={() => {
+                  const { workflow_run_id, ...queryWithoutWorkflowId } = router.query
+                  router.push({
+                    pathname: router.pathname,
+                    query: queryWithoutWorkflowId,
+                  })
+                }}
+                onStatusChange={handleWorkflowStatusChange}
+                statusComplete="FUNCTIONS_DEPLOYED"
+                statusFailed={['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED']}
+                headerTitle={hasCurrentWorkflowFailed ? 'Workflow failed' : undefined}
+                headerDescription={
+                  hasCurrentWorkflowFailed
+                    ? 'Consider creating a fresh branch from the latest production branch to resolve potential conflicts.'
+                    : undefined
+                }
+                headerIcon={
+                  hasCurrentWorkflowFailed ? (
+                    <AlertTriangle
+                      size={16}
+                      strokeWidth={1.5}
+                      className="text-destructive shrink-0"
+                    />
+                  ) : undefined
+                }
+                headerAction={
+                  hasCurrentWorkflowFailed ? (
+                    <Button
+                      type="default"
+                      asChild
+                      icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+                      className="shrink-0"
+                    >
+                      <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
+                    </Button>
+                  ) : undefined
+                }
+              />
+            </div>
           ) : null}
 
           {/* Tab navigation */}
