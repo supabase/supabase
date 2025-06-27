@@ -1,3 +1,5 @@
+import { AnalyticsInterval } from 'data/analytics/constants'
+
 export type Granularity = 'minute' | 'hour' | 'day' | 'week'
 export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {
   switch (interval) {
