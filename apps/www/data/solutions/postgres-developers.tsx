@@ -68,8 +68,7 @@ const data: () => {
   return {
     metadata: {
       metaTitle: 'Supabase for Postgres Developers',
-      metaDescription:
-        'Leading enterprises use Supabase to build faster, better, and more scalable products.',
+      metaDescription: 'Get started in seconds with a complete Postgres development platform',
     },
     heroSection: {
       id: 'hero',

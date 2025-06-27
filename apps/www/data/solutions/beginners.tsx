@@ -48,7 +48,7 @@ const data: () => {
     metadata: {
       metaTitle: 'Supabase for Beginners',
       metaDescription:
-        'Leading enterprises use Supabase to build faster, better, and more scalable products.',
+        'Supabase gives you the tools to easily manage databases, authentication, and backend infrastructure so you can build faster.',
     },
     heroSection: {
       id: 'hero',

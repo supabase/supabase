@@ -33,8 +33,7 @@ const data: () => {
   return {
     metadata: {
       metaTitle: 'Supabase for building Apps',
-      metaDescription:
-        'Leading enterprises use Supabase to build faster, better, and more scalable products.',
+      metaDescription: 'Your app, your vision. Supabase powers the rest.',
     },
     heroSection: {
       id: 'hero',

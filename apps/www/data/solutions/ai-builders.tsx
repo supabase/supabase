@@ -22,7 +22,7 @@ const data: {
   metadata: {
     metaTitle: 'Supabase for AI Builders',
     metaDescription:
-      'Leading enterprises use Supabase to build faster, better, and more scalable products.',
+      'Supabase gives your users an integrated and scalable backend that lets them focus on building without worrying about infrastructure.',
   },
   heroSection: {
     id: 'hero',
