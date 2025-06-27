@@ -47,6 +47,7 @@ import {
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
+import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields, sheetFields } from './UnifiedLogs.fields'
@@ -298,6 +299,7 @@ export const UnifiedLogs = () => {
             />
             <DataTableToolbar
               renderActions={() => [
+                <DownloadLogsButton searchParameters={searchParameters} />,
                 <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />,
                 fetchPreviousPage ? (
                   <LiveButton
