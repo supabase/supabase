@@ -79,7 +79,7 @@ const InfrastructureInfo = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  // @ts-ignore [Joshen] Check with Bobbie when we can remove this
+  // @ts-ignore [Bobbie] to be removed after 2025-06-30 prod deploy
   const hasExtensionDependentObjects = (data?.extension_dependent_objects ?? []).length > 0
   const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
   const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
