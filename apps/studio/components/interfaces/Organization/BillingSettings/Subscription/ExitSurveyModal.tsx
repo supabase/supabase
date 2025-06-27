@@ -82,7 +82,7 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
           try {
             await sendExitSurvey({
               orgSlug: slug,
-              reasons: `- ${selectedReason}\n`,
+              reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
               message,
               exitAction: 'downgrade',
             })

@@ -61,7 +61,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
             orgSlug: organization?.slug,
             projectRef,
             message,
-            reasons: `- ${selectedReason}\n`,
+            reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
             exitAction: 'delete',
           })
         } catch (error) {
