@@ -9,7 +9,6 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
@@ -106,14 +105,9 @@ const AuthUsage = () => {
   return (
     <>
       <ReportHeader title="Auth" />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={isRefreshing} />
-        </div>
-      </div>
       <section className="relative pt-16 -mt-2">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+          <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto dark:bg-background-200 bg-background">
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}

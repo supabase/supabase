@@ -207,15 +207,10 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={report.isLoading} />
-        </div>
-      </div>
       <GrafanaPromoBanner />
       <section className="relative pt-16 -mt-2">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+          <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto dark:bg-background-200 bg-background">
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
