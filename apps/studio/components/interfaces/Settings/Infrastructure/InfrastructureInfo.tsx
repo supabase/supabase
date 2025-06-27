@@ -78,14 +78,11 @@ const InfrastructureInfo = () => {
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
-  const hasExtensionDependentObjects = (data?.extension_dependent_objects ?? []).length > 0
 
-  // TODO(bobbie): once extension_dependent_objects is removed on the backend, the ts-ignores below */
-  // @ts-ignore
+  // @ts-ignore [Joshen] Check with Bobbie when we can remove this
+  const hasExtensionDependentObjects = (data?.extension_dependent_objects ?? []).length > 0
   const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
-  // @ts-ignore
   const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
-  // @ts-ignore
   const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
 
   return (
@@ -204,29 +201,27 @@ const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {/* TODO(bobbie): once extension_dependent_objects is removed on the backend, remove this block and the ts-ignores below */}
                     {!data.eligible ? (
                       hasExtensionDependentObjects ? (
                         <DatabaseExtensionsWarning
-                          extensions={data.extension_dependent_objects}
+                          // @ts-ignore
+                          extensions={data.extension_dependent_objects ?? []}
                           potentialBreakingChanges={
+                            // @ts-ignore
                             projectUpgradeEligibilityData?.potential_breaking_changes
                           }
                         />
                       ) : hasObjectsToBeDropped ? (
                         <ObjectsToBeDroppedWarning
-                          // @ts-ignore
-                          objectsToBeDropped={data?.objects_to_be_dropped || []}
+                          objectsToBeDropped={data.objects_to_be_dropped}
                         />
                       ) : hasUnsupportedExtensions ? (
                         <UnsupportedExtensionsWarning
-                          // @ts-ignore
-                          unsupportedExtensions={data?.unsupported_extensions || []}
+                          unsupportedExtensions={data.unsupported_extensions}
                         />
                       ) : hasObjectsInternalSchema ? (
                         <UserDefinedObjectsInInternalSchemasWarning
-                          // @ts-ignore
-                          objects={data?.user_defined_objects_in_internal_schemas || []}
+                          objects={data.user_defined_objects_in_internal_schemas}
                         />
                       ) : null
                     ) : null}
