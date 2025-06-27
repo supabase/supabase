@@ -1571,7 +1571,7 @@ export interface components {
       result?: unknown[]
     }
     ApiKeyResponse: {
-      api_key: string
+      api_key?: string | null
       description?: string | null
       hash?: string | null
       id?: string | null
@@ -1878,6 +1878,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -1893,6 +1894,7 @@ export interface components {
         /** Format: int64 */
         created_at: number
         entrypoint_path?: string
+        ezbr_sha256?: string
         id: string
         import_map?: boolean
         import_map_path?: string
@@ -2025,6 +2027,42 @@ export interface components {
     CreateSigningKeyBody: {
       /** @enum {string} */
       algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      private_jwk?:
+        | {
+            d: string
+            dp: string
+            dq: string
+            /** @enum {string} */
+            e: 'AQAB'
+            /** @enum {string} */
+            kty: 'RSA'
+            n: string
+            p: string
+            q: string
+            qi: string
+          }
+        | {
+            /** @enum {string} */
+            crv: 'P-256'
+            d: string
+            /** @enum {string} */
+            kty: 'EC'
+            x: string
+            y: string
+          }
+        | {
+            /** @enum {string} */
+            crv: 'Ed25519'
+            d: string
+            /** @enum {string} */
+            kty: 'OKP'
+            x: string
+          }
+        | {
+            k: string
+            /** @enum {string} */
+            kty: 'oct'
+          }
       /** @enum {string} */
       status?: 'in_use' | 'standby'
     }
@@ -2122,6 +2160,7 @@ export interface components {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2138,6 +2177,7 @@ export interface components {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2484,10 +2524,9 @@ export interface components {
         | 'preview'
       duration_estimate_hours: number
       eligible: boolean
-      extension_dependent_objects: string[]
       latest_app_version: string
       legacy_auth_custom_roles: string[]
-      potential_breaking_changes: string[]
+      objects_to_be_dropped: string[]
       target_upgrade_versions: {
         app_version: string
         /** @enum {string} */
@@ -2495,6 +2534,8 @@ export interface components {
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
+      unsupported_extensions: string[]
+      user_defined_objects_in_internal_schemas: string[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
@@ -6118,6 +6159,7 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        ezbr_sha256?: string
         /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string
@@ -6239,6 +6281,7 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        ezbr_sha256?: string
         /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string
