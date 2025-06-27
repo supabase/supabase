@@ -130,7 +130,9 @@ export const DeleteProjectModal = ({
       {!isFree && (
         <>
           <div className="space-y-1">
-            <h4 className="text-base">What can we improve on?</h4>
+            <h4 className="text-base">
+              Help us improve by sharing why you're deleting your project.
+            </h4>
           </div>
           <div className="space-y-4 pt-4">
             <div className="flex flex-wrap gap-2" data-toggle="buttons">

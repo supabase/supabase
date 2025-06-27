@@ -105,7 +105,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
       size="xlarge"
       visible={visible}
       onCancel={onClose}
-      header="What could we have done better?"
+      header="Help us improve by sharing why you're downgrading your plan."
     >
       <Modal.Content>
         <div className="space-y-4">
