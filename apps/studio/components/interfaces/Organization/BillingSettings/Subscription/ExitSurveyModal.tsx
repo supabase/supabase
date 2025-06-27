@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
+import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Alert, Button, Input, Modal } from 'ui'
-import type { ProjectInfo } from '../../../../../data/projects/projects-query'
-import { CANCELLATION_REASONS } from '../BillingSettings.constants'
+import { Alert, Button, cn, Input, Modal } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
@@ -17,10 +17,11 @@ export interface ExitSurveyModalProps {
 }
 
 // [Joshen] For context - Exit survey is only when going to Free Plan from a paid plan
-const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) => {
+export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) => {
   const { slug } = useParams()
 
   const [message, setMessage] = useState('')
+  const [selectedReason, setSelectedReason] = useState<string[]>([])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
@@ -40,15 +41,10 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
 
-  // Shuffle cancellation reasons then add 'None of the above'
-  const [shuffledReasons, setShuffledReasons] = useState<{ value: string; label?: string }[]>([])
-  useEffect(() => {
-    const randomized = [...CANCELLATION_REASONS].sort(() => Math.random() - 0.5)
-    setShuffledReasons([...randomized, { value: 'None of the above' }])
-  }, [])
-
-  // Single select for cancellation reason
-  const [selectedReason, setSelectedReason] = useState<string[]>([])
+  const shuffledReasons = [
+    ...CANCELLATION_REASONS.sort(() => Math.random() - 0.5),
+    { value: 'None of the above' },
+  ]
 
   const onSelectCancellationReason = (reason: string) => {
     setSelectedReason([reason])
@@ -104,97 +100,88 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
   }
 
   return (
-    <>
-      <Modal
-        hideFooter
-        size="xlarge"
-        visible={visible}
-        onCancel={onClose}
-        header="What could we have done better?"
-      >
-        <Modal.Content>
-          <div className="space-y-4">
-            <div className="space-y-8 mt-6">
-              <div className="flex flex-wrap gap-2" data-toggle="buttons">
-                {shuffledReasons.map((option) => {
-                  const active = selectedReason[0] === option.value
-                  return (
-                    <label
-                      key={option.value}
-                      className={`
-                      flex cursor-pointer items-center space-x-2 rounded-md py-1 
-                      pl-2 pr-3 text-center text-sm
-                      shadow-sm transition-all duration-100
-                      ${
-                        active
-                          ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                          : ` bg-border-strong text-foreground opacity-75 hover:opacity-100`
-                      }
-                  `}
-                    >
-                      <input
-                        type="radio"
-                        name="options"
-                        value={option.value}
-                        className="hidden"
-                        checked={active}
-                        onChange={() => onSelectCancellationReason(option.value)}
-                      />
-                      <div>{option.value}</div>
-                    </label>
-                  )
-                })}
-              </div>
-              <div className="text-area-text-sm">
-                <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
-                <Input.TextArea
-                  id="message"
-                  name="message"
-                  value={message}
-                  onChange={(event: any) => setMessage(event.target.value)}
-                  rows={3}
-                />
-              </div>
-            </div>
-            {hasProjectsWithComputeDowngrade && (
-              <Alert
-                withIcon
-                variant="warning"
-                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
-              >
-                This is due to changes in compute instances from the downgrade. Affected projects
-                include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
-              </Alert>
-            )}
+    <Modal
+      hideFooter
+      size="xlarge"
+      visible={visible}
+      onCancel={onClose}
+      header="What could we have done better?"
+    >
+      <Modal.Content>
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2" data-toggle="buttons">
+            {shuffledReasons.map((option) => {
+              const active = selectedReason[0] === option.value
+              return (
+                <label
+                  key={option.value}
+                  className={cn(
+                    'flex cursor-pointer items-center space-x-2 rounded-md py-1',
+                    'pl-2 pr-3 text-center text-sm',
+                    'shadow-sm transition-all duration-100',
+                    active
+                      ? `bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                      : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="options"
+                    value={option.value}
+                    className="hidden"
+                    checked={active}
+                    onChange={() => onSelectCancellationReason(option.value)}
+                  />
+                  <div>{option.value}</div>
+                </label>
+              )
+            })}
           </div>
-        </Modal.Content>
-
-        <div className="flex items-center justify-between border-t px-4 py-4">
-          <p className="text-xs text-foreground-lighter">
-            The unused amount for the remaining time of your billing cycle will be refunded as
-            credits
-          </p>
-
-          <div className="flex items-center space-x-2">
-            <Button type="default" onClick={() => onClose()}>
-              Cancel
-            </Button>
-            <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
-              <Button
-                type="danger"
-                className="pointer-events-auto"
-                loading={isSubmitting}
-                disabled={subscriptionUpdateDisabled || isSubmitting}
-                onClick={onSubmit}
-              >
-                Confirm downgrade
-              </Button>
-            </ProjectUpdateDisabledTooltip>
+          <div className="text-area-text-sm flex flex-col gap-y-2">
+            <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
+            <Input.TextArea
+              id="message"
+              name="message"
+              value={message}
+              onChange={(event: any) => setMessage(event.target.value)}
+              rows={3}
+            />
           </div>
+          {hasProjectsWithComputeDowngrade && (
+            <Alert
+              withIcon
+              variant="warning"
+              title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
+            >
+              This is due to changes in compute instances from the downgrade. Affected projects
+              include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
+            </Alert>
+          )}
         </div>
-      </Modal>
-    </>
+      </Modal.Content>
+
+      <div className="flex items-center justify-between border-t px-4 py-4">
+        <p className="text-xs text-foreground-lighter">
+          The unused amount for the remaining time of your billing cycle will be refunded as credits
+        </p>
+
+        <div className="flex items-center space-x-2">
+          <Button type="default" onClick={() => onClose()}>
+            Cancel
+          </Button>
+          <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
+            <Button
+              type="danger"
+              className="pointer-events-auto"
+              loading={isSubmitting}
+              disabled={subscriptionUpdateDisabled || isSubmitting}
+              onClick={onSubmit}
+            >
+              Confirm downgrade
+            </Button>
+          </ProjectUpdateDisabledTooltip>
+        </div>
+      </div>
+    </Modal>
   )
 }
-
-export default ExitSurveyModal

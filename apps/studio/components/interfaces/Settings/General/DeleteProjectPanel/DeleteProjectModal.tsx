@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -9,13 +8,18 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Input } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
-const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+export const DeleteProjectModal = ({
+  visible,
+  onClose,
+}: {
+  visible: boolean
+  onClose: () => void
+}) => {
   const router = useRouter()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
@@ -46,12 +50,10 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
 
   const textareaLabel = getReasonLabel(selectedReason[0])
 
-  // Shuffle cancellation reasons then add 'None of the above'
-  const [shuffledReasons, setShuffledReasons] = useState<{ value: string; label?: string }[]>([])
-  useEffect(() => {
-    const randomized = [...CANCELLATION_REASONS].sort(() => Math.random() - 0.5)
-    setShuffledReasons([...randomized, { value: 'None of the above' }])
-  }, [])
+  const shuffledReasons = [
+    ...CANCELLATION_REASONS.sort(() => Math.random() - 0.5),
+    { value: 'None of the above' },
+  ]
 
   const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
     onSuccess: async () => {
@@ -78,19 +80,6 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
   const { mutateAsync: sendExitSurvey, isLoading: isSending } = useSendDowngradeFeedbackMutation()
   const isSubmitting = isDeleting || isSending
 
-  useEffect(() => {
-    if (visible) {
-      setSelectedReason([])
-      setMessage('')
-    }
-  }, [visible])
-
-  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
-
   async function handleDeleteProject() {
     if (project === undefined) return
     if (!isFree && selectedReason.length === 0) {
@@ -100,88 +89,91 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
     deleteProject({ projectRef: project.ref, organizationSlug: organization?.slug })
   }
 
+  useEffect(() => {
+    if (visible) {
+      setSelectedReason([])
+      setMessage('')
+    }
+  }, [visible])
+
   return (
-    <>
-      <TextConfirmModal
-        visible={visible}
-        loading={isSubmitting}
-        size={isFree ? 'small' : 'medium'}
-        title={`Confirm deletion of ${project?.name}`}
-        variant="destructive"
-        alert={{
-          title: isFree
-            ? 'This action cannot be undone.'
-            : `This will permanently delete the ${project?.name}`,
-          description: !isFree ? `All project data will be lost, and cannot be undone` : '',
-        }}
-        text={
-          isFree
-            ? `This will permanently delete the ${project?.name} project and all of its data.`
-            : undefined
-        }
-        confirmPlaceholder="Type the project name in here"
-        confirmString={project?.name || ''}
-        confirmLabel="I understand, delete this project"
-        onConfirm={handleDeleteProject}
-        onCancel={() => {
-          if (!isSubmitting) onClose()
-        }}
-      >
-        {/* 
+    <TextConfirmModal
+      visible={visible}
+      loading={isSubmitting}
+      size={isFree ? 'small' : 'xlarge'}
+      title={`Confirm deletion of ${project?.name}`}
+      variant="destructive"
+      alert={{
+        title: isFree
+          ? 'This action cannot be undone.'
+          : `This will permanently delete the ${project?.name}`,
+        description: !isFree ? `All project data will be lost, and cannot be undone` : '',
+      }}
+      text={
+        isFree
+          ? `This will permanently delete the ${project?.name} project and all of its data.`
+          : undefined
+      }
+      confirmPlaceholder="Type the project name in here"
+      confirmString={project?.name || ''}
+      confirmLabel="I understand, delete this project"
+      onConfirm={handleDeleteProject}
+      onCancel={() => {
+        if (!isSubmitting) onClose()
+      }}
+    >
+      {/* 
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.
         */}
-        {!isFree && (
-          <>
-            <div className="space-y-1">
-              <h4 className="text-base">What can we improve on?</h4>
+      {!isFree && (
+        <>
+          <div className="space-y-1">
+            <h4 className="text-base">What can we improve on?</h4>
+          </div>
+          <div className="space-y-4 pt-4">
+            <div className="flex flex-wrap gap-2" data-toggle="buttons">
+              {shuffledReasons.map((option) => {
+                const active = selectedReason[0] === option.value
+                return (
+                  <label
+                    key={option.value}
+                    className={[
+                      'flex cursor-pointer items-center space-x-2 rounded-md py-1',
+                      'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
+                      `${
+                        active
+                          ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                          : ` bg-border-strong text-foreground opacity-50 hover:opacity-75`
+                      }`,
+                    ].join(' ')}
+                  >
+                    <input
+                      type="radio"
+                      name="options"
+                      value={option.value}
+                      className="hidden"
+                      checked={active}
+                      onChange={() => onSelectCancellationReason(option.value)}
+                    />
+                    <div>{option.value}</div>
+                  </label>
+                )
+              })}
             </div>
-            <div className="space-y-4 pt-4">
-              <div className="flex flex-wrap gap-2" data-toggle="buttons">
-                {shuffledReasons.map((option) => {
-                  const active = selectedReason[0] === option.value
-                  return (
-                    <label
-                      key={option.value}
-                      className={[
-                        'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                        'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
-                        `${
-                          active
-                            ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                            : ` bg-border-strong text-foreground opacity-50 hover:opacity-75`
-                        }`,
-                      ].join(' ')}
-                    >
-                      <input
-                        type="radio"
-                        name="options"
-                        value={option.value}
-                        className="hidden"
-                        checked={active}
-                        onChange={() => onSelectCancellationReason(option.value)}
-                      />
-                      <div>{option.value}</div>
-                    </label>
-                  )
-                })}
-              </div>
-              <div className="text-area-text-sm">
-                <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
-                <Input.TextArea
-                  name="message"
-                  rows={3}
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                />
-              </div>
+            <div className="text-area-text-sm flex flex-col gap-y-2">
+              <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
+              <Input.TextArea
+                name="message"
+                rows={3}
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+              />
             </div>
-          </>
-        )}
-      </TextConfirmModal>
-    </>
+          </div>
+        </>
+      )}
+    </TextConfirmModal>
   )
 }
-
-export default DeleteProjectModal

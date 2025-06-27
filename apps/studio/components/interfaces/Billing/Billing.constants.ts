@@ -41,5 +41,4 @@ export const CANCELLATION_REASONS = [
     label:
       'Building and maintaining your trust is our highest priority, could you please share the specific event or reason that led to this loss of trust?',
   },
-  // { value: 'None of the above' }, // Add as needed in the UI
 ]
