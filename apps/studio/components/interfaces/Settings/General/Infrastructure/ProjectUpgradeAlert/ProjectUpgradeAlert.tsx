@@ -187,6 +187,7 @@ const ProjectUpgradeAlert = () => {
                     [right-sized](https://supabase.com/docs/guides/platform/upgrading#disk-sizing) with the upgrade.`}
                   />
                 )}
+                {/* @ts-ignore */}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
                   <Alert_Shadcn_ variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />

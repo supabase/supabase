@@ -259,7 +259,7 @@ export type IntegrationConnectionsCreateVariables = {
 
 export type GitHubConnectionCreateVariables = {
   organizationId: number
-  connection: components['schemas']['CreateGitHubConnectionsBody']
+  connection: components['schemas']['CreateGitHubConnectionBody']
 }
 
 export type EnvironmentTargets = 'production' | 'preview' | 'development'
