@@ -18,6 +18,7 @@ import { useProfile } from 'lib/profile'
 import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ReportMenuItem } from './ReportMenuItem'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const ReportsMenu = () => {
   const router = useRouter()
@@ -25,6 +26,7 @@ const ReportsMenu = () => {
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
+  const authEnabled = useFlag('authreportv2')
 
   const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
@@ -97,6 +99,20 @@ const ReportsMenu = () => {
           key: 'api-overview',
           url: `/project/${ref}/reports/api-overview`,
         },
+        ...(authEnabled
+          ? [
+              {
+                name: 'Auth',
+                key: 'auth',
+                url: `/project/${ref}/reports/auth`,
+              },
+            ]
+          : []),
+        {
+          name: 'Database',
+          key: 'database',
+          url: `/project/${ref}/reports/database`,
+        },
         ...(storageEnabled
           ? [
               {
@@ -106,12 +122,6 @@ const ReportsMenu = () => {
               },
             ]
           : []),
-
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/reports/database`,
-        },
       ],
     },
   ]
