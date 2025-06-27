@@ -7,7 +7,6 @@ import {
   PuzzleIcon,
   TrendingUpIcon,
 } from 'lucide-react'
-import { PRODUCT_SHORTNAMES, products } from 'shared-data/products'
 
 export type SolutionTypes = Solutions[keyof Solutions]
 
@@ -27,7 +26,6 @@ export const skillBasedSolutions = {
   solutions: [
     {
       id: Solutions.aiBuilders,
-      category: 'use-case',
       text: 'For AI Builders',
       description: '',
       url: '/solutions/ai-builders',
@@ -35,7 +33,6 @@ export const skillBasedSolutions = {
     },
     {
       id: Solutions.noCode,
-      category: 'skill-level',
       text: 'For No Code',
       description: '',
       url: '/solutions/no-code',
@@ -43,7 +40,6 @@ export const skillBasedSolutions = {
     },
     {
       id: Solutions.beginners,
-      category: 'skill-level',
       text: 'For Beginners',
       description: '',
       url: '/solutions/beginners',
@@ -51,7 +47,6 @@ export const skillBasedSolutions = {
     },
     {
       id: Solutions.developers,
-      category: 'skill-level',
       text: 'For Developers',
       description: '',
       url: '/solutions/developers',
@@ -59,7 +54,6 @@ export const skillBasedSolutions = {
     },
     {
       id: Solutions.postgresDevs,
-      category: 'skill-level',
       text: 'For Postgres Devs',
       description: '',
       url: '/solutions/postgres-developers',
@@ -100,7 +94,6 @@ export const useCaseSolutions = {
   solutions: [
     {
       id: Solutions.neon,
-      category: 'use-case',
       text: 'Switch From Neon',
       description: '',
       url: '/solutions/switch-from-neon',
@@ -108,7 +101,6 @@ export const useCaseSolutions = {
     },
     {
       id: Solutions.startups,
-      category: 'use-case',
       text: 'For Startups',
       description: '',
       url: '/solutions/startups',
@@ -116,7 +108,6 @@ export const useCaseSolutions = {
     },
     {
       id: Solutions.enterprise,
-      category: 'use-case',
       text: 'For Enterprise',
       description: '',
       url: '/solutions/enterprise',

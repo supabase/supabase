@@ -41,6 +41,7 @@ import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
 import { useSendTelemetryEvent } from 'lib/telemetry'
+import { companyStats } from 'data/company-stats'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const DatabaseVisual = dynamic(() => import('components/Products/DatabaseVisual'))
@@ -711,11 +712,11 @@ const data: () => {
       highlights: [
         {
           heading: 'databases managed',
-          subheading: '1,000,000+',
+          subheading: companyStats.databasesManaged,
         },
         {
           heading: 'databases launched daily',
-          subheading: '2,500+',
+          subheading: companyStats.databasesLaunchedDaily,
         },
       ],
     },

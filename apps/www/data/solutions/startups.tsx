@@ -40,6 +40,7 @@ import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import { useBreakpoint } from 'common'
 import { useSendTelemetryEvent } from 'lib/telemetry'
+import { companyStats } from '../company-stats'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -86,10 +87,10 @@ const data: () => {
       image: (
         <Image
           src={{
-            dark: '/images/solutions/developers/developers-hero-dark.svg',
-            light: '/images/solutions/developers/developers-hero-light.svg',
+            dark: '/images/solutions/startups/startups-hero-dark.svg',
+            light: '/images/solutions/startups/startups-hero-light.svg',
           }}
-          alt="Supabase for Developers"
+          alt="Supabase for Startups"
           className="not-sr-only"
           width={1000}
           height={1000}
@@ -173,28 +174,28 @@ const data: () => {
             >
               <path
                 d="M26.0271 5.7251C25.4 5.09582 24.6548 4.59652 23.8343 4.25583C23.0139 3.91515 22.1342 3.73978 21.2458 3.73978C20.3574 3.73978 19.4778 3.91515 18.6573 4.25583C17.8368 4.59652 17.0917 5.09582 16.4646 5.7251L15.5021 6.7001L14.5396 5.7251C13.9125 5.09582 13.1673 4.59652 12.3468 4.25583C11.5264 3.91515 10.6467 3.73978 9.75831 3.73978C8.86992 3.73978 7.99026 3.91515 7.16978 4.25583C6.34931 4.59652 5.60416 5.09582 4.97706 5.7251C2.32706 8.3751 2.16456 12.8501 5.50206 16.2501L15.5021 26.2501L25.5021 16.2501C28.8396 12.8501 28.6771 8.3751 26.0271 5.7251Z"
-                stroke="#898989"
+                stroke="currentColor"
                 strokeWidth="0.952381"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <path
                 d="M15.5011 6.69992L11.5886 10.6249C11.094 11.1236 10.8164 11.7975 10.8164 12.4999C10.8164 13.2023 11.094 13.8762 11.5886 14.3749C12.0873 14.8696 12.7612 15.1471 13.4636 15.1471C14.166 15.1471 14.8399 14.8696 15.3386 14.3749L18.1636 11.6124C18.8657 10.9178 19.8134 10.5281 20.8011 10.5281C21.7887 10.5281 22.7365 10.9178 23.4386 11.6124L26.4386 14.6124"
-                stroke="#898989"
+                stroke="currentColor"
                 strokeWidth="0.952381"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <path
                 d="M23 18.75L20.5 16.25"
-                stroke="#898989"
+                stroke="currentColor"
                 strokeWidth="0.952381"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <path
                 d="M19.25 22.5L16.75 20"
-                stroke="#898989"
+                stroke="currentColor"
                 strokeWidth="0.952381"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -228,9 +229,9 @@ const data: () => {
             </>
           ),
           className:
-            'flex-col lg:flex-row [&>div:first-child]:lg:!w-full [&>div:first-child]:lg:px-0 [&>div:first-child]:lg:!mr-0 lg:!gap-0 px-4 lg:pr-0',
+            'flex-col lg:flex-row [&>div:first-child]:lg:!max-w-none [&>div:first-child]:lg:!mr-0 lg:!gap-0',
           image: (
-            <div className="relative lg:absolute lg:top-0 lg:right-0 w-full lg:w-1/3 shrink-1 pt-8">
+            <div className="relative w-full lg:w-1/3 shrink-1 pt-8 px-4 lg:pr-0">
               <div className="w-full h-full rounded-t-lg lg:rounded-tr-none overflow-hidden border-t border-l border-r lg:border-r-0 bg-surface-75">
                 <table className="min-w-full m-0">
                   <thead className="p-0">
@@ -596,11 +597,11 @@ const data: () => {
       highlights: [
         {
           heading: 'databases managed',
-          subheading: '1,000,000+',
+          subheading: companyStats.databasesManaged,
         },
         {
           heading: 'databases launched daily',
-          subheading: '2,500+',
+          subheading: companyStats.databasesLaunchedDaily,
         },
       ],
     },
