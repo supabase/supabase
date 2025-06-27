@@ -1,23 +1,28 @@
 import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 
 import Layout from 'components/Layouts/Default'
+import ProductHeader from 'components/Sections/ProductHeader2'
 import SolutionsStickyNav from 'components/SolutionsStickyNav'
-import content from 'data/solutions/neon'
+import getContent from 'data/solutions/startups'
+
 import { Solutions } from 'data/Solutions'
 
-const ProductHeader = dynamic(() => import('components/Sections/ProductHeader2'))
-const SingleQuote = dynamic(() => import('components/Sections/SingleQuote'))
-const FeaturesSection = dynamic(() => import('components/Solutions/FeaturesSection'))
+const WhySupabase = dynamic(() => import('components/Solutions/FeaturesSection'))
 const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
+const PlatformStarterSection = dynamic(() => import('components/Solutions/TwoColumnsSection'))
 const DXSection = dynamic(() => import('components/Solutions/DeveloperExperienceSection'))
 const ResultsSection = dynamic(() => import('components/Solutions/ResultsSection'))
 const FeatureGrid = dynamic(() => import('components/Solutions/FeatureGrid'))
+const SingleQuote = dynamic(() => import('components/Sections/SingleQuote'))
 const Security = dynamic(() => import('components/Enterprise/Security'))
-const CtaSection = dynamic(() => import('components/Solutions/CtaSection'))
+const MPCSection = dynamic(() => import('components/Solutions/MPCSection'))
 
-const Neon: NextPage = () => {
+const BeginnersPage: NextPage = () => {
+  const content = getContent()
+
   return (
     <>
       <NextSeo
@@ -26,38 +31,18 @@ const Neon: NextPage = () => {
         openGraph={{
           title: content.metadata.metaTitle,
           description: content.metadata.metaDescription,
-          url: `https://supabase.com/solutions/switch-from-neon`,
+          url: `https://supabase.com/solutions/startups`,
         }}
-        noindex={true}
-        nofollow={true}
       />
       <Layout className="overflow-visible">
-        <SolutionsStickyNav activeItem={Solutions.neon} type="use-case" />
-        <ProductHeader {...content.heroSection} />
-        <SingleQuote
-          quote={{
-            text: content.quote.text,
-            author: content.quote.author,
-            role: content.quote.role,
-            logo: content.quote.logo,
-            link: content.quote.link,
-            avatar: content.quote.avatar,
-          }}
-          {...content.quote}
+        <SolutionsStickyNav activeItem={Solutions.startups} type="use-case" />
+        <ProductHeader
+          {...content.heroSection}
+          className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
+          sectionContainerClassName="lg:gap-4"
         />
-        <FeaturesSection
-          id={content.why.id}
-          label={content.why.label}
-          heading={content.why.heading}
-          subheading={content.why.subheading}
-          features={content.why.features}
-        />
-        <PlatformSection
-          id={content.platform.id}
-          title={content.platform.title}
-          subheading={content.platform.subheading}
-          features={content.platform.features}
-        />
+        <WhySupabase {...content.why} />
+        <PlatformSection {...content.platform} />
         <DXSection
           id={content.developerExperience.id}
           title={content.developerExperience.title}
@@ -80,14 +65,31 @@ const Neon: NextPage = () => {
           features={content.securitySection.features}
           cta={content.securitySection.cta}
         />
-        <CtaSection
-          id={content.ctaSection.id}
-          title={content.ctaSection.title}
-          primaryCta={content.ctaSection.primaryCta}
+        <SingleQuote
+          id="quote"
+          className="!pb-8 md:!pb-12 [&_q]:max-w-2xl"
+          quote={{
+            text: 'Supabase enabled us to focus on building the best email infrastructure for developers — without worrying about backend complexity. Their authentication, database, and support have been game-changers for our rapid growth.',
+            author: 'Zeno Rocha',
+            role: 'CEO at Resend',
+            link: '/customers/resend',
+            logo: (
+              <Image
+                draggable={false}
+                src="/images/blog/avatars/zeno-rocha.png"
+                alt="Zeno Rocha, CEO at Resend"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
         />
+        <PlatformStarterSection {...content.platformStarterSection} />
+        <MPCSection {...content.mcp} />
       </Layout>
     </>
   )
 }
 
-export default Neon
+export default BeginnersPage

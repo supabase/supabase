@@ -1,5 +1,5 @@
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
-import { data as solutions } from 'data/Solutions'
+import { skillBasedSolutions, data as solutions, useCaseSolutions } from 'data/Solutions'
 
 const footerData = [
   {
@@ -46,18 +46,14 @@ const footerData = [
   {
     title: 'Solutions',
     links: [
-      ...solutions.solutions.map((solution) => ({
+      ...skillBasedSolutions.solutions.map((solution) => ({
         text: solution.text,
         url: `/solutions/${solution.id}`,
       })),
-      {
-        text: 'Switch from Neon',
-        url: '/solutions/switch-from-neon',
-      },
-      {
-        text: 'Enterprise',
-        url: '/solutions/enterprise',
-      },
+      ...useCaseSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: `/solutions/${solution.id}`,
+      })),
     ],
   },
   {

@@ -12,16 +12,19 @@ import {
 } from 'ui'
 
 import SectionContainer from 'components/Layouts/SectionContainer'
-import { SolutionTypes, data as solutions } from 'data/Solutions'
+import { SolutionTypes, skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
 
 interface Props {
   activeItem: SolutionTypes
   className?: string
+  type?: 'skill-based' | 'use-case'
 }
 
-function SolutionsStickyNav({ activeItem, className }: Props) {
+function SolutionsStickyNav({ type, activeItem, className }: Props) {
   const router = useRouter()
-  const items = solutions.solutions.map((solution: any) => ({
+  const solutions =
+    type === 'skill-based' ? skillBasedSolutions.solutions : useCaseSolutions.solutions
+  const items = solutions.map((solution: any) => ({
     id: solution.id,
     name: solution.text,
     href: solution.url,

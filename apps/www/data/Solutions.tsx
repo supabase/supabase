@@ -5,6 +5,7 @@ import {
   Code2Icon,
   PointerIcon,
   PuzzleIcon,
+  TrendingUpIcon,
 } from 'lucide-react'
 import { PRODUCT_SHORTNAMES, products } from 'shared-data/products'
 
@@ -16,33 +17,18 @@ export enum Solutions {
   beginners = 'beginners',
   developers = 'developers',
   postgresDevs = 'postgres-developers',
+  neon = 'neon',
+  startups = 'startups',
+  enterprise = 'enterprise',
 }
 
-const Icon = ({ icon, ...props }: any) => (
-  <svg
-    className="h-5 w-5"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    {...props}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="1.5"
-      d={icon}
-      stroke="currentColor"
-    />
-  </svg>
-)
-
-export const data = {
+export const skillBasedSolutions = {
   label: 'Solutions',
   solutions: [
     {
       id: Solutions.aiBuilders,
       category: 'use-case',
-      text: 'AI Builders',
+      text: 'For AI Builders',
       description: '',
       url: '/solutions/ai-builders',
       icon: BotIcon,
@@ -109,12 +95,42 @@ export const data = {
   ],
 }
 
+export const useCaseSolutions = {
+  label: 'Solutions',
+  solutions: [
+    {
+      id: Solutions.neon,
+      category: 'use-case',
+      text: 'Switch From Neon',
+      description: '',
+      url: '/solutions/switch-from-neon',
+      icon: ArrowLeftRight,
+    },
+    {
+      id: Solutions.startups,
+      category: 'use-case',
+      text: 'For Startups',
+      description: '',
+      url: '/solutions/startups',
+      icon: TrendingUpIcon,
+    },
+    {
+      id: Solutions.enterprise,
+      category: 'use-case',
+      text: 'For Enterprise',
+      description: '',
+      url: '/solutions/enterprise',
+      icon: Building2Icon,
+    },
+  ],
+}
+
 export const navData = {
   navigation: [
     {
       label: 'Skill Level',
       links: [
-        ...data.solutions.map((solution) => ({
+        ...skillBasedSolutions.solutions.map((solution) => ({
           text: solution.text,
           url: solution.url,
           icon: solution.icon,
@@ -124,20 +140,12 @@ export const navData = {
     {
       label: 'Use Case',
       links: [
-        {
-          text: 'Switch From Neon',
-          url: '/solutions/switch-from-neon',
-          icon: ArrowLeftRight,
-        },
-        {
-          text: 'Enterprise',
-          description: 'We support existing open source tools and communities wherever possible.',
-          url: '/solutions/enterprise',
-          icon: Building2Icon,
-        },
+        ...useCaseSolutions.solutions.map((solution) => ({
+          text: solution.text,
+          url: solution.url,
+          icon: solution.icon,
+        })),
       ],
     },
   ],
 }
-
-export default data

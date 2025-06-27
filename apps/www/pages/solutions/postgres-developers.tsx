@@ -33,7 +33,7 @@ const BeginnersPage: NextPage = () => {
         }}
       />
       <Layout className="overflow-visible">
-        <SubStickyNav activeItem={Solutions.postgresDevs} />
+        <SubStickyNav activeItem={Solutions.postgresDevs} type="skill-based" />
         <ProductHeader
           {...content.heroSection}
           className="[&_h1]:2xl:!text-5xl bg-default border-0 lg:pb-8 [&_.ph-footer]:mt-0 [&_.ph-footer]:lg:mt-16 [&_.ph-footer]:xl:mt-32"
