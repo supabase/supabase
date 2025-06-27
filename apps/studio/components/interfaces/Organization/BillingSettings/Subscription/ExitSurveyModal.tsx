@@ -100,52 +100,51 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   }
 
   return (
-    <Modal
-      hideFooter
-      size="xlarge"
-      visible={visible}
-      onCancel={onClose}
-      header="Help us improve by sharing why you're downgrading your plan."
-    >
+    <Modal hideFooter size="xlarge" visible={visible} onCancel={onClose} header="Help us improve">
       <Modal.Content>
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-2" data-toggle="buttons">
-            {shuffledReasons.map((option) => {
-              const active = selectedReason[0] === option.value
-              return (
-                <label
-                  key={option.value}
-                  className={cn(
-                    'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                    'pl-2 pr-3 text-center text-sm',
-                    'shadow-sm transition-all duration-100',
-                    active
-                      ? `bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                      : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="options"
-                    value={option.value}
-                    className="hidden"
-                    checked={active}
-                    onChange={() => onSelectCancellationReason(option.value)}
-                  />
-                  <div>{option.value}</div>
-                </label>
-              )
-            })}
-          </div>
-          <div className="text-area-text-sm flex flex-col gap-y-2">
-            <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
-            <Input.TextArea
-              id="message"
-              name="message"
-              value={message}
-              onChange={(event: any) => setMessage(event.target.value)}
-              rows={3}
-            />
+          <p className="text-sm text-foreground-light">
+            Share with us why you're downgrading your plan.
+          </p>
+          <div className="space-y-8 mt-6">
+            <div className="flex flex-wrap gap-2" data-toggle="buttons">
+              {shuffledReasons.map((option) => {
+                const active = selectedReason[0] === option.value
+                return (
+                  <label
+                    key={option.value}
+                    className={cn(
+                      'flex cursor-pointer items-center space-x-2 rounded-md py-1',
+                      'pl-2 pr-3 text-center text-sm',
+                      'shadow-sm transition-all duration-100',
+                      active
+                        ? `bg-foreground text-background opacity-100 hover:bg-opacity-75`
+                        : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="options"
+                      value={option.value}
+                      className="hidden"
+                      checked={active}
+                      onChange={() => onSelectCancellationReason(option.value)}
+                    />
+                    <div>{option.value}</div>
+                  </label>
+                )
+              })}
+            </div>
+            <div className="text-area-text-sm flex flex-col gap-y-2">
+              <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
+              <Input.TextArea
+                id="message"
+                name="message"
+                value={message}
+                onChange={(event: any) => setMessage(event.target.value)}
+                rows={3}
+              />
+            </div>
           </div>
           {hasProjectsWithComputeDowngrade && (
             <Alert
