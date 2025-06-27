@@ -21,7 +21,7 @@ export const DataTableColumnStatusCode = ({
     <div className={cn('flex items-center relative', className)}>
       <div
         className={cn(
-          'px-1 py-[0.03rem] rounded-md',
+          'px-1 py-[0.03rem] rounded-md text-xs',
           'flex items-center justify-center relative font-mono',
           colors.text,
           colors.bg,
