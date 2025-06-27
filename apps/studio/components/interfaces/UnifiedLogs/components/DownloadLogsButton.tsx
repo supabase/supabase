@@ -29,6 +29,7 @@ import {
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
 
 const DEFAULT_NUM_ROWS = '100'
+const DEFAULT_DURATION = '1'
 
 interface DownloadLogsButtonProps {
   searchParameters: QuerySearchParamsType
@@ -37,6 +38,7 @@ interface DownloadLogsButtonProps {
 export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps) => {
   const { ref } = useParams()
   const [numRows, setNumRows] = useState(DEFAULT_NUM_ROWS)
+  const [numHours, setNumHours] = useState(DEFAULT_NUM_ROWS)
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json'>()
 
   const { mutate: retrieveLogs, isLoading } = useGetUnifiedLogsMutation({
@@ -67,12 +69,20 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
 
   const onExportData = () => {
     if (!ref) return console.error('Project ref is required')
-    retrieveLogs({ projectRef: ref, search: searchParameters, limit: Number(numRows) })
+
+    const hasSpecificTimeRange = 'date' in searchParameters
+    retrieveLogs({
+      projectRef: ref,
+      search: searchParameters,
+      limit: Number(numRows),
+      hoursAgo: !hasSpecificTimeRange ? Number(numHours) : undefined,
+    })
   }
 
   useEffect(() => {
     if (!!selectedFormat) {
       setNumRows(DEFAULT_NUM_ROWS)
+      setNumHours(DEFAULT_DURATION)
     }
   }, [selectedFormat])
 
@@ -102,25 +112,42 @@ export const DownloadLogsButton = ({ searchParameters }: DownloadLogsButtonProps
           if (!open) setSelectedFormat(undefined)
         }}
       >
-        <DialogContent>
+        <DialogContent size="small">
           <DialogHeader className="border-b">
             <DialogTitle>Download logs as {selectedFormat?.toLocaleUpperCase()}</DialogTitle>
             <DialogDescription>
               Export your logs with the currently applied filters
             </DialogDescription>
           </DialogHeader>
-          <DialogSection>
-            <p className="text-sm mb-2">Select the result limit you want to export</p>
-            <Select_Shadcn_ value={numRows} onValueChange={setNumRows}>
-              <SelectTrigger_Shadcn_ className="w-32">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectItem_Shadcn_ value="100">100</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="500">500</SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="1000">1000</SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+          <DialogSection className="flex flex-col gap-y-2">
+            <div className="flex justify-between gap-x-2">
+              <p className="text-sm mb-2">Result limit for export</p>
+              <Select_Shadcn_ value={numRows} onValueChange={setNumRows}>
+                <SelectTrigger_Shadcn_ className="w-24">
+                  <SelectValue_Shadcn_ />
+                </SelectTrigger_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectItem_Shadcn_ value="100">100</SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="500">500</SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="1000">1000</SelectItem_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
+            </div>
+            {!('date' in searchParameters) && (
+              <div className="flex justify-between gap-x-2">
+                <p className="text-sm mb-2">Duration to retrieve</p>
+                <Select_Shadcn_ value={numHours} onValueChange={setNumHours}>
+                  <SelectTrigger_Shadcn_ className="w-36">
+                    <SelectValue_Shadcn_ />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectItem_Shadcn_ value="1">1 hour ago</SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="12">12 hours ago</SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="24">24 hours ago</SelectItem_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+              </div>
+            )}
           </DialogSection>
           <DialogFooter>
             <Button

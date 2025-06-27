@@ -5,12 +5,13 @@ import { getUnifiedLogsQuery } from 'components/interfaces/UnifiedLogs/UnifiedLo
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { getUnifiedLogsISOStartEnd, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 
 export type getUnifiedLogsVariables = {
   projectRef: string
   search: QuerySearchParamsType
   limit: number
+  hoursAgo?: number
 }
 
 // [Joshen] Mainly for retrieving logs on demand for downloading
@@ -18,11 +19,12 @@ export async function retrieveUnifiedLogs({
   projectRef,
   search,
   limit,
-}: UnifiedLogsVariables & { limit: number }) {
+  hoursAgo,
+}: getUnifiedLogsVariables) {
   if (typeof projectRef === 'undefined')
     throw new Error('projectRef is required for retrieveUnifiedLogs')
 
-  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search, hoursAgo)
   const sql = `${getUnifiedLogsQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${limit}`
 
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
