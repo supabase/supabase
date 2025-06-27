@@ -43,6 +43,12 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
+
+    {
+      label: 'SSO',
+      href: `/org/${slug}/sso`,
+    },
+
     {
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
