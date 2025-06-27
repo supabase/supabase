@@ -31,7 +31,14 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
   const isFree = projectPlan === 'free'
 
   const [message, setMessage] = useState<string>('')
-  const [selectedReasons, setSelectedReasons] = useState<string[]>([])
+  const [selectedReason, setSelectedReason] = useState<string[]>([])
+
+  // Shuffle cancellation reasons then add 'None of the above'
+  const [shuffledReasons, setShuffledReasons] = useState<string[]>([])
+  useEffect(() => {
+    const randomized = [...CANCELLATION_REASONS].sort(() => Math.random() - 0.5)
+    setShuffledReasons([...randomized, 'None of the above'])
+  }, [])
 
   const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
     onSuccess: async () => {
@@ -41,7 +48,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
             orgSlug: organization?.slug,
             projectRef,
             message,
-            reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+            reasons: `- ${selectedReason}\n`,
             exitAction: 'delete',
           })
         } catch (error) {
@@ -60,7 +67,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
 
   useEffect(() => {
     if (visible) {
-      setSelectedReasons([])
+      setSelectedReason([])
       setMessage('')
     }
   }, [visible])
@@ -71,18 +78,14 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
     },
   })
 
+  // Single select for cancellation reason
   const onSelectCancellationReason = (reason: string) => {
-    const existingSelection = selectedReasons.find((x) => x === reason)
-    const updatedSelection =
-      existingSelection === undefined
-        ? selectedReasons.concat([reason])
-        : selectedReasons.filter((x) => x !== reason)
-    setSelectedReasons(updatedSelection)
+    setSelectedReason([reason])
   }
 
   async function handleDeleteProject() {
     if (project === undefined) return
-    if (!isFree && selectedReasons.length === 0) {
+    if (!isFree && selectedReason.length === 0) {
       return toast.error('Please select at least one reason for deleting your project')
     }
 
@@ -128,8 +131,8 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
             </div>
             <div className="space-y-4 pt-4">
               <div className="flex flex-wrap gap-2" data-toggle="buttons">
-                {CANCELLATION_REASONS.map((option) => {
-                  const active = selectedReasons.find((x) => x === option)
+                {shuffledReasons.map((option) => {
+                  const active = selectedReason[0] === option
                   return (
                     <label
                       key={option}
@@ -144,11 +147,12 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
                       ].join(' ')}
                     >
                       <input
-                        type="checkbox"
+                        type="radio"
                         name="options"
                         value={option}
                         className="hidden"
-                        onClick={(event: any) => onSelectCancellationReason(event.target.value)}
+                        checked={active}
+                        onChange={() => onSelectCancellationReason(option)}
                       />
                       <div>{option}</div>
                     </label>
@@ -158,7 +162,7 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
               <div className="text-area-text-sm">
                 <Input.TextArea
                   name="message"
-                  label="Anything else that we can improve on?"
+                  label="What can we improve on?"
                   rows={3}
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}

@@ -11,5 +11,5 @@ export const CANCELLATION_REASONS = [
   'The pricing is unpredictable and hard to budget for.',
   'My company went out of business or was acquired.',
   'I lost trust in the company or its future direction.',
-  'None of the above',
+  // 'None of the above', // Added directly
 ]

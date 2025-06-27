@@ -1,5 +1,4 @@
-import { includes, without } from 'lodash'
-import { useReducer, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -22,7 +21,6 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
   const { slug } = useParams()
 
   const [message, setMessage] = useState('')
-  const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
@@ -42,17 +40,23 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
 
-  function reducer(state: any, action: any) {
-    if (includes(state, action.target.value)) {
-      return without(state, action.target.value)
-    } else {
-      return [...state, action.target.value]
-    }
+  // Shuffle cancellation reasons then add 'None of the above'
+  const [shuffledReasons, setShuffledReasons] = useState<string[]>([])
+  useEffect(() => {
+    const randomized = [...CANCELLATION_REASONS].sort(() => Math.random() - 0.5)
+    setShuffledReasons([...randomized, 'None of the above'])
+  }, [])
+
+  // Single select for cancellation reason
+  const [selectedReason, setSelectedReason] = useState<string | null>(null)
+
+  const onSelectCancellationReason = (reason: string) => {
+    setSelectedReason(reason)
   }
 
   const onSubmit = async () => {
-    if (selectedReasons.length === 0) {
-      return toast.error('Please select at least one reason for canceling your subscription')
+    if (!selectedReason) {
+      return toast.error('Please select a reason for canceling your subscription')
     }
 
     await downgradeOrganization()
@@ -70,7 +74,7 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
           try {
             await sendExitSurvey({
               orgSlug: slug,
-              reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+              reasons: `- ${selectedReason}\n`,
               message,
               exitAction: 'downgrade',
             })
@@ -104,8 +108,8 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
           <div className="space-y-4">
             <div className="space-y-8 mt-6">
               <div className="flex flex-wrap gap-2" data-toggle="buttons">
-                {CANCELLATION_REASONS.map((option) => {
-                  const active = selectedReasons.find((x) => x === option)
+                {shuffledReasons.map((option) => {
+                  const active = selectedReason === option
                   return (
                     <label
                       key={option}
@@ -121,11 +125,12 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
                   `}
                     >
                       <input
-                        type="checkbox"
+                        type="radio"
                         name="options"
                         value={option}
                         className="hidden"
-                        onClick={dispatchSelectedReasons}
+                        checked={active}
+                        onChange={() => onSelectCancellationReason(option)}
                       />
                       <div>{option}</div>
                     </label>
