@@ -8,7 +8,7 @@ These examples should be used as guidance when configuring Sentry functionality 
 # Exception Catching
 
 - Use `Sentry.captureException(error)` to capture an exception and log the error in Sentry.
-- Use this in try catch blocks or areas where exceptions are expected
+- Use this in try catch blocks or areas where exceptions are expected and not rethrown
 
 # Tracing Examples
 
