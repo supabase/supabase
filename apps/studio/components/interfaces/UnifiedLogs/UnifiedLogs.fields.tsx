@@ -52,9 +52,10 @@ export const filterFields = [
       return (
         <div className="flex w-full items-center justify-between gap-2 font-mono">
           <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
-            {props.label}
+            {props.label.replace('_', ' ')}
           </span>
-          <span className="text-xs text-muted-foreground/70">{props.value}</span>
+          {/* [Joshen] Temporarily hiding, this feels excessive */}
+          {/* <span className="text-xs text-muted-foreground/70">{props.value}</span> */}
         </div>
       )
     },
