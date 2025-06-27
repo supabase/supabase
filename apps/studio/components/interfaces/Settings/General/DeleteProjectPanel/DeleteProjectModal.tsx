@@ -33,11 +33,24 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
   const [message, setMessage] = useState<string>('')
   const [selectedReason, setSelectedReason] = useState<string[]>([])
 
+  // Single select for cancellation reason
+  const onSelectCancellationReason = (reason: string) => {
+    setSelectedReason([reason])
+  }
+
+  // Helper to get label for selected reason
+  const getReasonLabel = (reason: string | undefined) => {
+    const found = CANCELLATION_REASONS.find((r) => r.value === reason)
+    return found?.label || 'What can we improve on?'
+  }
+
+  const textareaLabel = getReasonLabel(selectedReason[0])
+
   // Shuffle cancellation reasons then add 'None of the above'
-  const [shuffledReasons, setShuffledReasons] = useState<string[]>([])
+  const [shuffledReasons, setShuffledReasons] = useState<{ value: string; label?: string }[]>([])
   useEffect(() => {
     const randomized = [...CANCELLATION_REASONS].sort(() => Math.random() - 0.5)
-    setShuffledReasons([...randomized, 'None of the above'])
+    setShuffledReasons([...randomized, { value: 'None of the above' }])
   }, [])
 
   const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
@@ -77,11 +90,6 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
       project_id: project?.id,
     },
   })
-
-  // Single select for cancellation reason
-  const onSelectCancellationReason = (reason: string) => {
-    setSelectedReason([reason])
-  }
 
   async function handleDeleteProject() {
     if (project === undefined) return
@@ -132,37 +140,37 @@ const DeleteProjectModal = ({ visible, onClose }: { visible: boolean; onClose: (
             <div className="space-y-4 pt-4">
               <div className="flex flex-wrap gap-2" data-toggle="buttons">
                 {shuffledReasons.map((option) => {
-                  const active = selectedReason[0] === option
+                  const active = selectedReason[0] === option.value
                   return (
                     <label
-                      key={option}
+                      key={option.value}
                       className={[
                         'flex cursor-pointer items-center space-x-2 rounded-md py-1',
                         'pl-2 pr-3 text-center text-sm shadow-sm transition-all duration-100',
                         `${
                           active
                             ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                            : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
+                            : ` bg-border-strong text-foreground opacity-50 hover:opacity-75`
                         }`,
                       ].join(' ')}
                     >
                       <input
                         type="radio"
                         name="options"
-                        value={option}
+                        value={option.value}
                         className="hidden"
                         checked={active}
-                        onChange={() => onSelectCancellationReason(option)}
+                        onChange={() => onSelectCancellationReason(option.value)}
                       />
-                      <div>{option}</div>
+                      <div>{option.value}</div>
                     </label>
                   )
                 })}
               </div>
               <div className="text-area-text-sm">
+                <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
                 <Input.TextArea
                   name="message"
-                  label="What can we improve on?"
                   rows={3}
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}

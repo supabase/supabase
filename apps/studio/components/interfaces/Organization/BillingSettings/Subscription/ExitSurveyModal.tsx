@@ -41,18 +41,26 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
 
   // Shuffle cancellation reasons then add 'None of the above'
-  const [shuffledReasons, setShuffledReasons] = useState<string[]>([])
+  const [shuffledReasons, setShuffledReasons] = useState<{ value: string; label?: string }[]>([])
   useEffect(() => {
     const randomized = [...CANCELLATION_REASONS].sort(() => Math.random() - 0.5)
-    setShuffledReasons([...randomized, 'None of the above'])
+    setShuffledReasons([...randomized, { value: 'None of the above' }])
   }, [])
 
   // Single select for cancellation reason
-  const [selectedReason, setSelectedReason] = useState<string | null>(null)
+  const [selectedReason, setSelectedReason] = useState<string[]>([])
 
   const onSelectCancellationReason = (reason: string) => {
-    setSelectedReason(reason)
+    setSelectedReason([reason])
   }
+
+  // Helper to get label for selected reason
+  const getReasonLabel = (reason: string | undefined) => {
+    const found = CANCELLATION_REASONS.find((r) => r.value === reason)
+    return found?.label || 'What can we improve on?'
+  }
+
+  const textareaLabel = getReasonLabel(selectedReason[0])
 
   const onSubmit = async () => {
     if (!selectedReason) {
@@ -109,10 +117,10 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
             <div className="space-y-8 mt-6">
               <div className="flex flex-wrap gap-2" data-toggle="buttons">
                 {shuffledReasons.map((option) => {
-                  const active = selectedReason === option
+                  const active = selectedReason[0] === option.value
                   return (
                     <label
-                      key={option}
+                      key={option.value}
                       className={`
                       flex cursor-pointer items-center space-x-2 rounded-md py-1 
                       pl-2 pr-3 text-center text-sm
@@ -120,30 +128,31 @@ const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalProps) =
                       ${
                         active
                           ? ` bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                          : ` bg-border-strong text-foreground opacity-25 hover:opacity-50`
+                          : ` bg-border-strong text-foreground opacity-75 hover:opacity-100`
                       }
                   `}
                     >
                       <input
                         type="radio"
                         name="options"
-                        value={option}
+                        value={option.value}
                         className="hidden"
                         checked={active}
-                        onChange={() => onSelectCancellationReason(option)}
+                        onChange={() => onSelectCancellationReason(option.value)}
                       />
-                      <div>{option}</div>
+                      <div>{option.value}</div>
                     </label>
                   )
                 })}
               </div>
               <div className="text-area-text-sm">
+                <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
                 <Input.TextArea
                   id="message"
                   name="message"
                   value={message}
                   onChange={(event: any) => setMessage(event.target.value)}
-                  label="What can we improve on?"
+                  rows={3}
                 />
               </div>
             </div>
