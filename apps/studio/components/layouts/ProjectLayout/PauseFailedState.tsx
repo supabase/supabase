@@ -96,7 +96,7 @@ const PauseFailedState = () => {
                     disabled={!canDeleteProject}
                     tooltip={{
                       content: {
-                        side: 'bottom',
+                        side: 'right',
                         text: !canDeleteProject
                           ? 'You need additional permissions to delete this project'
                           : undefined,
