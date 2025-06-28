@@ -50,10 +50,10 @@ export const DeleteProjectModal = ({
 
   const textareaLabel = getReasonLabel(selectedReason[0])
 
-  const shuffledReasons = [
+  const [shuffledReasons] = useState(() => [
     ...CANCELLATION_REASONS.sort(() => Math.random() - 0.5),
     { value: 'None of the above' },
-  ]
+  ])
 
   const { mutate: deleteProject, isLoading: isDeleting } = useProjectDeleteMutation({
     onSuccess: async () => {

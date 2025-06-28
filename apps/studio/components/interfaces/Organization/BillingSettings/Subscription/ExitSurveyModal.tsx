@@ -41,10 +41,10 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
 
-  const shuffledReasons = [
+  const [shuffledReasons] = useState(() => [
     ...CANCELLATION_REASONS.sort(() => Math.random() - 0.5),
     { value: 'None of the above' },
-  ]
+  ])
 
   const onSelectCancellationReason = (reason: string) => {
     setSelectedReason([reason])
