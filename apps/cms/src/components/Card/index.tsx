@@ -35,7 +35,7 @@ export const Card: React.FC<{
         'border border-border rounded-lg overflow-hidden bg-card hover:cursor-pointer',
         className
       )}
-      ref={card.ref}
+      ref={card.ref as React.Ref<HTMLDivElement>}
     >
       <div className="relative w-full ">
         {!metaImage && <div className="">No image</div>}
@@ -48,15 +48,15 @@ export const Card: React.FC<{
               <div>
                 {categories?.map((category, index) => {
                   if (typeof category === 'object') {
-                    const { title: titleFromCategory } = category
+                    const { name: nameFromCategory } = category
 
-                    const categoryTitle = titleFromCategory || 'Untitled category'
+                    const categoryName = nameFromCategory || 'Untitled category'
 
                     const isLast = index === categories.length - 1
 
                     return (
                       <Fragment key={index}>
-                        {categoryTitle}
+                        {categoryName}
                         {!isLast && <Fragment>, &nbsp;</Fragment>}
                       </Fragment>
                     )
@@ -71,7 +71,11 @@ export const Card: React.FC<{
         {titleToUse && (
           <div className="prose">
             <h3>
-              <Link className="not-prose" href={href} ref={link.ref}>
+              <Link
+                className="not-prose"
+                href={href}
+                ref={link.ref as React.Ref<HTMLAnchorElement>}
+              >
                 {titleToUse}
               </Link>
             </h3>
