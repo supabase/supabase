@@ -26,35 +26,35 @@ export const skillBasedSolutions = {
   solutions: [
     {
       id: Solutions.aiBuilders,
-      text: 'For AI Builders',
+      text: 'AI Builders',
       description: '',
       url: '/solutions/ai-builders',
       icon: BotIcon,
     },
     {
       id: Solutions.noCode,
-      text: 'For No Code',
+      text: 'No Code',
       description: '',
       url: '/solutions/no-code',
       icon: PointerIcon,
     },
     {
       id: Solutions.beginners,
-      text: 'For Beginners',
+      text: 'Beginners',
       description: '',
       url: '/solutions/beginners',
       icon: PuzzleIcon,
     },
     {
       id: Solutions.developers,
-      text: 'For Developers',
+      text: 'Developers',
       description: '',
       url: '/solutions/developers',
       icon: Code2Icon,
     },
     {
       id: Solutions.postgresDevs,
-      text: 'For Postgres Devs',
+      text: 'Postgres Devs',
       description: '',
       url: '/solutions/postgres-developers',
       icon: (props: any) => (
@@ -101,14 +101,14 @@ export const useCaseSolutions = {
     },
     {
       id: Solutions.startups,
-      text: 'For Startups',
+      text: 'Startups',
       description: '',
       url: '/solutions/startups',
       icon: TrendingUpIcon,
     },
     {
       id: Solutions.enterprise,
-      text: 'For Enterprise',
+      text: 'Enterprise',
       description: '',
       url: '/solutions/enterprise',
       icon: Building2Icon,
@@ -129,7 +129,7 @@ export const navData = {
       ],
     },
     {
-      label: 'Use Case',
+      label: "Who it's for",
       links: [
         ...useCaseSolutions.solutions.map((solution) => ({
           text: solution.text,
