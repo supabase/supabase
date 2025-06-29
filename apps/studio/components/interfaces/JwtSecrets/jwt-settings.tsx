@@ -213,7 +213,7 @@ const JWTSettings = () => {
                       disabled={!canUpdateConfig || isLoadingAuthConfig}
                     />
 
-                    <div className="space-y-3">
+                    <div className="space-y-3" id="generate-jwt">
                       <div className="p-3 px-6 border rounded-md shadow-sm bg-studio">
                         {isUpdatingJwtSecret ? (
                           <div className="flex items-center space-x-2">
