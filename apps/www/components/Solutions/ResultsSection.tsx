@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 import { cn, Badge } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-interface Props {
+export interface ResultsSectionProps {
   id: string
   heading: string | JSX.Element
   subheading: string | JSX.Element
@@ -14,7 +14,7 @@ type Highlight = {
   subheading: string
 }
 
-const ResultsSection: FC<Props> = (props) => {
+const ResultsSection: FC<ResultsSectionProps> = (props) => {
   return (
     <SectionContainer id={props.id} className="relative">
       <div className="relative z-10 flex flex-col gap-4 md:gap-8 pb-20">

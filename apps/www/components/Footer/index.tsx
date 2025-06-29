@@ -62,8 +62,8 @@ const Footer = (props: Props) => {
         <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
       <SectionContainer className="py-8">
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="space-y-8 xl:col-span-1">
+        <div className="xl:grid xl:grid-cols-7 xl:gap-4">
+          <div className="space-y-8 xl:col-span-2">
             <Link href="#" as="/" className="w-40">
               <Image
                 src={supabaseLogoWordmarkLight}
@@ -116,8 +116,8 @@ const Footer = (props: Props) => {
               </a>
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-5 xl:mt-0">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
               {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>

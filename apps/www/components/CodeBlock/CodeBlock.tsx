@@ -9,10 +9,11 @@ import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
+import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import { Button, cn } from 'ui'
 import monokaiCustomTheme from './CodeBlock.utils'
 
-export type LANG = 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin' | 'yaml'
+export type LANG = 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin' | 'yaml' | 'json'
 export interface CodeBlockProps {
   lang: LANG
   startingLineNumber?: number
@@ -62,6 +63,7 @@ function CodeBlock(props: CodeBlockProps) {
   SyntaxHighlighter.registerLanguage('bash', bash)
   SyntaxHighlighter.registerLanguage('kotlin', kotlin)
   SyntaxHighlighter.registerLanguage('yaml', yaml)
+  SyntaxHighlighter.registerLanguage('json', json)
 
   // const large = props.size === 'large' ? true : false
   const large = false

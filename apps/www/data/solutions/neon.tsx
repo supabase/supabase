@@ -1,4 +1,5 @@
 import { cn, Image } from 'ui'
+import dynamic from 'next/dynamic'
 import { CubeIcon } from '@heroicons/react/outline'
 import {
   ArrowRight,
@@ -17,14 +18,15 @@ import {
   Check,
   InfoIcon,
 } from 'lucide-react'
-import AuthVisual from '~/components/Products/AuthVisual'
-import FunctionsVisual from '~/components/Products/FunctionsVisual'
-import RealtimeVisual from '~/components/Products/RealtimeVisual'
-import RealtimeLogs from '~/components/Products/Functions/RealtimeLogs'
-import DataAPIsVisual from '~/components/Products/DataAPIsVisual'
+import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
 
-import MainProducts from '~/data/MainProducts'
+import MainProducts from 'data/MainProducts'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { companyStats } from 'data/company-stats'
+
+const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
+const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
+const RealtimeVisual = dynamic(() => import('components/Products/RealtimeVisual'))
 
 const data = {
   metadata: {
@@ -547,11 +549,11 @@ const data = {
     highlights: [
       {
         heading: 'databases managed',
-        subheading: '1,000,000+',
+        subheading: companyStats.databasesManaged,
       },
       {
         heading: 'databases launched daily',
-        subheading: '2,500+',
+        subheading: companyStats.databasesLaunchedDaily,
       },
     ],
   },

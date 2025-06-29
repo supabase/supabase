@@ -1988,6 +1988,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/enterprise',
+    destination: '/solutions/enterprise',
+  },
+  {
+    permanent: true,
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
   },

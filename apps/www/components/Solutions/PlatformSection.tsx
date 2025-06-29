@@ -8,7 +8,7 @@ interface Feature {
   subheading: string | React.ReactNode
   highlights?: string | React.ReactNode
   url?: string
-  icon?: string
+  icon?: string | React.ReactNode
   image?: any
   className?: string
   onClick?: any
@@ -16,7 +16,7 @@ interface Feature {
   isDatabase?: boolean
 }
 
-interface Props {
+export interface PlatformSectionProps {
   id?: string
   title: string | React.ReactNode
   subheading: string
@@ -24,7 +24,7 @@ interface Props {
   className?: string
 }
 
-const PlatformSection = ({ title, subheading, features, id, className }: Props) => {
+const PlatformSection = ({ title, subheading, features, id, className }: PlatformSectionProps) => {
   return (
     <SectionContainer id={id} className={cn('flex flex-col gap-12 py-16 md:py-24', className)}>
       <div className="flex flex-col gap-4 max-w-lg">
@@ -69,28 +69,31 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
         )}
       >
         <div className="flex items-center gap-2">
-          {feature.icon && (
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 25 25"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d={feature.icon}
-                stroke="currentColor"
-                strokeMiterlimit="10"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                strokeWidth="1.5"
-              />
-            </svg>
-          )}
+          {feature.icon &&
+            (typeof feature.icon === 'string' ? (
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 25 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d={feature.icon}
+                  stroke="currentColor"
+                  strokeMiterlimit="10"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  strokeWidth="1.5"
+                />
+              </svg>
+            ) : (
+              feature.icon
+            ))}
           <h3 className="">{feature.title}</h3>
         </div>
         <div className="flex-1 flex flex-col justify-between gap-2">
-          <p className="text-sm [&_strong]:!text-foreground">{feature.subheading}</p>
+          <p className="text-sm 2xl:text-base [&_strong]:!text-foreground">{feature.subheading}</p>
           {feature.highlights && (
             <span
               className={cn('hidden lg:block text-foreground', feature.isDatabase && 'md:block')}

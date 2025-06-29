@@ -15,13 +15,13 @@ interface Props {
   title?: string
   image?: React.ReactNode
   footer?: React.ReactNode
-  footerPosition?: 'bottom' | 'left'
+  footerPosition?: 'left' | 'bottom' | 'right'
   ctas?: CTA[]
   className?: string
   sectionContainerClassName?: string
 }
 
-const ProductHeader = (props: Props) => (
+const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
   <div
     className={cn(
       'w-full max-w-full relative mx-auto py-16 lg:py-24 border-b bg-alternative overflow-hidden',
@@ -61,12 +61,18 @@ const ProductHeader = (props: Props) => (
         )}
         <div className="flex flex-row md:flex-row md:items-center gap-2 mt-2">
           {props.ctas?.map((cta) => (
-            <Button key={cta.href} size="medium" type={cta.type ?? 'default'} asChild>
+            <Button
+              key={cta.href}
+              size="medium"
+              type={cta.type ?? 'default'}
+              onClick={cta.onClick}
+              asChild
+            >
               <Link href={cta.href}>{cta.label ?? 'Start for free'}</Link>
             </Button>
           ))}
         </div>
-        {props.footer && props.footerPosition === 'left' && (
+        {props.footer && footerPosition === 'left' && (
           <div className="ph-footer relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
             {props.footer}
           </div>
@@ -77,7 +83,7 @@ const ProductHeader = (props: Props) => (
           {props.image}
         </div>
       )}
-      {props.footer && props.footerPosition !== 'left' && (
+      {props.footer && footerPosition !== 'left' && (
         <div className="relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
           {props.footer}
         </div>

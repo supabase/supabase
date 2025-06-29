@@ -17,7 +17,7 @@ interface Feature {
   alignLeft?: boolean
 }
 
-interface Props {
+export interface DXSectionProps {
   id: string
   title: string | React.ReactNode
   subheading: string
@@ -25,7 +25,13 @@ interface Props {
   className?: string
 }
 
-const DeveloperExperienceSection = ({ id, title, subheading, features, className }: Props) => {
+const DeveloperExperienceSection = ({
+  id,
+  title,
+  subheading,
+  features,
+  className,
+}: DXSectionProps) => {
   return (
     <SectionContainer id={id} className={cn('flex flex-col gap-12 py-16 md:py-24', className)}>
       <div className="flex flex-col gap-4 max-w-lg">
