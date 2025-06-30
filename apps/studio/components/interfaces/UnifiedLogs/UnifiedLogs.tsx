@@ -27,7 +27,6 @@ import { FilterSideBar } from 'components/ui/DataTable/FilterSideBar'
 import { LiveButton } from 'components/ui/DataTable/LiveButton'
 import { LiveRow } from 'components/ui/DataTable/LiveRow'
 import { DataTableProvider } from 'components/ui/DataTable/providers/DataTableProvider'
-import { RefreshButton } from 'components/ui/DataTable/RefreshButton'
 import { TimelineChart } from 'components/ui/DataTable/TimelineChart'
 import { useUnifiedLogsChartQuery } from 'data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from 'data/logs/unified-logs-count-query'
@@ -45,6 +44,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
@@ -100,18 +100,35 @@ export const UnifiedLogs = () => {
     isLoading,
     isFetching,
     hasNextPage,
-    refetch,
+    refetch: refetchLogs,
     fetchNextPage,
     fetchPreviousPage,
   } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
-  const { data: counts, isLoading: isLoadingCounts } = useUnifiedLogsCountQuery({
+  const {
+    data: counts,
+    isLoading: isLoadingCounts,
+    isFetching: isFetchingCounts,
+    refetch: refetchCounts,
+  } = useUnifiedLogsCountQuery({
     projectRef,
     search: searchParameters,
   })
-  const { data: unifiedLogsChart = [] } = useUnifiedLogsChartQuery({
+  const {
+    data: unifiedLogsChart = [],
+    isFetching: isFetchingCharts,
+    refetch: refetchCharts,
+  } = useUnifiedLogsChartQuery({
     projectRef,
     search: searchParameters,
   })
+
+  const refetchAllData = () => {
+    refetchLogs()
+    refetchCounts()
+    refetchCharts()
+  }
+
+  const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
 
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
@@ -275,10 +292,13 @@ export const UnifiedLogs = () => {
         <FilterSideBar />
         <div className="flex max-w-full flex-1 flex-col border-border sm:border-l overflow-hidden">
           <DataTableHeaderLayout setTopBarHeight={setTopBarHeight}>
-            <DataTableFilterCommand searchParamsParser={SEARCH_PARAMS_PARSER} />
+            <DataTableFilterCommand
+              placeholder="Search logs..."
+              searchParamsParser={SEARCH_PARAMS_PARSER}
+            />
             <DataTableToolbar
               renderActions={() => [
-                <RefreshButton key="refresh" onClick={refetch} />,
+                <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />,
                 fetchPreviousPage ? (
                   <LiveButton
                     key="live"

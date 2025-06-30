@@ -555,9 +555,7 @@ export const SubscriptionPlanUpdateDialog = ({
                     ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
-                    createPaymentMethodInline={
-                      subscriptionPreview.pending_subscription_flow === true
-                    }
+                    createPaymentMethodInline={true}
                     readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                   />
                 </div>

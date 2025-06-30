@@ -660,6 +660,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/private-link/{organization_slug}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get organization's PrivateLink configuration. */
+    get: operations['PrivateLinkController_getPrivateLinkConfig']
+    /** Update organization's PrivateLink configuration. */
+    put: operations['PrivateLinkController_updatePrivateLinkConfig']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/vercel': {
     parameters: {
       query?: never
@@ -1517,23 +1535,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/{slug}/transfer': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Transfers the organization to the given member */
-    post: operations['TransferController_transferOrganization']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/organizations/{slug}/usage': {
     parameters: {
       query?: never
@@ -2142,9 +2143,10 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's logs */
-    get: operations['LogsController_getApiPaths']
+    get: operations['LogsController_getProjectLogsViaGet']
     put?: never
-    post?: never
+    /** Gets project's logs */
+    post: operations['LogsController_getProjectLogsViaPost']
     delete?: never
     options?: never
     head?: never
@@ -4462,6 +4464,7 @@ export interface components {
     CreateGitHubConnectionBody: {
       branch_limit?: number
       installation_id: number
+      new_branch_per_pr?: boolean
       project_ref: string
       repository_id: number
       supabase_changes_only?: boolean
@@ -4472,6 +4475,7 @@ export interface components {
       id: number
       inserted_at: string
       installation_id: number
+      new_branch_per_pr: boolean
       supabase_changes_only: boolean
       updated_at: string
       workdir: string
@@ -4698,8 +4702,7 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       name: string
-      org_id?: number
-      organization_slug?: string
+      organization_slug: string
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
@@ -5401,6 +5404,11 @@ export interface components {
       remediation: string
       title: string
     }[]
+    GetProjectLogsBody: {
+      iso_timestamp_end?: string
+      iso_timestamp_start?: string
+      sql?: string
+    }
     GetPublicUrlBody: {
       options?: {
         download?: boolean
@@ -5991,6 +5999,7 @@ export interface components {
         id: number
         inserted_at: string
         installation_id: number
+        new_branch_per_pr: boolean
         project: {
           id: number
           name: string
@@ -6798,6 +6807,12 @@ export interface components {
         message: string
       }[]
     }
+    PrivateLinkResponse: {
+      appliedSuccessfully: boolean
+      currentConfig: {
+        enabled: boolean
+      }
+    }
     Profile: {
       first_name: string
       gotrue_id: string
@@ -7572,12 +7587,6 @@ export interface components {
       page_url: string
       pathname: string
     }
-    TransferOrganizationBody: {
-      /** Format: uuid */
-      member_gotrue_id: string
-      member_id?: number
-      org_id: number
-    }
     TransferProjectBody: {
       target_organization_slug: string
     }
@@ -7880,6 +7889,7 @@ export interface components {
     }
     UpdateGitHubConnectionBody: {
       branch_limit?: number
+      new_branch_per_pr?: boolean
       supabase_changes_only?: boolean
       workdir?: string
     }
@@ -8212,6 +8222,11 @@ export interface components {
       db_pool: number | null
       db_schema: string
       max_rows: number
+    }
+    UpdatePrivateLinkBody: {
+      requestedConfig: {
+        enabled: boolean
+      }
     }
     UpdateProfileBody: {
       first_name?: string
@@ -9930,6 +9945,66 @@ export interface operations {
         }
       }
       /** @description Failed to get GitHub repository branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PrivateLinkController_getPrivateLinkConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        organization_slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrivateLinkResponse']
+        }
+      }
+      /** @description Failed to retrieve organization's PrivateLink config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PrivateLinkController_updatePrivateLinkConfig: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        organization_slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePrivateLinkBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrivateLinkResponse']
+        }
+      }
+      /** @description Failed to update organization's PrivateLink configuration. */
       500: {
         headers: {
           [name: string]: unknown
@@ -12170,34 +12245,6 @@ export interface operations {
         content?: never
       }
       /** @description Failed to delete the tax ID */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TransferController_transferOrganization: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['TransferOrganizationBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to update owner */
       500: {
         headers: {
           [name: string]: unknown
@@ -14569,12 +14616,11 @@ export interface operations {
       }
     }
   }
-  LogsController_getApiPaths: {
+  LogsController_getProjectLogsViaGet: {
     parameters: {
       query?: {
         iso_timestamp_end?: string
         iso_timestamp_start?: string
-        project?: string
         sql?: string
       }
       header?: never
@@ -14587,6 +14633,45 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's logs */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  LogsController_getProjectLogsViaPost: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GetProjectLogsBody']
+      }
+    }
+    responses: {
+      201: {
         headers: {
           [name: string]: unknown
         }

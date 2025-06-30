@@ -424,7 +424,7 @@ export const QueryBlock = ({
                       <Cell
                         key={`cell-${index}`}
                         className="transition-all duration-100"
-                        fill="var(--chart-1)"
+                        fill="hsl(var(--chart-1))"
                         opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
                         enableBackground={12}
                       />

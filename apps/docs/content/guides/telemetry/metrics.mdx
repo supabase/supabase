@@ -29,6 +29,18 @@ Access to the endpoint is secured via HTTP Basic Auth:
 - username: `service_role`
 - password: the service role JWT from the [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/api-keys)
 
+You can also retrieve your service role key programmatically using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get project API keys including service_role key
+curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true"
+```
+
 <ProjectConfigVariables variable="url" />
 
 ```shell
