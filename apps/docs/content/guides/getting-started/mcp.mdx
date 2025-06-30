@@ -15,6 +15,7 @@ The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP)
 - [Claude desktop](#claude-desktop)
 - [Claude code](#claude-code)
 - [Amp](#amp)
+- [Gemini CLI](#gemini-cli)
 
 Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
 
@@ -184,6 +185,40 @@ You can add the Supabase MCP server to Amp in two ways:
 
 1. Save the configuration file.
 1. Restart Amp to apply the new configuration.
+
+### Gemini CLI
+
+You can add the Supabase MCP server to Gemini CLI.
+Gemini CLI uses settings.json files for persistent configuration. There are two locations for these files:
+`~/.gemini/settings.json` for all Gemini CLI sessions for the current user or 
+`.gemini/settings.json` for project's root directory.
+
+
+1. Create or edit the `settings.json` file and add the following configuration:
+
+   ```json
+   {
+     "mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "@supabase/mcp-server-supabase@latest",
+           "--read-only",
+           "--project-ref=<project-ref>"
+         ],
+         "env": {
+           "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+         }
+       }
+     }
+   }
+   ```
+
+   Replace `project-ref` and `personal-access-token` with your project ref and personal access token.
+
+2. Save the configuration file.
+3. Start Gemini CLI to read the new configuration.
 
 ### Qodo Gen
 
