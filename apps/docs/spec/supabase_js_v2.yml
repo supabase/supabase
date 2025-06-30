@@ -4406,7 +4406,7 @@ functions:
         name: Call a read-only Postgres function
         code: |
           ```ts
-          const { data, error } = await supabase.rpc('hello_world', { get: true })
+          const { data, error } = await supabase.rpc('hello_world', undefined, { get: true })
           ```
         data:
           sql: |

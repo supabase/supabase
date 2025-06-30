@@ -25,7 +25,6 @@ import RightClickBrandLogo from './RightClickBrandLogo'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import useDropdownMenu from './useDropdownMenu'
 import { AnnouncementBanner, AuthenticatedDropdownMenu } from 'ui-patterns'
-import Announcement from '../LaunchWeek/7/LaunchSection/Announcement'
 
 interface Props {
   hideNavbar: boolean

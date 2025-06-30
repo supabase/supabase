@@ -74,7 +74,7 @@ supabase db diff -f create_employees_table
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Start the local database and apply migrations">
-      Start the local database and then apply the migration file to see your schema changes in the local Dashboard.
+      Start the local database first. Then, apply the migration manually to see your schema changes in the local Dashboard.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -82,7 +82,8 @@ supabase db diff -f create_employees_table
 <$CodeTabs>
 
 ```bash name=Terminal
-supabase start && supabase migration up
+supabase start
+supabase migration up
 ```
 
 </$CodeTabs>
@@ -97,28 +98,6 @@ supabase start && supabase migration up
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Stop the local database">
-      Before updating your schema files, stop the local development environment.
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-<$CodeTabs>
-
-```bash name=Terminal
-supabase stop
-```
-
-</$CodeTabs>
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
-
-<StepHikeCompact>
-
-  <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Add a new column">
       Edit `supabase/schemas/employees.sql` file to add a new column to `employees` table.
     </StepHikeCompact.Details>
@@ -150,7 +129,7 @@ Some entities like views and enums expect columns to be declared in a specific o
 
 <StepHikeCompact>
 
-  <StepHikeCompact.Step step={3}>
+  <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Generate a new migration">
       Diff existing migrations against your declared schema.
     </StepHikeCompact.Details>
@@ -172,7 +151,7 @@ supabase db diff -f add_age
 
 <StepHikeCompact>
 
-  <StepHikeCompact.Step step={4}>
+  <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Review the generated migration">
       Verify that the generated migration contain a single incremental change.
     </StepHikeCompact.Details>
@@ -193,7 +172,7 @@ alter table "public"."employees" add column "age" smallint not null;
 </StepHikeCompact>
 
 <StepHikeCompact>
-  <StepHikeCompact.Step step={5}>
+  <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Apply the pending migration">
       Start the database locally and apply the pending migration.
     </StepHikeCompact.Details>
@@ -203,7 +182,7 @@ alter table "public"."employees" add column "age" smallint not null;
 <$CodeTabs>
 
 ```bash name=Terminal
-supabase start && supabase migration up
+supabase migration up
 ```
 
 </$CodeTabs>

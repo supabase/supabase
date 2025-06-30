@@ -39,6 +39,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -149,7 +150,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const options = useMemo(() => {
     return {
       clientSecret: paymentIntentSecret,
-      appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+      appearance: getStripeElementsAppearanceOptions(resolvedTheme),
     } as any
   }, [paymentIntentSecret, resolvedTheme])
 
@@ -251,8 +252,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   name="paymentMethod"
                   render={() => (
                     <PaymentMethodSelection
+                      createPaymentMethodInline={false}
                       onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
                       selectedPaymentMethod={form.getValues('paymentMethod')}
+                      readOnly={executingTopUp || paymentConfirmationLoading}
                     />
                   )}
                 />
@@ -322,7 +325,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   paymentIntentConfirmed(paymentIntentConfirmation)
                 }
                 onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-                paymentMethodId={form.getValues().paymentMethod}
               />
             </Elements>
           )}

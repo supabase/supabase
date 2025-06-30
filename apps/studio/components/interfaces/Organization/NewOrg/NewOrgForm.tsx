@@ -1,11 +1,11 @@
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import _ from 'lodash'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -19,7 +19,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import {
   Button,
-  Input,
   Input_Shadcn_,
   Label_Shadcn_,
   Select_Shadcn_,
@@ -35,13 +34,14 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BillingCustomerDataNewOrgDialog } from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
 import { FormCustomerData } from '../BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
-import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
+import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import { getURL } from 'lib/helpers'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { NewPaymentMethodElement } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -119,13 +119,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     () =>
       ({
         clientSecret: setupIntent ? setupIntent.client_secret! : '',
-        appearance: {
-          theme: resolvedTheme?.includes('dark') ? 'night' : 'flat',
-          labels: 'floating',
-        },
-        ...(setupIntent?.pending_subscription_flow_enabled_for_creation === true
-          ? { paymentMethodCreation: 'manual' }
-          : {}),
+        appearance: getStripeElementsAppearanceOptions(resolvedTheme),
+        paymentMethodCreation: 'manual',
       }) as const,
     [setupIntent, resolvedTheme]
   )
@@ -185,13 +180,13 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       }
     },
     onError: (data) => {
-      toast.error(`Failed to create organization: ${data.message}`)
+      toast.error(data.message, { duration: 10_000 })
       resetPaymentMethod()
       setNewOrgLoading(false)
     },
   })
 
-  const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionChangeMutation({
+  const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
     onSuccess: (data) => {
       if (data && 'slug' in data) {
         onOrganizationCreated({ slug: data.slug })
@@ -212,7 +207,9 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       })
     } else {
       // If the payment intent is not successful, we reset the payment method and show an error
-      toast.error(`Could not confirm payment. Please try again or use a different card.`)
+      toast.error(`Could not confirm payment. Please try again or use a different card.`, {
+        duration: 10_000,
+      })
       resetPaymentMethod()
       setNewOrgLoading(false)
     }
@@ -240,7 +237,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
   const stripeOptionsConfirm = useMemo(() => {
     return {
       clientSecret: paymentIntentSecret,
-      appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+      appearance: getStripeElementsAppearanceOptions(resolvedTheme),
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
@@ -551,12 +548,13 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
         {setupIntent && formState.plan !== 'FREE' && (
           <Panel.Content>
             <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
-              <Payment
-                ref={paymentRef}
-                pending_subscription_flow_enabled_for_creation={
-                  setupIntent?.pending_subscription_flow_enabled_for_creation === true
-                }
-              />
+              <Panel.Content>
+                <NewPaymentMethodElement
+                  ref={paymentRef}
+                  email={user.profile?.primary_email}
+                  readOnly={newOrgLoading || paymentConfirmationLoading}
+                />
+              </Panel.Content>
             </Elements>
           </Panel.Content>
         )}
@@ -642,9 +640,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
               paymentIntentConfirmed(paymentIntentConfirmation)
             }
             onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-            paymentMethodId={paymentMethod.id}
             onError={(err) => {
-              toast.error(`Failed to confirm payment: ${err.message}`)
+              toast.error(err.message, { duration: 10_000 })
               setNewOrgLoading(false)
               resetPaymentMethod()
             }}
@@ -656,65 +653,3 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 }
 
 export default NewOrgForm
-
-/**
- * Set up as a separate component, as we need any component using stripe/elements to be wrapped in Elements.
- *
- * If Elements is on a higher level, we risk losing all form state in case a payment fails.
- */
-const Payment = forwardRef(
-  (
-    {
-      pending_subscription_flow_enabled_for_creation,
-    }: { pending_subscription_flow_enabled_for_creation: boolean },
-    ref
-  ) => {
-    const stripe = useStripe()
-    const elements = useElements()
-
-    const createPaymentMethod = async () => {
-      if (!stripe || !elements) return
-      await elements.submit()
-
-      if (pending_subscription_flow_enabled_for_creation) {
-        // To avoid double 3DS confirmation, we just create the payment method here, as there might be a confirmation step while doing the actual payment
-        const { error, paymentMethod } = await stripe.createPaymentMethod({
-          elements,
-        })
-        if (error || paymentMethod == null) {
-          toast.error(error?.message ?? ' Failed to process card details')
-          return
-        }
-        return paymentMethod
-      } else {
-        const { error, setupIntent } = await stripe.confirmSetup({
-          elements,
-          redirect: 'if_required',
-          confirmParams: {
-            return_url: `${getURL()}/new`,
-            expand: ['payment_method'],
-          },
-        })
-
-        if (error || !setupIntent.payment_method) {
-          toast.error(error?.message ?? ' Failed to save card details')
-          return
-        }
-
-        return setupIntent.payment_method as PaymentMethod
-      }
-    }
-
-    useImperativeHandle(ref, () => ({
-      createPaymentMethod,
-    }))
-
-    return (
-      <Panel.Content>
-        <PaymentElement />
-      </Panel.Content>
-    )
-  }
-)
-
-Payment.displayName = 'Payment'

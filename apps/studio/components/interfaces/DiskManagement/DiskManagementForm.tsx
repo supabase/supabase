@@ -56,6 +56,7 @@ import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import { DiskType, RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 
 export function DiskManagementForm() {
   // isLoading is used to avoid a useCheckPermissions() race condition
@@ -69,7 +70,8 @@ export function DiskManagementForm() {
     (warning) => warning.project === project?.ref
   )
   const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
-  const isFlyArchitecture = project?.cloud_provider === 'FLY'
+  const isAws = useIsAwsCloudProvider()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   /**
    * Permissions
@@ -118,27 +120,24 @@ export function DiskManagementForm() {
           setRefetchInterval(2000)
         }
       },
-      enabled: project != null && !isFlyArchitecture,
+      enabled: project != null && isAws,
     }
   )
   const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
   const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
-      enabled: project != null && !isFlyArchitecture,
+      enabled: project != null && isAws,
     })
   const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery(
     {
       projectRef,
     },
-    { enabled: project != null && !isFlyArchitecture }
+    { enabled: project != null && isAws }
   )
 
   const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
-    useDiskAutoscaleCustomConfigQuery(
-      { projectRef },
-      { enabled: project != null && !isFlyArchitecture }
-    )
+    useDiskAutoscaleCustomConfigQuery({ projectRef }, { enabled: project != null && isAws })
 
   /**
    * Handle default values
@@ -200,7 +199,7 @@ export function DiskManagementForm() {
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration ||
-    isFlyArchitecture
+    !isAws
 
   const disableComputeInputs = isPlanUpgradeRequired
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
@@ -344,15 +343,17 @@ export function DiskManagementForm() {
           <SpendCapDisabledSection />
           <NoticeBar
             type="default"
-            visible={isFlyArchitecture}
-            title="Disk configuration is not available on Fly Postgres"
+            visible={!isAws}
+            title="Disk configuration is only available for projects in the AWS cloud provider"
             description={
-              isBranch
-                ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
-                : 'The Fly Postgres offering is deprecated - please migrate your instance to Supabase to configure your disk.'
+              isAwsK8s
+                ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
+                : isBranch
+                  ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
+                  : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
             }
           />
-          {!isFlyArchitecture && (
+          {isAws && (
             <>
               <div className="flex flex-col gap-y-3">
                 <DiskCountdownRadial />
