@@ -17,6 +17,8 @@ import { useAuthLogsReport } from 'data/reports/auth-report-query'
 import type { ChartData } from 'components/ui/Charts/Charts.types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { useAttributeQueries } from 'components/ui/Charts/LogChartHandler'
+import { useEdgeFunctionReportFilters } from 'data/reports/edgefn.utils'
+import { useEdgeFunctionReport } from 'data/reports/edgefn.queries'
 
 export const useChartData = ({
   attributes,

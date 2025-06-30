@@ -41,10 +41,10 @@ from
   CROSS JOIN UNNEST(m.response) AS response
   ${functionId ? `WHERE function_id = '${functionId}'` : ''}
 group by
-  function_edge_logs.timestamp,
-  request.pathname
+  timestamp,
+  function_path
 order by
-  function_edge_logs.timestamp desc;        
+  timestamp desc;        
 
     `
     },
@@ -62,22 +62,52 @@ FROM
   CROSS JOIN UNNEST(m.request) AS request
   ${functionId ? `WHERE function_id = '${functionId}'` : ''}
 group by
-  function_edge_logs.timestamp,
-  response.status_code
+  timestamp,
+  status_code
 order by
-  function_edge_logs.timestamp desc;
+  timestamp desc;
     `
     },
-    InvocationsByRegion: (interval) => {
+    InvocationsByRegion: (interval, functionId) => {
       const granularity = analyticsIntervalToGranularity(interval)
       return `
 --edgefn-report-invocations-by-region
+select
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
+  h.x_sb_edge_region as region,
+  count(*) as count
+from
+  function_edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.response) as r
+  cross join unnest(r.headers) as h
+  where h.x_sb_edge_region is not null
+  ${functionId ? `and function_id = '${functionId}'` : ''}
+group by
+  timestamp,
+  region
+order by
+  timestamp desc
     `
     },
-    ExecutionTime: (interval) => {
+    ExecutionTime: (interval, functionId) => {
       const granularity = analyticsIntervalToGranularity(interval)
       return `
 --edgefn-report-execution-time
+select
+  timestamp_trunc(timestamp, ${granularity}) as timestamp,
+  request.pathname as function_path,
+  avg(m.execution_time_ms) as avg_execution_time
+from
+  function_edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) as request
+  ${functionId ? `where function_id = '${functionId}'` : ''}
+group by
+  timestamp,
+  function_path
+order by
+  timestamp desc
     `
     },
   }
@@ -195,8 +225,96 @@ const METRIC_FORMATTER: Record<
 
     return { data, chartAttributes }
   },
-  InvocationsByRegion: (rawData, attributes) => defaultFormatter(rawData, attributes),
-  ExecutionTime: (rawData, attributes) => defaultFormatter(rawData, attributes),
+  InvocationsByRegion: (rawData, attributes) => {
+    if (!rawData) return { data: undefined, chartAttributes: attributes }
+    const result = rawData.result || []
+
+    const regions = Array.from(new Set(result.map((p: any) => p.region))).filter(Boolean)
+
+    if (regions.length === 0) {
+      return { data: [], chartAttributes: [] } // No data, empty chart
+    }
+
+    const chartAttributes = regions.map((region) => {
+      return {
+        attribute: region,
+        label: region,
+        provider: 'logs',
+        enabled: true,
+      }
+    })
+
+    const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
+    const data = Array.from(timestamps)
+      .sort()
+      .map((timestamp) => {
+        const point: any = { period_start: timestamp }
+        chartAttributes.forEach((attr) => {
+          point[attr.attribute] = 0
+        })
+        const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
+        matchingPoints.forEach((p: any) => {
+          point[p.region] = p.count
+        })
+        return point
+      })
+
+    return { data, chartAttributes }
+  },
+  ExecutionTime: (rawData, attributes, logsMetric, functionId) => {
+    if (functionId) {
+      if (!rawData) return { data: undefined, chartAttributes: attributes }
+      const result = rawData.result || []
+      const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
+      const data = Array.from(timestamps)
+        .sort()
+        .map((timestamp) => {
+          const point: any = { period_start: timestamp }
+          attributes.forEach((attr) => {
+            point[attr.attribute] = 0
+          })
+          const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
+          matchingPoints.forEach((p: any) => {
+            point[attributes[0].attribute] = p.avg_execution_time
+          })
+          return point
+        })
+      return { data, chartAttributes: attributes }
+    }
+    // Multiple functions, create dynamic attributes
+    if (!rawData) return { data: undefined, chartAttributes: attributes }
+    const result = rawData.result || []
+
+    const functionPaths = Array.from(new Set(result.map((p: any) => p.function_path))) as string[]
+
+    if (functionPaths.length === 0) {
+      return { data: [], chartAttributes: [] } // No data, empty chart
+    }
+
+    const chartAttributes = functionPaths.map((path: string) => ({
+      attribute: path,
+      label: path.startsWith('/') ? path.substring(1) : path,
+      provider: 'logs',
+      enabled: true,
+    }))
+
+    const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
+    const data = Array.from(timestamps)
+      .sort()
+      .map((timestamp) => {
+        const point: any = { period_start: timestamp }
+        chartAttributes.forEach((attr) => {
+          point[attr.attribute] = 0
+        })
+        const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
+        matchingPoints.forEach((p: any) => {
+          point[p.function_path as string] = p.avg_execution_time
+        })
+        return point
+      })
+
+    return { data, chartAttributes }
+  },
 }
 
 /**
