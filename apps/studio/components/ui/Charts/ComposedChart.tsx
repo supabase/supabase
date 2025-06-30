@@ -59,7 +59,6 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   hideHighlightedValue?: boolean
   syncId?: string
   docsUrl?: string
-  titleTooltip?: string
 }
 
 export default function ComposedChart({

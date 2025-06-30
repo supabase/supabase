@@ -48,7 +48,6 @@ interface ComposedChartHandlerProps {
   isVisible?: boolean
   titleTooltip?: string
   docsUrl?: string
-  titleTooltip?: string
 }
 
 /**
