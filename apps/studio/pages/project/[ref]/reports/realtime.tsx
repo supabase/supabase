@@ -4,13 +4,13 @@ import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
 
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 
 import { analyticsKeys } from 'data/analytics/keys'
@@ -175,15 +175,13 @@ const RealtimeUsage = () => {
         <div className="grid grid-cols-1 gap-4">
           {dateRange &&
             REALTIME_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
-              <ComposedChartHandler
+              <ReportChart
                 key={`${attr.id}-${i}`}
-                {...attr}
-                attributes={attr.attributes as MultiAttribute[]}
+                chart={attr}
                 interval={dateRange.interval}
                 startDate={dateRange?.period_start?.date}
                 endDate={dateRange?.period_end?.date}
                 updateDateRange={updateDateRange}
-                defaultChartStyle={attr.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
               />
             ))}
         </div>

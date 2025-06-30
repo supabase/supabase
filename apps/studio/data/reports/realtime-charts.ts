@@ -71,7 +71,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
     defaultChartStyle: 'bar',
     attributes: [
       {
-        attribute: 'realtime_channel_joins_rate',
+        attribute: 'realtime_channel_joins',
         provider: 'infra-monitoring',
         label: 'Presence',
       },
