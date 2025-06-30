@@ -12,7 +12,13 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
+  Collapsible_Shadcn_ as Collapsible,
+  CollapsibleContent_Shadcn_ as CollapsibleContent,
+  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
+  Button,
 } from 'ui'
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import { MonacoEditor } from 'components/grid/components/common/MonacoEditor'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
 import { sheetFields } from './UnifiedLogs.fields'
 import { ColumnSchema } from './UnifiedLogs.schema'
@@ -21,9 +27,12 @@ import {
   MemoizedRequestStartedBlock,
   MemoizedNetworkBlock,
   MemoizedPostgRESTBlock,
+  MemoizedGoTrueBlock,
   MemoizedPostgresBlock,
   MemoizedResponseCompletedBlock,
 } from './ServiceFlow/ServiceFlowBlocks'
+// import { useServiceFlowData, shouldShowServiceFlow } from './ServiceFlow.queries'
+// import { ServiceFlowPanel as EnhancedServiceFlowPanel } from './ServiceFlow/components/ServiceFlowPanel'
 
 interface ServiceFlowPanelProps {
   selectedRow: any
@@ -55,6 +64,24 @@ export function ServiceFlowPanel({
   // TODO: Remove once repeated logs issue is fixed - should use selectedRow.id directly
   const realLogId = search?.logId || selectedRow?.id
 
+  console.log('🔍 Log ID extraction debug:', {
+    'search.logId': search?.logId,
+    'selectedRow.log_id': selectedRow?.log_id,
+    'selectedRow.uuid_id': selectedRow?.uuid_id,
+    'selectedRow.id': selectedRow?.id,
+    'final realLogId': realLogId,
+    'full search object': search,
+    'full searchParameters object': searchParameters,
+  })
+
+  // Determine service flow type
+  const isPostgrestFlow = selectedRow?.pathname?.includes('/rest/')
+  const isAuthFlow = selectedRow?.pathname?.includes('/auth/')
+  const shouldShowServiceFlow = isPostgrestFlow || isAuthFlow
+
+  // Determine service flow type for query
+  const serviceFlowType = isAuthFlow ? 'auth' : 'postgrest'
+
   // Query the logs API directly
   const {
     data: serviceFlowData,
@@ -63,11 +90,9 @@ export function ServiceFlowPanel({
   } = useUnifiedLogInspectionQuery({
     projectRef: projectRef,
     logId: realLogId,
-    type: 'postgrest',
+    type: serviceFlowType,
     search: searchParameters,
   })
-
-  const shouldShowServiceFlow = selectedRow?.pathname?.includes('/rest/')
 
   console.log('🔍 Service Flow Panel:', {
     selectedRow,
@@ -78,6 +103,9 @@ export function ServiceFlowPanel({
     selectedRowPathname: selectedRow?.pathname,
     selectedRowFullObject: selectedRow,
     shouldShowServiceFlow,
+    isPostgrestFlow,
+    isAuthFlow,
+    serviceFlowType,
     serviceFlowData,
     isLoading,
     error,
@@ -90,6 +118,8 @@ export function ServiceFlowPanel({
   // Log the enriched service flow data
   if (serviceFlowData?.result?.[0]) {
     console.log('📋 Service Flow Enriched Data:', serviceFlowData.result[0])
+    console.log('🔍 raw_log_data exists?', !!serviceFlowData.result[0].raw_log_data)
+    console.log('🔍 raw_log_data value:', serviceFlowData.result[0].raw_log_data)
   }
 
   // Log the raw log data if available
@@ -137,6 +167,146 @@ export function ServiceFlowPanel({
                       ...metadata,
                     }}
                   />
+
+                  {/* JSON Viewer Section */}
+                  <div className="mt-6 border-t border-border pt-4">
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          type="text"
+                          size="tiny"
+                          className="w-full justify-start p-0 h-auto text-sm font-medium text-foreground-light hover:text-foreground mb-3 group"
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronRight className="h-4 w-4 transition-transform group-data-[state=open]:rotate-90" />
+                            <span>View Full Log Data (JSON)</span>
+                          </div>
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                        <div className="space-y-4">
+                          {/* ALWAYS show enriched data sections for ALL log types */}
+
+                          {/* Complete Enriched Data - Show service flow data if available, otherwise show selected row */}
+                          <div>
+                            <h4 className="text-sm font-medium text-foreground mb-2">
+                              Complete Enriched Data
+                            </h4>
+                            <div className="border border-border rounded-lg overflow-hidden">
+                              <MonacoEditor
+                                readOnly
+                                language="json"
+                                value={JSON.stringify(
+                                  shouldShowServiceFlow && serviceFlowData?.result?.[0]
+                                    ? serviceFlowData.result[0]
+                                    : selectedRow,
+                                  null,
+                                  2
+                                )}
+                                height="500px"
+                                onChange={() => {}}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Raw Log Data Field - Show if service flow has it, otherwise show event_message */}
+                          <div>
+                            <h4 className="text-sm font-medium text-foreground mb-2">
+                              Raw Log Data Field
+                            </h4>
+                            <div className="border border-border rounded-lg overflow-hidden">
+                              <MonacoEditor
+                                readOnly
+                                language="json"
+                                value={
+                                  shouldShowServiceFlow &&
+                                  serviceFlowData?.result?.[0]?.raw_log_data
+                                    ? JSON.stringify(
+                                        serviceFlowData.result[0].raw_log_data,
+                                        null,
+                                        2
+                                      )
+                                    : selectedRow?.event_message
+                                      ? typeof selectedRow.event_message === 'string'
+                                        ? selectedRow.event_message
+                                        : JSON.stringify(selectedRow.event_message, null, 2)
+                                      : JSON.stringify(
+                                          { message: 'No raw log data or event message available' },
+                                          null,
+                                          2
+                                        )
+                                }
+                                height="500px"
+                                onChange={() => {}}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Original Selected Row - ALWAYS show */}
+                          <div>
+                            <h4 className="text-sm font-medium text-foreground mb-2">
+                              Original Selected Row
+                            </h4>
+                            <div className="border border-border rounded-lg overflow-hidden">
+                              <MonacoEditor
+                                readOnly
+                                language="json"
+                                value={JSON.stringify(selectedRow, null, 2)}
+                                height="500px"
+                                onChange={() => {}}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Debug Info - Service Flow Query Results */}
+                          {shouldShowServiceFlow && (
+                            <div>
+                              <h4 className="text-sm font-medium text-foreground mb-2">
+                                Service Flow Query Debug ({serviceFlowType})
+                              </h4>
+                              <div className="border border-border rounded-lg overflow-hidden">
+                                <MonacoEditor
+                                  readOnly
+                                  language="json"
+                                  value={JSON.stringify(
+                                    {
+                                      isLoading,
+                                      error: error?.toString(),
+                                      hasResults: !!serviceFlowData?.result?.[0],
+                                      resultCount: serviceFlowData?.result?.length || 0,
+                                      queryType: serviceFlowType,
+                                      logId: realLogId,
+                                      rawResponse: serviceFlowData,
+                                    },
+                                    null,
+                                    2
+                                  )}
+                                  height="300px"
+                                  onChange={() => {}}
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Metadata - Show if available */}
+                          {selectedRow?.metadata && (
+                            <div>
+                              <h4 className="text-sm font-medium text-foreground mb-2">Metadata</h4>
+                              <div className="border border-border rounded-lg overflow-hidden">
+                                <MonacoEditor
+                                  readOnly
+                                  language="json"
+                                  value={JSON.stringify(selectedRow.metadata, null, 2)}
+                                  height="300px"
+                                  onChange={() => {}}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
                 </TabsContent>
 
                 {shouldShowServiceFlow && (
@@ -148,13 +318,10 @@ export function ServiceFlowPanel({
                         </div>
                       ) : (
                         <>
-                          <div className="text-sm text-foreground-light mb-4">
-                            PostgREST Service Flow
-                            {serviceFlowData?.result &&
-                              ` (${serviceFlowData.result.length} enriched)`}
-                          </div>
-
-                          <MemoizedRequestStartedBlock data={selectedRow} />
+                          <MemoizedRequestStartedBlock
+                            data={selectedRow}
+                            enrichedData={serviceFlowData?.result?.[0]}
+                          />
 
                           <MemoizedNetworkBlock
                             data={selectedRow}
@@ -164,22 +331,34 @@ export function ServiceFlowPanel({
                             table={table}
                           />
 
-                          <MemoizedPostgRESTBlock
-                            data={selectedRow}
-                            enrichedData={serviceFlowData?.result?.[0]}
-                            isLoading={isLoading}
-                            filterFields={filterFields}
-                            table={table}
-                          />
+                          {isAuthFlow ? (
+                            <MemoizedGoTrueBlock
+                              data={selectedRow}
+                              enrichedData={serviceFlowData?.result?.[0]}
+                              isLoading={isLoading}
+                              filterFields={filterFields}
+                              table={table}
+                            />
+                          ) : (
+                            <>
+                              <MemoizedPostgRESTBlock
+                                data={selectedRow}
+                                enrichedData={serviceFlowData?.result?.[0]}
+                                isLoading={isLoading}
+                                filterFields={filterFields}
+                                table={table}
+                              />
 
-                          <MemoizedPostgresBlock
-                            data={selectedRow}
-                            enrichedData={serviceFlowData?.result?.[0]}
-                            isLoading={isLoading}
-                            isLast={false}
-                            filterFields={filterFields}
-                            table={table}
-                          />
+                              <MemoizedPostgresBlock
+                                data={selectedRow}
+                                enrichedData={serviceFlowData?.result?.[0]}
+                                isLoading={isLoading}
+                                isLast={false}
+                                filterFields={filterFields}
+                                table={table}
+                              />
+                            </>
+                          )}
 
                           <MemoizedResponseCompletedBlock data={selectedRow} />
                         </>

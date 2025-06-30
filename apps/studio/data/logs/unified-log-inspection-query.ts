@@ -1,6 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { post, handleError } from 'data/fetchers'
-import { getPostgrestServiceFlowQuery } from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
+import {
+  getPostgrestServiceFlowQuery,
+  getAuthServiceFlowQuery,
+} from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { ResponseError } from 'types'
 import { logsKeys } from './keys'
@@ -9,7 +12,7 @@ import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 export type UnifiedLogInspectionVariables = {
   projectRef?: string
   logId?: string
-  type?: 'postgrest'
+  type?: 'postgrest' | 'auth'
   search: QuerySearchParamsType
 }
 
@@ -30,6 +33,68 @@ export interface UnifiedLogInspectionEntry {
   auth_user?: string | null
   api_role?: string | null
   service_specific_data: Record<string, any>
+
+  // Request data
+  'request.path'?: string
+  'request.host'?: string
+  'request.method'?: string
+  'request.url'?: string
+
+  // Response data
+  'response.origin_time'?: number
+  'response.content_type'?: string
+  'response.cache_status'?: string
+
+  // API Key Authentication
+  'apikey.role'?: 'anon' | 'service_role' | '<invalid>' | '<unrecognized>' | null
+  'apikey.prefix'?: string
+  'apikey.error'?: string
+
+  // User Authorization
+  'authorization.role'?: 'authenticated' | 'anon' | null
+  user_id?: string
+  user_email?: string
+
+  // Cloudflare Network Info
+  cf_ray?: string
+  cf_country?: string
+  cf_datacenter?: string
+  client_ip?: string
+
+  // Client location data
+  'client.continent'?: string
+  'client.country'?: string
+  'client.city'?: string
+  'client.region'?: string
+  'client.region_code'?: string
+  'client.latitude'?: number
+  'client.longitude'?: number
+  'client.timezone'?: string
+
+  // Network data
+  'network.protocol'?: string
+  'network.datacenter'?: string
+
+  // Request headers
+  'headers.user_agent'?: string
+  'headers.x_client_info'?: string
+  'headers.x_forwarded_proto'?: string
+  'headers.x_real_ip'?: string
+
+  // JWT data
+  'jwt.apikey_role'?: string
+  'jwt.apikey_algorithm'?: string
+  'jwt.apikey_expires_at'?: string
+  'jwt.apikey_issuer'?: string
+  'jwt.apikey_signature_prefix'?: string
+  'jwt.auth_role'?: string
+  'jwt.auth_algorithm'?: string
+  'jwt.auth_expires_at'?: string
+  'jwt.auth_issuer'?: string
+  'jwt.auth_signature_prefix'?: string
+
+  // Raw data
+  raw_log_data?: any
 }
 
 export async function getUnifiedLogInspection(
@@ -57,6 +122,9 @@ export async function getUnifiedLogInspection(
   switch (type) {
     case 'postgrest':
       sql = getPostgrestServiceFlowQuery(logId)
+      break
+    case 'auth':
+      sql = getAuthServiceFlowQuery(logId)
       break
     default:
       throw new Error('Invalid type')
