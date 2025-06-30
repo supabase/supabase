@@ -363,6 +363,12 @@ const ReportFilterBar = ({
   // Get filter properties based on product type
   const getFilterProperties = () => {
     const baseProperties = [
+      // {
+      //   label: 'Path',
+      //   name: ReportFilterKeys.PATH,
+      //   type: 'string' as const,
+      //   operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+      // },
       {
         label: 'Status Code',
         name: ReportFilterKeys.STATUS_CODE,
@@ -395,15 +401,15 @@ const ReportFilterBar = ({
       },
     ]
 
-    // If productFilter is set, don't show path filters (handled automatically)
-    if (selectedProduct) {
-      return baseProperties
-    }
+    // // If productFilter is set, don't show path filters (handled automatically)
+    // if (selectedProduct) {
+    //   return baseProperties
+    // }
 
-    // If no productFilter but user manually selected a product, don't show path filter
-    if (currentProductFilter) {
-      return baseProperties
-    }
+    // // If no productFilter but user manually selected a product, don't show path filter
+    // if (currentProductFilter) {
+    //   return baseProperties
+    // }
 
     // Only show path filter when no product filtering is active
     return [
@@ -542,7 +548,6 @@ const ReportFilterBar = ({
           onFreeformTextChange={setFreeformText}
           filters={localFilters}
           onFilterChange={handleFilterChange}
-          className="border-control rounded-md border p-1 w-full"
         />
       </div>
 
