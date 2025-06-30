@@ -1,3 +1,4 @@
+import { cn } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
 interface HoverCardTimestampProps {
@@ -7,7 +8,7 @@ interface HoverCardTimestampProps {
 
 export function HoverCardTimestamp({ date, className }: HoverCardTimestampProps) {
   return (
-    <div className="relative w-fit">
+    <div className={cn('relative w-fit', className)}>
       <TimestampInfo utcTimestamp={date.getTime()} />
     </div>
   )

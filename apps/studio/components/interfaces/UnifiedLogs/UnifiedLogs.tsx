@@ -47,6 +47,7 @@ import {
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
+import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { FunctionLogsTab } from './components/FunctionLogsTab'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields, sheetFields } from './UnifiedLogs.fields'
@@ -298,6 +299,7 @@ export const UnifiedLogs = () => {
             />
             <DataTableToolbar
               renderActions={() => [
+                <DownloadLogsButton searchParameters={searchParameters} />,
                 <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />,
                 fetchPreviousPage ? (
                   <LiveButton
@@ -321,7 +323,7 @@ export const UnifiedLogs = () => {
           <ResizablePanelGroup direction="horizontal" className="w-full h-full">
             <ResizablePanel defaultSize={selectedRowKey ? 60 : 100} minSize={30} className="h-full">
               <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
-                <ResizablePanel defaultSize={100} minSize={30}>
+                <ResizablePanel defaultSize={40} minSize={30}>
                   <DataTableInfinite
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}
@@ -342,7 +344,7 @@ export const UnifiedLogs = () => {
                 {selectedRow?.original?.logs && selectedRow?.original?.logs?.length > 0 && (
                   <>
                     <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={20} minSize={20}>
+                    <ResizablePanel defaultSize={60} minSize={20}>
                       <div className="h-full flex flex-col overflow-hidden">
                         <div className="px-5 py-3 border-b border-border flex justify-between items-center">
                           <h3 className="text-sm font-medium">

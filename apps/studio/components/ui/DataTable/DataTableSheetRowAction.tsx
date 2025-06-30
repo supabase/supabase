@@ -170,7 +170,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
           <div className="absolute inset-0 bg-background/70 place-content-center">Value copied</div>
         ) : null}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" side="left">
+      <DropdownMenuContent align="end" side="bottom" className="w-40">
         {renderOptions()}
         <DropdownMenuSeparator />
         <DropdownMenuItem
