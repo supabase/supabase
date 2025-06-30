@@ -136,6 +136,7 @@ To call a read-only Postgres function on Read Replicas through the REST API, use
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
 
 <Admonition type="note">
+
 Starting on April 4th, 2025, we will be changing the routing behavior for eligible Data API requests:
 
 - Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project, regardless of location

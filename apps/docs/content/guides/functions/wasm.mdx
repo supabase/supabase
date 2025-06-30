@@ -63,8 +63,9 @@ meta="index.ts"
 />
 
 <Admonition type="note">
-  Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm
-  modules](https://deno.com/blog/v2.1) will require even less boilerplate code.
+
+Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm modules](https://deno.com/blog/v2.1) will require even less boilerplate code.
+
 </Admonition>
 
 ### Bundle and deploy the Edge Function
@@ -72,7 +73,9 @@ meta="index.ts"
 Before deploying the Edge Function, we need to ensure it bundles the Wasm module with it. We can do this by defining it in the `static_files` for the function in `superbase/config.toml`.
 
 <Admonition type="note">
-  You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+
+You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+
 </Admonition>
 
 ```toml

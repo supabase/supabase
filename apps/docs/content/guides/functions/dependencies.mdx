@@ -90,9 +90,9 @@ The recommended file structure for deployment:
 ```
 
 <Admonition type="caution">
-  While it's possible to use a global `deno.json` in the `/supabase/functions` directory for local
-  development, this approach is not recommended for deployment. Each function should maintain its
-  own configuration to ensure proper isolation and dependency management.
+
+While it's possible to use a global `deno.json` in the `/supabase/functions` directory for local development, this approach is not recommended for deployment. Each function should maintain its own configuration to ensure proper isolation and dependency management.
+
 </Admonition>
 
 ### Using import maps (legacy)
@@ -124,9 +124,11 @@ The recommended file structure:
 ```
 
 <Admonition type="caution">
-  While it's possible to use a global `import_map.json` in the `/supabase/functions` directory for
-  local development, this approach is not recommended for deployment. Each function should maintain
-  its own import map to ensure proper isolation.
+
+While it's possible to use a global `import_map.json` in the `/supabase/functions` directory for
+local development, this approach is not recommended for deployment. Each function should maintain
+its own import map to ensure proper isolation.
+
 </Admonition>
 
 If using import maps with VSCode, update your `.vscode/settings.json` to point to your function-specific import map:
@@ -173,9 +175,9 @@ Add your registry details in the `.npmrc` file. Follow [this guide](https://docs
 ```
 
 <Admonition type="caution">
-  While it's possible to use a global `.npmrc` in the `/supabase/functions` directory for local
-  development, we recommend using function-specific `.npmrc` files for deployment to maintain proper
-  isolation.
+
+While it's possible to use a global `.npmrc` in the `/supabase/functions` directory for local development, we recommend using function-specific `.npmrc` files for deployment to maintain proper isolation.
+
 </Admonition>
 
 After configuring your `.npmrc`, you can import the private package in your function code:

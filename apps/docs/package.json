@@ -124,7 +124,7 @@
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/typescript": "4.1.6",
     "@graphql-codegen/typescript-resolvers": "4.5.0",
-    "@supabase/supa-mdx-lint": "0.2.9-alpha",
+    "@supabase/supa-mdx-lint": "0.3.0-alpha",
     "@types/common-tags": "^1.8.4",
     "@types/estree": "1.0.5",
     "@types/graphql-validation-complexity": "^0.4.4",

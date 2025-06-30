@@ -125,7 +125,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
     - On your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true)
     - Find your Supavisor Session pooler string. It should end with 5432. It will be used in your `.env` file.
     <Admonition type="note">
+
       If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
     </Admonition>
 
     - If you plan on deploying Prisma to a serverless or auto-scaling environment, you'll also need your Supavisor transaction mode string.
@@ -282,7 +284,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="tip" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash
@@ -308,7 +312,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash
@@ -334,7 +340,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash
@@ -360,7 +368,9 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
               --script > prisma/migrations/0_init_supabase/migration.sql
             ```
             <Admonition type="note" label="conflict management">
+
               If there are any conflicts, reference [Prisma's official doc](https://www.prisma.io/docs/orm/prisma-migrate/getting-started#work-around-features-not-supported-by-prisma-schema-language) or the [trouble shooting guide](/docs/guides/database/prisma-troubleshooting) for more details
+
             </Admonition>
 
             ```bash
