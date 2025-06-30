@@ -42,12 +42,14 @@ const ReportChart = ({
         : chart.showMaxValue,
   })
 
+  console.log('chartAttributes', chartAttributes)
+  console.log('data', data)
+  console.log('highlightedValue', highlightedValue)
+
   return (
     <ComposedChartHandler
       {...chart}
-      attributes={
-        (chartAttributes.length > 0 ? chartAttributes : chart.attributes) as MultiAttribute[]
-      }
+      attributes={chart.attributes as MultiAttribute[]}
       data={data}
       isLoading={isLoading}
       highlightedValue={highlightedValue as any}

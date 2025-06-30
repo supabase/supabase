@@ -238,6 +238,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/organizations/{slug}/project-claim/{token}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project details for the specified organization and claim token */
+    get: operations['v1-get-organization-project-claim']
+    put?: never
+    /** Claims project for the specified organization */
+    post: operations['v1-claim-project-for-organization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects': {
     parameters: {
       query?: never
@@ -433,24 +451,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/projects/{ref}/api-keys/legacy': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
-    get: operations['checkLegacyApiKeys']
-    /** Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
-    put: operations['updateLegacyApiKeys']
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/v1/projects/{ref}/billing/addons': {
     parameters: {
       query?: never
@@ -509,6 +509,25 @@ export interface paths {
      * @description Disables preview branching for the specified project
      */
     delete: operations['v1-disable-preview-branching']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project claim token */
+    get: operations['v1-get-project-claim-token']
+    put?: never
+    /** Creates project claim token */
+    post: operations['v1-create-project-claim-token']
+    /** Revokes project claim token */
+    delete: operations['v1-delete-project-claim-token']
     options?: never
     head?: never
     patch?: never
@@ -1942,6 +1961,14 @@ export interface components {
     CreateOrganizationV1: {
       name: string
     }
+    CreateProjectClaimTokenResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      token: string
+      token_alias: string
+    }
     CreateProviderBody: {
       attribute_mapping?: {
         keys: {
@@ -2402,6 +2429,41 @@ export interface components {
       /** @enum {string} */
       token_type: 'Bearer'
     }
+    OrganizationProjectClaimResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      preview: {
+        errors: {
+          key: string
+          message: string
+        }[]
+        info: {
+          key: string
+          message: string
+        }[]
+        members_exceeding_free_project_limit: {
+          limit: number
+          name: string
+        }[]
+        /** @enum {string} */
+        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        target_organization_eligible: boolean | null
+        target_organization_has_free_project_slots: boolean | null
+        /** @enum {string|null} */
+        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+        valid: boolean
+        warnings: {
+          key: string
+          message: string
+        }[]
+      }
+      project: {
+        name: string
+        ref: string
+      }
+    }
     OrganizationResponseV1: {
       id: string
       name: string
@@ -2442,6 +2504,13 @@ export interface components {
       db_schema: string
       jwt_secret?: string
       max_rows: number
+    }
+    ProjectClaimTokenResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      token_alias: string
     }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
@@ -3790,6 +3859,62 @@ export interface operations {
       }
     }
   }
+  'v1-get-organization-project-claim': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationProjectClaimResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-claim-project-for-organization': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-list-all-projects': {
     parameters: {
       query?: never
@@ -4485,6 +4610,88 @@ export interface operations {
       }
       /** @description Failed to disable preview branching */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectClaimTokenResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateProjectClaimTokenResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }

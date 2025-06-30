@@ -26,7 +26,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
   {
     id: 'channel-events',
     label: 'Channel Events',
-    valuePrecision: 0,
+    valuePrecision: 2,
     hide: false,
     showTooltip: true,
     showLegend: false,
@@ -44,7 +44,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
   {
     id: 'channel-presence-events',
     label: 'Channel Presence Events',
-    valuePrecision: 0,
+    valuePrecision: 2,
     hide: false,
     showTooltip: true,
     showLegend: false,
@@ -62,10 +62,10 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
   {
     id: 'realtime_rate_of_channel_joins',
     label: 'Rate of Channel Joins',
-    valuePrecision: 0,
+    valuePrecision: 2,
     hide: false,
     showTooltip: false,
-    showLegend: true,
+    showLegend: false,
     showMaxValue: false,
     hideChartType: false,
     defaultChartStyle: 'bar',
@@ -80,7 +80,7 @@ export const getRealtimeReportAttributes = (isFreePlan: boolean) => [
   {
     id: 'client-to-realtime-connections',
     label: 'Realtime connections',
-    valuePrecision: 0,
+    valuePrecision: 2,
     hide: false,
     showTooltip: true,
     showLegend: false,

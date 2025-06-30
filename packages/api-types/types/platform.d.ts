@@ -16916,7 +16916,7 @@ export interface operations {
           | 'network_transmit_bytes'
           | 'pgbouncer_pools_client_active_connections'
           | 'realtime_connections_connected'
-          | 'realtime_channel_joins_rate'
+          | 'realtime_channel_joins'
           | 'realtime_channel_events'
           | 'realtime_channel_presence_events'
         databaseIdentifier?: string

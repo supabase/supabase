@@ -194,8 +194,6 @@ export const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  const projectRef = typeof ref === 'string' ? ref : Array.isArray(ref) ? ref[0] : ''
-
   const infraAttributes = attributes.filter((attr) => attr.provider === 'infra-monitoring')
   const dailyStatsAttributes = attributes.filter((attr) => attr.provider === 'daily-stats')
   const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
@@ -222,6 +220,22 @@ export const useAttributeQueries = (
     isVisible
   )
 
+  const referenceLineQueries = referenceLineAttributes.map((line) => {
+    let value = line.value || 0
+
+    return {
+      data: {
+        data: [], // Will be populated in combinedData
+        attribute: line.attribute,
+        total: value,
+        maximum: value,
+        totalGrouped: { [line.attribute]: value },
+      },
+      isLoading: false,
+      isError: false,
+    }
+  })
+
   let infraIdx = 0
   let dailyStatsIdx = 0
   return attributes
@@ -237,25 +251,16 @@ export const useAttributeQueries = (
           ...dailyStatsQueries[dailyStatsIdx++],
           data: { ...dailyStatsQueries[dailyStatsIdx - 1]?.data, provider: 'daily-stats' },
         }
+      } else if (attr.provider === 'reference-line') {
+        return {
+          ...referenceLineQueries[dailyStatsIdx++],
+          data: { ...referenceLineQueries[dailyStatsIdx - 1]?.data, provider: 'reference-line' },
+        }
       } else if (attr.provider === 'mock') {
         const mockData = getMockDataForAttribute(attr.attribute)
         return {
           isLoading: false,
           data: { ...mockData, provider: 'mock', attribute: attr.attribute },
-        }
-      } else if (attr.provider === 'reference-line') {
-        let value = attr.value || 0
-        return {
-          data: {
-            data: [],
-            attribute: attr.attribute,
-            total: value,
-            maximum: value,
-            totalGrouped: { [attr.attribute]: value },
-            provider: 'reference-line',
-          },
-          isLoading: false,
-          isError: false,
         }
       } else {
         return {
