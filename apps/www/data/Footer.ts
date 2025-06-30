@@ -1,5 +1,5 @@
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
-import { skillBasedSolutions, data as solutions, useCaseSolutions } from 'data/Solutions'
+import { skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
 
 const footerData = [
   {
