@@ -48,11 +48,11 @@ const footerData = [
     links: [
       ...skillBasedSolutions.solutions.map((solution) => ({
         text: solution.text,
-        url: `/solutions/${solution.id}`,
+        url: solution.url,
       })),
       ...useCaseSolutions.solutions.map((solution) => ({
         text: solution.text,
-        url: `/solutions/${solution.id}`,
+        url: solution.url,
       })),
     ],
   },
