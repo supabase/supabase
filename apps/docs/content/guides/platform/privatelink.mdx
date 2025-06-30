@@ -60,7 +60,7 @@ PrivateLink setup requires coordination between your team and Supabase. The proc
 Once PrivateLink is configured:
 
 - Your may configure a custom DNS record to point to your PrivateLink endpoint interface or the endpoints on.aws DNS record within your VPC
-- Applications will need to be updated to use the privatelink endpoint
+- Applications will need to be updated to use the PrivateLink endpoint
 - Standard database monitoring and observability tools will continue to work through the private connection
 
 ## Alpha limitations
@@ -72,9 +72,9 @@ During the alpha phase:
 
 ## Compatibility
 
-The PrivateLink endpoint behaves like a standard Postgre endpoint, allowing you to connect using:
+The PrivateLink endpoint behaves like a standard Postgres endpoint, allowing you to connect using:
 
-- Direct Postgre connections using standard tools
+- Direct Postgres connections using standard tools
 - Third-party database tools and ORMs (with the appropriate routing)
 - (PgBouncer Projects Only) Directly to the pooler.
 
