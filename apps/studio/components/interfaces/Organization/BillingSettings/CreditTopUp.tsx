@@ -1,6 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Elements, useStripe } from '@stripe/react-stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
@@ -35,10 +35,11 @@ import {
   Form_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
-  LoadingLine,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -149,7 +150,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const options = useMemo(() => {
     return {
       clientSecret: paymentIntentSecret,
-      appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+      appearance: getStripeElementsAppearanceOptions(resolvedTheme),
     } as any
   }, [paymentIntentSecret, resolvedTheme])
 
@@ -251,8 +252,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   name="paymentMethod"
                   render={() => (
                     <PaymentMethodSelection
+                      createPaymentMethodInline={false}
                       onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
                       selectedPaymentMethod={form.getValues('paymentMethod')}
+                      readOnly={executingTopUp || paymentConfirmationLoading}
                     />
                   )}
                 />
@@ -322,7 +325,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   paymentIntentConfirmed(paymentIntentConfirmation)
                 }
                 onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-                paymentMethodId={form.getValues().paymentMethod}
               />
             </Elements>
           )}
@@ -330,35 +332,4 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
       </Dialog>
     </div>
   )
-}
-
-const PaymentConfirmation = ({
-  paymentIntentSecret,
-  onPaymentIntentConfirm,
-  onLoadingChange,
-  paymentMethodId,
-}: {
-  paymentIntentSecret: string
-  paymentMethodId: string
-  onPaymentIntentConfirm: (response: PaymentIntentResult) => void
-  onLoadingChange: (loading: boolean) => void
-}) => {
-  const stripe = useStripe()
-
-  useEffect(() => {
-    if (stripe && paymentIntentSecret) {
-      onLoadingChange(true)
-      stripe!
-        .confirmCardPayment(paymentIntentSecret, { payment_method: paymentMethodId })
-        .then((res) => {
-          onPaymentIntentConfirm(res)
-          onLoadingChange(false)
-        })
-        .catch((err) => {
-          onLoadingChange(false)
-        })
-    }
-  }, [paymentIntentSecret, stripe])
-
-  return <LoadingLine loading={true} />
 }

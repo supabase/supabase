@@ -17,6 +17,7 @@ export type ExecuteSqlVariables = {
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
+  isStatementTimeoutDisabled?: boolean
   autoLimit?: number
   contextualInvalidation?: boolean
 }
@@ -29,6 +30,7 @@ export async function executeSql<T = any>(
     queryKey,
     handleError,
     isRoleImpersonationEnabled = false,
+    isStatementTimeoutDisabled = false,
   }: Pick<
     ExecuteSqlVariables,
     | 'projectRef'
@@ -37,6 +39,7 @@ export async function executeSql<T = any>(
     | 'queryKey'
     | 'handleError'
     | 'isRoleImpersonationEnabled'
+    | 'isStatementTimeoutDisabled'
   >,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
@@ -80,7 +83,7 @@ export async function executeSql<T = any>(
               .join('-') ?? '',
         },
       },
-      body: { query: sql },
+      body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
       headers,
     })
 

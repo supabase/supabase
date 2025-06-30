@@ -21,7 +21,6 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import ComposedChartHandler, { MultiAttribute } from 'components/ui/Charts/ComposedChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
@@ -33,12 +32,12 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import type { NextPageWithLayout } from 'types'
-import { useOrganizationQuery } from '../../../../data/organizations/organization-query'
-import { useSelectedOrganization } from '../../../../hooks/misc/useSelectedOrganization'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -64,6 +63,9 @@ const DatabaseUsage = () => {
   const org = useSelectedOrganization()
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  const isTeamsOrEnterprisePlan =
+    !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
+  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(1, 'day').toISOString()
@@ -126,7 +128,7 @@ const DatabaseUsage = () => {
         })
       )
     })
-    if (isReportsV2) {
+    if (showChartsV2) {
       REPORT_ATTRIBUTES_V2.forEach((chart: any) => {
         chart.attributes.forEach((attr: any) => {
           queryClient.invalidateQueries(
@@ -205,15 +207,10 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={report.isLoading} />
-        </div>
-      </div>
       <GrafanaPromoBanner />
       <section className="relative pt-16 -mt-2">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+          <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto dark:bg-background-200 bg-background">
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -252,24 +249,17 @@ const DatabaseUsage = () => {
             </div>
           </div>
         </div>
-        {isReportsV2 ? (
+        {showChartsV2 ? (
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
               REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
+                <ReportChart
                   key={chart.id}
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={dateRange.interval}
+                  chart={chart}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
+                  interval={dateRange.interval}
                   updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  showMaxValue={
-                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
                 />
               ))}
           </div>

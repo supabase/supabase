@@ -29,8 +29,8 @@ import {
 import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import { calculateTotalChartAggregate, CustomLabel, CustomTooltip } from './ComposedChart.utils'
-import { MultiAttribute } from './ComposedChartHandler'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import { MultiAttribute } from './ComposedChart.utils'
 import { ChartHighlight } from './useChartHighlight'
 import { formatBytes } from 'lib/helpers'
 
@@ -54,6 +54,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
+  titleTooltip?: string
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
   syncId?: string
@@ -111,6 +112,22 @@ export default function ComposedChart({
 
   const { Container } = useChartSize(size)
 
+  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+
+  const formatTimestamp = (ts: unknown) => {
+    if (typeof ts !== 'number' && typeof ts !== 'string') {
+      return ''
+    }
+
+    // Timestamps from auth logs can be in microseconds
+    if (typeof ts === 'number' && ts > 1e14) {
+      return day(ts / 1000).format(customDateFormat)
+    }
+
+    // dayjs can handle ISO strings and millisecond numbers
+    return day(ts).format(customDateFormat)
+  }
+
   // Default props
   const _XAxisProps = XAxisProps || {
     interval: data.length - 2,
@@ -124,18 +141,19 @@ export default function ComposedChart({
     width: 0,
   }
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
-
   function getHeaderLabel() {
     if (!xAxisIsDate) {
       if (!focusDataIndex) return highlightedLabel
-      return data[focusDataIndex]?.timestamp
+      return data[focusDataIndex]?.[xAxisKey]
     }
     return (
       (focusDataIndex !== null &&
         data &&
         data[focusDataIndex] !== undefined &&
-        day(data[focusDataIndex].timestamp).format(customDateFormat)) ||
+        (() => {
+          const ts = data[focusDataIndex][xAxisKey]
+          return formatTimestamp(ts)
+        })()) ||
       highlightedLabel
     )
   }
@@ -433,13 +451,11 @@ export default function ComposedChart({
           className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"
           style={{ marginLeft: YAxisProps?.width }}
         >
-          <span>
-            {xAxisIsDate ? day(data[0]?.timestamp).format(customDateFormat) : data[0]?.timestamp}
-          </span>
+          <span>{xAxisIsDate ? formatTimestamp(data[0]?.[xAxisKey]) : data[0]?.[xAxisKey]}</span>
           <span>
             {xAxisIsDate
-              ? day(data[data?.length - 1]?.timestamp).format(customDateFormat)
-              : data[data?.length - 1]?.timestamp}
+              ? formatTimestamp(data[data.length - 1]?.[xAxisKey])
+              : data[data.length - 1]?.[xAxisKey]}
           </span>
         </div>
       )}

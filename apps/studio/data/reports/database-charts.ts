@@ -1,7 +1,8 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
 import { formatBytes } from 'lib/helpers'
-import { Organization } from '../../types'
+import { Organization } from 'types'
 import { Project } from '../projects/project-detail-query'
+import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getReportAttributes = (isFreePlan: boolean) => [
   { id: 'ram_usage', label: 'Memory usage', hide: false },
@@ -26,7 +27,10 @@ export const getReportAttributes = (isFreePlan: boolean) => [
   },
 ]
 
-export const getReportAttributesV2 = (org: Organization, project: Project) => {
+export const getReportAttributesV2: (org: Organization, project: Project) => ReportAttributes[] = (
+  org,
+  project
+) => {
   const isFreePlan = org?.plan?.id === 'free'
   const computeSize = project?.infra_compute_size || 'medium'
   const isSpendCapEnabled =
@@ -41,12 +45,12 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showLegend: true,
       hideChartType: false,
       defaultChartStyle: 'line',
-      showMaxValue: true,
+      showMaxValue: false,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
       YAxisProps: {
-        width: 60,
+        width: 75,
         tickFormatter: (value: any) => formatBytes(value, 2),
       },
       attributes: [
@@ -55,36 +59,21 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           provider: 'infra-monitoring',
           label: 'Used',
           tooltip:
-            'Total RAM currently in use by the system and applications. High usage may indicate memory pressure.',
+            'RAM in use by Postgres and the operating system. Sustained high usage may indicate memory pressure',
         },
         {
           attribute: 'ram_usage_cache_and_buffers',
           provider: 'infra-monitoring',
           label: 'Cache + buffers',
           tooltip:
-            'RAM used for caching and buffering disk operations. Higher values improve read performance.',
+            'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
         },
         {
           attribute: 'ram_usage_free',
           provider: 'infra-monitoring',
           label: 'Free',
           tooltip:
-            'Available unused RAM. A small amount is always reserved. High unused RAM present with erratic Used RAM may indicate unoptimized queries disrupting cache.',
-        },
-        {
-          attribute: 'ram_usage_swap',
-          provider: 'infra-monitoring',
-          label: 'Swap',
-          omitFromTotal: false, // we can set this to true if we want to omit the swap from the total
-          tooltip:
-            'Memory swapped to disk when RAM is full. An instance has 1GB of SWAP. High swap with high disk I/O signals memory stress.',
-        },
-        {
-          attribute: 'ram_usage_total',
-          provider: 'infra-monitoring',
-          label: 'Max',
-          isMaxValue: true,
-          tooltip: 'Total RAM',
+            'Unallocated memory available for use. A small portion is always reserved by the operating system',
         },
       ],
     },
@@ -112,7 +101,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           label: 'System',
           format: '%',
           tooltip:
-            'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead.',
+            'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
         },
         {
           attribute: 'cpu_usage_busy_user',
@@ -120,7 +109,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           label: 'User',
           format: '%',
           tooltip:
-            'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries.',
+            'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
         },
         {
           attribute: 'cpu_usage_busy_iowait',
@@ -128,7 +117,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           label: 'IOwait',
           format: '%',
           tooltip:
-            'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks.',
+            'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
         },
         {
           attribute: 'cpu_usage_busy_irqs',
@@ -143,7 +132,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           label: 'Other',
           format: '%',
           tooltip:
-            'CPU time spent on other tasks (e.g., background processes, software interrupts).',
+            'CPU time spent on other tasks (e.g., background processes, software interrupts)',
         },
         {
           attribute: 'cpu_usage_max',
@@ -157,7 +146,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
     },
     {
       id: 'disk-iops',
-      label: 'Disk IOps',
+      label: 'Disk Input/Output operations per second (IOPS)',
       syncId: 'database-reports',
       hide: false,
       showTooltip: true,
@@ -176,16 +165,16 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
         {
           attribute: 'disk_iops_write',
           provider: 'infra-monitoring',
-          label: 'IOps write/s',
+          label: 'write IOPS',
           tooltip:
-            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity.',
+            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
         },
         {
           attribute: 'disk_iops_read',
           provider: 'infra-monitoring',
-          label: 'IOps read/s',
+          label: 'read IOPS',
           tooltip:
-            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching.',
+            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
         },
         {
           attribute: 'disk_iops_max',
@@ -221,13 +210,13 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
           provider: 'infra-monitoring',
           label: 'IO Usage',
           tooltip:
-            'The actual number of IO operations per second that the database is currently using.',
+            'The actual number of IO operations per second that the database is currently using',
         },
       ],
     },
     {
-      id: 'db-size',
-      label: 'Database Size',
+      id: 'disk-size',
+      label: 'Disk Size',
       syncId: 'database-reports',
       valuePrecision: 2,
       hide: false,
@@ -244,18 +233,35 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
       attributes: [
         {
-          attribute: 'pg_database_size',
+          attribute: 'disk_fs_used_system',
           provider: 'infra-monitoring',
-          label: 'Database',
-          tooltip: 'Total space on disk used by your database (tables, indexes, data, ...).',
+          format: 'bytes',
+          label: 'System',
+          tooltip: 'Reserved space for the system to ensure your database runs smoothly',
         },
         {
-          attribute: 'max_pg_database_size',
-          provider: 'reference-line',
-          label: 'Disk size',
-          value: (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
-          tooltip: 'Disk Size refers to the total space your project occupies on disk',
+          attribute: 'disk_fs_used_wal',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'WAL',
+          tooltip:
+            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
+        },
+
+        {
+          attribute: 'pg_database_size',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'Database',
+          tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
+        },
+        {
+          attribute: 'disk_fs_size',
+          provider: 'infra-monitoring',
           isMaxValue: true,
+          format: 'bytes',
+          label: 'Disk Size',
+          tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
         !isFreePlan &&
           (isSpendCapEnabled
@@ -286,42 +292,6 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       ],
     },
     {
-      id: 'network-traffic',
-      label: 'Network Traffic',
-      syncId: 'database-reports',
-      valuePrecision: 1,
-      showTooltip: true,
-      showLegend: true,
-      showMaxValue: false,
-      showGrid: true,
-      YAxisProps: {
-        width: 65,
-        tickFormatter: (value: any) => formatBytes(value, 1),
-      },
-      hideChartType: false,
-      defaultChartStyle: 'line',
-      hideHighlightedValue: true,
-      showTotal: false,
-      attributes: [
-        {
-          attribute: 'network_transmit_bytes',
-          provider: 'infra-monitoring',
-          label: 'Transmit',
-          tooltip:
-            'Data sent from your database to clients. High values may indicate large query results or numerous outgoing connections.',
-          stackId: '2',
-        },
-        {
-          attribute: 'network_receive_bytes',
-          provider: 'infra-monitoring',
-          label: 'Receive',
-          tooltip:
-            'Data received by your database from clients. High values may indicate frequent queries, large data inserts, or many incoming connections.',
-          stackId: '1',
-        },
-      ],
-    },
-    {
       id: 'client-connections',
       label: 'Database client connections',
       valuePrecision: 0,
@@ -330,56 +300,61 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
       showLegend: true,
       showMaxValue: true,
       hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
       defaultChartStyle: 'line',
       attributes: [
         {
           attribute: 'client_connections_postgres',
           provider: 'infra-monitoring',
-          label: 'postgres',
-          tooltip: 'Active connections',
+          label: 'Postgres',
+          tooltip:
+            'Direct connections to the Postgres database from your application and external clients',
         },
         {
           attribute: 'client_connections_authenticator',
           provider: 'infra-monitoring',
-          label: 'postgrest',
-          tooltip: 'Active connections',
-        },
-        {
-          attribute: 'client_connections_supabase_auth_admin',
-          provider: 'infra-monitoring',
-          label: 'auth',
-          tooltip: 'Active connections',
-        },
-        {
-          attribute: 'client_connections_supabase_storage_admin',
-          provider: 'infra-monitoring',
-          label: 'storage',
-          tooltip: 'Active connections',
+          label: 'PostgREST',
+          tooltip: 'Connection pool managed by PostgREST',
         },
         {
           attribute: 'client_connections_supabase_admin',
           provider: 'infra-monitoring',
-          label: 'supabase-admin',
-          tooltip: 'Active connections',
+          label: 'Reserved',
+          tooltip:
+            'Administrative connections used by various Supabase services for internal operations and maintenance tasks',
+        },
+        {
+          attribute: 'client_connections_supabase_auth_admin',
+          provider: 'infra-monitoring',
+          label: 'Auth',
+          tooltip: 'Connection pool managed by Supabase Auth',
+        },
+        {
+          attribute: 'client_connections_supabase_storage_admin',
+          provider: 'infra-monitoring',
+          label: 'Storage',
+          tooltip: 'Connection pool managed by Supabase Storage',
         },
         {
           attribute: 'client_connections_other',
           provider: 'infra-monitoring',
-          label: 'other',
-          tooltip: 'Active connections',
+          label: 'Other roles',
+          tooltip: "Miscellaneous database connections that don't fall into other categories.",
         },
         {
           attribute: 'max_db_connections',
-          provider: 'infra-monitoring',
-          label: 'Maximum connections allowed',
-          tooltip: 'Maximum connections for instance size',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: getConnectionLimits(computeSize).direct,
+          tooltip: 'Max available connections for your current compute size',
           isMaxValue: true,
         },
       ],
     },
     {
       id: 'pgbouncer-connections',
-      label: 'Pooler client connections',
+      label: 'Dedicated Pooler client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
       hide: false,
@@ -410,7 +385,7 @@ export const getReportAttributesV2 = (org: Organization, project: Project) => {
     },
     {
       id: 'supavisor-connections-active',
-      label: 'Supavisor client connections',
+      label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
       hide: isFreePlan,
