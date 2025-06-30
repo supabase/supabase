@@ -89,14 +89,6 @@ export function DataTableFilterCommand({
       return field?.commandDisabled
     })
 
-    const commandDisabledFilterKeys = currentDisabledFilters.reduce(
-      (prev, curr) => {
-        prev[curr.id] = curr.value
-        return prev
-      },
-      {} as Record<string, unknown>
-    )
-
     for (const key of Object.keys(searchParams)) {
       const value = searchParams[key as keyof typeof searchParams]
       table.getColumn(key)?.setFilterValue(value)
