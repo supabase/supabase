@@ -78,6 +78,7 @@ allow_list = [
     "[Pp]olyfill(s|ed)?",
     "[Pp]oolers?",
     "[Pp]resign(ed|ing)?",
+    "[Pp]roxying",
     "[Pp]sycopg",
     "[Qq]uickstarts?",
     "[Rr]ealtime",
