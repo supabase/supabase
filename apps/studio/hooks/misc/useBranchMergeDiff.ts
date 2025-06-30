@@ -32,10 +32,10 @@ export interface BranchMergeDiffResult {
   // Branch state
   isBranchOutOfDateMigrations: boolean
   hasEdgeFunctionModifications: boolean
-  newerRemovedFunctionsCount: number
-  hasNewerRemovedFunctions: boolean
-  newerModifiedFunctionsCount: number
-  hasNewerModifiedFunctions: boolean
+  missingFunctionsCount: number
+  hasMissingFunctions: boolean
+  outOfDateFunctionsCount: number
+  hasOutOfDateFunctions: boolean
   isBranchOutOfDateOverall: boolean
   missingMigrationsCount: number
   modifiedFunctionsCount: number
@@ -120,7 +120,7 @@ export const useBranchMergeDiff = ({
   }, [currentBranchMigrations, mainBranchMigrations])
 
   // Check if main branch has functions that are newer than the current branch versions
-  const newerModifiedFunctionsCount = useMemo(() => {
+  const outOfDateFunctionsCount = useMemo(() => {
     if (!edgeFunctionsDiff.modifiedSlugs.length) return 0
 
     return edgeFunctionsDiff.modifiedSlugs.filter((slug) => {
@@ -145,16 +145,16 @@ export const useBranchMergeDiff = ({
   ])
 
   // Check if main branch has functions that are newer than the current branch versions
-  const hasNewerModifiedFunctions = newerModifiedFunctionsCount > 0
+  const hasOutOfDateFunctions = outOfDateFunctionsCount > 0
 
   // Check if current branch has any edge function modifications (not additions/removals)
   // This only includes functions where the current branch version is newer than the main branch version
   const hasEdgeFunctionModifications =
-    edgeFunctionsDiff.modifiedSlugs.length > newerModifiedFunctionsCount
+    edgeFunctionsDiff.modifiedSlugs.length > outOfDateFunctionsCount
 
   // Count of removed functions that were updated on main branch after this branch was created
   // Note: For removed functions, we use branch creation date since there's no current branch version to compare to
-  const newerRemovedFunctionsCount = useMemo(() => {
+  const missingFunctionsCount = useMemo(() => {
     if (!currentBranchCreatedAt || !edgeFunctionsDiff.removedSlugs.length) return 0
 
     const branchCreatedAt = new Date(currentBranchCreatedAt).getTime()
@@ -175,11 +175,11 @@ export const useBranchMergeDiff = ({
   ])
 
   // Check if main branch has functions removed from current branch that were updated after branch creation
-  const hasNewerRemovedFunctions = newerRemovedFunctionsCount > 0
+  const hasMissingFunctions = missingFunctionsCount > 0
 
   // Update overall out-of-date check to include newer removed functions and newer modified functions
   const isBranchOutOfDateOverall =
-    isBranchOutOfDateMigrations || hasNewerRemovedFunctions || hasNewerModifiedFunctions
+    isBranchOutOfDateMigrations || hasMissingFunctions || hasOutOfDateFunctions
 
   // Get the count of migrations that the branch is missing
   const missingMigrationsCount = useMemo(() => {
@@ -225,10 +225,10 @@ export const useBranchMergeDiff = ({
     // Branch state
     isBranchOutOfDateMigrations,
     hasEdgeFunctionModifications,
-    newerRemovedFunctionsCount,
-    hasNewerRemovedFunctions,
-    newerModifiedFunctionsCount,
-    hasNewerModifiedFunctions,
+    missingFunctionsCount,
+    hasMissingFunctions,
+    outOfDateFunctionsCount,
+    hasOutOfDateFunctions,
     isBranchOutOfDateOverall,
     missingMigrationsCount,
     modifiedFunctionsCount,

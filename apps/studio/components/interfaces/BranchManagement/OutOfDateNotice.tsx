@@ -17,10 +17,10 @@ import { Admonition } from 'ui-patterns'
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
   missingMigrationsCount: number
-  hasNewerRemovedFunctions: boolean
-  newerRemovedFunctionsCount: number
-  hasNewerModifiedFunctions: boolean
-  newerModifiedFunctionsCount: number
+  hasMissingFunctions: boolean
+  missingFunctionsCount: number
+  hasOutOfDateFunctions: boolean
+  outOfDateFunctionsCount: number
   hasEdgeFunctionModifications: boolean
   modifiedFunctionsCount: number
   isPushing: boolean
@@ -30,10 +30,10 @@ interface OutOfDateNoticeProps {
 export const OutOfDateNotice = ({
   isBranchOutOfDateMigrations,
   missingMigrationsCount,
-  hasNewerRemovedFunctions,
-  newerRemovedFunctionsCount,
-  hasNewerModifiedFunctions,
-  newerModifiedFunctionsCount,
+  hasMissingFunctions,
+  missingFunctionsCount,
+  hasOutOfDateFunctions,
+  outOfDateFunctionsCount,
   hasEdgeFunctionModifications,
   modifiedFunctionsCount,
   isPushing,
@@ -43,29 +43,18 @@ export const OutOfDateNotice = ({
   const hasOutdatedMigrations = isBranchOutOfDateMigrations && missingMigrationsCount > 0
 
   const getTitle = () => {
-    if (hasOutdatedMigrations && (hasNewerRemovedFunctions || hasNewerModifiedFunctions)) {
-      const functionCount = newerRemovedFunctionsCount + newerModifiedFunctionsCount
-      return `Missing ${missingMigrationsCount} migration${missingMigrationsCount !== 1 ? 's' : ''} and ${functionCount} updated function${functionCount !== 1 ? 's' : ''} from main branch`
+    if (hasOutdatedMigrations && (hasMissingFunctions || hasOutOfDateFunctions)) {
+      return 'Your database schema and edge functions are out of date'
     } else if (hasOutdatedMigrations) {
-      return `Missing ${missingMigrationsCount} migration${missingMigrationsCount !== 1 ? 's' : ''} from main branch`
-    } else if (hasNewerRemovedFunctions && hasNewerModifiedFunctions) {
-      const functionCount = newerRemovedFunctionsCount + newerModifiedFunctionsCount
-      return `Main branch has ${functionCount} updated function${functionCount !== 1 ? 's' : ''}`
-    } else if (hasNewerRemovedFunctions) {
-      return `Main branch has ${newerRemovedFunctionsCount} updated function${newerRemovedFunctionsCount !== 1 ? 's' : ''} that were removed in this branch`
-    } else if (hasNewerModifiedFunctions) {
-      return `Main branch has ${newerModifiedFunctionsCount} updated function${newerModifiedFunctionsCount !== 1 ? 's' : ''}`
+      return 'Your database schema is out of date'
+    } else if (hasMissingFunctions || hasOutOfDateFunctions) {
+      return 'Your functions are out of date'
     }
     return 'Branch is out of date'
   }
 
   const getDescription = () => {
-    if (hasOutdatedMigrations && (hasNewerRemovedFunctions || hasNewerModifiedFunctions)) {
-      return `The main branch has migrations and functions that were updated after this branch was created.`
-    } else if (hasNewerRemovedFunctions || hasNewerModifiedFunctions) {
-      return `The main branch has functions that were created or updated after this branch was created.`
-    }
-    return 'Update this branch to get the latest changes from the main branch.'
+    return 'Update this branch to get the latest changes from the production branch.'
   }
 
   const handleUpdateClick = () => {
@@ -103,7 +92,8 @@ export const OutOfDateNotice = ({
                 <AlertDialogDescription>
                   This branch has {modifiedFunctionsCount} modified edge function
                   {modifiedFunctionsCount !== 1 ? 's' : ''} that will be overwritten when updating
-                  with the latest functions from the main branch, and this action cannot be undone.
+                  with the latest functions from the production branch. This action cannot be
+                  undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

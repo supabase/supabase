@@ -12,12 +12,14 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
 import { useBranchMergeDiff } from 'hooks/misc/useBranchMergeDiff'
+import { useWorkflowManagement } from 'hooks/misc/useWorkflowManagement'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
 import { Badge, Button, NavMenu, NavMenuItem, cn, Alert } from 'ui'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
+
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import { GitBranchIcon, GitMerge, Shield, ExternalLink, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
@@ -34,12 +36,7 @@ const MergePage: NextPageWithLayout = () => {
 
   const project = useSelectedProject()
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // State to track related workflow runs with their project refs
-  const [relatedWorkflowRunIds, setRelatedWorkflowRunIds] = useState<Record<string, string>>({})
-
-  // State to track failed workflows
-  const [failedWorkflowIds, setFailedWorkflowIds] = useState<Set<string>>(new Set())
+  const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
 
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
@@ -59,18 +56,6 @@ const MergePage: NextPageWithLayout = () => {
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
-  // Get workflow run ID from URL query parameter and initialize state
-  useEffect(() => {
-    const workflowRunId = router.query.workflow_run_id as string | undefined
-    if (workflowRunId && !relatedWorkflowRunIds[workflowRunId]) {
-      // Default to current branch project ref if not specified
-      setRelatedWorkflowRunIds((prev) => ({
-        ...prev,
-        [workflowRunId]: ref || '',
-      }))
-    }
-  }, [router.query.workflow_run_id, ref, relatedWorkflowRunIds])
-
   // Get combined diff data (database, edge functions, migrations, and branch state)
   const {
     diffContent,
@@ -81,10 +66,10 @@ const MergePage: NextPageWithLayout = () => {
     edgeFunctionsDiff,
     isBranchOutOfDateMigrations,
     hasEdgeFunctionModifications,
-    newerRemovedFunctionsCount,
-    hasNewerRemovedFunctions,
-    newerModifiedFunctionsCount,
-    hasNewerModifiedFunctions,
+    missingFunctionsCount,
+    hasMissingFunctions,
+    outOfDateFunctionsCount,
+    hasOutOfDateFunctions,
     isBranchOutOfDateOverall,
     missingMigrationsCount,
     modifiedFunctionsCount,
@@ -99,43 +84,74 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
-  // Handle workflow completion - refetch diff once when workflow completes or fails
-  const handleWorkflowStatusChange = useCallback(
-    (status: string, workflowRunId: string) => {
-      const isComplete =
-        status === 'FUNCTIONS_DEPLOYED' ||
-        status === 'MIGRATIONS_FAILED' ||
-        status === 'FUNCTIONS_FAILED'
+  // Get workflow run ID from URL
+  const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
 
-      const isFailed = status === 'MIGRATIONS_FAILED' || status === 'FUNCTIONS_FAILED'
+  // Reset workflow status when workflow ID changes
+  useEffect(() => {
+    setWorkflowFinalStatus(null)
+  }, [currentWorkflowRunId])
 
-      if (isFailed) {
-        setFailedWorkflowIds((prev) => new Set(prev).add(workflowRunId))
-      }
-
-      if (isComplete) {
-        // Refetch diff and edge functions once when workflow completes
+  // Try current branch first, then parent branch
+  const { currentWorkflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
+    useWorkflowManagement({
+      workflowRunId: currentWorkflowRunId,
+      projectRef: ref,
+      onWorkflowComplete: (status) => {
+        setWorkflowFinalStatus(status)
         refetchDiff()
         edgeFunctionsDiff.refetchCurrentBranchFunctions()
         edgeFunctionsDiff.refetchMainBranchFunctions()
-      }
+      },
+    })
+
+  const { currentWorkflowRun: parentBranchWorkflow, workflowRunLogs: parentBranchLogs } =
+    useWorkflowManagement({
+      workflowRunId: currentWorkflowRunId,
+      projectRef: parentProjectRef,
+      onWorkflowComplete: (status) => {
+        setWorkflowFinalStatus(status)
+        refetchDiff()
+        edgeFunctionsDiff.refetchCurrentBranchFunctions()
+        edgeFunctionsDiff.refetchMainBranchFunctions()
+      },
+    })
+
+  // Use whichever workflow run was found
+  const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
+  const workflowRunLogs = currentBranchLogs || parentBranchLogs
+
+  // Check if workflow failed based on final status or current status
+  const hasCurrentWorkflowFailed = workflowFinalStatus
+    ? ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowFinalStatus)
+    : currentWorkflowRun?.status &&
+      ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(currentWorkflowRun.status)
+
+  // Helper functions for URL management
+  const addWorkflowRun = useCallback(
+    (workflowRunId: string) => {
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, workflow_run_id: workflowRunId },
+      })
     },
-    [refetchDiff, edgeFunctionsDiff]
+    [router]
   )
+
+  const clearWorkflowRun = useCallback(() => {
+    const { workflow_run_id, ...queryWithoutWorkflowId } = router.query
+    router.push({
+      pathname: router.pathname,
+      query: queryWithoutWorkflowId,
+    })
+  }, [router])
 
   const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
     onSuccess: (data) => {
       toast.success('Branch update initiated!')
-      // Add workflow run ID to URL for persistence and track it (push workflows run on current branch)
+      // Add workflow run ID to URL for persistence
       if (data?.workflow_run_id) {
-        setRelatedWorkflowRunIds((prev) => ({
-          ...prev,
-          [data.workflow_run_id]: ref || '',
-        }))
-        router.push({
-          pathname: router.pathname,
-          query: { ...router.query, workflow_run_id: data.workflow_run_id },
-        })
+        addWorkflowRun(data.workflow_run_id)
       }
     },
     onError: (error) => {
@@ -152,16 +168,9 @@ const MergePage: NextPageWithLayout = () => {
         } else {
           toast.success('Branch merge initiated!')
         }
-        // Add workflow run ID to URL for persistence and track it (merge workflows run on parent branch)
+        // Add workflow run ID to URL for persistence
         if (data.workflowRunId) {
-          setRelatedWorkflowRunIds((prev) => ({
-            ...prev,
-            [data.workflowRunId]: parentProjectRef || '',
-          }))
-          router.push({
-            pathname: router.pathname,
-            query: { ...router.query, workflow_run_id: data.workflowRunId },
-          })
+          addWorkflowRun(data.workflowRunId)
         }
       } else {
         toast.info('No changes to merge - branch merged successfully!')
@@ -204,13 +213,6 @@ const MergePage: NextPageWithLayout = () => {
 
   // Determine current active tab via query param (defaults to 'database')
   const currentTab = (router.query.tab as string) || 'database'
-
-  // Get the current workflow run ID from URL
-  const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
-
-  // Check if current workflow run has failed
-  const hasCurrentWorkflowFailed =
-    currentWorkflowRunId && failedWorkflowIds.has(currentWorkflowRunId)
 
   // Navigation items for PageLayout - updates the `tab` query param
   const navigationItems = useMemo(() => {
@@ -274,8 +276,7 @@ const MergePage: NextPageWithLayout = () => {
     )
   }
 
-  const isDataLoaded = !isCombinedDiffLoading
-  const isMergeDisabled = combinedHasChanges && isDataLoaded
+  const isMergeDisabled = !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall
 
   // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
@@ -284,7 +285,7 @@ const MergePage: NextPageWithLayout = () => {
         <ButtonTooltip
           tooltip={{
             content: {
-              text: 'No changes to merge',
+              text: !combinedHasChanges ? 'No changes to merge' : 'Branch is out of date',
             },
           }}
           type="primary"
@@ -354,10 +355,10 @@ const MergePage: NextPageWithLayout = () => {
             <OutOfDateNotice
               isBranchOutOfDateMigrations={isBranchOutOfDateMigrations}
               missingMigrationsCount={missingMigrationsCount}
-              hasNewerRemovedFunctions={hasNewerRemovedFunctions}
-              newerRemovedFunctionsCount={newerRemovedFunctionsCount}
-              hasNewerModifiedFunctions={hasNewerModifiedFunctions}
-              newerModifiedFunctionsCount={newerModifiedFunctionsCount}
+              hasMissingFunctions={hasMissingFunctions}
+              missingFunctionsCount={missingFunctionsCount}
+              hasOutOfDateFunctions={hasOutOfDateFunctions}
+              outOfDateFunctionsCount={outOfDateFunctionsCount}
               hasEdgeFunctionModifications={hasEdgeFunctionModifications}
               modifiedFunctionsCount={modifiedFunctionsCount}
               isPushing={isPushing}
@@ -366,25 +367,17 @@ const MergePage: NextPageWithLayout = () => {
           ) : currentWorkflowRunId ? (
             <div className="my-6">
               <WorkflowLogsCard
-                workflowRunId={currentWorkflowRunId}
-                projectRef={relatedWorkflowRunIds[currentWorkflowRunId] || ref || ''}
-                onClose={() => {
-                  const { workflow_run_id, ...queryWithoutWorkflowId } = router.query
-                  router.push({
-                    pathname: router.pathname,
-                    query: queryWithoutWorkflowId,
-                  })
-                }}
-                onStatusChange={handleWorkflowStatusChange}
-                statusComplete="FUNCTIONS_DEPLOYED"
-                statusFailed={['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED']}
-                headerTitle={hasCurrentWorkflowFailed ? 'Workflow failed' : undefined}
-                headerDescription={
+                workflowRun={currentWorkflowRun}
+                logs={workflowRunLogs}
+                isLoading={!workflowRunLogs && !!currentWorkflowRunId}
+                onClose={clearWorkflowRun}
+                overrideTitle={hasCurrentWorkflowFailed ? 'Workflow failed' : undefined}
+                overrideDescription={
                   hasCurrentWorkflowFailed
                     ? 'Consider creating a fresh branch from the latest production branch to resolve potential conflicts.'
                     : undefined
                 }
-                headerIcon={
+                overrideIcon={
                   hasCurrentWorkflowFailed ? (
                     <AlertTriangle
                       size={16}
@@ -393,7 +386,7 @@ const MergePage: NextPageWithLayout = () => {
                     />
                   ) : undefined
                 }
-                headerAction={
+                overrideAction={
                   hasCurrentWorkflowFailed ? (
                     <Button
                       type="default"
