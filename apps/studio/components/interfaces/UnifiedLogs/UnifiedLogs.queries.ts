@@ -35,7 +35,11 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
-      whereConditions.push(`${key} = '${value}'`)
+      if (['host', 'pathname'].includes(key)) {
+        whereConditions.push(`${key} LIKE '%${value}%'`)
+      } else {
+        whereConditions.push(`${key} = '${value}'`)
+      }
     }
   })
 
@@ -234,7 +238,7 @@ const getEdgeLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
@@ -273,7 +277,7 @@ const getPostgrestLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
@@ -311,7 +315,7 @@ const getPostgresLogsQuery = () => {
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
           ELSE null
       END as level,
-      null as path,
+      null as pathname,
       null as host,
       event_message as event_message,
       null as method,
@@ -341,7 +345,7 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.url as path,
+      fel_request.url as pathname,
       fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
@@ -387,7 +391,7 @@ const getAuthLogsQuery = () => {
           WHEN el_in_al_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      el_in_al_request.path as path,
+      el_in_al_request.path as pathname,
       el_in_al_request.host as host,
       null as event_message,
       el_in_al_request.method as method,
@@ -428,7 +432,7 @@ const getSupavisorLogsQuery = () => {
           WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
           ELSE 'success'
       END as level,
-      null as path,
+      null as pathname,
       null as host,
       null as event_message,
       null as method,
@@ -478,7 +482,7 @@ SELECT
     log_type,
     status,
     level,
-    path,
+    pathname,
     host,
     event_message,
     method,
@@ -498,8 +502,9 @@ ${finalWhere}
  * Also returns facets for all filter dimensions
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
+  const methodWhere =
+    finalWhere.length > 0 ? `${finalWhere} AND method is NOT NULL` : 'WHERE method IS NOT NULL'
 
   // Create a count query using the same unified logs CTE
   const sql = `
@@ -530,8 +535,7 @@ UNION ALL
 -- Get counts by method
 SELECT 'method' as dimension, method as value, COUNT(*) as count
 FROM unified_logs
-${finalWhere}
-WHERE method IS NOT NULL
+${methodWhere}
 GROUP BY method
 `
 
