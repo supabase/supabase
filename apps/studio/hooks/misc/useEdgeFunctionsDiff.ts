@@ -5,12 +5,13 @@ import {
   getEdgeFunctionBody,
   type EdgeFunctionBodyData,
 } from 'data/edge-functions/edge-function-body-query'
-import type { EdgeFunctionsData } from 'data/edge-functions/edge-functions-query'
+import {
+  useEdgeFunctionsQuery,
+  type EdgeFunctionsData,
+} from 'data/edge-functions/edge-functions-query'
 import { basename } from 'path'
 
 interface UseEdgeFunctionsDiffProps {
-  currentBranchFunctions?: EdgeFunctionsData
-  mainBranchFunctions?: EdgeFunctionsData
   currentBranchRef?: string
   mainBranchRef?: string
 }
@@ -37,17 +38,44 @@ export interface EdgeFunctionsDiffResult {
   functionFileInfo: FunctionFileInfo
   isLoading: boolean
   hasChanges: boolean
+  refetchCurrentBranchFunctions: () => void
+  refetchMainBranchFunctions: () => void
+  currentBranchFunctions?: EdgeFunctionsData
+  mainBranchFunctions?: EdgeFunctionsData
 }
 
 // Small helper around path.basename but avoids importing the full Node path lib for the browser bundle
 const fileKey = (fullPath: string) => basename(fullPath)
 
 export const useEdgeFunctionsDiff = ({
-  currentBranchFunctions,
-  mainBranchFunctions,
   currentBranchRef,
   mainBranchRef,
 }: UseEdgeFunctionsDiffProps): EdgeFunctionsDiffResult => {
+  // Fetch edge functions for both branches
+  const {
+    data: currentBranchFunctions,
+    isLoading: isCurrentFunctionsLoading,
+    refetch: refetchCurrentBranchFunctions,
+  } = useEdgeFunctionsQuery(
+    { projectRef: currentBranchRef },
+    {
+      enabled: !!currentBranchRef,
+      staleTime: 30000, // 30 seconds
+    }
+  )
+
+  const {
+    data: mainBranchFunctions,
+    isLoading: isMainFunctionsLoading,
+    refetch: refetchMainBranchFunctions,
+  } = useEdgeFunctionsQuery(
+    { projectRef: mainBranchRef },
+    {
+      enabled: !!mainBranchRef,
+      staleTime: 30000, // 30 seconds
+    }
+  )
+
   // Identify added / removed / overlapping functions
   const {
     added = [],
@@ -110,12 +138,15 @@ export const useEdgeFunctionsDiff = ({
   })
 
   // Flatten loading flags ----------------------------------------------------
-  const isLoading = [
-    ...currentBodiesQueries,
-    ...mainBodiesQueries,
-    ...addedBodiesQueries,
-    ...removedBodiesQueries,
-  ].some((q) => q.isLoading)
+  const isLoading =
+    [
+      ...currentBodiesQueries,
+      ...mainBodiesQueries,
+      ...addedBodiesQueries,
+      ...removedBodiesQueries,
+    ].some((q) => q.isLoading) ||
+    isCurrentFunctionsLoading ||
+    isMainFunctionsLoading
 
   // Aggregate errors across all queries and handle the first encountered error.
   const firstError = [
@@ -226,6 +257,10 @@ export const useEdgeFunctionsDiff = ({
     functionFileInfo,
     isLoading,
     hasChanges,
+    refetchCurrentBranchFunctions,
+    refetchMainBranchFunctions,
+    currentBranchFunctions,
+    mainBranchFunctions,
   }
 }
 
