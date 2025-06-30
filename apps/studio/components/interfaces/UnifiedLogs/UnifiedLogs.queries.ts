@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { SearchParamsType } from './UnifiedLogs.types'
+import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
 // Pagination and control parameters
 const PAGINATION_PARAMS = ['sort', 'start', 'size', 'uuid', 'cursor', 'direction', 'live'] as const
@@ -17,7 +17,7 @@ const BASE_CONDITIONS_EXCLUDED_PARAMS = [...PAGINATION_PARAMS, 'date', 'level'] 
  * @param search SearchParamsType object containing query parameters
  * @returns Object with whereConditions array and formatted WHERE clause
  */
-const buildQueryConditions = (search: SearchParamsType) => {
+const buildQueryConditions = (search: QuerySearchParamsType) => {
   const whereConditions: string[] = []
 
   // Process all search parameters for filtering
@@ -35,7 +35,11 @@ const buildQueryConditions = (search: SearchParamsType) => {
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
-      whereConditions.push(`${key} = '${value}'`)
+      if (['host', 'pathname'].includes(key)) {
+        whereConditions.push(`${key} LIKE '%${value}%'`)
+      } else {
+        whereConditions.push(`${key} = '${value}'`)
+      }
     }
   })
 
@@ -234,7 +238,7 @@ const getEdgeLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
@@ -274,7 +278,7 @@ const getPostgrestLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
@@ -312,7 +316,7 @@ const getPostgresLogsQuery = () => {
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
           ELSE null
       END as level,
-      null as path,
+      null as pathname,
       null as host,
       event_message as event_message,
       null as method,
@@ -342,7 +346,7 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.url as path,
+      fel_request.url as pathname,
       fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
@@ -388,7 +392,7 @@ const getAuthLogsQuery = () => {
           WHEN el_in_al_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      el_in_al_request.path as path,
+      el_in_al_request.path as pathname,
       el_in_al_request.host as host,
       null as event_message,
       el_in_al_request.method as method,
@@ -429,7 +433,7 @@ const getSupavisorLogsQuery = () => {
           WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
           ELSE 'success'
       END as level,
-      null as path,
+      null as pathname,
       null as host,
       null as event_message,
       null as method,
@@ -503,7 +507,7 @@ WITH unified_logs AS (
 /**
  * Unified logs SQL query
  */
-export const getUnifiedLogsQuery = (search: SearchParamsType): string => {
+export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
   // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
 
@@ -516,7 +520,7 @@ SELECT
     log_type,
     status,
     level,
-    path,
+    pathname,
     host,
     event_message,
     method,
@@ -535,9 +539,10 @@ ${finalWhere}
  * Get a count query for the total logs within the timeframe
  * Also returns facets for all filter dimensions
  */
-export const getLogsCountQuery = (search: SearchParamsType): string => {
-  // Use the buildQueryConditions helper
+export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   const { finalWhere } = buildQueryConditions(search)
+  const methodWhere =
+    finalWhere.length > 0 ? `${finalWhere} AND method is NOT NULL` : 'WHERE method IS NOT NULL'
 
   // Create a count query using the same unified logs CTE
   const sql = `
@@ -568,8 +573,7 @@ UNION ALL
 -- Get counts by method
 SELECT 'method' as dimension, method as value, COUNT(*) as count
 FROM unified_logs
-${finalWhere}
-WHERE method IS NOT NULL
+${methodWhere}
 GROUP BY method
 `
 
@@ -580,9 +584,9 @@ GROUP BY method
  * Enhanced logs chart query with dynamic bucketing based on time range
  * Incorporates dynamic bucketing from the older implementation
  */
-export const getLogsChartQuery = (search: SearchParamsType | Record<string, any>): string => {
+export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
   // Use the buildQueryConditions helper
-  const { finalWhere } = buildQueryConditions(search as SearchParamsType)
+  const { finalWhere } = buildQueryConditions(search)
 
   // Determine appropriate bucketing level based on time range
   const truncationLevel = calculateChartBucketing(search)

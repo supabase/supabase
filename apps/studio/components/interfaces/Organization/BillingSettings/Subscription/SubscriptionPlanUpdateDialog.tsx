@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { Check, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
@@ -11,7 +10,6 @@ import {
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { organizationKeys } from 'data/organizations/keys'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
@@ -85,7 +83,6 @@ export const SubscriptionPlanUpdateDialog = ({
   projects,
 }: Props) => {
   const { resolvedTheme } = useTheme()
-  const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
@@ -116,6 +113,7 @@ export const SubscriptionPlanUpdateDialog = ({
   )
 
   const onSuccessfulPlanChange = () => {
+    setPaymentConfirmationLoading(false)
     toast.success(
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )
@@ -134,6 +132,7 @@ export const SubscriptionPlanUpdateDialog = ({
         onSuccessfulPlanChange()
       },
       onError: (error) => {
+        setPaymentConfirmationLoading(false)
         toast.error(`Unable to update subscription: ${error.message}`)
       },
     }
@@ -169,9 +168,13 @@ export const SubscriptionPlanUpdateDialog = ({
     if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
 
+    setPaymentConfirmationLoading(true)
+
     const paymentMethod = await paymentMethodSelection.current?.createPaymentMethod()
     if (paymentMethod) {
       setSelectedPaymentMethod(paymentMethod.id)
+    } else {
+      setPaymentConfirmationLoading(false)
     }
 
     if (
@@ -180,23 +183,6 @@ export const SubscriptionPlanUpdateDialog = ({
       changeType === 'upgrade'
     ) {
       return
-    }
-
-    if (paymentMethod) {
-      queryClient.setQueriesData(
-        organizationKeys.paymentMethods(selectedOrganization.slug),
-        (prev: any) => {
-          if (!prev) return prev
-          return {
-            ...prev,
-            defaultPaymentMethodId: paymentMethod?.id,
-            data: prev.data.map((pm: any) => ({
-              ...pm,
-              is_default: pm.id === paymentMethod?.id,
-            })),
-          }
-        }
-      )
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default
@@ -253,6 +239,10 @@ export const SubscriptionPlanUpdateDialog = ({
     <Dialog
       open={selectedTier !== undefined && selectedTier !== 'tier_free'}
       onOpenChange={(open) => {
+        // Do not allow closing mid-change
+        if (isUpdating || paymentConfirmationLoading || isConfirming) {
+          return
+        }
         if (!open) onClose()
       }}
     >
@@ -561,17 +551,15 @@ export const SubscriptionPlanUpdateDialog = ({
             </div>
 
             <div className="pt-4">
-              {!billingViaPartner && !subscriptionPreviewIsLoading && changeType === 'upgrade' && (
+              {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
                 <div className="space-y-2 mb-4">
                   <BillingCustomerDataExistingOrgDialog />
 
                   <PaymentMethodSelection
                     ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
-                    onSelectPaymentMethod={setSelectedPaymentMethod}
-                    createPaymentMethodInline={
-                      subscriptionPreview?.pending_subscription_flow === true
-                    }
+                    onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
+                    createPaymentMethodInline={true}
                     readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                   />
                 </div>
@@ -700,7 +688,6 @@ export const SubscriptionPlanUpdateDialog = ({
                 paymentIntentConfirmed(paymentIntentConfirmation)
               }
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
-              paymentMethodId={selectedPaymentMethod!}
             />
           </Elements>
         )}

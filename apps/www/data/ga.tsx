@@ -1,12 +1,12 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
 import { Activity } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+import { companyStats } from 'data/company-stats'
 
 export const data = (isDark: boolean) => ({
   hero: {
     title: <>We are moving to General Availability</>,
     publishedAt: '15 April 2024',
-    // publishedAt: null,
     sections: [
       { title: 'General Availability', link: '#ga' },
       { title: 'Open Source & Community', link: '#open-source' },
@@ -20,11 +20,11 @@ export const data = (isDark: boolean) => ({
   highlightsSection: {
     highlights: [
       {
-        number: '1,000,000+',
+        number: companyStats.databasesManaged,
         text: 'databases managed',
       },
       {
-        number: '2,500+',
+        number: companyStats.databasesLaunchedDaily,
         text: 'databases launched daily',
       },
       {

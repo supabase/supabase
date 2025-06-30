@@ -25,7 +25,7 @@ import {
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
@@ -85,6 +85,7 @@ const DeployNewReplicaPanel = ({
     (x) => x.organization_id === project?.organization_id
   )
   const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
@@ -182,6 +183,7 @@ const DeployNewReplicaPanel = ({
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
+    !isAwsK8s &&
     !isProWithSpendCapEnabled
 
   const computeAddons =
@@ -259,6 +261,19 @@ const DeployNewReplicaPanel = ({
                 className="mt-3"
                 href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
               />
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        ) : isAwsK8s ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Read replicas are not supported for AWS (Revamped) projects
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                Projects provisioned by other cloud providers currently will not be able to use read
+                replicas
+              </span>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : currentPgVersion < 15 ? (

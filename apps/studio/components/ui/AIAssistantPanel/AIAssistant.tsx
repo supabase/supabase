@@ -1,28 +1,24 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { last } from 'lodash'
 import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
-import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
-import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -36,15 +32,16 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ButtonTooltip } from '../ButtonTooltip'
-import DotGrid from '../DotGrid'
+import { DotGrid } from '../DotGrid'
+import { ErrorBoundary } from '../ErrorBoundary'
+import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
-import AIOnboarding from './AIOnboarding'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { AIOnboarding } from './AIOnboarding'
+import { AIOptInModal } from './AIOptInModal'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
-import { ErrorBoundary } from '../ErrorBoundary'
 
 const MemoizedMessage = memo(
   ({
@@ -68,8 +65,7 @@ const MemoizedMessage = memo(
       <Message
         key={message.id}
         id={message.id}
-        role={message.role}
-        content={message.content}
+        message={message}
         readOnly={message.role === 'user'}
         isLoading={isLoading}
         onResults={onResults}
@@ -88,18 +84,30 @@ interface AIAssistantProps {
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const project = useSelectedProject()
-  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
   const selectedOrganization = useSelectedOrganization()
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
+  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
 
+  const [updatedOptInSinceMCP] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+    false
+  )
+
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
+
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const showMetadataWarning =
+    IS_PLATFORM &&
+    !!selectedOrganization &&
+    ((!useBedrockAssistant && aiOptInLevel === 'disabled') ||
+      (useBedrockAssistant && (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')))
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -129,11 +137,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const handleError = useCallback((error: Error) => {
-    const errorMessage = JSON.parse(error.message).message
-    toast.error(errorMessage)
-  }, [])
-
   // Handle completion of the assistant's response
   const handleChatFinish = useCallback((message: MessageType) => {
     // If we have a user message stored in the ref, save both messages
@@ -156,24 +159,42 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages,
   } = useChat({
     id: snap.activeChatId,
-    api: `${BASE_PATH}/api/ai/sql/generate-v3`,
+    api: useBedrockAssistant
+      ? `${BASE_PATH}/api/ai/sql/generate-v4`
+      : `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
     initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
-    body: {
-      includeSchemaMetadata,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: currentSchema,
-      table: currentTable?.name,
+    experimental_prepareRequestBody: ({ messages }) => {
+      // [Joshen] Specifically limiting the chat history that get's sent to reduce the
+      // size of the context that goes into the model. This should always be an odd number
+      // as much as possible so that the first message is always the user's
+      const MAX_CHAT_HISTORY = 5
+
+      return JSON.stringify({
+        messages: messages.slice(-MAX_CHAT_HISTORY),
+        aiOptInLevel,
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        schema: currentSchema,
+        table: currentTable?.name,
+        includeSchemaMetadata: !useBedrockAssistant
+          ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
+          : undefined,
+      })
     },
-    onError: handleError,
+    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+      const headers = await constructHeaders()
+      const existingHeaders = new Headers(init?.headers)
+      for (const [key, value] of headers.entries()) {
+        existingHeaders.set(key, value)
+      }
+      return fetch(input, { ...init, headers: existingHeaders })
+    },
+    onError: onErrorChat,
     onFinish: handleChatFinish,
   })
-
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const updateMessage = useCallback(
     ({
@@ -207,24 +228,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const hasMessages = chatMessages.length > 0
 
-  const sendMessageToAssistant = async (content: string) => {
-    const payload = { role: 'user', createdAt: new Date(), content } as MessageType
-    const headerData = await constructHeaders()
+  const sendMessageToAssistant = (content: string) => {
+    const payload = { role: 'user', createdAt: new Date(), content, id: uuidv4() } as MessageType
     snap.clearSqlSnippets()
 
     // Store the user message in the ref before appending
     lastUserMessageRef.current = payload
 
-    const authorizationHeader = headerData.get('Authorization')
-
-    append(
-      payload,
-      authorizationHeader
-        ? {
-            headers: { Authorization: authorizationHeader },
-          }
-        : undefined
-    )
+    append(payload)
 
     setValue('')
 
@@ -245,30 +256,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       })
     }
-  }
-
-  const confirmOptInToShareSchemaData = async () => {
-    if (!canUpdateOrganization) {
-      return toast.error('You do not have the required permissions to update this organization')
-    }
-
-    if (!selectedOrganization?.slug) return console.error('Organization slug is required')
-
-    const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
-
-    const updatedOptInTags = existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
-      ? existingOptInTags
-      : [...existingOptInTags, OPT_IN_TAGS.AI_SQL]
-
-    updateOrganization(
-      { slug: selectedOrganization?.slug, opt_in_tags: updatedOptInTags },
-      {
-        onSuccess: () => {
-          toast.success('Successfully opted-in')
-          setIsConfirmOptInModalOpen(false)
-        },
-      }
-    )
   }
 
   const handleClearMessages = () => {
@@ -336,9 +323,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   </TooltipTrigger>
                   <TooltipContent className="w-80">
                     The Assistant is in Alpha and your prompts might be rate limited.{' '}
-                    {includeSchemaMetadata
-                      ? 'Project metadata is being shared to improve Assistant responses.'
-                      : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
+                    {aiOptInLevel === 'schema_and_log_and_data' &&
+                      'Schema, logs, and query data are being shared to improve Assistant responses.'}
+                    {aiOptInLevel === 'schema_and_log' &&
+                      'Schema and logs are being shared to improve Assistant responses.'}
+                    {aiOptInLevel === 'schema' &&
+                      'Only schema metadata is being shared to improve Assistant responses.'}
+                    {aiOptInLevel === 'disabled' &&
+                      'Project metadata is not being shared. Opt in to improve Assistant responses.'}
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -375,16 +367,30 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 </div>
               </div>
             </div>
-            {!includeSchemaMetadata && selectedOrganization && (
+            {showMetadataWarning && (
               <Admonition
                 type="default"
-                title="Project metadata is not shared"
-                description={
-                  isHipaaProjectDisallowed
-                    ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
-                    : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
+                title={
+                  newOrgAiOptIn && !updatedOptInSinceMCP
+                    ? 'The Assistant has just been updated to help you better!'
+                    : isHipaaProjectDisallowed
+                      ? 'Project metadata is not shared due to HIPAA'
+                      : aiOptInLevel === 'disabled'
+                        ? 'Project metadata is currently not shared'
+                        : 'Limited metadata is shared to the Assistant'
                 }
-                className="border-0 border-b rounded-none bg-background"
+                description={
+                  newOrgAiOptIn && !updatedOptInSinceMCP
+                    ? 'You may now opt-in to share schema metadata and even logs for better results'
+                    : isHipaaProjectDisallowed
+                      ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
+                      : aiOptInLevel === 'disabled'
+                        ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
+                        : aiOptInLevel === 'schema'
+                          ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
+                          : ''
+                }
+                className="border-0 border-b rounded-none bg-background mb-0"
               >
                 {!isHipaaProjectDisallowed && (
                   <Button
@@ -406,36 +412,41 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           {hasMessages ? (
             <div className="w-full p-5">
               {renderedMessages}
-              {(last(chatMessages)?.role === 'user' ||
-                last(chatMessages)?.content?.length === 0) && (
-                <div className="flex gap-4 w-auto overflow-hidden">
-                  <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-                  <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
-                    <span>Thinking</span>
-                    <div className="flex gap-1">
-                      <motion.span
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                      >
-                        .
-                      </motion.span>
-                      <motion.span
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                      >
-                        .
-                      </motion.span>
-                      <motion.span
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                      >
-                        .
-                      </motion.span>
+              <AnimatePresence>
+                {isChatLoading && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex gap-4 w-auto overflow-hidden"
+                  >
+                    <div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                      <span>Thinking</span>
+                      <div className="flex gap-1">
+                        <motion.span
+                          animate={{ opacity: [0, 1, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                        >
+                          .
+                        </motion.span>
+                        <motion.span
+                          animate={{ opacity: [0, 1, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                        >
+                          .
+                        </motion.span>
+                        <motion.span
+                          animate={{ opacity: [0, 1, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                        >
+                          .
+                        </motion.span>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
-              <div className="h-1" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : snap.suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
@@ -473,7 +484,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               <GenericSkeletonLoader className="w-4/5" />
             </div>
           ) : (tables ?? [])?.length > 0 ? (
-            <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
+            <AIOnboarding onSendMessage={sendMessageToAssistant} />
           ) : isApiKeySet ? (
             <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
               <h2 className="text-base mb-2">Welcome to Supabase!</h2>
@@ -624,7 +635,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             onValueChange={(e) => setValue(e.target.value)}
             onSubmit={(event) => {
               event.preventDefault()
-              if (includeSchemaMetadata) {
+              if (aiOptInLevel !== 'disabled') {
                 const sqlSnippetsString =
                   snap.sqlSnippets
                     ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
@@ -634,28 +645,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 scrollToEnd()
               } else {
                 sendMessageToAssistant(value)
+                snap.setSqlSnippets([])
+                scrollToEnd()
               }
             }}
           />
         </div>
       </div>
 
-      <ConfirmationModal
+      <AIOptInModal
         visible={isConfirmOptInModalOpen}
-        size="large"
-        title="Confirm sending anonymous data to OpenAI"
-        confirmLabel="Confirm"
         onCancel={() => setIsConfirmOptInModalOpen(false)}
-        onConfirm={confirmOptInToShareSchemaData}
-        loading={isUpdating}
-      >
-        <p className="text-sm text-foreground-light">
-          By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
-          This is an organization-wide setting, and affects all projects in your organization.
-        </p>
-
-        <OptInToOpenAIToggle />
-      </ConfirmationModal>
+      />
     </ErrorBoundary>
   )
 }
