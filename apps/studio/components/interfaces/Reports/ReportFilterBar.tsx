@@ -1,28 +1,18 @@
-import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
-import { ComponentProps, useEffect, useState } from 'react'
-import SVG from 'react-inlinesvg'
+import { Database, RefreshCw } from 'lucide-react'
+import { ComponentProps, useCallback, useEffect, useState, useMemo } from 'react'
+import { parseAsString, useQueryStates } from 'nuqs'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
-import { BASE_PATH } from 'lib/constants'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Input,
-  Popover,
-  Select,
-  cn,
-} from 'ui'
+import { cn } from 'ui'
+import { FilterBar } from 'ui-patterns'
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
+import type { FilterGroup, FilterCondition } from 'ui-patterns'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -81,6 +71,22 @@ const PRODUCT_FILTERS = [
   },
 ]
 
+enum ReportFilterKeys {
+  PATH = 'request.path',
+  SEARCH = 'request.search',
+  X_CLIENT_INFO = 'request.headers.x_client_info',
+  USER_AGENT = 'request.headers.user_agent',
+  STATUS_CODE = 'response.status_code',
+}
+
+export const REPORT_FILTER_PARAMS_PARSER = {
+  [ReportFilterKeys.PATH]: parseAsString,
+  [ReportFilterKeys.SEARCH]: parseAsString,
+  [ReportFilterKeys.X_CLIENT_INFO]: parseAsString,
+  [ReportFilterKeys.USER_AGENT]: parseAsString,
+  [ReportFilterKeys.STATUS_CODE]: parseAsString, // Changed to string to handle operators
+}
+
 const ReportFilterBar = ({
   filters,
   isLoading = false,
@@ -94,32 +100,285 @@ const ReportFilterBar = ({
 }: ReportFilterBarProps) => {
   const { ref } = useParams()
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
-
-  const filterKeys = [
-    'request.path',
-    'request.method',
-    'request.search',
-    'request.headers.x_client_info',
-    'request.headers.user_agent',
-    'response.status_code',
-  ]
-  const [showAdder, setShowAdder] = useState(false)
   const [currentProductFilter, setCurrentProductFilter] = useState<
     null | (typeof PRODUCT_FILTERS)[number]
   >(null)
-  const [addFilterValues, setAddFilterValues] = useState<ReportFilterItem>({
-    key: filterKeys[0],
-    compare: 'matches',
-    value: '',
-  })
 
-  const resetFilterValues = () => {
-    setAddFilterValues({
-      key: filterKeys[0],
-      compare: 'matches',
-      value: '',
-    })
+  // URL-safe operator mappings
+  const URL_OPERATOR_MAP = {
+    '=': 'eq',
+    '!=': 'neq',
+    '>=': 'gte',
+    '<=': 'lte',
+    '>': 'gt',
+    '<': 'lt',
+    CONTAINS: 'contains',
+    'STARTS WITH': 'startswith',
+    'ENDS WITH': 'endswith',
   }
+
+  const REVERSE_URL_OPERATOR_MAP = Object.fromEntries(
+    Object.entries(URL_OPERATOR_MAP).map(([k, v]) => [v, k])
+  )
+
+  // Parse encoded filter value (e.g., "gte:300" -> { operator: ">=", value: "300" })
+  const parseFilterValue = useCallback((encodedValue: string | number | null) => {
+    if (!encodedValue || typeof encodedValue !== 'string') {
+      return { operator: '=', value: encodedValue?.toString() || '' }
+    }
+
+    const parts = encodedValue.split(':')
+    if (parts.length === 2) {
+      const [urlOperator, value] = parts
+      const operator = REVERSE_URL_OPERATOR_MAP[urlOperator] || '='
+      return { operator, value }
+    }
+
+    // Default to equals if no operator specified
+    return { operator: '=', value: encodedValue }
+  }, [])
+
+  // Encode operator + value for URL (e.g., operator: ">=", value: "300" -> "gte:300")
+  const encodeFilterValue = useCallback((operator: string, value: string | number) => {
+    const urlOperator = URL_OPERATOR_MAP[operator as keyof typeof URL_OPERATOR_MAP] || 'eq'
+    return `${urlOperator}:${value}`
+  }, [])
+
+  // Convert query filters to FilterGroup format
+  const convertQueryFiltersToFilterGroup = useCallback(
+    (queryState: Record<string, string | number | null>): FilterGroup => {
+      const conditions: FilterCondition[] = []
+
+      Object.entries(queryState).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== '') {
+          const { operator, value: filterValue } = parseFilterValue(value)
+          conditions.push({
+            propertyName: key,
+            value: filterValue,
+            operator: operator,
+          })
+        }
+      })
+
+      return {
+        logicalOperator: 'AND',
+        conditions,
+      }
+    },
+    []
+  )
+
+  // Convert operator from FilterBar format to ReportFilterItem format
+  const getCompareOperator = useCallback(
+    (operator: string): 'matches' | 'is' | '>=' | '<=' | '>' | '<' | '!=' => {
+      switch (operator) {
+        case '=':
+          return 'is'
+        case '!=':
+          return '!='
+        case '>=':
+          return '>='
+        case '<=':
+          return '<='
+        case '>':
+          return '>'
+        case '<':
+          return '<'
+        case 'CONTAINS':
+        case 'STARTS WITH':
+        case 'ENDS WITH':
+          return 'matches'
+        default:
+          return 'matches'
+      }
+    },
+    []
+  )
+
+  // Convert FilterGroup to ReportFilterItem format for the report system
+  const convertFilterGroupToReportFilters = useCallback(
+    (filterGroup: FilterGroup): ReportFilterItem[] => {
+      const reportFilters: ReportFilterItem[] = []
+
+      filterGroup.conditions.forEach((condition) => {
+        if (!('logicalOperator' in condition)) {
+          // It's a FilterCondition, not a nested FilterGroup
+          const filterCondition = condition as FilterCondition
+          // Only send to report system if filter has a value (empty filters are for UI only)
+          if (
+            filterCondition.value !== null &&
+            filterCondition.value !== '' &&
+            filterCondition.value !== undefined
+          ) {
+            reportFilters.push({
+              key: filterCondition.propertyName,
+              value: filterCondition.value.toString(),
+              compare: getCompareOperator(filterCondition.operator),
+            })
+          }
+        }
+      })
+
+      return reportFilters
+    },
+    []
+  )
+
+  // Convert FilterGroup back to query filters format
+  const convertFilterGroupToQueryFilters = useCallback((filterGroup: FilterGroup) => {
+    const queryUpdate: Record<string, string | number | null> = {}
+
+    // Clear all existing filters first
+    Object.keys(REPORT_FILTER_PARAMS_PARSER).forEach((key) => {
+      queryUpdate[key] = null
+    })
+
+    // Add new filters with encoded operator+value
+    filterGroup.conditions.forEach((condition) => {
+      if (!('logicalOperator' in condition)) {
+        // It's a FilterCondition, not a nested FilterGroup
+        const filterCondition = condition as FilterCondition
+        if (filterCondition.propertyName in REPORT_FILTER_PARAMS_PARSER) {
+          // Encode operator + value for URL safety
+          const encodedValue = encodeFilterValue(
+            filterCondition.operator,
+            filterCondition.value as string | number
+          )
+          queryUpdate[filterCondition.propertyName] = encodedValue
+        }
+      }
+    })
+
+    return queryUpdate
+  }, [])
+
+  const initialFilters: FilterGroup = {
+    logicalOperator: 'AND',
+    conditions: [],
+  }
+
+  const [queryFilters, setQueryFilters] = useQueryStates(REPORT_FILTER_PARAMS_PARSER, {
+    throttleMs: 200,
+  })
+  const [localFilters, setLocalFilters] = useState<FilterGroup>(initialFilters)
+  const [freeformText, setFreeformText] = useState('')
+
+  // Initialize local state from URL params (like UnifiedLogs does)
+  const defaultFilterGroup = useMemo(() => {
+    return convertQueryFiltersToFilterGroup(queryFilters)
+  }, [queryFilters])
+
+  // Track if we're initializing to avoid sync loops
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Set initial local state from URL params (only once on mount)
+  useEffect(() => {
+    if (!isInitialized) {
+      setLocalFilters(defaultFilterGroup)
+      setIsInitialized(true)
+    }
+  }, [defaultFilterGroup, isInitialized])
+
+  // Sync local filter changes back to URL state (only after initialization)
+  useEffect(() => {
+    if (!isInitialized) return // Don't sync during initialization
+
+    const queryUpdate = convertFilterGroupToQueryFilters(localFilters)
+
+    // Simple comparison - only update if there are meaningful differences
+    const hasChanges = Object.entries(queryUpdate).some(
+      ([key, value]) => queryFilters[key as keyof typeof queryFilters] !== value
+    )
+
+    if (hasChanges) {
+      setQueryFilters(queryUpdate)
+    }
+  }, [localFilters, isInitialized])
+
+  // Separate effect for report filter updates (only for filters with values)
+  useEffect(() => {
+    const reportFilters = convertFilterGroupToReportFilters(localFilters)
+
+    // Only compare filters that have values (ignore empty UI-only filters)
+    const currentFilterState = filters
+      .map((f) => `${f.key}:${f.value}:${f.compare}`)
+      .sort()
+      .join('|')
+    const newFilterState = reportFilters
+      .map((f) => `${f.key}:${f.value}:${f.compare}`)
+      .sort()
+      .join('|')
+
+    // Only update if the actual report filters changed
+    if (currentFilterState !== newFilterState) {
+      onRemoveFilters(filters)
+      reportFilters.forEach((filter) => onAddFilter(filter))
+    }
+  }, [localFilters, filters, onRemoveFilters, onAddFilter])
+
+  const handleFilterChange = (newFilters: FilterGroup) => {
+    setLocalFilters(newFilters)
+  }
+
+  // Get filter properties based on product type
+  const getFilterProperties = () => {
+    const commonProperties = [
+      {
+        label: 'Path',
+        name: ReportFilterKeys.PATH,
+        type: 'string' as const,
+        operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+      },
+      {
+        label: 'Status Code',
+        name: ReportFilterKeys.STATUS_CODE,
+        type: 'number' as const,
+        options: [
+          { label: '200', value: '200' },
+          { label: '300', value: '300' },
+          { label: '400', value: '400' },
+          { label: '500', value: '500' },
+        ],
+        operators: ['=', '!=', '>', '<', '>=', '<='],
+      },
+      {
+        label: 'User Agent',
+        name: ReportFilterKeys.USER_AGENT,
+        type: 'string' as const,
+        operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+      },
+    ]
+
+    if (productFilter === 'storage') {
+      return [
+        {
+          label: 'Storage Path',
+          name: ReportFilterKeys.PATH,
+          type: 'string' as const,
+          operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+        },
+        ...commonProperties.slice(1), // Skip the general Path filter since we have Storage Path
+      ]
+    }
+
+    return [
+      ...commonProperties,
+      {
+        label: 'Search Params',
+        name: ReportFilterKeys.SEARCH,
+        type: 'string' as const,
+        operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+      },
+      {
+        label: 'Client Info',
+        name: ReportFilterKeys.X_CLIENT_INFO,
+        type: 'string' as const,
+        operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+      },
+    ]
+  }
+
+  const filterProperties = getFilterProperties()
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
     onDatepickerChange(vals)
@@ -163,8 +422,8 @@ const ReportFilterBar = ({
   }, [])
 
   return (
-    <div className={cn('flex items-center justify-between', className)}>
-      <div className="flex flex-row justify-start items-center flex-wrap gap-2">
+    <div className={cn('flex flex-wrap md:items-center justify-between gap-2', className)}>
+      <div className="flex gap-2">
         <ButtonTooltip
           type="default"
           disabled={isLoading}
@@ -178,166 +437,15 @@ const ReportFilterBar = ({
           value={selectedRange}
           helpers={datepickerHelpers}
         />
-        {!productFilter && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                className="inline-flex flex-row gap-2"
-                iconRight={<ChevronDown size={14} />}
-              >
-                <span>
-                  {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="start">
-              <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
-                <p>All Requests</p>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {PRODUCT_FILTERS.map((productFilter) => {
-                const Icon = productFilter.icon
-
-                return (
-                  <DropdownMenuItem
-                    key={productFilter.key}
-                    className="space-x-2"
-                    disabled={productFilter.key === currentProductFilter?.key}
-                    onClick={() => handleProductFilterChange(productFilter)}
-                  >
-                    {productFilter.key === 'graphql' ? (
-                      <SVG
-                        src={`${BASE_PATH}/img/graphql.svg`}
-                        className="w-[20px] h-[20px] mr-2"
-                        preProcessor={(code) =>
-                          code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                        }
-                      />
-                    ) : Icon !== null ? (
-                      <Icon size={20} strokeWidth={1.5} className="mr-2" />
-                    ) : null}
-                    <div className="flex flex-col">
-                      <p
-                        className={cn(
-                          productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
-                          'inline-block'
-                        )}
-                      >
-                        {productFilter.label}
-                      </p>
-                      <p className=" text-left text-foreground-light inline-block w-[180px]">
-                        {productFilter.description}
-                      </p>
-                    </div>
-                  </DropdownMenuItem>
-                )
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        {filters
-          .filter(
-            (filter) =>
-              filter.value !== currentProductFilter?.filterValue ||
-              filter.key !== currentProductFilter?.filterKey
-          )
-          .map((filter) => (
-            <div
-              key={`${filter.key}-${filter.compare}-${filter.value}`}
-              className="text-xs rounded border border-foreground-lighter bg-surface-300 px-2 h-7 flex flex-row justify-center gap-1 items-center"
-            >
-              {filter.key} {filter.compare} {filter.value}
-              <Button
-                type="text"
-                size="tiny"
-                className="!p-0 !space-x-0"
-                onClick={() => onRemoveFilters([filter])}
-                icon={<X className="text-foreground-light" />}
-              >
-                <span className="sr-only">Remove</span>
-              </Button>
-            </div>
-          ))}
-        <Popover
-          align="end"
-          header={
-            <div className="flex justify-between items-center py-1">
-              <h5 className="text-sm text-foreground">Add Filter</h5>
-
-              <Button
-                type="primary"
-                size="tiny"
-                onClick={() => {
-                  onAddFilter(addFilterValues)
-                  setShowAdder(false)
-                  resetFilterValues()
-                }}
-              >
-                Save
-              </Button>
-            </div>
-          }
-          open={showAdder}
-          onOpenChange={(openValue) => setShowAdder(openValue)}
-          overlay={
-            <div className="px-3 py-3 flex flex-col gap-2">
-              <Select
-                size="tiny"
-                value={addFilterValues.key}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
-                }}
-                label="Attribute Filter"
-              >
-                {filterKeys.map((key) => (
-                  <Select.Option key={key} value={key}>
-                    {key}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Select
-                size="tiny"
-                value={addFilterValues.compare}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({
-                    ...prev,
-                    compare: e.target.value as ReportFilterItem['compare'],
-                  }))
-                }}
-                label="Comparison"
-              >
-                {['matches', 'is'].map((value) => (
-                  <Select.Option key={value} value={value}>
-                    {value}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Input
-                size="tiny"
-                label="Value"
-                placeholder={
-                  addFilterValues.compare === 'matches'
-                    ? 'Provide a regex expression'
-                    : 'Provide a string'
-                }
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
-                }}
-              />
-            </div>
-          }
-          showClose
-        >
-          <Button
-            asChild
-            type="default"
-            size="tiny"
-            icon={<Plus className={`text-foreground-light `} />}
-          >
-            <span>Add filter</span>
-          </Button>
-        </Popover>
+      </div>
+      <div className="order-last md:order-none flex-1">
+        <FilterBar
+          filterProperties={filterProperties}
+          freeformText={freeformText}
+          onFreeformTextChange={setFreeformText}
+          filters={localFilters}
+          onFilterChange={handleFilterChange}
+        />
       </div>
 
       <DatabaseSelector

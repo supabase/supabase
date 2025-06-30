@@ -82,13 +82,32 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
       const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
       const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
 
-      if (filter.compare === 'matches') {
-        return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
-      } else if (filter.compare === 'is') {
-        return `${filterKey} = ${filter.value}`
+      // Handle different comparison operators
+      switch (filter.compare) {
+        case 'matches':
+          return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
+        case 'is':
+          return `${filterKey} = ${filter.value}`
+        case '!=':
+          return `${filterKey} != ${filter.value}`
+        case '>=':
+          return `${filterKey} >= ${filter.value}`
+        case '<=':
+          return `${filterKey} <= ${filter.value}`
+        case '>':
+          return `${filterKey} > ${filter.value}`
+        case '<':
+          return `${filterKey} < ${filter.value}`
+        default:
+          // Fallback to exact match for unknown operators
+          return `${filterKey} = ${filter.value}`
       }
     })
+    .filter(Boolean) // Remove any null/undefined conditions
     .join(' AND ')
+
+  if (conditions === '') return ''
+
   if (prepend) {
     return 'WHERE ' + conditions
   } else {
@@ -401,8 +420,7 @@ limit 12
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
         where starts_with(request.path, '/storage/v1/object') 
-        where
-          response.status_code >= 400
+        and response.status_code >= 400
         ${generateRegexpWhere(filters, false)}
         group by
           request.path, request.method, request.search, response.status_code
