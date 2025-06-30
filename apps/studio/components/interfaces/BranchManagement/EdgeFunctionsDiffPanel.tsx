@@ -5,7 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import { Code, Wind } from 'lucide-react'
 import DiffViewer from 'components/ui/DiffViewer'
 import { Loading, EmptyState } from 'components/ui/AsyncState'
-import type { EdgeFunctionsDiffResult, FileInfo, FileStatus } from 'hooks/misc/useEdgeFunctionsDiff'
+import type {
+  EdgeFunctionsDiffResult,
+  FileInfo,
+  FileStatus,
+} from 'hooks/branches/useEdgeFunctionsDiff'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { basename } from 'path'
