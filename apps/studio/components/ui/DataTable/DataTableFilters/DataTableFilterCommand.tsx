@@ -62,6 +62,10 @@ export function DataTableFilterCommand({
 
   const trimmedInputValue = inputValue.trim()
 
+  const queryFields = filterFields.filter(
+    (x) => typeof x.value === 'string' && currentWord.includes(`${x.value}:`)
+  )
+
   // [Joshen] Temporarily disabling as this conflicts with our current CMD K behaviour
   // useHotKey(() => setOpen((open) => !open), 'k')
 
@@ -227,104 +231,110 @@ export function DataTableFilterCommand({
                       }}
                       className="group"
                     >
-                      {field.value}
+                      {field.label}
                       <CommandItemSuggestions field={field} />
                     </CommandItem>
                   )
                 })}
               </CommandGroup>
               <CommandSeparator />
-              <CommandGroup heading="Query">
-                {filterFields?.map((field) => {
-                  if (typeof field.value !== 'string') return null
-                  if (!currentWord.includes(`${field.value}:`)) return null
 
-                  const column = table.getColumn(field.value)
-                  const facetedValue =
-                    getFacetedUniqueValues?.(table, field.value) || column?.getFacetedUniqueValues()
+              {queryFields.length > 0 && (
+                <>
+                  <CommandGroup heading="Query">
+                    {queryFields.map((field) => {
+                      const column = table.getColumn(field.value)
+                      const facetedValue =
+                        getFacetedUniqueValues?.(table, field.value) ||
+                        column?.getFacetedUniqueValues()
 
-                  const options = getFieldOptions({ field })
+                      const options = getFieldOptions({ field })
 
-                  return options.map((optionValue) => {
-                    return (
-                      <CommandItem
-                        key={`${String(field.value)}:${optionValue}`}
-                        value={`${String(field.value)}:${optionValue}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                        }}
-                        onSelect={(value) => {
-                          setInputValue((prev) =>
-                            replaceInputByFieldType({
-                              prev,
-                              currentWord,
-                              optionValue,
-                              value,
-                              field,
-                            })
-                          )
-                          setCurrentWord('')
-                        }}
-                      >
-                        {`${optionValue}`}
-                        {facetedValue?.has(optionValue) ? (
-                          <span className="ml-auto font-mono text-muted-foreground">
-                            {formatCompactNumber(facetedValue.get(optionValue) || 0)}
-                          </span>
-                        ) : null}
-                      </CommandItem>
-                    )
-                  })
-                })}
-              </CommandGroup>
-              <CommandSeparator />
-              <CommandGroup heading="Suggestions">
-                {lastSearches
-                  ?.sort((a, b) => b.timestamp - a.timestamp)
-                  .slice(0, 5)
-                  .map((item) => {
-                    return (
-                      <CommandItem
-                        key={`suggestion:${item.search}`}
-                        value={`suggestion:${item.search}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                        }}
-                        onSelect={(value) => {
-                          const search = value.replace('suggestion:', '')
-                          setInputValue(`${search} `)
-                          setCurrentWord('')
-                        }}
-                        className="group"
-                      >
-                        {item.search}
-                        <span className="ml-auto truncate text-muted-foreground/80 group-aria-[selected=true]:block">
-                          {formatDistanceToNow(item.timestamp, {
-                            addSuffix: true,
-                          })}
-                        </span>
-                        <button
-                          type="button"
+                      return options.map((optionValue) => {
+                        return (
+                          <CommandItem
+                            key={`${String(field.value)}:${optionValue}`}
+                            value={`${String(field.value)}:${optionValue}`}
+                            onMouseDown={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                            }}
+                            onSelect={(value) => {
+                              setInputValue((prev) =>
+                                replaceInputByFieldType({
+                                  prev,
+                                  currentWord,
+                                  optionValue,
+                                  value,
+                                  field,
+                                })
+                              )
+                              setCurrentWord('')
+                            }}
+                          >
+                            {`${optionValue}`}
+                            {facetedValue?.has(optionValue) ? (
+                              <span className="ml-auto font-mono text-muted-foreground">
+                                {formatCompactNumber(facetedValue.get(optionValue) || 0)}
+                              </span>
+                            ) : null}
+                          </CommandItem>
+                        )
+                      })
+                    })}
+                  </CommandGroup>
+                  <CommandSeparator />
+                </>
+              )}
+
+              {lastSearches.length > 0 && (
+                <CommandGroup heading="Suggestions">
+                  {lastSearches
+                    .sort((a, b) => b.timestamp - a.timestamp)
+                    .slice(0, 5)
+                    .map((item) => {
+                      return (
+                        <CommandItem
+                          key={`suggestion:${item.search}`}
+                          value={`suggestion:${item.search}`}
                           onMouseDown={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
                           }}
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            // TODO: extract into function
-                            setLastSearches(lastSearches.filter((i) => i.search !== item.search))
+                          onSelect={(value) => {
+                            const search = value.replace('suggestion:', '')
+                            setInputValue(`${search} `)
+                            setCurrentWord('')
                           }}
-                          className="ml-1 hidden rounded-md p-0.5 hover:bg-background group-aria-[selected=true]:block"
+                          className="group"
                         >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </CommandItem>
-                    )
-                  })}
-              </CommandGroup>
+                          {item.search}
+                          <span className="ml-auto truncate text-muted-foreground/80 group-aria-[selected=true]:block">
+                            {formatDistanceToNow(item.timestamp, {
+                              addSuffix: true,
+                            })}
+                          </span>
+                          <button
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                            }}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              // TODO: extract into function
+                              setLastSearches(lastSearches.filter((i) => i.search !== item.search))
+                            }}
+                            className="ml-1 hidden rounded-md p-0.5 hover:bg-background group-aria-[selected=true]:block"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </CommandItem>
+                      )
+                    })}
+                </CommandGroup>
+              )}
               <CommandEmpty>No results found.</CommandEmpty>
             </CommandList>
             <div className="bg-surface-100 flex flex-wrap justify-between gap-3 border-t bg-accent/50 px-2 py-1.5 text-sm text-accent-foreground">
@@ -370,10 +380,12 @@ export function DataTableFilterCommand({
 function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<TData> }) {
   const { table, getFacetedMinMaxValues, getFacetedUniqueValues } = useDataTable()
   const value = field.value as string
+  const className = 'ml-2 hidden truncate text-foreground-lighter group-aria-[selected=true]:block'
+
   switch (field.type) {
     case 'checkbox': {
       return (
-        <span className="ml-1 hidden truncate text-muted-foreground/80 group-aria-[selected=true]:block">
+        <span className={cn(className)}>
           {getFacetedUniqueValues
             ? Array.from(getFacetedUniqueValues(table, value)?.keys() || [])
                 .map((value) => `[${value}]`)
@@ -385,17 +397,13 @@ function CommandItemSuggestions<TData>({ field }: { field: DataTableFilterField<
     case 'slider': {
       const [min, max] = getFacetedMinMaxValues?.(table, value) || [field.min, field.max]
       return (
-        <span className="ml-1 hidden truncate text-muted-foreground/80 group-aria-[selected=true]:block">
+        <span className={cn(className)}>
           [{min} - {max}]
         </span>
       )
     }
     case 'input': {
-      return (
-        <span className="ml-1 hidden truncate text-muted-foreground/80 group-aria-[selected=true]:block">
-          [{`${String(field.value)}`} input]
-        </span>
-      )
+      return <span className={cn(className)}>[{`${String(field.value)}`} input]</span>
     }
     default: {
       return null
