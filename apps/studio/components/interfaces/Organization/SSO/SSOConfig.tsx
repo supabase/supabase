@@ -24,12 +24,6 @@ import Metadata from './Metadata'
 import AttributeMapping from './AttributeMapping'
 import Join from './Join'
 
-// attribute mapping has these fields:
-// email: can be a single string or an array of strings
-// user_name: can be a single string or an array of strings
-// first_name: can be a single string or an array of strings
-// last_name: can be a single string or an array of strings
-
 const attrValueArraySchema = z.array(z.object({ value: z.string() }))
 
 const FormSchema = z
@@ -43,6 +37,7 @@ const FormSchema = z
     firstNameMapping: attrValueArraySchema,
     lastNameMapping: attrValueArraySchema,
     joinOrgOnSignup: z.boolean(),
+    roleOnJoin: z.string().optional(),
   })
   .refine((data) => data.metadataXmlUrl || data.metadataXmlFile, {
     message: 'Please provide either a metadata XML URL or upload a metadata XML file',
@@ -76,10 +71,11 @@ const SSOConfig = () => {
       firstNameMapping: [],
       lastNameMapping: [],
       joinOrgOnSignup: false,
+      roleOnJoin: 'developer',
     },
   })
 
-  const onSubmit: SubmitHandler<SSOConfigForm> = async ({
+  const onSubmit: SubmitHandler<SSOConfigForm> = ({
     enabled,
     domains,
     metadataXmlUrl,
@@ -89,6 +85,7 @@ const SSOConfig = () => {
     firstNameMapping,
     lastNameMapping,
     joinOrgOnSignup,
+    roleOnJoin,
   }) => {
     const attributeMapping = {
       keys: {
@@ -104,7 +101,8 @@ const SSOConfig = () => {
       metadataXmlUrl,
       metadataXmlFile,
       attributeMapping,
-      joinOrgOnSignup
+      joinOrgOnSignup,
+      roleOnJoin
     )
   }
 
@@ -118,12 +116,12 @@ const SSOConfig = () => {
         </ScaffoldDescription> */}
 
         <Form_Shadcn_ {...form}>
-          <Card>
-            <form
-              id={FORM_ID}
-              className="flex-grow overflow-auto"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
+          <form
+            id={FORM_ID}
+            className="flex-grow overflow-auto"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <Card>
               <CardContent>
                 <FormField_Shadcn_
                   control={form.control}
@@ -135,18 +133,25 @@ const SSOConfig = () => {
                       layout="flex-row-reverse"
                       className="gap-1 relative flex items-center justify-between pb-4"
                     >
-                      <FormControl_Shadcn_ className="flex items-center gap-2 zans">
+                      <FormControl_Shadcn_ className="flex items-center gap-2">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
-              <CardContent>{form.watch('enabled') && <Domains form={form} />}</CardContent>
-              <CardContent>{form.watch('enabled') && <Metadata form={form} />}</CardContent>
-              <CardContent>
-                {form.watch('enabled') && (
-                  <>
+
+              {form.watch('enabled') && (
+                <>
+                  <CardContent>
+                    <Domains form={form} />
+                  </CardContent>
+
+                  <CardContent>
+                    <Metadata form={form} />
+                  </CardContent>
+
+                  <CardContent>
                     <AttributeMapping
                       form={form}
                       emailField="emailMapping"
@@ -154,27 +159,30 @@ const SSOConfig = () => {
                       firstNameField="firstNameMapping"
                       lastNameField="lastNameMapping"
                     />
-                  </>
-                )}
-              </CardContent>
-              <CardContent>{form.watch('enabled') && <Join form={form} />}</CardContent>
-            </form>
+                  </CardContent>
 
-            <CardFooter className="justify-end space-x-2">
-              {form.formState.isDirty && (
-                <Button type="default" onClick={() => form.reset()}>
-                  Cancel
-                </Button>
+                  <CardContent>
+                    <Join form={form} />
+                  </CardContent>
+                </>
               )}
-              <Button
-                type="primary"
-                htmlType="submit"
-                //disabled={}
-              >
-                Save changes
-              </Button>
-            </CardFooter>
-          </Card>
+
+              <CardFooter className="justify-end space-x-2 border-t">
+                {form.formState.isDirty && (
+                  <Button type="default" onClick={() => form.reset()}>
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={!form.formState.isDirty || form.formState.isSubmitting}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
         </Form_Shadcn_>
       </ScaffoldSection>
     </ScaffoldContainer>
