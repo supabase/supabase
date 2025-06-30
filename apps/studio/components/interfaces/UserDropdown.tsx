@@ -123,7 +123,6 @@ export function UserDropdown() {
               <DropdownMenuItem
                 onSelect={async () => {
                   await signOut()
-                  await router.push('/sign-in')
                 }}
               >
                 Log out
