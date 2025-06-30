@@ -101,20 +101,6 @@ export const StorageReport: NextPageWithLayout = () => {
         />
         <ReportWidget
           isLoading={isLoading}
-          params={params.errorCounts}
-          title="Response Errors"
-          tooltip="Error responses with 4XX or 5XX status codes"
-          data={data.errorCounts || []}
-          error={error.errorCounts}
-          renderer={ErrorCountsChartRenderer}
-          appendProps={{
-            data: data.topErrorRoutes || [],
-            params: params.topErrorRoutes,
-          }}
-          append={TopApiRoutesRenderer}
-        />
-        <ReportWidget
-          isLoading={isLoading}
           params={params.responseSpeed}
           title="Response Speed"
           tooltip="Average response speed (in miliseconds) of a request"
@@ -124,7 +110,6 @@ export const StorageReport: NextPageWithLayout = () => {
           appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
           append={TopApiRoutesRenderer}
         />
-
         <ReportWidget
           isLoading={isLoading}
           params={params.networkTraffic}
