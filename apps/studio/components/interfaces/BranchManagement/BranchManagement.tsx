@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { AutomaticBranchingRow } from 'components/interfaces/Settings/Integrations/GithubIntegration/AutomaticBranchingRow'
+import { GitHubStatus } from 'components/interfaces/Settings/Integrations/GithubIntegration/GitHubStatus'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -211,7 +211,7 @@ const BranchManagement = () => {
                     />
                   )}
 
-                  {isSuccessConnections && hasBranchEnabled && <AutomaticBranchingRow />}
+                  {isSuccessConnections && hasBranchEnabled && <GitHubStatus />}
 
                   {isErrorBranches && tab === 'overview' && (
                     <AlertError

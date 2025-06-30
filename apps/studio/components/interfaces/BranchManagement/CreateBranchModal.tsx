@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Check, DollarSign, FileText, Github, Loader2 } from 'lucide-react'
+import { DollarSign, Github, GitMerge, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect } from 'react'
@@ -23,7 +23,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { sidePanelsState } from 'state/side-panels'
 import {
   Badge,
   Button,
@@ -43,9 +42,11 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useRouter } from 'next/router'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
+  const router = useRouter()
   const queryClient = useQueryClient()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -95,12 +96,6 @@ export const CreateBranchModal = () => {
 
   const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
-  const isProdBranchLinked = Boolean(
-    prodBranch?.git_branch && prodBranch.git_branch.trim().length > 0
-  )
-
-  const isBranchingEnabled = gitlessBranching || (!!githubConnection && isProdBranchLinked)
-
   const formId = 'create-branch-form'
   const FormSchema = z
     .object({
@@ -118,20 +113,11 @@ export const CreateBranchModal = () => {
       gitBranchName: z
         .string()
         .refine(
-          (val) => gitlessBranching || (val && val.length > 0),
-          'Git branch name is required'
+          (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
+          'Git branch name is required when GitHub is connected'
         ),
     })
     .superRefine(async (val, ctx) => {
-      if (!gitlessBranching && (!githubConnection || !isProdBranchLinked)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Automatic branching must be configured before creating a preview branch',
-          path: ['gitBranchName'],
-        })
-        return
-      }
-
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
         try {
           await checkGithubBranchValidity({
@@ -156,7 +142,7 @@ export const CreateBranchModal = () => {
     defaultValues: { branchName: '', gitBranchName: '' },
   })
 
-  const canSubmit = !isCreating && !isChecking && isBranchingEnabled
+  const canSubmit = !isCreating && !isChecking
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -167,9 +153,9 @@ export const CreateBranchModal = () => {
     })
   }
 
-  const openLinkerPanel = () => {
+  const handleGitHubClick = () => {
     setShowCreateBranchModal(false)
-    sidePanelsState.setGithubConnectionsOpen(true)
+    router.push(`/project/${projectRef}/settings/integrations`)
   }
 
   useEffect(() => {
@@ -205,7 +191,7 @@ export const CreateBranchModal = () => {
                 )}
               />
 
-              {githubConnection && isProdBranchLinked && (
+              {githubConnection && (
                 <FormField_Shadcn_
                   control={form.control}
                   name="gitBranchName"
@@ -235,7 +221,7 @@ export const CreateBranchModal = () => {
                           </div>
                         </div>
                       }
-                      description="Migrations from this Git branch will be automatically deployed"
+                      description="Automatically deploy changes on every commit"
                     >
                       <div className="relative w-full">
                         <FormControl_Shadcn_>
@@ -262,11 +248,11 @@ export const CreateBranchModal = () => {
               )}
               {isSuccessConnections && (
                 <>
-                  {(!githubConnection || !isProdBranchLinked) && (
+                  {!githubConnection && (
                     <div className="flex items-center gap-2 justify-between">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <Label>Git branch</Label>
+                          <Label>Sync with a GitHub branch</Label>
                           {!gitlessBranching && (
                             <Badge variant="warning" size="small">
                               Required
@@ -274,10 +260,10 @@ export const CreateBranchModal = () => {
                           )}
                         </div>
                         <p className="text-sm text-foreground-light">
-                          Keep this Supabase branch in sync with a Git branch
+                          Keep this preview branch in sync with a chosen GitHub branch
                         </p>
                       </div>
-                      <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
+                      <Button type="default" icon={<Github />} onClick={handleGitHubClick}>
                         Configure
                       </Button>
                     </div>
@@ -293,17 +279,30 @@ export const CreateBranchModal = () => {
                 <div className="flex flex-row gap-4">
                   <div>
                     <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
-                      <FileText className="text-info" size={20} strokeWidth={2} />
+                      <GitMerge className="text-info" size={20} strokeWidth={2} />
                     </figure>
                   </div>
                   <div className="flex flex-col gap-y-1">
                     <p className="text-sm text-foreground">
-                      Migrations are applied from your GitHub repository
+                      {prodBranch?.git_branch
+                        ? 'Merging to production enabled'
+                        : 'Merging to production disabled'}
                     </p>
                     <p className="text-sm text-foreground-light">
-                      Migration files in your <code className="text-xs">./supabase</code> directory
-                      will run on both Preview Branches and Production when pushing and merging
-                      branches.
+                      {prodBranch?.git_branch ? (
+                        <>
+                          When this branch is merged to{' '}
+                          <code className="text-xs font-mono">{prodBranch.git_branch}</code>,
+                          migrations will be deployed to production. Otherwise, migrations only run
+                          on preview branches.
+                        </>
+                      ) : (
+                        <>
+                          Merging this branch to production will not deploy migrations. To enable
+                          production deployment, enable "Deploy to production" in project
+                          integration settings.
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>

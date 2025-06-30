@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import ProjectLinker from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
+import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
@@ -58,7 +59,11 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     () =>
       supabaseProjectsData
         ?.filter((project) => project.organization_id === selectedOrganization?.id)
-        .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
+        .map((project) => ({
+          name: project.name,
+          ref: project.ref,
+          is_branch_enabled: project.is_branch_enabled,
+        })) ?? EMPTY_ARR,
     [selectedOrganization?.id, supabaseProjectsData]
   )
 
@@ -81,9 +86,23 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     }
   )
 
+  const { mutate: createBranch } = useBranchCreateMutation({
+    onError: (error) => {
+      console.error('Failed to enable branching:', error)
+    },
+  })
+
   const { mutate: createConnection, isLoading: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
-      onSuccess() {
+      onSuccess: (data, variables) => {
+        const projectData = supabaseProjects.find((p) => p.ref === variables.connection.project_ref)
+        if (projectData && !projectData.is_branch_enabled) {
+          createBranch({
+            projectRef: variables.connection.project_ref,
+            branchName: 'main',
+            gitBranch: '',
+          })
+        }
         toast.success('Successfully linked project to repository!')
         sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       },
@@ -117,7 +136,10 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
 
     createConnection({
       organizationId: selectedOrganization.id,
-      connection: variables.new,
+      connection: {
+        ...variables.new,
+        new_branch_per_pr: false,
+      },
     })
   }
 
