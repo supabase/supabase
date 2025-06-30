@@ -84,6 +84,7 @@
     "framer-motion": "^11.11.17",
     "generate-password-browser": "^1.1.0",
     "html-to-image": "^1.10.8",
+    "http-status": "^2.1.0",
     "icons": "workspace:*",
     "idb": "^8.0.2",
     "immutability-helper": "^3.1.1",
