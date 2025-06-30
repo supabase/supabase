@@ -77,6 +77,7 @@ const Indexes = () => {
       projectRef: project.ref,
       connectionString: project.connectionString,
       name: index.name,
+      schema: selectedSchema,
     })
   }
 
