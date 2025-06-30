@@ -6,7 +6,6 @@ import { useDebounce } from 'use-debounce'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
 import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -36,7 +35,6 @@ interface CronJobScheduleSectionProps {
 export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
   const { project } = useProjectContext()
 
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
   const [inputValue, setInputValue] = useState('')
   const [debouncedValue] = useDebounce(inputValue, 750)
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
@@ -67,7 +65,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
 
   useEffect(() => {
     if (useNaturalLanguage && debouncedValue) {
-      generateCronSyntax({ prompt: debouncedValue, useBedrockAssistant })
+      generateCronSyntax({ prompt: debouncedValue })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, useNaturalLanguage])

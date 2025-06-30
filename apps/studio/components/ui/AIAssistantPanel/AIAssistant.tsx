@@ -88,9 +88,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
 
-  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
 
@@ -106,8 +104,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const showMetadataWarning =
     IS_PLATFORM &&
     !!selectedOrganization &&
-    ((!useBedrockAssistant && aiOptInLevel === 'disabled') ||
-      (useBedrockAssistant && (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')))
+    (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -159,9 +156,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setMessages,
   } = useChat({
     id: snap.activeChatId,
-    api: useBedrockAssistant
-      ? `${BASE_PATH}/api/ai/sql/generate-v4`
-      : `${BASE_PATH}/api/ai/sql/generate-v3`,
+    api: `${BASE_PATH}/api/ai/sql/generate-v4`,
     maxSteps: 5,
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
@@ -179,9 +174,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         connectionString: project?.connectionString,
         schema: currentSchema,
         table: currentTable?.name,
-        includeSchemaMetadata: !useBedrockAssistant
-          ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
-          : undefined,
       })
     },
     fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -371,7 +363,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               <Admonition
                 type="default"
                 title={
-                  newOrgAiOptIn && !updatedOptInSinceMCP
+                  !updatedOptInSinceMCP
                     ? 'The Assistant has just been updated to help you better!'
                     : isHipaaProjectDisallowed
                       ? 'Project metadata is not shared due to HIPAA'
@@ -380,7 +372,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                         : 'Limited metadata is shared to the Assistant'
                 }
                 description={
-                  newOrgAiOptIn && !updatedOptInSinceMCP
+                  !updatedOptInSinceMCP
                     ? 'You may now opt-in to share schema metadata and even logs for better results'
                     : isHipaaProjectDisallowed
                       ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
