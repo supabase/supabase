@@ -1,13 +1,28 @@
 import { Timer } from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
 import { Image } from 'ui'
-import { AIData } from './solutions.types'
+import type {
+  CTASection,
+  FeaturesSection,
+  HeroSection,
+  Metadata,
+  Quotes,
+  Testimonials,
+} from './solutions.utils'
 
-const data: AIData = {
+const data: {
+  metadata: Metadata
+  heroSection: HeroSection
+  quotes: Quotes
+  why: FeaturesSection
+  features: FeaturesSection
+  testimonials: Testimonials
+  'cta-section': CTASection
+} = {
   metadata: {
     metaTitle: 'Supabase for AI Builders',
     metaDescription:
-      'Leading enterprises use Supabase to build faster, better, and more scalable products.',
+      'Supabase gives your users an integrated and scalable backend that lets them focus on building without worrying about infrastructure.',
   },
   heroSection: {
     id: 'hero',
