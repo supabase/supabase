@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { Check, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
@@ -11,7 +10,6 @@ import {
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { organizationKeys } from 'data/organizations/keys'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
@@ -115,6 +113,7 @@ export const SubscriptionPlanUpdateDialog = ({
   )
 
   const onSuccessfulPlanChange = () => {
+    setPaymentConfirmationLoading(false)
     toast.success(
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )
@@ -133,6 +132,7 @@ export const SubscriptionPlanUpdateDialog = ({
         onSuccessfulPlanChange()
       },
       onError: (error) => {
+        setPaymentConfirmationLoading(false)
         toast.error(`Unable to update subscription: ${error.message}`)
       },
     }
@@ -168,9 +168,13 @@ export const SubscriptionPlanUpdateDialog = ({
     if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
 
+    setPaymentConfirmationLoading(true)
+
     const paymentMethod = await paymentMethodSelection.current?.createPaymentMethod()
     if (paymentMethod) {
       setSelectedPaymentMethod(paymentMethod.id)
+    } else {
+      setPaymentConfirmationLoading(false)
     }
 
     if (
