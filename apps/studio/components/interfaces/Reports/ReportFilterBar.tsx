@@ -1,13 +1,23 @@
-import { Database, RefreshCw } from 'lucide-react'
+import { ChevronDown, Database, RefreshCw } from 'lucide-react'
 import { ComponentProps, useCallback, useEffect, useState, useMemo } from 'react'
 import { parseAsString, useQueryStates } from 'nuqs'
+import SVG from 'react-inlinesvg'
+import { BASE_PATH } from 'lib/constants'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
-import { cn } from 'ui'
+import {
+  cn,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
 import { FilterBar } from 'ui-patterns'
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
@@ -24,7 +34,7 @@ interface ReportFilterBarProps {
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
-  productFilter?: string
+  selectedProduct?: string
   className?: string
 }
 
@@ -95,7 +105,7 @@ const ReportFilterBar = ({
   onRemoveFilters,
   onRefresh,
   datepickerHelpers,
-  productFilter,
+  selectedProduct,
   className,
 }: ReportFilterBarProps) => {
   const { ref } = useParams()
@@ -134,11 +144,9 @@ const ReportFilterBar = ({
       return { operator, value }
     }
 
-    // Default to equals if no operator specified
     return { operator: '=', value: encodedValue }
   }, [])
 
-  // Encode operator + value for URL (e.g., operator: ">=", value: "300" -> "gte:300")
   const encodeFilterValue = useCallback((operator: string, value: string | number) => {
     const urlOperator = URL_OPERATOR_MAP[operator as keyof typeof URL_OPERATOR_MAP] || 'eq'
     return `${urlOperator}:${value}`
@@ -151,6 +159,10 @@ const ReportFilterBar = ({
 
       Object.entries(queryState).forEach(([key, value]) => {
         if (value !== null && value !== undefined && value !== '') {
+          if (key === ReportFilterKeys.PATH && (selectedProduct || currentProductFilter)) {
+            return
+          }
+
           const { operator, value: filterValue } = parseFilterValue(value)
           conditions.push({
             propertyName: key,
@@ -165,7 +177,7 @@ const ReportFilterBar = ({
         conditions,
       }
     },
-    []
+    [selectedProduct, currentProductFilter]
   )
 
   // Convert operator from FilterBar format to ReportFilterItem format
@@ -202,8 +214,15 @@ const ReportFilterBar = ({
 
       filterGroup.conditions.forEach((condition) => {
         if (!('logicalOperator' in condition)) {
-          // It's a FilterCondition, not a nested FilterGroup
           const filterCondition = condition as FilterCondition
+
+          if (
+            filterCondition.propertyName === ReportFilterKeys.PATH &&
+            (selectedProduct || currentProductFilter)
+          ) {
+            return
+          }
+
           // Only send to report system if filter has a value (empty filters are for UI only)
           if (
             filterCondition.value !== null &&
@@ -221,36 +240,48 @@ const ReportFilterBar = ({
 
       return reportFilters
     },
-    []
+    [selectedProduct, currentProductFilter]
   )
 
   // Convert FilterGroup back to query filters format
-  const convertFilterGroupToQueryFilters = useCallback((filterGroup: FilterGroup) => {
-    const queryUpdate: Record<string, string | number | null> = {}
+  const convertFilterGroupToQueryFilters = useCallback(
+    (filterGroup: FilterGroup) => {
+      const queryUpdate: Record<string, string | number | null> = {}
 
-    // Clear all existing filters first
-    Object.keys(REPORT_FILTER_PARAMS_PARSER).forEach((key) => {
-      queryUpdate[key] = null
-    })
+      // Clear all existing filters first
+      Object.keys(REPORT_FILTER_PARAMS_PARSER).forEach((key) => {
+        queryUpdate[key] = null
+      })
 
-    // Add new filters with encoded operator+value
-    filterGroup.conditions.forEach((condition) => {
-      if (!('logicalOperator' in condition)) {
-        // It's a FilterCondition, not a nested FilterGroup
-        const filterCondition = condition as FilterCondition
-        if (filterCondition.propertyName in REPORT_FILTER_PARAMS_PARSER) {
-          // Encode operator + value for URL safety
-          const encodedValue = encodeFilterValue(
-            filterCondition.operator,
-            filterCondition.value as string | number
-          )
-          queryUpdate[filterCondition.propertyName] = encodedValue
+      // Add new filters with encoded operator+value
+      filterGroup.conditions.forEach((condition) => {
+        if (!('logicalOperator' in condition)) {
+          // It's a FilterCondition, not a nested FilterGroup
+          const filterCondition = condition as FilterCondition
+
+          // Skip path filters if product filtering is active (handled separately)
+          if (
+            filterCondition.propertyName === ReportFilterKeys.PATH &&
+            (selectedProduct || currentProductFilter)
+          ) {
+            return
+          }
+
+          if (filterCondition.propertyName in REPORT_FILTER_PARAMS_PARSER) {
+            // Encode operator + value for URL safety
+            const encodedValue = encodeFilterValue(
+              filterCondition.operator,
+              filterCondition.value as string | number
+            )
+            queryUpdate[filterCondition.propertyName] = encodedValue
+          }
         }
-      }
-    })
+      })
 
-    return queryUpdate
-  }, [])
+      return queryUpdate
+    },
+    [selectedProduct, currentProductFilter]
+  )
 
   const initialFilters: FilterGroup = {
     logicalOperator: 'AND',
@@ -299,8 +330,16 @@ const ReportFilterBar = ({
   useEffect(() => {
     const reportFilters = convertFilterGroupToReportFilters(localFilters)
 
-    // Only compare filters that have values (ignore empty UI-only filters)
-    const currentFilterState = filters
+    // Separate product filters (managed by dropdown) from other filters (managed by FilterBar)
+    const productFilters = filters.filter((f) =>
+      PRODUCT_FILTERS.some((pf) => f.key === pf.filterKey && f.value === pf.filterValue)
+    )
+    const otherFilters = filters.filter(
+      (f) => !PRODUCT_FILTERS.some((pf) => f.key === pf.filterKey && f.value === pf.filterValue)
+    )
+
+    // Only compare non-product filters (FilterBar managed filters)
+    const currentFilterState = otherFilters
       .map((f) => `${f.key}:${f.value}:${f.compare}`)
       .sort()
       .join('|')
@@ -309,9 +348,10 @@ const ReportFilterBar = ({
       .sort()
       .join('|')
 
-    // Only update if the actual report filters changed
+    // Only update if the FilterBar managed filters changed
     if (currentFilterState !== newFilterState) {
-      onRemoveFilters(filters)
+      // Remove only non-product filters, preserve product filters
+      onRemoveFilters(otherFilters)
       reportFilters.forEach((filter) => onAddFilter(filter))
     }
   }, [localFilters, filters, onRemoveFilters, onAddFilter])
@@ -322,13 +362,7 @@ const ReportFilterBar = ({
 
   // Get filter properties based on product type
   const getFilterProperties = () => {
-    const commonProperties = [
-      {
-        label: 'Path',
-        name: ReportFilterKeys.PATH,
-        type: 'string' as const,
-        operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
-      },
+    const baseProperties = [
       {
         label: 'Status Code',
         name: ReportFilterKeys.STATUS_CODE,
@@ -347,22 +381,6 @@ const ReportFilterBar = ({
         type: 'string' as const,
         operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
       },
-    ]
-
-    if (productFilter === 'storage') {
-      return [
-        {
-          label: 'Storage Path',
-          name: ReportFilterKeys.PATH,
-          type: 'string' as const,
-          operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
-        },
-        ...commonProperties.slice(1), // Skip the general Path filter since we have Storage Path
-      ]
-    }
-
-    return [
-      ...commonProperties,
       {
         label: 'Search Params',
         name: ReportFilterKeys.SEARCH,
@@ -375,6 +393,27 @@ const ReportFilterBar = ({
         type: 'string' as const,
         operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
       },
+    ]
+
+    // If productFilter is set, don't show path filters (handled automatically)
+    if (selectedProduct) {
+      return baseProperties
+    }
+
+    // If no productFilter but user manually selected a product, don't show path filter
+    if (currentProductFilter) {
+      return baseProperties
+    }
+
+    // Only show path filter when no product filtering is active
+    return [
+      {
+        label: 'Path',
+        name: ReportFilterKeys.PATH,
+        type: 'string' as const,
+        operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+      },
+      ...baseProperties,
     ]
   }
 
@@ -416,8 +455,8 @@ const ReportFilterBar = ({
   })
 
   useEffect(() => {
-    if (productFilter) {
-      handleProductFilterChange(PRODUCT_FILTERS.find((p) => p.key === productFilter) ?? null)
+    if (selectedProduct) {
+      handleProductFilterChange(PRODUCT_FILTERS.find((p) => p.key === selectedProduct) ?? null)
     }
   }, [])
 
@@ -437,6 +476,64 @@ const ReportFilterBar = ({
           value={selectedRange}
           helpers={datepickerHelpers}
         />
+        {!selectedProduct && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="default"
+                className="inline-flex flex-row gap-2"
+                iconRight={<ChevronDown size={14} />}
+              >
+                <span>
+                  {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start">
+              <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
+                <p>All Requests</p>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {PRODUCT_FILTERS.map((productFilterItem) => {
+                const Icon = productFilterItem.icon
+
+                return (
+                  <DropdownMenuItem
+                    key={productFilterItem.key}
+                    className="space-x-2"
+                    disabled={productFilterItem.key === currentProductFilter?.key}
+                    onClick={() => handleProductFilterChange(productFilterItem)}
+                  >
+                    {productFilterItem.key === 'graphql' ? (
+                      <SVG
+                        src={`${BASE_PATH}/img/graphql.svg`}
+                        className="w-[20px] h-[20px] mr-2"
+                        preProcessor={(code) =>
+                          code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                        }
+                      />
+                    ) : Icon !== null ? (
+                      <Icon size={20} strokeWidth={1.5} className="mr-2" />
+                    ) : null}
+                    <div className="flex flex-col">
+                      <p
+                        className={cn(
+                          productFilterItem.key === currentProductFilter?.key ? 'font-bold' : '',
+                          'inline-block'
+                        )}
+                      >
+                        {productFilterItem.label}
+                      </p>
+                      <p className=" text-left text-foreground-light inline-block w-[180px]">
+                        {productFilterItem.description}
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                )
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
       <div className="order-last md:order-none flex-1">
         <FilterBar
@@ -445,6 +542,7 @@ const ReportFilterBar = ({
           onFreeformTextChange={setFreeformText}
           filters={localFilters}
           onFilterChange={handleFilterChange}
+          className="border-control rounded-md border p-1 w-full"
         />
       </div>
 

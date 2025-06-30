@@ -79,7 +79,7 @@ export const StorageReport: NextPageWithLayout = () => {
               onRefresh={refresh}
               isLoading={isLoading}
               filters={filters}
-              productFilter="storage"
+              selectedProduct="storage"
               datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
               className="w-full"
             />
