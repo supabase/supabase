@@ -17,6 +17,8 @@ import { useAuthLogsReport } from 'data/reports/auth-report-query'
 import type { ChartData } from 'components/ui/Charts/Charts.types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { useAttributeQueries } from 'components/ui/Charts/ComposedChartHandler'
+import { useEdgeFunctionReport } from 'data/reports/edgefn.queries'
+import { useEdgeFunctionReportFilters } from 'data/reports/edgefn.utils'
 
 export const useChartData = ({
   attributes,
@@ -39,19 +41,42 @@ export const useChartData = ({
 
   const logsAttributes = attributes.filter((attr) => attr.provider === 'logs')
   const nonLogsAttributes = attributes.filter((attr) => attr.provider !== 'logs')
+  const { functionId } = useEdgeFunctionReportFilters()
+
+  const isEdgeFunctionRoute = router.asPath.includes('/reports/edge-functions')
 
   const {
-    data: logsData,
-    attributes: logsChartAttributes,
-    isLoading: isLogsLoading,
+    data: authData,
+    attributes: authChartAttributes,
+    isLoading: isAuthLoading,
   } = useAuthLogsReport({
     projectRef: ref as string,
     attributes: logsAttributes,
     startDate,
     endDate,
     interval: interval as AnalyticsInterval,
-    enabled: logsAttributes.length > 0,
+    enabled: logsAttributes.length > 0 && !isEdgeFunctionRoute,
   })
+
+  const {
+    data: edgeFunctionData,
+    attributes: edgeFunctionChartAttributes,
+    isLoading: isEdgeFunctionLoading,
+  } = useEdgeFunctionReport({
+    projectRef: ref as string,
+    attributes: logsAttributes,
+    startDate,
+    endDate,
+    interval: interval as AnalyticsInterval,
+    enabled: logsAttributes.length > 0 && isEdgeFunctionRoute,
+    functionId,
+  })
+
+  const logsData = isEdgeFunctionRoute ? edgeFunctionData : authData
+  const logsChartAttributes = isEdgeFunctionRoute
+    ? edgeFunctionChartAttributes
+    : authChartAttributes
+  const isLogsLoading = isEdgeFunctionRoute ? isEdgeFunctionLoading : isAuthLoading
 
   const chartAttributes = useMemo(
     () => nonLogsAttributes.concat(logsChartAttributes || []),

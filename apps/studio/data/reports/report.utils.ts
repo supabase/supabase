@@ -19,3 +19,19 @@ export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Gra
       return 'hour'
   }
 }
+
+export const REPORT_STATUS_CODE_COLORS: { [key: string]: { light: string; dark: string } } = {
+  '400': { light: '#FFD54F', dark: '#FFF176' },
+  '401': { light: '#FF8A65', dark: '#FFAB91' },
+  '403': { light: '#FFB74D', dark: '#FFCC80' },
+  '404': { light: '#90A4AE', dark: '#B0BEC5' },
+  '409': { light: '#BA68C8', dark: '#CE93D8' },
+  '410': { light: '#A1887F', dark: '#BCAAA4' },
+  '422': { light: '#FF9800', dark: '#FFB74D' },
+  '429': { light: '#E65100', dark: '#F57C00' },
+  '500': { light: '#B71C1C', dark: '#D32F2F' },
+  '502': { light: '#9575CD', dark: '#B39DDB' },
+  '503': { light: '#0097A7', dark: '#4DD0E1' },
+  '504': { light: '#C0CA33', dark: '#D4E157' },
+  default: { light: '#757575', dark: '#9E9E9E' },
+}

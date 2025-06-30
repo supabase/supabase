@@ -18,7 +18,6 @@ import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queri
 import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
 import { useChartHighlight } from './useChartHighlight'
-import { getMockDataForAttribute } from 'data/reports/auth-charts'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
@@ -238,10 +237,9 @@ export const useAttributeQueries = (
           data: { ...dailyStatsQueries[dailyStatsIdx - 1]?.data, provider: 'daily-stats' },
         }
       } else if (attr.provider === 'mock') {
-        const mockData = getMockDataForAttribute(attr.attribute)
         return {
           isLoading: false,
-          data: { ...mockData, provider: 'mock', attribute: attr.attribute },
+          data: { data: [], provider: 'mock', attribute: attr.attribute },
         }
       } else if (attr.provider === 'reference-line') {
         let value = attr.value || 0
