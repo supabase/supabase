@@ -1,5 +1,4 @@
-import React, { PropsWithChildren, useState, useMemo, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
+import React, { PropsWithChildren, useState, useEffect, useRef } from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn, WarningIcon } from 'ui'
 
@@ -11,14 +10,14 @@ import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
 import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
+import { getMockDataForAttribute } from 'data/reports/auth-charts'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
-import { MultiAttribute } from './ComposedChart.utils'
+import type { MultiAttribute } from './ComposedChart.utils'
 
-export interface ComposedChartHandlerProps {
+interface LogChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
@@ -40,6 +39,7 @@ export interface ComposedChartHandlerProps {
   updateDateRange: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
+  titleTooltip?: string
   docsUrl?: string
 }
 
@@ -88,12 +88,9 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
  *
  * Provided data must be in the expected chart format.
  */
-const ComposedChartHandler = ({
+const LogChartHandler = ({
   label,
   attributes,
-  startDate,
-  endDate,
-  interval,
   customDateFormat,
   children = null,
   defaultChartStyle = 'bar',
@@ -109,131 +106,14 @@ const ComposedChartHandler = ({
   showTotal,
   updateDateRange,
   valuePrecision,
-  isVisible = true,
+  titleTooltip,
   id,
   ...otherProps
-}: PropsWithChildren<ComposedChartHandlerProps>) => {
-  const router = useRouter()
-  const { ref } = router.query
-
-  const state = useDatabaseSelectorStateSnapshot()
+}: PropsWithChildren<LogChartHandlerProps>) => {
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const chartHighlight = useChartHighlight()
 
-  const databaseIdentifier = state.selectedDatabaseId
-
-  // Use the custom hook at the top level of the component
-  const attributeQueries = useAttributeQueries(
-    attributes,
-    ref,
-    startDate,
-    endDate,
-    interval as AnalyticsInterval,
-    databaseIdentifier,
-    data,
-    isVisible
-  )
-
-  // Combine all the data into a single dataset
-  const combinedData = useMemo(() => {
-    if (data) return data
-
-    const isLoading = attributeQueries.some((query: any) => query.isLoading)
-    if (isLoading) return undefined
-
-    const hasError = attributeQueries.some((query: any) => !query.data)
-    if (hasError) return undefined
-
-    // Get all unique timestamps from all datasets
-    const timestamps = new Set<string>()
-    attributeQueries.forEach((query: any) => {
-      query.data?.data?.forEach((point: any) => {
-        if (point?.period_start) {
-          timestamps.add(point.period_start)
-        }
-      })
-    })
-
-    const referenceLineQueries = attributeQueries.filter(
-      (_, index) => attributes[index].provider === 'reference-line'
-    )
-
-    // Combine data points for each timestamp
-    const combined = Array.from(timestamps)
-      .sort()
-      .map((timestamp) => {
-        const point: any = { timestamp }
-
-        // Add regular attributes
-        attributes.forEach((attr, index) => {
-          if (!attr) return
-
-          // Handle custom value attributes (like disk size)
-          if (attr.customValue !== undefined) {
-            point[attr.attribute] = attr.customValue
-            return
-          }
-
-          // Skip reference line attributes here, we'll add them below
-          if (attr.provider === 'reference-line') return
-
-          const queryData = attributeQueries[index]?.data?.data
-          const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
-          let value = matchingPoint?.[attr.attribute] ?? 0
-
-          // Apply value manipulation if provided
-          if (attr.manipulateValue && typeof attr.manipulateValue === 'function') {
-            // Ensure value is a number before manipulation
-            const numericValue = typeof value === 'number' ? value : Number(value) || 0
-            value = attr.manipulateValue(numericValue)
-          }
-
-          point[attr.attribute] = value
-        })
-
-        // Add reference line values for each timestamp
-        referenceLineQueries.forEach((query: any) => {
-          const attr = query.data.attribute
-          const value = query.data.total
-          point[attr] = value
-        })
-
-        return point as DataPoint
-      })
-
-    return combined as DataPoint[]
-  }, [data, attributeQueries, attributes])
-
-  const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
-
-  // Calculate highlighted value based on the first attribute's data
-  const _highlightedValue = useMemo(() => {
-    if (highlightedValue !== undefined) return highlightedValue
-
-    const firstAttr = attributes[0]
-    const firstQuery = attributeQueries[0]
-    const firstData = firstQuery?.data
-
-    if (!firstData) return undefined
-
-    const shouldHighlightMaxValue =
-      firstAttr.provider === 'daily-stats' &&
-      !firstAttr.attribute.includes('ingress') &&
-      !firstAttr.attribute.includes('egress') &&
-      'maximum' in firstData
-
-    const shouldHighlightTotalGroupedValue = 'totalGrouped' in firstData
-
-    return shouldHighlightMaxValue
-      ? firstData.maximum
-      : firstAttr.provider === 'daily-stats'
-        ? firstData.total
-        : shouldHighlightTotalGroupedValue
-          ? firstData.totalGrouped?.[firstAttr.attribute as keyof typeof firstData.totalGrouped]
-          : (firstData.data[firstData.data.length - 1] as any)?.[firstAttr.attribute]
-  }, [highlightedValue, attributes, attributeQueries])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Panel
         className={cn(
@@ -250,7 +130,7 @@ const ComposedChartHandler = ({
     )
   }
 
-  if (!combinedData) {
+  if (!data) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
         <WarningIcon />
@@ -272,11 +152,11 @@ const ComposedChartHandler = ({
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
-          data={combinedData as DataPoint[]}
+          data={data as any}
           format={format}
           xAxisKey="period_start"
           yAxisKey={attributes[0].attribute}
-          highlightedValue={_highlightedValue}
+          highlightedValue={highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
           chartHighlight={chartHighlight}
@@ -289,6 +169,7 @@ const ComposedChartHandler = ({
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
+          titleTooltip={titleTooltip}
           {...otherProps}
         />
       </Panel.Content>
@@ -296,7 +177,7 @@ const ComposedChartHandler = ({
   )
 }
 
-const useAttributeQueries = (
+export const useAttributeQueries = (
   attributes: MultiAttribute[],
   ref: string | string[] | undefined,
   startDate: string,
@@ -306,16 +187,15 @@ const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  const infraAttributes = attributes
-    .filter((attr) => attr?.provider === 'infra-monitoring')
-    .map((attr) => attr.attribute as InfraMonitoringAttribute)
-  const dailyStatsAttributes = attributes
-    .filter((attr) => attr?.provider === 'daily-stats')
-    .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
-  const referenceLines = attributes.filter((attr) => attr?.provider === 'reference-line')
+  const projectRef = typeof ref === 'string' ? ref : Array.isArray(ref) ? ref[0] : ''
+
+  const infraAttributes = attributes.filter((attr) => attr.provider === 'infra-monitoring')
+  const dailyStatsAttributes = attributes.filter((attr) => attr.provider === 'daily-stats')
+  const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
+  const referenceLineAttributes = attributes.filter((attr) => attr.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
-    infraAttributes,
+    infraAttributes.map((attr) => attr.attribute as InfraMonitoringAttribute),
     ref,
     startDate,
     endDate,
@@ -325,7 +205,7 @@ const useAttributeQueries = (
     isVisible
   )
   const dailyStatsQueries = useProjectDailyStatsQueries(
-    dailyStatsAttributes,
+    dailyStatsAttributes.map((attr) => attr.attribute as ProjectDailyStatsAttribute),
     ref,
     startDate,
     endDate,
@@ -335,29 +215,54 @@ const useAttributeQueries = (
     isVisible
   )
 
-  const referenceLineQueries = referenceLines.map((line) => {
-    let value = line.value || 0
-
-    return {
-      data: {
-        data: [], // Will be populated in combinedData
-        attribute: line.attribute,
-        total: value,
-        maximum: value,
-        totalGrouped: { [line.attribute]: value },
-      },
-      isLoading: false,
-      isError: false,
-    }
-  })
-
-  return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries]
+  let infraIdx = 0
+  let dailyStatsIdx = 0
+  return attributes
+    .filter((attr) => attr.provider !== 'logs')
+    .map((attr) => {
+      if (attr.provider === 'infra-monitoring') {
+        return {
+          ...infraQueries[infraIdx++],
+          data: { ...infraQueries[infraIdx - 1]?.data, provider: 'infra-monitoring' },
+        }
+      } else if (attr.provider === 'daily-stats') {
+        return {
+          ...dailyStatsQueries[dailyStatsIdx++],
+          data: { ...dailyStatsQueries[dailyStatsIdx - 1]?.data, provider: 'daily-stats' },
+        }
+      } else if (attr.provider === 'mock') {
+        const mockData = getMockDataForAttribute(attr.attribute)
+        return {
+          isLoading: false,
+          data: { ...mockData, provider: 'mock', attribute: attr.attribute },
+        }
+      } else if (attr.provider === 'reference-line') {
+        let value = attr.value || 0
+        return {
+          data: {
+            data: [],
+            attribute: attr.attribute,
+            total: value,
+            maximum: value,
+            totalGrouped: { [attr.attribute]: value },
+            provider: 'reference-line',
+          },
+          isLoading: false,
+          isError: false,
+        }
+      } else {
+        return {
+          isLoading: false,
+          data: undefined,
+        }
+      }
+    })
 }
 
-export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+export default function LazyLogChartHandler(props: LogChartHandlerProps) {
   return (
     <LazyChartWrapper>
-      <ComposedChartHandler {...props} />
+      <LogChartHandler {...props} />
     </LazyChartWrapper>
   )
 }
