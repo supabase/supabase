@@ -10,7 +10,6 @@ import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
 export const columnSchema = z.object({
   id: z.string(),
   log_type: z.enum(LOG_TYPES),
-  uuid: z.string(),
   method: z.enum(METHODS),
   host: z.string(),
   pathname: z.string(),

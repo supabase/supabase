@@ -14,6 +14,7 @@ The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP)
 - [Cline](#cline) (VS Code extension)
 - [Claude desktop](#claude-desktop)
 - [Claude code](#claude-code)
+- [Amp](#amp)
 
 Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
 
@@ -117,10 +118,83 @@ You can also add the Supabase MCP server as a locally-scoped server, which will 
 1. Run the following command in your terminal:
 
    ```bash
-   claude mcp add supabase -s local -e SUPABASE_ACCESS_TOKEN=your_token_here npx -y @supabase/mcp-server-supabase@latest
+   claude mcp add supabase -s local -e SUPABASE_ACCESS_TOKEN=your_token_here -- npx -y @supabase/mcp-server-supabase@latest
    ```
 
 Locally-scoped servers take precedence over project-scoped servers with the same name and are stored in your project-specific user settings.
+
+### Amp
+
+You can add the Supabase MCP server to Amp in two ways:
+
+#### Option 1: VSCode settings.json
+
+1. Open "Preferences: Open User Settings (JSON)"
+2. Add the following configuration:
+
+   ```json
+   {
+     "amp.mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "@supabase/mcp-server-supabase@latest",
+           "--read-only",
+           "--project-ref=<project-ref>"
+         ],
+         "env": {
+           "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+         }
+       }
+     }
+   }
+   ```
+
+   Replace `project-ref` and `personal-access-token` with your project ref and personal access token.
+
+3. Save the configuration file.
+4. Restart VS Code to apply the new configuration.
+
+#### Option 2: Amp CLI
+
+1. Edit `~/.config/amp/settings.json`
+1. Add the following configuration:
+
+   ```json
+   {
+     "amp.mcpServers": {
+       "supabase": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "@supabase/mcp-server-supabase@latest",
+           "--read-only",
+           "--project-ref=<project-ref>"
+         ],
+         "env": {
+           "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+         }
+       }
+     }
+   }
+   ```
+
+   Replace `project-ref` and `personal-access-token` with your project ref and personal access token.
+
+1. Save the configuration file.
+1. Restart Amp to apply the new configuration.
+
+### Qodo Gen
+
+1. Open [Qodo Gen](https://docs.qodo.ai/qodo-documentation/qodo-gen) chat panel in VSCode or IntelliJ.
+1. Click `Connect more tools`.
+1. Click `+ Add new MCP`.
+1. Add the following configuration:
+
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Qodo Gen" }} />
+
+1. Click `Save`.
 
 ### Next steps
 

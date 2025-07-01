@@ -23,14 +23,10 @@ export type LogsMeta = {
   currentPercentiles: Record<Percentile, number>
 }
 
-export type UnifiedLogsMeta = {
-  logTypeCounts: Record<UnifiedLogSchema['log_type'], number>
-  currentPercentiles: Record<string, number>
-}
-
 export type PageParam = { cursor: number; direction: 'next' | 'prev' }
 
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
+export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'>
 
 export type SearchParams = {
   [key: string]: string | string[] | undefined

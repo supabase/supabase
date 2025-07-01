@@ -63,9 +63,7 @@ export const CreateKeyDialog = ({
             <SelectContent_Shadcn_>
               <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
               <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="ES256" disabled>
-                ES256 (ECC)
-              </SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="ES256">ES256 (ECC)</SelectItem_Shadcn_>
               <SelectItem_Shadcn_ value="EdDSA" disabled>
                 EdDSA (Ed25519)
               </SelectItem_Shadcn_>
