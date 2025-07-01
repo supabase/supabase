@@ -52,3 +52,18 @@ export interface ReportFilterItem {
   compare: 'matches' | 'is' | '>=' | '<=' | '>' | '<' | '!='
   query?: string
 }
+
+export interface ReportFilterProperty {
+  label: string
+  name: string
+  type: 'string' | 'number'
+  options?: Array<{ label: string; value: string }>
+  operators: string[]
+  placeholder?: string
+}
+
+export interface ReportFilter {
+  propertyName: string | number
+  operator: string | number
+  value: string | number
+}

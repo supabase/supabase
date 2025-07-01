@@ -11,21 +11,7 @@ import {
   Popover_Shadcn_,
   Input,
 } from 'ui'
-
-export interface ReportFilterProperty {
-  label: string
-  name: string
-  type: 'string' | 'number'
-  options?: Array<{ label: string; value: string }>
-  operators: string[]
-  placeholder?: string
-}
-
-export interface ReportFilter {
-  propertyName: string | number
-  operator: string | number
-  value: string | number
-}
+import type { ReportFilter, ReportFilterProperty } from './Reports.types'
 
 export interface ReportFilterPopoverProps {
   buttonText?: string
