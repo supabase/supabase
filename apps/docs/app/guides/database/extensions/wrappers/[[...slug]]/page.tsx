@@ -261,7 +261,7 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
   const dashboardIntegrationURL = getDashboardIntegrationURL(meta.dashboardIntegrationPath)
 
   return (
-    <GuideTemplate meta={meta} mdxOptions={options} {...data}>
+    <GuideTemplate meta={meta} mdxOptions={options} {...data} childrenPosition="before">
       {dashboardIntegrationURL && (
         <Admonition type="tip">
           <p>You can enable the {meta.title} wrapper right from the Supabase dashboard.</p>
@@ -309,11 +309,12 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
-    if (!tag) {
-      throw new Error('No latest release found for federated wrappers pages')
-    }
+    // const tag = await getLatestRelease()
+    // if (!tag) {
+    //   throw new Error('No latest release found for federated wrappers pages')
+    // }
 
+    const tag = 'main'
     const repoPath = `${org}/${repo}/${tag}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 

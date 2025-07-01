@@ -54,13 +54,21 @@ interface BaseGuideTemplateProps {
   children?: ReactNode
   editLink: EditLink
   mdxOptions?: SerializeOptions
+  childrenPosition?: 'before' | 'after'
 }
 
 type GuideTemplateProps =
   | WithRequired<BaseGuideTemplateProps, 'children'>
   | WithRequired<BaseGuideTemplateProps, 'content'>
 
-const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
+const GuideTemplate = ({
+  meta,
+  content,
+  children,
+  childrenPosition = 'after',
+  editLink,
+  mdxOptions,
+}: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
 
   return (
@@ -90,8 +98,9 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
+            {childrenPosition === 'before' && children}
             {content && <MDXRemoteBase source={content} options={mdxOptions} />}
-            {children}
+            {childrenPosition === 'after' && children}
             <footer className="mt-16 not-prose">
               <a
                 href={
