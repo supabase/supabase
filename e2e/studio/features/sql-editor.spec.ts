@@ -36,7 +36,7 @@ test.describe('SQL Editor', () => {
 })
 
 test.describe('SQL Snippets', () => {
-  test.only('should create and load a new snippet', async ({ page }) => {
+  test('should create and load a new snippet', async ({ page }) => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/sql`))
 
     const addButton = page.getByTestId('sql-editor-new-query-button')
@@ -58,43 +58,44 @@ test.describe('SQL Snippets', () => {
     await runButton.click()
 
     // snippet exists
-    const sqlSnippet = page.getByText('Untitled query', { exact: true })
-    await expect(sqlSnippet).toBeVisible()
+    const privateSnippet = page.getByLabel('private-snippets')
+    await expect(privateSnippet).toContainText('Untitled query')
 
     // favourite snippets
     await page.getByTestId('sql-editor-utility-actions').click()
     await page.getByRole('menuitem', { name: 'Add to favorites', exact: true }).click()
-    await expect(page.getByText('Untitled query', { exact: true })).toHaveCount(2)
+    const favouriteSnippetsSection = page.getByLabel('favorite-snippets')
+    await expect(favouriteSnippetsSection).toContainText('Untitled query')
 
     // unfavorite snippets
     await page.waitForTimeout(500)
     await page.getByTestId('sql-editor-utility-actions').click()
     await page.getByRole('menuitem', { name: 'Remove from favorites' }).click()
+    await expect(favouriteSnippetsSection).not.toBeVisible()
 
     // rename snippet
-    await sqlSnippet.click({ button: 'right' })
+    await privateSnippet.getByText('Untitled query').click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
     await page.getByRole('textbox', { name: 'Name' }).fill('test snippet')
     await page.getByRole('button', { name: 'Rename query', exact: true }).click()
 
-    const sqlSnippet2 = page.getByText('test snippet', { exact: true })
-    await expect(sqlSnippet2).toBeVisible()
+    const privateSnippet2 = privateSnippet.getByText('test snippet', { exact: true })
+    await expect(privateSnippet2).toBeVisible()
 
     // share with a team
-    await sqlSnippet2.click({ button: 'right' })
+    await privateSnippet2.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Share query with team' }).click()
     await expect(page.getByRole('heading', { name: 'Confirm to share query: test' })).toBeVisible()
     await page.getByRole('button', { name: 'Share query', exact: true }).click()
-    await expect(page.getByText('test snippet')).toHaveCount(2)
+    const sharedSnippet = await page.getByLabel('project-level-snippets')
+    await expect(sharedSnippet).toContainText('test snippet')
 
     // unshare a snippet
-    const sqlSnippetshared = page.getByText('test snippet', { exact: true })
-    await sqlSnippetshared.click({ button: 'right' })
+    await sharedSnippet.getByText('test snippet').click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Unshare query with team' }).click()
-
     await expect(page.getByRole('heading', { name: 'Confirm to unshare query:' })).toBeVisible()
     await page.getByRole('button', { name: 'Unshare query', exact: true }).click()
-    await expect(page.getByText('test snippet', { exact: true })).toHaveCount(1)
+    await expect(sharedSnippet).not.toBeVisible()
   })
 })
