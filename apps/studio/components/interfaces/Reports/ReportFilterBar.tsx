@@ -1,16 +1,16 @@
 import { ChevronDown, Database, RefreshCw } from 'lucide-react'
 import { ComponentProps, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
-import { BASE_PATH } from 'lib/constants'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
+import { BASE_PATH } from 'lib/constants'
 import {
-  cn,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,

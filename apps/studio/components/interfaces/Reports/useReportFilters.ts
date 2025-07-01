@@ -164,7 +164,7 @@ export const useReportFilters = ({
 
   const [isInitialized, setIsInitialized] = useState(false)
   const lastAppliedFilterState = useRef<string>('')
-  const lastSetUrlState = useRef<string>('')
+  const preventUrlSync = useRef(false)
 
   // Initialize local state from URL params (only once on mount)
   useEffect(() => {
@@ -172,16 +172,22 @@ export const useReportFilters = ({
       const initialFilters = convertQueryFiltersToReportFilters(queryFilters)
       setLocalFilters(initialFilters)
       setIsInitialized(true)
-
-      // Initialize the URL state tracking with current URL state
-      const currentUrlState = Object.entries(queryFilters)
-        .filter(([, value]) => value !== null)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, value]) => `${key}=${value}`)
-        .join('&')
-      lastSetUrlState.current = currentUrlState
     }
-  }, [isInitialized])
+  }, [isInitialized, convertQueryFiltersToReportFilters, queryFilters])
+
+  // Sync URL changes back to local state (when URL changes externally)
+  useEffect(() => {
+    if (!isInitialized || preventUrlSync.current) return
+
+    const filtersFromUrl = convertQueryFiltersToReportFilters(queryFilters)
+    const currentFilterJson = JSON.stringify(localFilters)
+    const urlFilterJson = JSON.stringify(filtersFromUrl)
+
+    if (currentFilterJson !== urlFilterJson) {
+      console.log('Syncing local filters from URL change:', { filtersFromUrl, localFilters })
+      setLocalFilters(filtersFromUrl)
+    }
+  }, [queryFilters, isInitialized, convertQueryFiltersToReportFilters])
 
   // Sync local filter changes back to URL state (only after initialization)
   useEffect(() => {
@@ -189,19 +195,12 @@ export const useReportFilters = ({
 
     const queryUpdate = convertReportFiltersToQueryFilters(localFilters)
 
-    // Create a string representation for comparison
-    const newUrlState = Object.entries(queryUpdate)
-      .filter(([, value]) => value !== null)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&')
-
-    if (lastSetUrlState.current !== newUrlState) {
-      console.log('Updating URL state from:', lastSetUrlState.current, 'to:', newUrlState)
-      lastSetUrlState.current = newUrlState
-      setQueryFilters(queryUpdate)
-    }
-  }, [localFilters, isInitialized, setQueryFilters])
+    // Prevent feedback loop during URL updates
+    preventUrlSync.current = true
+    setQueryFilters(queryUpdate).finally(() => {
+      preventUrlSync.current = false
+    })
+  }, [localFilters, isInitialized, setQueryFilters, convertReportFiltersToQueryFilters])
 
   // Separate effect for report filter updates (only for filters with values)
   useEffect(() => {
