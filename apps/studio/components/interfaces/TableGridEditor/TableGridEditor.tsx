@@ -13,7 +13,7 @@ import {
   isView,
 } from 'data/table-editor/table-editor-types'
 import { useGetTables } from 'data/tables/tables-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
@@ -51,9 +51,16 @@ export const TableGridEditor = ({
 
   const [{ view: selectedView = 'data' }] = useUrlState()
 
-  const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
-  const isReadOnly = !canEditTables && !canEditColumns
+  const canEditTables = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+  const canEditColumns = useAsyncCheckProjectPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'columns'
+  )
+  const permissionsLoading = canEditTables.isLoading || canEditColumns.isLoading
+  const isReadOnly = !canEditTables.can && !canEditColumns.can
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
 
@@ -83,7 +90,7 @@ export const TableGridEditor = ({
   }, [onClearDashboardHistory, router, selectedTable, tabs])
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
-  if (isLoadingSelectedTable || !projectRef) {
+  if (isLoadingSelectedTable || !projectRef || permissionsLoading) {
     return (
       <div className="flex flex-col">
         <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
