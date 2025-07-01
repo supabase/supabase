@@ -1,5 +1,7 @@
 # Supabase Studio E2E Tests
 
+hello
+
 ## Set up
 
 ```bash
