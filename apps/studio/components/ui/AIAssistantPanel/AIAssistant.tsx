@@ -1,7 +1,7 @@
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
+import { ArrowDown, FileText, Info, RefreshCw, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -312,56 +312,40 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       <div className={cn('flex flex-col h-full', className)}>
         <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
-            <div className="border-b flex items-center bg gap-x-3 pl-5 pr-4 h-[46px]">
-              <AiIconAnimation allowHoverEffect />
-
+            <div className="border-b border-b-muted flex items-center bg gap-x-4 pl-3 pr-5 h-[46px]">
               <div className="text-sm flex-1 flex items-center gap-x-2">
-                Assistant
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info size={14} className="text-foreground-light" />
-                  </TooltipTrigger>
-                  <TooltipContent className="w-80">
-                    The Assistant is in Alpha and your prompts might be rate limited.{' '}
-                    {aiOptInLevel === 'schema_and_log_and_data' &&
-                      'Schema, logs, and query data are being shared to improve Assistant responses.'}
-                    {aiOptInLevel === 'schema_and_log' &&
-                      'Schema and logs are being shared to improve Assistant responses.'}
-                    {aiOptInLevel === 'schema' &&
-                      'Only schema metadata is being shared to improve Assistant responses.'}
-                    {aiOptInLevel === 'disabled' &&
-                      'Project metadata is not being shared. Opt in to improve Assistant responses.'}
-                  </TooltipContent>
-                </Tooltip>
+                <AIAssistantChatSelector disabled={isChatLoading} />
               </div>
               <div className="flex items-center gap-x-4">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <p
-                      title={currentChat}
-                      className="text-xs text-foreground-light truncate max-w-[145px] 2xl:max-w-full"
-                    >
-                      {currentChat}
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Current chat: {currentChat}</TooltipContent>
-                </Tooltip>
-                <div className="flex items-center gap-x-2">
-                  <AIAssistantChatSelector disabled={isChatLoading} />
+                <div className="flex items-center">
                   <ButtonTooltip
-                    type="default"
+                    type="text"
                     size="tiny"
-                    icon={<RefreshCw size={14} />}
+                    icon={<Settings strokeWidth={1.5} size={14} />}
+                    onClick={() => setIsConfirmOptInModalOpen(true)}
+                    className="h-7 w-7 p-0"
+                    disabled={isChatLoading}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'Permission settings',
+                      },
+                    }}
+                  />
+                  <ButtonTooltip
+                    type="text"
+                    size="tiny"
+                    icon={<RefreshCw strokeWidth={1.5} size={14} />}
                     onClick={handleClearMessages}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
                     tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
                   />
                   <ButtonTooltip
-                    type="default"
+                    type="text"
                     className="w-7 h-7"
                     onClick={snap.closeAssistant}
-                    icon={<X />}
+                    icon={<X strokeWidth={1.5} size={14} />}
                     tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
                   />
                 </div>
@@ -410,7 +394,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             </div>
           )}
           {hasMessages ? (
-            <div className="w-full p-5">
+            <div className="w-full px-7 py-8 space-y-8">
               {renderedMessages}
               <AnimatePresence>
                 {isChatLoading && (
@@ -576,9 +560,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="p-5 pt-0 z-20 relative">
+        <div className="px-3 pb-3 z-20 relative">
           {snap.sqlSnippets && snap.sqlSnippets.length > 0 && (
-            <div className="mb-2">
+            <div className="mb-0 mx-4">
               {snap.sqlSnippets.map((snippet: string, index: number) => (
                 <CollapsibleCodeBlock
                   key={index}
@@ -589,7 +573,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     newSnippets.splice(index, 1)
                     snap.setSqlSnippets(newSnippets)
                   }}
-                  className="text-xs"
+                  className="text-xs rounded-b-none"
                 />
               ))}
             </div>

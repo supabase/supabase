@@ -75,18 +75,14 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
         onSubmit={onSubmit}
         className={cn('relative', props.className)}
       >
-        {icon && (
-          <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}>
-            {icon}
-          </div>
-        )}
         <ExpandingTextArea
           ref={textAreaRef}
           autoFocus={isMobile}
           disabled={disabled}
-          className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded-[18px]')}
+          className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded')}
           placeholder={placeholder}
           spellCheck={false}
+          rows={3}
           value={value}
           onChange={(event) => onValueChange(event)}
           onKeyDown={handleKeyDown}
