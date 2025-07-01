@@ -15,13 +15,13 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
     text: 'Last 10 minutes',
     calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 30 minutes',
     calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 60 minutes',

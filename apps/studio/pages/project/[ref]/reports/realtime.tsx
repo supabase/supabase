@@ -11,12 +11,22 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
+import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
+import {
+  ResponseSpeedChartRenderer,
+  TopApiRoutesRenderer,
+  TotalRequestsChartRenderer,
+} from 'components/interfaces/Reports/renderers/ApiRenderers'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 
 import { analyticsKeys } from 'data/analytics/keys'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
+import { useApiReport } from 'data/reports/api-report-query'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -41,6 +51,19 @@ export default RealtimeReport
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { db, chart, ref } = useParams()
+  const report = useApiReport()
+
+  const {
+    data,
+    error,
+    filters,
+    isLoading,
+    params,
+    mergeParams,
+    removeFilters,
+    addFilter,
+    refresh,
+  } = report
 
   const state = useDatabaseSelectorStateSnapshot()
   const defaultStart = dayjs().subtract(7, 'day').toISOString()
@@ -126,6 +149,21 @@ const RealtimeUsage = () => {
       period_end: { date: to, time_period: 'today' },
       interval: handleIntervalGranularity(from, to),
     })
+    report.mergeParams({
+      iso_timestamp_start: from,
+      iso_timestamp_end: to,
+    })
+  }
+
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    report.mergeParams({
+      iso_timestamp_start: vals.from || '',
+      iso_timestamp_end: vals.to || '',
+    })
+    setDateRange({
+      period_start: { date: vals.from || '', time_period: '1d' },
+      period_end: { date: vals.to || '', time_period: 'today' },
+    })
   }
 
   return (
@@ -145,7 +183,7 @@ const RealtimeUsage = () => {
             <div className="flex items-center gap-3">
               <DateRangePicker
                 loading={false}
-                value={'1d'}
+                value="1d"
                 options={TIME_PERIODS_INFRA}
                 currentBillingPeriodStart={undefined}
                 onChange={(values) => {
@@ -187,6 +225,48 @@ const RealtimeUsage = () => {
                 defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
               />
             ))}
+        </div>
+        <div className="relative pt-16 mt-4 border-t">
+          <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
+            <div className="sticky top-0 bg-200 py-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
+              <ReportFilterBar
+                onRemoveFilters={removeFilters}
+                onDatepickerChange={handleDatepickerChange}
+                datepickerFrom={params.totalRequests.iso_timestamp_start}
+                datepickerTo={params.totalRequests.iso_timestamp_end}
+                onAddFilter={addFilter}
+                onRefresh={refresh}
+                isLoading={isLoading}
+                filters={filters}
+                selectedProduct="realtime"
+                datepickerHelpers={createFilteredDatePickerHelpers(orgPlan?.id || 'free')}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <ReportWidget
+              isLoading={isLoading}
+              params={params.totalRequests}
+              title="Total Requests"
+              data={data.totalRequests || []}
+              error={error.totalRequest}
+              renderer={TotalRequestsChartRenderer}
+              append={TopApiRoutesRenderer}
+              appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
+            />
+            <ReportWidget
+              isLoading={isLoading}
+              params={params.responseSpeed}
+              title="Response Speed"
+              tooltip="Average response speed (in miliseconds) of a request"
+              data={data.responseSpeed || []}
+              error={error.responseSpeed}
+              renderer={ResponseSpeedChartRenderer}
+              appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
+              append={TopApiRoutesRenderer}
+            />
+          </div>
         </div>
       </section>
     </>
