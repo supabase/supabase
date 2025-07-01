@@ -210,16 +210,20 @@ export const BranchDropdown = () => {
         </div>
       )}
 
-      {isSuccess && isBranchingEnabled && branches.length > 0 && (
+      {isSuccess && (
         <>
           <Link href={`/project/${ref}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
             <span className="text-foreground max-w-32 lg:max-w-none truncate">
-              {selectedBranch?.name}
+              {isBranchingEnabled ? selectedBranch?.name : 'main'}
             </span>
-            {selectedBranch?.is_default ? (
-              <Badge variant="warning">Production</Badge>
+            {isBranchingEnabled ? (
+              selectedBranch?.is_default ? (
+                <Badge variant="warning">Production</Badge>
+              ) : (
+                <Badge variant="brand">Preview Branch</Badge>
+              )
             ) : (
-              <Badge variant="brand">Preview Branch</Badge>
+              <Badge variant="warning">Production</Badge>
             )}
           </Link>
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -232,23 +236,13 @@ export const BranchDropdown = () => {
               />
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-              <MenuContent branchList={sortedBranches ?? []} showSearch />
+              <MenuContent
+                branchList={isBranchingEnabled ? sortedBranches ?? [] : [defaultMainBranch]}
+                showSearch={isBranchingEnabled}
+              />
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </>
-      )}
-
-      {isSuccess && !isBranchingEnabled && (
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>
-            <Button type="text" icon={<GitBranch strokeWidth={1.5} />}>
-              Branching
-            </Button>
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-            <MenuContent branchList={[defaultMainBranch]} />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
       )}
     </>
   )
