@@ -89,6 +89,20 @@ export const TableGridEditor = ({
     }
   }, [onClearDashboardHistory, router, selectedTable, tabs])
 
+  // Debugging notes for permissions and read-only logic
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[TableGridEditor Debug] canEditTables:', canEditTables)
+    // eslint-disable-next-line no-console
+    console.log('[TableGridEditor Debug] canEditColumns:', canEditColumns)
+    // eslint-disable-next-line no-console
+    console.log('[TableGridEditor Debug] permissionsLoading:', permissionsLoading)
+    // eslint-disable-next-line no-console
+    console.log('[TableGridEditor Debug] isReadOnly:', isReadOnly)
+    // eslint-disable-next-line no-console
+    console.log('[TableGridEditor Debug] selectedTable:', selectedTable)
+  }
+
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef || permissionsLoading) {
     return (
