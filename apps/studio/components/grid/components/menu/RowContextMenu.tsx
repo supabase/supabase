@@ -16,7 +16,7 @@ export type RowContextMenuProps = {
 const RowContextMenu = ({ rows }: RowContextMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
-
+  console.log('snap', snap)
   function onDeleteRow(p: ItemParams) {
     const { props } = p
     const { rowIdx } = props

@@ -32,6 +32,16 @@ export const SupabaseGrid = ({
     gridProps?: GridProps
   }
 >) => {
+  // Debug log for gridProps and editable
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[SupabaseGrid Debug] gridProps:', gridProps)
+    // eslint-disable-next-line no-console
+    if (gridProps && 'editable' in gridProps) {
+      console.log('[SupabaseGrid Debug] editable:', (gridProps as any).editable)
+    }
+  }
+
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
