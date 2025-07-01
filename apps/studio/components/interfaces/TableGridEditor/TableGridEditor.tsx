@@ -13,7 +13,7 @@ import {
   isView,
 } from 'data/table-editor/table-editor-types'
 import { useGetTables } from 'data/tables/tables-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
@@ -51,16 +51,9 @@ export const TableGridEditor = ({
 
   const [{ view: selectedView = 'data' }] = useUrlState()
 
-  const canEditTables = useAsyncCheckProjectPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
-  )
-  const canEditColumns = useAsyncCheckProjectPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
-  )
-  const permissionsLoading = canEditTables.isLoading || canEditColumns.isLoading
-  const isReadOnly = !canEditTables.can && !canEditColumns.can
+  const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
+  const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+  const isReadOnly = !canEditTables && !canEditColumns
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
 
@@ -89,48 +82,8 @@ export const TableGridEditor = ({
     }
   }, [onClearDashboardHistory, router, selectedTable, tabs])
 
-  const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
-  const isTableSelected = isTableLike(selectedTable)
-  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
-  const canEditViaTableEditor = isTableSelected && !isLocked
-  const editable = !isReadOnly && canEditViaTableEditor
-
-  const gridKey = selectedTable ? `${selectedTable.schema}_${selectedTable.name}` : 'unknown_table'
-
-  // Debugging notes for permissions and read-only logic
-  if (typeof window !== 'undefined') {
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] canEditTables:', canEditTables)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] canEditColumns:', canEditColumns)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] permissionsLoading:', permissionsLoading)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] isReadOnly:', isReadOnly)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] selectedTable:', selectedTable)
-    // Additional debug logs
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] isLocked:', isLocked)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] isTableSelected:', isTableSelected)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] canEditViaTableEditor:', canEditViaTableEditor)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] editable:', editable)
-    // eslint-disable-next-line no-console
-    console.log('[TableGridEditor Debug] SupabaseGrid props:', {
-      gridKey,
-      isViewSelected,
-      isTableSelected,
-      selectedView,
-      selectedTable,
-      editable,
-    })
-  }
-
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
-  if (isLoadingSelectedTable || !projectRef || permissionsLoading) {
+  if (isLoadingSelectedTable || !projectRef) {
     return (
       <div className="flex flex-col">
         <div className="h-10 bg-dash-sidebar dark:bg-surface-100" />
@@ -192,6 +145,14 @@ export const TableGridEditor = ({
       </div>
     )
   }
+
+  const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
+  const isTableSelected = isTableLike(selectedTable)
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
+  const canEditViaTableEditor = isTableSelected && !isLocked
+  const editable = !isReadOnly && canEditViaTableEditor
+
+  const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
   /** [Joshen] We're going to need to refactor SupabaseGrid eventually to make the code here more readable
    * For context we previously built the SupabaseGrid as a reusable npm component, but eventually decided
