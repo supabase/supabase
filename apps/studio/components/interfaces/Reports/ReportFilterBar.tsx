@@ -97,7 +97,7 @@ export const REPORT_FILTER_PARAMS_PARSER = {
   [ReportFilterKeys.SEARCH]: parseAsString,
   [ReportFilterKeys.X_CLIENT_INFO]: parseAsString,
   [ReportFilterKeys.USER_AGENT]: parseAsString,
-  [ReportFilterKeys.STATUS_CODE]: parseAsString, // Changed to string to handle operators
+  [ReportFilterKeys.STATUS_CODE]: parseAsString,
 }
 
 const ReportFilterBar = ({
@@ -117,7 +117,6 @@ const ReportFilterBar = ({
     null | (typeof PRODUCT_FILTERS)[number]
   >(null)
 
-  // URL-safe operator mappings
   const URL_OPERATOR_MAP = {
     '=': 'eq',
     '!=': 'neq',
@@ -203,14 +202,12 @@ const ReportFilterBar = ({
     []
   )
 
-  // Convert ReportFilter to ReportFilterItem format for the report system
   const convertReportFiltersToReportFilterItems = useMemo(
     () =>
       (reportFilters: ReportFilter[]): ReportFilterItem[] => {
         const reportFilterItems: ReportFilterItem[] = []
 
         reportFilters.forEach((filter) => {
-          // Only send to report system if filter has a value (empty filters are for UI only)
           if (filter.value !== null && filter.value !== '' && filter.value !== undefined) {
             reportFilterItems.push({
               key: filter.propertyName.toString(),
@@ -235,10 +232,8 @@ const ReportFilterBar = ({
         queryUpdate[key] = null
       })
 
-      // Add new filters with encoded operator+value
       reportFilters.forEach((filter) => {
         if (filter.propertyName in REPORT_FILTER_PARAMS_PARSER) {
-          // Encode operator + value for URL safety
           const encodedValue = encodeFilterValue(filter.operator, filter.value as string | number)
           queryUpdate[filter.propertyName] = encodedValue
         }
@@ -252,12 +247,6 @@ const ReportFilterBar = ({
   const [queryFilters, setQueryFilters] = useQueryStates(REPORT_FILTER_PARAMS_PARSER)
   const [localFilters, setLocalFilters] = useState<ReportFilter[]>([])
 
-  // Initialize local state from URL params
-  const defaultReportFilters = useMemo(() => {
-    return convertQueryFiltersToReportFilters(queryFilters)
-  }, [queryFilters, convertQueryFiltersToReportFilters])
-
-  // Track if we're initializing to avoid sync loops
   const [isInitialized, setIsInitialized] = useState(false)
 
   // Track the last applied filter state to prevent circular dependencies
@@ -266,10 +255,11 @@ const ReportFilterBar = ({
   // Track the last URL state that we set to prevent feedback loops
   const lastSetUrlState = useRef<string>('')
 
-  // Set initial local state from URL params (only once on mount)
+  // Initialize local state from URL params (only once on mount)
   useEffect(() => {
-    if (!isInitialized && defaultReportFilters.length >= 0) {
-      setLocalFilters(defaultReportFilters)
+    if (!isInitialized) {
+      const initialFilters = convertQueryFiltersToReportFilters(queryFilters)
+      setLocalFilters(initialFilters)
       setIsInitialized(true)
 
       // Initialize the URL state tracking with current URL state
@@ -280,7 +270,7 @@ const ReportFilterBar = ({
         .join('&')
       lastSetUrlState.current = currentUrlState
     }
-  }, [defaultReportFilters, isInitialized, queryFilters])
+  }, [isInitialized])
 
   // Sync local filter changes back to URL state (only after initialization)
   useEffect(() => {
@@ -295,16 +285,15 @@ const ReportFilterBar = ({
       .map(([key, value]) => `${key}=${value}`)
       .join('&')
 
-    // Only update if this is different from what we last set
     if (lastSetUrlState.current !== newUrlState) {
+      console.log('Updating URL state from:', lastSetUrlState.current, 'to:', newUrlState)
       lastSetUrlState.current = newUrlState
       setQueryFilters(queryUpdate)
     }
-  }, [localFilters, isInitialized, setQueryFilters]) // Removed queryFilters dependency to prevent feedback loop
+  }, [localFilters, isInitialized, setQueryFilters])
 
-  // Separate effect for report filter updates (only for filters with values)
   useEffect(() => {
-    if (!isInitialized) return // Don't apply filters during initialization
+    if (!isInitialized) return
 
     const reportFilterItems = convertReportFiltersToReportFilterItems(localFilters)
 
@@ -314,7 +303,6 @@ const ReportFilterBar = ({
       .sort()
       .join('|')
 
-    // Only update if the ReportFilterPopover managed filters changed
     if (lastAppliedFilterState.current !== newFilterState) {
       lastAppliedFilterState.current = newFilterState
 
@@ -339,16 +327,15 @@ const ReportFilterBar = ({
         onRemoveFilters(otherFilters)
       }
 
-      // Add all the new filters from the popover
       reportFilterItems.forEach((filter) => onAddFilter(filter))
     }
-  }, [localFilters, isInitialized]) // Added isInitialized dependency
+  }, [localFilters, isInitialized])
 
   const handleFilterChange = (newFilters: ReportFilter[]) => {
+    console.log('handleFilterChange called with:', newFilters)
     setLocalFilters(newFilters)
   }
 
-  // Get filter properties based on product type
   const getFilterProperties = (): ReportFilterProperty[] => {
     const baseProperties: ReportFilterProperty[] = [
       {
@@ -388,7 +375,6 @@ const ReportFilterBar = ({
       },
     ]
 
-    // Only show path filter when no product filtering is active
     return [
       {
         label: 'Path',
