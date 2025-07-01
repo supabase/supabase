@@ -1357,14 +1357,89 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
+      name: 'Configuration',
+      url: undefined,
+      items: [
+        { name: 'Environment Variables', url: '/guides/functions/secrets' },
+        { name: 'Managing Dependencies', url: '/guides/functions/dependencies' },
+        { name: 'Function Configuration', url: '/guides/functions/function-configuration' },
+      ],
+    },
+    {
+      name: 'Development',
+      url: undefined,
+      items: [
+        { name: 'Error Handling', url: '/guides/functions/error-handling' },
+        { name: 'HTTP Methods', url: '/guides/functions/http-methods' },
+        { name: 'Using Deno 2', url: '/guides/functions/deno2' },
+      ],
+    },
+    {
+      name: 'Deployment',
+      url: undefined,
+      items: [
+        {
+          name: 'Deploy to Production',
+          url: '/guides/functions/deploy',
+        },
+        {
+          name: 'Deploying with CI/CD pipelines',
+          url: '/guides/functions/cicd-workflow',
+        },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Local Debugging with DevTools',
+          url: '/guides/functions/debugging-tools',
+        },
+        {
+          name: 'Testing your Functions',
+          url: '/guides/functions/unit-test',
+        },
+        {
+          name: 'Logging',
+          url: '/guides/functions/logging',
+        },
+        {
+          name: 'Log Drains',
+          url: '/guides/telemetry/log-drains',
+        },
+        {
+          name: 'Troubleshooting',
+          url: '/guides/functions/troubleshooting',
+        },
+      ],
+    },
+    {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        {
+          name: 'Regional invocations',
+          url: '/guides/functions/regional-invocation',
+        },
+        {
+          name: 'Status codes',
+          url: '/guides/functions/status-codes',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/functions/limits',
+        },
+        {
+          name: 'Pricing',
+          url: '/guides/functions/pricing',
+        },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Managing dependencies', url: '/guides/functions/dependencies' },
-        {
-          name: 'Managing environment variables',
-          url: '/guides/functions/secrets',
-        },
         {
           name: 'Integrating with Supabase Auth',
           url: '/guides/functions/auth',
@@ -1401,68 +1476,14 @@ export const functions: NavMenuConstant = {
           name: 'Wasm modules',
           url: '/guides/functions/wasm',
         },
-        {
-          name: 'Deploying with CI / CD pipelines',
-          url: '/guides/functions/cicd-workflow',
-        },
+
         {
           name: 'Integrating with Log Drains',
           url: '/guides/platform/log-drains',
         },
-        {
-          name: 'Using Deno 2',
-          url: '/guides/functions/deno2',
-        },
       ],
     },
-    {
-      name: 'Debugging',
-      url: undefined,
-      items: [
-        {
-          name: 'Local Debugging with DevTools',
-          url: '/guides/functions/debugging-tools',
-        },
-        {
-          name: 'Logging',
-          url: '/guides/functions/logging',
-        },
-        {
-          name: 'Troubleshooting Common Issues',
-          url: '/guides/functions/troubleshooting',
-        },
-        {
-          name: 'Testing your Edge Functions',
-          url: '/guides/functions/unit-test',
-        },
-        {
-          name: 'Monitoring with Sentry',
-          url: '/guides/functions/examples/sentry-monitoring',
-        },
-      ],
-    },
-    {
-      name: 'Platform',
-      url: undefined,
-      items: [
-        {
-          name: 'Regional invocations',
-          url: '/guides/functions/regional-invocation',
-        },
-        {
-          name: 'Status codes',
-          url: '/guides/functions/status-codes',
-        },
-        {
-          name: 'Limits',
-          url: '/guides/functions/limits',
-        },
-        {
-          name: 'Pricing',
-          url: '/guides/functions/pricing',
-        },
-      ],
-    },
+
     {
       name: 'Examples',
       url: undefined,
