@@ -1346,14 +1346,6 @@ export const functions: NavMenuConstant = {
           name: 'Development Environment',
           url: '/guides/functions/development-environment',
         },
-        {
-          name: 'Deploy to Production',
-          url: '/guides/functions/deploy',
-        },
-        {
-          name: 'Development tips',
-          url: '/guides/functions/development-tips',
-        },
       ],
     },
     {
@@ -1403,10 +1395,6 @@ export const functions: NavMenuConstant = {
         {
           name: 'Logging',
           url: '/guides/functions/logging',
-        },
-        {
-          name: 'Log Drains',
-          url: '/guides/telemetry/log-drains',
         },
         {
           name: 'Troubleshooting',
