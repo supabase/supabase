@@ -178,14 +178,14 @@ export function DiskManagementForm() {
   // We only support disk configurations for >=Large instances
   // If a customer downgrades back to <Large, we should reset the storage settings to avoid incurring unnecessary costs
   useEffect(() => {
-    if (modifiedComputeSize && project?.infra_compute_size) {
+    if (modifiedComputeSize && project?.infra_compute_size && isDialogOpen) {
       if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)) {
         form.setValue('storageType', DiskType.GP3)
         form.setValue('throughput', DISK_LIMITS['gp3'].minThroughput)
         form.setValue('provisionedIOPS', DISK_LIMITS['gp3'].minIops)
       }
     }
-  }, [modifiedComputeSize])
+  }, [modifiedComputeSize, isDialogOpen, project])
 
   /**
    * State handling
