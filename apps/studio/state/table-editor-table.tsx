@@ -183,18 +183,6 @@ export const TableEditorTableStateContextProvider = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // eslint-disable-next-line no-console
-    }
-    // We can use a === check here because react-query is good
-    // about returning objects with the same ref / different ref
-    if (state._originalTableRef !== table || state.editable !== props.editable) {
-      state.editable = props.editable ?? true
-      state.updateTable(table)
-    }
-  }, [table, props.editable, state])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
       return subscribe(state, () => {
         saveTableEditorStateToLocalStorageDebounced({
           gridColumns: state.gridColumns,
@@ -206,6 +194,15 @@ export const TableEditorTableStateContextProvider = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    // We can use a === check here because react-query is good
+    // about returning objects with the same ref / different ref
+    if (state._originalTableRef !== table || state.editable !== props.editable) {
+      state.editable = props.editable ?? true
+      state.updateTable(table)
+    }
+  }, [table, props.editable, state])
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
