@@ -1,18 +1,18 @@
-import type { EdgeFunctionsData } from 'data/edge-functions/edge-functions-query'
-import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
-
-import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 import { Code, Wind } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+
+import { EmptyState, Loading } from 'components/ui/AsyncState'
 import DiffViewer from 'components/ui/DiffViewer'
-import { Loading, EmptyState } from 'components/ui/AsyncState'
+import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
 import type {
   EdgeFunctionsDiffResult,
   FileInfo,
   FileStatus,
 } from 'hooks/branches/useEdgeFunctionsDiff'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { EMPTY_ARR } from 'lib/void'
 import { basename } from 'path'
+import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult
@@ -55,7 +55,7 @@ const FunctionDiff = ({
   fileInfos,
 }: FunctionDiffProps) => {
   // Get all file keys from fileInfos
-  const allFileKeys = fileInfos.map((info) => info.key)
+  const allFileKeys = useMemo(() => fileInfos.map((info) => info.key), [fileInfos])
 
   const [activeFileKey, setActiveFileKey] = useState<string | undefined>(() => allFileKeys[0])
 
@@ -169,9 +169,9 @@ const EdgeFunctionsDiffPanel = ({
                 key={slug}
                 functionSlug={slug}
                 currentBody={diffResults.addedBodiesMap[slug]!}
-                mainBody={[] as EdgeFunctionBodyData}
+                mainBody={EMPTY_ARR}
                 currentBranchRef={currentBranchRef}
-                fileInfos={diffResults.functionFileInfo[slug] || []}
+                fileInfos={diffResults.functionFileInfo[slug] || EMPTY_ARR}
               />
             ))}
           </div>
@@ -185,10 +185,10 @@ const EdgeFunctionsDiffPanel = ({
               <FunctionDiff
                 key={slug}
                 functionSlug={slug}
-                currentBody={[] as EdgeFunctionBodyData}
+                currentBody={EMPTY_ARR}
                 mainBody={diffResults.removedBodiesMap[slug]!}
                 currentBranchRef={mainBranchRef}
-                fileInfos={diffResults.functionFileInfo[slug] || []}
+                fileInfos={diffResults.functionFileInfo[slug] || EMPTY_ARR}
               />
             ))}
           </div>
@@ -204,7 +204,7 @@ const EdgeFunctionsDiffPanel = ({
               currentBody={diffResults.currentBodiesMap[slug]!}
               mainBody={diffResults.mainBodiesMap[slug]!}
               currentBranchRef={currentBranchRef}
-              fileInfos={diffResults.functionFileInfo[slug] || []}
+              fileInfos={diffResults.functionFileInfo[slug] || EMPTY_ARR}
             />
           ))}
         </div>

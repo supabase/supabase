@@ -47,7 +47,6 @@ const MergePage: NextPageWithLayout = () => {
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
     {
-      enabled: !!parentProjectRef,
       refetchOnMount: 'always',
       refetchOnWindowFocus: true,
       staleTime: 0,

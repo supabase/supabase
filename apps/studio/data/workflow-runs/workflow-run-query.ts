@@ -5,6 +5,7 @@ import type { ResponseError } from 'types'
 import { workflowRunKeys } from './keys'
 
 export type WorkflowRunVariables = {
+  projectRef?: string
   workflowRunId?: string
 }
 
@@ -37,11 +38,11 @@ export type WorkflowRunData = { logs: string; workflowRunId: string }
 export type WorkflowRunError = ResponseError
 
 export const useWorkflowRunQuery = <TData = WorkflowRunData>(
-  { workflowRunId }: WorkflowRunVariables,
+  { projectRef, workflowRunId }: WorkflowRunVariables,
   { enabled = true, ...options }: UseQueryOptions<WorkflowRunData, WorkflowRunError, TData> = {}
 ) =>
   useQuery<WorkflowRunData, WorkflowRunError, TData>(
-    workflowRunKeys.detail(workflowRunId),
+    workflowRunKeys.detail(projectRef, workflowRunId),
     ({ signal }) => getWorkflowRun({ workflowRunId }, signal),
     {
       enabled: enabled && typeof workflowRunId !== 'undefined',

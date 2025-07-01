@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { handleError, get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
@@ -14,34 +14,27 @@ export async function getBranchDiff({
   branchId,
   includedSchemas,
 }: Pick<BranchDiffVariables, 'branchId' | 'includedSchemas'>) {
-  try {
-    const response = await get('/v1/branches/{branch_id}/diff' as any, {
-      params: {
-        path: { branch_id: branchId },
-        query: includedSchemas ? { included_schemas: includedSchemas } : undefined,
-      },
-      headers: {
-        Accept: 'text/plain',
-      },
-      parseAs: 'text',
-    })
+  const { data: diffData, error } = await get('/v1/branches/{branch_id}/diff', {
+    params: {
+      path: { branch_id: branchId },
+      query: includedSchemas ? { included_schemas: includedSchemas } : undefined,
+    },
+    headers: {
+      Accept: 'text/plain',
+    },
+    parseAs: 'text',
+  })
 
-    if (response.error) {
-      handleError(response.error)
-    }
-
-    const diffData = response.data as string
-
-    // Handle empty object responses (when no diff exists)
-    if (typeof diffData === 'object' && Object.keys(diffData).length === 0) {
-      return ''
-    }
-
-    return diffData || ''
-  } catch (error) {
+  if (error) {
     handleError(error)
+  }
+
+  // Handle empty object responses (when no diff exists)
+  if (typeof diffData === 'object' && Object.keys(diffData).length === 0) {
     return ''
   }
+
+  return diffData || ''
 }
 
 type BranchDiffData = Awaited<ReturnType<typeof getBranchDiff>>
@@ -54,7 +47,7 @@ export const useBranchDiffQuery = (
   }: Omit<UseQueryOptions<BranchDiffData, ResponseError>, 'queryKey' | 'queryFn'> = {}
 ) =>
   useQuery<BranchDiffData, ResponseError>(
-    branchKeys.diff(branchId),
+    branchKeys.diff(projectRef, branchId),
     () => getBranchDiff({ branchId, includedSchemas }),
     {
       enabled: enabled && typeof branchId !== 'undefined' && branchId !== '',

@@ -1,7 +1,8 @@
-import React from 'react'
-import { Card, CardHeader, CardContent, CardTitle, Button } from 'ui'
 import { motion } from 'framer-motion'
-import { CircleDotDashed, GitMerge, X, AlertTriangle } from 'lucide-react'
+import { CircleDotDashed, GitMerge, X } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+
+import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 interface WorkflowRun {
   id: string
@@ -26,7 +27,7 @@ interface WorkflowLogsCardProps {
   overrideAction?: React.ReactNode
 }
 
-const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
+const WorkflowLogsCard = ({
   workflowRun,
   logs,
   isLoading = false,
@@ -35,11 +36,11 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
   overrideDescription,
   overrideIcon,
   overrideAction,
-}) => {
-  const scrollRef = React.useRef<HTMLDivElement>(null)
+}: WorkflowLogsCardProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom when logs change
-  React.useEffect(() => {
+  useEffect(() => {
     if (scrollRef.current && logs) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
@@ -92,7 +93,7 @@ const WorkflowLogsCard: React.FC<WorkflowLogsCardProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {overrideAction && overrideAction}
+            {overrideAction}
             {onClose && (
               <Button
                 type="text"
