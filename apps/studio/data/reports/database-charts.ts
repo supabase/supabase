@@ -216,7 +216,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     },
     {
       id: 'disk-size',
-      label: 'Disk Size',
+      label: 'Disk Usage',
       syncId: 'database-reports',
       valuePrecision: 2,
       hide: false,
@@ -260,10 +260,10 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           provider: 'infra-monitoring',
           isMaxValue: true,
           format: 'bytes',
-          label: 'Disk Size',
+          label: 'Disk size',
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
-        !isFreePlan &&
+        isFreePlan &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',
