@@ -268,10 +268,16 @@ const MergePage: NextPageWithLayout = () => {
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
     return (
-      <PageLayout title="Merge Request">
-        <div className="p-6">
-          <p>This page is only available for preview branches.</p>
-        </div>
+      <PageLayout>
+        <ScaffoldContainer size="full">
+          <div className="flex items-center flex-col justify-center w-full py-16">
+            <ProductEmptyState title="Merge Request">
+              <p className="text-sm text-foreground-light">
+                This page is only available for preview branches.
+              </p>
+            </ProductEmptyState>
+          </div>
+        </ScaffoldContainer>
       </PageLayout>
     )
   }

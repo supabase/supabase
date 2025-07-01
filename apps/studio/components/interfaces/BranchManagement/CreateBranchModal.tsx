@@ -3,7 +3,6 @@ import { useParams } from 'common'
 import { Check, DollarSign, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -47,7 +46,6 @@ interface CreateBranchModalProps {
 }
 
 export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) => {
-  const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
@@ -79,7 +77,6 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
     onSuccess: (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       onClose()
-      router.push(`/project/${data.project_ref}`)
     },
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)
@@ -284,7 +281,7 @@ export const CreateBranchModal = ({ visible, onClose }: CreateBranchModalProps) 
             <DialogFooter className="sm:justify-between gap-2" padding="medium">
               <p className="flex items-center gap-2 text-sm text-foreground">
                 <DollarSign size={16} strokeWidth={1.5} />
-                Each preview branch costs $0.32 per day
+                Each preview branch costs $0.01344 per hour
               </p>
               <div className="flex items-center gap-2">
                 <Button disabled={isCreating} type="default" onClick={onClose}>
