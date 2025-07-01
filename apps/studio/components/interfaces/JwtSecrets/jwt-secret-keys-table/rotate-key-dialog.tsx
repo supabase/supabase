@@ -116,7 +116,7 @@ export function RotateKeyDialog({
             )}
           >
             <Timer className="size-4" />
-            Previously used
+            Previous key
           </Badge>
           <div />
           <div />
@@ -140,7 +140,7 @@ export function RotateKeyDialog({
 
             <Label_Shadcn_
               htmlFor="understands-standby"
-              className="flex items-center gap-4 text-sm/6"
+              className="flex items-top gap-4 text-sm leading-none"
             >
               <Checkbox_Shadcn_
                 id="understands-standby"
@@ -172,7 +172,7 @@ export function RotateKeyDialog({
 
             <Label_Shadcn_
               htmlFor="understands-previously-used"
-              className="flex items-center gap-4 text-sm/6"
+              className="flex items-top gap-4 text-sm leading-none"
             >
               <Checkbox_Shadcn_
                 id="understands-previously-used"
@@ -211,7 +211,7 @@ export function RotateKeyDialog({
             {verifyJWTEdgeFunctions.length > 0 && (
               <Label_Shadcn_
                 htmlFor="edge-functions-verify-jwt"
-                className="flex items-center gap-4"
+                className="flex items-top gap-4 text-sm leading-none"
               >
                 <Checkbox_Shadcn_
                   id="edge-functions-verify-jwt"
