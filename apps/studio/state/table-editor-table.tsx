@@ -181,6 +181,35 @@ export const TableEditorTableStateContextProvider = ({
     })
   ).current
 
+  // Debug log for initial state
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[TableEditorTableStateContextProvider Debug] initial state:', {
+      editable: state.editable,
+      table: state.table,
+      originalTable: state.originalTable,
+    })
+  }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line no-console
+      console.log(
+        '[TableEditorTableStateContextProvider Debug] useEffect - table or editable changed:',
+        {
+          editable: state.editable,
+          table: state.table,
+          originalTable: state.originalTable,
+        }
+      )
+    }
+    // We can use a === check here because react-query is good
+    // about returning objects with the same ref / different ref
+    if (state._originalTableRef !== table) {
+      state.updateTable(table)
+    }
+  }, [table])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       return subscribe(state, () => {
@@ -194,14 +223,6 @@ export const TableEditorTableStateContextProvider = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  useEffect(() => {
-    // We can use a === check here because react-query is good
-    // about returning objects with the same ref / different ref
-    if (state._originalTableRef !== table) {
-      state.updateTable(table)
-    }
-  }, [table])
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
