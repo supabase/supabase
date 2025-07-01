@@ -30,6 +30,11 @@ export const createTableEditorTableState = ({
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
 }) => {
+  // Debug: Log when createTableEditorTableState is called and with what editable value
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[DEBUG][createTableEditorTableState] called with editable:', editable)
+  }
   const table = parseSupaTable(originalTable)
 
   const savedState = loadTableEditorStateFromLocalStorage(projectRef, table.name, table.schema)
@@ -56,6 +61,16 @@ export const createTableEditorTableState = ({
     _originalTableRef: ref(originalTable),
 
     updateTable: (table: Entity) => {
+      // Debug: Log when updateTable is called and what the current and new editable values are
+      if (typeof window !== 'undefined') {
+        // eslint-disable-next-line no-console
+        console.log(
+          '[DEBUG][updateTable] called. Current editable:',
+          state.editable,
+          'New table:',
+          table
+        )
+      }
       const supaTable = parseSupaTable(table)
 
       const gridColumns = getInitialGridColumns(
@@ -73,6 +88,11 @@ export const createTableEditorTableState = ({
       state.gridColumns = gridColumns
       state.originalTable = table
       state._originalTableRef = ref(table)
+      // Debug: Log after updateTable has run
+      if (typeof window !== 'undefined') {
+        // eslint-disable-next-line no-console
+        console.log('[DEBUG][updateTable] after update. editable:', state.editable)
+      }
     },
 
     /* Rows */
@@ -143,6 +163,12 @@ export const createTableEditorTableState = ({
     editable,
   })
 
+  // Debug: Log after state is created
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[DEBUG][createTableEditorTableState] state created with editable:', state.editable)
+  }
+
   return state
 }
 
@@ -161,6 +187,11 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
+  // Debug: Log what editable is being passed to the provider
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-console
+    console.log('[DEBUG][TableEditorTableStateContextProvider] props.editable:', props.editable)
+  }
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -184,7 +215,7 @@ export const TableEditorTableStateContextProvider = ({
   // Debug log for initial state
   if (typeof window !== 'undefined') {
     // eslint-disable-next-line no-console
-    console.log('[TableEditorTableStateContextProvider Debug] initial state:', {
+    console.log('[DEBUG][TableEditorTableStateContextProvider] initial state:', {
       editable: state.editable,
       table: state.table,
       originalTable: state.originalTable,
@@ -195,7 +226,7 @@ export const TableEditorTableStateContextProvider = ({
     if (typeof window !== 'undefined') {
       // eslint-disable-next-line no-console
       console.log(
-        '[TableEditorTableStateContextProvider Debug] useEffect - table or editable changed:',
+        '[DEBUG][TableEditorTableStateContextProvider] useEffect - table or editable changed:',
         {
           editable: state.editable,
           table: state.table,
