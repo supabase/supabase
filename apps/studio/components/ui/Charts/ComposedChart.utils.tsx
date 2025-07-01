@@ -31,13 +31,7 @@ export interface ReportAttributes {
   hideHighlightedValue?: boolean
 }
 
-export type Provider =
-  | 'infra-monitoring'
-  | 'daily-stats'
-  | 'mock'
-  | 'reference-line'
-  | 'logs'
-  | 'combine'
+export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
 
 export type MultiAttribute = {
   attribute: string
