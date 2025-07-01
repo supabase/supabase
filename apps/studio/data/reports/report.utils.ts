@@ -1,4 +1,6 @@
 import { AnalyticsInterval } from 'data/analytics/constants'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { useMemo } from 'react'
 
 export type Granularity = 'minute' | 'hour' | 'day' | 'week'
 export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {
@@ -34,4 +36,19 @@ export const REPORT_STATUS_CODE_COLORS: { [key: string]: { light: string; dark: 
   '503': { light: '#0097A7', dark: '#4DD0E1' },
   '504': { light: '#C0CA33', dark: '#D4E157' },
   default: { light: '#757575', dark: '#9E9E9E' },
+}
+
+export const useEdgeFnIdToName = ({ projectRef }: { projectRef: string }) => {
+  const { data: edgeFunctions, isLoading } = useEdgeFunctionsQuery({
+    projectRef,
+  })
+
+  function edgeFnIdToName(id: string) {
+    return edgeFunctions?.find((fn) => fn.id === id)?.name
+  }
+
+  return {
+    edgeFnIdToName,
+    isLoading,
+  }
 }

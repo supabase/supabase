@@ -3,7 +3,7 @@ import { get } from 'data/fetchers'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
-import { analyticsIntervalToGranularity } from './report.utils'
+import { analyticsIntervalToGranularity, useEdgeFnIdToName } from './report.utils'
 import { REPORT_STATUS_CODE_COLORS } from './report.utils'
 
 /**
@@ -25,31 +25,37 @@ type MetricKey = (typeof METRIC_KEYS)[number]
  * Each metric has a corresponding SQL query.
  */
 
-const METRIC_SQL: Record<MetricKey, (interval: AnalyticsInterval, functionId?: string) => string> =
-  {
-    TotalInvocations: (interval, functionId) => {
-      return `
+const METRIC_SQL: Record<
+  MetricKey,
+  (interval: AnalyticsInterval, functionIds?: string[]) => string
+> = {
+  TotalInvocations: (interval, functionIds) => {
+    return `
 --edgefn-report-invocations
 select
   timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
-  request.pathname as function_path,
+  function_id,
   count(*) as count
 from
   function_edge_logs
   CROSS JOIN UNNEST(metadata) AS m
   CROSS JOIN UNNEST(m.request) AS request
   CROSS JOIN UNNEST(m.response) AS response
-  ${functionId ? `WHERE function_id = '${functionId}'` : ''}
+  ${
+    functionIds && functionIds.length > 0
+      ? `WHERE function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
+      : ''
+  }
 group by
   timestamp,
-  function_path
+  function_id
 order by
   timestamp desc;        
 
     `
-    },
-    ExecutionStatusCodes: (interval, functionId) => {
-      return `
+  },
+  ExecutionStatusCodes: (interval, functionIds) => {
+    return `
 --edgefn-report-execution-status-codes
 select
   timestamp_trunc(timestamp, ${analyticsIntervalToGranularity(interval)}) as timestamp,
@@ -60,17 +66,21 @@ FROM
   CROSS JOIN UNNEST(metadata) AS m
   CROSS JOIN UNNEST(m.response) AS response
   CROSS JOIN UNNEST(m.request) AS request
-  ${functionId ? `WHERE function_id = '${functionId}'` : ''}
+  ${
+    functionIds && functionIds.length > 0
+      ? `WHERE function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
+      : ''
+  }
 group by
   timestamp,
   status_code
 order by
   timestamp desc;
     `
-    },
-    InvocationsByRegion: (interval, functionId) => {
-      const granularity = analyticsIntervalToGranularity(interval)
-      return `
+  },
+  InvocationsByRegion: (interval, functionIds) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    return `
 --edgefn-report-invocations-by-region
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
@@ -82,35 +92,43 @@ from
   cross join unnest(m.response) as r
   cross join unnest(r.headers) as h
   where h.x_sb_edge_region is not null
-  ${functionId ? `and function_id = '${functionId}'` : ''}
+  ${
+    functionIds && functionIds.length > 0
+      ? `and function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
+      : ''
+  }
 group by
   timestamp,
   region
 order by
   timestamp desc
     `
-    },
-    ExecutionTime: (interval, functionId) => {
-      const granularity = analyticsIntervalToGranularity(interval)
-      return `
+  },
+  ExecutionTime: (interval, functionIds) => {
+    const granularity = analyticsIntervalToGranularity(interval)
+    return `
 --edgefn-report-execution-time
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
-  request.pathname as function_path,
+  function_id,
   avg(m.execution_time_ms) as avg_execution_time
 from
   function_edge_logs
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
-  ${functionId ? `where function_id = '${functionId}'` : ''}
+  ${
+    functionIds && functionIds.length > 0
+      ? `where function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
+      : ''
+  }
 group by
   timestamp,
-  function_path
+  function_id
 order by
   timestamp desc
     `
-    },
-  }
+  },
+}
 
 /**
  * FORMATTERS.
@@ -144,11 +162,12 @@ const METRIC_FORMATTER: Record<
     rawData: any,
     attributes: MultiAttribute[],
     logsMetric: string,
-    functionId?: string
+    functionIds?: string[],
+    edgeFnIdToName?: (id: string) => string | undefined
   ) => { data: any; chartAttributes: any }
 > = {
-  TotalInvocations: (rawData, attributes, logsMetric, functionId) => {
-    if (functionId) {
+  TotalInvocations: (rawData, attributes, logsMetric, functionIds, edgeFnIdToName) => {
+    if (functionIds && functionIds.length > 0) {
       // A single function is selected, use the default single-attribute behavior.
       return defaultFormatter(rawData, attributes)
     }
@@ -157,15 +176,15 @@ const METRIC_FORMATTER: Record<
     if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
 
-    const functionPaths = Array.from(new Set(result.map((p: any) => p.function_path))) as string[]
+    const functionIdsInData = Array.from(new Set(result.map((p: any) => p.function_id))) as string[]
 
-    if (functionPaths.length === 0) {
+    if (functionIdsInData.length === 0) {
       return { data: [], chartAttributes: [] } // No data, empty chart
     }
 
-    const chartAttributes = functionPaths.map((path: string) => ({
-      attribute: path,
-      label: path.startsWith('/') ? path.substring(1) : path,
+    const chartAttributes = functionIdsInData.map((id: string) => ({
+      attribute: id,
+      label: edgeFnIdToName?.(id) ?? id,
       provider: 'logs',
       enabled: true,
     }))
@@ -180,7 +199,7 @@ const METRIC_FORMATTER: Record<
         })
         const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
         matchingPoints.forEach((p: any) => {
-          point[p.function_path as string] = p.count
+          point[p.function_id as string] = p.count
         })
         return point
       })
@@ -250,7 +269,7 @@ const METRIC_FORMATTER: Record<
       .map((timestamp) => {
         const point: any = { period_start: timestamp }
         chartAttributes.forEach((attr) => {
-          point[attr.attribute] = 0
+          point[attr.attribute as string] = 0
         })
         const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
         matchingPoints.forEach((p: any) => {
@@ -261,8 +280,8 @@ const METRIC_FORMATTER: Record<
 
     return { data, chartAttributes }
   },
-  ExecutionTime: (rawData, attributes, logsMetric, functionId) => {
-    if (functionId) {
+  ExecutionTime: (rawData, attributes, logsMetric, functionIds, edgeFnIdToName) => {
+    if (functionIds && functionIds.length > 0) {
       if (!rawData) return { data: undefined, chartAttributes: attributes }
       const result = rawData.result || []
       const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
@@ -285,15 +304,15 @@ const METRIC_FORMATTER: Record<
     if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
 
-    const functionPaths = Array.from(new Set(result.map((p: any) => p.function_path))) as string[]
+    const functionIdsInData = Array.from(new Set(result.map((p: any) => p.function_id))) as string[]
 
-    if (functionPaths.length === 0) {
+    if (functionIdsInData.length === 0) {
       return { data: [], chartAttributes: [] } // No data, empty chart
     }
 
-    const chartAttributes = functionPaths.map((path: string) => ({
-      attribute: path,
-      label: path.startsWith('/') ? path.substring(1) : path,
+    const chartAttributes = functionIdsInData.map((id: string) => ({
+      attribute: id,
+      label: edgeFnIdToName?.(id) ?? id,
       provider: 'logs',
       enabled: true,
     }))
@@ -308,7 +327,7 @@ const METRIC_FORMATTER: Record<
         })
         const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
         matchingPoints.forEach((p: any) => {
-          point[p.function_path as string] = p.avg_execution_time
+          point[p.function_id as string] = p.avg_execution_time
         })
         return point
       })
@@ -329,7 +348,7 @@ export function useEdgeFunctionReport({
   endDate,
   interval,
   enabled = true,
-  functionId,
+  functionIds,
 }: {
   projectRef: string
   attributes: MultiAttribute[]
@@ -337,20 +356,29 @@ export function useEdgeFunctionReport({
   endDate: string
   interval: AnalyticsInterval
   enabled?: boolean
-  functionId?: string
+  functionIds?: string[]
 }) {
   const logsMetric = attributes.length > 0 ? attributes[0].attribute : ''
-
+  const { edgeFnIdToName } = useEdgeFnIdToName({ projectRef })
   const isEdgeFnMetric = METRIC_KEYS.includes(logsMetric)
 
-  const sql = isEdgeFnMetric ? METRIC_SQL[logsMetric as MetricKey](interval, functionId) : ''
+  const sql = isEdgeFnMetric ? METRIC_SQL[logsMetric as MetricKey](interval, functionIds) : ''
 
   const {
     data: rawData,
     error,
     isLoading,
   } = useQuery(
-    ['edge-function-report', projectRef, logsMetric, startDate, endDate, interval, sql, functionId],
+    [
+      'edge-function-report',
+      projectRef,
+      logsMetric,
+      startDate,
+      endDate,
+      interval,
+      sql,
+      functionIds,
+    ],
     async () => {
       const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
         params: {
@@ -374,7 +402,13 @@ export function useEdgeFunctionReport({
   // Use formatter if available
   const formatter =
     (isEdgeFnMetric ? METRIC_FORMATTER[logsMetric as MetricKey] : undefined) || defaultFormatter
-  const { data, chartAttributes } = formatter(rawData, attributes, logsMetric, functionId)
+  const { data, chartAttributes } = formatter(
+    rawData,
+    attributes,
+    logsMetric,
+    functionIds,
+    edgeFnIdToName
+  )
 
   return {
     data,

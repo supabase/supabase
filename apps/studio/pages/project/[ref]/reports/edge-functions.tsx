@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { ArrowRight, ChevronDown, RefreshCw } from 'lucide-react'
@@ -17,21 +17,11 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 
 import type { NextPageWithLayout } from 'types'
 
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import { useEdgeFunctionReportFilters } from 'data/reports/edgefn.utils'
+import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import ReportChart from 'components/interfaces/Reports/ReportChart'
-import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn.charts'
-import {
-  EdgeFunctionsResponse,
-  useEdgeFunctionsQuery,
-} from 'data/edge-functions/edge-functions-query'
+import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { Label } from '@ui/components/shadcn/ui/label'
 
 const EdgeFunctionsReport: NextPageWithLayout = () => {
   return (
@@ -52,11 +42,18 @@ export default EdgeFunctionsReport
 
 const EdgeFunctionsUsage = () => {
   const { ref } = useParams()
-  const { functionId, setFunctionId } = useEdgeFunctionReportFilters()
   const { data: functions, isLoading: isLoadingFunctions } = useEdgeFunctionsQuery({
     projectRef: ref,
   })
-  const selectedFunction = functions?.find((fn) => fn.id === functionId)
+  const [isOpen, setIsOpen] = useState(false)
+  const [functionIds, setFunctionIds] = useState<string[]>([])
+  const [tempFunctionIds, setTempFunctionIds] = useState<string[]>(functionIds)
+
+  useEffect(() => {
+    if (isOpen) {
+      setTempFunctionIds(functionIds)
+    }
+  }, [isOpen, functionIds])
 
   const defaultStart = dayjs().subtract(1, 'day').toISOString()
   const defaultEnd = dayjs().toISOString()
@@ -69,8 +66,7 @@ const EdgeFunctionsUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+  useCurrentOrgPlan()
 
   const EDGEFN_CHARTS = getEdgeFunctionReportAttributes()
 
@@ -149,26 +145,86 @@ const EdgeFunctionsUsage = () => {
                   }
                 }}
               />
-              <DropdownMenu>
+              <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" iconRight={<ChevronDown />}>
-                    <span>{selectedFunction?.slug ?? 'All Functions'}</span>
+                    <span>
+                      {functionIds.length === 0
+                        ? 'All Functions'
+                        : `${functionIds.length} function${
+                            functionIds.length > 1 ? 's' : ''
+                          } selected`}
+                    </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start" className="w-48">
-                  <DropdownMenuRadioGroup
-                    value={functionId ?? 'all'}
-                    onValueChange={(value) => {
-                      setFunctionId(value === 'all' ? null : value)
-                    }}
-                  >
-                    <DropdownMenuRadioItem value="all">All Functions</DropdownMenuRadioItem>
-                    {functions?.map((fn: EdgeFunctionsResponse) => (
-                      <DropdownMenuRadioItem key={fn.id} value={fn.id}>
-                        {fn.slug}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
+                <DropdownMenuContent side="bottom" align="start" className="w-72 p-0">
+                  <div className="space-y-px max-h-60 overflow-y-auto p-1">
+                    <Label
+                      key="all-functions"
+                      htmlFor="all-functions"
+                      className="flex items-center hover:bg-overlay-hover overflow-hidden p-2 rounded-sm"
+                    >
+                      <Checkbox
+                        id="all-functions"
+                        checked={tempFunctionIds.length === 0}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                          if (event.target.checked) {
+                            setTempFunctionIds([])
+                          }
+                        }}
+                      />
+                      <div className="flex flex-col">
+                        <span>All Functions</span>
+                      </div>
+                    </Label>
+                    {functions
+                      ?.filter((fn: { slug: string }) => typeof fn.slug === 'string')
+                      .map((fn) => (
+                        <Label
+                          key={fn.id}
+                          htmlFor={fn.id}
+                          className="flex items-center hover:bg-overlay-hover overflow-hidden p-2 rounded-sm"
+                        >
+                          <div>
+                            <Checkbox
+                              id={fn.id}
+                              checked={tempFunctionIds.includes(fn.id)}
+                              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                if (event.target.checked) {
+                                  setTempFunctionIds([...tempFunctionIds, fn.id])
+                                } else {
+                                  setTempFunctionIds(tempFunctionIds.filter((id) => id !== fn.id))
+                                }
+                              }}
+                            />
+                          </div>
+                          <div className="flex flex-col">
+                            <span>{fn.slug}</span>
+                          </div>
+                        </Label>
+                      ))}
+                  </div>
+                  <div className="flex items-center justify-end gap-2 border-t border-default p-2">
+                    <Button
+                      size="tiny"
+                      type="default"
+                      onClick={() => setIsOpen(false)}
+                      htmlType="button"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="tiny"
+                      type="primary"
+                      htmlType="button"
+                      onClick={() => {
+                        setFunctionIds(tempFunctionIds)
+                        setIsOpen(false)
+                      }}
+                    >
+                      Apply
+                    </Button>
+                  </div>
                 </DropdownMenuContent>
               </DropdownMenu>
               {dateRange && (
@@ -198,6 +254,7 @@ const EdgeFunctionsUsage = () => {
                 startDate={dateRange?.period_start?.date}
                 endDate={dateRange?.period_end?.date}
                 updateDateRange={updateDateRange}
+                functionIds={functionIds}
               />
             ))}
         </div>
