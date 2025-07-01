@@ -16,7 +16,11 @@ export const useStorageReport = () => {
 
   const identifier = state.selectedDatabaseId
 
-  const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.storage.queries>(
+  const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
+    PRESET_CONFIG.api.queries,
+    projectRef ?? 'default'
+  )
+  const storageQueryHooks = queriesFactory<keyof typeof PRESET_CONFIG.storage.queries>(
     PRESET_CONFIG.storage.queries,
     projectRef ?? 'default'
   )
@@ -27,8 +31,8 @@ export const useStorageReport = () => {
   const responseSpeed = queryHooks.responseSpeed()
   const topSlowRoutes = queryHooks.topSlowRoutes()
   const networkTraffic = queryHooks.networkTraffic()
-  const cacheHitRate = queryHooks.cacheHitRate()
-  const topCacheMisses = queryHooks.topCacheMisses()
+  const cacheHitRate = storageQueryHooks.cacheHitRate()
+  const topCacheMisses = storageQueryHooks.topCacheMisses()
   const activeHooks = [
     totalRequests,
     topRoutes,
@@ -83,28 +87,28 @@ export const useStorageReport = () => {
 
   useEffect(() => {
     if (totalRequests.changeQuery) {
-      totalRequests.changeQuery(PRESET_CONFIG.storage.queries.totalRequests.sql(formattedFilters))
+      totalRequests.changeQuery(PRESET_CONFIG.api.queries.totalRequests.sql(formattedFilters))
     }
     if (topRoutes.changeQuery) {
-      topRoutes.changeQuery(PRESET_CONFIG.storage.queries.topRoutes.sql(formattedFilters))
+      topRoutes.changeQuery(PRESET_CONFIG.api.queries.topRoutes.sql(formattedFilters))
     }
     if (errorCounts.changeQuery) {
-      errorCounts.changeQuery(PRESET_CONFIG.storage.queries.errorCounts.sql(formattedFilters))
+      errorCounts.changeQuery(PRESET_CONFIG.api.queries.errorCounts.sql(formattedFilters))
     }
 
     if (topErrorRoutes.changeQuery) {
-      topErrorRoutes.changeQuery(PRESET_CONFIG.storage.queries.topErrorRoutes.sql(formattedFilters))
+      topErrorRoutes.changeQuery(PRESET_CONFIG.api.queries.topErrorRoutes.sql(formattedFilters))
     }
     if (responseSpeed.changeQuery) {
-      responseSpeed.changeQuery(PRESET_CONFIG.storage.queries.responseSpeed.sql(formattedFilters))
+      responseSpeed.changeQuery(PRESET_CONFIG.api.queries.responseSpeed.sql(formattedFilters))
     }
 
     if (topSlowRoutes.changeQuery) {
-      topSlowRoutes.changeQuery(PRESET_CONFIG.storage.queries.topSlowRoutes.sql(formattedFilters))
+      topSlowRoutes.changeQuery(PRESET_CONFIG.api.queries.topSlowRoutes.sql(formattedFilters))
     }
 
     if (networkTraffic.changeQuery) {
-      networkTraffic.changeQuery(PRESET_CONFIG.storage.queries.networkTraffic.sql(formattedFilters))
+      networkTraffic.changeQuery(PRESET_CONFIG.api.queries.networkTraffic.sql(formattedFilters))
     }
 
     if (cacheHitRate.changeQuery) {

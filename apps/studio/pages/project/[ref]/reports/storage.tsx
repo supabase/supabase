@@ -13,8 +13,8 @@ import {
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
-  ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
@@ -22,11 +22,11 @@ import {
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { useStorageReport } from 'data/reports/storage-report-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useApiReport } from 'data/reports/api-report-query'
+import { useStorageReport } from 'data/reports/storage-report-query'
 
 import type { NextPageWithLayout } from 'types'
-import DefaultLayout from 'components/layouts/DefaultLayout'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
