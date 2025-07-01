@@ -31,17 +31,20 @@ Follow the instructions for your AI tool to connect the Supabase MCP server. The
 ### Cursor
 
 1. **Open Cursor Settings**
+
    - Navigate to **Cursor Settings > Features > MCP**
    - Click **"+ Add New MCP Server"**
 
 2. **Configure Supabase MCP Server**
+
    - **Name**: `Supabase`
    - **Type**: `stdio`
    - **Command**: `npx -y @supabase/mcp-server-supabase@latest --read-only --project-ref=<project-ref>`
-   - **Environment Variables**: 
+   - **Environment Variables**:
      - Add variable: `SUPABASE_ACCESS_TOKEN` with value `<personal-access-token>`
 
 3. **Replace Placeholders**
+
    - Replace `<project-ref>` with your project reference from your Supabase dashboard
    - Replace `<personal-access-token>` with the personal access token you created in Step 1
 
