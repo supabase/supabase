@@ -1413,6 +1413,28 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
+      name: 'Platform',
+      url: undefined,
+      items: [
+        {
+          name: 'Regional invocations',
+          url: '/guides/functions/regional-invocation',
+        },
+        {
+          name: 'Status codes',
+          url: '/guides/functions/status-codes',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/functions/limits',
+        },
+        {
+          name: 'Pricing',
+          url: '/guides/functions/pricing',
+        },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
@@ -1460,28 +1482,6 @@ export const functions: NavMenuConstant = {
       ],
     },
 
-    {
-      name: 'Platform',
-      url: undefined,
-      items: [
-        {
-          name: 'Regional invocations',
-          url: '/guides/functions/regional-invocation',
-        },
-        {
-          name: 'Status codes',
-          url: '/guides/functions/status-codes',
-        },
-        {
-          name: 'Limits',
-          url: '/guides/functions/limits',
-        },
-        {
-          name: 'Pricing',
-          url: '/guides/functions/pricing',
-        },
-      ],
-    },
     {
       name: 'Examples',
       url: undefined,
