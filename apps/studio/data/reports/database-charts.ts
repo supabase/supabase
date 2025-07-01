@@ -263,7 +263,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'Disk size',
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
-        isFreePlan &&
+        !isFreePlan &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',
