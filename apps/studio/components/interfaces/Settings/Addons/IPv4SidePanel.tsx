@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -11,13 +12,14 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsAwsCloudProvider } from 'hooks/misc/useSelectedProject'
 import { formatCurrency } from 'lib/helpers'
-import { ExternalLink } from 'lucide-react'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
+  const isAws = useIsAwsCloudProvider()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
 
@@ -86,7 +88,7 @@ const IPv4SidePanel = () => {
       onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4 || !isAws}
       tooltip={
         isFreePlan
           ? 'Unable to enable IPv4 on a Free Plan'
@@ -116,6 +118,13 @@ const IPv4SidePanel = () => {
             addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
             database via a IPv4 address.
           </p>
+
+          {!isAws && (
+            <Admonition
+              type="default"
+              title="Dedicated IPv4 address is only available for AWS projects"
+            />
+          )}
 
           {isPgBouncerEnabled ? (
             <Admonition
@@ -168,7 +177,7 @@ const IPv4SidePanel = () => {
                   className="col-span-4 !p-0"
                   name="ipv4"
                   key={option.identifier}
-                  disabled={isFreePlan}
+                  disabled={isFreePlan || !isAws}
                   checked={selectedOption === option.identifier}
                   label={option.name}
                   value={option.identifier}

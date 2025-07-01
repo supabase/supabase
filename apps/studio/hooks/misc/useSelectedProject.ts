@@ -34,11 +34,18 @@ export function useProjectByRef(
   }, [project, projects, ref])
 }
 
-export const useIsAwsNew = () => {
+export const useIsAwsCloudProvider = () => {
   const project = useSelectedProject()
-  const isAwsNew =
-    project?.cloud_provider !== PROVIDERS.AWS.id && project?.cloud_provider !== PROVIDERS.FLY.id
-  return isAwsNew
+  const isAws = project?.cloud_provider === PROVIDERS.AWS.id
+
+  return isAws
+}
+
+export const useIsAwsK8sCloudProvider = () => {
+  const project = useSelectedProject()
+  const isAwsK8s = project?.cloud_provider === PROVIDERS.AWS_K8S.id
+
+  return isAwsK8s
 }
 
 export const useIsOrioleDb = () => {
