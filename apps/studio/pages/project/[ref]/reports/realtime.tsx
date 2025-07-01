@@ -5,13 +5,13 @@ import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
 
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
+import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 
 import { analyticsKeys } from 'data/analytics/keys'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
@@ -19,6 +19,7 @@ import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
 
 import type { NextPageWithLayout } from 'types'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -174,14 +175,16 @@ const RealtimeUsage = () => {
 
         <div className="grid grid-cols-1 gap-4">
           {dateRange &&
-            REALTIME_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
-              <ReportChart
-                key={`${attr.id}-${i}`}
-                chart={attr}
+            REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
+              <ComposedChartHandler
+                key={chart.id}
+                {...chart}
+                attributes={chart.attributes as MultiAttribute[]}
                 interval={dateRange.interval}
                 startDate={dateRange?.period_start?.date}
                 endDate={dateRange?.period_end?.date}
                 updateDateRange={updateDateRange}
+                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
               />
             ))}
         </div>
