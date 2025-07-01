@@ -19,9 +19,10 @@ import {
 } from 'ui'
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
-import type { ReportFilterItem } from './Reports.types'
 import { ReportFilterPopover } from './ReportFilterPopover'
 import { useReportFilters } from './useReportFilters'
+
+import type { ReportFilterItem } from './Reports.types'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]

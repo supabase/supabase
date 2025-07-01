@@ -1,13 +1,8 @@
-import { useState } from 'react'
-
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import {
-  createFilteredDatePickerHelpers,
-  REPORTS_DATEPICKER_HELPERS,
-} from 'components/interfaces/Reports/Reports.constants'
+import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
@@ -23,7 +18,6 @@ import {
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useApiReport } from 'data/reports/api-report-query'
 import { useStorageReport } from 'data/reports/storage-report-query'
 
 import type { NextPageWithLayout } from 'types'
@@ -46,22 +40,11 @@ export const StorageReport: NextPageWithLayout = () => {
 
   const plan = organization?.plan
 
-  const defaultHelper =
-    REPORTS_DATEPICKER_HELPERS.find((h) => h.default) || REPORTS_DATEPICKER_HELPERS[0]
-
-  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
-    to: defaultHelper.calcTo(),
-    from: defaultHelper.calcFrom(),
-    isHelper: true,
-    text: defaultHelper.text,
-  })
-
   const handleDatepickerChange = (vals: DatePickerValue) => {
     mergeParams({
       iso_timestamp_start: vals.from || '',
       iso_timestamp_end: vals.to || '',
     })
-    setSelectedRange(vals)
   }
 
   return (
@@ -130,29 +113,6 @@ export const StorageReport: NextPageWithLayout = () => {
           append={TopCacheMissesRenderer}
           appendProps={{ data: data.topCacheMisses || [] }}
         />
-        {/* 
-      {true && (
-        <div className="grid grid-cols-1 gap-4">
-          {selectedRange &&
-            STORAGE_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-              <LazyComposedChartHandler
-                key={chart.id}
-                {...chart}
-                attributes={chart.attributes as MultiAttribute[]}
-                interval={'hour'}
-                startDate={selectedRange?.from}
-                endDate={selectedRange?.to}
-                // updateDateRange={updateDateRange}
-                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                showMaxValue={
-                  chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                    ? true
-                    : chart.showMaxValue
-                }
-              />
-            ))}
-        </div>
-      )} */}
       </section>
     </ReportPadding>
   )
