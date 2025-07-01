@@ -236,10 +236,11 @@ export const TableEditorTableStateContextProvider = ({
     }
     // We can use a === check here because react-query is good
     // about returning objects with the same ref / different ref
-    if (state._originalTableRef !== table) {
+    if (state._originalTableRef !== table || state.editable !== props.editable) {
+      state.editable = props.editable ?? true
       state.updateTable(table)
     }
-  }, [table])
+  }, [table, props.editable, state])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
