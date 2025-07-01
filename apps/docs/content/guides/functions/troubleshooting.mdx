@@ -5,7 +5,9 @@ description: 'How to solve common problems and issues related to Edge Functions.
 subtitle: 'How to solve common problems and issues related to Edge Functions.'
 ---
 
-When developing Edge Functions, you can run intue various issue during development, deployment, and at runtime. Most problems fall under these categories:
+{/* supa-mdx-lint-disable Rule001HeadingCase */}
+
+When developing Edge Functions, you can run into various issue during development, deployment, and at runtime. Most problems fall under these categories:
 
 - [Deployment issues](/docs/guides/functions/troubleshooting#deployment-issues)
 - [Runtime issues](/docs/guides/functions/troubleshooting#runtime-issues)
@@ -26,9 +28,9 @@ supabase update
 
 ---
 
-## Deployment Issues
+## Deployment issues
 
-### Unable to Deploy Edge Function
+### Unable to deploy Edge Function
 
 1. **Check function syntax:** Run `deno check` on your function files locally
 2. **Review dependencies:** Verify all imports are accessible and compatible with Deno
@@ -47,7 +49,7 @@ supabase functions deploy your-function --debug
   include all output from the diagnostic commands.
 </Admonition>
 
-### Bundle Size Issues
+### Bundle size issues
 
 Functions have a 10MB source code limit. Check your bundle size:
 
@@ -63,9 +65,9 @@ Look for the "size" field in the output. If your bundle is too large:
 
 ---
 
-## Runtime Issues
+## Runtime issues
 
-### Edge Function Takes Too Long to Respond
+### Edge Function takes too long to respond
 
 Functions have a 60-second execution limit.
 
@@ -97,7 +99,7 @@ The 546 error typically indicates resource exhaustion or code issues:
 
 Run the function locally with `supabase functions serve` to get detailed stack traces.
 
-### Unable to Call Edge Function
+### Unable to call Edge Function
 
 For invocation or CORS issues:
 
@@ -130,9 +132,9 @@ There are two debugging tools available: Invocations and Logs. Invocations shows
 
 ---
 
-## Local Development Issues
+## Local development issues
 
-### Issues Serving Functions Locally
+### Issues serving functions locally
 
 When `supabase functions serve` fails:
 
@@ -156,9 +158,9 @@ If the problem persists, search the [Edge Runtime](https://github.com/supabase/e
 </Admonition>
 ---
 
-## Performance Optimization
+## Performance optimization
 
-### Monitoring Resource Usage
+### Monitoring resource usage
 
 Track your function's performance through the dashboard:
 
@@ -175,7 +177,7 @@ Track your function's performance through the dashboard:
 
 </Admonition>
 
-### Understanding CPU Limits
+### Understanding CPU limits
 
 An isolate is like a worker that can handle multiple requests for a function. It works until a time limit of 400 seconds is reached. Edge Functions use isolates with soft and hard CPU limits:
 

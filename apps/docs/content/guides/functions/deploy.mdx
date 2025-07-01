@@ -8,7 +8,7 @@ tocVideo: '5OWH9c4u68M'
 
 Once you have developed your Edge Functions locally, you can deploy them to your Supabase project.
 
-<Admonition type="info">
+<Admonition type="note">
   Before getting started, make sure you have the Supabase CLI installed. Check out the CLI
   installation guide for installation methods and troubleshooting.
 </Admonition>
@@ -25,7 +25,7 @@ supabase login
 
 ---
 
-## Step 2: Connect Your Project
+## Step 2: Connect your project
 
 Get the project ID associated with your function:
 
@@ -62,7 +62,7 @@ Or deploy individual Edge Functions by specifying the function name:
 supabase functions deploy hello-world
 ```
 
-### Deploying Public Functions
+### Deploying public functions
 
 By default, Edge Functions require a valid JWT in the authorization header. If you want to deploy Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can pass the `--no-verify-jwt` flag:
 
@@ -110,7 +110,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 </$CodeTabs>
 
-<Admonition type="info">
+<Admonition type="note">
   Note that the `SUPABASE_ANON_KEY` is different in development and production. To get your
   production anon key, you can find it in your Supabase dashboard under Settings > API.
 </Admonition>
@@ -121,7 +121,7 @@ You should now see the expected response:
 { "message": "Hello Production!" }
 ```
 
-<Admonition type="info">
+<Admonition type="note">
   You can also test the function through the Dashboard. To see how that works, check out the
   [Dashboard Quickstart guide](/docs/guides/dashboard/quickstart).
 </Admonition>

@@ -25,7 +25,7 @@ import process from 'node:process'
 import path from 'jsr:@std/path@1.0.8'
 ```
 
-### Using `deno.json` (Recommended)
+### Using `deno.json` (recommended)
 
 Each function should have its own `deno.json` file to manage dependencies and configure Deno-specific settings. This ensures proper isolation between functions and is the recommended approach for deployment. When you update the dependencies for one function, it won't accidentally break another function that needs different versions.
 
@@ -108,11 +108,11 @@ import_map = "./supabase/functions/function-one/import_map.json"
 
 ---
 
-## Private NPM Packages
+## Private NPM packages
 
 To use private npm packages, create a `.npmrc` file within your function’s own directory.
 
-<Admonition type="info">This feature requires Supabase CLI version 1.207.9 or higher.</Admonition>
+<Admonition type="note">This feature requires Supabase CLI version 1.207.9 or higher.</Admonition>
 
 ```bash
 └── supabase

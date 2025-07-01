@@ -9,7 +9,7 @@ Logs are provided for each function invocation, locally and in hosted environmen
 
 ---
 
-## Accessing Logs
+## Accessing logs
 
 ### Production
 
@@ -29,9 +29,9 @@ When [developing locally](/docs/guides/functions/local-development) you will see
 
 ---
 
-## Log Event Types
+## Log event types
 
-### Automatic Logs
+### Automatic logs
 
 Your functions automatically capture several types of events:
 
@@ -39,7 +39,7 @@ Your functions automatically capture several types of events:
 - **Custom log events**: You can use `console.log`, `console.error`, and `console.warn` in your code to emit custom log events. These events also appear in the Logs tool.
 - **Boot and Shutdown Logs**: The Logs tool extends its coverage to include logs for the boot and shutdown of functions.
 
-### Custom Logs
+### Custom logs
 
 You can add your own log messages using standard console methods:
 
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
 
 ## Logging tips
 
-### Logging Request Headers
+### Logging request headers
 
 When debugging Edge Functions, a common mistake is to try to log headers to the developer console via code like this:
 

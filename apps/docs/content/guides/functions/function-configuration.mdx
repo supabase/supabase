@@ -35,7 +35,7 @@ This configuration tell Supabase that the `stripe-webhook` function doesn't requ
 
 You set these rules once and never worry about them again. Deploy your functions knowing that the security and behavior is exactly what each endpoint needs.
 
-<Admonition type="info">
+<Admonition type="note">
 
 To see more general `config.toml` options, check out [this guide](https://supabase.com/docs/guides/local-development/managing-config).
 
@@ -43,7 +43,7 @@ To see more general `config.toml` options, check out [this guide](https://supaba
 
 ---
 
-## Skipping Authorization Checks
+## Skipping authorization checks
 
 By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can configure this in your `config.toml`:
 
@@ -65,9 +65,9 @@ supabase functions serve hello-world --no-verify-jwt
 
 ---
 
-## Custom Entrypoints
+## Custom entrypoints
 
-<Admonition type="info">
+<Admonition type="note">
 
 `entrypoint` is available only in Supabase CLI version 1.215.0 or higher.
 
