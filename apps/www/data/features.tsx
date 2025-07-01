@@ -330,7 +330,7 @@ By implementing Network Restrictions, you create a more secure environment for y
     docsUrl: 'https://supabase.com/docs/guides/platform/network-restrictions',
     slug: 'network-restrictions',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
@@ -405,7 +405,7 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: false,
     },
   },
@@ -484,7 +484,7 @@ By leveraging Read Replicas, you can achieve consistent low-latency performance 
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
     slug: 'read-replicas',
     status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
@@ -1368,7 +1368,7 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
     slug: 's3-compatibility',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1411,7 +1411,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1446,7 +1446,7 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocation',
     slug: 'regional-invocations',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1481,7 +1481,7 @@ By leveraging NPM Compatibility in Supabase Edge Functions, you can take advanta
     docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
     slug: 'npm-compatibility',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -1736,7 +1736,7 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
       availableOnSelfHosted: true,
       selfHostedTooling: {
         label: 'OpenAI API Key',
-        link: 'https://platform.openai.com/docs/quickstart#create-and-export-an-api-key://platform.openai.com/api-keys',
+        link: 'https://platform.openai.com/docs/libraries#create-and-export-an-api-key',
       },
     },
   },
@@ -2121,7 +2121,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     docsUrl: 'https://supabase.com/docs/reference/dart/start',
     slug: 'client-library-flutter',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -2146,7 +2146,7 @@ This feature is particularly valuable for iOS developers looking to leverage the
     docsUrl: 'https://supabase.com/docs/reference/swift/start',
     slug: 'client-library-swift',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },

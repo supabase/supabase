@@ -31,13 +31,19 @@ export interface ReportAttributes {
   hideHighlightedValue?: boolean
 }
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line' | 'combine'
+export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
 
 export type MultiAttribute = {
   attribute: string
   provider: Provider
   label?: string
-  color?: string
+  color?: {
+    light: string
+    dark: string
+  }
+  statusCode?: string
+  grantType?: string
+  providerType?: string
   stackId?: string
   format?: string
   description?: string
@@ -65,6 +71,7 @@ export type MultiAttribute = {
   strokeDasharray?: string
   className?: string
   hide?: boolean
+  enabled?: boolean
 }
 
 interface CustomIconProps {
@@ -167,7 +174,7 @@ const CustomTooltip = ({
       return (
         <div key={entry.name} className="flex items-center w-full">
           {getIcon(entry.color, isMax)}
-          <span className="text-foreground-lighter ml-1 flex-grow">
+          <span className="text-foreground-lighter ml-1 flex-grow cursor-default select-none">
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
@@ -194,9 +201,12 @@ const CustomTooltip = ({
       >
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload.reverse().map((entry: any, index: number) => (
-            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
-          ))}
+          {payload
+            .reverse()
+            .filter((entry: any) => entry.value !== 0)
+            .map((entry: any, index: number) => (
+              <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+            ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>
@@ -270,7 +280,7 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
         {getIcon(entry.name, entry.color)}
         <span
           className={cn(
-            'text-nowrap text-foreground-lighter',
+            'text-nowrap text-foreground-lighter cursor-default select-none',
             hoveredLabel && !isHovered && 'opacity-50'
           )}
         >

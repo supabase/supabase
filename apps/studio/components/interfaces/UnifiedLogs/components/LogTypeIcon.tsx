@@ -44,7 +44,7 @@ export const LogTypeIcon = ({
         <IconComponent />
       </TooltipTrigger>
       <TooltipContent side="left">
-        <div className="text-sm">{type}</div>
+        <div className="text-xs">{type}</div>
       </TooltipContent>
     </Tooltip>
   )

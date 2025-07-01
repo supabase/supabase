@@ -10,12 +10,14 @@ import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfigu
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const project = useSelectedProject()
-  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
+  const isAws = useIsAwsCloudProvider()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
+
+  const showNewDiskManagementUI = isAws || isAwsK8s
 
   return (
     <>
