@@ -7,7 +7,7 @@ subtitle: 'How to solve common problems and issues related to Edge Functions.'
 
 {/* supa-mdx-lint-disable Rule001HeadingCase */}
 
-When developing Edge Functions, you can run into various issue during development, deployment, and at runtime. Most problems fall under these categories:
+When developing Edge Functions, you can run into various issues during development, deployment, and at runtime. Most problems fall under these categories:
 
 - [Deployment issues](/docs/guides/functions/troubleshooting#deployment-issues)
 - [Runtime issues](/docs/guides/functions/troubleshooting#runtime-issues)
@@ -138,7 +138,7 @@ There are two debugging tools available: Invocations and Logs. Invocations shows
 
 When `supabase functions serve` fails:
 
-1. **Use debug mode:** Run with the `-debug` flag for detailed output
+1. **Use debug mode:** Run with the `--debug` flag for detailed output
 2. **Check port availability:** Ensure ports `54321` and `8081` are available
 
 ```bash
@@ -149,7 +149,7 @@ supabase functions serve your-function --debug
 lsof -i :54321
 ```
 
-If the problem persists, search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repositories for similar error messages. Support engineers can then try to run the provided sample code locally and see if they can reproduce the issue.
+If the problem persists, search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repositories for similar error messages.
 
 <Admonition type="note">
   If the output from the commands above does not help you to resolve the issue, open a support
