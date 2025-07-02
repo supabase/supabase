@@ -20,14 +20,18 @@ export type FDWCreateVariables = {
   formState: {
     [k: string]: string
   }
+  mode: 'tables' | 'schema'
   tables: any[]
+  targetSchema: string
 }
 
 export function getCreateFDWSql({
   wrapperMeta,
   formState,
+  mode,
   tables,
-}: Pick<FDWCreateVariables, 'wrapperMeta' | 'formState' | 'tables'>) {
+  targetSchema,
+}: Pick<FDWCreateVariables, 'wrapperMeta' | 'formState' | 'tables' | 'mode' | 'targetSchema'>) {
   const newSchemasSql = tables
     .filter((table) => table.is_new_schema)
     .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
@@ -158,11 +162,7 @@ export function getCreateFDWSql({
         .join('\n')}
     
       execute format(
-        E'create server ${formState.server_name}\\n'
-        '   foreign data wrapper ${formState.wrapper_name}\\n'
-        '   options (\\n'
-        '     ${optionsSqlArray}\\n'
-        '   );',
+        E'create server ${formState.server_name} foreign data wrapper ${formState.wrapper_name} options (${optionsSqlArray});',
         ${encryptedOptions.map((option) => `v_${option.name}`).join(',\n')}
       );
     end $$;
@@ -195,6 +195,13 @@ export function getCreateFDWSql({
     })
     .join('\n\n')
 
+  let importForeignSchemaSql = ''
+  if (wrapperMeta.canTargetSchema) {
+    importForeignSchemaSql = /* SQL */ `
+  import foreign schema "default" from server ${formState.server_name} into ${targetSchema} options (strict 'true');
+`
+  }
+
   const sql = /* SQL */ `
     ${newSchemasSql}
 
@@ -204,20 +211,16 @@ export function getCreateFDWSql({
 
     ${createServerSql}
 
-    ${createTablesSql}
+    ${mode === 'tables' ? createTablesSql : ''}
+
+    ${mode === 'schema' ? importForeignSchemaSql : ''}
   `
 
   return sql
 }
 
-export async function createFDW({
-  projectRef,
-  connectionString,
-  wrapperMeta,
-  formState,
-  tables,
-}: FDWCreateVariables) {
-  const sql = wrapWithTransaction(getCreateFDWSql({ wrapperMeta, formState, tables }))
+export async function createFDW({ projectRef, connectionString, ...rest }: FDWCreateVariables) {
+  const sql = wrapWithTransaction(getCreateFDWSql(rest))
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

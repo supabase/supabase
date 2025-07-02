@@ -1,14 +1,25 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { isEmpty } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { invalidateSchemasQuery } from 'data/database/schemas-query'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import { invalidateSchemasQuery, useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
+import {
+  Button,
+  Form,
+  Input,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
+  Separator,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  WarningIcon,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
@@ -34,8 +45,12 @@ export const CreateWrapperSheet = ({
   const { project } = useProjectContext()
 
   const [newTables, setNewTables] = useState<any[]>([])
+  const [targetSchema, setTargetSchema] = useState('public')
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
+  const [selectedMode, setSelectedMode] = useState<'tables' | 'schema'>(
+    wrapperMeta.tables.length > 0 ? 'tables' : 'schema'
+  )
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
   const { mutate: createFDW, isLoading: isCreating } = useFDWCreateMutation({
@@ -49,6 +64,9 @@ export const CreateWrapperSheet = ({
       onClose()
     },
   })
+
+  // prefetch schemas to make sure the schema selector is populated
+  useSchemasQuery({ projectRef: project?.ref, connectionString: project?.connectionString })
 
   const initialValues = {
     wrapper_name: '',
@@ -80,15 +98,18 @@ export const CreateWrapperSheet = ({
 
     const { wrapper_name } = values
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
-    if (newTables.length === 0) errors.tables = 'Please add at least one table'
-    if (!isEmpty(errors)) return setFormErrors(errors)
+    if (selectedMode === 'tables' && newTables.length === 0) {
+      errors.tables = 'Please add at least one table'
+    }
 
     createFDW({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapperMeta,
       formState: { ...values, server_name: `${wrapper_name}_server` },
+      mode: selectedMode,
       tables: newTables,
+      targetSchema: targetSchema,
     })
   }
 
@@ -142,6 +163,7 @@ export const CreateWrapperSheet = ({
                       />
                     </FormSectionContent>
                   </FormSection>
+                  <Separator />
                   <FormSection
                     header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
                   >
@@ -158,75 +180,155 @@ export const CreateWrapperSheet = ({
                         ))}
                     </FormSectionContent>
                   </FormSection>
-                  <FormSection
-                    header={
-                      <FormSectionLabel>
-                        <p>Foreign Tables</p>
-                        <p className="text-foreground-light mt-2 w-[90%]">
-                          You can query your data from these foreign tables after the wrapper is
-                          created
-                        </p>
-                      </FormSectionLabel>
-                    }
-                  >
-                    <FormSectionContent loading={false}>
-                      {newTables.length === 0 ? (
-                        <div className="flex justify-end translate-y-4">
-                          <Button type="default" onClick={() => setIsEditingTable(true)}>
-                            Add foreign table
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          {newTables.map((table, i) => (
-                            <div
-                              key={`${table.schema_name}.${table.table_name}`}
-                              className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
-                            >
-                              <div>
-                                <p className="text-sm">
-                                  {table.schema_name}.{table.table_name}
-                                </p>
-                                <p className="text-sm text-foreground-light">
-                                  Columns:{' '}
-                                  {table.columns.map((column: any) => column.name).join(', ')}
-                                </p>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  type="default"
-                                  className="px-1"
-                                  icon={<Edit />}
-                                  onClick={() => {
-                                    setIsEditingTable(true)
-                                    setSelectedTableToEdit({ ...table, tableIndex: i })
-                                  }}
-                                />
-                                <Button
-                                  type="default"
-                                  className="px-1"
-                                  icon={<Trash />}
-                                  onClick={() => {
-                                    setNewTables((prev) => prev.filter((_, j) => j !== i))
-                                  }}
-                                />
-                              </div>
+                  <Separator />
+                  <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
+                    <FormSectionContent loading={false} className="text-sm">
+                      <RadioGroupStacked
+                        value={selectedMode}
+                        onValueChange={(value) => setSelectedMode(value as 'tables' | 'schema')}
+                      >
+                        <RadioGroupStackedItem
+                          key="tables"
+                          value="tables"
+                          disabled={wrapperMeta.tables.length === 0}
+                          label="Tables"
+                          showIndicator={false}
+                        >
+                          <div className="flex  gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                Define tables where the wrapper data will be shown.
+                              </p>
                             </div>
-                          ))}
-                        </div>
-                      )}
-                      {newTables.length > 0 && (
-                        <div className="flex justify-end">
-                          <Button type="default" onClick={() => setIsEditingTable(true)}>
-                            Add foreign table
-                          </Button>
-                        </div>
-                      )}
-                      {newTables.length === 0 && formErrors.tables && (
-                        <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
-                      )}
+                          </div>
+                          {wrapperMeta.tables.length === 0 ? (
+                            <div className="w-full flex gap-x-2 py-2 items-center">
+                              <WarningIcon />
+                              <span className="text-xs">
+                                This wrapper doesn't support using foreign tables.
+                              </span>
+                            </div>
+                          ) : null}
+                        </RadioGroupStackedItem>
+                        <RadioGroupStackedItem
+                          key="schema"
+                          value="schema"
+                          disabled={!wrapperMeta.canTargetSchema}
+                          label="Schema"
+                          showIndicator={false}
+                        >
+                          <div className="flex  gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                Specify schema in which the wrapper will create tables.
+                              </p>
+                            </div>
+                          </div>
+                          {!wrapperMeta.canTargetSchema ? (
+                            <div className="w-full flex gap-x-2 py-2 items-center">
+                              <WarningIcon />
+                              <span className="text-xs">
+                                This wrapper doesn't support using a foreign schema.
+                              </span>
+                            </div>
+                          ) : null}
+                        </RadioGroupStackedItem>
+                      </RadioGroupStacked>
                     </FormSectionContent>
                   </FormSection>
+                  <Separator />
+                  {selectedMode === 'tables' && (
+                    <FormSection
+                      header={
+                        <FormSectionLabel>
+                          <p>Foreign Tables</p>
+                          <p className="text-foreground-light mt-2 w-[90%]">
+                            You can query your data from these foreign tables after the wrapper is
+                            created
+                          </p>
+                        </FormSectionLabel>
+                      }
+                    >
+                      <FormSectionContent loading={false}>
+                        {newTables.length === 0 ? (
+                          <div className="flex justify-end translate-y-4">
+                            <Button type="default" onClick={() => setIsEditingTable(true)}>
+                              Add foreign table
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {newTables.map((table, i) => (
+                              <div
+                                key={`${table.schema_name}.${table.table_name}`}
+                                className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
+                              >
+                                <div>
+                                  <p className="text-sm">
+                                    {table.schema_name}.{table.table_name}
+                                  </p>
+                                  <p className="text-sm text-foreground-light">
+                                    Columns:{' '}
+                                    {table.columns.map((column: any) => column.name).join(', ')}
+                                  </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Button
+                                    type="default"
+                                    className="px-1"
+                                    icon={<Edit />}
+                                    onClick={() => {
+                                      setIsEditingTable(true)
+                                      setSelectedTableToEdit({ ...table, tableIndex: i })
+                                    }}
+                                  />
+                                  <Button
+                                    type="default"
+                                    className="px-1"
+                                    icon={<Trash />}
+                                    onClick={() => {
+                                      setNewTables((prev) => prev.filter((_, j) => j !== i))
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {newTables.length > 0 && (
+                          <div className="flex justify-end">
+                            <Button type="default" onClick={() => setIsEditingTable(true)}>
+                              Add foreign table
+                            </Button>
+                          </div>
+                        )}
+                        {newTables.length === 0 && formErrors.tables && (
+                          <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
+                        )}
+                      </FormSectionContent>
+                    </FormSection>
+                  )}
+                  {selectedMode === 'schema' && (
+                    <FormSection
+                      header={
+                        <FormSectionLabel>
+                          <p>Foreign Schema</p>
+                          <p className="text-foreground-light mt-2 w-[90%]">
+                            All wrapper tables will be created in the specified schema.
+                          </p>
+                        </FormSectionLabel>
+                      }
+                    >
+                      <FormSectionContent loading={false}>
+                        <SchemaSelector
+                          portal={false}
+                          size="small"
+                          selectedSchemaName={targetSchema}
+                          onSelectSchema={(schema) => setTargetSchema(schema)}
+                        />
+                      </FormSectionContent>
+                    </FormSection>
+                  )}
                 </div>
 
                 <SheetFooter>
