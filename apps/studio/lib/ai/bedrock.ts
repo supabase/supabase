@@ -1,18 +1,38 @@
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
+import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
 
 const credentialProvider = createCredentialChain(
   // Vercel OIDC provider will be used for staging/production
-  awsCredentialsProvider({
-    roleArn: process.env.AWS_BEDROCK_ROLE_ARN!,
-  }),
+  vercelOidcProvider,
 
   // AWS profile will be used for local development
   fromNodeProviderChain({
     profile: process.env.AWS_BEDROCK_PROFILE,
   })
 )
+
+/**
+ * Creates a Vercel OIDC provider for AWS credentials.
+ *
+ * Wraps `awsCredentialsProvider` to properly handle errors
+ * so that it can be used in a credential chain.
+ */
+async function vercelOidcProvider() {
+  try {
+    return await awsCredentialsProvider({
+      roleArn: process.env.AWS_BEDROCK_ROLE_ARN!,
+    })()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to create Vercel OIDC provider'
+
+    // Re-throw using the correct error type and `tryNextLink` option
+    throw new CredentialsProviderError(message, {
+      tryNextLink: true,
+    })
+  }
+}
 
 export const bedrockRegionMap = {
   us: 'us-east-1',
