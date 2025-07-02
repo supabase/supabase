@@ -298,38 +298,43 @@ const BranchManagement = () => {
                         />
                       )}
                       {tab === 'prs' && (
-                        <BranchManagementSection
-                          header={`${branchesWithPRs.length} branches with pull requests and ${mergeRequests?.length || 0} merge requests found`}
-                        >
-                          {isErrorMergeRequests && (
-                            <AlertError
-                              error={mergeRequestsError}
-                              subject="Failed to retrieve merge requests"
-                            />
-                          )}
+                        <div className="space-y-4">
+                          {/* Merge Requests Panel */}
+                          <BranchManagementSection
+                            header={`${mergeRequests?.length || 0} merge requests found`}
+                          >
+                            {isErrorMergeRequests && (
+                              <AlertError
+                                error={mergeRequestsError}
+                                subject="Failed to retrieve merge requests"
+                              />
+                            )}
 
-                          {/* Merge Requests */}
-                          {mergeRequests && mergeRequests.length > 0 && (
-                            <>
-                              <div className="px-6 py-2 bg-surface-100 text-xs font-medium text-foreground-light border-b">
-                                Merge Requests
-                              </div>
-                              {mergeRequests.map((mergeRequest) => (
+                            {mergeRequests && mergeRequests.length > 0 ? (
+                              mergeRequests.map((mergeRequest) => (
                                 <MergeRequestRow
                                   key={mergeRequest.id}
                                   mergeRequest={mergeRequest}
                                 />
-                              ))}
-                            </>
-                          )}
-
-                          {/* GitHub Pull Requests */}
-                          {branchesWithPRs.length > 0 && (
-                            <>
-                              <div className="px-6 py-2 bg-surface-100 text-xs font-medium text-foreground-light border-b">
-                                GitHub Pull Requests
+                              ))
+                            ) : (
+                              <div className="px-6 py-8 text-center text-foreground-light">
+                                <p className="text-sm">No merge requests found</p>
+                                {gitlessBranching && (
+                                  <p className="text-xs mt-1">
+                                    Create a branch and request a merge to see merge requests here
+                                  </p>
+                                )}
                               </div>
-                              {branchesWithPRs.map((branch) => {
+                            )}
+                          </BranchManagementSection>
+
+                          {/* GitHub Pull Requests Panel */}
+                          <BranchManagementSection
+                            header={`${branchesWithPRs.length} branches with GitHub pull requests found`}
+                          >
+                            {branchesWithPRs.length > 0 ? (
+                              branchesWithPRs.map((branch) => {
                                 return (
                                   <BranchRow
                                     key={branch.id}
@@ -339,13 +344,8 @@ const BranchManagement = () => {
                                     onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                                   />
                                 )
-                              })}
-                            </>
-                          )}
-
-                          {/* Empty state when no PRs or merge requests */}
-                          {branchesWithPRs.length === 0 &&
-                            (!mergeRequests || mergeRequests.length === 0) && (
+                              })
+                            ) : (
                               <PullRequestsEmptyState
                                 url={generateCreatePullRequestURL()}
                                 hasBranches={previewBranches.length > 0}
@@ -353,7 +353,8 @@ const BranchManagement = () => {
                                 gitlessBranching={gitlessBranching}
                               />
                             )}
-                        </BranchManagementSection>
+                          </BranchManagementSection>
+                        </div>
                       )}
                       {tab === 'branches' && (
                         <BranchManagementSection

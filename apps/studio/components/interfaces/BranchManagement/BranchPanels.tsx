@@ -430,46 +430,21 @@ export const MergeRequestRow = ({ mergeRequest }: MergeRequestRowProps) => {
   const formattedTimeFromNow = dayjs(mergeRequest.merge_requested_at).fromNow()
 
   return (
-    <div className="w-full flex items-center justify-between px-6 py-2.5">
-      <div className="flex items-center gap-x-4">
-        <ButtonTooltip
-          asChild
-          type="default"
-          className="max-w-[300px]"
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: mergeRequest.description || 'View merge request details',
-            },
-          }}
-        >
-          <Link href={`/project/${projectRef}/merge-requests/${mergeRequest.id}`}>
-            {mergeRequest.title}
-          </Link>
-        </ButtonTooltip>
-
-        <div className="text-xs text-foreground-light">
-          {mergeRequest.head} → {mergeRequest.base}
-        </div>
-
-        <Badge variant="outline">Merge Request</Badge>
+    <Link
+      href={`/project/${projectRef}/merge-requests/${mergeRequest.id}`}
+      className="flex items-center gap-x-4 px-6 py-2.5 hover:bg-surface-100"
+    >
+      <div className="flex items-center gap-x-4 flex-1">
+        {mergeRequest.title}
 
         {mergeRequest.merge_approved_by ? (
-          <Badge variant="default" className="bg-green-100 text-green-800">
-            Approved
-          </Badge>
+          <Badge variant="success">Approved</Badge>
         ) : (
-          <Badge variant="secondary">Pending Approval</Badge>
+          <Badge variant="warning">Open</Badge>
         )}
-
-        <p className="text-xs text-foreground-lighter">Requested {formattedTimeFromNow}</p>
       </div>
 
-      <div className="flex items-center gap-x-2">
-        <Button asChild type="default">
-          <Link href={`/project/${projectRef}/merge-requests/${mergeRequest.id}`}>Review</Link>
-        </Button>
-      </div>
-    </div>
+      <p className="text-xs text-foreground-lighter">Requested {formattedTimeFromNow}</p>
+    </Link>
   )
 }
