@@ -498,13 +498,19 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           ) : isShowingOnboarding ? (
             <AIOnboarding
               onMessageSend={sendMessageToAssistant}
+              value={value}
+              onValueChange={setValue}
               sqlSnippets={snap.sqlSnippets as string[] | undefined}
               onRemoveSnippet={(index) => {
                 const newSnippets = [...(snap.sqlSnippets ?? [])]
                 newSnippets.splice(index, 1)
                 snap.setSqlSnippets(newSnippets)
               }}
-              suggestions={snap.suggestions}
+              suggestions={
+                snap.suggestions as
+                  | { title?: string; prompts?: { label: string; description: string }[] }
+                  | undefined
+              }
             />
           ) : null}
         </div>

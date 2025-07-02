@@ -14,6 +14,8 @@ interface AIOnboardingProps {
     title?: string
     prompts?: { label: string; description: string }[]
   }
+  value: string
+  onValueChange: (value: string) => void
 }
 
 export const AIOnboarding = ({
@@ -21,8 +23,9 @@ export const AIOnboarding = ({
   sqlSnippets,
   onRemoveSnippet,
   suggestions,
+  value,
+  onValueChange,
 }: AIOnboardingProps) => {
-  const [value, setValue] = useState('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const defaultPrompts = [
@@ -60,14 +63,34 @@ export const AIOnboarding = ({
     },
   ]
 
-  // Use suggestions if available, otherwise use default prompts
+  const codeSnippetPrompts = [
+    {
+      title: 'Explain code',
+      prompt: 'Explain what this code does and how it works',
+      icon: <FileText strokeWidth={1.25} size={14} />,
+    },
+    {
+      title: 'Improve code',
+      prompt: 'How can I improve this code for better performance and readability?',
+      icon: <WandSparkles strokeWidth={1.25} size={14} />,
+    },
+    {
+      title: 'Debug issues',
+      prompt: 'Help me debug any potential issues with this code',
+      icon: <MessageCircleMore strokeWidth={1.25} size={14} />,
+    },
+  ]
+
+  // Use suggestions if available, otherwise use code-specific prompts if snippets exist, or default prompts
   const prompts = suggestions?.prompts
     ? suggestions.prompts.map((suggestion) => ({
         title: suggestion.label,
         prompt: suggestion.description,
         icon: <FileText strokeWidth={1.25} size={14} />,
       }))
-    : defaultPrompts
+    : sqlSnippets && sqlSnippets.length > 0
+      ? codeSnippetPrompts
+      : defaultPrompts
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -106,12 +129,12 @@ export const AIOnboarding = ({
               disabled={false}
               placeholder="Ask me anything..."
               value={value}
-              onValueChange={(e) => setValue(e.target.value)}
+              onValueChange={(e) => onValueChange(e.target.value)}
               onSubmit={(event) => {
                 event.preventDefault()
                 if (value.trim()) {
                   onMessageSend(value)
-                  setValue('')
+                  onValueChange('')
                 }
               }}
               autoFocus
@@ -132,7 +155,7 @@ export const AIOnboarding = ({
                   type="outline"
                   className="text-xs rounded-full"
                   onClick={() => {
-                    setValue(item.prompt)
+                    onValueChange(item.prompt)
                     inputRef.current?.focus()
                   }}
                 >
