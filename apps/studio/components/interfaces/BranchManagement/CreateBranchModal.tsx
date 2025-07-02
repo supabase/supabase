@@ -337,7 +337,13 @@ export const CreateBranchModal = () => {
               </Button>
               <Button
                 form={formId}
-                disabled={!isSuccessConnections || isCreating || !canSubmit || isChecking}
+                disabled={
+                  !isSuccessConnections ||
+                  isCreating ||
+                  !canSubmit ||
+                  isChecking ||
+                  (!gitlessBranching && !githubConnection)
+                }
                 loading={isCreating}
                 type="primary"
                 htmlType="submit"
