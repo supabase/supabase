@@ -326,6 +326,7 @@ allow_list = [
     "sessionStorage",
     "stdin",
     "stdout",
+    "[Ss]ubnet(s)?",
     "[Ss]ubpage",
     "supabase-auth-ui",
     "supabase-csharp",

@@ -702,6 +702,10 @@ export const auth = {
               name: 'Password verification hook',
               url: '/guides/auth/auth-hooks/password-verification-hook',
             },
+            {
+              name: 'Before User Created hook',
+              url: '/guides/auth/auth-hooks/before-user-created-hook',
+            },
           ],
         },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
