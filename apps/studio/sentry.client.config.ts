@@ -78,6 +78,14 @@ Sentry.init({
       return null
     }
 
+    // Filter out errors like 'e._5BLbSXV[t] is not a function' or anything matching '[t] is not a function'
+    if (
+      hint.originalException instanceof Error &&
+      hint.originalException.message.includes('[t] is not a function')
+    ) {
+      return null
+    }
+
     return event
   },
   ignoreErrors: [
