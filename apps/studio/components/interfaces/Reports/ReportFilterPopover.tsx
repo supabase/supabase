@@ -1,5 +1,5 @@
 import { ChevronDown, Filter as FilterIcon, Plus, X } from 'lucide-react'
-import { KeyboardEvent, useCallback, useState, useMemo } from 'react'
+import { KeyboardEvent, useCallback, useState, useMemo, useEffect } from 'react'
 import { isEqual } from 'lodash'
 
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
@@ -10,8 +10,115 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   Input,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  cn,
 } from 'ui'
 import type { ReportFilter, ReportFilterProperty } from './Reports.types'
+import { sizes } from 'ui/src/lib/commonCva'
+import defaultTheme from 'ui/src/lib/theme/defaultTheme'
+
+const FilterableInput = ({
+  value,
+  onChange,
+  onKeyDown,
+  placeholder,
+  availableOptions = [],
+}: {
+  value: string | number
+  onChange: (value: string | number) => void
+  onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
+  placeholder?: string
+  type?: string
+  availableOptions?: string[]
+}) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [inputValue, setInputValue] = useState(String(value || ''))
+
+  // Ensure we always have a valid array
+  const safeOptions = Array.isArray(availableOptions) ? availableOptions : []
+
+  useEffect(() => {
+    setInputValue(String(value || ''))
+  }, [value])
+
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue)
+    onChange(newValue)
+  }
+
+  const handleOptionSelect = (option: string) => {
+    setInputValue(option)
+    onChange(option)
+    setIsOpen(false)
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape') {
+      setIsOpen(false)
+      return
+    }
+
+    // When dropdown is open, let Command component handle Enter for selection
+    if (event.key === 'Enter' && isOpen) {
+      // Don't call onKeyDown to prevent interference with Command's selection
+      return
+    }
+
+    // When dropdown is closed, allow custom input
+    if (event.key === 'Enter' && !isOpen) {
+      return
+    }
+
+    onKeyDown(event)
+  }
+
+  return (
+    <div className="relative flex-1">
+      <Command_Shadcn_ className="relative overflow-visible bg-transparent">
+        <CommandInput_Shadcn_
+          placeholder={placeholder}
+          value={inputValue}
+          onValueChange={handleInputChange}
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={handleKeyDown}
+          className={cn('h-6 text-sm', defaultTheme.input.variants.standard, sizes.tiny)}
+          wrapperClassName="!p-0 !border !border-control rounded-md"
+          showSearchIcon={false}
+        />
+        <div
+          className={cn(
+            'absolute top-full left-0 right-0 z-50 mt-1 opacity-0 transition-opacity pointer-events-none',
+            isOpen && safeOptions.length > 0 && 'opacity-100 pointer-events-auto'
+          )}
+        >
+          <CommandList_Shadcn_ className="max-h-60 overflow-auto bg-surface-100 border border-border rounded-md shadow-lg">
+            <CommandEmpty_Shadcn_ className="py-2 px-3 text-sm text-foreground-lighter">
+              No matching options found. Press Enter to use "{inputValue}"
+            </CommandEmpty_Shadcn_>
+            <CommandGroup_Shadcn_>
+              {safeOptions.map((option, index) => (
+                <CommandItem_Shadcn_
+                  key={`${option}-${index}`}
+                  value={option}
+                  onSelect={() => handleOptionSelect(option)}
+                  className="px-3 py-2 text-sm cursor-pointer"
+                >
+                  {option}
+                </CommandItem_Shadcn_>
+              ))}
+            </CommandGroup_Shadcn_>
+          </CommandList_Shadcn_>
+        </div>
+      </Command_Shadcn_>
+      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
+    </div>
+  )
+}
 
 export interface ReportFilterPopoverProps {
   buttonText?: string
@@ -72,12 +179,9 @@ const ReportFilterRow = ({
   }
 
   const handleValueChange = (value: string | number) => {
-    const convertedValue =
-      property?.type === 'number' ? (isNaN(Number(value)) ? value : Number(value)) : value
-
     onChange(filterIdx, {
       ...filter,
-      value: convertedValue,
+      value,
     })
   }
 
@@ -113,26 +217,16 @@ const ReportFilterRow = ({
         </Button>
       </DropdownControl>
 
-      {valueOptions.length > 0 ? (
-        <DropdownControl
-          align="start"
-          className="flex-1"
-          options={valueOptions}
-          onSelect={(value) => handleValueChange(value)}
-        >
-          <Button
-            asChild
-            type="outline"
-            icon={
-              <div className="text-foreground-lighter w-full">
-                <ChevronDown strokeWidth={1.5} />
-              </div>
-            }
-            className="w-full flex-1 justify-start"
-          >
-            <span>{filter.value || 'Select value'}</span>
-          </Button>
-        </DropdownControl>
+      {valueOptions?.length > 0 ? (
+        <FilterableInput
+          value={filter.value}
+          onChange={handleValueChange}
+          onKeyDown={onKeyDown}
+          placeholder={
+            property?.placeholder || `Enter ${property?.type === 'number' ? 'number' : 'text'}`
+          }
+          availableOptions={valueOptions?.map((option) => String(option.value)) || []}
+        />
       ) : (
         <Input
           size="tiny"
@@ -146,7 +240,6 @@ const ReportFilterRow = ({
           onKeyDown={onKeyDown}
         />
       )}
-
       <Button
         type="text"
         size="tiny"
