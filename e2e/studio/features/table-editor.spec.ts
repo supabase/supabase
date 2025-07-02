@@ -2,9 +2,6 @@ import { expect, Page } from '@playwright/test'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
 
-// Helper to generate a random table name
-const getRandomTableName = () => `pw-test-${Math.floor(Math.random() * 10000)}`
-
 const getSelectors = (tableName: string) => ({
   tableButton: (page) => page.getByRole('button', { name: `View ${tableName}` }),
   newTableBtn: (page) => page.getByRole('button', { name: 'New table', exact: true }),
@@ -41,12 +38,67 @@ const getSelectors = (tableName: string) => ({
   confirmDeleteBtn: (page) => page.getByRole('button', { name: 'Delete' }),
   rlsCheckbox: (page) => page.getByLabel('Enable Row Level Security ('),
   rlsConfirmBtn: (page) => page.getByRole('button', { name: 'Confirm' }),
-  deleteTableToast: (page) => page.getByText('Successfully deleted table "'),
+  deleteTableToast: (page, tableName) =>
+    page.getByText(`Successfully deleted table "${tableName}"`),
 })
+
+const createTable = async (page: Page, tableName: string) => {
+  const s = getSelectors(tableName)
+
+  await s.newTableBtn(page).click()
+  await s.tableNameInput(page).fill(tableName)
+
+  await s.createdAtExtraOptions(page).click()
+  await page.getByText('Is Nullable').click()
+  await s.createdAtExtraOptions(page).click({ force: true })
+
+  await s.addColumnBtn(page).click()
+  await s.columnNameInput(page).fill('defaultValueColumn')
+  await s.chooseColumnType(page).click()
+  await s.signedIntOption(page).click()
+  await s.defaultValueField(page).click()
+  await s.defaultValueField(page).fill('2')
+
+  await s.saveBtn(page).click()
+
+  // wait till we see the success toast
+  // Text: Table tableName is good to go!
+
+  await expect(
+    page.getByText(`Table ${tableName} is good to go!`),
+    'Success toast should be visible after table creation'
+  ).toBeVisible({
+    timeout: 50000,
+  })
+
+  await expect(
+    page.getByRole('button', { name: `View ${tableName}` }),
+    'Table should be visible after creation'
+  ).toBeVisible()
+}
+
+const deleteTables = async (page: Page, tableName: string) => {
+  const s = getSelectors(tableName)
+
+  await page.waitForTimeout(500)
+  const exists = (await s.tableButton(page).count()) > 0
+  if (!exists) return
+
+  await s.viewTableLabel(page).click()
+  await s.viewTableLabel(page).getByRole('button').nth(1).click()
+  await s.deleteTableBtn(page).click()
+  await s.confirmDeleteBtn(page).click()
+  await expect(
+    s.deleteTableToast(page, tableName),
+    'Delete confirmation toast should be visible'
+  ).toBeVisible()
+}
 
 test.describe('Table Editor', () => {
   let page: Page
-  let tableName: string
+  const testTableName = `pw-test-table-editor`
+  const tableNameRlsEnabled = `pw-test-rls-enabled`
+  const tableNameRlsDisabled = `pw-test-rls-disabled`
 
   test.beforeAll(async ({ browser, ref }) => {
     test.setTimeout(60000)
@@ -55,66 +107,27 @@ test.describe('Table Editor', () => {
      * Create a new table for the tests
      */
     page = await browser.newPage()
-
     await page.goto(toUrl(`/project/${ref}/editor`))
 
-    tableName = getRandomTableName()
-    const s = getSelectors(tableName)
-
-    await s.newTableBtn(page).click()
-    await s.tableNameInput(page).fill(tableName)
-
-    await s.createdAtExtraOptions(page).click()
-    await page.getByText('Is Nullable').click()
-    await s.createdAtExtraOptions(page).click({ force: true })
-
-    await s.addColumnBtn(page).click()
-    await s.columnNameInput(page).fill('defaultValueColumn')
-    await s.chooseColumnType(page).click()
-    await s.signedIntOption(page).click()
-    await s.defaultValueField(page).click()
-    await s.defaultValueField(page).fill('2')
-
-    await s.saveBtn(page).click()
-
-    // wait till we see the success toast
-    // Text: Table tableName is good to go!
-
-    await expect(
-      page.getByText(`Table ${tableName} is good to go!`),
-      'Success toast should be visible after table creation'
-    ).toBeVisible({
-      timeout: 50000,
-    })
-
-    await expect(
-      page.getByRole('button', { name: `View ${tableName}` }),
-      'Table should be visible after creation'
-    ).toBeVisible()
+    await page.waitForTimeout(2000)
+    // delete table name if it exists
+    await deleteTables(page, testTableName)
+    await deleteTables(page, tableNameRlsEnabled)
+    await deleteTables(page, tableNameRlsDisabled)
   })
 
   test.afterAll(async () => {
     test.setTimeout(60000)
-    /**
-     * Delete the table after the tests are done
-     */
-    const s = getSelectors(tableName)
 
-    const exists = (await s.tableButton(page).count()) > 0
-    if (!exists) return
-
-    await s.viewTableLabel(page).click()
-    await s.viewTableLabel(page).getByRole('button').nth(1).click()
-    await s.deleteTableBtn(page).click()
-    await s.confirmDeleteBtn(page).click()
-    await expect(
-      s.deleteTableToast(page),
-      'Delete confirmation toast should be visible'
-    ).toBeVisible()
+    // delete all tables related to this test
+    await deleteTables(page, testTableName)
+    await deleteTables(page, tableNameRlsEnabled)
+    await deleteTables(page, tableNameRlsDisabled)
   })
 
   test('should perform all table operations sequentially', async ({ ref }) => {
-    const s = getSelectors(tableName)
+    await createTable(page, testTableName)
+    const s = getSelectors(testTableName)
     test.setTimeout(60000)
 
     // 1. View table definition
@@ -124,17 +137,18 @@ test.describe('Table Editor', () => {
       s.viewLines(page),
       'Table definition should contain the correct SQL'
     ).toContainText(
-      `CREATE  TABLE public.${tableName} (  id bigint GENERATED BY DEFAULT AS IDENTITY NOT NULL,  created_at timestamp with time zone NULL DEFAULT now(),  "defaultValueColumn" smallint NULL DEFAULT '2'::smallint,  CONSTRAINT ${tableName}_pkey PRIMARY KEY (id)) TABLESPACE pg_default;`
+      `create table public.pw - test - table - editor ( id bigint generated by default as identity not null, created_at timestamp with time zone null default now(), "defaultValueColumn" smallint null default '2'::smallint, constraint pw - test - table - editor_pkey primary key (id)) TABLESPACE pg_default;
+      `
     )
 
     // 2. Insert test data
-    await page.getByRole('button', { name: `View ${tableName}` }).click()
+    await page.getByRole('button', { name: `View ${testTableName}` }).click()
     await s.insertRowBtn(page).click()
     await s.insertModal(page).click()
     await s.defaultValueInput(page).fill('100')
     await s.actionBarSaveRow(page).click()
 
-    await page.getByRole('button', { name: `View ${tableName}` }).click()
+    await page.getByRole('button', { name: `View ${testTableName}` }).click()
     await s.insertRowBtn(page).click()
     await s.insertModal(page).click()
     await s.defaultValueInput(page).fill('4')
@@ -151,7 +165,11 @@ test.describe('Table Editor', () => {
     await page.keyboard.down('Escape')
 
     // Wait for sorting to complete
-    await page.waitForResponse((response) => response.url().includes(`pg-meta/${ref}/query`))
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes(`pg-meta/${ref}/query`) ||
+        response.url().includes('pg-meta/default/query')
+    )
 
     // give it a second to rerender
     await page.waitForTimeout(1000)
@@ -206,5 +224,36 @@ test.describe('Table Editor', () => {
       page.getByTestId('tables-list'),
       'Tables list should be visible in public schema'
     ).toBeVisible()
+
+    await deleteTables(page, testTableName)
+  })
+
+  test('should show rls accordingly', async () => {
+    await createTable(page, tableNameRlsEnabled)
+
+    // testing rls enabled
+    await page.getByRole('button', { name: `View ${tableNameRlsEnabled}` }).click()
+    await expect(page.getByRole('link', { name: 'Add RLS policy' })).toBeVisible()
+
+    // testing rls disabled
+    const s2 = getSelectors(tableNameRlsDisabled)
+    await s2.newTableBtn(page).click()
+    await s2.tableNameInput(page).fill(tableNameRlsDisabled)
+    await s2.rlsCheckbox(page).click()
+    await s2.rlsConfirmBtn(page).click()
+    await s2.saveBtn(page).click()
+
+    await expect(
+      page.getByText(`Table ${tableNameRlsDisabled} is good to go!`),
+      'Success toast should be visible after Rls disabled table is created.'
+    ).toBeVisible({
+      timeout: 50000,
+    })
+
+    await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
+    await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
+
+    await deleteTables(page, tableNameRlsEnabled)
+    await deleteTables(page, tableNameRlsDisabled)
   })
 })

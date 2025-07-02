@@ -1,0 +1,94 @@
+---
+id: 'privatelink'
+title: 'PrivateLink'
+description: 'Secure private network connectivity to your Supabase database using AWS VPC Lattice.'
+---
+
+<Admonition type="note">
+
+PrivateLink is currently in alpha and available exclusively to Enterprise customers. Contact your account manager or [reach out to our team](https://supabase.com/contact/enterprise) to enable this feature.
+
+</Admonition>
+
+PrivateLink provides enterprise-grade private network connectivity between your AWS VPC and your Supabase database using AWS VPC Lattice. This eliminates exposure to the public internet by creating a secure, private connection that keeps your database traffic within the AWS network backbone.
+
+By enabling PrivateLink, database connections never traverse the public internet, enabling the disablement of public facing connectivity and providing an additional layer of security and compliance for sensitive workloads. This infrastructure-level security feature helps organizations meet strict data governance requirements and reduces potential attack vectors.
+
+## How PrivateLink works
+
+Supabase PrivateLink is an organisation level configuration. It works by sharing a [VPC Lattice Resource Configuration](https://docs.aws.amazon.com/vpc-lattice/latest/ug/resource-configuration.html) to any number of AWS Accounts for each of your Supabase projects. Connectivity can be achieved by either associating the Resource Configuration to a PrivateLink endpoint, or a [VPC Lattice Service Network](https://docs.aws.amazon.com/vpc-lattice/latest/ug/service-networks.html). This means:
+
+- Database traffic flows through private AWS infrastructure only
+- Connection latency is typically reduced compared to public internet routing
+- Network isolation provides enhanced security posture
+- Attack surface is minimized by eliminating public exposure
+
+The connection architecture changes from public internet routing to a dedicated private path through AWS's secure network backbone.
+
+Supabase PrivateLink is currently just for direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
+
+## Requirements
+
+To use PrivateLink with your Supabase project:
+
+- Enterprise Supabase subscription
+- AWS VPC in the same region as your Supabase project
+- Appropriate permissions to accept Resource Shares, and create and manage endpoints
+
+<Admonition type="caution">
+
+PrivateLink connections are region-specific. Your VPC and Supabase project must be in the same AWS region to establish the connection.
+
+</Admonition>
+
+## Getting started
+
+PrivateLink setup requires coordination between your team and Supabase. The process involves sharing your AWS Account ID(s) and accepting a Resource Share.
+
+### Setup process
+
+1. **Contact Supabase Support**: Reach out to your Enterprise account manager or [contact our team](https://supabase.com/contact/enterprise) to initiate PrivateLink setup
+2. **Provide AWS Account Details**: Share your AWS Account ID(s) with our team. Optionally specify which Supabase projects you want to enable (otherwise all projects in your organization will be included)
+3. **Accept Resource Share**: Supabase will send you an AWS Resource Share containing the VPC Lattice Resource Configurations for your projects. Accept this share from your AWS console
+4. **Create Connection**: In your AWS account, either [create a PrivateLink endpoint](https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-resources.html) or [attach the Resource Configuration](https://docs.aws.amazon.com/vpc-lattice/latest/ug/service-network-associations.html) to an existing VPC Lattice Service Network
+5. **Test Connectivity**: Verify the private connection is working correctly from your VPC
+6. **Update Applications**: Configure your applications to use the private connection details
+7. **Disable Public Connectivity**: Optionally, disable public internet access for your database to enforce private-only connectivity
+
+### DNS and connectivity
+
+Once PrivateLink is configured:
+
+- You may configure a custom DNS record to point to your PrivateLink endpoint interface or the endpoints on.aws DNS record within your VPC
+- Applications will need to be updated to use the PrivateLink endpoint
+- Standard database monitoring and observability tools will continue to work through the private connection
+
+## Alpha limitations
+
+During the alpha phase:
+
+- **Setup Coordination**: Configuration requires direct coordination with Supabase support team
+- **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
+
+## Compatibility
+
+The PrivateLink endpoint behaves like a standard Postgres endpoint, allowing you to connect using:
+
+- Direct Postgres connections using standard tools
+- Third-party database tools and ORMs (with the appropriate routing)
+- (PgBouncer Projects Only) Directly to the pooler.
+
+## Use cases
+
+PrivateLink is ideal for organizations requiring:
+
+- **Regulatory Compliance**: Meeting strict data governance requirements that mandate private network connectivity
+- **Enhanced Security**: Eliminating public internet exposure for sensitive database workloads
+- **Corporate Policies**: Adhering to enterprise security policies that prohibit database connections over public networks
+- **Performance Optimization**: Benefiting from reduced latency through AWS's private network infrastructure
+
+## Next steps
+
+Ready to enhance your database security with PrivateLink? [Contact our Enterprise team](https://supabase.com/contact/enterprise) to discuss your requirements and begin the setup process.
+
+Our support team will guide you through the configuration and ensure your private database connectivity meets your security and performance requirements.

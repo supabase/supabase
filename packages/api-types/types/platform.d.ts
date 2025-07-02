@@ -16618,6 +16618,12 @@ export interface operations {
           'application/json': components['schemas']['DatabaseDetailResponse'][]
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   DatabasesStatusesController_getStatus: {
@@ -16915,6 +16921,10 @@ export interface operations {
           | 'network_receive_bytes'
           | 'network_transmit_bytes'
           | 'pgbouncer_pools_client_active_connections'
+          | 'realtime_connections_connected'
+          | 'realtime_channel_joins'
+          | 'realtime_channel_events'
+          | 'realtime_channel_presence_events'
         databaseIdentifier?: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
