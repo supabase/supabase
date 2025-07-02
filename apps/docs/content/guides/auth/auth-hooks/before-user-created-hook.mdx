@@ -12,13 +12,14 @@ You can implement this hook using an HTTP endpoint or a Postgres function. If th
 
 Supabase Auth will send a payload containing these fields to your hook:
 
-| Field    | Type     | Description                                                                               |
-| -------- | -------- | ----------------------------------------------------------------------------------------- |
+| Field      | Type     | Description                                                                               |
+| ---------- | -------- | ----------------------------------------------------------------------------------------- |
 | `metadata` | `object` | Metadata about the request. Includes IP address, request ID, and hook type.               |
-| `user`   | `object` | The user record that is about to be created. Matches the shape of the `auth.users` table. |
+| `user`     | `object` | The user record that is about to be created. Matches the shape of the `auth.users` table. |
 
 <Admonition type="note">
-Because the hook is ran just before the insertion into the database, this user will not be found in Postgres at the time the hook is called. 
+  Because the hook is ran just before the insertion into the database, this user will not be found
+  in Postgres at the time the hook is called.
 </Admonition>
 
 <Tabs
@@ -34,7 +35,7 @@ Because the hook is ran just before the insertion into the database, this user w
     "uuid": "8b34dcdd-9df1-4c10-850a-b3277c653040",
     "time": "2025-04-29T13:13:24.755552-07:00",
     "name": "before-user-created",
-    "ip_address": "127.0.0.1",
+    "ip_address": "127.0.0.1"
   },
   "user": {
     "id": "ff7fc9ae-3b1b-4642-9241-64adb9848a03",
@@ -80,7 +81,7 @@ Because the hook is ran just before the insertion into the database, this user w
         "name": {
           "type": "string",
           "enum": ["before-user-created"]
-        },
+        }
       },
       "required": ["uuid", "time", "ip_address", "name"]
     },
@@ -113,8 +114,17 @@ Because the hook is ran just before the insertion into the database, this user w
         "is_anonymous": { "type": "boolean" }
       },
       "required": [
-        "id", "aud", "role", "email", "phone", "app_metadata",
-        "user_metadata", "identities", "created_at", "updated_at", "is_anonymous"
+        "id",
+        "aud",
+        "role",
+        "email",
+        "phone",
+        "app_metadata",
+        "user_metadata",
+        "identities",
+        "created_at",
+        "updated_at",
+        "is_anonymous"
       ]
     }
   },
@@ -129,9 +139,9 @@ Because the hook is ran just before the insertion into the database, this user w
 
 Your hook must return a response that either allows or blocks the signup request.
 
-| Field    | Type      | Description                                                                                           |
-| -------- | --------- | ----------------------------------------------------------------------------------------------------- |
-| `error`  | `object`  | (Optional) Return this to reject the signup. Includes a code, message, and optional HTTP status code. |
+| Field   | Type     | Description                                                                                           |
+| ------- | -------- | ----------------------------------------------------------------------------------------------------- |
+| `error` | `object` | (Optional) Return this to reject the signup. Includes a code, message, and optional HTTP status code. |
 
 Returning an empty object with a `200` or `204` status code allows the request to proceed. Returning a JSON response with an `error` object and a `4xx` status code blocks the request and propagates the error message to the client. See the [error handling documentation](/docs/guides/auth/auth-hooks#error-handling) for more details.
 
@@ -185,8 +195,9 @@ Each of the following examples shows how to use the `before-user-created` hook t
 Allow signups only from specific domains like supabase.com or example.test. Reject all others. This is useful for private/internal apps, enterprise gating, or invite-only beta access.
 
 The `before-user-created` hook solves this by:
-* Detecting that a user is about to be created
-* Providing the email address in the `user.email` field
+
+- Detecting that a user is about to be created
+- Providing the email address in the `user.email` field
 
 Run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `signup_email_domains` table with some sample data and a `hook_restrict_signup_by_email_domain` function to be called by the `before-user-created` auth hook.
 
@@ -288,10 +299,10 @@ revoke execute
 Some applications want to **allow sign-ins with a provider like Discord only for users who already exist**, while blocking new account creation via that provider. This prevents unwanted signups through OAuth flows and enables tighter control over who can join the app.
 
 The `before-user-created` hook solves this by:
-* Detecting that a user is about to be created
-* Allowing you to inspect the `app_metadata.provider`
-* Knowing the request came from an OAuth flow
 
+- Detecting that a user is about to be created
+- Allowing you to inspect the `app_metadata.provider`
+- Knowing the request came from an OAuth flow
 
 Run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `hook_reject_discord_signups` function to be called by the `before-user-created` auth hook.
 
@@ -331,14 +342,14 @@ revoke execute
 
 </TabPanel>
 
-
 <TabPanel id="sql-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
 This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
-* Detecting that a user is about to be created
-* Providing the IP address in the `metadata.ip_address` field
+
+- Detecting that a user is about to be created
+- Providing the IP address in the `metadata.ip_address` field
 
 Run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `signup_networks` table with some sample data and a `hook_restrict_signup_by_network` function to be called by the `before-user-created` auth hook.
 
@@ -427,12 +438,11 @@ revoke execute
   on function public.hook_restrict_signup_by_network
   from authenticated, anon, public;
 ```
-</TabPanel>
 
+</TabPanel>
 
 </Tabs>
 </TabPanel>
-
 
 <TabPanel id="http" label="HTTP">
 <Tabs
@@ -442,13 +452,13 @@ revoke execute
   defaultActiveId="http-allow-by-domain"
 >
 
-
 <TabPanel id="http-allow-by-domain" label="Allow by Domain">
 Allow signups only from specific domains like supabase.com or example.test. Reject all others. This is useful for private/internal apps, enterprise gating, or invite-only beta access.
 
 The `before-user-created` hook solves this by:
-* Detecting that a user is about to be created
-* Providing the email address in the `user.email` field
+
+- Detecting that a user is about to be created
+- Providing the email address in the `user.email` field
 
 Create a `.env` file with the following environment variables:
 
@@ -479,10 +489,7 @@ Add the following code to your edge function:
 ```ts
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
-const allowedDomains = [
-  'supabase.com',
-  'example.test',
-]
+const allowedDomains = ['supabase.com', 'example.test']
 
 Deno.serve(async (req) => {
   const payload = await req.text()
@@ -500,8 +507,8 @@ Deno.serve(async (req) => {
         JSON.stringify({
           error: {
             message: 'Please sign up with a company email address.',
-            http_code: 400
-          }
+            http_code: 400,
+          },
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
@@ -509,13 +516,14 @@ Deno.serve(async (req) => {
 
     return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: { message: 'Invalid request format' } }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    )
+    return new Response(JSON.stringify({ error: { message: 'Invalid request format' } }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 })
 ```
+
 </TabPanel>
 
 <TabPanel id="http-block-by-oauth-provider" label="Block by OAuth Provider">
@@ -523,9 +531,9 @@ Some applications want to **allow sign-ins with a provider like Discord only for
 
 The `before-user-created` hook solves this by:
 
-* Allowing you to inspect the `app_metadata.provider`
-* Detecting that a user is about to be created
-* Knowing the request came from an OAuth flow
+- Allowing you to inspect the `app_metadata.provider`
+- Detecting that a user is about to be created
+- Knowing the request came from an OAuth flow
 
 Create a `.env` file with the following environment variables:
 
@@ -573,8 +581,8 @@ Deno.serve(async (req) => {
         JSON.stringify({
           error: {
             message: `Signups with ${provider} are not allowed.`,
-            http_code: 403
-          }
+            http_code: 403,
+          },
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
       )
@@ -586,16 +594,17 @@ Deno.serve(async (req) => {
   }
 })
 ```
-</TabPanel>
 
+</TabPanel>
 
 <TabPanel id="http-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
 This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
-* Detecting that a user is about to be created
-* Providing the IP address in the `metadata.ip_address` field
+
+- Detecting that a user is about to be created
+- Providing the IP address in the `metadata.ip_address` field
 
 Before creating the edge function run the following snippet in your project's [SQL Editor](https://supabase.com/dashboard/project/_/sql/new). This will create a `signup_networks` table with some sample data and a `hook_restrict_signup_by_network` function to be called by the `before-user-created` auth hook.
 
@@ -712,68 +721,71 @@ supabase functions new before-user-created-hook
 Add the following code to your edge function:
 
 ```ts
-import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
 const whSecret = Deno.env.get('BEFORE_USER_CREATED_HOOK_SECRET')?.replace('v1,whsec_', '')
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL')
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-const wh = new Webhook(whSecret);
-const supabase = createClient(supabaseUrl, supabaseKey);
+const wh = new Webhook(whSecret)
+const supabase = createClient(supabaseUrl, supabaseKey)
 
-Deno.serve(async (req)=>{
-  const payload = await req.text();
-  const headers = Object.fromEntries(req.headers);
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const headers = Object.fromEntries(req.headers)
   try {
-    const event = wh.verify(payload, headers);
+    const event = wh.verify(payload, headers)
 
     // Call the same Postgres function as in the SQL example.
     const { data, error } = await supabase.rpc('hook_restrict_signup_by_network', {
-      event: JSON.parse(payload)
-    });
+      event: JSON.parse(payload),
+    })
     if (error) {
-      console.error('RPC call failed:', error);
-      return new Response(JSON.stringify({
-        error: {
-          message: 'Internal error processing signup restriction',
-          http_code: 500
+      console.error('RPC call failed:', error)
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: 'Internal error processing signup restriction',
+            http_code: 500,
+          },
+        }),
+        {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      }), {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      )
     }
     return new Response(JSON.stringify(data ?? {}), {
       status: 200,
       headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+        'Content-Type': 'application/json',
+      },
+    })
   } catch (err) {
-    console.error('Webhook verification failed:', err);
-    return new Response(JSON.stringify({
-      error: {
-        message: 'Invalid request format or signature'
+    console.error('Webhook verification failed:', err)
+    return new Response(
+      JSON.stringify({
+        error: {
+          message: 'Invalid request format or signature',
+        },
+      }),
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    }), {
-      status: 400,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    )
   }
-});
+})
 ```
-</TabPanel>
 
+</TabPanel>
 
 </Tabs>
 
-
 </TabPanel>
 </Tabs>
-
-
