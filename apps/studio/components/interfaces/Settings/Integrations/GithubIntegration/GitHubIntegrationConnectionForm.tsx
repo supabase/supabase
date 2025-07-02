@@ -69,8 +69,8 @@ const GitHubIntegrationConnectionForm = ({
   const selectedOrganization = useSelectedOrganization()
   const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
-  const [selectedRepositoryId, setSelectedRepositoryId] = useState<string | undefined>()
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
+  const isParentProject = !Boolean(selectedProject?.parent_project_ref)
 
   const canUpdateGitHubConnection = useCheckPermissions(
     PermissionAction.UPDATE,
@@ -185,9 +185,7 @@ const GitHubIntegrationConnectionForm = ({
   const currentRepositoryId = githubSettingsForm.watch('repositoryId')
 
   // Calculate selected repository based on current form value
-  const selectedRepository = githubRepos.find(
-    (repo) => repo.id === (currentRepositoryId || selectedRepositoryId)
-  )
+  const selectedRepository = githubRepos.find((repo) => repo.id === currentRepositoryId)
 
   const handleCreateOrUpdateConnection = async (data: z.infer<typeof GitHubSettingsSchema>) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
@@ -221,7 +219,6 @@ const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    // Create the connection
     createConnection({
       organizationId: selectedOrganization.id,
       connection: {
@@ -274,7 +271,6 @@ const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    // Update connection settings
     updateConnectionSettings({
       connectionId: currentConnection.id,
       organizationId: selectedOrganization.id,
@@ -286,7 +282,6 @@ const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    // Handle branch update
     if (prodBranch?.id) {
       updateBranch({
         id: prodBranch.id,
@@ -323,7 +318,6 @@ const GitHubIntegrationConnectionForm = ({
         supabaseChangesOnly: true,
         branchLimit: '50',
       })
-      setSelectedRepositoryId(undefined)
     } catch (error) {
       console.error('Error removing integration:', error)
       toast.error('Failed to remove integration')
@@ -337,13 +331,11 @@ const GitHubIntegrationConnectionForm = ({
     if (!selectedRepo || !connection) return
 
     try {
-      // Delete the existing connection
       await deleteConnection({
         organizationId: selectedOrganization!.id,
         connectionId: connection.id,
       })
 
-      // Create new connection with the new repository
       await handleCreateConnection(data, selectedRepo)
 
       setIsConfirmingRepoChange(false)
@@ -375,7 +367,6 @@ const GitHubIntegrationConnectionForm = ({
         supabaseChangesOnly: connection.supabase_changes_only,
         branchLimit: String(connection.branch_limit),
       })
-      setSelectedRepositoryId(connection.repository.id.toString())
     }
   }, [connection, prodBranch, githubSettingsForm])
 
@@ -414,7 +405,10 @@ const GitHubIntegrationConnectionForm = ({
   return (
     <>
       <Form_Shadcn_ {...githubSettingsForm}>
-        <form onSubmit={githubSettingsForm.handleSubmit(handleCreateOrUpdateConnection)}>
+        <form
+          onSubmit={githubSettingsForm.handleSubmit(handleCreateOrUpdateConnection)}
+          className={cn(!isParentProject && 'opacity-25 pointer-events-none')}
+        >
           <Card>
             <CardContent className="space-y-6">
               {/* Repository Selection */}
@@ -468,7 +462,6 @@ const GitHubIntegrationConnectionForm = ({
                                   value={`${repo.name.replaceAll('"', '')}-${i}`}
                                   className="flex gap-2 items-center"
                                   onSelect={() => {
-                                    setSelectedRepositoryId(repo.id)
                                     field.onChange(repo.id)
                                     setRepoComboboxOpen(false)
                                   }}
@@ -499,7 +492,7 @@ const GitHubIntegrationConnectionForm = ({
                 )}
               />
             </CardContent>
-            <CardContent className={cn(!selectedRepositoryId && 'opacity-25 pointer-events-none')}>
+            <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
               <FormField_Shadcn_
                 control={githubSettingsForm.control}
                 name="supabaseDirectory"
@@ -521,7 +514,7 @@ const GitHubIntegrationConnectionForm = ({
                 )}
               />
             </CardContent>
-            <CardContent className={cn(!selectedRepositoryId && 'opacity-25 pointer-events-none')}>
+            <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
               {/* Production Branch Sync Section */}
               <div className="space-y-4">
                 <FormField_Shadcn_
@@ -579,7 +572,7 @@ const GitHubIntegrationConnectionForm = ({
                 </div>
               </div>
             </CardContent>
-            <CardContent className={cn(!selectedRepositoryId && 'opacity-25 pointer-events-none')}>
+            <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
               {/* Automatic Branching Section */}
               <div className="space-y-4">
                 <FormField_Shadcn_
@@ -669,7 +662,6 @@ const GitHubIntegrationConnectionForm = ({
                   <Button
                     type="default"
                     onClick={() => {
-                      setSelectedRepositoryId(connection?.repository.id.toString() || '')
                       githubSettingsForm.reset()
                     }}
                     disabled={disabled || !canUpdateGitHubConnection}
