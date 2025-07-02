@@ -30,36 +30,36 @@ export const AIOnboarding = ({
 
   const defaultPrompts = [
     {
-      title: 'Generate a back-end',
+      title: 'Create a back-end',
       prompt:
         'Create a messaging app with users, messages, and an edge function that uses OpenAI to summarize message threads.',
-      icon: <WandSparkles strokeWidth={1.25} size={14} />,
+      icon: <WandSparkles strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Health check',
       prompt: 'Can you check if my database and edge functions are healthy?',
-      icon: <MessageCircleMore strokeWidth={1.25} size={14} />,
+      icon: <MessageCircleMore strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Query your data',
       prompt:
         'Give me a list of new users from the auth.users table who signed up in the past week',
-      icon: <FileText strokeWidth={1.25} size={14} />,
+      icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Set up RLS policies',
       prompt: 'Create RLS policies to ensure users can only access their own data',
-      icon: <MessageCircleMore strokeWidth={1.25} size={14} />,
+      icon: <MessageCircleMore strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Create a function',
       prompt: 'Create an edge function that summarises the contents of a table row using OpenAI',
-      icon: <WandSparkles strokeWidth={1.25} size={14} />,
+      icon: <WandSparkles strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Generate sample data',
       prompt: 'Generate sample data for a blog with users, posts, and comments tables',
-      icon: <FileText strokeWidth={1.25} size={14} />,
+      icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
   ]
 
@@ -67,17 +67,17 @@ export const AIOnboarding = ({
     {
       title: 'Explain code',
       prompt: 'Explain what this code does and how it works',
-      icon: <FileText strokeWidth={1.25} size={14} />,
+      icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Improve code',
       prompt: 'How can I improve this code for better performance and readability?',
-      icon: <WandSparkles strokeWidth={1.25} size={14} />,
+      icon: <WandSparkles strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Debug issues',
       prompt: 'Help me debug any potential issues with this code',
-      icon: <MessageCircleMore strokeWidth={1.25} size={14} />,
+      icon: <MessageCircleMore strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
   ]
 
@@ -86,7 +86,7 @@ export const AIOnboarding = ({
     ? suggestions.prompts.map((suggestion) => ({
         title: suggestion.label,
         prompt: suggestion.description,
-        icon: <FileText strokeWidth={1.25} size={14} />,
+        icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
       }))
     : sqlSnippets && sqlSnippets.length > 0
       ? codeSnippetPrompts
@@ -153,7 +153,7 @@ export const AIOnboarding = ({
                   size="small"
                   icon={item.icon}
                   type="outline"
-                  className="text-xs rounded-full"
+                  className="text-xs rounded-full !h-auto py-1 px-2 text-foreground-light"
                   onClick={() => {
                     onValueChange(item.prompt)
                     inputRef.current?.focus()
