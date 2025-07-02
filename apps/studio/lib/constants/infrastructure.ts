@@ -25,7 +25,8 @@ export const PRICING_TIER_PRODUCT_IDS = {
   ENTERPRISE: 'tier_enterprise',
 }
 
-export const DEFAULT_PROVIDER: CloudProvider = 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider =
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'AWS_K8S' : 'AWS'
 
 export const PROVIDERS = {
   FLY: {
