@@ -21,6 +21,8 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useStorageReport } from 'data/reports/storage-report-query'
 
 import type { NextPageWithLayout } from 'types'
+import Link from 'next/link'
+import { ExternalLinkIcon } from 'lucide-react'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -107,7 +109,21 @@ export const StorageReport: NextPageWithLayout = () => {
           isLoading={isLoading}
           params={params.cacheHitRate}
           title="Request Caching"
-          tooltip="The number of storage requests that are cached at the edge level. A higher number of hits is better."
+          tooltip={
+            <div>
+              The number of storage requests that are cached at the edge level. A higher number of
+              hits is better.{' '}
+              <span className="flex items-center gap-1 text-foreground-lighter">
+                <Link
+                  href="https://supabase.com/docs/guides/storage/cdn/fundamentals"
+                  target="_blank"
+                >
+                  Read More
+                </Link>
+                <ExternalLinkIcon className="w-3 h-3" />
+              </span>
+            </div>
+          }
           data={data.cacheHitRate || []}
           renderer={CacheHitRateChartRenderer}
           append={TopCacheMissesRenderer}
