@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { isEmpty } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -101,6 +102,7 @@ export const CreateWrapperSheet = ({
     if (selectedMode === 'tables' && newTables.length === 0) {
       errors.tables = 'Please add at least one table'
     }
+    if (!isEmpty(errors)) return setFormErrors(errors)
 
     createFDW({
       projectRef: project?.ref,
