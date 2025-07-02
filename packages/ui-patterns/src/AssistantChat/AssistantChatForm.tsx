@@ -73,7 +73,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
         ref={formRef}
         {...props}
         onSubmit={onSubmit}
-        className={cn('relative', props.className)}
+        className={cn('relative ', props.className)}
       >
         <ExpandingTextArea
           ref={textAreaRef}

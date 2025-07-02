@@ -1,238 +1,109 @@
 import { motion } from 'framer-motion'
 import { FileText, MessageCircleMore, WandSparkles } from 'lucide-react'
+import { useRef, useState } from 'react'
 
-import { Button } from 'ui'
-import {
-  InnerSideMenuCollapsible,
-  InnerSideMenuCollapsibleContent,
-  InnerSideMenuCollapsibleTrigger,
-} from 'ui-patterns/InnerSideMenu'
+import { Button, cn } from 'ui'
+import { AssistantChatForm } from 'ui-patterns'
 
 interface AIOnboardingProps {
-  onSendMessage: (message: string) => void
+  onMessageSend: (message: string) => void
 }
 
-export const AIOnboarding = ({ onSendMessage }: AIOnboardingProps) => {
-  const sendMessageToAssistant = (message: string) => {
-    onSendMessage(message)
-  }
+export const AIOnboarding = ({ onMessageSend }: AIOnboardingProps) => {
+  const [value, setValue] = useState('')
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const prompts = [
+    {
+      title: 'Generate a back-end',
+      prompt:
+        'Create a messaging app with users, messages, and an edge function that uses OpenAI to summarize message threads.',
+      icon: <WandSparkles strokeWidth={1.25} size={14} />,
+    },
+    {
+      title: 'Health check',
+      prompt: 'Can you check if my database and edge functions are healthy?',
+      icon: <MessageCircleMore strokeWidth={1.25} size={14} />,
+    },
+    {
+      title: 'Query your data',
+      prompt:
+        'Give me a list of new users from the auth.users table who signed up in the past week',
+      icon: <FileText strokeWidth={1.25} size={14} />,
+    },
+    {
+      title: 'Set up RLS policies',
+      prompt: 'Create RLS policies to ensure users can only access their own data',
+      icon: <MessageCircleMore strokeWidth={1.25} size={14} />,
+    },
+    {
+      title: 'Create a function',
+      prompt: 'Create an edge function that summarises the contents of a table row using OpenAI',
+      icon: <WandSparkles strokeWidth={1.25} size={14} />,
+    },
+    {
+      title: 'Generate sample data',
+      prompt: 'Generate sample data for a blog with users, posts, and comments tables',
+      icon: <FileText strokeWidth={1.25} size={14} />,
+    },
+  ]
 
   return (
-    <div className="w-full p-5 flex flex-col grow shrink-0 justify-end overflow-auto">
-      <div className="shrink-0">
+    <div className="w-full h-full flex flex-col">
+      {/* Header Section */}
+      <div className="flex-1 flex flex-col items-center justify-center p-7">
         <motion.div
-          initial={{ x: -10, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0 }}
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-md flex flex-col items-center"
         >
-          <p className="text-base mb-2">How can I assist you?</p>
-          <p className="text-sm text-foreground-lighter mb-4">
-            I can help you build and manage your database by writing SQL or supabase-js, set up
-            policies, functions or triggers, and query your data - ask me anything.
-          </p>
-        </motion.div>
-        <motion.div>
-          <motion.div
-            initial={{ x: -10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0 }}
-          >
-            <InnerSideMenuCollapsible className="border-b border-muted py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="Tables" />
-              <InnerSideMenuCollapsibleContent>
-                <div className="mt-3 mb-1 space-y-1">
-                  <Button
-                    size="small"
-                    icon={<WandSparkles strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant(
-                        "Create a table of countries and a table of cities. The cities table should have a country column that's a foreign key to the countries table."
-                      )
-                    }
-                  >
-                    Create a new table
-                  </Button>
+          <h2 className="text-2xl mb-6">How can I assist you?</h2>
+          <div className="w-full mb-6">
+            <AssistantChatForm
+              textAreaRef={inputRef}
+              className={cn(
+                'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              )}
+              loading={false}
+              disabled={false}
+              placeholder="Ask me anything..."
+              value={value}
+              onValueChange={(e) => setValue(e.target.value)}
+              onSubmit={(event) => {
+                event.preventDefault()
+                if (value.trim()) {
+                  onMessageSend(value)
+                  setValue('')
+                }
+              }}
+              autoFocus
+            />
+          </div>
 
-                  <Button
-                    size="small"
-                    icon={<FileText strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant(
-                        'Give me a list of new users from the auth.users table who signed up in the past week'
-                      )
-                    }
-                  >
-                    Query your data
-                  </Button>
-
-                  <Button
-                    size="small"
-                    icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant(
-                        'Give me a chart showing the number of new sign ups in the auth.users table per day over the last week'
-                      )
-                    }
-                  >
-                    Chart your data
-                  </Button>
-                </div>
-              </InnerSideMenuCollapsibleContent>
-            </InnerSideMenuCollapsible>
-          </motion.div>
-
-          <motion.div
-            initial={{ x: -10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
-            <InnerSideMenuCollapsible className="border-b border-muted py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="RLS Policies" />
-              <InnerSideMenuCollapsibleContent>
-                <div className="mt-3 mb-1 space-y-1">
-                  <Button
-                    size="small"
-                    icon={<WandSparkles strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant(
-                        'Suggest some database RLS policies I can add to my public schema'
-                      )
-                    }
-                  >
-                    Suggest RLS policies
-                  </Button>
-
-                  <Button
-                    size="small"
-                    icon={<FileText strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant('Generate some examples of database RLS policies')
-                    }
-                  >
-                    Examples of RLS policies
-                  </Button>
-
-                  <Button
-                    size="small"
-                    icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() => sendMessageToAssistant(`What are database RLS policies`)}
-                  >
-                    What are RLS policies?
-                  </Button>
-                </div>
-              </InnerSideMenuCollapsibleContent>
-            </InnerSideMenuCollapsible>
-          </motion.div>
-
-          <motion.div
-            initial={{ x: -10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <InnerSideMenuCollapsible className="border-b border-muted py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="Functions" />
-              <InnerSideMenuCollapsibleContent>
-                <div className="mt-3 mb-1 space-y-1">
-                  <Button
-                    size="small"
-                    icon={<WandSparkles strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant(
-                        'Suggest some database functions I can add to my public schema'
-                      )
-                    }
-                  >
-                    Suggest database functions
-                  </Button>
-
-                  <Button
-                    size="small"
-                    icon={<FileText strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant('Generate some examples of database functions')
-                    }
-                  >
-                    Examples of database functions
-                  </Button>
-
-                  <Button
-                    size="small"
-                    icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() => sendMessageToAssistant('What are database functions')}
-                  >
-                    What are database functions?
-                  </Button>
-                </div>
-              </InnerSideMenuCollapsibleContent>
-            </InnerSideMenuCollapsible>
-          </motion.div>
-
-          <motion.div
-            initial={{ x: -10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <InnerSideMenuCollapsible className="py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="Triggers" />
-              <InnerSideMenuCollapsibleContent>
-                <div className="mt-3 mb-1 space-y-1">
-                  <Button
-                    size="small"
-                    icon={<WandSparkles strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant(
-                        'Suggest some database triggers I can add to my public schema'
-                      )
-                    }
-                  >
-                    Suggest database Triggers
-                  </Button>
-
-                  <Button
-                    size="small"
-                    icon={<FileText strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() =>
-                      sendMessageToAssistant(`Generate some examples of database triggers`)
-                    }
-                  >
-                    Examples of database triggers
-                  </Button>
-
-                  <Button
-                    size="small"
-                    icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() => sendMessageToAssistant('What are database triggers')}
-                  >
-                    What are database triggers?
-                  </Button>
-                </div>
-              </InnerSideMenuCollapsibleContent>
-            </InnerSideMenuCollapsible>
-          </motion.div>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {prompts.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ y: 5, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <Button
+                  size="small"
+                  icon={item.icon}
+                  type="outline"
+                  className="text-xs rounded-full"
+                  onClick={() => {
+                    setValue(item.prompt)
+                    inputRef.current?.focus()
+                  }}
+                >
+                  {item.title}
+                </Button>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </div>

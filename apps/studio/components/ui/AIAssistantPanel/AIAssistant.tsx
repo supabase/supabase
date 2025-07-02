@@ -8,7 +8,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -22,18 +21,9 @@ import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import {
-  AiIconAnimation,
-  Button,
-  cn,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from 'ui'
+import { AiIconAnimation, Button, cn } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { DotGrid } from '../DotGrid'
 import { ErrorBoundary } from '../ErrorBoundary'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
@@ -268,6 +258,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   const hasMessages = chatMessages.length > 0
+  const isShowingOnboarding = !hasMessages && isApiKeySet
 
   const sendMessageToAssistant = (content: string) => {
     const payload = { role: 'user', createdAt: new Date(), content, id: uuidv4() } as MessageType
@@ -355,7 +346,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <div className="z-30 sticky top-0">
             <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
               <div className="text-sm flex-1 flex items-center">
-                <AiIconAnimation size={20} />
+                <AiIconAnimation size={20} allowHoverEffect={false} />
                 <span className="text-border-stronger dark:text-border-strong ml-3">
                   <svg
                     viewBox="0 0 24 24"
@@ -445,11 +436,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               </Admonition>
             )}
           </div>
-          {!hasMessages && (
-            <div className="h-48 flex-0 m-8">
-              <DotGrid rows={10} columns={10} count={33} />
-            </div>
-          )}
           {hasMessages ? (
             <div className="w-full px-7 py-8 space-y-6">
               {renderedMessages}
@@ -520,63 +506,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               </div>
             </div>
           ) : isLoadingTables && isApiKeySet ? (
-            <div className="w-full h-full flex-1 flex flex-col justify-end items-start p-5">
-              {/* [Joshen] We could try play around with a custom loader for the assistant here */}
+            <div className="w-full h-full flex-1 flex flex-col justify-center items-center p-5">
               <GenericSkeletonLoader className="w-4/5" />
             </div>
-          ) : (tables ?? [])?.length > 0 ? (
-            <AIOnboarding onSendMessage={sendMessageToAssistant} />
           ) : isApiKeySet ? (
-            <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
-              <h2 className="text-base mb-2">Welcome to Supabase!</h2>
-              <p className="text-sm text-foreground-lighter mb-6">
-                This is the Supabase assistant which will help you create, debug and modify tables,
-                policies, functions and more. You can even use it to query your data using just your
-                words. It looks like we have a blank canvas though, so what are you looking to
-                build? Here are some ideas.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={() => setValue('Generate a database schema for ...')}
-                  className="rounded-full"
-                >
-                  Generate a ...
-                </Button>
-                {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
-                  <TooltipProvider key={qs.title}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="outline"
-                          className="rounded-full"
-                          onClick={() => {
-                            setMessages([
-                              {
-                                id: uuidv4(),
-                                role: 'user',
-                                createdAt: new Date(Date.now() - 3000),
-                                content: qs.description,
-                              },
-                              {
-                                id: uuidv4(),
-                                role: 'assistant',
-                                createdAt: new Date(),
-                                content: `Sure! I can help you with that. Here is a starting point you can run directly or customize further. Would you like to make any changes?  \n\n\`\`\`sql\n-- props: {"title": "${qs.title}"}\n${qs.sql}\n\`\`\``,
-                              },
-                            ])
-                          }}
-                        >
-                          {qs.title}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{qs.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ))}
-              </div>
-            </div>
+            <AIOnboarding onMessageSend={sendMessageToAssistant} />
           ) : null}
         </div>
 
@@ -617,81 +551,84 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative">
-          {snap.sqlSnippets && snap.sqlSnippets.length > 0 && (
-            <div className="mb-0 mx-4">
-              {snap.sqlSnippets.map((snippet: string, index: number) => (
-                <CollapsibleCodeBlock
-                  key={index}
-                  hideLineNumbers
-                  value={snippet}
-                  onRemove={() => {
-                    const newSnippets = [...(snap.sqlSnippets ?? [])]
-                    newSnippets.splice(index, 1)
-                    snap.setSqlSnippets(newSnippets)
-                  }}
-                  className="text-xs rounded-b-none"
-                />
-              ))}
-            </div>
-          )}
-          {disablePrompts && (
-            <Admonition
-              showIcon={false}
-              type="default"
-              title="Assistant has been temporarily disabled"
-              description="We're currently looking into getting it back online"
-            />
-          )}
-
-          {isSuccess && !isApiKeySet && (
-            <Admonition
-              type="default"
-              title="OpenAI API key not set"
-              description={
-                <Markdown
-                  content={
-                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
-                  }
-                />
-              }
-            />
-          )}
-
-          <AssistantChatForm
-            textAreaRef={inputRef}
-            className={cn(
-              'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+        {!isShowingOnboarding && (
+          <div className="px-3 pb-3 z-20 relative">
+            {snap.sqlSnippets && snap.sqlSnippets.length > 0 && (
+              <div className="mb-0 mx-4">
+                {snap.sqlSnippets.map((snippet: string, index: number) => (
+                  <CollapsibleCodeBlock
+                    key={index}
+                    hideLineNumbers
+                    value={snippet}
+                    onRemove={() => {
+                      const newSnippets = [...(snap.sqlSnippets ?? [])]
+                      newSnippets.splice(index, 1)
+                      snap.setSqlSnippets(newSnippets)
+                    }}
+                    className="text-xs rounded-b-none border-b-0"
+                  />
+                ))}
+              </div>
             )}
-            loading={isChatLoading}
-            disabled={!isApiKeySet || disablePrompts || isChatLoading}
-            placeholder={
-              hasMessages
-                ? 'Ask a follow up question...'
-                : (snap.sqlSnippets ?? [])?.length > 0
-                  ? 'Ask a question or make a change...'
-                  : 'Chat to Postgres...'
-            }
-            value={value}
-            onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(event) => {
-              event.preventDefault()
-              if (aiOptInLevel !== 'disabled') {
-                const sqlSnippetsString =
-                  snap.sqlSnippets
-                    ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
-                    .join('\n') || ''
-                const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
-                sendMessageToAssistant(valueWithSnippets)
-                scrollToEnd()
-              } else {
-                sendMessageToAssistant(value)
-                snap.setSqlSnippets([])
-                scrollToEnd()
+            {disablePrompts && (
+              <Admonition
+                showIcon={false}
+                type="default"
+                title="Assistant has been temporarily disabled"
+                description="We're currently looking into getting it back online"
+              />
+            )}
+
+            {isSuccess && !isApiKeySet && (
+              <Admonition
+                type="default"
+                title="OpenAI API key not set"
+                description={
+                  <Markdown
+                    content={
+                      'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                    }
+                  />
+                }
+              />
+            )}
+
+            <AssistantChatForm
+              textAreaRef={inputRef}
+              className={cn(
+                'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              )}
+              loading={isChatLoading}
+              disabled={!isApiKeySet || disablePrompts || isChatLoading}
+              placeholder={
+                hasMessages
+                  ? 'Ask a follow up question...'
+                  : (snap.sqlSnippets ?? [])?.length > 0
+                    ? 'Ask a question or make a change...'
+                    : 'Chat to Postgres...'
               }
-            }}
-          />
-        </div>
+              value={value}
+              autoFocus
+              onValueChange={(e) => setValue(e.target.value)}
+              onSubmit={(event) => {
+                event.preventDefault()
+                if (aiOptInLevel !== 'disabled') {
+                  const sqlSnippetsString =
+                    snap.sqlSnippets
+                      ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
+                      .join('\n') || ''
+                  const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
+                  sendMessageToAssistant(valueWithSnippets)
+                  scrollToEnd()
+                } else {
+                  sendMessageToAssistant(value)
+                  snap.setSqlSnippets([])
+                  scrollToEnd()
+                }
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <AIOptInModal
