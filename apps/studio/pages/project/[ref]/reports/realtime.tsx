@@ -101,6 +101,8 @@ const RealtimeUsage = () => {
       )
     })
 
+    refresh()
+
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
@@ -155,16 +157,16 @@ const RealtimeUsage = () => {
     })
   }
 
-  const handleDatepickerChange = (vals: DatePickerValue) => {
-    report.mergeParams({
-      iso_timestamp_start: vals.from || '',
-      iso_timestamp_end: vals.to || '',
-    })
-    setDateRange({
-      period_start: { date: vals.from || '', time_period: '1d' },
-      period_end: { date: vals.to || '', time_period: 'today' },
-    })
-  }
+  // const handleDatepickerChange = (vals: DatePickerValue) => {
+  //   report.mergeParams({
+  //     iso_timestamp_start: vals.from || '',
+  //     iso_timestamp_end: vals.to || '',
+  //   })
+  //   setDateRange({
+  //     period_start: { date: vals.from || '', time_period: '1d' },
+  //     period_end: { date: vals.to || '', time_period: 'today' },
+  //   })
+  // }
 
   return (
     <>
@@ -231,16 +233,18 @@ const RealtimeUsage = () => {
             <div className="sticky top-0 bg-200 py-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
               <ReportFilterBar
                 onRemoveFilters={removeFilters}
-                onDatepickerChange={handleDatepickerChange}
-                datepickerFrom={params.totalRequests.iso_timestamp_start}
-                datepickerTo={params.totalRequests.iso_timestamp_end}
+                hideDatepicker={true}
+                // onDatepickerChange={handleDatepickerChange}
+                datepickerFrom={dateRange.from}
+                datepickerTo={dateRange.to}
                 onAddFilter={addFilter}
-                onRefresh={refresh}
+                // onRefresh={refresh}
                 isLoading={isLoading}
                 filters={filters}
                 selectedProduct="realtime"
                 datepickerHelpers={createFilteredDatePickerHelpers(orgPlan?.id || 'free')}
                 className="w-full"
+                showDatabaseSelector={false}
               />
             </div>
           </div>

@@ -29,13 +29,15 @@ interface ReportFilterBarProps {
   isLoading: boolean
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
-  onRefresh: () => void
-  onDatepickerChange: ComponentProps<typeof LogsDatePicker>['onSubmit']
+  onRefresh?: () => void
+  onDatepickerChange?: ComponentProps<typeof LogsDatePicker>['onSubmit']
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
   className?: string
   selectedProduct?: string
+  showDatabaseSelector?: boolean
+  hideDatepicker?: boolean
 }
 
 const PRODUCT_FILTERS = [
@@ -86,11 +88,13 @@ const ReportFilterBar = ({
   isLoading = false,
   onAddFilter,
   onDatepickerChange,
+  hideDatepicker = false,
   onRemoveFilters,
   onRefresh,
   datepickerHelpers,
   className,
   selectedProduct,
+  showDatabaseSelector = true,
 }: ReportFilterBarProps) => {
   const { ref } = useParams()
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
@@ -122,7 +126,7 @@ const ReportFilterBar = ({
   }
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
-    onDatepickerChange(vals)
+    onDatepickerChange && onDatepickerChange(vals)
     setSelectedRange(vals)
   }
 
@@ -165,19 +169,23 @@ const ReportFilterBar = ({
   return (
     <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
-        <ButtonTooltip
-          type="default"
-          disabled={isLoading}
-          icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
-          className="w-7"
-          tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-          onClick={() => onRefresh()}
-        />
-        <LogsDatePicker
-          onSubmit={handleDatepickerChange}
-          value={selectedRange}
-          helpers={datepickerHelpers}
-        />
+        {onRefresh && (
+          <ButtonTooltip
+            type="default"
+            disabled={isLoading}
+            icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={() => onRefresh()}
+          />
+        )}
+        {!hideDatepicker && (
+          <LogsDatePicker
+            onSubmit={handleDatepickerChange}
+            value={selectedRange}
+            helpers={datepickerHelpers}
+          />
+        )}
         {!selectedProduct && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -340,11 +348,15 @@ const ReportFilterBar = ({
         </Popover>
       </div>
 
-      <DatabaseSelector
-        additionalOptions={
-          (loadBalancers ?? []).length > 0 ? [{ id: `${ref}-all`, name: 'API Load Balancer' }] : []
-        }
-      />
+      {showDatabaseSelector && (
+        <DatabaseSelector
+          additionalOptions={
+            (loadBalancers ?? []).length > 0
+              ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
+              : []
+          }
+        />
+      )}
     </div>
   )
 }
