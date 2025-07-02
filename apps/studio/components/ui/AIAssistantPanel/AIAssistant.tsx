@@ -261,7 +261,23 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const isShowingOnboarding = !hasMessages && isApiKeySet
 
   const sendMessageToAssistant = (content: string) => {
-    const payload = { role: 'user', createdAt: new Date(), content, id: uuidv4() } as MessageType
+    let finalContent = content
+
+    // Handle SQL snippets based on opt-in level
+    if (aiOptInLevel !== 'disabled') {
+      const sqlSnippetsString =
+        snap.sqlSnippets?.map((snippet: string) => '```sql\n' + snippet + '\n```').join('\n') || ''
+      finalContent = [content, sqlSnippetsString].filter(Boolean).join('\n\n')
+    } else {
+      snap.setSqlSnippets([])
+    }
+
+    const payload = {
+      role: 'user',
+      createdAt: new Date(),
+      content: finalContent,
+      id: uuidv4(),
+    } as MessageType
     snap.clearSqlSnippets()
 
     // Store the user message in the ref before appending
@@ -475,42 +491,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 )}
               </AnimatePresence>
             </div>
-          ) : snap.suggestions ? (
-            <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
-              <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
-                Suggestions
-              </h3>
-              {snap.suggestions.title && <p>{snap.suggestions.title}</p>}
-              <div className="-mx-3 mt-4 mb-12">
-                {snap.suggestions?.prompts?.map((prompt: string, idx: number) => (
-                  <Button
-                    key={`suggestion-${idx}`}
-                    size="small"
-                    icon={<FileText strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() => {
-                      setValue(prompt)
-                      if (inputRef.current && snap.initialInput) {
-                        inputRef.current.focus()
-                        inputRef.current.setSelectionRange(
-                          snap.initialInput.length,
-                          snap.initialInput.length
-                        )
-                      }
-                    }}
-                  >
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
-            </div>
           ) : isLoadingTables && isApiKeySet ? (
             <div className="w-full h-full flex-1 flex flex-col justify-center items-center p-5">
               <GenericSkeletonLoader className="w-4/5" />
             </div>
-          ) : isApiKeySet ? (
-            <AIOnboarding onMessageSend={sendMessageToAssistant} />
+          ) : isShowingOnboarding ? (
+            <AIOnboarding
+              onMessageSend={sendMessageToAssistant}
+              sqlSnippets={snap.sqlSnippets as string[] | undefined}
+              onRemoveSnippet={(index) => {
+                const newSnippets = [...(snap.sqlSnippets ?? [])]
+                newSnippets.splice(index, 1)
+                snap.setSqlSnippets(newSnippets)
+              }}
+              suggestions={snap.suggestions}
+            />
           ) : null}
         </div>
 
@@ -612,19 +607,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               onValueChange={(e) => setValue(e.target.value)}
               onSubmit={(event) => {
                 event.preventDefault()
-                if (aiOptInLevel !== 'disabled') {
-                  const sqlSnippetsString =
-                    snap.sqlSnippets
-                      ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
-                      .join('\n') || ''
-                  const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
-                  sendMessageToAssistant(valueWithSnippets)
-                  scrollToEnd()
-                } else {
-                  sendMessageToAssistant(value)
-                  snap.setSqlSnippets([])
-                  scrollToEnd()
-                }
+                sendMessageToAssistant(value)
+                scrollToEnd()
               }}
             />
           </div>

@@ -9,7 +9,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 type SuggestionsType = {
   title: string
-  prompts?: string[]
+  prompts?: { label: string; description: string }[]
 }
 
 type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
@@ -286,6 +286,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (chat) {
         chat.messages = []
         chat.updatedAt = new Date()
+        state.suggestions = undefined
         state.sqlSnippets = []
         state.initialInput = ''
       }

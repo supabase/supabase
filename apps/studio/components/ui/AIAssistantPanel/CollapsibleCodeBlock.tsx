@@ -22,7 +22,7 @@ export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBloc
     <div className="relative">
       <div
         className={cn(
-          'flex items-center gap-1 p-2 bg-surface-100 border border-default w-full overflow-hidden',
+          'flex items-center gap-1 px-2 py-1.5 bg-surface-100 border border-default w-full overflow-hidden',
           'rounded-md',
           props.className
         )}

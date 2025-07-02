@@ -4,16 +4,28 @@ import { useRef, useState } from 'react'
 
 import { Button, cn } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 
 interface AIOnboardingProps {
   onMessageSend: (message: string) => void
+  sqlSnippets?: string[]
+  onRemoveSnippet?: (index: number) => void
+  suggestions?: {
+    title?: string
+    prompts?: { label: string; description: string }[]
+  }
 }
 
-export const AIOnboarding = ({ onMessageSend }: AIOnboardingProps) => {
+export const AIOnboarding = ({
+  onMessageSend,
+  sqlSnippets,
+  onRemoveSnippet,
+  suggestions,
+}: AIOnboardingProps) => {
   const [value, setValue] = useState('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const prompts = [
+  const defaultPrompts = [
     {
       title: 'Generate a back-end',
       prompt:
@@ -48,6 +60,15 @@ export const AIOnboarding = ({ onMessageSend }: AIOnboardingProps) => {
     },
   ]
 
+  // Use suggestions if available, otherwise use default prompts
+  const prompts = suggestions?.prompts
+    ? suggestions.prompts.map((suggestion) => ({
+        title: suggestion.label,
+        prompt: suggestion.description,
+        icon: <FileText strokeWidth={1.25} size={14} />,
+      }))
+    : defaultPrompts
+
   return (
     <div className="w-full h-full flex flex-col">
       {/* Header Section */}
@@ -59,7 +80,23 @@ export const AIOnboarding = ({ onMessageSend }: AIOnboardingProps) => {
           className="text-center max-w-md flex flex-col items-center"
         >
           <h2 className="text-2xl mb-6">How can I assist you?</h2>
+          {suggestions?.title && (
+            <p className="text-sm text-foreground-lighter mb-8">{suggestions.title}</p>
+          )}
           <div className="w-full mb-6">
+            {sqlSnippets && sqlSnippets.length > 0 && (
+              <div className="mx-4">
+                {sqlSnippets.map((snippet: string, index: number) => (
+                  <CollapsibleCodeBlock
+                    key={index}
+                    hideLineNumbers
+                    value={snippet}
+                    onRemove={() => onRemoveSnippet?.(index)}
+                    className="text-xs rounded-b-none border-b-0 text-left"
+                  />
+                ))}
+              </div>
+            )}
             <AssistantChatForm
               textAreaRef={inputRef}
               className={cn(
