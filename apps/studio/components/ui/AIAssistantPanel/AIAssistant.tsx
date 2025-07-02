@@ -130,18 +130,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   // Handle completion of the assistant's response
-  const handleChatFinish = useCallback(
-    (message: MessageType) => {
-      // If we have a user message stored in the ref, save both messages
-      if (lastUserMessageRef.current) {
-        snap.saveMessage([lastUserMessageRef.current, message])
-        lastUserMessageRef.current = null
-      } else {
-        snap.saveMessage(message)
-      }
-    },
-    [snap]
-  )
+  const handleChatFinish = useCallback((message: MessageType) => {
+    // If we have a user message stored in the ref, save both messages
+    if (lastUserMessageRef.current) {
+      snap.saveMessage([lastUserMessageRef.current, message])
+      lastUserMessageRef.current = null
+    } else {
+      snap.saveMessage(message)
+    }
+  }, [])
 
   // TODO(refactor): This useChat hook should be moved down into each chat session.
   // That way we won't have to disable switching chats while the chat is loading,

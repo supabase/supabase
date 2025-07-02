@@ -121,8 +121,8 @@ export const Message = function Message({
                           <ReactMarkdown
                             key={`${id}-part-${index}`}
                             className={cn(
-                              'prose prose-sm break-words [&>p:not(:last-child)]:!mb-2',
-                              isUser && 'text-foreground font-semibold'
+                              'prose prose-sm prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+                              isUser && 'text-foreground [&>p]:font-medium'
                             )}
                             remarkPlugins={[remarkGfm]}
                             components={allMarkdownComponents}
