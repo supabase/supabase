@@ -311,17 +311,16 @@ from edge_logs f
   cross join unnest(m.request) as r
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
-where starts_with(request.path, '/storage/v1/object') and r.method = 'GET'
-${generateRegexpWhere(filters, false)}
-GROUP BY
- timestamp
-ORDER BY timestamp desc
+where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
+  ${generateRegexpWhere(filters, false)}
+group by timestamp
+order by timestamp desc
 `,
       },
       topCacheMisses: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (_filters) => `
+        sql: (filters) => `
         -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
@@ -332,9 +331,10 @@ from edge_logs f
   cross join unnest(m.request) as r
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
-where starts_with(request.path, '/storage/v1/object') 
+where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+  ${generateRegexpWhere(filters, false)} 
 group by path, search
 order by count desc
 limit 12
