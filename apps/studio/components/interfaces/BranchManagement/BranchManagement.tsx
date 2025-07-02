@@ -16,6 +16,7 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useMergeRequestsQuery } from 'data/merge-requests/merge-requests-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -24,7 +25,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
+import { BranchLoader, BranchManagementSection, BranchRow, MergeRequestRow } from './BranchPanels'
 import { CreateBranchModal } from './CreateBranchModal'
 import {
   BranchingEmptyState,
@@ -81,18 +82,27 @@ const BranchManagement = () => {
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
+
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
 
+  const {
+    data: mergeRequests,
+    error: mergeRequestsError,
+    isLoading: isLoadingMergeRequests,
+    isError: isErrorMergeRequests,
+    isSuccess: isSuccessMergeRequests,
+  } = useMergeRequestsQuery({ projectRef })
+
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
 
-  const isError = isErrorConnections || isErrorBranches
-  const isLoading = isLoadingConnections || isLoadingBranches
-  const isSuccess = isSuccessConnections && isSuccessBranches
+  const isError = isErrorConnections || isErrorBranches || isErrorMergeRequests
+  const isLoading = isLoadingConnections || isLoadingBranches || isLoadingMergeRequests
+  const isSuccess = isSuccessConnections && isSuccessBranches && isSuccessMergeRequests
 
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
@@ -289,28 +299,60 @@ const BranchManagement = () => {
                       )}
                       {tab === 'prs' && (
                         <BranchManagementSection
-                          header={`${branchesWithPRs.length} branches with pull requests found`}
+                          header={`${branchesWithPRs.length} branches with pull requests and ${mergeRequests?.length || 0} merge requests found`}
                         >
-                          {branchesWithPRs.length > 0 ? (
-                            branchesWithPRs.map((branch) => {
-                              return (
-                                <BranchRow
-                                  key={branch.id}
-                                  repo={repo}
-                                  branch={branch}
-                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
-                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
-                                />
-                              )
-                            })
-                          ) : (
-                            <PullRequestsEmptyState
-                              url={generateCreatePullRequestURL()}
-                              hasBranches={previewBranches.length > 0}
-                              githubConnection={githubConnection}
-                              gitlessBranching={gitlessBranching}
+                          {isErrorMergeRequests && (
+                            <AlertError
+                              error={mergeRequestsError}
+                              subject="Failed to retrieve merge requests"
                             />
                           )}
+
+                          {/* Merge Requests */}
+                          {mergeRequests && mergeRequests.length > 0 && (
+                            <>
+                              <div className="px-6 py-2 bg-surface-100 text-xs font-medium text-foreground-light border-b">
+                                Merge Requests
+                              </div>
+                              {mergeRequests.map((mergeRequest) => (
+                                <MergeRequestRow
+                                  key={mergeRequest.id}
+                                  mergeRequest={mergeRequest}
+                                />
+                              ))}
+                            </>
+                          )}
+
+                          {/* GitHub Pull Requests */}
+                          {branchesWithPRs.length > 0 && (
+                            <>
+                              <div className="px-6 py-2 bg-surface-100 text-xs font-medium text-foreground-light border-b">
+                                GitHub Pull Requests
+                              </div>
+                              {branchesWithPRs.map((branch) => {
+                                return (
+                                  <BranchRow
+                                    key={branch.id}
+                                    repo={repo}
+                                    branch={branch}
+                                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                    onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                                  />
+                                )
+                              })}
+                            </>
+                          )}
+
+                          {/* Empty state when no PRs or merge requests */}
+                          {branchesWithPRs.length === 0 &&
+                            (!mergeRequests || mergeRequests.length === 0) && (
+                              <PullRequestsEmptyState
+                                url={generateCreatePullRequestURL()}
+                                hasBranches={previewBranches.length > 0}
+                                githubConnection={githubConnection}
+                                gitlessBranching={gitlessBranching}
+                              />
+                            )}
                         </BranchManagementSection>
                       )}
                       {tab === 'branches' && (

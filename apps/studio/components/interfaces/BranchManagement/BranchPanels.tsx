@@ -25,6 +25,7 @@ import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
+import type { MergeRequest } from 'data/merge-requests/merge-requests-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
@@ -416,6 +417,59 @@ export const BranchRow = ({
         visible={showEditBranchModal}
         onClose={() => setShowEditBranchModal(false)}
       />
+    </div>
+  )
+}
+
+interface MergeRequestRowProps {
+  mergeRequest: MergeRequest
+}
+
+export const MergeRequestRow = ({ mergeRequest }: MergeRequestRowProps) => {
+  const { ref: projectRef } = useParams()
+  const formattedTimeFromNow = dayjs(mergeRequest.merge_requested_at).fromNow()
+
+  return (
+    <div className="w-full flex items-center justify-between px-6 py-2.5">
+      <div className="flex items-center gap-x-4">
+        <ButtonTooltip
+          asChild
+          type="default"
+          className="max-w-[300px]"
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: mergeRequest.description || 'View merge request details',
+            },
+          }}
+        >
+          <Link href={`/project/${projectRef}/merge-requests/${mergeRequest.id}`}>
+            {mergeRequest.title}
+          </Link>
+        </ButtonTooltip>
+
+        <div className="text-xs text-foreground-light">
+          {mergeRequest.head} → {mergeRequest.base}
+        </div>
+
+        <Badge variant="outline">Merge Request</Badge>
+
+        {mergeRequest.merge_approved_by ? (
+          <Badge variant="default" className="bg-green-100 text-green-800">
+            Approved
+          </Badge>
+        ) : (
+          <Badge variant="secondary">Pending Approval</Badge>
+        )}
+
+        <p className="text-xs text-foreground-lighter">Requested {formattedTimeFromNow}</p>
+      </div>
+
+      <div className="flex items-center gap-x-2">
+        <Button asChild type="default">
+          <Link href={`/project/${projectRef}/merge-requests/${mergeRequest.id}`}>Review</Link>
+        </Button>
+      </div>
     </div>
   )
 }

@@ -6,6 +6,7 @@ import {
   ListTree,
   MessageCircle,
   Shield,
+  Send,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -15,6 +16,7 @@ import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { CreateMergeRequestModal } from 'components/interfaces/BranchManagement/CreateMergeRequestModal'
 import {
   Badge,
   Button,
@@ -83,6 +85,7 @@ export const BranchDropdown = () => {
   const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
 
   const [open, setOpen] = useState(false)
+  const [showDeployRequestModal, setShowDeployRequestModal] = useState(false)
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
 
   const mainBranch = branches?.find((branch) => branch.is_default)
@@ -162,7 +165,7 @@ export const BranchDropdown = () => {
                         Manage branches
                       </Link>
                     </CommandItem_Shadcn_>
-                    {/* Show merge button only for non-main branches, gated by feature flag */}
+                    {/* Show deploy request button only for non-main branches, gated by feature flag */}
                     {gitlessBranching &&
                       isBranch &&
                       selectedBranch &&
@@ -172,17 +175,14 @@ export const BranchDropdown = () => {
                             className="cursor-pointer w-full"
                             onSelect={() => {
                               setOpen(false)
-                              router.push(`/project/${ref}/merge`)
+                              setShowDeployRequestModal(true)
                             }}
                             onClick={() => setOpen(false)}
                           >
-                            <Link
-                              href={`/project/${ref}/merge`}
-                              className="w-full flex items-center gap-2"
-                            >
-                              <GitMerge size={14} strokeWidth={1.5} />
-                              Review changes
-                            </Link>
+                            <div className="w-full flex items-center gap-2">
+                              <Send size={14} strokeWidth={1.5} />
+                              Create deploy request
+                            </div>
                           </CommandItem_Shadcn_>
                         </>
                       )}
@@ -218,6 +218,17 @@ export const BranchDropdown = () => {
             </PopoverContent_Shadcn_>
           </Popover_Shadcn_>
         </>
+      )}
+
+      {/* Deploy Request Modal */}
+      {gitlessBranching && selectedBranch && mainBranch && !selectedBranch.is_default && (
+        <CreateMergeRequestModal
+          visible={showDeployRequestModal}
+          onClose={() => setShowDeployRequestModal(false)}
+          projectRef={projectRef || ''}
+          headBranchName={selectedBranch.name}
+          baseBranchName={mainBranch.name}
+        />
       )}
     </>
   )
