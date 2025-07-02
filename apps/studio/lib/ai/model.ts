@@ -3,7 +3,7 @@ import { LanguageModel } from 'ai'
 import { bedrock, checkAwsCredentials } from './bedrock'
 
 export const modelsByProvider = {
-  bedrock: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+  bedrock: 'us.anthropic.claude-3-5-sonnet-20241022-v2:0',
   openai: 'gpt-4.1-2025-04-14',
 }
 
