@@ -1,9 +1,8 @@
 import Link from 'next/link'
-import { Database, Wind } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { CircleAlert, Database, Wind } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
 
 import DiffViewer from 'components/ui/DiffViewer'
-import { Loading, ErrorState, EmptyState } from 'components/ui/AsyncState'
 
 interface DatabaseDiffPanelProps {
   diffContent?: string
@@ -19,18 +18,28 @@ const DatabaseDiffPanel = ({
   error,
   currentBranchRef,
 }: DatabaseDiffPanelProps) => {
-  if (isLoading) return <Loading />
+  if (isLoading) return <Skeleton className="h-64" />
 
-  if (error) return <ErrorState message="Error loading branch diff" />
+  if (error)
+    return (
+      <div className="p-6 text-center">
+        <CircleAlert size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <h3 className="mb-1">Error loading branch diff</h3>
+        <p className="text-sm text-foreground-light">
+          Please try again in a few minutes and contact support if the problem persists.
+        </p>
+      </div>
+    )
 
-  // Handle empty diff content
   if (!diffContent || diffContent.trim() === '') {
     return (
-      <EmptyState
-        title="No changes detected between branches"
-        description="Any changes to your database schema will be shown here for review"
-        icon={Wind}
-      />
+      <div className="p-6 text-center">
+        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <h3 className="mb-1">No changes detected between branches</h3>
+        <p className="text-sm text-foreground-light">
+          Any changes to your database schema will be shown here for review
+        </p>
+      </div>
     )
   }
 

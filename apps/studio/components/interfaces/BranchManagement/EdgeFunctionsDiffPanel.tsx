@@ -2,7 +2,6 @@ import { Code, Wind } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
-import { EmptyState, Loading } from 'components/ui/AsyncState'
 import DiffViewer from 'components/ui/DiffViewer'
 import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
 import type {
@@ -12,7 +11,7 @@ import type {
 } from 'hooks/branches/useEdgeFunctionsDiff'
 import { EMPTY_ARR } from 'lib/void'
 import { basename } from 'path'
-import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult
@@ -146,16 +145,18 @@ const EdgeFunctionsDiffPanel = ({
   mainBranchRef,
 }: EdgeFunctionsDiffPanelProps) => {
   if (diffResults.isLoading) {
-    return <Loading />
+    return <Skeleton className="h-64" />
   }
 
   if (!diffResults.hasChanges) {
     return (
-      <EmptyState
-        title="No changes detected between branches"
-        description="Any changes to your edge functions will be shown here for review"
-        icon={Wind}
-      />
+      <div className="p-6 text-center">
+        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <h3 className="mb-1">No changes detected between branches</h3>
+        <p className="text-sm text-foreground-light">
+          Any changes to your edge functions will be shown here for review
+        </p>
+      </div>
     )
   }
 
