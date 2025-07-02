@@ -1942,6 +1942,7 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       git_branch?: string
+      is_default?: boolean
       persistent?: boolean
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.

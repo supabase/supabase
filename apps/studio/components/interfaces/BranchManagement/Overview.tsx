@@ -2,9 +2,9 @@ import { noop } from 'lodash'
 import { Button } from 'ui'
 
 import type { Branch } from 'data/branches/branches-query'
+import { ChevronRight } from 'lucide-react'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { PreviewBranchesEmptyState } from './EmptyStates'
-import { ChevronRight } from 'lucide-react'
 
 const MAX_BRANCHES_OVERVIEW = 10
 
@@ -18,9 +18,10 @@ interface OverviewProps {
   onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
   generateCreatePullRequestURL: (branchName?: string) => string
+  showProductionBranch?: boolean
 }
 
-const Overview = ({
+export const Overview = ({
   isLoading,
   isSuccess,
   repo,
@@ -30,15 +31,18 @@ const Overview = ({
   onSelectCreateBranch,
   onSelectDeleteBranch,
   generateCreatePullRequestURL,
+  showProductionBranch = true,
 }: OverviewProps) => {
   return (
     <>
-      <BranchManagementSection header="Production branch">
-        {isLoading && <BranchRowLoader />}
-        {isSuccess && mainBranch !== undefined && (
-          <BranchRow isMain branch={mainBranch} repo={repo} onSelectDeleteBranch={noop} />
-        )}
-      </BranchManagementSection>
+      {showProductionBranch && (
+        <BranchManagementSection header="Production branch">
+          {isLoading && <BranchRowLoader />}
+          {isSuccess && mainBranch !== undefined && (
+            <BranchRow isMain branch={mainBranch} repo={repo} onSelectDeleteBranch={noop} />
+          )}
+        </BranchManagementSection>
+      )}
 
       <BranchManagementSection
         header="Preview branches"
@@ -72,5 +76,3 @@ const Overview = ({
     </>
   )
 }
-
-export default Overview

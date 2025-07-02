@@ -12,31 +12,31 @@ import { Button } from 'ui'
 export const BranchingEmptyState = () => {
   const snap = useAppStateSnapshot()
 
-  const canEnableBranching = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-    resource: { is_default: true },
+  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
+    resource: { is_default: false },
   })
 
   return (
     <ProductEmptyState title="Database Branching">
       <p className="text-sm text-light">
-        Create preview branches to experiment changes to your database schema in a safe,
-        non-destructible environment.
+        Create preview branches to experiment with changes to your database schema in a safe,
+        non-destructive environment.
       </p>
       <div className="flex items-center space-x-2 !mt-4">
         <ButtonTooltip
-          disabled={!canEnableBranching}
+          disabled={!canCreateBranches}
           icon={<GitBranch strokeWidth={1.5} />}
-          onClick={() => snap.setShowEnableBranchingModal(true)}
+          onClick={() => snap.setShowCreateBranchModal(true)}
           tooltip={{
             content: {
               side: 'bottom',
-              text: !canEnableBranching
-                ? 'You need additional permissions to enable branching'
+              text: !canCreateBranches
+                ? 'You need additional permissions to create branches'
                 : undefined,
             },
           }}
         >
-          Enable branching
+          Create branch
         </ButtonTooltip>
 
         <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
