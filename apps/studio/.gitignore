@@ -37,3 +37,5 @@ yarn-error.log*
 /public/dashboard
 # Sentry Auth Token
 .sentryclirc
+
+certificates

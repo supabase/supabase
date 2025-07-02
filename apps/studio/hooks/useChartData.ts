@@ -16,7 +16,7 @@ import type { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
 import { useAuthLogsReport } from 'data/reports/auth-report-query'
 import type { ChartData } from 'components/ui/Charts/Charts.types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { useAttributeQueries } from 'components/ui/Charts/ComposedChartHandler'
+import { useAttributeQueries } from 'components/ui/Charts/LogChartHandler'
 
 export const useChartData = ({
   attributes,

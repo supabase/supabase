@@ -2206,6 +2206,7 @@ export const platform: NavMenuConstant = {
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
         { name: 'Default Platform Permissions', url: '/guides/platform/permissions' },
+        { name: 'PrivateLink', url: '/guides/platform/privatelink' },
       ],
     },
     {
