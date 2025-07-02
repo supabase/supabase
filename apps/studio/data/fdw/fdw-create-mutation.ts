@@ -205,12 +205,9 @@ export function getCreateFDWSql({
     })
     .join('\n\n')
 
-  let importForeignSchemaSql = ''
-  if (wrapperMeta.canTargetSchema) {
-    importForeignSchemaSql = /* SQL */ `
+  const importForeignSchemaSql = /* SQL */ `
   import foreign schema "${sourceSchema}" from server ${formState.server_name} into ${targetSchema} options (strict 'true');
 `
-  }
 
   const sql = /* SQL */ `
     ${newSchemasSql}

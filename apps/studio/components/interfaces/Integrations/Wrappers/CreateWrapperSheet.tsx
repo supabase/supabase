@@ -47,7 +47,6 @@ export const CreateWrapperSheet = ({
   const { project } = useProjectContext()
 
   const [newTables, setNewTables] = useState<any[]>([])
-  const [targetSchema, setTargetSchema] = useState('public')
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [selectedMode, setSelectedMode] = useState<'tables' | 'schema'>(
@@ -73,6 +72,8 @@ export const CreateWrapperSheet = ({
   const initialValues = {
     wrapper_name: '',
     server_name: '',
+    source_schema: wrapperMeta.sourceSchemaOption?.defaultValue ?? '',
+    target_schema: 'public',
     ...Object.fromEntries(
       wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
     ),
@@ -112,7 +113,8 @@ export const CreateWrapperSheet = ({
       formState: { ...values, server_name: `${wrapper_name}_server` },
       mode: selectedMode,
       tables: newTables,
-      targetSchema: targetSchema,
+      sourceSchema: values.source_schema,
+      targetSchema: values.target_schema,
     })
   }
 
@@ -125,7 +127,7 @@ export const CreateWrapperSheet = ({
           onSubmit={onSubmit}
           className="flex-grow flex flex-col h-full"
         >
-          {({ handleReset, values, initialValues }: any) => {
+          {({ handleReset, values, initialValues, setFieldValue }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
             const onClosePanel = () => {
@@ -343,8 +345,8 @@ export const CreateWrapperSheet = ({
                           <SchemaSelector
                             portal={false}
                             size="small"
-                            selectedSchemaName={targetSchema}
-                            onSelectSchema={(schema) => setTargetSchema(schema)}
+                            selectedSchemaName={values.target_schema}
+                            onSelectSchema={(schema) => setFieldValue('target_schema', schema)}
                           />
                         </div>
                       </FormSectionContent>
