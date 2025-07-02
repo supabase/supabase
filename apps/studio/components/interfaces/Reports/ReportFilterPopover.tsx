@@ -186,67 +186,76 @@ const ReportFilterRow = ({
   }
 
   return (
-    <div className="flex w-full items-center justify-between gap-x-2 px-3">
-      <DropdownControl align="start" options={propertyOptions} onSelect={handlePropertyChange}>
-        <Button
-          asChild
-          type="outline"
-          icon={
-            <div className="text-foreground-lighter">
-              <ChevronDown strokeWidth={1.5} />
-            </div>
-          }
-          className="w-32 justify-start"
-        >
-          <span>{property?.label ?? 'Select property'}</span>
-        </Button>
-      </DropdownControl>
-
-      <DropdownControl align="start" options={operatorOptions} onSelect={handleOperatorChange}>
-        <Button
-          asChild
-          type="outline"
-          icon={
-            <div className="text-foreground-lighter">
-              <ChevronDown strokeWidth={1.5} />
-            </div>
-          }
-          className="w-20 justify-start"
-        >
-          <span>{filter.operator}</span>
-        </Button>
-      </DropdownControl>
-
-      {valueOptions?.length > 0 ? (
-        <FilterableInput
-          value={filter.value}
-          onChange={handleValueChange}
-          onKeyDown={onKeyDown}
-          placeholder={
-            property?.placeholder || `Enter ${property?.type === 'number' ? 'number' : 'text'}`
-          }
-          availableOptions={valueOptions?.map((option) => String(option.value)) || []}
-        />
-      ) : (
-        <Input
-          size="tiny"
-          className="flex-1"
-          placeholder={
-            property?.placeholder || `Enter ${property?.type === 'number' ? 'number' : 'text'}`
-          }
-          value={filter.value}
-          type={property?.type === 'number' ? 'number' : 'text'}
-          onChange={(event) => handleValueChange(event.target.value)}
-          onKeyDown={onKeyDown}
-        />
+    <div className="flex flex-col">
+      {filterIdx > 0 && (
+        <div className="flex items-center gap-2 p-1 w-full">
+          <div className="w-auto flex-1 bg-border h-px" />
+          <span className="text-xs font-mono text-foreground-lighter">AND</span>
+          <div className="w-auto flex-1 bg-border h-px" />
+        </div>
       )}
-      <Button
-        type="text"
-        size="tiny"
-        className="px-1"
-        icon={<X strokeWidth={1.5} />}
-        onClick={() => onDelete(filterIdx)}
-      />
+      <div className="flex w-full items-center justify-between gap-x-2 px-3">
+        <DropdownControl align="start" options={propertyOptions} onSelect={handlePropertyChange}>
+          <Button
+            asChild
+            type="outline"
+            icon={
+              <div className="text-foreground-lighter">
+                <ChevronDown strokeWidth={1.5} />
+              </div>
+            }
+            className="w-32 justify-start"
+          >
+            <span>{property?.label ?? 'Select property'}</span>
+          </Button>
+        </DropdownControl>
+
+        <DropdownControl align="start" options={operatorOptions} onSelect={handleOperatorChange}>
+          <Button
+            asChild
+            type="outline"
+            icon={
+              <div className="text-foreground-lighter">
+                <ChevronDown strokeWidth={1.5} />
+              </div>
+            }
+            className="w-20 justify-start"
+          >
+            <span>{filter.operator}</span>
+          </Button>
+        </DropdownControl>
+
+        {valueOptions?.length > 0 ? (
+          <FilterableInput
+            value={filter.value}
+            onChange={handleValueChange}
+            onKeyDown={onKeyDown}
+            placeholder={
+              property?.placeholder || `Enter ${property?.type === 'number' ? 'number' : 'text'}`
+            }
+            availableOptions={valueOptions?.map((option) => String(option.value)) || []}
+          />
+        ) : (
+          <Input
+            size="tiny"
+            className="flex-1"
+            placeholder={
+              property?.placeholder || `Enter ${property?.type === 'number' ? 'number' : 'text'}`
+            }
+            value={filter.value}
+            type={property?.type === 'number' ? 'number' : 'text'}
+            onChange={(event) => handleValueChange(event.target.value)}
+            onKeyDown={onKeyDown}
+          />
+        )}
+        <Button
+          type="text"
+          size="tiny"
+          className="px-1"
+          icon={<X strokeWidth={1.5} />}
+          onClick={() => onDelete(filterIdx)}
+        />
+      </div>
     </div>
   )
 }
@@ -336,7 +345,7 @@ export const ReportFilterPopover = ({
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-[500px]" side="bottom" align="start" portal={portal}>
         <div className="space-y-2 py-2">
-          <div className="space-y-2">
+          <div>
             {localFilters.map((filter, index) => (
               <ReportFilterRow
                 key={`filter-${filter.propertyName}-${index}`}
