@@ -64,8 +64,6 @@ const MergeRequestPage: NextPageWithLayout = () => {
     id,
   })
 
-  console.log('mergeRequest', mergeRequest)
-
   // Get branch information for base and head
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
@@ -76,12 +74,8 @@ const MergeRequestPage: NextPageWithLayout = () => {
     }
   )
 
-  console.log('branches', branches)
-
   const headBranch = branches?.find((branch) => branch.id === mergeRequest?.head)
   const baseBranch = branches?.find((branch) => branch.id === mergeRequest?.base)
-
-  console.log('branches', headBranch, baseBranch)
 
   // Get the head branch project to use for connection string
   const headBranchProject = useProjectByRef(headBranch?.project_ref)
@@ -150,8 +144,6 @@ const MergeRequestPage: NextPageWithLayout = () => {
   // Use whichever workflow run was found
   const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
   const workflowRunLogs = currentBranchLogs || parentBranchLogs
-
-  console.log('isBranchOutOfDateMigrations', isBranchOutOfDateMigrations)
 
   // Check if workflow failed based on final status or current status
   const hasCurrentWorkflowFailed = workflowFinalStatus
@@ -423,7 +415,7 @@ const MergeRequestPage: NextPageWithLayout = () => {
     const requestedTime = dayjs(mergeRequest.merge_requested_at).fromNow()
     const approvalStatus = mergeRequest.merge_approved_by ? 'Approved' : 'Open'
     return (
-      <div className="flex items-center gap-2 mt-3">
+      <div className="flex items-center gap-2 mt-2">
         <Badge variant="warning">{approvalStatus}</Badge>
         {mergeRequest.merge_requested_by} requested to merge
         <Link
