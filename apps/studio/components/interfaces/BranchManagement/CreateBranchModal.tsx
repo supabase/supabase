@@ -182,7 +182,7 @@ export const CreateBranchModal = () => {
               <>
                 <UpgradeToPro
                   primaryText="Upgrade to unlock branching"
-                  secondaryText="Create and test changes like new configurations, database schemas, or edge functions in a separate, temporary instance without affecting your production setup"
+                  secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
                   source="create-branch"
                 />
                 <DialogSectionSeparator />
