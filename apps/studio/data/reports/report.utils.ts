@@ -1,8 +1,7 @@
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useMemo } from 'react'
 
-export type Granularity = 'minute' | 'hour' | 'day' | 'week'
+export type Granularity = 'minute' | 'hour' | 'day'
 export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {
   switch (interval) {
     case '1m':

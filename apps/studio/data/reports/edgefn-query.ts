@@ -167,22 +167,19 @@ const METRIC_FORMATTER: Record<
   ) => { data: any; chartAttributes: any }
 > = {
   TotalInvocations: (rawData, attributes, logsMetric, functionIds, edgeFnIdToName) => {
-    if (functionIds && functionIds.length > 0) {
-      // A single function is selected, use the default single-attribute behavior.
-      return defaultFormatter(rawData, attributes)
-    }
-
-    // Multiple functions, create dynamic attributes
+    // Always use dynamic attributes, so the chart can show per-function stats.
     if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
 
     const functionIdsInData = Array.from(new Set(result.map((p: any) => p.function_id))) as string[]
 
-    if (functionIdsInData.length === 0) {
+    const chartFunctionIds = functionIds && functionIds.length > 0 ? functionIds : functionIdsInData
+
+    if (chartFunctionIds.length === 0) {
       return { data: [], chartAttributes: [] } // No data, empty chart
     }
 
-    const chartAttributes = functionIdsInData.map((id: string) => ({
+    const chartAttributes = chartFunctionIds.map((id: string) => ({
       attribute: id,
       label: edgeFnIdToName?.(id) ?? id,
       provider: 'logs',
@@ -281,36 +278,19 @@ const METRIC_FORMATTER: Record<
     return { data, chartAttributes }
   },
   ExecutionTime: (rawData, attributes, logsMetric, functionIds, edgeFnIdToName) => {
-    if (functionIds && functionIds.length > 0) {
-      if (!rawData) return { data: undefined, chartAttributes: attributes }
-      const result = rawData.result || []
-      const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
-      const data = Array.from(timestamps)
-        .sort()
-        .map((timestamp) => {
-          const point: any = { period_start: timestamp }
-          attributes.forEach((attr) => {
-            point[attr.attribute] = 0
-          })
-          const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
-          matchingPoints.forEach((p: any) => {
-            point[attributes[0].attribute] = p.avg_execution_time
-          })
-          return point
-        })
-      return { data, chartAttributes: attributes }
-    }
-    // Multiple functions, create dynamic attributes
+    // Always use dynamic attributes, so the chart can show per-function stats.
     if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
 
     const functionIdsInData = Array.from(new Set(result.map((p: any) => p.function_id))) as string[]
 
-    if (functionIdsInData.length === 0) {
+    const chartFunctionIds = functionIds && functionIds.length > 0 ? functionIds : functionIdsInData
+
+    if (chartFunctionIds.length === 0) {
       return { data: [], chartAttributes: [] } // No data, empty chart
     }
 
-    const chartAttributes = functionIdsInData.map((id: string) => ({
+    const chartAttributes = chartFunctionIds.map((id: string) => ({
       attribute: id,
       label: edgeFnIdToName?.(id) ?? id,
       provider: 'logs',
