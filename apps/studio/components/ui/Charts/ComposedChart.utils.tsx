@@ -9,6 +9,7 @@ import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
+  titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
