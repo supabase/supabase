@@ -92,18 +92,18 @@ const ReportFilterBar = ({
   selectedProduct,
   className,
 }: ReportFilterBarProps) => {
-  const { ref } = useParams()
-  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
+  //const { ref } = useParams()
+  //const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
   const [currentProductFilter, setCurrentProductFilter] = useState<
     null | (typeof PRODUCT_FILTERS)[number]
   >(null)
 
   // Use the custom hook for filter management
-  const { localFilters, filterProperties, handleFilterChange } = useReportFilters({
-    onAddFilter,
-    onRemoveFilters,
-    filters,
-  })
+  // const { localFilters, filterProperties, handleFilterChange } = useReportFilters({
+  //   onAddFilter,
+  //   onRemoveFilters,
+  //   filters,
+  // })
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
     onDatepickerChange(vals)
@@ -221,19 +221,19 @@ const ReportFilterBar = ({
           </DropdownMenu>
         )}
       </div>
-      <div className="order-last md:order-none flex-1">
+      {/* <div className="order-last md:order-none flex-1">
         <ReportFilterPopover
           filterProperties={filterProperties}
           filters={localFilters}
           onFiltersChange={handleFilterChange}
         />
-      </div>
+      </div> */}
 
-      <DatabaseSelector
+      {/* <DatabaseSelector
         additionalOptions={
           (loadBalancers ?? []).length > 0 ? [{ id: `${ref}-all`, name: 'API Load Balancer' }] : []
         }
-      />
+      /> */}
     </div>
   )
 }
