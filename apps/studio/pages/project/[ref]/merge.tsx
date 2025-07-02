@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/router'
-import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { useParams } from 'common'
@@ -43,7 +42,6 @@ const MergePage: NextPageWithLayout = () => {
 
   const parentProject = useProjectByRef(parentProjectRef)
 
-  // Get branch information
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
     {
@@ -55,7 +53,6 @@ const MergePage: NextPageWithLayout = () => {
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
-  // Get combined diff data (database, edge functions, migrations, and branch state)
   const {
     diffContent,
     isDatabaseDiffLoading,
@@ -83,15 +80,12 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
-  // Get workflow run ID from URL
   const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
 
-  // Reset workflow status when workflow ID changes
   useEffect(() => {
     setWorkflowFinalStatus(null)
   }, [currentWorkflowRunId])
 
-  // Try current branch first, then parent branch
   const { currentWorkflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
     useWorkflowManagement({
       workflowRunId: currentWorkflowRunId,
@@ -116,17 +110,14 @@ const MergePage: NextPageWithLayout = () => {
       },
     })
 
-  // Use whichever workflow run was found
   const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
   const workflowRunLogs = currentBranchLogs || parentBranchLogs
 
-  // Check if workflow failed based on final status or current status
   const hasCurrentWorkflowFailed = workflowFinalStatus
     ? ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowFinalStatus)
     : currentWorkflowRun?.status &&
       ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(currentWorkflowRun.status)
 
-  // Helper functions for URL management
   const addWorkflowRun = useCallback(
     (workflowRunId: string) => {
       router.push({
@@ -148,7 +139,6 @@ const MergePage: NextPageWithLayout = () => {
   const { mutate: pushBranch, isLoading: isPushing } = useBranchPushMutation({
     onSuccess: (data) => {
       toast.success('Branch update initiated!')
-      // Add workflow run ID to URL for persistence
       if (data?.workflow_run_id) {
         addWorkflowRun(data.workflow_run_id)
       }
@@ -167,7 +157,6 @@ const MergePage: NextPageWithLayout = () => {
         } else {
           toast.success('Branch merge initiated!')
         }
-        // Add workflow run ID to URL for persistence
         if (data.workflowRunId) {
           addWorkflowRun(data.workflowRunId)
         }
@@ -210,10 +199,8 @@ const MergePage: NextPageWithLayout = () => {
     [parentProjectRef]
   )
 
-  // Determine current active tab via query param (defaults to 'database')
   const currentTab = (router.query.tab as string) || 'database'
 
-  // Navigation items for PageLayout - updates the `tab` query param
   const navigationItems = useMemo(() => {
     const buildHref = (tab: string) => {
       const query: Record<string, string> = { tab }
@@ -236,7 +223,6 @@ const MergePage: NextPageWithLayout = () => {
     ]
   }, [currentWorkflowRunId, currentTab])
 
-  // Show coming soon notice if feature flag is disabled
   if (!gitlessBranching) {
     return (
       <PageLayout>
@@ -355,7 +341,6 @@ const MergePage: NextPageWithLayout = () => {
     >
       <div className="border-b">
         <ScaffoldContainer size="full">
-          {/* Show out of date notice or workflow logs */}
           {isBranchOutOfDateOverall && !currentWorkflowRunId ? (
             <OutOfDateNotice
               isBranchOutOfDateMigrations={isBranchOutOfDateMigrations}
@@ -407,7 +392,6 @@ const MergePage: NextPageWithLayout = () => {
             </div>
           ) : null}
 
-          {/* Tab navigation */}
           <NavMenu className="mt-4 border-none">
             {navigationItems.map((item) => {
               const isActive =
@@ -431,7 +415,6 @@ const MergePage: NextPageWithLayout = () => {
         </ScaffoldContainer>
       </div>
       <ScaffoldContainer size="full" className="pt-6 pb-12">
-        {/* Content based on selected tab */}
         {currentTab === 'database' ? (
           <DatabaseDiffPanel
             diffContent={diffContent}
