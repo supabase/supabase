@@ -20,7 +20,7 @@ export const bedrockRegionMap = {
   apac: 'ap-southeast-1',
 } as const
 
-type BedrockRegion = keyof typeof bedrockRegionMap
+export type BedrockRegion = keyof typeof bedrockRegionMap
 
 export const bedrockForRegion = (region: BedrockRegion) =>
   createAmazonBedrock({

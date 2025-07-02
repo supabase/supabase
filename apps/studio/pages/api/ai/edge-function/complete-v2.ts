@@ -38,12 +38,6 @@ export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { model, error: modelError } = await getModel()
-
-    if (modelError) {
-      return res.status(500).json({ error: modelError.message })
-    }
-
     const { completionMetadata, projectRef, connectionString, includeSchemaMetadata } = req.body
     const { textBeforeCursor, textAfterCursor, language, prompt, selection } = completionMetadata
 
@@ -51,6 +45,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({
         error: 'Missing project_ref in request body',
       })
+    }
+
+    const { model, error: modelError } = await getModel(projectRef)
+
+    if (modelError) {
+      return res.status(500).json({ error: modelError.message })
     }
 
     const authorization = req.headers.authorization
