@@ -1,7 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as bedrockModule from './bedrock'
-import { bedrock } from './bedrock'
 import { getModel, ModelErrorMessage, modelsByProvider } from './model'
 
 vi.mock('@ai-sdk/openai', () => ({
@@ -9,8 +8,9 @@ vi.mock('@ai-sdk/openai', () => ({
 }))
 
 vi.mock('./bedrock', () => ({
-  bedrock: vi.fn(() => 'bedrock-model'),
+  bedrockForRegion: vi.fn(() => () => 'bedrock-model'),
   checkAwsCredentials: vi.fn(),
+  selectBedrockRegion: vi.fn(() => 'us'),
 }))
 
 describe('getModel', () => {
@@ -24,31 +24,23 @@ describe('getModel', () => {
     process.env = { ...originalEnv }
   })
 
-  it('should return bedrock model when AWS credentials are available and AWS_BEDROCK_REGION is set', async () => {
+  it('should return bedrock model when AWS credentials are available', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
-    process.env.AWS_BEDROCK_REGION = 'us-east-1'
 
     const { model, error } = await getModel()
 
+    console.log('Model:', model)
+
     expect(model).toEqual('bedrock-model')
-    expect(bedrock).toHaveBeenCalledWith(modelsByProvider.bedrock)
+    expect(bedrockModule.bedrockForRegion).toHaveBeenCalledWith('us')
     expect(error).toBeUndefined()
-  })
-
-  it('should return error when AWS credentials are available but AWS_BEDROCK_REGION is not set', async () => {
-    vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
-    delete process.env.AWS_BEDROCK_REGION
-
-    const { error } = await getModel()
-
-    expect(error).toEqual(new Error('AWS_BEDROCK_REGION is not set'))
   })
 
   it('should return OpenAI model when AWS credentials are not available but OPENAI_API_KEY is set', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(false)
     process.env.OPENAI_API_KEY = 'test-key'
 
-    const { model } = await getModel()
+    const { model } = await getModel('test-key')
 
     expect(model).toEqual('openai-model')
     expect(openai).toHaveBeenCalledWith(modelsByProvider.openai)
@@ -58,7 +50,7 @@ describe('getModel', () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(false)
     delete process.env.OPENAI_API_KEY
 
-    const { error } = await getModel()
+    const { error } = await getModel('test-key')
 
     expect(error).toEqual(new Error(ModelErrorMessage))
   })

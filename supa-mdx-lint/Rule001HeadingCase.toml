@@ -147,6 +147,7 @@ may_uppercase = [
     "PostgREST",
     "Presence",
     "Prisma",
+    "PrivateLink",
     "Prometheus",
     "Python",
 	"Qodo Gen",
