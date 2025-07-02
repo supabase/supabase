@@ -14,10 +14,17 @@ const credentialProvider = createCredentialChain(
   })
 )
 
-export const bedrock = createAmazonBedrock({
-  credentialProvider,
-  region: process.env.AWS_BEDROCK_REGION,
-})
+const bedrockForRegion = (region: string) =>
+  createAmazonBedrock({
+    credentialProvider,
+    region,
+  })
+
+export const bedrockByRegion = {
+  us: bedrockForRegion('us-east-1'),
+  eu: bedrockForRegion('eu-west-1'),
+  apac: bedrockForRegion('ap-southeast-1'),
+}
 
 export async function checkAwsCredentials() {
   try {

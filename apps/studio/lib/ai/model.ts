@@ -1,9 +1,13 @@
 import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
-import { bedrock, checkAwsCredentials } from './bedrock'
+import { bedrockByRegion, checkAwsCredentials } from './bedrock'
 
 export const modelsByProvider = {
-  bedrock: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+  bedrock: {
+    us: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+    eu: 'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
+    apac: 'apac.anthropic.claude-3-7-sonnet-20250219-v1:0',
+  },
   openai: 'gpt-4.1-2025-04-14',
 }
 
@@ -37,7 +41,7 @@ export async function getModel(): Promise<ModelResponse> {
     }
 
     return {
-      model: bedrock(modelsByProvider.bedrock),
+      model: bedrockByRegion.us(modelsByProvider.bedrock.us),
     }
   }
 
