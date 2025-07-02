@@ -186,7 +186,7 @@ const ReportFilterRow = ({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-3">
       {filterIdx > 0 && (
         <div className="flex items-center gap-2 p-1 w-full">
           <div className="w-auto flex-1 bg-border h-px" />
@@ -194,7 +194,7 @@ const ReportFilterRow = ({
           <div className="w-auto flex-1 bg-border h-px" />
         </div>
       )}
-      <div className="flex w-full items-center justify-between gap-x-2 px-3">
+      <div className="flex w-full items-center justify-between gap-x-2">
         <DropdownControl align="start" options={propertyOptions} onSelect={handlePropertyChange}>
           <Button
             asChild
