@@ -1181,6 +1181,7 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
     ],
+    canTargetSchema: true,
   },
   {
     name: 'firebase_wrapper',
@@ -1765,6 +1766,7 @@ export const WRAPPERS: WrapperMeta[] = [
         },
       ],
     },
+    canTargetSchema: true,
     tables: [
       {
         label: 'Users',

@@ -8,9 +8,12 @@ export type WrapperMeta = {
   extensionName: string
   label: string
   server: Server
-  tables: Table[]
   docsUrl: string
   minimumExtensionVersion?: string
+  // If true, the wrapper can target a schema which will be populated with tables specified by the wrapper..
+  canTargetSchema?: boolean
+  // Array of tables that needs to be supplied to the wrapper. If the array is empty, the wrapper should target a schema.
+  tables: Table[]
 }
 
 export type ServerOption = {
