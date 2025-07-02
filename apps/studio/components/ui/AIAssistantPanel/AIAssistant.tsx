@@ -640,7 +640,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             disabled={!isApiKeySet || disablePrompts || isChatLoading}
             placeholder={
               hasMessages
-                ? 'Reply to the assistant...'
+                ? 'Ask a follow up question...'
                 : (snap.sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
                   : 'Chat to Postgres...'
