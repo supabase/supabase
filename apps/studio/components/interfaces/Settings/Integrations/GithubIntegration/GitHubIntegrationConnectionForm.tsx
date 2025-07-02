@@ -124,6 +124,7 @@ const GitHubIntegrationConnectionForm = ({
         id: repo.id.toString(),
         name: repo.name,
         installation_id: repo.installation_id,
+        default_branch: repo.default_branch || 'main',
       })) ?? EMPTY_ARR,
     [githubReposData]
   )
@@ -134,11 +135,11 @@ const GitHubIntegrationConnectionForm = ({
   const GitHubSettingsSchema = z
     .object({
       repositoryId: z.string().min(1, 'Please select a repository'),
-      enableProductionSync: z.boolean().default(false),
-      branchName: z.string(),
-      new_branch_per_pr: z.boolean().default(false),
+      enableProductionSync: z.boolean().default(true),
+      branchName: z.string().default('main'),
+      new_branch_per_pr: z.boolean().default(true),
       supabaseDirectory: z.string().default('.'),
-      supabaseChangesOnly: z.boolean().default(false),
+      supabaseChangesOnly: z.boolean().default(true),
       branchLimit: z.string().default('50'),
     })
     .superRefine(async (val, ctx) => {
@@ -170,11 +171,11 @@ const GitHubIntegrationConnectionForm = ({
     reValidateMode: 'onBlur',
     defaultValues: {
       repositoryId: connection?.repository.id.toString() || '',
-      enableProductionSync: false,
-      branchName: '',
-      new_branch_per_pr: false,
+      enableProductionSync: true,
+      branchName: 'main',
+      new_branch_per_pr: true,
       supabaseDirectory: '.',
-      supabaseChangesOnly: false,
+      supabaseChangesOnly: true,
       branchLimit: '50',
     },
   })
@@ -315,11 +316,11 @@ const GitHubIntegrationConnectionForm = ({
 
       githubSettingsForm.reset({
         repositoryId: '',
-        enableProductionSync: false,
-        branchName: '',
-        new_branch_per_pr: false,
+        enableProductionSync: true,
+        branchName: 'main',
+        new_branch_per_pr: true,
         supabaseDirectory: '.',
-        supabaseChangesOnly: false,
+        supabaseChangesOnly: true,
         branchLimit: '50',
       })
       setSelectedRepositoryId(undefined)
@@ -351,6 +352,15 @@ const GitHubIntegrationConnectionForm = ({
       toast.error('Failed to change repository')
     }
   }
+
+  useEffect(() => {
+    if (selectedRepository) {
+      githubSettingsForm.setValue(
+        'branchName',
+        githubRepos.find((repo) => repo.id === selectedRepository.id)?.default_branch || 'main'
+      )
+    }
+  }, [selectedRepository])
 
   useEffect(() => {
     if (connection) {
