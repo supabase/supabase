@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { CheckCircle2, Settings, XCircle, AlertCircle } from 'lucide-react'
+import { CheckCircle2, Settings, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 
 import { useParams } from 'common'
@@ -12,10 +12,10 @@ import { Button, Card, CardContent } from 'ui'
 import Link from 'next/link'
 
 export const GitHubStatus = () => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const parentProjectRef = selectedProject?.parent_project_ref || projectRef
 
   const { data: connections } = useGitHubConnectionsQuery(
     { organizationId: selectedOrganization?.id },
@@ -23,11 +23,13 @@ export const GitHubStatus = () => {
   )
 
   const { data: branches } = useBranchesQuery(
-    { projectRef: selectedProject?.ref },
-    { enabled: !!selectedProject?.ref }
+    { projectRef: parentProjectRef },
+    { enabled: !!parentProjectRef }
   )
 
-  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const githubConnection = connections?.find(
+    (connection) => connection.project.ref === parentProjectRef
+  )
   const mainBranch = branches?.find((branch) => branch.is_default)
 
   const isConnected = Boolean(githubConnection)
