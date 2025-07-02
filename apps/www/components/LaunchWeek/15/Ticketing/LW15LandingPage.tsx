@@ -13,10 +13,14 @@ const LW15LandingPage = () => {
   const currentTime = '17:03:45'
   const year = '2025'
 
-  const centerColClassNames = cn('md:col-start-6 md:col-span-6', 'xl:col-start-8 xl:col-span-4')
+  const centerColClassNames = cn(
+    'md:col-start-6 md:col-span-6',
+    'xl:col-start-7 xl:col-span-5',
+    '2xl:col-start-8 2xl:col-span-4'
+  )
 
   return (
-    <SectionContainer className="flex flex-col justify-between !py-10 h-full">
+    <SectionContainer className="flex flex-col justify-between gap-12 !py-10 h-full">
       <div className="flex justify-between items-start text-xs">
         <div className="flex flex-col">
           <div>Detected timezone: {detectedTimezone}</div>
@@ -106,7 +110,7 @@ const LW15LandingPage = () => {
         <div className={cn(centerColClassNames)}>
           <p>Claim your ticket to enter LW15</p>
         </div>
-        <div className="md:col-start-12 text-right">Online users: 9</div>
+        <div className="md:col-start-12 text-right text-nowrap">Online users: 9</div>
       </div>
     </SectionContainer>
   )
