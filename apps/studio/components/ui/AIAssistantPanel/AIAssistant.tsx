@@ -22,7 +22,15 @@ import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { Button, cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+import {
+  AiIconAnimation,
+  Button,
+  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { DotGrid } from '../DotGrid'
@@ -339,8 +347,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       <div className={cn('flex flex-col h-full', className)}>
         <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
-            <div className="border-b border-b-muted flex items-center bg gap-x-4 pl-3 pr-5 h-[46px]">
-              <div className="text-sm flex-1 flex items-center gap-x-2">
+            <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
+              <div className="text-sm flex-1 flex items-center">
+                <AiIconAnimation size={20} />
+                <span className="text-border-stronger dark:text-border-strong ml-3">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    shapeRendering="geometricPrecision"
+                  >
+                    <path d="M16 3.549L7.12 20.600"></path>
+                  </svg>
+                </span>
                 <AIAssistantChatSelector disabled={isChatLoading} />
               </div>
               <div className="flex items-center gap-x-4">
