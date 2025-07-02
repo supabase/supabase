@@ -1425,53 +1425,26 @@ export const functions: NavMenuConstant = {
       ],
     },
     {
-      name: 'Guides',
+      name: 'Integrations',
       url: undefined,
       items: [
-        {
-          name: 'Integrating with Supabase Auth',
-          url: '/guides/functions/auth',
-        },
-        {
-          name: 'Integrating with Postgres',
-          url: '/guides/functions/connect-to-postgres',
-        },
-        {
-          name: 'Integrating with Supabase Storage',
-          url: '/guides/functions/storage-caching',
-        },
-        {
-          name: 'Handling Routing in Functions',
-          url: '/guides/functions/routing',
-        },
-        {
-          name: 'Background Tasks',
-          url: '/guides/functions/background-tasks',
-        },
-        {
-          name: 'Ephemeral Storage',
-          url: '/guides/functions/ephemeral-storage',
-        },
-        {
-          name: 'WebSockets',
-          url: '/guides/functions/websockets',
-        },
-        {
-          name: 'Running AI Models',
-          url: '/guides/functions/ai-models',
-        },
-        {
-          name: 'Wasm modules',
-          url: '/guides/functions/wasm',
-        },
-
-        {
-          name: 'Integrating with Log Drains',
-          url: '/guides/platform/log-drains',
-        },
+        { name: 'Supabase Auth', url: '/guides/functions/auth' },
+        { name: 'Supabase Database (Postgres)', url: '/guides/functions/connect-to-postgres' },
+        { name: 'Supabase Storage', url: '/guides/functions/storage-caching' },
       ],
     },
-
+    {
+      name: 'Advanced Features',
+      url: undefined,
+      items: [
+        { name: 'Background Tasks', url: '/guides/functions/background-tasks' },
+        { name: 'Ephemeral Storage', url: '/guides/functions/ephemeral-storage' },
+        { name: 'WebSockets', url: '/guides/functions/websockets' },
+        { name: 'Routing', url: '/guides/functions/routing' },
+        { name: 'Wasm Modules', url: '/guides/functions/wasm' },
+        { name: 'AI Models', url: '/guides/functions/ai-models' },
+      ],
+    },
     {
       name: 'Examples',
       url: undefined,
