@@ -498,7 +498,8 @@ const GitHubIntegrationConnectionForm = ({
                   </FormItemLayout>
                 )}
               />
-
+            </CardContent>
+            <CardContent className={cn(!selectedRepositoryId && 'opacity-25 pointer-events-none')}>
               <FormField_Shadcn_
                 control={githubSettingsForm.control}
                 name="supabaseDirectory"
@@ -520,7 +521,7 @@ const GitHubIntegrationConnectionForm = ({
                 )}
               />
             </CardContent>
-            <CardContent>
+            <CardContent className={cn(!selectedRepositoryId && 'opacity-25 pointer-events-none')}>
               {/* Production Branch Sync Section */}
               <div className="space-y-4">
                 <FormField_Shadcn_
@@ -578,7 +579,7 @@ const GitHubIntegrationConnectionForm = ({
                 </div>
               </div>
             </CardContent>
-            <CardContent>
+            <CardContent className={cn(!selectedRepositoryId && 'opacity-25 pointer-events-none')}>
               {/* Automatic Branching Section */}
               <div className="space-y-4">
                 <FormField_Shadcn_
@@ -667,7 +668,10 @@ const GitHubIntegrationConnectionForm = ({
                 {githubSettingsForm.formState.isDirty && (
                   <Button
                     type="default"
-                    onClick={() => githubSettingsForm.reset()}
+                    onClick={() => {
+                      setSelectedRepositoryId(connection?.repository.id.toString() || '')
+                      githubSettingsForm.reset()
+                    }}
                     disabled={disabled || !canUpdateGitHubConnection}
                   >
                     Cancel
