@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
-import { bedrockByRegion, checkAwsCredentials } from './bedrock'
+import { bedrockForRegion, checkAwsCredentials, selectBedrockRegion } from './bedrock'
 
 export const modelsByProvider = {
   bedrock: {
@@ -29,7 +29,7 @@ export const ModelErrorMessage =
 /**
  * Retrieves the appropriate AI model based on available credentials.
  */
-export async function getModel(): Promise<ModelResponse> {
+export async function getModel(routingKey: string): Promise<ModelResponse> {
   const hasAwsCredentials = await checkAwsCredentials()
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
 
@@ -40,8 +40,13 @@ export async function getModel(): Promise<ModelResponse> {
       }
     }
 
+    // Select the Bedrock region based on the routing key
+    const bedrockRegion = await selectBedrockRegion(routingKey)
+    const bedrock = bedrockForRegion(bedrockRegion)
+    const modelName = modelsByProvider.bedrock[bedrockRegion]
+
     return {
-      model: bedrockByRegion.us(modelsByProvider.bedrock.us),
+      model: bedrock(modelName),
     }
   }
 
