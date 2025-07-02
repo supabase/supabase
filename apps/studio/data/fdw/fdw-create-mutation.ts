@@ -22,6 +22,7 @@ export type FDWCreateVariables = {
   }
   mode: 'tables' | 'schema'
   tables: any[]
+  sourceSchema: string
   targetSchema: string
 }
 
@@ -30,8 +31,12 @@ export function getCreateFDWSql({
   formState,
   mode,
   tables,
+  sourceSchema,
   targetSchema,
-}: Pick<FDWCreateVariables, 'wrapperMeta' | 'formState' | 'tables' | 'mode' | 'targetSchema'>) {
+}: Pick<
+  FDWCreateVariables,
+  'wrapperMeta' | 'formState' | 'tables' | 'mode' | 'sourceSchema' | 'targetSchema'
+>) {
   const newSchemasSql = tables
     .filter((table) => table.is_new_schema)
     .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
@@ -107,10 +112,12 @@ export function getCreateFDWSql({
 
   const createEncryptedKeysSql = createEncryptedKeysSqlArray.join('\n')
 
-  const encryptedOptionsSqlArray = encryptedOptions.map((option) => `${option.name} ''%s''`)
-  const unencryptedOptionsSqlArray = unencryptedOptions.map(
-    (option) => `${option.name} ''${formState[option.name]}''`
-  )
+  const encryptedOptionsSqlArray = encryptedOptions
+    .filter((option) => formState[option.name])
+    .map((option) => `${option.name} ''%s''`)
+  const unencryptedOptionsSqlArray = unencryptedOptions
+    .filter((option) => formState[option.name])
+    .map((option) => `${option.name} ''${formState[option.name]}''`)
   const optionsSqlArray = [...encryptedOptionsSqlArray, ...unencryptedOptionsSqlArray].join(',')
 
   const createServerSql = /* SQL */ `
@@ -163,7 +170,10 @@ export function getCreateFDWSql({
     
       execute format(
         E'create server ${formState.server_name} foreign data wrapper ${formState.wrapper_name} options (${optionsSqlArray});',
-        ${encryptedOptions.map((option) => `v_${option.name}`).join(',\n')}
+        ${encryptedOptions
+          .filter((option) => formState[option.name])
+          .map((option) => `v_${option.name}`)
+          .join(',\n')}
       );
     end $$;
   `
@@ -198,7 +208,7 @@ export function getCreateFDWSql({
   let importForeignSchemaSql = ''
   if (wrapperMeta.canTargetSchema) {
     importForeignSchemaSql = /* SQL */ `
-  import foreign schema "default" from server ${formState.server_name} into ${targetSchema} options (strict 'true');
+  import foreign schema "${sourceSchema}" from server ${formState.server_name} into ${targetSchema} options (strict 'true');
 `
   }
 

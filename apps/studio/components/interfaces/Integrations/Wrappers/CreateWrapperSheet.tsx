@@ -13,6 +13,7 @@ import {
   Button,
   Form,
   Input,
+  Label_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -322,12 +323,30 @@ export const CreateWrapperSheet = ({
                       }
                     >
                       <FormSectionContent loading={false}>
-                        <SchemaSelector
-                          portal={false}
-                          size="small"
-                          selectedSchemaName={targetSchema}
-                          onSelectSchema={(schema) => setTargetSchema(schema)}
-                        />
+                        {wrapperMeta.sourceSchemaOption && (
+                          <div>
+                            <InputField
+                              key="source_schema"
+                              option={wrapperMeta.sourceSchemaOption}
+                              loading={false}
+                              error={formErrors['source_schema']}
+                            />
+                            <p className="text-foreground-lighter text-sm">
+                              {wrapperMeta.sourceSchemaOption.description}
+                            </p>
+                          </div>
+                        )}
+                        <div className="flex flex-col gap-2">
+                          <Label_Shadcn_ className="text-foreground-light">
+                            Target Schema
+                          </Label_Shadcn_>
+                          <SchemaSelector
+                            portal={false}
+                            size="small"
+                            selectedSchemaName={targetSchema}
+                            onSelectSchema={(schema) => setTargetSchema(schema)}
+                          />
+                        </div>
                       </FormSectionContent>
                     </FormSection>
                   )}
