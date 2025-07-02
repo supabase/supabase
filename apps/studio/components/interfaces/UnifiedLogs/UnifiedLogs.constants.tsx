@@ -34,7 +34,7 @@ export const CHART_CONFIG = {
 } satisfies ChartConfig
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
-export const METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const
+export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES = [
   'auth',
   'edge',
@@ -86,5 +86,5 @@ export const SEARCH_PARAMS_PARSER = {
   live: parseAsBoolean.withDefault(false),
 
   // REQUIRED FOR SELECTION
-  uuid: parseAsString,
+  id: parseAsString,
 }

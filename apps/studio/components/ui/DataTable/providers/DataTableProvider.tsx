@@ -7,7 +7,7 @@ import type {
   Table,
   VisibilityState,
 } from '@tanstack/react-table'
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, ReactNode, useContext, useMemo } from 'react'
 
 import { DataTableFilterField } from '../DataTable.types'
 import { ControlsProvider } from './ControlsProvider'
@@ -29,7 +29,9 @@ interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
   table: Table<TData>
   filterFields: DataTableFilterField<TData>[]
   columns: ColumnDef<TData, TValue>[]
+  isFetching?: boolean
   isLoading?: boolean
+  isLoadingCounts?: boolean
   getFacetedUniqueValues?: (table: Table<TData>, columnId: string) => Map<string, number>
   getFacetedMinMaxValues?: (table: Table<TData>, columnId: string) => undefined | [number, number]
 }
@@ -45,7 +47,7 @@ export function DataTableProvider<TData, TValue>({
   ...props
 }: Partial<DataTableStateContextType> &
   DataTableBaseContextType<TData, TValue> & {
-    children: React.ReactNode
+    children: ReactNode
   }) {
   const value = useMemo(
     () => ({

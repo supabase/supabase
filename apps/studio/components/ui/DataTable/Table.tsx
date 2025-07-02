@@ -13,17 +13,15 @@ import {
 
 // Only create a custom component for Table with the added props
 const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof ShadcnTable>>(
-  ({ className, ...props }, ref) => (
+  ({ className, onScroll, ...props }, ref) => (
     <ShadcnTable
       ref={ref}
       {...props}
-      className={cn('', className)}
+      className={cn(className)}
       containerProps={{
-        className:
-          'table-fixed min-w-max caption-bottom text-sm max-h-[calc(100vh_-_var(--top-bar-height))]',
-        ...props.containerProps,
+        onScroll,
+        className: 'h-full w-full overflow-auto table-fixed min-w-max caption-bottom text-sm',
       }}
-      // REMINDER: we are not scrolling the table, but the container
     />
   )
 )
@@ -33,7 +31,7 @@ const TableHeader = forwardRef<
   HTMLTableSectionElement,
   ComponentPropsWithRef<typeof ShadcnTableHeader>
 >(({ className, ...props }, ref) => (
-  <ShadcnTableHeader ref={ref} className={cn('sticky top-0', className)} {...props} />
+  <ShadcnTableHeader ref={ref} className={cn('sticky top-0 z-[1]', className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
@@ -63,12 +61,7 @@ const TableRow = forwardRef<HTMLTableRowElement, ComponentPropsWithRef<typeof Sh
   ({ className, ...props }, ref) => (
     <ShadcnTableRow
       ref={ref}
-      className={cn(
-        'bg-background hover:bg-muted/50',
-        //   '[&>*]:border-t [&>:not(:last-child)]:border-r',
-        'border-b-0',
-        className
-      )}
+      className={cn('bg-background hover:bg-surface-100 border-b-0', className)}
       {...props}
     />
   )
@@ -95,10 +88,7 @@ const TableCell = forwardRef<HTMLTableCellElement, ComponentPropsWithRef<typeof 
   ({ className, ...props }, ref) => (
     <ShadcnTableCell
       ref={ref}
-      className={cn(
-        'text-[0.8rem] !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate',
-        className
-      )}
+      className={cn('text-xs !py-1 p-2 [&>[role=checkbox]]:translate-y-[2px] truncate', className)}
       {...props}
     />
   )

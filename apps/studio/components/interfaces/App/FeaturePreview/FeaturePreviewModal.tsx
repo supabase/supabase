@@ -7,22 +7,17 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import { InlineEditorPreview } from './InlineEditorPreview'
-import { SqlEditorTabsPreview } from './SqlEditorTabs'
-import { TableEditorTabsPreview } from './TableEditorTabs'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
 } = {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
-  [LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]: <TableEditorTabsPreview />,
-  [LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]: <SqlEditorTabsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
 }
@@ -62,13 +57,6 @@ const FeaturePreviewModal = () => {
       properties: { feature: selectedFeatureKey },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
-
-    if (ref && selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS) {
-      removeTabsByEditor(ref, 'table')
-    }
-    if (ref && selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
-      removeTabsByEditor(ref, 'sql')
-    }
   }
 
   function handleCloseFeaturePreviewModal() {

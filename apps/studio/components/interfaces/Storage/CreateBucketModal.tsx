@@ -13,7 +13,8 @@ import {
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { IS_PLATFORM } from 'lib/constants'
-import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import { Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -115,29 +116,36 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         onSubmit={onSubmit}
       >
         {({ values }: { values: any }) => {
+          const isPublicBucket = values.public
+
           return (
             <>
-              <Modal.Content>
+              <Modal.Content className={cn('!px-0', isPublicBucket && '!pb-0')}>
                 <Input
                   id="name"
                   name="name"
                   type="text"
-                  className="w-full"
+                  className="w-full px-5"
                   layout="vertical"
                   label="Name of bucket"
                   labelOptional="Buckets cannot be renamed once created."
                   descriptionText="Only lowercase letters, numbers, dots, and hyphens"
                 />
-                <div className="space-y-2 mt-6">
+                <div className="flex flex-col gap-y-2 mt-6">
                   <Toggle
                     id="public"
                     name="public"
                     layout="flex"
+                    className="px-5"
                     label="Public bucket"
                     descriptionText="Anyone can read any object without any authorization"
                   />
-                  {values.public && (
-                    <Alert title="Public buckets are not protected" variant="warning" withIcon>
+                  {isPublicBucket && (
+                    <Admonition
+                      type="warning"
+                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                      title="Public buckets are not protected"
+                    >
                       <p className="mb-2">
                         Users can read objects in public buckets without any authorization.
                       </p>
@@ -145,7 +153,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                         Row level security (RLS) policies are still required for other operations
                         such as object uploads and deletes.
                       </p>
-                    </Alert>
+                    </Admonition>
                   )}
                 </div>
               </Modal.Content>

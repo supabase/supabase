@@ -74,7 +74,9 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
         queryClient.invalidateQueries(invoicesKeys.orgUpcomingPreview(slug)),
         queryClient.invalidateQueries(organizationKeys.detail(slug)),
         queryClient.invalidateQueries(organizationKeys.list()),
+        queryClient.invalidateQueries(organizationKeys.paymentMethods(slug)),
       ])
+
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
