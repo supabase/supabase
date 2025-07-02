@@ -22,15 +22,7 @@ import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import {
-  AiIconAnimation,
-  Button,
-  cn,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { DotGrid } from '../DotGrid'
@@ -138,16 +130,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   // Handle completion of the assistant's response
-  const handleChatFinish = useCallback((message: MessageType) => {
-    // If we have a user message stored in the ref, save both messages
-    if (lastUserMessageRef.current) {
-      snap.saveMessage([lastUserMessageRef.current, message])
-      lastUserMessageRef.current = null
-    } else {
-      // Otherwise just save the assistant message
-      snap.saveMessage(message)
-    }
-  }, [])
+  const handleChatFinish = useCallback(
+    (message: MessageType) => {
+      // If we have a user message stored in the ref, save both messages
+      if (lastUserMessageRef.current) {
+        snap.saveMessage([lastUserMessageRef.current, message])
+        lastUserMessageRef.current = null
+      } else {
+        snap.saveMessage(message)
+      }
+    },
+    [snap]
+  )
 
   // TODO(refactor): This useChat hook should be moved down into each chat session.
   // That way we won't have to disable switching chats while the chat is loading,
@@ -166,19 +160,55 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
     initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
+    async onToolCall({ toolCall }) {
+      if (toolCall.toolName === 'rename_chat') {
+        const { newName } = toolCall.args as { newName: string }
+        if (snap.activeChatId && newName?.trim()) {
+          snap.renameChat(snap.activeChatId, newName.trim())
+          return `Chat renamed to "${newName.trim()}"`
+        }
+        return 'Failed to rename chat: Invalid chat or name'
+      }
+    },
     experimental_prepareRequestBody: ({ messages }) => {
       // [Joshen] Specifically limiting the chat history that get's sent to reduce the
       // size of the context that goes into the model. This should always be an odd number
       // as much as possible so that the first message is always the user's
       const MAX_CHAT_HISTORY = 5
 
+      const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
+
+      // Filter out incomplete tool calls from message parts while preserving the rest
+      const cleanedMessages = slicedMessages.map((message) => {
+        if (message.role === 'assistant' && message.parts) {
+          const cleanedParts = message.parts.filter((part: any) => {
+            // Remove tool invocations that are incomplete
+            if (
+              part.type === 'tool-invocation' &&
+              part.toolInvocation &&
+              (part.toolInvocation.state === 'call' || part.toolInvocation.state === 'partial-call')
+            ) {
+              return false
+            }
+            return true
+          })
+
+          return {
+            ...message,
+            parts: cleanedParts,
+          }
+        }
+        return message
+      })
+
       return JSON.stringify({
-        messages: messages.slice(-MAX_CHAT_HISTORY),
+        messages: cleanedMessages,
         aiOptInLevel,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         schema: currentSchema,
         table: currentTable?.name,
+        chatName: currentChat,
         includeSchemaMetadata: !useBedrockAssistant
           ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
           : undefined,
@@ -394,7 +424,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             </div>
           )}
           {hasMessages ? (
-            <div className="w-full px-7 py-8 space-y-8">
+            <div className="w-full px-7 py-8 space-y-6">
               {renderedMessages}
               <AnimatePresence>
                 {isChatLoading && (

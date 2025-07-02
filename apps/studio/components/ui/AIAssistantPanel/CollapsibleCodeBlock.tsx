@@ -29,7 +29,7 @@ export const CollapsibleCodeBlock = ({ onRemove, ...props }: CollapsibleCodeBloc
       >
         <HoverCard_Shadcn_>
           <HoverCardTrigger_Shadcn_ asChild>
-            <div className="flex flex-1 items-center gap-2 text-foreground-light px-2 hover:text-foreground cursor-pointer">
+            <div className="flex flex-1 items-center gap-2 text-foreground-light px-2 hover:text-foreground cursor-pointer overflow-hidden">
               <Code size={14} strokeWidth={1.5} />
               <span className="text-xs font-mono flex-1 truncate pointer">{firstLine}...</span>
             </div>

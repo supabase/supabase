@@ -49,6 +49,7 @@ const requestBodySchema = z.object({
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  chatName: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -72,7 +73,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, aiOptInLevel } = data
+  const { messages, projectRef, connectionString, aiOptInLevel, chatName } = data
 
   try {
     let mcpTools: ToolSet = {}
@@ -127,6 +128,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         execute: async () => {
           return { status: 'Tool call sent to client for rendering.' }
         },
+      }),
+      rename_chat: tool({
+        description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
+        parameters: z.object({
+          newName: z
+            .string()
+            .describe('The new name for the chat session. Should be descriptive and concise.'),
+        }),
+        // No execute function - this will be handled client-side
       }),
     }
 
@@ -230,6 +240,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # Core Principles:
       - **Tool Usage Strategy**:
+          - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**
           - **Always attempt to use MCP tools** like \`list_tables\` and \`list_extensions\` to gather schema information if available. If these tools are not available or return a privacy message, state that you cannot access schema information and will proceed based on general Postgres/Supabase knowledge.
           - For **READ ONLY** queries:
               - Explain your plan.
@@ -297,6 +308,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                   - UPDATE: \`USING (condition) WITH CHECK (condition)\` (often the same or related conditions)
                   - DELETE: \`USING (condition)\`
               - Prefer \`PERMISSIVE\` policies unless \`RESTRICTIVE\` is explicitly needed.
+              - Avoid recursion errors when writing RLS policies that reference the same table. Use security definer functions to avoid this when needed.
               - Leverage Supabase helper functions: \`auth.uid()\` for the user's ID, \`auth.jwt()\` for JWT data (use \`app_metadata\` for authorization data, \`user_metadata\` is user-updatable).
               - **Performance**: Add indexes on columns used in RLS policies. Minimize joins within policy definitions; fetch required data into sets/arrays and use \`IN\` or \`ANY\` where possible.
       - **Functions**:
@@ -358,6 +370,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           \`\`\`
 
       # General Instructions:
+      
       - **Available Schemas**: ${schemasString}
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
@@ -373,7 +386,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     result.pipeDataStreamToResponse(res, {
       getErrorMessage: (error) => {
         if (error == null) {
-          return 'unknown error'
+          return 'Untitled error'
         }
 
         if (typeof error === 'string') {
