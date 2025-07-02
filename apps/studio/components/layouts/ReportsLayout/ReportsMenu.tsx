@@ -27,6 +27,7 @@ const ReportsMenu = () => {
   const pageKey = (id || router.pathname.split('/')[4]) as string
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
   const authEnabled = useFlag('authreportv2')
+  const edgeFnEnabled = useFlag('edgefunctionreport')
 
   const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
@@ -113,6 +114,15 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
+        ...(edgeFnEnabled
+          ? [
+              {
+                name: 'Edge Functions',
+                key: 'edge-functions',
+                url: `/project/${ref}/reports/edge-functions`,
+              },
+            ]
+          : []),
         ...(storageEnabled
           ? [
               {
