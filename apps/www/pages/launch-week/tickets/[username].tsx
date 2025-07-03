@@ -69,7 +69,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.LIVE_SUPABASE_SERVICE_ROLE_KEY!
+    process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
   // fetch the normal ticket

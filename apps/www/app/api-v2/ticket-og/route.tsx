@@ -157,7 +157,7 @@ export async function GET(req: Request, res: Response) {
 
     const supabaseAdminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-      process.env.LIVE_SUPABASE_SERVICE_ROLE_KEY as string
+      process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY as string
     )
 
     // Track social shares
