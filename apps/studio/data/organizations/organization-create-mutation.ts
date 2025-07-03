@@ -1,11 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
-import type { components } from 'data/api'
+import { castOrganizationResponseToOrganization } from './organizations-query'
 
 export type OrganizationCreateVariables = {
   name: string
@@ -61,10 +62,24 @@ export const useOrganizationCreateMutation = ({
     (vars) => createOrganization(vars),
     {
       async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(organizationKeys.list()),
-          queryClient.invalidateQueries(permissionKeys.list()),
-        ])
+        if (data && !('pending_payment_intent_secret' in data)) {
+          // [Joshen] We're manually updating the query client here as the org's subscription is
+          // created async, and the invalidation will happen too quick where the GET organizations
+          // endpoint will error out with a 500 since the subscription isn't created yet.
+          queryClient.setQueriesData(
+            {
+              queryKey: organizationKeys.list(),
+              exact: true,
+            },
+            (prev: any) => {
+              if (!prev) return prev
+              return [...prev, castOrganizationResponseToOrganization(data)]
+            }
+          )
+
+          await queryClient.invalidateQueries(permissionKeys.list())
+        }
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

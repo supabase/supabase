@@ -1,10 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { GitHubConnectionCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
+
+type GitHubConnectionCreateVariables = {
+  organizationId: number
+  connection: components['schemas']['CreateGitHubConnectionBody']
+}
 
 export async function createGitHubConnection({ connection }: GitHubConnectionCreateVariables) {
   const { data, error } = await post('/platform/integrations/github/connections', {

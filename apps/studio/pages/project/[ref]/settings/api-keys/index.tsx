@@ -5,7 +5,7 @@ import { DisplayApiSettings } from 'components/ui/ProjectSettings'
 import type { NextPageWithLayout } from 'types'
 
 const ApiKeysLegacyPage: NextPageWithLayout = () => {
-  return <DisplayApiSettings legacy showNotice={false} />
+  return <DisplayApiSettings showTitle={false} showNotice={false} />
 }
 
 ApiKeysLegacyPage.getLayout = (page) => (

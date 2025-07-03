@@ -117,7 +117,8 @@ test('can click load older', async () => {
   )
 
   const loadOlder = await waitFor(
-    async () => await screen.findByRole('button', { name: /Load older/i })
+    async () => await screen.findByRole('button', { name: /Load older/i }),
+    { timeout: 10000 }
   )
 
   loadOlder.onclick = vi.fn()

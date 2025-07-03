@@ -38,9 +38,21 @@ const EdgeFunctionSecrets = () => {
 
   const secrets =
     searchString.length > 0
-      ? (data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
-        [])
-      : (data ?? [])
+      ? data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
+        []
+      : data ?? []
+
+  const headers = [
+    <Table.th key="secret-name">Name</Table.th>,
+    <Table.th key="secret-value" className="flex items-center gap-x-2">
+      <Badge color="scale" className="font-mono">
+        SHA256
+      </Badge>{' '}
+      Digest or prefix
+    </Table.th>,
+    <Table.th key="secret-updated-at">Updated at</Table.th>,
+    <Table.th key="actions" />,
+  ]
 
   return (
     <>
@@ -73,17 +85,7 @@ const EdgeFunctionSecrets = () => {
 
               <div className="w-full overflow-hidden overflow-x-auto">
                 <Table
-                  head={[
-                    <Table.th key="secret-name">Name</Table.th>,
-                    <Table.th key="secret-value" className="flex items-center gap-x-2">
-                      <Badge color="scale" className="font-mono">
-                        SHA256
-                      </Badge>{' '}
-                      Digest or prefix
-                    </Table.th>,
-                    <Table.th key="secret-updated-at">Updated at</Table.th>,
-                    <Table.th key="actions" />,
-                  ]}
+                  head={headers}
                   body={
                     secrets.length > 0 ? (
                       secrets.map((secret) => (
@@ -95,7 +97,7 @@ const EdgeFunctionSecrets = () => {
                       ))
                     ) : secrets.length === 0 && searchString.length > 0 ? (
                       <Table.tr>
-                        <Table.td colSpan={4}>
+                        <Table.td colSpan={headers.length}>
                           <p className="text-sm text-foreground">No results found</p>
                           <p className="text-sm text-foreground-light">
                             Your search for "{searchString}" did not return any results
@@ -104,7 +106,7 @@ const EdgeFunctionSecrets = () => {
                       </Table.tr>
                     ) : (
                       <Table.tr>
-                        <Table.td colSpan={4}>
+                        <Table.td colSpan={headers.length}>
                           <p className="text-sm text-foreground">No secrets created</p>
                           <p className="text-sm text-foreground-light">
                             There are no secrets associated with your project yet

@@ -11,6 +11,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
+import { getStripeElementsAppearanceOptions } from './Payment.utils'
 
 interface AddNewPaymentMethodModalProps {
   visible: boolean
@@ -90,7 +91,7 @@ const AddNewPaymentMethodModal = ({
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+    appearance: getStripeElementsAppearanceOptions(resolvedTheme),
   } as any
 
   const onLocalCancel = () => {

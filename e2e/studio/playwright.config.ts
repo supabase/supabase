@@ -12,7 +12,7 @@ export default defineConfig({
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
-  retries: 3,
+  retries: IS_CI ? 3 : 1,
   use: {
     baseURL: env.STUDIO_URL,
     screenshot: 'off',

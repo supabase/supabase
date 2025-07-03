@@ -45,12 +45,22 @@ export const OrganizationDropdown = () => {
 
   return (
     <>
-      <Link href={`/org/${slug}`} className="flex items-center gap-2 flex-shrink-0 text-sm">
+      <Link
+        href={slug ? `/org/${slug}` : '/organizations'}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
         <Boxes size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span className="text-foreground max-w-32 lg:max-w-none truncate hidden md:block">
-          {orgName}
+        <span
+          className={cn(
+            'max-w-32 lg:max-w-none truncate hidden md:block',
+            !!selectedOrganization ? 'text-foreground' : 'text-foreground-lighter'
+          )}
+        >
+          {orgName ?? 'Select an organization'}
         </span>
-        <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
+        {!!selectedOrganization && (
+          <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
+        )}
       </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
@@ -71,6 +81,7 @@ export const OrganizationDropdown = () => {
                     const href = !!routeSlug
                       ? router.pathname.replace('[slug]', org.slug)
                       : `/org/${org.slug}`
+
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}

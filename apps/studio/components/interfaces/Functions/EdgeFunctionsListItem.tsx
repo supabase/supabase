@@ -8,7 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -55,10 +55,8 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
             onClick={(event: any) => {
               function onCopy(value: any) {
                 setIsCopied(true)
-                navigator.clipboard.writeText(value).then()
-                setTimeout(function () {
-                  setIsCopied(false)
-                }, 3000)
+                copyToClipboard(value)
+                setTimeout(() => setIsCopied(false), 3000)
               }
               event.stopPropagation()
               onCopy(endpoint)

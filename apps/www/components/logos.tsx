@@ -118,6 +118,11 @@ const logos = [
     alt: 'betashares',
     name: 'betashares',
   },
+  {
+    image: `/images/logos/publicity/submagic.svg`,
+    alt: 'submagic',
+    name: 'submagic',
+  },
 ]
 
 const LogosRow: React.FC<{ className?: string }> = ({ className }) => (

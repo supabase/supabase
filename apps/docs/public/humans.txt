@@ -16,6 +16,7 @@ Artyom Borissov
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
+Brent Newson
 Carel de Waal
 Cemal Kılıç
 Chandana Anumula
@@ -45,6 +46,7 @@ Greg Richardson
 Guilherme Souza
 Haydn Maley
 Hieu Pham
+Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
@@ -85,6 +87,7 @@ Qiao Han
 Raminder Singh
 Riccardo Busetti
 Rodrigo Mansueli
+Ronan Lehane
 Rory Wilding
 Sam Rose
 Sergio Cioban Filho

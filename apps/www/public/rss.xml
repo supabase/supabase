@@ -5,14 +5,28 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 26 May 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 25 Jun 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/natural-db</guid>
+  <title>Build a Personalized AI Assistant with Postgres</title>
+  <link>https://supabase.com/blog/natural-db</link>
+  <description>Learn how to build a Supabase powered AI assistant that combines PostgreSQL with scheduling and external tools for long-term memory, structured data management and autonomous actions.</description>
+  <pubDate>Wed, 25 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/multigres-vitess-for-postgres</guid>
+  <title>Announcing Multigres: Vitess for Postgres</title>
+  <link>https://supabase.com/blog/multigres-vitess-for-postgres</link>
+  <description>Today we are welcoming Sugu, the co-creator of Vitess, to the Supabase team. He is joining Supabase to build Multigres: Vitess for Postgres.</description>
+  <pubDate>Tue, 10 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/building-on-open-table-formats</guid>
   <title>Building on open table formats</title>
   <link>https://supabase.com/blog/building-on-open-table-formats</link>
   <description>Open table formats like Apache Iceberg, Delta Lake, and Apache Hudi are transforming how developers manage large-scale data on object storage systems.</description>
-  <pubDate>Fri, 29 May 2025 00:00:00 -0700</pubDate>
+  <pubDate>Thu, 29 May 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</guid>

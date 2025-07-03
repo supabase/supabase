@@ -2,18 +2,20 @@ import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 
-import Layout from '~/components/Layouts/Default'
-import content from '~/data/solutions/neon'
+import Layout from 'components/Layouts/Default'
+import SolutionsStickyNav from 'components/SolutionsStickyNav'
+import content from 'data/solutions/neon'
+import { Solutions } from 'data/Solutions'
 
-const ProductHeader = dynamic(() => import('~/components/Sections/ProductHeader2'))
-const SingleQuote = dynamic(() => import('~/components/Enterprise/SingleQuote'))
-const FeaturesSection = dynamic(() => import('~/components/Solutions/FeaturesSection'))
-const PlatformSection = dynamic(() => import('~/components/Solutions/PlatformSection'))
-const DXSection = dynamic(() => import('~/components/Solutions/DeveloperExperienceSection'))
-const ResultsSection = dynamic(() => import('~/components/Solutions/ResultsSection'))
-const FeatureGrid = dynamic(() => import('~/components/Solutions/FeatureGrid'))
-const Security = dynamic(() => import('~/components/Enterprise/Security'))
-const CtaSection = dynamic(() => import('~/components/Solutions/CtaSection'))
+const ProductHeader = dynamic(() => import('components/Sections/ProductHeader2'))
+const SingleQuote = dynamic(() => import('components/Sections/SingleQuote'))
+const FeaturesSection = dynamic(() => import('components/Solutions/FeaturesSection'))
+const PlatformSection = dynamic(() => import('components/Solutions/PlatformSection'))
+const DXSection = dynamic(() => import('components/Solutions/DeveloperExperienceSection'))
+const ResultsSection = dynamic(() => import('components/Solutions/ResultsSection'))
+const FeatureGrid = dynamic(() => import('components/Solutions/FeatureGrid'))
+const Security = dynamic(() => import('components/Enterprise/Security'))
+const CtaSection = dynamic(() => import('components/Solutions/CtaSection'))
 
 const Neon: NextPage = () => {
   return (
@@ -24,12 +26,13 @@ const Neon: NextPage = () => {
         openGraph={{
           title: content.metadata.metaTitle,
           description: content.metadata.metaDescription,
-          url: `https://supabase.com/neon`,
+          url: `https://supabase.com/solutions/switch-from-neon`,
         }}
         noindex={true}
         nofollow={true}
       />
       <Layout className="overflow-visible">
+        <SolutionsStickyNav activeItem={Solutions.neon} type="use-case" />
         <ProductHeader {...content.heroSection} />
         <SingleQuote
           quote={{
