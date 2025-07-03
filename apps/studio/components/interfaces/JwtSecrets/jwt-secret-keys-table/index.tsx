@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowRight,
   CircleArrowUp,
   Eye,
   FileKey,
@@ -15,6 +14,7 @@ import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import {
@@ -24,9 +24,15 @@ import {
 } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Badge,
   Button,
   Card,
@@ -34,7 +40,6 @@ import {
   cn,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -44,28 +49,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
@@ -600,12 +591,12 @@ export default function JWTSecretKeysTable() {
             <DialogTitle>Start using new JWT signing keys</DialogTitle>
           </DialogHeader>
           <DialogSectionSeparator />
-          <DialogSection>
+          <DialogSection className="flex flex-col gap-2 text-sm text-foreground-light">
             <p>
               Your project today uses a legacy symmetric JWT secret to create JWTs. To be able to
-              use an asymmetric JWT signing key you first have to migrate it to the new system. This
-              change does not cause any downtime on your project.
+              use an asymmetric JWT signing key you first have to migrate it to the new approach.
             </p>
+            <p>This change does not cause any downtime on your project.</p>
           </DialogSection>
           <DialogFooter>
             <Button
