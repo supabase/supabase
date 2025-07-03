@@ -309,6 +309,7 @@ allow_list = [
     "ngrok",
     "node-postgres",
     "npm",
+    "pnpm",
     "npmrc",
     "npx",
     "ns",
