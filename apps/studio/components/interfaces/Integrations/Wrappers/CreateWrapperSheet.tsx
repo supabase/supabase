@@ -347,7 +347,7 @@ export const CreateWrapperSheet = ({
                         <FormSectionLabel>
                           <p>Foreign Schema</p>
                           <p className="text-foreground-light mt-2 w-[90%]">
-                            All wrapper tables will be created in the specified schema.
+                            All wrapper tables will be created in the specified target schema.
                           </p>
                         </FormSectionLabel>
                       }
