@@ -59,6 +59,8 @@ export const expectedToolsSchema = z.object({
   list_branches: basicToolSchema,
   get_logs: basicToolSchema,
   execute_sql: basicToolSchema,
+  search_docs: basicToolSchema,
+  get_advisors: basicToolSchema,
 })
 
 export const toolWhitelist = Object.keys(expectedToolsSchema.shape)
@@ -130,12 +132,18 @@ export function getAllowedTools(aiOptInLevel: AiOptInLevel) {
     aiOptInLevel === 'schema_and_log' ||
     aiOptInLevel === 'schema_and_log_and_data'
   ) {
-    allowedTools.push('list_tables', 'list_extensions', 'list_edge_functions', 'list_branches')
+    allowedTools.push(
+      'list_tables',
+      'list_extensions',
+      'list_edge_functions',
+      'list_branches',
+      'search_docs'
+    )
   }
 
   // For schema_and_log permission level, add log access tools
   if (aiOptInLevel === 'schema_and_log' || aiOptInLevel === 'schema_and_log_and_data') {
-    allowedTools.push('get_logs')
+    allowedTools.push('get_logs', 'get_advisors')
   }
 
   // For schema_and_log_and_data permission level, add data access tools
