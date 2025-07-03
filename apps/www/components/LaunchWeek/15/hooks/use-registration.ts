@@ -4,6 +4,7 @@ import { RealtimeChannel } from '@supabase/supabase-js'
 import useConfData from './use-conf-data'
 import { LW15_URL } from 'lib/constants'
 import supabase from '../supabase'
+import { BG_COLORS, TYPO_COLORS } from '../Ticketing/colors'
 
 function subscribeToTicketChanges(
   username: string,
@@ -30,7 +31,6 @@ interface RegistrationProps {
 }
 
 export const useRegistration = ({ onError, onRegister }: RegistrationProps = {}) => {
-  // const [realtimeChannel, setRealtimeChannel] = useState<RealtimeChannel | null>(null)
   const [
     { userTicketData: userData, session, userTicketDataState, urlParamsLoaded, referal },
     dispatch,
@@ -52,6 +52,10 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
     const name = sessionUser.user_metadata.full_name
     const email = sessionUser.email
     const userId = sessionUser.id
+    const defaultColors = {
+      background: BG_COLORS[0],
+      foreground: TYPO_COLORS[0],
+    }
 
     if (!username) {
       throw new Error('Username is required')
@@ -59,8 +63,6 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
 
     if (!userData.id) {
       dispatch({ type: 'USER_TICKET_FETCH_STARTED' })
-
-      // console.log('Inserting ticket for user', username, referal)
 
       const { error: ticketInsertError } = await supabase
         .from('tickets')
@@ -71,6 +73,9 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
           name,
           username,
           referred_by: referal ?? null,
+          metadata: {
+            colors: defaultColors,
+          },
         })
         .select()
         .single()
