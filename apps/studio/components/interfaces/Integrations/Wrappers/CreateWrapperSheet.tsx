@@ -4,6 +4,7 @@ import { Edit, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import SchemaEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SchemaEditor'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -49,6 +50,7 @@ export const CreateWrapperSheet = ({
 
   const [newTables, setNewTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
+  const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState()
   const [selectedMode, setSelectedMode] = useState<'tables' | 'schema'>(
     wrapperMeta.tables.length > 0 ? 'tables' : 'schema'
@@ -373,6 +375,7 @@ export const CreateWrapperSheet = ({
                             size="small"
                             selectedSchemaName={values.target_schema}
                             onSelectSchema={(schema) => setFieldValue('target_schema', schema)}
+                            onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
                           />
                         </div>
                       </FormSectionContent>
@@ -401,6 +404,14 @@ export const CreateWrapperSheet = ({
                     Create wrapper
                   </Button>
                 </SheetFooter>
+                <SchemaEditor
+                  visible={createSchemaSheetOpen}
+                  closePanel={() => setCreateSchemaSheetOpen(false)}
+                  onSuccess={(schema) => {
+                    setFieldValue('target_schema', schema)
+                    setCreateSchemaSheetOpen(false)
+                  }}
+                />
               </>
             )
           }}
