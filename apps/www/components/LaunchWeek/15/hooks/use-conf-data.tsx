@@ -31,6 +31,10 @@ export type UserTicketData = {
     hideAvatar?: boolean
     hideMetadata?: boolean
     theme?: string
+    colors?: {
+      background: string
+      foreground: string
+    }
   }
   shared_on_twitter?: string
   shared_on_linkedin?: string

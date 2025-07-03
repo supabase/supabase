@@ -11,7 +11,7 @@ const LW15Ticket = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement
   return (
     <div
       className={cn(
-        'min-h-[443px] max-h-[550px] h-full w-auto aspect-[278/443] flex flex-col bg-black shadow-xl rounded-md overflow-hidden',
+        'min-h-[443px] max-h-[550px] h-full w-auto aspect-[278/443] flex flex-col bg-black text-white shadow-xl rounded-md overflow-hidden',
         className
       )}
       {...props}

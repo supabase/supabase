@@ -1,20 +1,17 @@
 import React from 'react'
+import Link from 'next/link'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import SectionContainer from 'components/Layouts/SectionContainer'
-import { Button, cn } from 'ui'
-import { useTheme } from 'next-themes'
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { useRegistration } from '../hooks/use-registration'
 import { FifteenSVG, LW15ThemeSwitcher, LWSVG } from '../lw15.components'
 
 const LW15LandingPage = () => {
   const register = useRegistration()
-  const [state, dispatch] = useLw15ConfData()
-  const { resolvedTheme, setTheme } = useTheme()
-  const isDarkMode = resolvedTheme?.includes('dark')
+  const [state] = useLw15ConfData()
+  const user = state.userTicketData
 
-  console.log('lw15 landing page state', state)
-
-  const ticketId = ''
   const detectedTimezone = 'GMT+1'
   const currentTime = '17:03:45'
   const year = '2025'
@@ -61,14 +58,29 @@ const LW15LandingPage = () => {
               Discover fresh tools, <br />
               unlock new possibilities.
             </h2>
-            <Button
-              className="h-auto py-1 px-2"
-              type="secondary"
-              size="medium"
-              onClick={handleClaimTicket}
-            >
-              Claim your ticket
-            </Button>
+            <div>
+              {user.id ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button className="h-auto py-1 px-2" type="secondary" size="medium" asChild>
+                      <Link href="/launch-week/ticket">View your ticket</Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    You claimed a ticket as @{user.username}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Button
+                  className="h-auto py-1 px-2"
+                  type="secondary"
+                  size="medium"
+                  onClick={handleClaimTicket}
+                >
+                  Claim your ticket
+                </Button>
+              )}
+            </div>
           </div>
           <div className="md:col-start-12 text-right hidden md:block">{year}</div>
         </div>
@@ -78,7 +90,11 @@ const LW15LandingPage = () => {
           <div className="w-full h-px bg-foreground" />
         </div>
         <div className={cn(centerColClassNames)}>
-          <p>Claim your ticket to enter LW15</p>
+          <p>
+            {user.id
+              ? `Nice to see you back, ${user.name?.split(' ')[0]}`
+              : 'Claim your ticket to enter LW15'}
+          </p>
         </div>
         <div className="md:col-start-12 text-right text-nowrap">Online users: 9</div>
       </div>
