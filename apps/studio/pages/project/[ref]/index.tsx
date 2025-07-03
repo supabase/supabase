@@ -49,7 +49,7 @@ const Home: NextPageWithLayout = () => {
   useEffect(() => {
     if (enableBranching && !hasShownEnableBranchingModalRef.current) {
       hasShownEnableBranchingModalRef.current = true
-      snap.setShowEnableBranchingModal(true)
+      snap.setShowCreateBranchModal(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableBranching])

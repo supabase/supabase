@@ -59,12 +59,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
 
-  const { model, error: modelError } = await getModel()
-
-  if (modelError) {
-    return res.status(500).json({ error: modelError.message })
-  }
-
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const { data, error: parseError } = requestBodySchema.safeParse(body)
 
@@ -73,6 +67,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const { messages, projectRef, connectionString, aiOptInLevel } = data
+
+  const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
+
+  if (modelError) {
+    return res.status(500).json({ error: modelError.message })
+  }
 
   try {
     let mcpTools: ToolSet = {}

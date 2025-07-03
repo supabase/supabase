@@ -18,12 +18,14 @@ const ReportChart = ({
   endDate,
   interval,
   updateDateRange,
+  functionIds,
 }: {
   chart: any
   startDate: string
   endDate: string
   interval: string
   updateDateRange: UpdateDateRange
+  functionIds?: string[]
 }) => {
   const {
     data,
@@ -35,6 +37,7 @@ const ReportChart = ({
     startDate,
     endDate,
     interval,
+    functionIds,
     data: undefined,
     highlightedValue:
       chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'

@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowRight,
   CircleArrowUp,
   Eye,
   FileKey,
@@ -15,6 +14,7 @@ import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import {
@@ -24,9 +24,15 @@ import {
 } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Badge,
   Button,
   Card,
@@ -34,7 +40,6 @@ import {
   cn,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -44,34 +49,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
 import { CreateKeyDialog } from './create-key-dialog'
+import { RotateKeyDialog } from './rotate-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
 
 const MotionTableRow = motion(TableRow)
@@ -184,19 +176,6 @@ export default function JWTSecretKeysTable() {
       resetDialog()
     } catch (error) {
       console.error('Failed to delete key', error)
-    }
-  }
-
-  const handleRotateKey = async () => {
-    try {
-      await updateMutation.mutateAsync({
-        projectRef: projectRef!,
-        keyId: standbyKey!.id,
-        status: 'in_use',
-      })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to rotate key', error)
     }
   }
 
@@ -612,12 +591,12 @@ export default function JWTSecretKeysTable() {
             <DialogTitle>Start using new JWT signing keys</DialogTitle>
           </DialogHeader>
           <DialogSectionSeparator />
-          <DialogSection>
+          <DialogSection className="flex flex-col gap-2 text-sm text-foreground-light">
             <p>
               Your project today uses a legacy symmetric JWT secret to create JWTs. To be able to
-              use an asymmetric JWT signing key you first have to migrate it to the new system. This
-              change does not cause any downtime on your project.
+              use an asymmetric JWT signing key you first have to migrate it to the new approach.
             </p>
+            <p>This change does not cause any downtime on your project.</p>
           </DialogSection>
           <DialogFooter>
             <Button
@@ -637,132 +616,18 @@ export default function JWTSecretKeysTable() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={shownDialog === 'rotate'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Rotate Key</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection>
-            <DialogDescription>
-              {standbyKey ? (
-                <>
-                  The standby key ({algorithmLabels[standbyKey.algorithm]}) will be promoted to 'In
-                  use'. This will:
-                  <ul className="list-disc pl-4 mt-2 space-y-2">
-                    <li>Change the current standby key to 'In use'</li>
-                    <li>Move the current 'In use' key to 'Previously used'</li>
-                    <li>Move any 'Previously used' key to 'Revoked'</li>
-                  </ul>
-                </>
-              ) : (
-                <>
-                  Since there is no standby key, you need to choose an algorithm for the new key:
-                  <div className="mt-4 space-y-4">
-                    <Select_Shadcn_
-                      value={newKeyAlgorithm}
-                      onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
-                    >
-                      <SelectTrigger_Shadcn_ id="rotateAlgorithm">
-                        <SelectValue_Shadcn_ placeholder="Select algorithm" />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="ES256">ES256 (ECC)</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="EdDSA">EdDSA (Ed25519)</SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-                    <p className="text-sm text-foreground-light">
-                      {algorithmDescriptions[newKeyAlgorithm]}
-                    </p>
-                  </div>
-                </>
-              )}
-            </DialogDescription>
-          </DialogSection>
-          <DialogFooter>
-            <Button onClick={() => setShownDialog('confirm-rotate')}>Review Rotation</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={shownDialog === 'confirm-rotate'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-lg overflow-hidden">
-          <DialogHeader>
-            <DialogTitle>Confirm key rotation</DialogTitle>
-            <DialogDescription>
-              Review the key rotation process below. Ensure your application's components have
-              already picked up and are trusting your standby key to avoid downtime.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection className="relative bg">
-            <div className="relative flex flex-col items-center space-y-6 py-6">
-              {standbyKey ? (
-                <div className="flex items-center">
-                  <Badge
-                    className={cn(statusColors['standby'], 'px-3 py-1 space-x-1 items-baseline')}
-                  >
-                    <Timer size={13} className="self-center" />
-                    <span>STANDBY KEY</span>
-                    <span className="text-xs font-mono text-foreground-light">
-                      {algorithmLabels[standbyKey!.algorithm]}
-                    </span>
-                  </Badge>
-                  <ArrowRight className="h-4 w-4 mx-1 text-foreground-light" />
-                  <Badge className={cn(statusColors['in_use'], 'px-3 py-1 space-x-1')}>
-                    <Key size={13} />
-                    <span>CURRENTLY USED</span>
-                  </Badge>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Badge
-                    className={cn(
-                      'bg-surface-300 bg-opacity-100 text-foreground border border-foreground-muted px-3 py-1 space-x-1'
-                    )}
-                  >
-                    <Key size={13} className="mr-1.5" />
-                    <span>New Key</span>
-                    <span className="text-xs font-mono text-foreground-light">
-                      {algorithmLabels[newKeyAlgorithm]}
-                    </span>
-                  </Badge>
-                  <ArrowRight className="h-4 w-4 text-foreground-light" />
-                  <Badge className={cn(statusColors['in_use'], 'px-3 py-1')}>
-                    <Key size={13} className="mr-1.5" />
-                    CURRENTLY USED
-                  </Badge>
-                </div>
-              )}
-
-              <div className="flex items-center">
-                <Badge className={cn(statusColors['in_use'], 'px-3 py-1 space-x-1 items-baseline')}>
-                  <Key size={13} className="self-center" />
-                  <span>CURRENTLY USED</span>
-                  <span className="text-xs font-mono text-foreground-light">
-                    {inUseKey?.algorithm && algorithmLabels[inUseKey.algorithm]}
-                  </span>
-                </Badge>
-                <ArrowRight className="h-4 w-4 mx-1 text-foreground-light" />
-                <Badge className={cn(statusColors['previously_used'], 'px-3 py-1 space-x-1')}>
-                  <Timer size={13} />
-                  <span>PREVIOUS KEY</span>
-                </Badge>
-              </div>
-            </div>
-          </DialogSection>
-          <DialogFooter>
-            <Button type="outline" onClick={resetDialog}>
-              Cancel
-            </Button>
-            <Button onClick={() => handleRotateKey()} loading={isLoadingMutation}>
-              Confirm rotation
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {standbyKey && inUseKey && projectRef && (
+        <Dialog open={shownDialog === 'rotate'} onOpenChange={resetDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <RotateKeyDialog
+              projectRef={projectRef}
+              standbyKey={standbyKey}
+              inUseKey={inUseKey}
+              onClose={resetDialog}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       <Dialog open={shownDialog === 'key-details'} onOpenChange={resetDialog}>
         <DialogContent className="sm:max-w-lg">
