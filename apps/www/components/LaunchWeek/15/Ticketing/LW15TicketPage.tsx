@@ -45,6 +45,69 @@ const LW15TicketPage = () => {
     }
   }
 
+  const TicketCustomizationSection = ({ className }: { className?: string }) => (
+    <div className={cn('flex flex-col gap-12 border-t pt-4 w-full', className)}>
+      <div className="grid grid-cols-6 w-full gap-4">
+        <p className="col-span-full xl:col-span-2 lg:text-xs tracking-[-0.25px]">
+          No templates, just tools to help you shape the output exactly how you want it.
+        </p>
+        <div className="col-span-full xl:col-span-3 xl:col-start-4 flex flex-col gap-4">
+          <div className="w-full grid grid-cols-3">
+            <p>Typo color</p>
+            <div className="flex flex-col col-span-2">
+              <div className="flex gap-2 flex-wrap justify-between">
+                {TYPO_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    className={cn(
+                      'flex-1 max-w-6 aspect-square rounded-full border border-control flex items-center justify-center transition-all',
+                      selectedFg === color
+                        ? 'border-background ring-1 ring-foreground scale-110'
+                        : 'border-transparent'
+                    )}
+                    style={{ background: color }}
+                    aria-label={color}
+                    onClick={() => handleColorChange('foreground', color)}
+                    disabled={state.saving}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="w-full grid grid-cols-3">
+            <p>Bg color</p>
+            <div className="flex flex-col col-span-2">
+              <div className="flex gap-2 flex-wrap justify-between">
+                {BG_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    className={cn(
+                      'flex-1 max-w-6 aspect-square rounded-full border border-control flex items-center justify-center transition-all',
+                      selectedBg === color
+                        ? 'border-background ring-1 ring-foreground scale-110'
+                        : 'border-transparent'
+                    )}
+                    style={{ background: color }}
+                    aria-label={color}
+                    onClick={() => handleColorChange('background', color)}
+                    disabled={state.saving}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="hidden lg:flex justify-between items-end gap-4 text-xs">
+        <div className="flex flex-col">
+          <p>Ticket ID: #{user.ticket_number}</p>
+          <p>Accepted at: {user.username}</p>
+        </div>
+        <LW15ThemeSwitcher />
+      </div>
+    </div>
+  )
+
   if (!confState.sessionLoaded)
     return (
       <div className="h-full w-full flex items-center justify-center opacity-0 animate-fade-in">
@@ -72,66 +135,7 @@ const LW15TicketPage = () => {
             Hey @{user.username}, customize your Launch Week ticket
           </div>
         </div>
-        <div className="hidden w-full lg:flex flex-col gap-12 border-t pt-4">
-          <div className="grid grid-cols-6 w-full gap-4">
-            <p className="col-span-2">
-              No templates, just tools to help you shape the output exactly how you want it.
-            </p>
-            <div className="col-span-3 col-start-4 flex flex-col gap-4">
-              <div className="w-full grid grid-cols-3">
-                <p>Typo color</p>
-                <div className="flex flex-col col-span-2">
-                  <div className="flex gap-2 flex-wrap">
-                    {TYPO_COLORS.map((color) => (
-                      <button
-                        key={color}
-                        className={cn(
-                          'flex-1 aspect-square rounded-full border border-control flex items-center justify-center transition-all',
-                          selectedFg === color
-                            ? 'border-background ring-1 ring-foreground scale-110'
-                            : 'border-transparent'
-                        )}
-                        style={{ background: color }}
-                        aria-label={color}
-                        onClick={() => handleColorChange('foreground', color)}
-                        disabled={state.saving}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="w-full grid grid-cols-3">
-                <p>Bg color</p>
-                <div className="flex flex-col col-span-2">
-                  <div className="flex gap-2 flex-wrap">
-                    {BG_COLORS.map((color) => (
-                      <button
-                        key={color}
-                        className={cn(
-                          'flex-1 aspect-square rounded-full border border-control flex items-center justify-center transition-all',
-                          selectedBg === color
-                            ? 'border-background ring-1 ring-foreground scale-110'
-                            : 'border-transparent'
-                        )}
-                        style={{ background: color }}
-                        aria-label={color}
-                        onClick={() => handleColorChange('background', color)}
-                        disabled={state.saving}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-between items-end gap-4 text-xs">
-            <div className="flex flex-col">
-              <p>Ticket ID: #{user.ticket_number}</p>
-              <p>Accepted at: {user.username}</p>
-            </div>
-            <LW15ThemeSwitcher />
-          </div>
-        </div>
+        <TicketCustomizationSection className="hidden lg:flex" />
       </div>
       <div
         className="w-full border border-muted min-h-fit h-full bg-surface-300 flex items-center justify-center p-8 transition-colors duration-300"
@@ -145,6 +149,7 @@ const LW15TicketPage = () => {
           </div>
         </div>
       </div>
+      <TicketCustomizationSection className="lg:hidden" />
     </SectionContainer>
   )
 }
