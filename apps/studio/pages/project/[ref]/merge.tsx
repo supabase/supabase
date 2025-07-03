@@ -151,17 +151,11 @@ const MergePage: NextPageWithLayout = () => {
   const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
       setIsSubmitting(false)
-      if (data.hadChanges) {
-        if (data.migrationCreated) {
-          toast.success('Migration created and branch merge initiated!')
-        } else {
-          toast.success('Branch merge initiated!')
-        }
-        if (data.workflowRunId) {
-          addWorkflowRun(data.workflowRunId)
-        }
+      if (data.workflowRunId) {
+        toast.success('Branch merge initiated!')
+        addWorkflowRun(data.workflowRunId)
       } else {
-        toast.info('No changes to merge - branch merged successfully!')
+        toast.info('No changes to merge')
       }
     },
     onError: (error) => {
