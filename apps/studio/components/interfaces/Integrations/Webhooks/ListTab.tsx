@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
-import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
+import { EditHookPanel } from 'components/interfaces/Database/Hooks/EditHookPanel'
 import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
@@ -13,7 +13,6 @@ export const WebhooksListTab = () => {
   const [showDeleteHookForm, setShowDeleteHookForm] = useState<boolean>(false)
 
   const canReadWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'triggers')
-  const canCreateWebhooks = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
   const isPermissionsLoaded = usePermissionsLoaded()
 
   const createHook = () => {
