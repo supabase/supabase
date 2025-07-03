@@ -47,6 +47,7 @@ type LwAction =
   | { type: 'USER_TICKET_FETCH_ERROR'; payload: Error }
   | { type: 'USER_TICKET_UPDATED'; payload: UserTicketData }
   | { type: 'SESSION_UPDATED'; payload: Session | null }
+  | { type: 'SESSION_LOADED' }
   | { type: 'TICKET_LOADING_START' }
   | { type: 'TICKET_LOADING_SUCCESS' }
   | { type: 'TICKET_LOADING_ERROR'; payload?: Error }
@@ -68,6 +69,7 @@ interface LwState {
   userTicketData: UserTicketData
   ticketState: TicketState
   session: Session | null
+  sessionLoaded: boolean
   userTicketDataState: 'unloaded' | 'loading' | 'error' | 'loaded'
   userTicketDataError: Error | null
   ticketLoadingState: 'unloaded' | 'loading' | 'error' | 'loaded'
@@ -93,6 +95,11 @@ export const lwReducer = (state: LwState, action: LwAction): LwState => {
         session: action.payload,
         // Show claim form if session is not available. Form triggers authentication flow.
         claimFormState: !action.payload ? 'visible' : 'hidden',
+      }
+    case 'SESSION_LOADED':
+      return {
+        ...state,
+        sessionLoaded: true,
       }
     case 'USER_TICKET_FETCH_STARTED':
       return { ...state, userTicketDataState: 'loading', userTicketDataError: null }
@@ -201,6 +208,7 @@ export const Lw15ConfDataProvider = ({
     userTicketData: {},
     ticketState: 'loading',
     session: null,
+    sessionLoaded: false,
     ticketLoadingState: 'unloaded',
     ticketVisibility: false,
     userTicketDataState: 'unloaded',

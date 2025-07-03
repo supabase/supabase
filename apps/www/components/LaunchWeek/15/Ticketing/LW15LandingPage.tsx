@@ -48,7 +48,7 @@ const LW15LandingPage = () => {
           </div>
           <FifteenSVG className="h-full w-auto" />
         </div>
-        <div className="grid md:grid-cols-12 gap-4">
+        <div className="grid md:grid-cols-12 gap-4 delay-100">
           <div className="hidden md:block md:col-span-4 text-sm">
             Celebrate our launch week with exciting new features designed to take your development
             skills to the next level.

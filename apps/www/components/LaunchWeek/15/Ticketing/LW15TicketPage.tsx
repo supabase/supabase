@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { cn } from 'ui'
 import SectionContainer from 'components/Layouts/SectionContainer'
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
@@ -9,14 +9,23 @@ import LW15TicketShare from './LW15TicketShare'
 import TicketURLCopy from './TicketUrlCopy'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 import { updateTicketColors } from '../hooks/use-registration'
+import { useRouter } from 'next/router'
 
 const LW15TicketPage = () => {
   useRegistration()
   const [state, setState] = useState({ saving: false })
   const [confState] = useLw15ConfData()
   const user = confState.userTicketData
+  const router = useRouter()
   const selectedFg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const selectedBg = user?.metadata?.colors?.background || BG_COLORS[0]
+
+  // Redirect if there is no session
+  useEffect(() => {
+    if (confState.sessionLoaded && confState.session === null) {
+      router.replace('/launch-week')
+    }
+  }, [confState.sessionLoaded, confState.session, router])
 
   const handleColorChange = async (type: 'foreground' | 'background', color: string) => {
     if (!user?.username) return
@@ -35,6 +44,20 @@ const LW15TicketPage = () => {
       setState({ saving: false })
     }
   }
+
+  if (!confState.sessionLoaded)
+    return (
+      <div className="h-full w-full flex items-center justify-center opacity-0 animate-fade-in">
+        Loading...
+      </div>
+    )
+
+  if (!user.id)
+    return (
+      <div className="h-full w-full flex items-center justify-center opacity-0 animate-fade-in">
+        Loading...
+      </div>
+    )
 
   return (
     <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-4 !py-10 h-full">
