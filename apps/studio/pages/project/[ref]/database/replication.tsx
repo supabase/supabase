@@ -18,14 +18,14 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
     <>
       {enablePgReplicate ? (
         <>
-        <ScaffoldContainer>
-          <ScaffoldHeader>
-            <ScaffoldTitle>Replication</ScaffoldTitle>
-            <ScaffoldDescription>Send data to other destinations</ScaffoldDescription>
-          </ScaffoldHeader>
-        </ScaffoldContainer>
-        <Destinations />
-      </>
+          <ScaffoldContainer>
+            <ScaffoldHeader>
+              <ScaffoldTitle>Replication</ScaffoldTitle>
+              <ScaffoldDescription>Send data to other destinations</ScaffoldDescription>
+            </ScaffoldHeader>
+          </ScaffoldContainer>
+          <Destinations />
+        </>
       ) : (
         <>
           <ScaffoldContainer>

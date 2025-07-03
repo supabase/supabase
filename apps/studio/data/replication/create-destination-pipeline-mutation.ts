@@ -22,7 +22,7 @@ export type CreateDestinationPipelineParams = {
   pipelineConfig: {
     publicationName: string
     batch: {
-      maxSize: number,
+      maxSize: number
       maxFillMs: number
     }
   }
@@ -37,7 +37,7 @@ async function createDestinationPipeline(
     },
     pipelineConfig: {
       publicationName,
-      batch: { maxSize, maxFillMs }
+      batch: { maxSize, maxFillMs },
     },
     sourceId,
   }: CreateDestinationPipelineParams,
@@ -61,7 +61,7 @@ async function createDestinationPipeline(
         publication_name: publicationName,
         batch: {
           max_size: maxSize,
-          max_fill_ms: maxFillMs
+          max_fill_ms: maxFillMs,
         },
       },
       source_id: sourceId,

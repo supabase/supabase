@@ -24,7 +24,7 @@ export type UpdateDestinationPipelineParams = {
   pipelineConfig: {
     publicationName: string
     batch: {
-      maxSize: number,
+      maxSize: number
       maxFillMs: number
     }
   }
