@@ -163,33 +163,6 @@ export default function ComposedChart({
     color: CHART_COLORS.REFERENCE_LINE,
   }
 
-  const chartData =
-    data && !!data[0]
-      ? Object.entries(data[0])
-          ?.map(([key, value]) => ({
-            name: key,
-            value: value,
-          }))
-          .filter(
-            (att) =>
-              att.name !== 'timestamp' &&
-              att.name !== 'period_start' &&
-              att.name !== maxAttribute?.attribute &&
-              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
-          )
-          .map((att, index) => {
-            const attribute = attributes.find((attr) => attr.attribute === att.name)
-            return {
-              ...att,
-              color: attribute?.color
-                ? resolvedTheme?.includes('dark')
-                  ? attribute.color.dark
-                  : attribute.color.light
-                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
-            }
-          })
-      : []
-
   const lastDataPoint = !!data[data.length - 1]
     ? Object.entries(data[data.length - 1])
         .map(([key, value]) => ({
@@ -229,6 +202,34 @@ export default function ComposedChart({
     chartHighlight?.coordinates.left &&
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
+
+  const chartData =
+    data && !!data[0]
+      ? Object.entries(data[0])
+          ?.map(([key, value]) => ({
+            name: key,
+            value: value,
+          }))
+          .filter(
+            (att) =>
+              att.name !== 'timestamp' &&
+              att.name !== 'period_start' &&
+              att.name !== maxAttribute?.attribute &&
+              !referenceLines.map((a) => a.attribute).includes(att.name) &&
+              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
+          )
+          .map((att, index) => {
+            const attribute = attributes.find((attr) => attr.attribute === att.name)
+            return {
+              ...att,
+              color: attribute?.color
+                ? resolvedTheme?.includes('dark')
+                  ? attribute.color.dark
+                  : attribute.color.light
+                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+            }
+          })
+      : []
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'

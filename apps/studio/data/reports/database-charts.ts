@@ -215,83 +215,6 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       ],
     },
     {
-      id: 'disk-size',
-      label: 'Disk Size',
-      syncId: 'database-reports',
-      valuePrecision: 2,
-      hide: false,
-      showTooltip: true,
-      showLegend: true,
-      showMaxValue: true,
-      showGrid: true,
-      YAxisProps: {
-        width: 65,
-        tickFormatter: (value: any) => formatBytes(value, 1),
-      },
-      hideChartType: false,
-      defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
-      attributes: [
-        {
-          attribute: 'disk_fs_used_system',
-          provider: 'infra-monitoring',
-          format: 'bytes',
-          label: 'System',
-          tooltip: 'Reserved space for the system to ensure your database runs smoothly',
-        },
-        {
-          attribute: 'disk_fs_used_wal',
-          provider: 'infra-monitoring',
-          format: 'bytes',
-          label: 'WAL',
-          tooltip:
-            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
-        },
-
-        {
-          attribute: 'pg_database_size',
-          provider: 'infra-monitoring',
-          format: 'bytes',
-          label: 'Database',
-          tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
-        },
-        {
-          attribute: 'disk_fs_size',
-          provider: 'infra-monitoring',
-          isMaxValue: true,
-          format: 'bytes',
-          label: 'Disk Size',
-          tooltip: 'Disk Size refers to the total space your project occupies on disk',
-        },
-        !isFreePlan &&
-          (isSpendCapEnabled
-            ? {
-                attribute: 'pg_database_size_percent_paid_spendCap',
-                provider: 'reference-line',
-                isReferenceLine: true,
-                strokeDasharray: '4 2',
-                label: 'Spend cap enabled',
-                value:
-                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
-                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
-                opacity: 1,
-              }
-            : {
-                attribute: 'pg_database_size_percent_paid',
-                provider: 'reference-line',
-                isReferenceLine: true,
-                label: '90% - Disk resize threshold',
-                className: '[&_line]:!stroke-yellow-800',
-                value:
-                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) *
-                  1024 *
-                  1024 *
-                  1024 *
-                  0.9, // reaching 90% of the disk size will trigger a disk resize https://supabase.com/docs/guides/platform/database-size
-              }),
-      ],
-    },
-    {
       id: 'client-connections',
       label: 'Database client connections',
       valuePrecision: 0,
@@ -403,6 +326,83 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'supavisor',
           tooltip: 'Supavisor connections',
         },
+      ],
+    },
+    {
+      id: 'disk-size',
+      label: 'Disk Usage',
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      showGrid: true,
+      YAxisProps: {
+        width: 65,
+        tickFormatter: (value: any) => formatBytes(value, 1),
+      },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
+      attributes: [
+        {
+          attribute: 'disk_fs_used_system',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'System',
+          tooltip: 'Reserved space for the system to ensure your database runs smoothly',
+        },
+        {
+          attribute: 'disk_fs_used_wal',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'WAL',
+          tooltip:
+            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
+        },
+
+        {
+          attribute: 'pg_database_size',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'Database',
+          tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
+        },
+        {
+          attribute: 'disk_fs_size',
+          provider: 'infra-monitoring',
+          isMaxValue: true,
+          format: 'bytes',
+          label: 'Disk Size',
+          tooltip: 'Disk Size refers to the total space your project occupies on disk',
+        },
+        !isFreePlan &&
+          (isSpendCapEnabled
+            ? {
+                attribute: 'pg_database_size_percent_paid_spendCap',
+                provider: 'reference-line',
+                isReferenceLine: true,
+                strokeDasharray: '4 2',
+                label: 'Spend cap enabled',
+                value:
+                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
+                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
+                opacity: 1,
+              }
+            : {
+                attribute: 'pg_database_size_percent_paid',
+                provider: 'reference-line',
+                isReferenceLine: true,
+                label: '90% - Disk resize threshold',
+                className: '[&_line]:!stroke-yellow-800',
+                value:
+                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) *
+                  1024 *
+                  1024 *
+                  1024 *
+                  0.9, // reaching 90% of the disk size will trigger a disk resize https://supabase.com/docs/guides/platform/database-size
+              }),
       ],
     },
   ]
