@@ -3,27 +3,37 @@ import { cn } from 'ui'
 import useLw15ConfData from '../hooks/use-conf-data'
 import { FifteenSVG, LWSVG } from '../lw15.components'
 import Image from 'next/image'
+import { TYPO_COLORS, BG_COLORS } from './colors'
 
 const LW15Ticket = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
   const [state] = useLw15ConfData()
   const user = state.userTicketData
+  const fg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
+  const bg = user?.metadata?.colors?.background || BG_COLORS[0]
 
   return (
     <div
       className={cn(
-        'min-h-[443px] max-h-[550px] h-full w-auto aspect-[278/443] flex flex-col bg-black text-white shadow-xl rounded-md overflow-hidden',
+        'min-h-[443px] transition-colors duration-300 max-h-[550px] h-full w-auto aspect-[278/443] flex flex-col shadow-xl rounded-md overflow-hidden',
         className
       )}
+      style={{ background: bg, color: fg }}
       {...props}
     >
       <div className="relative w-full h-1/2">
-        <Image
-          alt=""
-          src="/images/launchweek/15/ticket-bg.png"
-          width={600}
-          height={600}
-          className="absolute w-full h-full inset-0 bg-cover"
-        />
+        <div className="absolute w-full h-full inset-0 bg-cover">
+          <Image
+            alt=""
+            src="/images/launchweek/15/ticket-bg.png"
+            width={600}
+            height={600}
+            className="absolute w-full h-full inset-0 bg-cover mix-blend-screen"
+          />
+          <div
+            className="absolute w-full h-full inset-0 mix-blend-color"
+            style={{ background: bg }}
+          />
+        </div>
         <div className="relative z-10 flex flex-col p-4 gap-4 w-full h-full bg-background/30">
           <div>Launch Week</div>
           <div className="w-full h-[50px] flex items-center justify-between">

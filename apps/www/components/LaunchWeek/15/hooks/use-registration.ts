@@ -212,3 +212,33 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
     upgradeTicket,
   }
 }
+
+// Update ticket colors in the database
+export async function updateTicketColors({
+  username,
+  background,
+  foreground,
+}: {
+  username: string
+  background: string
+  foreground: string
+}) {
+  const { error } = await supabase
+    .from('tickets')
+    .update({
+      metadata: {
+        colors: {
+          background,
+          foreground,
+        },
+      },
+    })
+    .eq('launch_week', 'lw15')
+    .eq('username', username)
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to update ticket colors', error)
+    throw error
+  }
+}

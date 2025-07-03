@@ -1,4 +1,5 @@
-import React from 'react'
+import { useState } from 'react'
+import { cn } from 'ui'
 import SectionContainer from 'components/Layouts/SectionContainer'
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { useRegistration } from '../hooks/use-registration'
@@ -6,11 +7,34 @@ import { LWSVG, FifteenSVG, LW15ThemeSwitcher } from '../lw15.components'
 import LW15Ticket from './LW15Ticket'
 import LW15TicketShare from './LW15TicketShare'
 import TicketURLCopy from './TicketUrlCopy'
+import { TYPO_COLORS, BG_COLORS } from './colors'
+import { updateTicketColors } from '../hooks/use-registration'
 
 const LW15TicketPage = () => {
   useRegistration()
-  const [state] = useLw15ConfData()
-  const user = state.userTicketData
+  const [state, setState] = useState({ saving: false })
+  const [confState] = useLw15ConfData()
+  const user = confState.userTicketData
+  const selectedFg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
+  const selectedBg = user?.metadata?.colors?.background || BG_COLORS[0]
+
+  const handleColorChange = async (type: 'foreground' | 'background', color: string) => {
+    if (!user?.username) return
+    const newColors = {
+      background: type === 'background' ? color : selectedBg,
+      foreground: type === 'foreground' ? color : selectedFg,
+    }
+    setState({ saving: true })
+    try {
+      await updateTicketColors({
+        username: user.username!,
+        background: newColors.background,
+        foreground: newColors.foreground,
+      })
+    } finally {
+      setState({ saving: false })
+    }
+  }
 
   return (
     <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-4 !py-10 h-full">
@@ -33,36 +57,46 @@ const LW15TicketPage = () => {
             <div className="col-span-3 col-start-4 flex flex-col gap-4">
               <div className="w-full grid grid-cols-3">
                 <p>Typo color</p>
-                <div className="flex flex-col">
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                </div>
-                <div className="flex flex-col">
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
+                <div className="flex flex-col col-span-2">
+                  <div className="flex gap-2 flex-wrap">
+                    {TYPO_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        className={cn(
+                          'flex-1 aspect-square rounded-full border border-control flex items-center justify-center transition-all',
+                          selectedFg === color
+                            ? 'border-background ring-1 ring-foreground scale-110'
+                            : 'border-transparent'
+                        )}
+                        style={{ background: color }}
+                        aria-label={color}
+                        onClick={() => handleColorChange('foreground', color)}
+                        disabled={state.saving}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="w-full grid grid-cols-3">
                 <p>Bg color</p>
-                <div className="flex flex-col">
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                </div>
-                <div className="flex flex-col">
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
-                  <div>#90EbFE</div>
+                <div className="flex flex-col col-span-2">
+                  <div className="flex gap-2 flex-wrap">
+                    {BG_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        className={cn(
+                          'flex-1 aspect-square rounded-full border border-control flex items-center justify-center transition-all',
+                          selectedBg === color
+                            ? 'border-background ring-1 ring-foreground scale-110'
+                            : 'border-transparent'
+                        )}
+                        style={{ background: color }}
+                        aria-label={color}
+                        onClick={() => handleColorChange('background', color)}
+                        disabled={state.saving}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -76,7 +110,10 @@ const LW15TicketPage = () => {
           </div>
         </div>
       </div>
-      <div className="w-full min-h-fit h-full bg-surface-300 flex items-center justify-center p-8">
+      <div
+        className="w-full min-h-fit h-full bg-surface-300 flex items-center justify-center p-8"
+        style={{ background: selectedFg }}
+      >
         <div className="flex flex-col justify-center gap-8 h-full">
           <LW15Ticket />
           <div className="flex flex-col gap-1">
