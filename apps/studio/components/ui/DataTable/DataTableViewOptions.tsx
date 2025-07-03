@@ -1,9 +1,9 @@
-import { Check, GripVertical, Settings2 } from 'lucide-react'
+import { GripVertical, Settings2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import {
   Button,
-  cn,
+  Checkbox_Shadcn_,
   Command_Shadcn_ as Command,
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandGroup_Shadcn_ as CommandGroup,
@@ -45,9 +45,9 @@ export function DataTableViewOptions() {
           icon={<Settings2 className="text-foreground" />}
         />
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="end" className="w-[200px] p-0">
+      <PopoverContent portal side="bottom" align="end" className="w-[200px] p-0">
         <Command>
-          <CommandInput value={search} onValueChange={setSearch} placeholder="Search options..." />
+          <CommandInput value={search} onValueChange={setSearch} placeholder="Search columns..." />
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
             <CommandGroup>
@@ -68,19 +68,10 @@ export function DataTableViewOptions() {
                       <CommandItem
                         value={column.id}
                         onSelect={() => column.toggleVisibility(!column.getIsVisible())}
-                        className={'capitalize'}
+                        className="capitalize p-1"
                         disabled={drag}
                       >
-                        <div
-                          className={cn(
-                            'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-                            column.getIsVisible()
-                              ? 'bg-primary text-primary-foreground'
-                              : 'opacity-50 [&_svg]:invisible'
-                          )}
-                        >
-                          <Check className={cn('h-4 w-4')} />
-                        </div>
+                        <Checkbox_Shadcn_ checked={column.getIsVisible()} className="mr-2" />
                         <span>{(column.columnDef.meta as any)?.label || column.id}</span>
                         {enableColumnOrdering && !search ? (
                           <SortableDragHandle

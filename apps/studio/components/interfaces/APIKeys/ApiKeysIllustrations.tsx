@@ -1,4 +1,4 @@
-import { ExternalLink, Github, Mail } from 'lucide-react'
+import { ExternalLink, Github } from 'lucide-react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { FeatureBanner } from 'components/ui/FeatureBanner'
@@ -119,7 +119,13 @@ export const ApiKeysComingSoonBanner = () => {
         </p>
         <div className="mt-4">
           <Button type="default" icon={<Github />}>
-            Learn more
+            <a
+              href="https://github.com/orgs/supabase/discussions/29260"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more
+            </a>
           </Button>
         </div>
       </div>

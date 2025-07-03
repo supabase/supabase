@@ -4,7 +4,6 @@ import { ParserBuilder } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import {
   cn,
   Command_Shadcn_ as Command,
@@ -33,9 +32,13 @@ import {
 interface DataTableFilterCommandProps {
   // TODO: maybe use generics for the parser
   searchParamsParser: Record<string, ParserBuilder<any>>
+  placeholder?: string
 }
 
-export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCommandProps) {
+export function DataTableFilterCommand({
+  searchParamsParser,
+  placeholder = 'Search data table...',
+}: DataTableFilterCommandProps) {
   const { table, isLoading, filterFields: _filterFields, getFacetedUniqueValues } = useDataTable()
   const columnFilters = table.getState().columnFilters
   const inputRef = useRef<HTMLInputElement>(null)
@@ -59,7 +62,8 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
 
   const trimmedInputValue = inputValue.trim()
 
-  useHotKey(() => setOpen((open) => !open), 'k')
+  // [Joshen] Temporarily disabling as this conflicts with our current CMD K behaviour
+  // useHotKey(() => setOpen((open) => !open), 'k')
 
   useEffect(() => {
     // TODO: we could check for ARRAY_DELIMITER or SLIDER_DELIMITER to auto-set filter when typing
@@ -139,13 +143,15 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
             trimmedInputValue ? 'text-foreground' : 'text-foreground-light'
           )}
         >
-          {trimmedInputValue ? inputValue : 'Search data table...'}
+          {trimmedInputValue ? inputValue : placeholder}
         </span>
-        <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
+        {/* [Joshen] Temporarily disabling as this conflicts with existing CMD K shortcut */}
+        {/* <Kbd className="ml-auto text-muted-foreground group-hover:text-accent-foreground">
           <span className="mr-1">⌘</span>
           <span>K</span>
-        </Kbd>
+        </Kbd> */}
       </button>
+
       <Command
         className={cn(
           'overflow-visible rounded-lg border border-border shadow-md [&>div]:border-none bg',
@@ -185,7 +191,7 @@ export function DataTableFilterCommand({ searchParamsParser }: DataTableFilterCo
             const word = getWordByCaretPosition({ value, caretPosition })
             setCurrentWord(word)
           }}
-          placeholder="Search data table..."
+          placeholder={placeholder}
           className="text-foreground"
         />
         <div className="relative">
