@@ -92,7 +92,12 @@ export const AIAssistantChatSelector = ({
   return (
     <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="text" size="tiny" iconRight={<ChevronDown size={14} />}>
+        <Button
+          type="text"
+          size="tiny"
+          iconRight={<ChevronDown size={14} />}
+          className="max-w-64 truncate"
+        >
           {currentChat}
         </Button>
       </PopoverTrigger_Shadcn_>

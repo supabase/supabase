@@ -132,9 +132,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       rename_chat: tool({
         description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
         parameters: z.object({
-          newName: z
-            .string()
-            .describe('The new name for the chat session. Should be descriptive and concise.'),
+          newName: z.string().describe('The new name for the chat session. Five words or less.'),
         }),
         // No execute function - this will be handled client-side
       }),
