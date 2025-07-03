@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import SchemaSelector from 'components/ui/SchemaSelector'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { invalidateSchemasQuery, useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import {
@@ -52,6 +53,18 @@ export const CreateWrapperSheet = ({
   const [selectedMode, setSelectedMode] = useState<'tables' | 'schema'>(
     wrapperMeta.tables.length > 0 ? 'tables' : 'schema'
   )
+
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
+  // The import foreign schema requires a minimum extension version of 0.5.0
+  const hasRequiredVersionForeignSchema = wrappersExtension?.installed_version
+    ? wrappersExtension?.installed_version >= '0.5.0'
+    : false
+
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
   const { mutate: createFDW, isLoading: isCreating } = useFDWCreateMutation({
@@ -218,7 +231,9 @@ export const CreateWrapperSheet = ({
                         <RadioGroupStackedItem
                           key="schema"
                           value="schema"
-                          disabled={!wrapperMeta.canTargetSchema}
+                          disabled={
+                            !wrapperMeta.canTargetSchema || !hasRequiredVersionForeignSchema
+                          }
                           label="Schema"
                           showIndicator={false}
                         >
@@ -229,14 +244,25 @@ export const CreateWrapperSheet = ({
                               </p>
                             </div>
                           </div>
-                          {!wrapperMeta.canTargetSchema ? (
+                          {wrapperMeta.canTargetSchema ? (
+                            hasRequiredVersionForeignSchema ? null : (
+                              <div className="w-full flex gap-x-2 py-2 items-center">
+                                <WarningIcon />
+                                <span className="text-xs text-left">
+                                  This feature requires the{' '}
+                                  <span className="text-brand">wrappers</span> extension to be of
+                                  minimum version of 0.5.0.
+                                </span>
+                              </div>
+                            )
+                          ) : (
                             <div className="w-full flex gap-x-2 py-2 items-center">
                               <WarningIcon />
                               <span className="text-xs">
                                 This wrapper doesn't support using a foreign schema.
                               </span>
                             </div>
-                          ) : null}
+                          )}
                         </RadioGroupStackedItem>
                       </RadioGroupStacked>
                     </FormSectionContent>
