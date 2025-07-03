@@ -162,7 +162,7 @@ const General = () => {
                       </p>
                     </div>
                   </div>
-                  <div>
+                  <div id="project-usage">
                     <Button asChild type="default">
                       <Link href={`/org/${organization?.slug}/usage?projectRef=${project?.ref}`}>
                         View project usage
