@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { REALTIME_CHANNEL_STATES, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
+import { useCallback, useEffect, useRef } from 'react'
+import { RealtimeChannel } from '@supabase/supabase-js'
 
 import useConfData from './use-conf-data'
-import { LW14_URL } from '~/lib/constants'
+import { LW15_URL } from 'lib/constants'
 import supabase from '../supabase'
 
 function subscribeToTicketChanges(
@@ -66,7 +66,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
         .from('tickets')
         .insert({
           user_id: userId,
-          launch_week: 'lw14',
+          launch_week: 'lw15',
           email,
           name,
           username,
@@ -85,7 +85,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
       const { data, error: ticketsViewError } = await supabase
         .from('tickets_view')
         .select('*')
-        .eq('launch_week', 'lw14')
+        .eq('launch_week', 'lw15')
         .eq('username', username)
         .single()
 
@@ -112,7 +112,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
   }
 
   const handleGithubSignIn = useCallback(async () => {
-    let redirectTo = `${LW14_URL}`
+    let redirectTo = `${LW15_URL}/ticket`
 
     if (referal) {
       redirectTo += `?referal=${referal}`
@@ -193,7 +193,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
       const { error } = await supabase
         .from('tickets')
         .update({ game_won_at: new Date() })
-        .eq('launch_week', 'lw14')
+        .eq('launch_week', 'lw15')
         .eq('username', userData.username)
 
       if (error) {

@@ -1,9 +1,9 @@
-import { RealtimeChannel, Session, SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
-import { createContext, Dispatch, useContext, useEffect, useMemo, useReducer } from 'react'
+import { createContext, Dispatch, useContext, useEffect, useReducer } from 'react'
+import type { RealtimeChannel, Session } from '@supabase/supabase-js'
 
 /**
- * This is copy of shared use-conf-data.ts. For laynch week 14 we need different ticket states.
+ * This is copy of shared use-conf-data.ts. For launch week 15 we need different ticket states.
  * To not break the existing functionality, we are creating a new context and hook.
  */
 

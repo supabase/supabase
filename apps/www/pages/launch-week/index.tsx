@@ -38,7 +38,7 @@ const Lw15Page = () => {
         }}
       />
 
-      <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData, partymodeStatus: 'on' }}>
+      <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
         <DefaultLayout className="!min-h-[calc(100dvh-66px)] h-[calc(100dvh-66px)]">
           <LW15LandingPage />
         </DefaultLayout>
