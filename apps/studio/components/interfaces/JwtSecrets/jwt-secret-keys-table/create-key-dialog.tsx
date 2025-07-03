@@ -1,7 +1,10 @@
-import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
-import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { useState } from 'react'
 import { toast } from 'sonner'
+
+import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
+import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import {
   Button,
   DialogFooter,
@@ -18,6 +21,8 @@ import {
 } from 'ui'
 import { algorithmDescriptions } from '../algorithm-details'
 
+dayjs.extend(relativeTime)
+
 export const CreateKeyDialog = ({
   projectRef,
   onClose,
@@ -29,10 +34,24 @@ export const CreateKeyDialog = ({
 
   const { mutate, isLoading: isLoadingMutation } = useJWTSigningKeyCreateMutation({
     onSuccess: () => {
+      toast.success('Standby key created successfully')
       onClose()
     },
     onError: (error) => {
-      toast.error(`Failed to add new standby key: ${error.message}`)
+      let errorMessage = error.message
+
+      if (errorMessage.includes('Please wait until')) {
+        const dateString = errorMessage
+          .replace('Please wait until ', '')
+          .replace('before attempting this request again.', '')
+          .trim()
+        const date = dayjs(dateString)
+
+        if (date.isValid()) {
+          errorMessage = `Please wait for ${date.fromNow(true)} before attempting this request again.`
+        }
+      }
+      toast.error(`Failed to add new standby key: ${errorMessage}`)
     },
   })
 
