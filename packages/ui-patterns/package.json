@@ -314,6 +314,10 @@
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
     },
+    "./McpUrlBuilder": {
+      "import": "./src/McpUrlBuilder/index.ts",
+      "types": "./src/McpUrlBuilder/index.ts"
+    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"

@@ -32,6 +32,7 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
+import { McpTabContent } from './McpTabContent'
 
 export const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -146,7 +147,6 @@ export const Connect = () => {
     const endpoint = settings?.app_config?.endpoint ?? ''
     const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
 
-    const apiUrl = canReadAPIKeys ? apiHost : null
     return {
       apiUrl: apiHost ?? null,
       anonKey: anonKey?.api_key ?? null,
@@ -187,16 +187,26 @@ export const Connect = () => {
           <span>Connect</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
-        <DialogHeader className={DIALOG_PADDING_X}>
+      <DialogContent
+        dialogOverlayProps={{ className: '!pt-[10vh]' }}
+        className={cn('sm:max-w-5xl p-0 max-h-[80vh] flex flex-col')}
+        centered={false}
+      >
+        <DialogHeader className={cn(DIALOG_PADDING_X, 'flex-shrink-0')}>
           <DialogTitle>Connect to your project</DialogTitle>
           <DialogDescription>
             Get the connection strings and environment variables for your app
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
-          <TabsList_Shadcn_ className={cn('flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}>
+        <Tabs_Shadcn_
+          defaultValue="direct"
+          onValueChange={(value) => handleConnectionType(value)}
+          className="flex-1 min-h-0 flex flex-col"
+        >
+          <TabsList_Shadcn_
+            className={cn('flex-shrink-0 flex overflow-x-scroll gap-x-4', DIALOG_PADDING_X)}
+          >
             {CONNECTION_TYPES.map((type) => (
               <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
                 {type.label}
@@ -204,99 +214,114 @@ export const Connect = () => {
             ))}
           </TabsList_Shadcn_>
 
-          {CONNECTION_TYPES.map((type) => {
-            const hasChildOptions =
-              (connectionObject.find((parent) => parent.key === selectedParent)?.children.length ||
-                0) > 0
-            const hasGrandChildOptions =
-              (connectionObject
-                .find((parent) => parent.key === selectedParent)
-                ?.children.find((child) => child.key === selectedChild)?.children.length || 0) > 0
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {CONNECTION_TYPES.map((type) => {
+              const hasChildOptions =
+                (connectionObject.find((parent) => parent.key === selectedParent)?.children
+                  .length || 0) > 0
+              const hasGrandChildOptions =
+                (connectionObject
+                  .find((parent) => parent.key === selectedParent)
+                  ?.children.find((child) => child.key === selectedChild)?.children.length || 0) > 0
 
-            if (type.key === 'direct') {
+              if (type.key === 'direct') {
+                return (
+                  <TabsContent_Shadcn_
+                    key="direct"
+                    value="direct"
+                    className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
+                  >
+                    <div className={DIALOG_PADDING_Y}>
+                      <DatabaseConnectionString />
+                    </div>
+                  </TabsContent_Shadcn_>
+                )
+              }
+
+              if (type.key === 'mcp') {
+                return (
+                  <TabsContent_Shadcn_
+                    key="mcp"
+                    value="mcp"
+                    className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+                  >
+                    <McpTabContent />
+                  </TabsContent_Shadcn_>
+                )
+              }
+
               return (
                 <TabsContent_Shadcn_
-                  key="direct"
-                  value="direct"
-                  className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
+                  key={`content-${type.key}`}
+                  value={type.key}
+                  className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
                 >
-                  <div className={DIALOG_PADDING_Y}>
-                    <DatabaseConnectionString />
+                  <div className="flex flex-col md:flex-row gap-2 justify-between">
+                    <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
+                      <ConnectDropdown
+                        state={selectedParent}
+                        updateState={handleParentChange}
+                        label={
+                          connectionObject === FRAMEWORKS || connectionObject === MOBILES
+                            ? 'Framework'
+                            : 'Tool'
+                        }
+                        items={connectionObject}
+                      />
+                      {selectedParent && hasChildOptions && (
+                        <ConnectDropdown
+                          state={selectedChild}
+                          updateState={handleChildChange}
+                          label="Using"
+                          items={getChildOptions()}
+                        />
+                      )}
+                      {selectedChild && hasGrandChildOptions && (
+                        <ConnectDropdown
+                          state={selectedGrandchild}
+                          updateState={handleGrandchildChange}
+                          label="With"
+                          items={getGrandchildrenOptions()}
+                        />
+                      )}
+                    </div>
+                    {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
+                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href={
+                            connectionObject.find((item) => item.key === selectedParent)
+                              ?.guideLink || ''
+                          }
+                        >
+                          {connectionObject.find((item) => item.key === selectedParent)?.label}{' '}
+                          guide
+                        </a>
+                      </Button>
+                    )}
                   </div>
+                  <p className="text-xs text-foreground-lighter my-3">
+                    Add the following files below to your application
+                  </p>
+                  <ConnectTabContent
+                    projectKeys={projectKeys}
+                    filePath={filePath}
+                    className="rounded-b-none"
+                  />
+                  <Panel.Notice
+                    className="border border-t-0 rounded-lg rounded-t-none"
+                    title="New API keys coming 2025"
+                    description={`
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
+`}
+                    href="https://github.com/orgs/supabase/discussions/29260"
+                    buttonText="Read the announcement"
+                  />
                 </TabsContent_Shadcn_>
               )
-            }
-
-            return (
-              <TabsContent_Shadcn_
-                key={`content-${type.key}`}
-                value={type.key}
-                className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
-              >
-                <div className="flex flex-col md:flex-row gap-2 justify-between">
-                  <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3">
-                    <ConnectDropdown
-                      state={selectedParent}
-                      updateState={handleParentChange}
-                      label={
-                        connectionObject === FRAMEWORKS || connectionObject === MOBILES
-                          ? 'Framework'
-                          : 'Tool'
-                      }
-                      items={connectionObject}
-                    />
-                    {selectedParent && hasChildOptions && (
-                      <ConnectDropdown
-                        state={selectedChild}
-                        updateState={handleChildChange}
-                        label="Using"
-                        items={getChildOptions()}
-                      />
-                    )}
-                    {selectedChild && hasGrandChildOptions && (
-                      <ConnectDropdown
-                        state={selectedGrandchild}
-                        updateState={handleGrandchildChange}
-                        label="With"
-                        items={getGrandchildrenOptions()}
-                      />
-                    )}
-                  </div>
-                  {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
-                    <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        href={
-                          connectionObject.find((item) => item.key === selectedParent)?.guideLink ||
-                          ''
-                        }
-                      >
-                        {connectionObject.find((item) => item.key === selectedParent)?.label} guide
-                      </a>
-                    </Button>
-                  )}
-                </div>
-                <p className="text-xs text-foreground-lighter my-3">
-                  Add the following files below to your application
-                </p>
-                <ConnectTabContent
-                  projectKeys={projectKeys}
-                  filePath={filePath}
-                  className="rounded-b-none"
-                />
-                <Panel.Notice
-                  className="border border-t-0 rounded-lg rounded-t-none"
-                  title="New API keys coming 2025"
-                  description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
-`}
-                  href="https://github.com/orgs/supabase/discussions/29260"
-                  buttonText="Read the announcement"
-                />
-              </TabsContent_Shadcn_>
-            )
-          })}
+            })}
+          </div>
         </Tabs_Shadcn_>
       </DialogContent>
     </Dialog>

@@ -29,6 +29,7 @@ import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { AuthErrorCodes } from '../ui/AuthErrorCodes'
+import { McpConfigPanel } from '../ui/McpConfigPanel'
 
 const components = {
   Accordion,
@@ -53,6 +54,7 @@ const components = {
   Image: (props: any) => <Image fill alt="" className="object-contain" {...props} />,
   JwtGenerator,
   Link,
+  McpConfigPanel,
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
