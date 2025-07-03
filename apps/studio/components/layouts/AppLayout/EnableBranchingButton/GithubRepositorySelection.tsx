@@ -1,11 +1,10 @@
-import { useParams } from 'common'
+import { Check, Loader2 } from 'lucide-react'
+
 import {
   EmptyIntegrationConnection,
   IntegrationConnection,
 } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import type { GitHubConnection } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { Check, Loader2 } from 'lucide-react'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
   Badge,
@@ -31,9 +30,6 @@ const GithubRepositorySelection = ({
   isValid,
   githubConnection,
 }: GithubRepositorySelectionProps) => {
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
-
   const sidePanels = useSidePanelsStateSnapshot()
 
   function onSelectConnectRepo() {

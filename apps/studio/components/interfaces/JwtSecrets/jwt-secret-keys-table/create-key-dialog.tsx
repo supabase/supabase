@@ -1,9 +1,17 @@
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
+
 import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { useState, useMemo } from 'react'
-import { toast } from 'sonner'
+import { stringToBase64URL } from 'lib/base64url'
 import {
   Button,
+  Checkbox_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -15,14 +23,10 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  Checkbox_Shadcn_,
   Textarea,
 } from 'ui'
-import { stringToBase64URL } from 'lib/base64url'
-import { algorithmDescriptions } from '../algorithm-details'
+
+dayjs.extend(relativeTime)
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']
@@ -109,10 +113,24 @@ export const CreateKeyDialog = ({
 
   const { mutate, isLoading: isLoadingMutation } = useJWTSigningKeyCreateMutation({
     onSuccess: () => {
+      toast.success('Standby key created successfully')
       onClose()
     },
     onError: (error) => {
-      toast.error(`Failed to add new standby key: ${error.message}`)
+      let errorMessage = error.message
+
+      if (errorMessage.includes('Please wait until')) {
+        const dateString = errorMessage
+          .replace('Please wait until ', '')
+          .replace('before attempting this request again.', '')
+          .trim()
+        const date = dayjs(dateString)
+
+        if (date.isValid()) {
+          errorMessage = `Please wait for ${date.fromNow(true)} before attempting this request again.`
+        }
+      }
+      toast.error(`Failed to add new standby key: ${errorMessage}`)
     },
   })
 

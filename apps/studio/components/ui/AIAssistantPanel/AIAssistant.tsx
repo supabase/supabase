@@ -1,5 +1,6 @@
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -42,6 +43,10 @@ import { AIOptInModal } from './AIOptInModal'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
+
+type ExtendedMessage = MessageType & {
+  results?: any[]
+}
 
 const MemoizedMessage = memo(
   ({
@@ -172,13 +177,25 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       // as much as possible so that the first message is always the user's
       const MAX_CHAT_HISTORY = 5
 
+      const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
+
+      // Filter out results from messages before sending to the model
+      const cleanedMessages = slicedMessages.map((message) => {
+        const cleanedMessage = { ...message } as ExtendedMessage
+        if (message.role === 'assistant' && (message as ExtendedMessage).results) {
+          delete cleanedMessage.results
+        }
+        return cleanedMessage
+      })
+
       return JSON.stringify({
-        messages: messages.slice(-MAX_CHAT_HISTORY),
+        messages: cleanedMessages,
         aiOptInLevel,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         schema: currentSchema,
         table: currentTable?.name,
+        chatName: currentChat,
         includeSchemaMetadata: !useBedrockAssistant
           ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
           : undefined,

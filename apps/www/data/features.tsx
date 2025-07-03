@@ -1736,7 +1736,7 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
       availableOnSelfHosted: true,
       selfHostedTooling: {
         label: 'OpenAI API Key',
-        link: 'https://platform.openai.com/docs/quickstart#create-and-export-an-api-key://platform.openai.com/api-keys',
+        link: 'https://platform.openai.com/docs/libraries#create-and-export-an-api-key',
       },
     },
   },

@@ -21,6 +21,7 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
@@ -36,8 +37,8 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 
-import ReportChart from 'components/interfaces/Reports/ReportChart'
 import type { NextPageWithLayout } from 'types'
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -207,10 +208,15 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
+      <div className="w-full flex flex-col gap-1">
+        <div className="h-2 w-full">
+          <ShimmerLine active={report.isLoading} />
+        </div>
+      </div>
       <GrafanaPromoBanner />
       <section className="relative pt-16 -mt-2">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto dark:bg-background-200 bg-background">
+          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -253,13 +259,20 @@ const DatabaseUsage = () => {
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
               REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ReportChart
+                <ComposedChartHandler
                   key={chart.id}
-                  chart={chart}
+                  {...chart}
+                  attributes={chart.attributes as MultiAttribute[]}
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  interval={dateRange.interval}
                   updateDateRange={updateDateRange}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  showMaxValue={
+                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
                 />
               ))}
           </div>
