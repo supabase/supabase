@@ -14,7 +14,7 @@ const LW15Ticket = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement
   return (
     <div
       className={cn(
-        'min-h-[443px] transition-colors duration-300 max-h-[550px] h-full w-auto aspect-[278/443] flex flex-col shadow-xl rounded-md overflow-hidden',
+        'min-h-[443px] transition-colors duration-300 [&_*]:transition-colors [&_*]:duration-300 max-h-[550px] h-full w-auto aspect-[278/443] flex flex-col shadow-2xl rounded-md overflow-hidden',
         className
       )}
       style={{ background: bg, color: fg }}
@@ -32,6 +32,10 @@ const LW15Ticket = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement
           <div
             className="absolute w-full h-full inset-0 mix-blend-color"
             style={{ background: bg }}
+          />
+          <span
+            className="absolute top-5 mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg shadow-inner"
+            style={{ background: fg }}
           />
         </div>
         <div className="relative z-10 flex flex-col p-4 gap-4 w-full h-full bg-background/30">
