@@ -1,16 +1,10 @@
-import { NextSeo } from 'next-seo'
-import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
+import LW15TicketPageProxy from '~/components/LaunchWeek/15/Ticketing/LW15TicketPageProxy'
 import { useRouter } from 'next/router'
 
 import { Lw15ConfDataProvider } from 'components/LaunchWeek/15/hooks/use-conf-data'
-import DefaultLayout from 'components/Layouts/Default'
-import LW15TicketPage from 'components/LaunchWeek/15/Ticketing/LW15TicketPage'
+import DefaultLayout from '../../components/Layouts/Default'
 
 const Lw15Page = () => {
-  const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
-  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/15/lw15-og.png?lw=15`
-
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
   const defaultUserData = {
@@ -22,28 +16,11 @@ const Lw15Page = () => {
   }
 
   return (
-    <>
-      <NextSeo
-        title={TITLE}
-        description={DESCRIPTION}
-        openGraph={{
-          title: TITLE,
-          description: DESCRIPTION,
-          url: LW15_URL,
-          images: [
-            {
-              url: OG_IMAGE,
-            },
-          ],
-        }}
-      />
-
-      <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
-        <DefaultLayout className="!min-h-fit h-fit lg:h-[calc(100dvh-66px)]">
-          <LW15TicketPage />
-        </DefaultLayout>
-      </Lw15ConfDataProvider>
-    </>
+    <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
+      <DefaultLayout className="!min-h-fit h-fit lg:h-[calc(100dvh-66px)]">
+        <LW15TicketPageProxy />
+      </DefaultLayout>
+    </Lw15ConfDataProvider>
   )
 }
 

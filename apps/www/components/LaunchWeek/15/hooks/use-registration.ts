@@ -222,7 +222,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
       }
 
       // Trigger og-image ticket generation
-      await fetch(`/api-v2/ticket-og?username=${userData.username}&secret=true`)
+      await fetch(`/api-v2/ticket-og?username=${userData.username}`)
     } else {
       console.warn('Cannot upgrade ticket without user data')
     }

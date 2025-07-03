@@ -1,13 +1,17 @@
 import React from 'react'
 import { cn } from 'ui'
-import useLw15ConfData from '../hooks/use-conf-data'
+import useLw15ConfData, { UserTicketData } from '../hooks/use-conf-data'
 import { FifteenSVG, LWSVG } from '../lw15.components'
 import Image from 'next/image'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 
-const LW15Ticket = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+const LW15Ticket = ({
+  user: userFromProps,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & { user: UserTicketData }) => {
   const [state] = useLw15ConfData()
-  const user = state.userTicketData
+  const user = userFromProps || state.userTicketData
   const fg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const bg = user?.metadata?.colors?.background || BG_COLORS[0]
 
