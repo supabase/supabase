@@ -27,6 +27,7 @@ const ReportsMenu = () => {
   const pageKey = (id || router.pathname.split('/')[4]) as string
   const authEnabled = useFlag('authreportv2')
   const edgeFnEnabled = useFlag('edgefunctionreport')
+  const realtimeEnabled = useFlag('realtimeReport')
   const storageReportEnabled = useFlag('storagereport')
 
   // b/c fly doesn't support storage
@@ -118,6 +119,15 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
+        ...(realtimeEnabled
+          ? [
+              {
+                name: 'Realtime',
+                key: 'realtime',
+                url: `/project/${ref}/reports/realtime`,
+              },
+            ]
+          : []),
         ...(edgeFnEnabled
           ? [
               {
