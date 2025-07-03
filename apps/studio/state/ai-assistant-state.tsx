@@ -12,7 +12,7 @@ type SuggestionsType = {
   prompts?: { label: string; description: string }[]
 }
 
-type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+export type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
 
 type ChatSession = {
   id: string
