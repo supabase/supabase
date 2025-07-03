@@ -80,10 +80,14 @@ export const BranchDropdown = () => {
   const projectDetails = useSelectedProject()
   const snap = useAppStateSnapshot()
 
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const projectRef =
-    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
-  const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
+  const projectRef = projectDetails?.parent_project_ref || ref
+
+  const {
+    data: branches,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
 
   const isBranchingEnabled = projectDetails?.is_branch_enabled === true
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
