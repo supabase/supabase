@@ -22,6 +22,7 @@ export type UserTicketData = {
   role?: string
   company?: string
   location?: string
+  created_at?: string
   metadata?: {
     role?: string
     company?: string

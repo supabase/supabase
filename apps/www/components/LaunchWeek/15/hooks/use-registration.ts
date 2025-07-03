@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { RealtimeChannel } from '@supabase/supabase-js'
 
-import useConfData from './use-conf-data'
+import useConfData, { type UserTicketData } from './use-conf-data'
 import { LW15_URL } from 'lib/constants'
 import supabase from '../supabase'
 import { BG_COLORS, TYPO_COLORS } from '../Ticketing/colors'
@@ -237,17 +237,21 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
 // Update ticket colors in the database
 export async function updateTicketColors({
   username,
+  userMetadata,
   background,
   foreground,
 }: {
   username: string
+  userMetadata: UserTicketData['metadata']
   background: string
   foreground: string
 }) {
+  console.log('previous userMetadata', userMetadata)
   const { error } = await supabase
     .from('tickets')
     .update({
       metadata: {
+        ...userMetadata,
         colors: {
           background,
           foreground,

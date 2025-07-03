@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
 import { cn } from 'ui'
 import SectionContainer from 'components/Layouts/SectionContainer'
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
@@ -37,6 +38,7 @@ const LW15TicketPage = () => {
     try {
       await updateTicketColors({
         username: user.username!,
+        userMetadata: user.metadata,
         background: newColors.background,
         foreground: newColors.foreground,
       })
@@ -44,6 +46,8 @@ const LW15TicketPage = () => {
       setState({ saving: false })
     }
   }
+
+  console.log('state', state)
 
   const TicketCustomizationSection = ({ className }: { className?: string }) => (
     <div className={cn('flex flex-col gap-12 border-t pt-4 w-full', className)}>
@@ -101,7 +105,7 @@ const LW15TicketPage = () => {
       <div className="hidden lg:flex justify-between items-end gap-4 text-xs">
         <div className="flex flex-col">
           <p>Ticket ID: #{user.ticket_number}</p>
-          <p>Accepted at: {user.username}</p>
+          <p>Claimed at: {dayjs(user.created_at).format('DD MMM / HH:mm')}</p>
         </div>
         <LW15ThemeSwitcher />
       </div>
