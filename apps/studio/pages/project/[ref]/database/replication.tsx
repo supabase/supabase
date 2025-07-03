@@ -1,4 +1,4 @@
-import ReplicationComingSoon from 'components/interfaces/Database/Replication/ComingSoon'
+import Destinations from 'components/interfaces/Database/Replication/Destinations'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
@@ -25,7 +25,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               <ScaffoldDescription>Send data to other destinations</ScaffoldDescription>
             </ScaffoldHeader>
           </ScaffoldContainer>
-          <ReplicationComingSoon />
+          <Destinations />
         </>
       ) : (
         <ScaffoldContainer>
