@@ -134,7 +134,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         parameters: z.object({
           newName: z.string().describe('The new name for the chat session. Five words or less.'),
         }),
-        // No execute function - this will be handled client-side
+        execute: async () => {
+          return { status: 'Chat request sent to client' }
+        },
       }),
     }
 

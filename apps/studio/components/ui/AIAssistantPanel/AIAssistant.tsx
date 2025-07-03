@@ -1,5 +1,5 @@
-import type { Message as MessageType } from 'ai/react'
-import { useChat } from 'ai/react'
+import type { Message as MessageType } from '@ai-sdk/react'
+import { useChat } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown, FileText, Info, RefreshCw, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -130,10 +130,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // Handle completion of the assistant's response
   const handleChatFinish = useCallback(
     (message: MessageType, options: { finishReason: string }) => {
-      const { finishReason } = options
-      if (finishReason !== 'stop') return
-
-      // If we have a user message stored in the ref, save both messages
       if (lastUserMessageRef.current) {
         snap.saveMessage([lastUserMessageRef.current, message])
         lastUserMessageRef.current = null
@@ -179,27 +175,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       const slicedMessages = messages.slice(-MAX_CHAT_HISTORY)
 
-      // Filter out incomplete tool calls from message parts while preserving the rest
+      // Filter out results from messages before sending to the model
       const cleanedMessages = slicedMessages.map((message) => {
-        if (message.role === 'assistant' && message.parts) {
-          const cleanedParts = message.parts.filter((part: any) => {
-            // Remove tool invocations that are incomplete
-            if (
-              part.type === 'tool-invocation' &&
-              part.toolInvocation &&
-              (part.toolInvocation.state === 'call' || part.toolInvocation.state === 'partial-call')
-            ) {
-              return false
-            }
-            return true
-          })
-
-          return {
-            ...message,
-            parts: cleanedParts,
-          }
+        // Remove results property from message
+        const cleanedMessage = { ...message }
+        if (message.role === 'assistant' && message.results) {
+          delete cleanedMessage.results
         }
-        return message
+        return cleanedMessage
       })
 
       return JSON.stringify({
@@ -493,7 +476,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             </div>
           ) : isLoadingTables && isApiKeySet ? (
             <div className="w-full h-full flex-1 flex flex-col justify-center items-center p-5">
-              <GenericSkeletonLoader className="w-4/5" />
+              <GenericSkeletonLoader className="w-4/5 flex flex-col items-center" />
             </div>
           ) : isShowingOnboarding ? (
             <AIOnboarding
