@@ -6,11 +6,13 @@ import SectionContainer from 'components/Layouts/SectionContainer'
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { useRegistration } from '../hooks/use-registration'
 import { FifteenSVG, LW15ThemeSwitcher, LWSVG } from '../lw15.components'
+import { LoaderCircle } from 'lucide-react'
 
 const LW15LandingPage = () => {
   const register = useRegistration()
   const [state] = useLw15ConfData()
   const user = state.userTicketData
+  const isLoading = !state.sessionLoaded
 
   const detectedTimezone = 'GMT+1'
   const currentTime = '17:03:45'
@@ -63,7 +65,13 @@ const LW15LandingPage = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button className="h-auto py-1 px-2" type="secondary" size="medium" asChild>
-                      <Link href="/launch-week/ticket">View your ticket</Link>
+                      <Link href="/launch-week/ticket">
+                        {isLoading ? (
+                          <LoaderCircle className="w-4 h-4 animate-spinner" />
+                        ) : (
+                          'View your ticket'
+                        )}
+                      </Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="right">
@@ -72,12 +80,16 @@ const LW15LandingPage = () => {
                 </Tooltip>
               ) : (
                 <Button
-                  className="h-auto py-1 px-2"
+                  className="h-auto py-1 px-2 min-w-[125px] min-h-[28px]"
                   type="secondary"
                   size="medium"
                   onClick={handleClaimTicket}
                 >
-                  Claim your ticket
+                  {isLoading ? (
+                    <LoaderCircle className="w-4 h-4 animate-spinner" />
+                  ) : (
+                    'Claim your ticket'
+                  )}
                 </Button>
               )}
             </div>

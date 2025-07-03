@@ -5,6 +5,7 @@ import useConfData from './use-conf-data'
 import { LW15_URL } from 'lib/constants'
 import supabase from '../supabase'
 import { BG_COLORS, TYPO_COLORS } from '../Ticketing/colors'
+import { fetchGitHubUser } from '../utils/github-api'
 
 function subscribeToTicketChanges(
   username: string,
@@ -64,6 +65,22 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
     if (!userData.id) {
       dispatch({ type: 'USER_TICKET_FETCH_STARTED' })
 
+      // Fetch GitHub user data
+      let githubUserData = null
+      try {
+        githubUserData = await fetchGitHubUser(username)
+      } catch (error) {
+        console.warn('Failed to fetch GitHub user data:', error)
+      }
+
+      const metadata = {
+        colors: defaultColors,
+        ...(githubUserData && {
+          company: githubUserData.company,
+          location: githubUserData.location,
+        }),
+      }
+
       const { error: ticketInsertError } = await supabase
         .from('tickets')
         .insert({
@@ -73,9 +90,7 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
           name,
           username,
           referred_by: referal ?? null,
-          metadata: {
-            colors: defaultColors,
-          },
+          metadata,
         })
         .select()
         .single()

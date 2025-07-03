@@ -11,6 +11,8 @@ const LW15Ticket = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement
   const fg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const bg = user?.metadata?.colors?.background || BG_COLORS[0]
 
+  console.log(state)
+
   return (
     <div
       className={cn(
@@ -55,8 +57,8 @@ const LW15Ticket = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement
               <p>Location</p>
             </div>
             <div className="col-span-2 flex flex-col">
-              <p>Engineer</p>
-              <p>Singapore</p>
+              <p>{user?.metadata?.company || 'Engineer'}</p>
+              <p>{user?.metadata?.location || 'Worldwide'}</p>
             </div>
           </div>
         </div>

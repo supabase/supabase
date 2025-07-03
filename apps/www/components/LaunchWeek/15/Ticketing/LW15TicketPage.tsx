@@ -141,7 +141,7 @@ const LW15TicketPage = () => {
         className="w-full border border-muted min-h-fit h-full bg-surface-300 flex items-center justify-center p-8 transition-colors duration-300"
         style={{ background: `${selectedFg}95` }}
       >
-        <div className="flex flex-col justify-center gap-8 h-full">
+        <div className="flex flex-col justify-center gap-8 min-h-fit h-full">
           <LW15Ticket />
           <div className="flex flex-col gap-1">
             <TicketURLCopy />
