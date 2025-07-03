@@ -7,11 +7,9 @@ import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signin
 import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { stringToBase64URL } from 'lib/base64url'
 import {
+  Badge,
   Button,
   Checkbox_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -43,7 +41,6 @@ export const CreateKeyDialog = ({
   onClose: () => void
 }) => {
   const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('ES256')
-  const [isAdvancedOpen, setAdvancedOpen] = useState(false)
   const [isBYOK, setBYOK] = useState(false)
   const [privateKey, setPrivateKey] = useState('')
   const [isBase64, setBase64] = useState(false)
@@ -139,15 +136,9 @@ export const CreateKeyDialog = ({
       projectRef: projectRef!,
       algorithm: newKeyAlgorithm,
       status: 'standby',
-      private_jwk: !isBYOK
-        ? null
-        : newKeyAlgorithm !== 'HS256'
-          ? Object.fromEntries(
-              Object.entries(JSON.parse(privateKey)).filter(([prop]) =>
-                ALLOWED_JWK_PROPERTIES.has(prop)
-              )
-            )
-          : {
+      private_jwk: isBYOK
+        ? newKeyAlgorithm === 'HS256'
+          ? {
               kty: 'oct',
               k: isBase64
                 ? privateKey
@@ -156,7 +147,13 @@ export const CreateKeyDialog = ({
                     .replace(/\//g, '_')
                     .replace(/=/g, '')
                 : stringToBase64URL(privateKey),
-            },
+            }
+          : Object.fromEntries(
+              Object.entries(JSON.parse(privateKey)).filter(([prop]) =>
+                ALLOWED_JWK_PROPERTIES.has(prop)
+              )
+            )
+        : null,
     })
   }
 
@@ -167,84 +164,81 @@ export const CreateKeyDialog = ({
       </DialogHeader>
       <DialogSectionSeparator />
       <DialogSection className="space-y-4">
-        <p className="text-sm">
-          Creates a new JWT signing key in standby mode. Once all of your application's components
-          have been updated to trust this key you can switch to it for new JWTs issued by Supabase
-          Auth.
+        <p className="text-sm text-foreground-light">
+          This will create a new JWT signing key in standby mode. The key will be available for your
+          application to use, but won't be used for signing new JWTs until you activate it. Once
+          you've updated your application to trust this key, you can switch to it for new JWTs.
         </p>
       </DialogSection>
       <DialogSectionSeparator />
       <DialogSection className="flex flex-col gap-4">
-        <Collapsible_Shadcn_ open={isAdvancedOpen} onOpenChange={setAdvancedOpen}>
-          <CollapsibleContent_Shadcn_ asChild>
-            <div className="flex flex-col gap-4">
-              <Label_Shadcn_ htmlFor="algorithm">Choose signing algorithm:</Label_Shadcn_>
-              <Select_Shadcn_
-                name="algorithm"
-                value={newKeyAlgorithm}
-                onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
-              >
-                <SelectTrigger_Shadcn_ id="algorithm">
-                  <SelectValue_Shadcn_ placeholder="Select algorithm" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="ES256">ES256 (ECC)</SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-
-              <Label_Shadcn_ htmlFor="byok" className="flex items-center gap-x-2">
-                <Checkbox_Shadcn_
-                  name="byok"
-                  checked={isBYOK}
-                  onCheckedChange={(value) => setBYOK(!!value)}
-                />
-                {newKeyAlgorithm === 'HS256' ? 'Provide your own secret' : 'Import a private key'}
-              </Label_Shadcn_>
-
-              {isBYOK && (
-                <div className="flex flex-col gap-2">
-                  <Textarea
-                    className="font-mono"
-                    placeholder={
-                      newKeyAlgorithm === 'HS256'
-                        ? 'Type in your JWT secret'
-                        : 'Add a private key in JWK (JSON Web Key) format'
-                    }
-                    value={privateKey}
-                    onChange={(e: any) => {
-                      setPrivateKey(e.target.value)
-                    }}
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck="false"
-                  />
-                  {privateKeyMessage && <p className="text-red-900 text-sm">{privateKeyMessage}</p>}
-                </div>
-              )}
-              {isBYOK && newKeyAlgorithm === 'HS256' && (
-                <>
-                  <Label_Shadcn_ htmlFor="base64" className="flex items-center gap-x-2">
-                    <Checkbox_Shadcn_
-                      name="base64"
-                      checked={isBase64}
-                      onCheckedChange={(value) => setBase64(!!value)}
-                    />
-                    Secret is already Base64 encoded
-                  </Label_Shadcn_>
-                </>
-              )}
+        <div className="flex flex-col gap-4">
+          <Label_Shadcn_ htmlFor="algorithm">Choose signing algorithm:</Label_Shadcn_>
+          <Select_Shadcn_
+            name="algorithm"
+            value={newKeyAlgorithm}
+            onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
+          >
+            <SelectTrigger_Shadcn_ id="algorithm">
+              <SelectValue_Shadcn_ placeholder="Select algorithm" />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="ES256">
+                <span>ES256 (ECC)</span>
+                <Badge variant="brand" className="ml-2">
+                  Recommended
+                </Badge>
+              </SelectItem_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
+        </div>
+        <div className="flex flex-col gap-4">
+          <Label_Shadcn_ htmlFor="byok" className="flex items-center gap-x-2">
+            <Checkbox_Shadcn_
+              id="byok"
+              checked={isBYOK}
+              onCheckedChange={(value) => setBYOK(!!value)}
+            />
+            {newKeyAlgorithm === 'HS256'
+              ? 'Import an existing secret'
+              : 'Import an existing private key'}
+          </Label_Shadcn_>
+          {isBYOK && (
+            <div className="flex flex-col gap-2">
+              <Textarea
+                className="font-mono"
+                placeholder={
+                  newKeyAlgorithm === 'HS256'
+                    ? 'Type in your JWT secret'
+                    : 'Add a private key in JWK (JSON Web Key) format'
+                }
+                value={privateKey}
+                onChange={(e: any) => {
+                  setPrivateKey(e.target.value)
+                }}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+              />
+              {privateKeyMessage && <p className="text-red-900 text-sm">{privateKeyMessage}</p>}
             </div>
-          </CollapsibleContent_Shadcn_>
-
-          {!isAdvancedOpen && (
-            <CollapsibleTrigger_Shadcn_ className="text-sm">
-              Advanced options
-            </CollapsibleTrigger_Shadcn_>
           )}
-        </Collapsible_Shadcn_>
+          {isBYOK && newKeyAlgorithm === 'HS256' && (
+            <>
+              <Label_Shadcn_ htmlFor="base64" className="flex items-center gap-x-2">
+                <Checkbox_Shadcn_
+                  id="base64"
+                  checked={isBase64}
+                  onCheckedChange={(value) => setBase64(!!value)}
+                />
+                Secret is already Base64 encoded
+              </Label_Shadcn_>
+            </>
+          )}
+        </div>
       </DialogSection>
       <DialogFooter>
         <Button
