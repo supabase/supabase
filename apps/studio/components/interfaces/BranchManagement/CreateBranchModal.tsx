@@ -170,7 +170,15 @@ export const CreateBranchModal = () => {
 
   return (
     <Dialog open={showCreateBranchModal} onOpenChange={(open) => setShowCreateBranchModal(open)}>
-      <DialogContent size="large" hideClose>
+      <DialogContent
+        size="large"
+        hideClose
+        onOpenAutoFocus={(e) => {
+          if (promptProPlanUpgrade) {
+            e.preventDefault()
+          }
+        }}
+      >
         <DialogHeader padding="small">
           <DialogTitle>Create a new preview branch</DialogTitle>
         </DialogHeader>
