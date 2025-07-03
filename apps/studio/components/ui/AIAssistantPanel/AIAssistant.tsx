@@ -33,6 +33,10 @@ import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
 
+type ExtendedMessage = MessageType & {
+  results?: any[]
+}
+
 const MemoizedMessage = memo(
   ({
     message,
@@ -177,9 +181,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       // Filter out results from messages before sending to the model
       const cleanedMessages = slicedMessages.map((message) => {
-        // Remove results property from message
-        const cleanedMessage = { ...message }
-        if (message.role === 'assistant' && message.results) {
+        const cleanedMessage = { ...message } as ExtendedMessage
+        if (message.role === 'assistant' && (message as ExtendedMessage).results) {
           delete cleanedMessage.results
         }
         return cleanedMessage
