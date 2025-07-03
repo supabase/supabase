@@ -188,7 +188,7 @@ const DestinationPanel = ({
           },
           sourceId,
           publicationName: data.publicationName,
-          pipelinConfig: {
+          pipelineConfig: {
             config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs },
           },
         })

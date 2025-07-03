@@ -1799,6 +1799,7 @@ export interface components {
       sms_vonage_api_key: string | null
       sms_vonage_api_secret: string | null
       sms_vonage_from: string | null
+      /** Format: email */
       smtp_admin_email: string | null
       smtp_host: string | null
       smtp_max_frequency: number | null
@@ -2908,6 +2909,7 @@ export interface components {
       sms_vonage_api_key?: string | null
       sms_vonage_api_secret?: string | null
       sms_vonage_from?: string | null
+      /** Format: email */
       smtp_admin_email?: string | null
       smtp_host?: string | null
       smtp_max_frequency?: number | null
