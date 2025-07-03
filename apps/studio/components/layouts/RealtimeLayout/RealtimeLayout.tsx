@@ -14,7 +14,14 @@ export interface RealtimeLayoutProps {
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
-  const enableRealtimeSettings = useFlag('enableRealtimeSettings')
+  const enableRealtimeSettingsFlag = useFlag<string>('enableRealtimeSettings')
+  const enableRealtimeSettings =
+    project?.ref &&
+    enableRealtimeSettingsFlag &&
+    enableRealtimeSettingsFlag
+      .split(',')
+      .map((it) => it.trim())
+      .includes(project.ref)
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
