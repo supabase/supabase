@@ -105,7 +105,7 @@ interface TooltipProps {
   label?: string | number
   attributes?: MultiAttribute[]
   isPercentage?: boolean
-  format?: 'ms'
+  format?: string | ((value: unknown) => string)
   valuePrecision?: number
   showMaxValue?: boolean
   showTotal?: boolean
