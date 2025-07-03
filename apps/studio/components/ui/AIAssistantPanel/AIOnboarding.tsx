@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
-import { FileText, MessageCircleMore, WandSparkles } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { Code, FileText, Heart, MessageCircleMore, Shield, WandSparkles } from 'lucide-react'
+import { useRef } from 'react'
 
 import { Button, cn } from 'ui'
 import { AssistantChatForm } from 'ui-patterns'
@@ -38,7 +38,7 @@ export const AIOnboarding = ({
     {
       title: 'Health check',
       prompt: 'Can you check if my database and edge functions are healthy?',
-      icon: <MessageCircleMore strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
+      icon: <Heart strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Query your data',
@@ -49,12 +49,12 @@ export const AIOnboarding = ({
     {
       title: 'Set up RLS policies',
       prompt: 'Create RLS policies to ensure users can only access their own data',
-      icon: <MessageCircleMore strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
+      icon: <Shield strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Create a function',
       prompt: 'Create an edge function that summarises the contents of a table row using OpenAI',
-      icon: <WandSparkles strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
+      icon: <Code strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
     },
     {
       title: 'Generate sample data',
@@ -95,17 +95,15 @@ export const AIOnboarding = ({
   return (
     <div className="w-full h-full flex flex-col">
       {/* Header Section */}
-      <div className="flex-1 flex flex-col items-center justify-center p-7">
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
         <motion.div
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-center max-w-md flex flex-col items-center"
+          className="text-center max-w-xl w-full overflow-hiddenflex flex-col items-center"
         >
           <h2 className="text-2xl mb-6">How can I assist you?</h2>
-          {suggestions?.title && (
-            <p className="text-sm text-foreground-lighter mb-8">{suggestions.title}</p>
-          )}
+
           <div className="w-full mb-6">
             {sqlSnippets && sqlSnippets.length > 0 && (
               <div className="mx-4">
