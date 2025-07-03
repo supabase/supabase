@@ -507,29 +507,30 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 exit={{ opacity: 0 }}
                 className="pointer-events-none z-10 -mt-24"
               >
-                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent" />
-              </motion.div>
-              <motion.div
-                className="absolute bottom-20 left-1/2 -translate-x-1/2"
-                variants={{
-                  hidden: { y: 5, opacity: 0 },
-                  show: { y: 0, opacity: 1 },
-                }}
-                transition={{ duration: 0.1 }}
-                initial="hidden"
-                animate="show"
-                exit="hidden"
-              >
-                <Button
-                  type="default"
-                  className="rounded-full w-8 h-8 p-1.5"
-                  onClick={() => {
-                    scrollToEnd()
-                    if (inputRef.current) inputRef.current.focus()
-                  }}
-                >
-                  <ArrowDown size={16} />
-                </Button>
+                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                  <motion.div
+                    className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
+                    variants={{
+                      hidden: { y: 5, opacity: 0 },
+                      show: { y: 0, opacity: 1 },
+                    }}
+                    transition={{ duration: 0.1 }}
+                    initial="hidden"
+                    animate="show"
+                    exit="hidden"
+                  >
+                    <Button
+                      type="default"
+                      className="rounded-full w-8 h-8 p-1.5"
+                      onClick={() => {
+                        scrollToEnd()
+                        if (inputRef.current) inputRef.current.focus()
+                      }}
+                    >
+                      <ArrowDown size={16} />
+                    </Button>
+                  </motion.div>
+                </div>
               </motion.div>
             </>
           )}
