@@ -10,6 +10,8 @@ import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProje
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
+import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
@@ -21,7 +23,7 @@ import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { GitBranchIcon, GitMerge, Shield, ExternalLink, AlertTriangle } from 'lucide-react'
+import { GitBranchIcon, GitMerge, Shield, ExternalLink, AlertTriangle, X } from 'lucide-react'
 import Link from 'next/link'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
@@ -107,6 +109,14 @@ const MergePage: NextPageWithLayout = () => {
         setWorkflowFinalStatus(status)
         refetchDiff()
         edgeFunctionsDiff.clearDiffsOptimistically()
+        // Clear the review_requested_at field
+        if (parentProjectRef) {
+          updateBranch({
+            id: currentBranch.id,
+            projectRef: parentProjectRef,
+            reviewRequestedAt: null,
+          })
+        }
       },
     })
 
@@ -117,6 +127,10 @@ const MergePage: NextPageWithLayout = () => {
     ? ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(workflowFinalStatus)
     : currentWorkflowRun?.status &&
       ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(currentWorkflowRun.status)
+
+  const hasCurrentWorkflowCompleted = workflowFinalStatus
+    ? workflowFinalStatus === 'FUNCTIONS_DEPLOYED'
+    : currentWorkflowRun?.status === 'FUNCTIONS_DEPLOYED'
 
   const isWorkflowRunning =
     currentWorkflowRun?.status === 'RUNNING_MIGRATIONS' ||
@@ -168,9 +182,36 @@ const MergePage: NextPageWithLayout = () => {
     },
   })
 
+  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
+    onSuccess: () => {
+      toast.success('Branch closed successfully')
+      router.push(`/project/${parentProjectRef}/branches`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to close branch: ${error.message}`)
+    },
+  })
+
+  const { mutate: updateBranch } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Branch updated successfully')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update branch: ${error.message}`)
+    },
+  })
+
   const handlePush = () => {
     if (!currentBranch?.id || !parentProjectRef) return
     pushBranch({
+      id: currentBranch.id,
+      projectRef: parentProjectRef,
+    })
+  }
+
+  const handleCloseBranch = () => {
+    if (!currentBranch?.id || !parentProjectRef) return
+    deleteBranch({
       id: currentBranch.id,
       projectRef: parentProjectRef,
     })
@@ -401,6 +442,16 @@ const MergePage: NextPageWithLayout = () => {
                       className="shrink-0"
                     >
                       <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
+                    </Button>
+                  ) : hasCurrentWorkflowCompleted ? (
+                    <Button
+                      type="default"
+                      onClick={handleCloseBranch}
+                      loading={isDeleting}
+                      icon={<X size={16} strokeWidth={1.5} />}
+                      className="shrink-0"
+                    >
+                      Close branch
                     </Button>
                   ) : undefined
                 }

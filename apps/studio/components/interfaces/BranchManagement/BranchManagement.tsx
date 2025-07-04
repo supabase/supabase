@@ -28,6 +28,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
 import { PreviewBranchesEmptyState, PullRequestsEmptyState } from './EmptyStates'
 import { Overview } from './Overview'
+import { ReviewRow } from './ReviewRow'
 
 type Tab = 'overview' | 'prs' | 'branches'
 
@@ -80,6 +81,9 @@ const BranchManagement = () => {
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
+  const branchesReadyForReview = previewBranches.filter(
+    (branch) => branch.review_requested_at !== undefined && branch.review_requested_at !== null
+  )
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
@@ -155,7 +159,7 @@ const BranchManagement = () => {
                     }`}
                     onClick={() => setTab('prs')}
                   >
-                    Pull requests
+                    Merge requests
                   </Button>
                   <Button
                     type="default"
@@ -237,30 +241,45 @@ const BranchManagement = () => {
                         />
                       )}
                       {tab === 'prs' && (
-                        <BranchManagementSection
-                          header={`${branchesWithPRs.length} branches with pull requests found`}
-                        >
-                          {branchesWithPRs.length > 0 ? (
-                            branchesWithPRs.map((branch) => {
-                              return (
-                                <BranchRow
-                                  key={branch.id}
-                                  repo={repo}
-                                  branch={branch}
-                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
-                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
-                                />
-                              )
-                            })
-                          ) : (
-                            <PullRequestsEmptyState
-                              url={generateCreatePullRequestURL()}
-                              hasBranches={previewBranches.length > 0}
-                              githubConnection={githubConnection}
-                              gitlessBranching={gitlessBranching}
-                            />
-                          )}
-                        </BranchManagementSection>
+                        <div className="space-y-4">
+                          <BranchManagementSection
+                            header={`${branchesReadyForReview.length} branches ready for review`}
+                          >
+                            {branchesReadyForReview.length > 0 ? (
+                              branchesReadyForReview.map((branch) => {
+                                return <ReviewRow key={branch.id} branch={branch} />
+                              })
+                            ) : (
+                              <div className="px-6 py-4 text-sm text-foreground-light">
+                                No branches are currently ready for review
+                              </div>
+                            )}
+                          </BranchManagementSection>
+                          <BranchManagementSection
+                            header={`${branchesWithPRs.length} branches with pull requests`}
+                          >
+                            {branchesWithPRs.length > 0 ? (
+                              branchesWithPRs.map((branch) => {
+                                return (
+                                  <BranchRow
+                                    key={branch.id}
+                                    repo={repo}
+                                    branch={branch}
+                                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                    onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                                  />
+                                )
+                              })
+                            ) : (
+                              <PullRequestsEmptyState
+                                url={generateCreatePullRequestURL()}
+                                hasBranches={previewBranches.length > 0}
+                                githubConnection={githubConnection}
+                                gitlessBranching={gitlessBranching}
+                              />
+                            )}
+                          </BranchManagementSection>
+                        </div>
                       )}
                       {tab === 'branches' && (
                         <BranchManagementSection
