@@ -346,7 +346,7 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.url as pathname,
+      fel_request.path as pathname,
       fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
@@ -460,7 +460,7 @@ const getSupabaseStorageLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
