@@ -242,19 +242,21 @@ const BranchManagement = () => {
                       )}
                       {tab === 'prs' && (
                         <div className="space-y-4">
-                          <BranchManagementSection
-                            header={`${branchesReadyForReview.length} branches ready for review`}
-                          >
-                            {branchesReadyForReview.length > 0 ? (
-                              branchesReadyForReview.map((branch) => {
-                                return <ReviewRow key={branch.id} branch={branch} />
-                              })
-                            ) : (
-                              <div className="px-6 py-4 text-sm text-foreground-light">
-                                No branches are currently ready for review
-                              </div>
-                            )}
-                          </BranchManagementSection>
+                          {gitlessBranching && (
+                            <BranchManagementSection
+                              header={`${branchesReadyForReview.length} branches ready for review`}
+                            >
+                              {branchesReadyForReview.length > 0 ? (
+                                branchesReadyForReview.map((branch) => {
+                                  return <ReviewRow key={branch.id} branch={branch} />
+                                })
+                              ) : (
+                                <div className="px-6 py-4 text-sm text-foreground-light">
+                                  No branches are currently ready for review
+                                </div>
+                              )}
+                            </BranchManagementSection>
+                          )}
                           <BranchManagementSection
                             header={`${branchesWithPRs.length} branches with pull requests`}
                           >
