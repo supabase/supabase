@@ -2,12 +2,13 @@ import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
+import { useProfile } from 'lib/profile'
 import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
-function castOrganizationResponseToOrganization(
-  org: components['schemas']['OrganizationResponse']
-): Organization {
+export type OrganizationBase = components['schemas']['OrganizationResponse']
+
+export function castOrganizationResponseToOrganization(org: OrganizationBase): Organization {
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
@@ -34,10 +35,11 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   enabled = true,
   ...options
 }: UseQueryOptions<OrganizationsData, OrganizationsError, TData> = {}) => {
+  const { profile } = useProfile()
   return useQuery<OrganizationsData, OrganizationsError, TData>(
     organizationKeys.list(),
     ({ signal }) => getOrganizations(signal),
-    { enabled: enabled, ...options, staleTime: 30 * 60 * 1000 }
+    { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
   )
 }
 

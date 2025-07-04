@@ -1,52 +1,49 @@
+import dayjs from 'dayjs'
+import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
-import React, { ReactNode, useState } from 'react'
+import { ReactNode, useState } from 'react'
 
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { copyToClipboard } from 'lib/helpers'
-import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
-  Alert,
   Badge,
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover,
   SidePanel,
   Tabs,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_SOURCE_DESCRIPTION,
   LogsTableName,
 } from './Logs.constants'
-import DatePickers from './Logs.DatePickers'
-import { LogTemplate, LogsWarning, WarehouseCollection } from './Logs.types'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
+import { LogsWarning, LogTemplate, WarehouseCollection } from './Logs.types'
 import { WarehouseQueryTemplate } from './Warehouse.utils'
 
 export type SourceType = 'logs' | 'warehouse'
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   warehouseTemplates?: WarehouseQueryTemplate[]
-  onSelectTemplate: (template: LogTemplate) => void
-  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
-  onSelectSource: (source: string) => void
-  onClear: () => void
-  onSave?: () => void
-  hasEditorValue: boolean
-  isLoading: boolean
-  onDateChange: React.ComponentProps<typeof DatePickers>['onChange']
-  defaultTo: string
   defaultFrom: string
+  defaultTo: string
   warnings: LogsWarning[]
   warehouseCollections: WarehouseCollection[]
   dataSource: SourceType
+  onSelectTemplate: (template: LogTemplate) => void
+  onSelectWarehouseTemplate: (template: WarehouseQueryTemplate) => void
+  onSelectSource: (source: string) => void
+  onDateChange: (value: DatePickerValue) => void
   onDataSourceChange: (sourceType: SourceType) => void
 }
 
@@ -62,15 +59,15 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
 const LogsQueryPanel = ({
   templates = [],
   warehouseTemplates = [],
-  onSelectTemplate,
-  onSelectWarehouseTemplate,
-  onSelectSource,
   defaultFrom,
   defaultTo,
-  onDateChange,
   warnings,
   warehouseCollections,
   dataSource,
+  onSelectTemplate,
+  onSelectWarehouseTemplate,
+  onSelectSource,
+  onDateChange,
   onDataSourceChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
@@ -88,14 +85,36 @@ const LogsQueryPanel = ({
       if (key === 'AUTH') return authEnabled
       if (key === 'STORAGE') return storageEnabled
       if (key === 'FN_EDGE') return edgeFunctionsEnabled
+      if (key === 'PG_CRON') return false
       if (key === 'WAREHOUSE') return false
       return true
     })
     .map(([, value]) => value)
 
+  function getDefaultDatePickerValue() {
+    if (defaultFrom && defaultTo) {
+      return {
+        to: defaultTo,
+        from: defaultFrom,
+        text: `${dayjs(defaultFrom).format('DD MMM, HH:mm')} - ${dayjs(defaultTo).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      }
+    }
+    return {
+      to: EXPLORER_DATEPICKER_HELPERS[0].calcTo(),
+      from: EXPLORER_DATEPICKER_HELPERS[0].calcFrom(),
+      text: EXPLORER_DATEPICKER_HELPERS[0].text,
+      isHelper: true,
+    }
+  }
+
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
+    getDefaultDatePickerValue()
+  )
+
   return (
     <div className="border-b bg-surface-100">
-      <div className="flex w-full items-center justify-between px-5 py-2">
+      <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
             {warehouseEnabled && (
@@ -204,41 +223,42 @@ const LogsQueryPanel = ({
             )}
 
             {dataSource === 'logs' && (
-              <DatePickers
-                to={defaultTo}
-                from={defaultFrom}
-                onChange={onDateChange}
+              <LogsDatePicker
+                value={selectedDatePickerValue}
+                onSubmit={(value) => {
+                  setSelectedDatePickerValue(value)
+                  onDateChange(value)
+                }}
                 helpers={EXPLORER_DATEPICKER_HELPERS}
               />
             )}
 
-            <div className="overflow-hidden">
-              <div
-                className={` transition-all duration-300 ${
-                  warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
-                }`}
-              >
-                <Popover
-                  overlay={
-                    <Alert variant="warning" title="">
-                      <div className="flex flex-col gap-3">
-                        {warnings.map((warning, index) => (
-                          <p key={index}>
-                            {warning.text}{' '}
-                            {warning.link && (
-                              <Link href={warning.link}>{warning.linkText || 'View'}</Link>
-                            )}
-                          </p>
-                        ))}
-                      </div>
-                    </Alert>
-                  }
-                >
+            <div
+              data-testid="log-explorer-warnings"
+              className={`transition-all duration-300 h-full ${
+                warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
+              }`}
+            >
+              <Tooltip>
+                <TooltipTrigger className="flex items-start">
                   <Badge variant="warning">
                     {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
                   </Badge>
-                </Popover>
-              </div>
+                  <TooltipContent className="p-0 divide-y max-w-xs" side="bottom">
+                    {warnings.map((warning, index) => (
+                      <p
+                        key={index}
+                        className="px-3 py-1.5 text-xs text-foreground-light text-left"
+                      >
+                        {warning.text}{' '}
+                        {warning.link && (
+                          <Link href={warning.link}>{warning.linkText || 'View'}</Link>
+                        )}
+                      </p>
+                    ))}
+                  </TooltipContent>
+                </TooltipTrigger>
+              </Tooltip>
             </div>
           </div>
           {dataSource === 'logs' && (
@@ -357,43 +377,19 @@ const Field = ({
       >
         <span>{field.path}</span>
         {isCopied ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+          <Tooltip>
+            <TooltipTrigger>
               <Check size={14} strokeWidth={3} className="text-brand" />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copied</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Copied</TooltipContent>
+          </Tooltip>
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+          <Tooltip>
+            <TooltipTrigger>
               <Clipboard size={14} strokeWidth={1.5} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copy value</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Copy value</TooltipContent>
+          </Tooltip>
         )}
       </Table.td>
       <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>

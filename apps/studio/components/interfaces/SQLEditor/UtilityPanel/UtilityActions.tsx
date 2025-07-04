@@ -1,20 +1,11 @@
-import {
-  AlignLeft,
-  Check,
-  Command,
-  CornerDownLeft,
-  Heart,
-  Keyboard,
-  Loader2,
-  MoreVertical,
-} from 'lucide-react'
+import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -24,11 +15,12 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
+import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
 
 export type UtilityActionsProps = {
@@ -88,6 +80,7 @@ const UtilityActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            data-testId="sql-editor-utility-actions"
             type="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
             icon={<MoreVertical className="text-foreground-light" />}
@@ -143,8 +136,8 @@ const UtilityActions = ({
         </DropdownMenu>
 
         {IS_PLATFORM && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               {isFavorite ? (
                 <Button
                   type="text"
@@ -162,57 +155,45 @@ const UtilityActions = ({
                   icon={<Heart className="fill-none stroke-foreground-light" />}
                 />
               )}
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
               {isFavorite ? 'Remove from' : 'Add to'} favorites
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
         )}
 
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               type="text"
               onClick={prettifyQuery}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
             />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Prettify SQL</TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
-          <DatabaseSelector
-            selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
-            variant="connected-on-right"
-            onSelectId={onSelectDatabase}
+          {IS_PLATFORM && (
+            <DatabaseSelector
+              selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
+              variant="connected-on-right"
+              onSelectId={onSelectDatabase}
+            />
+          )}
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
-          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
-          <Button
-            onClick={() => executeQuery()}
-            disabled={isDisabled || isExecuting}
-            type="primary"
-            size="tiny"
-            iconRight={
-              isExecuting ? (
-                <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  {os === 'macos' ? (
-                    <Command size={10} strokeWidth={1.5} />
-                  ) : (
-                    <p className="text-xs text-foreground-light">CTRL</p>
-                  )}
-                  <CornerDownLeft size={10} strokeWidth={1.5} />
-                </div>
-              )
-            }
+          <SqlRunButton
+            isDisabled={isDisabled || isExecuting}
+            isExecuting={isExecuting}
             className="rounded-l-none min-w-[82px]"
-          >
-            {hasSelection ? 'Run selected' : 'Run'}
-          </Button>
+            onClick={executeQuery}
+          />
         </div>
       </div>
     </div>

@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
 import {
   Calendar,
@@ -32,6 +31,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import {
@@ -72,6 +74,8 @@ const ColumnType = ({
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
+  const unsupportedDataTypeText = `This column's data type cannot be changed via the Table Editor as it is not supported yet. You can do so through the SQL Editor instead.`
+
   const getOptionByName = (name: string) => {
     // handle built in types
     const pgOption = POSTGRES_DATA_TYPE_OPTIONS.find((option) => option.name === name)
@@ -111,8 +115,8 @@ const ColumnType = ({
 
   if (!isAvailableType) {
     return (
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
@@ -122,39 +126,22 @@ const ColumnType = ({
             size="small"
             icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
-            descriptionText={
-              showLabel
-                ? 'Custom non-native psql data types currently cannot be changed to a different data type via Supabase Studio'
-                : ''
-            }
+            descriptionText={showLabel ? unsupportedDataTypeText : undefined}
           />
-        </Tooltip.Trigger>
+        </TooltipTrigger>
         {!showLabel && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background w-[240px]',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  Custom non-native psql data types currently cannot be changed to a different data
-                  type via Supabase Studio
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
+          <TooltipContent side="bottom" className="w-80">
+            {unsupportedDataTypeText}
+          </TooltipContent>
         )}
-      </Tooltip.Root>
+      </Tooltip>
     )
   }
 
   if (disabled && !showLabel) {
     return (
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger>
+      <Tooltip>
+        <TooltipTrigger>
           <Input
             readOnly
             disabled
@@ -164,23 +151,13 @@ const ColumnType = ({
             size="small"
             value={value}
           />
-        </Tooltip.Trigger>
+        </TooltipTrigger>
         {!showLabel && description && (
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background w-[240px]',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">{description}</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
+          <TooltipContent side="bottom">
+            <div className="w-80">{description}</div>
+          </TooltipContent>
         )}
-      </Tooltip.Root>
+      </Tooltip>
     )
   }
 

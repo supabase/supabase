@@ -6,14 +6,14 @@ import { tableRowKeys } from 'data/table-rows/keys'
 import { Button } from 'ui'
 
 export type RefreshButtonProps = {
-  table: { id: number }
+  tableId?: number
   isRefetching?: boolean
 }
 
-const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
+const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const queryKey = tableRowKeys.tableRowsAndCount(ref, table.id)
+  const queryKey = tableRowKeys.tableRowsAndCount(ref, tableId)
 
   async function onClick() {
     await queryClient.invalidateQueries(queryKey)

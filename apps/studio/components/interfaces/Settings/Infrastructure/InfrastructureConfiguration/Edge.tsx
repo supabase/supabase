@@ -5,7 +5,7 @@ import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow'
 import { useParams } from 'common'
 import { useReplicationLagQuery } from 'data/read-replicas/replica-lag-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 
 export const SmoothstepEdge = ({
@@ -53,8 +53,8 @@ export const SmoothstepEdge = ({
       <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
       {data !== undefined && !isError && status === REPLICA_STATUS.ACTIVE_HEALTHY && (
         <EdgeLabelRenderer>
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <div
                 className="bg-surface-100 px-1.5 py-0.5 rounded absolute nodrag nopan"
                 style={{
@@ -68,13 +68,13 @@ export const SmoothstepEdge = ({
                   <p className="font-mono text-xs">{lagValue}s</p>
                 )}
               </div>
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom" align="center">
+            </TooltipTrigger>
+            <TooltipContent side="bottom" align="center">
               {isLoading
                 ? `Checking replication lag for replica ID: ${formattedId}`
                 : `Replication lag (seconds) for replica ID: ${formattedId}`}
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            </TooltipContent>
+          </Tooltip>
         </EdgeLabelRenderer>
       )}
     </>

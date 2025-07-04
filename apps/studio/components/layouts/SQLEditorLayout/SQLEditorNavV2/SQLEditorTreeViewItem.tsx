@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
@@ -11,6 +6,10 @@ import { Snippet } from 'data/content/sql-folders-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useProfile } from 'lib/profile'
+import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { ComponentProps, useEffect } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -22,12 +21,9 @@ import {
   TreeViewItem,
 } from 'ui'
 
-interface SQLEditorTreeViewItemProps {
+interface SQLEditorTreeViewItemProps
+  extends Omit<ComponentProps<typeof TreeViewItem>, 'name' | 'xPadding'> {
   element: any
-  level: number
-  isBranch: boolean
-  isSelected: boolean
-  isExpanded: boolean
   isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'
   getNodeProps: () => any
@@ -38,7 +34,7 @@ interface SQLEditorTreeViewItemProps {
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
-  onSelectCopyPersonal?: () => void
+  onSelectDuplicate?: () => void
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
@@ -69,7 +65,7 @@ export const SQLEditorTreeViewItem = ({
   onSelectShare,
   onSelectUnshare,
   onSelectDownload,
-  onSelectCopyPersonal,
+  onSelectDuplicate,
   onEditSave,
   onMultiSelect,
   isLastItem,
@@ -79,6 +75,7 @@ export const SQLEditorTreeViewItem = ({
   sort,
   name,
   onFolderContentsChange,
+  ...props
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
@@ -162,13 +159,12 @@ export const SQLEditorTreeViewItem = ({
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <TreeViewItem
-            level={level}
-            xPadding={16}
-            name={element.name}
             className={className}
+            level={level}
             isExpanded={isExpanded}
             isBranch={isBranch}
-            isSelected={isSelected || id === element.id}
+            isSelected={isSelected}
+            isPreview={props.isPreview}
             isEditing={isEditing}
             isLoading={(isEnabled && isLoading) || isSaving}
             onEditSubmit={(value) => {
@@ -189,10 +185,13 @@ export const SQLEditorTreeViewItem = ({
                 if (isEditing) {
                   return
                 }
-
+                // When the item is a folder, we want to expand/close it
                 onClick(e)
               }
             }}
+            {...props}
+            name={element.name}
+            xPadding={16}
           />
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
@@ -261,13 +260,12 @@ export const SQLEditorTreeViewItem = ({
               <ContextMenuItem_Shadcn_
                 asChild
                 className="gap-x-2"
-                onSelect={() => {}}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
                 <Link
-                  href={`/project/${projectRef}/sql/${element.id}`}
-                  target="_blank"
+                  target="_self"
                   rel="noreferrer"
+                  href={`/project/${projectRef}/sql/${element.id}`}
                 >
                   <ExternalLink size={14} />
                   Open in new tab
@@ -314,19 +312,16 @@ export const SQLEditorTreeViewItem = ({
                   Unshare query with team
                 </ContextMenuItem_Shadcn_>
               )}
-              {onSelectCopyPersonal !== undefined &&
-                isSharedSnippet &&
-                !isOwner &&
-                canCreateSQLSnippet && (
-                  <ContextMenuItem_Shadcn_
-                    className="gap-x-2"
-                    onSelect={() => onSelectCopyPersonal()}
-                    onFocusCapture={(e) => e.stopPropagation()}
-                  >
-                    <Copy size={14} />
-                    Duplicate personal copy
-                  </ContextMenuItem_Shadcn_>
-                )}
+              {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => onSelectDuplicate()}
+                  onFocusCapture={(e) => e.stopPropagation()}
+                >
+                  <Copy size={14} />
+                  Duplicate query
+                </ContextMenuItem_Shadcn_>
+              )}
               {onSelectDownload !== undefined && IS_PLATFORM && (
                 <ContextMenuItem_Shadcn_
                   className="gap-x-2"

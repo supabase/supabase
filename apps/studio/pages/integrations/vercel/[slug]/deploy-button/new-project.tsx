@@ -5,6 +5,7 @@ import { ChangeEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
+import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -136,8 +137,8 @@ const CreateProject = () => {
   async function onCreateProject() {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
-    if (!foreignProjectId) return console.error('No foreignProjectId ID set')
-    if (!organization) return console.error('No organization ID set')
+    if (!foreignProjectId) return console.error('No foreignProjectId set')
+    if (!organization) return console.error('No organization set')
 
     snapshot.setLoading(true)
 
@@ -149,7 +150,7 @@ const CreateProject = () => {
     }
 
     createProject({
-      organizationId: organization.id,
+      organizationSlug: organization.slug,
       name: projectName,
       dbPass,
       dbRegion,
@@ -200,7 +201,7 @@ const CreateProject = () => {
 
         snapshot.setLoading(false)
 
-        if (next) {
+        if (next && isVercelUrl(next)) {
           window.location.href = next
         }
       },

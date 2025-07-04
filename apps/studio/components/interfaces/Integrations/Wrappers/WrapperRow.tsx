@@ -23,7 +23,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const canManageWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const [editWrapperShown, setEditWrapperShown] = useState(false)
-  const [isClosingEditWrapper, setisClosingEditWrapper] = useState(false)
+  const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
   const [deleteWrapperShown, setDeleteWrapperShown] = useState(false)
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
@@ -45,7 +45,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   return (
     <>
       <TableRow>
-        <TableCell className="space-y-3 align-top !py-3 min-w-80">
+        <TableCell className="gap-2 align-top !py-3 min-w-80">
           {wrapper.name}
 
           {visibleMetadata.map((metadata) => (
@@ -53,8 +53,10 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               key={metadata.name}
               className="flex items-center space-x-2 text-sm text-foreground-light"
             >
-              <span className="text-foreground-lighter">{metadata.label}:</span>
-              <span>{serverOptions[metadata.name]}</span>
+              <span className="text-foreground-lighter text-nowrap">{metadata.label}:</span>
+              <span className="truncate max-w-72" title={serverOptions[metadata.name]}>
+                {serverOptions[metadata.name]}
+              </span>
             </div>
           ))}
         </TableCell>
@@ -77,10 +79,12 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                   />
                 </Badge>
 
-                <Badge className="pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem]">
-                  <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
-                  {table.schema}.{table.table_name}
-                </Badge>
+                <Link href={`/project/${ref}/editor/${table.id}`}>
+                  <Badge className="transition hover:bg-surface-300 pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem]">
+                    <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
+                    {table.schema}.{table.table_name}
+                  </Badge>
+                </Link>
               </div>
             )
           })}
@@ -99,7 +103,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
             </div>
           ))}
         </TableCell>
-        <TableCell className="space-x-2">
+        <TableCell className="space-x-2 flex-nowrap">
           <ButtonTooltip
             disabled={!canManageWrappers}
             type="default"
@@ -132,17 +136,17 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           />
         </TableCell>
       </TableRow>
-      <Sheet open={editWrapperShown} onOpenChange={() => setisClosingEditWrapper(true)}>
+      <Sheet open={editWrapperShown} onOpenChange={() => setIsClosingEditWrapper(true)}>
         <SheetContent size="lg" tabIndex={undefined}>
           <EditWrapperSheet
             wrapper={wrapper}
             wrapperMeta={integration.meta}
             onClose={() => {
               setEditWrapperShown(false)
-              setisClosingEditWrapper(false)
+              setIsClosingEditWrapper(false)
             }}
             isClosing={isClosingEditWrapper}
-            setIsClosing={setisClosingEditWrapper}
+            setIsClosing={setIsClosingEditWrapper}
           />
         </SheetContent>
       </Sheet>

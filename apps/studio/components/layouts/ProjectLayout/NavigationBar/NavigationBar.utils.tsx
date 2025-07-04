@@ -1,5 +1,9 @@
-import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+import { Blocks, FileText, Lightbulb, List, Logs, Settings } from 'lucide-react'
 
+import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
+import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
+import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
+import { generateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/SettingsMenu.utils'
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
@@ -14,9 +18,8 @@ import {
   TableEditor,
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
 
-export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
+export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
@@ -34,7 +37,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: !IS_PLATFORM
         ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql/new`),
+        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
     },
   ]
 }
@@ -52,6 +55,9 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
 
+  const databaseMenu = generateDatabaseMenu(project)
+  const authMenu = generateAuthMenu(ref as string)
+
   return [
     {
       key: 'database',
@@ -64,6 +70,7 @@ export const generateProductRoutes = (
           : isProjectActive
             ? `/project/${ref}/database/schemas`
             : `/project/${ref}/database/backups/scheduled`),
+      items: databaseMenu,
     },
     ...(authEnabled
       ? [
@@ -72,6 +79,7 @@ export const generateProductRoutes = (
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
+            items: authMenu,
           },
         ]
       : []),
@@ -85,7 +93,7 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    ...(IS_PLATFORM && edgeFunctionsEnabled
+    ...(edgeFunctionsEnabled
       ? [
           {
             key: 'functions',
@@ -108,9 +116,15 @@ export const generateProductRoutes = (
   ]
 }
 
-export const generateOtherRoutes = (ref?: string, project?: Project): Route[] => {
+export const generateOtherRoutes = (
+  ref?: string,
+  project?: Project,
+  features?: { unifiedLogs?: boolean }
+): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
+
+  const showUnifiedLogs = features?.unifiedLogs ?? false
 
   return [
     {
@@ -133,8 +147,18 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       key: 'logs',
       label: 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs`),
     },
+    ...(showUnifiedLogs
+      ? [
+          {
+            key: 'unified-logs',
+            label: 'Unified Logs',
+            icon: <Logs size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/unified-logs`),
+          },
+        ]
+      : []),
     {
       key: 'api',
       label: 'API Docs',
@@ -151,6 +175,7 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
 }
 
 export const generateSettingsRoutes = (ref?: string, project?: Project): Route[] => {
+  const settingsMenu = generateSettingsMenu(ref as string)
   return [
     ...(IS_PLATFORM
       ? [
@@ -159,6 +184,7 @@ export const generateSettingsRoutes = (ref?: string, project?: Project): Route[]
             label: 'Project Settings',
             icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && `/project/${ref}/settings/general`,
+            items: settingsMenu,
           },
         ]
       : []),

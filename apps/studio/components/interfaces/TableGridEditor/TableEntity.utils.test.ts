@@ -70,9 +70,16 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
         tags: ['tag-a', 'tag-c'],
         metadata: '{"version": 1}',
       },
+      {
+        idx: 2,
+        id: 3,
+        name: 'ONeil',
+        tags: ['tag-a'],
+        metadata: `{"version": 1, "name": "O'Neil"}`,
+      },
     ]
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES ('2', 'Person 1', '{"tag-a","tag-c"}', '{"version": 1}');`
+    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES ('2', 'Person 1', '{"tag-a","tag-c"}', '{"version": 1}'), ('3', 'ONeil', '{"tag-a"}', '{"version": 1, "name": "O''Neil"}');`
     expect(result).toBe(expected)
   })
 

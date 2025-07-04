@@ -1,11 +1,9 @@
-import { ExclamationCircleIcon } from '@heroicons/react/16/solid'
 import { Check } from 'lucide-react'
 import Image from 'next/image'
 
 import { useParams } from 'common'
 import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
-import { Badge, Button, Dialog, DialogContent, DialogTrigger } from 'ui'
-import { AddRLSPolicyForFirebaseDialog } from './AddRLSPolicyForFirebaseDialog'
+import { Badge, Button } from 'ui'
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
   getIntegrationType,
@@ -67,6 +65,37 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           .
         </>
       )
+
+    case 'clerk':
+      return (
+        <>
+          Allow users to use Supabase with Clerk. Additional setup may be required. You can read
+          more in the{' '}
+          <a
+            className="hover:decoration-brand underline hover:text-foreground transition"
+            href="https://supabase.com/docs/guides/auth/third-party/clerk"
+          >
+            documentation
+          </a>
+          .
+        </>
+      )
+
+    case 'workos':
+      return (
+        <>
+          Allow users to use Supabase with WorkOS. Additional setup may be required. You can read
+          more in the{' '}
+          <a
+            className="hover:decoration-brand underline hover:text-foreground transition"
+            href="https://supabase.com/docs/guides/auth/third-party/workos"
+          >
+            documentation
+          </a>
+          .
+        </>
+      )
+
     case 'custom':
     default:
       return 'Custom'
@@ -123,6 +152,22 @@ export const IntegrationTypeContent = ({
       )
     }
 
+    case 'clerk':
+      return (
+        <div className="text-sm flex flex-row gap-x-4">
+          <span className="text-foreground-light w-36">Domain</span>
+          <span className="text-foreground">{integration?.oidc_issuer_url ?? ''}</span>
+        </div>
+      )
+
+    case 'workos':
+      return (
+        <div className="text-sm flex flex-row gap-x-4">
+          <span className="text-foreground-light w-36">Issuer URL</span>
+          <span className="text-foreground">{integration?.oidc_issuer_url ?? ''}</span>
+        </div>
+      )
+
     case 'custom':
     default:
       return <>Custom</>
@@ -134,7 +179,6 @@ export const IntegrationCard = ({
   canUpdateConfig,
   onDelete,
 }: IntegrationCardProps) => {
-  const { ref: projectRef } = useParams()
   let type = getIntegrationType(integration)
 
   if (type === 'custom') {

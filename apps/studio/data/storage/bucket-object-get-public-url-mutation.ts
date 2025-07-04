@@ -9,7 +9,7 @@ type BucketObjectPublicUrlParams = {
   projectRef: string
   bucketId?: string
   path: string
-  options?: components['schemas']['PublicUrlOptions']
+  options?: components['schemas']['GetSignedUrlBody']['options']
 }
 export const getPublicUrlForBucketObject = async (
   { projectRef, bucketId, path, options }: BucketObjectPublicUrlParams,

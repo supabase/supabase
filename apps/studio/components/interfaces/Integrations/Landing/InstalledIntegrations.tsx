@@ -6,7 +6,7 @@ export const InstalledIntegrations = () => {
   const { installedIntegrations, error, isLoading, isSuccess, isError } = useInstalledIntegrations()
 
   return (
-    <div className="px-10 py-6 flex flex-col gap-y-5">
+    <div className="px-4 md:px-10 py-6 flex flex-col gap-y-5">
       <h2>Installed integrations</h2>
       <div className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3">
         {isLoading &&

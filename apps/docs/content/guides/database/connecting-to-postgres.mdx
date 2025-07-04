@@ -1,16 +1,17 @@
 ---
 title: 'Connect to your database'
 description: 'Connect to Postgres from your frontend, backend, or serverless environment'
-subtitle: 'Connect to Postgres from your frontend, backend, or serverless environment'
+subtitle: 'Supabase provides multiple methods to connect to your Postgres database, whether you’re working on the frontend, backend, or utilizing serverless functions.'
 ---
 
-## Quick summary
+## How to connect to your Postgres databases
 
 How you connect to your database depends on where you're connecting from:
 
 - For frontend applications, use the [Data API](#data-apis-and-client-libraries)
 - For Postgres clients, use a connection string
-  - For persistent clients (for example, long-running servers or database GUIs) use the [direct connection string](#direct-connection) if your environment supports IPv6, and [Supavisor session mode](#supavisor-session-mode) if not
+  - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6
+  - For persistent clients, and support for both IPv4 and IPv6, use [Supavisor session mode](#supavisor-session-mode)
   - For temporary clients (for example, serverless or edge functions) use [Supavisor transaction mode](#supavisor-transaction-mode)
 
 ## Quickstarts
@@ -51,7 +52,7 @@ The Data APIs allow you to interact with your database using REST or GraphQL req
 - [REST](/docs/guides/api)
 - [GraphQL](/docs/guides/graphql/api)
 
-For convenience, you can also use the Supabase client libraries, which wrap the Data APIs with a developer-friendly interface and automatically handle authentication:
+For convenience, you can also use the [Supabase client libraries](/docs/reference), which wrap the Data APIs with a developer-friendly interface and automatically handle authentication:
 
 - [JavaScript](/docs/reference/javascript)
 - [Flutter](/docs/reference/dart)
@@ -66,7 +67,7 @@ The direct connection string connects directly to your Postgres instance. It is 
 
 <Admonition type="caution">
 
-Direct connections use IPv6 by default. If your environment doesn't support IPv6, use [Supavisor session mode](#supavisor-session-mode) or get the [IPv4 addon](/docs/guides/platform/ipv4-address).
+Direct connections use IPv6 by default. If your environment doesn't support IPv6, use [Supavisor session mode](#supavisor-session-mode) or get the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 </Admonition>
 
@@ -76,29 +77,25 @@ The connection string looks like this:
 postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
 ```
 
-Get your project's direct string from the [Database Settings](/dashboard/project/_/settings/database) page:
+Get your project's direct connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is unchecked. Copy the URI.
+## Shared pooler
 
-## Supavisor session mode
+Every Supabase project includes a free, shared connection pooler. This is ideal for persistent servers when IPv6 is not supported.
 
-The session mode connection string connects to your Postgres instance via a proxy. This is ideal for persistent servers when IPv6 is not supported.
+### Supavisor session mode
+
+The session mode connection string connects to your Postgres instance via a proxy.
 
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-Get your project's session mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
+Get your project's Session pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Session mode` is selected. Copy the URI.
-
-## Supavisor transaction mode
+### Supavisor transaction mode
 
 The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is ideal for serverless or edge functions, which require many transient connections.
 
@@ -111,14 +108,24 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 The connection string looks like this:
 
 ```
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
-Get your project's transaction mode string from the [Database Settings](/dashboard/project/_/settings/database) page:
+Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Display connection pooler` is checked and `Transaction mode` is selected. Copy the URI.
+## Dedicated pooler
+
+For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+
+The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
+
+Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+
+<Admonition type="note">
+
+PgBouncer always runs in Transaction mode and the current version does not support prepared statement (will be added in a few weeks).
+
+</Admonition>
 
 ## More about connection pooling
 
@@ -160,3 +167,43 @@ You can obtain your connection info and Server root certificate from your applic
 ## Resources
 
 - [Connection management](/docs/guides/database/connection-management)
+- [Connecting with psql](/docs/guides/database/psql)
+- [Importing data into Supabase](/docs/guides/database/import-data)
+
+## Troubleshooting and Postgres connection string FAQs
+
+Below are answers to common challenges and queries.
+
+### What is a “connection refused” error?
+
+A “Connection refused” error typically means your database isn’t reachable. Ensure your Supabase project is running, confirm your database’s connection string, check firewall settings, and validate network permissions.
+
+### What is the “FATAL: Password authentication failed” error?
+
+This error occurs when your credentials are incorrect. Double-check your username and password from the Supabase dashboard. If the problem persists, reset your database password from the project settings.
+
+### How do you connect using IPv4?
+
+Supabase’s default direct connection supports IPv6 only. To connect over IPv4, consider using the Supavisor session or transaction modes, or a connection pooler (shared or dedicated), which support both IPv4 and IPv6.
+
+### How do you choose a connection method?
+
+- Direct connection: Persistent backend services (IPv6 only)
+- Supavisor session mode: Persistent backend needing IPv4
+- Supavisor transaction mode: Serverless functions
+- Shared pooler: General-purpose connections with IPv4 and IPv6
+- Dedicated pooler: High-performance apps requiring dedicated resources (paid tier)
+
+### Where is the Postgres connection string in Supabase?
+
+Your connection string is located in the Supabase Dashboard. Click the "Connect" button at the top of the page.
+
+### Can you use `psql` with a Supabase database?
+
+Yes. Use the following command structure, replacing `your_connection_string` with the string from your Supabase dashboard:
+
+```
+psql "your_connection_string"
+```
+
+Ensure you have `psql` installed locally before running this command.

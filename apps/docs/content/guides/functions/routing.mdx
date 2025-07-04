@@ -5,8 +5,8 @@ description: 'How to handle custom routing within Edge Functions.'
 subtitle: 'How to handle custom routing within Edge Functions.'
 ---
 
-Usually, an Edge Function is written to perform a single action (eg: write a record to the database). However, if your app's logic is split into multiple Edge Functions requests to each action may seem slower.
-This is because each Edge Function needs to be booted before serving a request (known as cold starts). If an action is performed less frequently (eg: deleting a record), there is a high-chance of that function experiencing a cold-start.
+Usually, an Edge Function is written to perform a single action (e.g. write a record to the database). However, if your app's logic is split into multiple Edge Functions requests to each action may seem slower.
+This is because each Edge Function needs to be booted before serving a request (known as cold starts). If an action is performed less frequently (e.g. deleting a record), there is a high-chance of that function experiencing a cold-start.
 
 One way to reduce the cold starts and increase performance of your app is to combine multiple actions into a single Edge Function. This way only one instance of the Edge Function needs to be booted and it can handle multiple requests to different actions.
 For example, we can use a single Edge Function to create a typical CRUD API (create, read, update, delete records).
@@ -160,10 +160,10 @@ We should see a response printing `Hello Foo!`.
 
 ## Using route parameters
 
-We can use route parameters to capture values at specific URL segments (eg: `/tasks/:taskId/notes/:noteId`).
+We can use route parameters to capture values at specific URL segments (e.g. `/tasks/:taskId/notes/:noteId`).
 
 Here's an example Edge Function implemented using the Framework for managing tasks using route parameters.
-Keep in mind paths must be prefixed by function name (ie. `tasks` in this example). Route parameters can only be used after the function name prefix.
+Keep in mind paths must be prefixed by function name (i.e. `tasks` in this example). Route parameters can only be used after the function name prefix.
 
 <Tabs
   scrollable
@@ -417,7 +417,7 @@ Deno.serve(async (req) => {
 
 ## URL patterns API
 
-If you prefer not to use a web framework, you can directly use [URLPattern API](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API) within your Edge Functions to implement routing.
+If you prefer not to use a web framework, you can directly use [URL Pattern API](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API) within your Edge Functions to implement routing.
 This is ideal for small apps with only couple of routes and you want to have a custom matching algorithm.
 
 Here is an example Edge Function using URL Patterns API: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/restful-tasks/index.ts

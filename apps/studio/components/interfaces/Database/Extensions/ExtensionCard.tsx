@@ -1,23 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Book, Github, Loader2, Settings } from 'lucide-react'
+import { AlertTriangle, Book, Github, Loader2, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { extensions } from 'shared-data'
-import {
-  Button,
-  cn,
-  Switch,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
@@ -29,7 +23,6 @@ interface ExtensionCardProps {
 
 const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const { project } = useProjectContext()
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
   const isOn = extension.installed_version !== null
   const isOrioleDb = useIsOrioleDb()
 
@@ -44,12 +37,10 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const disabled = !canUpdateExtensions || orioleDbCheck
 
   const X_PADDING = 'px-5'
-  const extensionMeta = extensions.find((item: any) => item.name === extension.name)
+  const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
-    ? siteUrl === 'http://localhost:8082'
-      ? `http://localhost:3001/docs${extensions.find((item) => item.name === extension.name)?.link}`
-      : `https://supabase.com/docs${extensions.find((item) => item.name === extension.name)?.link}`
-    : extensions.find((item: any) => item.name === extension.name)?.link ?? undefined
+    ? `https://supabase.com/docs${extensionMeta?.link}`
+    : extensionMeta?.link ?? undefined
 
   const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {
@@ -87,8 +78,8 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
           {isDisabling ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_>
+            <Tooltip>
+              <TooltipTrigger>
                 <Switch
                   disabled={disabled}
                   checked={isOn}
@@ -96,17 +87,17 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
                   }
                 />
-              </TooltipTrigger_Shadcn_>
+              </TooltipTrigger>
               {disabled && (
-                <TooltipContent_Shadcn_ side="bottom">
+                <TooltipContent side="bottom">
                   {!canUpdateExtensions
                     ? 'You need additional permissions to toggle extensions'
                     : orioleDbCheck
                       ? 'Project is using OrioleDB and cannot be disabled'
                       : null}
-                </TooltipContent_Shadcn_>
+                </TooltipContent>
               )}
-            </Tooltip_Shadcn_>
+            </Tooltip>
           )}
         </div>
 
@@ -144,6 +135,20 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                   Docs
                 </a>
               </Button>
+            )}
+            {extensionMeta?.deprecated && extensionMeta?.deprecated.length > 0 && (
+              <ButtonTooltip
+                type="warning"
+                icon={<AlertTriangle />}
+                className="rounded-full"
+                tooltip={{
+                  content: {
+                    text: `The extension is deprecated and will be removed in ${extensionMeta.deprecated.join(', ')}.`,
+                  },
+                }}
+              >
+                Deprecated
+              </ButtonTooltip>
             )}
           </div>
         </div>

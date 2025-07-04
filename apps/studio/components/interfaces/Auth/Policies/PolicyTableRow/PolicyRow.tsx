@@ -8,7 +8,7 @@ import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Badge,
   Button,
@@ -18,11 +18,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { generatePolicyCreateSQL } from './PolicyTableRow.utils'
+import { generatePolicyUpdateSQL } from './PolicyTableRow.utils'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -37,7 +37,7 @@ const PolicyRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
@@ -67,28 +67,35 @@ const PolicyRow = ({
           </p>
 
           <div className="flex flex-col gap-y-1">
-            <p className="text-sm text-foreground">{policy.name}</p>
+            <Button
+              type="text"
+              className="h-auto text-foreground text-sm border-none p-0 hover:bg-transparent justify-start"
+              onClick={() => onSelectEditPolicy(policy)}
+            >
+              {policy.name}
+            </Button>
             <div className="flex items-center gap-x-1">
               <div className="text-foreground-lighter text-sm">
-                Applied to:
+                Applied to:{' '}
                 {policy.roles.slice(0, 3).map((role, i) => (
-                  <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
-                    {role}
-                  </code>
-                ))}{' '}
-                role
+                  <span key={`policy-${role}-${i}`}>
+                    <code className="text-foreground-light text-xs">{role}</code>
+                    {i < Math.min(policy.roles.length, 3) - 1 ? ', ' : ' '}
+                  </span>
+                ))}
+                {policy.roles.length > 1 ? 'roles' : 'role'}
               </div>
               {policy.roles.length > 3 && (
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <code key="policy-etc" className="text-foreground-light text-xs">
                       + {policy.roles.length - 3} more roles
                     </code>
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom" align="center">
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" align="center">
                     {policy.roles.slice(3).join(', ')}
-                  </TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  </TooltipContent>
+                </Tooltip>
               )}
             </div>
           </div>
@@ -112,8 +119,9 @@ const PolicyRow = ({
               <DropdownMenuItem
                 className="space-x-2"
                 onClick={() => {
-                  const sql = generatePolicyCreateSQL(policy)
-                  setAiAssistantPanel({
+                  const sql = generatePolicyUpdateSQL(policy)
+                  aiSnap.newChat({
+                    name: `Update policy ${policy.name}`,
                     open: true,
                     sqlSnippets: [sql],
                     initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,

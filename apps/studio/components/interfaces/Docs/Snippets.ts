@@ -342,10 +342,31 @@ let { data: ${resourceId}, error } = await supabase
     bash: {
       language: 'bash',
       code: `
-curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
+curl --get '${endpoint}/rest/v1/${resourceId}' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer ${apiKey}" \\
--H "Range: 0-9"
+-H "Range: 0-9" \\
+-d "select=*" \\
+\\
+\`# Filters\` \\
+-d "column=eq.Equal+to" \\
+-d "column=gt.Greater+than" \\
+-d "column=lt.Less+than" \\
+-d "column=gte.Greater+than+or+equal+to" \\
+-d "column=lte.Less+than+or+equal+to" \\
+-d "column=like.*CaseSensitive*" \\
+-d "column=ilike.*CaseInsensitive*" \\
+-d "column=is.null" \\
+-d "column=in.(Array,Values)" \\
+-d "column=neq.Not+equal+to" \\
+\\
+\`# Arrays\` \\
+-d "array_column=cs.{array,contains}" \\
+-d "array_column=cd.{contained,by}" \\
+\\
+\`# Logical operators\` \\
+-d "column=not.like.Negate+filter" \\
+-d "or=(some_column.eq.Some+value,other_column.eq.Other+value)"
 `,
     },
     js: {
@@ -354,6 +375,7 @@ curl '${endpoint}/rest/v1/${resourceId}?id=eq.1&select=*' \\
 let { data: ${resourceId}, error } = await supabase
   .from('${resourceId}')
   .select("*")
+
   // Filters
   .eq('column', 'Equal to')
   .gt('column', 'Greater than')
@@ -365,9 +387,14 @@ let { data: ${resourceId}, error } = await supabase
   .is('column', null)
   .in('column', ['Array', 'Values'])
   .neq('column', 'Not equal to')
+
   // Arrays
   .contains('array_column', ['array', 'contains'])
   .containedBy('array_column', ['contained', 'by'])
+
+  // Logical operators
+  .not('column', 'like', 'Negate filter')
+  .or('some_column.eq.Some value, other_column.eq.Other value')
 `,
     },
   }),

@@ -10,7 +10,10 @@ export interface MembersExceedLimitModalProps {
 const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalProps) => {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug },
+    { enabled: visible }
+  )
 
   return (
     <Modal

@@ -5,12 +5,12 @@
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
 
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
 import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
-  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
-
 import type { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
@@ -98,30 +97,17 @@ const InputWithSuggestions = ({
         actions={
           showSuggestions && (
             <DropdownMenu>
-              <Tooltip.Root delayDuration={0}>
-                <DropdownMenuTrigger asChild>
-                  <Tooltip.Trigger asChild>
-                    <Button type="default" className="!px-1 mr-0.5">
-                      <List strokeWidth={1.5} size={14} />
-                    </Button>
-                  </Tooltip.Trigger>
-                </DropdownMenuTrigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'bg-alternative rounded py-1 px-2 leading-none shadow',
-                        'border-background border',
-                      ].join(' ')}
-                    >
-                      <span className="text-foreground text-xs">
-                        {suggestionsTooltip || 'Suggestions'}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+              <DropdownMenuTrigger asChild>
+                <ButtonTooltip
+                  type="default"
+                  className="!px-1 mr-0.5"
+                  tooltip={{
+                    content: { text: suggestionsTooltip || 'Suggestions', side: 'bottom' },
+                  }}
+                >
+                  <List strokeWidth={1.5} size={14} />
+                </ButtonTooltip>
+              </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" side="bottom">
                 <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>

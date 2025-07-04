@@ -25,7 +25,7 @@ export async function unassignOrganizationMemberRole({
         path: {
           slug,
           gotrue_id: gotrueId,
-          role_id: roleId.toString(),
+          role_id: roleId,
         },
       },
     }

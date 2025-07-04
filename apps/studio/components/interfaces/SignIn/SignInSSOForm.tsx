@@ -5,10 +5,8 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
 
@@ -23,8 +21,6 @@ const SignInSSOForm = () => {
   const signInSchema = object({
     email: string().email('Must be a valid email').required('Email is required'),
   })
-
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const onSignIn = async ({ email }: { email: string }) => {
     const toastId = toast.loading('Signing in...')
@@ -41,7 +37,7 @@ const SignInSSOForm = () => {
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
           ? location.origin
           : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/sign-in-mfa`
+      }${BASE_PATH}/sign-in-mfa?method=sso`
     )
 
     const { data, error } = await auth.signInWithSSO({
@@ -53,7 +49,6 @@ const SignInSSOForm = () => {
     })
 
     if (!error) {
-      sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
       await queryClient.resetQueries()
       setLastSignInUsed('sso')
       if (data) {

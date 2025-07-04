@@ -10,10 +10,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on: [larger-runner-4cpu]
+    runs-on:
+      group: Default Larger Runners
 
     steps:
       - name: Checkout
@@ -22,7 +26,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9.10.0
           run_install: false
 
       - name: Use Node.js

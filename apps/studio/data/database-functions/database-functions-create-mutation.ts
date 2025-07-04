@@ -9,7 +9,7 @@ import type { ResponseError } from 'types'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
 }
 

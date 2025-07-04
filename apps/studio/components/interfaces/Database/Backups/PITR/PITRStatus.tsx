@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -8,9 +7,9 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button } from 'ui'
 import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -59,38 +58,22 @@ const PITRStatus = ({
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  disabled={hasReadReplicas || !canTriggerPhysicalBackup}
-                  onClick={() => onSetConfiguration()}
-                >
-                  Start a restore
-                </Button>
-              </Tooltip.Trigger>
-              {hasReadReplicas ||
-                (!canTriggerPhysicalBackup && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="left">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          {hasReadReplicas
-                            ? 'You will need to remove all read replicas first to trigger a PITR recovery'
-                            : !canTriggerPhysicalBackup
-                              ? 'You need additional permissions to trigger a PITR recovery'
-                              : null}
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                ))}
-            </Tooltip.Root>
+            <ButtonTooltip
+              disabled={hasReadReplicas || !canTriggerPhysicalBackup}
+              onClick={() => onSetConfiguration()}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: hasReadReplicas
+                    ? 'You will need to remove all read replicas first to trigger a PITR recovery'
+                    : !canTriggerPhysicalBackup
+                      ? 'You need additional permissions to trigger a PITR recovery'
+                      : undefined,
+                },
+              }}
+            >
+              Start a restore
+            </ButtonTooltip>
           </div>
         }
       >

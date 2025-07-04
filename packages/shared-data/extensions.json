@@ -288,15 +288,6 @@
     "product_url": null
   },
   {
-    "name": "pg_stat_monitor",
-    "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
-    "tags": ["Utility"],
-    "link": "/guides/database/extensions/pg_stat_monitor",
-    "github_url": null,
-    "product": null,
-    "product_url": null
-  },
-  {
     "name": "pg_stat_statements",
     "comment": "track execution statistics of all SQL statements executed",
     "tags": ["Admin", "Utility"],
@@ -357,7 +348,8 @@
     "link": "/guides/database/extensions/pgjwt",
     "github_url": "https://github.com/michelp/pgjwt",
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "pgroonga",
@@ -428,7 +420,8 @@
     "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#coffeescript-extension",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "pljava",
@@ -445,7 +438,8 @@
     "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#livescript-extension",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "plpgsql",
@@ -472,7 +466,8 @@
     "link": "/guides/database/extensions/plv8",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "postgis",
@@ -553,7 +548,8 @@
     "link": "/guides/database/extensions/timescaledb",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "tsm_system_rows",
