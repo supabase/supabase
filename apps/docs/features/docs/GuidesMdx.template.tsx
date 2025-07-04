@@ -61,14 +61,7 @@ type GuideTemplateProps =
   | WithRequired<BaseGuideTemplateProps, 'children'>
   | WithRequired<BaseGuideTemplateProps, 'content'>
 
-const GuideTemplate = ({
-  meta,
-  content,
-  children,
-  childrenPosition = 'after',
-  editLink,
-  mdxOptions,
-}: GuideTemplateProps) => {
+const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
 
   return (
@@ -98,9 +91,9 @@ const GuideTemplate = ({
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
-            {childrenPosition === 'before' && children}
             {content && <MDXRemoteBase source={content} options={mdxOptions} />}
-            {childrenPosition === 'after' && children}
+            {children}
+
             <footer className="mt-16 not-prose">
               <a
                 href={
@@ -143,5 +136,5 @@ const GuideTemplate = ({
   )
 }
 
-export { GuideTemplate, newEditLink }
+export { GuideTemplate, EDIT_LINK_SYMBOL, newEditLink }
 export type { EditLink }

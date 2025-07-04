@@ -274,7 +274,7 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
             </Button>
           </Admonition>
         )}
-
+        
         <GuideMdxContent content={data.content} mdxOptions={options} />
 
         <GuideFooter editLink={data.editLink} />
@@ -318,7 +318,7 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
+    const tag = await getLatestRelease() || 'main' 
     if (!tag) {
       throw new Error('No latest release found for federated wrappers pages')
     }

@@ -2,12 +2,12 @@ import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 interface GuideArticleProps {
-  content: string
+  content?: string
   mdxOptions: SerializeOptions
 }
 
 export function GuideMdxContent({ content, mdxOptions }: GuideArticleProps) {
-  return <MDXRemoteBase source={content} options={mdxOptions} />
+  return content ? <MDXRemoteBase source={content} options={mdxOptions} /> : null
 }
 
 GuideMdxContent.displayName = 'GuideMdxContent'
