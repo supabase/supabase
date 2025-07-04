@@ -2,6 +2,8 @@ export { logsKeys } from './keys'
 export {
   useUnifiedLogInspectionQuery,
   getUnifiedLogInspection,
+  SERVICE_FLOW_TYPES,
+  type ServiceFlowType,
   type UnifiedLogInspectionVariables,
   type UnifiedLogInspectionResponse,
   type UnifiedLogInspectionEntry,

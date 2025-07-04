@@ -1,10 +1,13 @@
 import { useState } from 'react'
 
 import { Table } from '@tanstack/react-table'
+
+// Debug flag for console logs - set to true for debugging
+const DEBUG_SERVICE_FLOW = false
 import { useParams } from 'common'
 import { DataTableSheetDetails } from 'components/ui/DataTable/DataTableSheetDetails'
 import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
-import { useUnifiedLogInspectionQuery } from 'data/logs'
+import { useUnifiedLogInspectionQuery, ServiceFlowType } from 'data/logs'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -28,6 +31,8 @@ import {
   MemoizedNetworkBlock,
   MemoizedPostgRESTBlock,
   MemoizedGoTrueBlock,
+  MemoizedEdgeFunctionBlock,
+  MemoizedStorageBlock,
   MemoizedPostgresBlock,
   MemoizedResponseCompletedBlock,
 } from './ServiceFlow/ServiceFlowBlocks'
@@ -64,23 +69,44 @@ export function ServiceFlowPanel({
   // TODO: Remove once repeated logs issue is fixed - should use selectedRow.id directly
   const realLogId = search?.logId || selectedRow?.id
 
-  console.log('🔍 Log ID extraction debug:', {
-    'search.logId': search?.logId,
-    'selectedRow.log_id': selectedRow?.log_id,
-    'selectedRow.uuid_id': selectedRow?.uuid_id,
-    'selectedRow.id': selectedRow?.id,
-    'final realLogId': realLogId,
-    'full search object': search,
-    'full searchParameters object': searchParameters,
-  })
+  if (DEBUG_SERVICE_FLOW) {
+    console.log('🔍 Log ID extraction debug:', {
+      'search.logId': search?.logId,
+      'selectedRow.log_id': selectedRow?.log_id,
+      'selectedRow.uuid_id': selectedRow?.uuid_id,
+      'selectedRow.id': selectedRow?.id,
+      'final realLogId': realLogId,
+      'full search object': search,
+      'full searchParameters object': searchParameters,
+    })
+  }
 
-  // Determine service flow type
-  const isPostgrestFlow = selectedRow?.pathname?.includes('/rest/')
-  const isAuthFlow = selectedRow?.pathname?.includes('/auth/')
-  const shouldShowServiceFlow = isPostgrestFlow || isAuthFlow
+  // Helper function to map log_type to service flow type
+  const getServiceFlowType = (logType: string): ServiceFlowType | undefined => {
+    switch (logType) {
+      case 'auth':
+        return 'auth'
+      case 'edge function':
+        return 'edge-function'
+      case 'storage':
+        return 'storage'
+      case 'postgrest':
+        return 'postgrest'
+      default:
+        return undefined
+    }
+  }
 
-  // Determine service flow type for query
-  const serviceFlowType = isAuthFlow ? 'auth' : 'postgrest'
+  // Determine service flow type based on log_type
+  const logType = selectedRow?.log_type
+  const serviceFlowType = getServiceFlowType(logType)
+  const shouldShowServiceFlow = serviceFlowType !== undefined
+
+  // Individual flow type checks for conditional rendering
+  const isPostgrestFlow = serviceFlowType === 'postgrest'
+  const isAuthFlow = serviceFlowType === 'auth'
+  const isEdgeFunctionFlow = serviceFlowType === 'edge-function'
+  const isStorageFlow = serviceFlowType === 'storage'
 
   // Query the logs API directly
   const {
@@ -94,37 +120,43 @@ export function ServiceFlowPanel({
     search: searchParameters,
   })
 
-  console.log('🔍 Service Flow Panel:', {
-    selectedRow,
-    selectedRowKey,
-    selectedRowId: selectedRow?.id,
-    logId: searchParameters?.logId,
-    originalLogId: selectedRow?.original_log_id,
-    selectedRowPathname: selectedRow?.pathname,
-    selectedRowFullObject: selectedRow,
-    shouldShowServiceFlow,
-    isPostgrestFlow,
-    isAuthFlow,
-    serviceFlowType,
-    serviceFlowData,
-    isLoading,
-    error,
-  })
+  if (DEBUG_SERVICE_FLOW) {
+    console.log('🔍 Service Flow Panel:', {
+      selectedRow,
+      selectedRowKey,
+      selectedRowId: selectedRow?.id,
+      logId: searchParameters?.logId,
+      originalLogId: selectedRow?.original_log_id,
+      selectedRowPathname: selectedRow?.pathname,
+      selectedRowFullObject: selectedRow,
+      shouldShowServiceFlow,
+      isPostgrestFlow,
+      isAuthFlow,
+      isEdgeFunctionFlow,
+      isStorageFlow,
+      serviceFlowType,
+      serviceFlowData,
+      isLoading,
+      error,
+    })
 
-  console.log('🔍 Raw selectedRow fields:', Object.keys(selectedRow || {}))
-  console.log('🔍 selectedRow.id value:', selectedRow?.id, 'type:', typeof selectedRow?.id)
-  console.log('🔍 realLogId value:', selectedRow?.log_id, 'type:', typeof selectedRow?.log_id)
-
-  // Log the enriched service flow data
-  if (serviceFlowData?.result?.[0]) {
-    console.log('📋 Service Flow Enriched Data:', serviceFlowData.result[0])
-    console.log('🔍 raw_log_data exists?', !!serviceFlowData.result[0].raw_log_data)
-    console.log('🔍 raw_log_data value:', serviceFlowData.result[0].raw_log_data)
+    console.log('🔍 Raw selectedRow fields:', Object.keys(selectedRow || {}))
+    console.log('🔍 selectedRow.id value:', selectedRow?.id, 'type:', typeof selectedRow?.id)
+    console.log('🔍 realLogId value:', selectedRow?.log_id, 'type:', typeof selectedRow?.log_id)
   }
 
-  // Log the raw log data if available
-  if (serviceFlowData?.result?.[0]?.raw_log_data) {
-    console.log('🗂️ Complete Raw Log Data:', serviceFlowData.result[0].raw_log_data)
+  // Log the enriched service flow data
+  if (DEBUG_SERVICE_FLOW) {
+    if (serviceFlowData?.result?.[0]) {
+      console.log('📋 Service Flow Enriched Data:', serviceFlowData.result[0])
+      console.log('🔍 raw_log_data exists?', !!serviceFlowData.result[0].raw_log_data)
+      console.log('🔍 raw_log_data value:', serviceFlowData.result[0].raw_log_data)
+    }
+
+    // Log the raw log data if available
+    if (serviceFlowData?.result?.[0]?.raw_log_data) {
+      console.log('🗂️ Complete Raw Log Data:', serviceFlowData.result[0].raw_log_data)
+    }
   }
 
   if (selectedRowKey) {
@@ -333,6 +365,22 @@ export function ServiceFlowPanel({
 
                           {isAuthFlow ? (
                             <MemoizedGoTrueBlock
+                              data={selectedRow}
+                              enrichedData={serviceFlowData?.result?.[0]}
+                              isLoading={isLoading}
+                              filterFields={filterFields}
+                              table={table}
+                            />
+                          ) : isEdgeFunctionFlow ? (
+                            <MemoizedEdgeFunctionBlock
+                              data={selectedRow}
+                              enrichedData={serviceFlowData?.result?.[0]}
+                              isLoading={isLoading}
+                              filterFields={filterFields}
+                              table={table}
+                            />
+                          ) : isStorageFlow ? (
+                            <MemoizedStorageBlock
                               data={selectedRow}
                               enrichedData={serviceFlowData?.result?.[0]}
                               isLoading={isLoading}

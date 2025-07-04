@@ -3,16 +3,25 @@ import { post, handleError } from 'data/fetchers'
 import {
   getPostgrestServiceFlowQuery,
   getAuthServiceFlowQuery,
+  getEdgeFunctionServiceFlowQuery,
+  getStorageServiceFlowQuery,
 } from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { ResponseError } from 'types'
 import { logsKeys } from './keys'
 import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 
+// Debug flag for console logs - set to true for debugging
+const DEBUG_SERVICE_FLOW = false
+
+// Service flow types - subset of LOG_TYPES that support service flows
+export const SERVICE_FLOW_TYPES = ['postgrest', 'auth', 'edge-function', 'storage'] as const
+export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
+
 export type UnifiedLogInspectionVariables = {
   projectRef?: string
   logId?: string
-  type?: 'postgrest' | 'auth'
+  type?: ServiceFlowType
   search: QuerySearchParamsType
 }
 
@@ -101,12 +110,14 @@ export async function getUnifiedLogInspection(
   { projectRef, logId, type, search }: UnifiedLogInspectionVariables,
   signal?: AbortSignal
 ) {
-  console.log('🔍 getUnifiedLogInspection called with:', {
-    projectRef,
-    logId,
-    type,
-    search,
-  })
+  if (DEBUG_SERVICE_FLOW) {
+    console.log('🔍 getUnifiedLogInspection called with:', {
+      projectRef,
+      logId,
+      type,
+      search,
+    })
+  }
 
   if (!projectRef) {
     throw new Error('projectRef is required')
@@ -126,6 +137,12 @@ export async function getUnifiedLogInspection(
     case 'auth':
       sql = getAuthServiceFlowQuery(logId)
       break
+    case 'edge-function':
+      sql = getEdgeFunctionServiceFlowQuery(logId)
+      break
+    case 'storage':
+      sql = getStorageServiceFlowQuery(logId)
+      break
     default:
       throw new Error('Invalid type')
   }
@@ -133,12 +150,14 @@ export async function getUnifiedLogInspection(
   // Use the same timestamp logic as the main unified logs query
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
-  console.log('🔍 Generated SQL:', sql)
-  console.log('🔍 API call parameters:', {
-    projectRef,
-    iso_timestamp_start: isoTimestampStart,
-    iso_timestamp_end: isoTimestampEnd,
-  })
+  if (DEBUG_SERVICE_FLOW) {
+    console.log('🔍 Generated SQL:', sql)
+    console.log('🔍 API call parameters:', {
+      projectRef,
+      iso_timestamp_start: isoTimestampStart,
+      iso_timestamp_end: isoTimestampEnd,
+    })
+  }
 
   const { data, error } = await post('/platform/projects/{ref}/analytics/endpoints/logs.all', {
     params: { path: { ref: projectRef } },
@@ -155,7 +174,9 @@ export async function getUnifiedLogInspection(
     handleError(error)
   }
 
-  console.log('🔍 Service Flow API Response:', data)
+  if (DEBUG_SERVICE_FLOW) {
+    console.log('🔍 Service Flow API Response:', data)
+  }
 
   return data as unknown as UnifiedLogInspectionResponse
 }

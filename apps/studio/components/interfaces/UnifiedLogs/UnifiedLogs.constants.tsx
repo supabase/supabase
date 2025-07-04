@@ -37,9 +37,7 @@ export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const
 export const LOG_TYPES = [
   'auth',
-  'edge',
-  'edge_function',
-  'function_events',
+  'edge function',
   'postgres',
   'postgres_upgrade',
   'postgrest',

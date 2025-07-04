@@ -30,15 +30,15 @@ export const FunctionLogsTab = ({ logs = [] }: FunctionLogsTabProps) => {
           // Map the log level to our standard levels
 
           return (
-            <div key={log.id} className="py-1 border-b border-border last:border-0">
+            <div key={log.id} className="py-3 px-4 border-b border-border last:border-0">
               <div className="flex items-start gap-5">
                 <div className="flex flex-row items-center gap-5">
-                  <HoverCardTimestamp date={date} className="min-w-20 ml-14" />
+                  <HoverCardTimestamp date={date} className="min-w-20 ml-14 flex-shrink-0" />
 
                   <DataTableColumnStatusCode
                     value={log.level}
                     level={log.level}
-                    className="min-w-20"
+                    className="min-w-20 flex-shrink-0"
                   />
                   {/* <span className="text-foreground">{log.event_type || 'Log'}</span> */}
                 </div>
