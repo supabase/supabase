@@ -3,8 +3,7 @@ import {
   genGuideMeta,
   genGuidesStaticParams,
 } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate } from '~/features/ui/GuideTemplate'
-// import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
+import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
 
 export const dynamicParams = false
 
