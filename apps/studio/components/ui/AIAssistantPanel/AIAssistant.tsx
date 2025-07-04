@@ -1,6 +1,5 @@
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
 import { useRouter } from 'next/router'

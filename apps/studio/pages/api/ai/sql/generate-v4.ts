@@ -1,12 +1,15 @@
 import pgMeta from '@supabase/pg-meta'
+import { streamText, tool, ToolSet } from 'ai'
+import { source } from 'common-tags'
 import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { streamText, tool, ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
-import { source } from 'common-tags'
+import { getOrganizations } from 'data/organizations/organizations-query'
+import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
@@ -17,8 +20,6 @@ import {
   transformToolResult,
 } from './supabase-mcp'
 import { getTools } from './tools'
-import { getOrganizations } from 'data/organizations/organizations-query'
-import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 export const maxDuration = 120
 
@@ -70,16 +71,30 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages, projectRef, connectionString, orgSlug } = data
 
   // Get organizations and compute opt in level server-side
-  const organizations = await getOrganizations({
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authorization && { Authorization: authorization }),
-    },
-  })
-  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const ServerSideAiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+  const [organizations, projects] = await Promise.all([
+    getOrganizations({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+    getProjects({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+  ])
 
-  const aiOptInLevel = ServerSideAiOptInLevel
+  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+  const selectedProject = projects.find((project) => project.ref === projectRef)
+
+  // If the project is not in the organization specific by the org slug, return an error
+  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+    return res.status(400).json({ error: 'Project and organization do not match' })
+  }
+
+  const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
 
   const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
 

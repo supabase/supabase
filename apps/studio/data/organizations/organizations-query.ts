@@ -17,11 +17,13 @@ export function castOrganizationResponseToOrganization(org: OrganizationBase): O
   }
 }
 
-export async function getOrganizations(options?: {
+export async function getOrganizations({
+  signal,
+  headers,
+}: {
   signal?: AbortSignal
   headers?: Record<string, string>
 }): Promise<Organization[]> {
-  const { signal, headers } = options || {}
   const { data, error } = await get('/platform/organizations', { signal, headers })
 
   if (error) handleError(error)
