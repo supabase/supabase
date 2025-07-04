@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { useQueries } from '@tanstack/react-query'
+import { useMemo, useCallback } from 'react'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { handleError } from 'data/fetchers'
 import {
   getEdgeFunctionBody,
@@ -42,6 +42,7 @@ export interface EdgeFunctionsDiffResult {
   refetchMainBranchFunctions: () => void
   currentBranchFunctions?: EdgeFunctionsData
   mainBranchFunctions?: EdgeFunctionsData
+  clearDiffsOptimistically: () => void
 }
 
 // Small helper around path.basename but avoids importing the full Node path lib for the browser bundle
@@ -51,6 +52,8 @@ export const useEdgeFunctionsDiff = ({
   currentBranchRef,
   mainBranchRef,
 }: UseEdgeFunctionsDiffProps): EdgeFunctionsDiffResult => {
+  const queryClient = useQueryClient()
+
   // Fetch edge functions for both branches
   const {
     data: currentBranchFunctions,
@@ -60,6 +63,7 @@ export const useEdgeFunctionsDiff = ({
     { projectRef: currentBranchRef },
     {
       enabled: !!currentBranchRef,
+      refetchOnMount: 'always',
       staleTime: 30000, // 30 seconds
     }
   )
@@ -72,6 +76,7 @@ export const useEdgeFunctionsDiff = ({
     { projectRef: mainBranchRef },
     {
       enabled: !!mainBranchRef,
+      refetchOnMount: 'always',
       staleTime: 30000, // 30 seconds
     }
   )
@@ -107,6 +112,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
       enabled: !!currentBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
@@ -116,6 +122,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
       enabled: !!mainBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
@@ -125,6 +132,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
       enabled: !!currentBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
@@ -134,6 +142,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
       enabled: !!mainBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
@@ -246,6 +255,22 @@ export const useEdgeFunctionsDiff = ({
 
   const hasChanges = addedSlugs.length > 0 || removedSlugs.length > 0 || modifiedSlugs.length > 0
 
+  const clearDiffsOptimistically = useCallback(() => {
+    if (!currentBranchRef || !mainBranchRef || !mainBranchFunctions) return
+
+    queryClient.setQueryData(
+      ['edge-functions', { projectRef: currentBranchRef }],
+      mainBranchFunctions
+    )
+
+    mainBranchFunctions.forEach((func) => {
+      const mainBody = mainBodiesMap[func.slug]
+      if (mainBody) {
+        queryClient.setQueryData(['edge-function-body', currentBranchRef, func.slug], mainBody)
+      }
+    })
+  }, [currentBranchRef, mainBranchRef, mainBranchFunctions, mainBodiesMap, queryClient])
+
   return {
     addedSlugs,
     removedSlugs,
@@ -261,6 +286,7 @@ export const useEdgeFunctionsDiff = ({
     refetchMainBranchFunctions,
     currentBranchFunctions,
     mainBranchFunctions,
+    clearDiffsOptimistically,
   }
 }
 
