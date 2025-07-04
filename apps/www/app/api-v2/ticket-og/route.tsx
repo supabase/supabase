@@ -96,7 +96,7 @@ export async function GET(req: Request, res: Response) {
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
     const SUPABASE_LOGO_IMG = `${STORAGE_URL}/assets/supabase-white.png`
     const SUPABASE_LOGO_RATIO = 541 / 103
-    const SUPABASE_LOGO_HEIGHT = 20
+    const SUPABASE_LOGO_HEIGHT = 24
     const DATE_FONT_SIZE = 75
     const LW15_LOGO_HEIGHT = 70
     const LW15_LEFT = `${STORAGE_URL}/assets/LW15_LEFT.png`
