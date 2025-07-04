@@ -28,14 +28,13 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
-import { AuthErrorCodes } from '../ui/AuthErrorCodes'
+import { ErrorCodes } from '../ui/ErrorCodes'
 
 const components = {
   Accordion,
   AccordionItem,
   Admonition,
   AiPromptsIndex,
-  AuthErrorCodes,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
@@ -44,6 +43,7 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   CostWarning,
+  ErrorCodes,
   Extensions,
   GlassPanel,
   IconArrowDown: ArrowDown,
