@@ -41,11 +41,11 @@ const LW15LandingPage = () => {
           <LWSVG className="h-full w-auto" />
           <div className="relative h-full flex-1 dark:mix-blend-screen">
             <video
-              src="/images/launchweek/15/galazy-horizontal-dark.mp4"
+              src="/images/launchweek/15/lw15-galaxy.mp4"
               autoPlay
               muted
               loop
-              className="h-full w-full object-cover "
+              className="h-full w-full object-cover"
             />
           </div>
           <FifteenSVG className="h-full w-auto" />
