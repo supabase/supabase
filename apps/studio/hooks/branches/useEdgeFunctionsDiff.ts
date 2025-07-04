@@ -63,6 +63,7 @@ export const useEdgeFunctionsDiff = ({
     { projectRef: currentBranchRef },
     {
       enabled: !!currentBranchRef,
+      refetchOnMount: 'always',
       staleTime: 30000, // 30 seconds
     }
   )
@@ -75,6 +76,7 @@ export const useEdgeFunctionsDiff = ({
     { projectRef: mainBranchRef },
     {
       enabled: !!mainBranchRef,
+      refetchOnMount: 'always',
       staleTime: 30000, // 30 seconds
     }
   )
@@ -110,6 +112,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
       enabled: !!currentBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
@@ -119,6 +122,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
       enabled: !!mainBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
@@ -128,6 +132,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: currentBranchRef, slug }, signal),
       enabled: !!currentBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
@@ -137,6 +142,7 @@ export const useEdgeFunctionsDiff = ({
       queryFn: ({ signal }: { signal?: AbortSignal }) =>
         getEdgeFunctionBody({ projectRef: mainBranchRef, slug }, signal),
       enabled: !!mainBranchRef,
+      refetchOnMount: 'always' as const,
     })),
   })
 
