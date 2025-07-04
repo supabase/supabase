@@ -57,12 +57,12 @@ const LW15Ticket = ({
           <div className="text-2xl lg:text-3xl">@{user.username}</div>
           <div className="w-full grid grid-cols-3 gap-4 text-sm">
             <div className="flex flex-col">
-              <p>Occupation</p>
+              <p>Company</p>
               <p>Location</p>
             </div>
             <div className="col-span-2 flex flex-col">
-              <p>{user?.metadata?.company || 'Engineer'}</p>
-              <p>{user?.metadata?.location || 'Worldwide'}</p>
+              <p>{user?.metadata?.company || '—'}</p>
+              <p>{user?.metadata?.location || '—'}</p>
             </div>
           </div>
         </div>

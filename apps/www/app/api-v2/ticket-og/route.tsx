@@ -15,131 +15,14 @@ const corsHeaders = {
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15`
-
-// Load custom font
-// const FONT_URL = `${STORAGE_URL}/assets/font/Nippo-Regular.otf`
-// const MONO_FONT_URL = `${STORAGE_URL}/assets/font/DepartureMono-Regular.otf`
-
-const FONT_URL = '/fonts/launchweek/14/Nippo-Regular.otf'
-const MONO_FONT_URL = '/fonts/launchweek/14/DepartureMono-Regular.otf'
+// Load custom fonts
+const FONT_URLS = {
+  CIRCULAR:
+    'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/fonts/CircularStd-Book.otf',
+}
 
 const LW_TABLE = 'tickets'
 const LW_MATERIALIZED_VIEW = 'tickets_view'
-
-const usernameToLines = (username: string): string[] => {
-  const maxLineLength = 15
-
-  const nonBreakingReplacements = [
-    { regexp: new RegExp(' ', 'g'), replacement: '\u00A0' }, // Space → Non-breaking space
-    { regexp: new RegExp('-', 'g'), replacement: '\u2011' }, // Hyphen → Non-breaking hyphen
-    { regexp: new RegExp('/', 'g'), replacement: '\u2060\u002F\u2060' }, // Slash with word joiners
-    { regexp: new RegExp('\\.', 'g'), replacement: '\u2024' }, // One dot leader (alternative to period)
-  ]
-  const allowList = [...nonBreakingReplacements.map((x) => x.regexp), new RegExp('\\w', 'g')]
-    .map((x) => x.source.replace('-', '\\-'))
-    .join('|')
-  const allowRegexp = new RegExp(`[^${allowList}]`, 'g')
-  const allowdUsername = username.replace(allowRegexp, '')
-  // Split only by spaces, keeping hyphenated words together
-  const words = allowdUsername.split(' ')
-  const lines: string[] = []
-  let currentLine = ''
-
-  // First try to break at word boundaries (spaces only)
-  for (const word of words) {
-    // If adding this word would exceed the line length and we already have content
-    if (
-      currentLine.length + (currentLine ? 1 : 0) + word.length > maxLineLength &&
-      currentLine.length > 0
-    ) {
-      // Add current line to lines array and start a new line
-      lines.push(currentLine)
-      currentLine = word
-    } else {
-      // Add word to current line with a space if needed
-      currentLine = currentLine ? `${currentLine} ${word}` : word
-    }
-  }
-
-  // Add the last line if it has content
-  if (currentLine) {
-    lines.push(currentLine)
-  }
-
-  // If we still have too few lines but some are too long, split them by character
-  // but try to avoid splitting at hyphens
-  let finalLines: string[] = []
-  for (const line of lines) {
-    if (line.length > maxLineLength) {
-      // For long words, try to find good break points
-      let remainingText = line
-      while (remainingText.length > 0) {
-        if (remainingText.length <= maxLineLength) {
-          finalLines.push(remainingText)
-          break
-        }
-
-        // Try to find a good break point that's not a hyphen
-        let breakPoint = maxLineLength
-
-        // Look for a hyphen in the potential break area (a few chars before maxLineLength)
-        const searchArea = remainingText.substring(Math.max(0, breakPoint - 5), breakPoint + 1)
-        const hyphenPos = searchArea.indexOf('-')
-
-        // If we found a hyphen, adjust the break point to keep the hyphenated word together
-        if (hyphenPos >= 0) {
-          // Calculate the actual position in the original string
-          const actualHyphenPos = Math.max(0, breakPoint - 5) + hyphenPos
-
-          // If hyphen is near the beginning, include the whole hyphenated word on next line
-          if (actualHyphenPos < maxLineLength / 2) {
-            breakPoint = actualHyphenPos
-          }
-          // If hyphen is near the end, include the whole hyphenated word on this line
-          else {
-            // Find the end of the hyphenated word
-            const spaceAfterHyphen = remainingText.indexOf(' ', actualHyphenPos)
-            if (spaceAfterHyphen > 0 && spaceAfterHyphen - actualHyphenPos < 10) {
-              // If the rest of the hyphenated word is reasonably short, keep it together
-              breakPoint = spaceAfterHyphen
-            }
-          }
-        }
-
-        finalLines.push(remainingText.substring(0, breakPoint))
-        remainingText = remainingText.substring(breakPoint).trim()
-      }
-    } else {
-      finalLines.push(line)
-    }
-  }
-
-  // Limit to 3 lines maximum
-  if (finalLines.length > 3) {
-    finalLines = finalLines.slice(0, 2)
-    // Truncate the last line if needed and add ellipsis
-    let lastLine = finalLines[2] || ''
-    if (lastLine.length > 8) {
-      lastLine = lastLine.slice(0, 8) + '...'
-    }
-    finalLines.push(lastLine)
-  }
-
-  finalLines = finalLines.map((line, index) => {
-    let result = line
-    nonBreakingReplacements.forEach(({ regexp, replacement }) => {
-      result = result.replace(regexp, replacement)
-    })
-
-    if (index < finalLines.length - 1) {
-      result = result.padEnd(maxLineLength, '\u00A0')
-    }
-    return result
-  })
-
-  // Ensure we don't have more than 3 lines
-  return finalLines.slice(0, 3)
-}
 
 export async function GET(req: Request, res: Response) {
   const url = new URL(req.url)
@@ -148,9 +31,6 @@ export async function GET(req: Request, res: Response) {
   // Verify that req.url is from an allowed domain
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const userAgent = req.headers.get('user-agent')
-
-  const font = fetch(new URL(FONT_URL, url)).then((res) => res.arrayBuffer())
-  const mono_font = fetch(new URL(MONO_FONT_URL, url)).then((res) => res.arrayBuffer())
 
   try {
     if (!username) throw new Error('missing username param')
@@ -190,100 +70,42 @@ export async function GET(req: Request, res: Response) {
     if (error) console.log('Failed to fetch user. Inner error:', error.message)
     if (!user) throw new Error(error?.message ?? 'user not found')
 
-    const {
-      name,
-      secret,
-      metadata,
-      platinum: isPlatinum,
-      shared_on_twitter: sharedOnTwitter,
-      shared_on_linkedin: sharedOnLinkedIn,
-      ticket_number,
-    } = user
+    const FONT_CIRCULAR = fetch(new URL(FONT_URLS['CIRCULAR'], import.meta.url)).then((res) =>
+      res.arrayBuffer()
+    )
+    const CIRCULAR_FONT_DATA = await FONT_CIRCULAR
 
-    const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
-    const platinumSecret = platinum && secret
-
-    const seatCode = (466561 + (ticket_number || 0)).toString(36).toUpperCase()
+    const { metadata } = user
 
     // Generate image and upload to storage.
-    const ticketType = secret
-      ? platinum
-        ? 'platinumSecret'
-        : 'secret'
-      : platinum
-        ? 'platinum'
-        : 'regular'
+    const ticketType = 'regular'
 
-    const STYLING_CONFIG = () => ({
-      TICKET_FOREGROUND: metadata.colors?.foreground,
-      TICKET_BACKGROUND: metadata.colors?.background,
-    })
-
-    const TICKET_THEME = {
-      regular: {
-        color: 'rgb(239, 239, 239)',
-        background: 'transparent',
-      },
-      secret: {
-        color: 'rgba(44, 244, 158)',
-        background: 'rgba(44, 244, 158, 0.2)',
-      },
-      platinum: {
-        color: 'rgba(255, 199, 58)',
-        background: 'rgba(255, 199, 58, 0.2)',
-      },
-      platinumSecret: {
-        color: 'rgba(255, 199, 58)',
-        background: 'rgba(255, 199, 58, 0.2)',
-      },
+    const STYLING_CONFIG = {
+      TICKET_FOREGROUND: metadata.colors?.foreground ?? '#ffffff',
+      TICKET_BACKGROUND: metadata.colors?.background ?? '#000000',
+      // IMG: `${STORAGE_URL}/assets/bg/${ticket_number}.png`,
+      IMG: `${STORAGE_URL}/assets/bg/001.png`,
     }
-
-    const fontData = await font
-    const monoFontData = await mono_font
 
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
-    const USERNAME_BOTTOM = 435
-
-    const BACKGROUND = () => ({
-      regular: {
-        BACKGROUND_IMG: new URL(`/images/launchweek/15/og-15-regular.png`, url).href,
-      },
-      platinum: {
-        BACKGROUND_IMG: new URL(`/images/launchweek/15/og-15-platinum.png`, url).href,
-      },
-      platinumSecret: {
-        BACKGROUND_IMG: new URL(`/images/launchweek/15/og-15-platinum-secret.png`, url).href,
-      },
-      secret: {
-        BACKGROUND_IMG: new URL(`/images/launchweek/15/og-15-secret.png`, url).href,
-      },
-    })
-
-    const NOISE = new URL('/images/launchweek/15/noise-pattern.png', url).href
-
-    const computeBackgroundWidth = (letters: number) => {
-      return 100 + (letters * 40 + (letters - 1) * 12)
-    }
-    const lines = usernameToLines(name ?? username)
-
-    const secretStyles = {
-      background: 'linear-gradient(0deg, rgb(18 18 18 / 0.5) 50%, transparent 50%)',
-      backgroundSize: '100% 6px, 0px 100%',
-    }
-
-    const testStyles = {
-      background: 'red',
-      backgroundSize: '100% 6px, 0px 100%',
-    }
-
-    const secretTextStyles = {
-      textShadow: '0 0 15px rgba(52,211,153,0.8)',
-    }
-
-    const platinumSecretTextStyles = {
-      textShadow: '0 0 15px rgba(255,199,58,0.8)',
-    }
+    const OG_PADDING_Y = 100
+    const OG_PADDING_X = 80
+    const TICKET_RATIO = 940 / 1500
+    const TICKET_WIDTH = 480
+    const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
+    const SUPABASE_LOGO_IMG = `${STORAGE_URL}/assets/supabase-white.png`
+    const SUPABASE_LOGO_RATIO = 541 / 103
+    const SUPABASE_LOGO_HEIGHT = 20
+    const DATE_FONT_SIZE = 75
+    const LW15_LOGO_HEIGHT = 70
+    const LW15_LEFT = `${STORAGE_URL}/assets/LW15_LEFT.png`
+    const LW15_LEFT_RATIO = 215 / 116
+    const LW15_RIGHT = `${STORAGE_URL}/assets/LW15_RIGHT.png`
+    const LW15_RIGHT_RATIO = 145 / 116
+    const LW15_TEXT_LOGO_FONT_SIZE = 90
+    const USERNAME_FONT_SIZE = 38
+    const TICKET_BOTTOM_TEXT_FONT_SIZE = 16
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -293,9 +115,10 @@ export async function GET(req: Request, res: Response) {
               width: '1200px',
               height: '628px',
               position: 'relative',
-              fontFamily: '"Nippo-Regular"',
+              fontFamily: 'Circular',
               overflow: 'hidden',
-              color: STYLING_CONFIG().TICKET_FOREGROUND,
+              color: STYLING_CONFIG.TICKET_BACKGROUND,
+              backgroundColor: '#000',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -306,93 +129,340 @@ export async function GET(req: Request, res: Response) {
               width="1204"
               height="634"
               style={{
-                position: 'absolute',
-                top: '-2px',
-                left: '-2px',
-                bottom: '-2px',
-                right: '-2px',
+                position: 'relative',
+                width: '1204px',
+                height: '634px',
+                top: '0px',
+                left: '0px',
+                bottom: '0px',
+                right: '0px',
                 backgroundSize: 'cover',
-                backgroundColor: STYLING_CONFIG().TICKET_FOREGROUND,
+                opacity: 0.25,
               }}
-              src={BACKGROUND()[ticketType].BACKGROUND_IMG}
+              src={STYLING_CONFIG.IMG}
             />
-            {/* Seat number */}
+
+            {/* LINEAR GRADIENT */}
             <div
               style={{
-                transform: 'rotate(-90deg)',
-                fontFamily: '"Nippo-Regular"',
-                fontSize: '82px',
                 position: 'absolute',
-                color: TICKET_THEME[ticketType].color,
-                top: 70,
-                right: 135,
-                ...(secret ? secretTextStyles : {}),
-                ...(platinumSecret ? platinumSecretTextStyles : {}),
+                width: '100%',
+                height: '100%',
+                left: '0px',
+                top: '0px',
+                bottom: '0px',
+                right: '0px',
+                background: 'linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))',
+                zIndex: 1,
+              }}
+            />
+
+            {/* LEFT */}
+            <div
+              style={{
+                position: 'absolute',
+                width: `${OG_WIDTH - OG_PADDING_X * 2 - TICKET_WIDTH}px`,
+                height: '100%',
+                top: '0px',
+                left: '0px',
+                padding: `${OG_PADDING_Y}px 0 ${OG_PADDING_Y}px ${OG_PADDING_X}px`,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                color: '#fff',
               }}
             >
-              {seatCode}
-            </div>
-
-            {/* Render each username line */}
-            {lines.map((line, index) => (
               <div
-                key={index}
                 style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '40px',
+                  top: '0px',
+                  left: '0px',
                   display: 'flex',
-                  position: 'absolute',
-                  bottom: USERNAME_BOTTOM - index * 80,
-                  paddingLeft: '93px',
-                  paddingRight: 0,
-                  left: 27,
-                  height: '61px',
-                  width: `${computeBackgroundWidth(line.length)}px`,
-                  backgroundColor: TICKET_THEME[ticketType].background,
+                  justifyContent: 'space-between',
                 }}
               >
                 <p
                   style={{
-                    fontFamily: '"DepartureMono-Regular"',
+                    fontSize: `28px`,
+                    lineHeight: '110%',
                     margin: '0',
-                    color: TICKET_THEME[ticketType].color,
-                    padding: '0',
-                    fontSize: '82px',
-                    lineHeight: '56px',
-                    display: 'flex',
-                    ...(secret ? secretTextStyles : {}),
-                    ...(platinumSecret ? platinumSecretTextStyles : {}),
                   }}
                 >
-                  {line}
+                  Launch Week 15
                 </p>
+                {/* <img
+                  src={LW15_LEFT}
+                  width="100%"
+                  height="100%"
+                  style={{
+                    position: 'relative',
+                    width: `${LW15_LOGO_HEIGHT * LW15_LEFT_RATIO}px`,
+                    height: `${LW15_LOGO_HEIGHT}`,
+                    backgroundSize: 'contain',
+                  }}
+                />
+                <img
+                  src={LW15_RIGHT}
+                  width="100%"
+                  height="100%"
+                  style={{
+                    position: 'relative',
+                    width: `${LW15_LOGO_HEIGHT * LW15_RIGHT_RATIO}px`,
+                    height: `${LW15_LOGO_HEIGHT}`,
+                    backgroundSize: 'contain',
+                  }}
+                /> */}
               </div>
-            ))}
-
-            {secret && (
               <div
                 style={{
-                  position: 'absolute',
-                  top: '0px',
-                  left: '0px',
-                  right: '0px',
-                  bottom: '0px',
-                  ...secretStyles,
+                  position: 'relative',
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '30px',
                 }}
-              />
-            )}
+              >
+                <p
+                  style={{
+                    fontSize: `${DATE_FONT_SIZE}px`,
+                    lineHeight: '110%',
+                    margin: '0',
+                  }}
+                >
+                  July 14—18
+                </p>
+                <img
+                  src={SUPABASE_LOGO_IMG}
+                  width="100%"
+                  height="40px"
+                  style={{
+                    position: 'relative',
+                    backgroundSize: 'contain',
+                    height: `${SUPABASE_LOGO_HEIGHT}px`,
+                    width: `${SUPABASE_LOGO_RATIO * SUPABASE_LOGO_HEIGHT}px`,
+                  }}
+                />
+              </div>
+            </div>
 
-            {secret && (
-              <img
-                src={NOISE}
+            {/* TICKET */}
+            <div
+              style={{
+                position: 'absolute',
+                width: `${TICKET_WIDTH}px`,
+                height: `${TICKET_HEIGHT}px`,
+                top: `${OG_PADDING_Y - 40}px`,
+                right: `${OG_PADDING_X}px`,
+                backgroundColor: STYLING_CONFIG.TICKET_BACKGROUND,
+                color: STYLING_CONFIG.TICKET_FOREGROUND,
+                borderRadius: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                boxShadow: '0 0 60px 0 rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              <div
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  opacity: '0.1',
+                  position: 'relative',
+                  width: '100%',
+                  height: '50%',
+                  display: 'flex',
                 }}
-              />
-            )}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    backgroundSize: 'cover',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                >
+                  <img
+                    width="600"
+                    height="600"
+                    src={STYLING_CONFIG.IMG}
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      backgroundSize: 'cover',
+                      left: 0,
+                      mixBlendMode: 'screen',
+                      opacity: 0.7,
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      position: 'absolute',
+                      background: STYLING_CONFIG.TICKET_BACKGROUND,
+                      width: '100%',
+                      height: '100%',
+                      right: 0,
+                      bottom: 0,
+                      top: 0,
+                      left: 0,
+                      mixBlendMode: 'color',
+                      opacity: 0.2,
+                    }}
+                  />
+                  <span
+                    className="absolute top-5 mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg shadow-inner"
+                    style={{
+                      position: 'absolute',
+                      top: '30px',
+                      margin: '0 auto',
+                      width: '70px',
+                      height: '20px',
+                      backgroundColor: '#000',
+                      borderRadius: '10px',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      zIndex: 2,
+                      padding: '27px 20px',
+                      gap: '10px',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: `21px`,
+                        padding: '0',
+                        margin: '0',
+                      }}
+                    >
+                      Launch Week
+                    </p>
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
+                          padding: '0',
+                          margin: '0',
+                        }}
+                      >
+                        LW
+                      </p>
+                      <p
+                        style={{
+                          fontSize: `${LW15_TEXT_LOGO_FONT_SIZE}px`,
+                          padding: '0',
+                          margin: '0',
+                        }}
+                      >
+                        15
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '50%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  padding: '10px 20px',
+                  gap: '0px',
+                }}
+              >
+                <p
+                  style={{
+                    display: 'flex',
+                    position: 'relative',
+                    width: '100%',
+                    backgroundSize: 'cover',
+                    fontSize: `${USERNAME_FONT_SIZE}px`,
+                    lineHeight: '110%',
+                  }}
+                >
+                  @{username}
+                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    position: 'relative',
+                    width: '100%',
+                    marginTop: '10px',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      width: '35%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    Company
+                  </p>
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    {metadata.company ?? '—'}
+                  </p>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    position: 'relative',
+                    width: '100%',
+                    marginTop: '8px',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      width: '35%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    Location
+                  </p>
+                  <p
+                    style={{
+                      fontSize: `${TICKET_BOTTOM_TEXT_FONT_SIZE}px`,
+                      lineHeight: '110%',
+                      padding: '0',
+                      margin: '0',
+                    }}
+                  >
+                    {metadata.location ?? '—'}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </>
       ),
@@ -401,13 +471,8 @@ export async function GET(req: Request, res: Response) {
         height: OG_HEIGHT,
         fonts: [
           {
-            name: 'Nippo-Regular',
-            data: fontData,
-            style: 'normal',
-          },
-          {
-            name: 'DepartureMono-Regular',
-            data: monoFontData,
+            name: 'CircularStd-Book',
+            data: CIRCULAR_FONT_DATA,
             style: 'normal',
           },
         ],
