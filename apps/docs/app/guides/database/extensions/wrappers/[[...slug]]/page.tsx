@@ -318,7 +318,7 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = (await getLatestRelease())
+    const tag = await getLatestRelease()
     if (!tag) {
       throw new Error('No latest release found for federated wrappers pages')
     }
