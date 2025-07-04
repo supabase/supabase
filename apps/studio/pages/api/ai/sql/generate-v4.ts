@@ -7,7 +7,6 @@ import { streamText, tool, ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { aiOptInLevelSchema } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
@@ -18,6 +17,8 @@ import {
   transformToolResult,
 } from './supabase-mcp'
 import { getTools } from './tools'
+import { getOrganizations } from 'data/organizations/organizations-query'
+import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 
 export const maxDuration = 120
 
@@ -45,10 +46,10 @@ export default wrapper
 const requestBodySchema = z.object({
   messages: z.array(z.any()),
   projectRef: z.string(),
-  aiOptInLevel: aiOptInLevelSchema,
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  orgSlug: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -66,7 +67,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, aiOptInLevel } = data
+  const { messages, projectRef, connectionString, orgSlug } = data
+
+  // Get organizations and compute opt in level server-side
+  const organizations = await getOrganizations({
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authorization && { Authorization: authorization }),
+    },
+  })
+  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+  const ServerSideAiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+
+  const aiOptInLevel = ServerSideAiOptInLevel
 
   const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
 

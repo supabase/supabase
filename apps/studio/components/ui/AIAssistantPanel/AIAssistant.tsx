@@ -199,6 +199,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         includeSchemaMetadata: !useBedrockAssistant
           ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
           : undefined,
+        orgSlug: selectedOrganization?.slug,
       })
     },
     fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
