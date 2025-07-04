@@ -16,6 +16,7 @@ import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDi
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
 import { Badge, Button, NavMenu, NavMenuItem, cn, Alert } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 
@@ -36,6 +37,7 @@ const MergePage: NextPageWithLayout = () => {
   const project = useSelectedProject()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
@@ -116,6 +118,10 @@ const MergePage: NextPageWithLayout = () => {
     : currentWorkflowRun?.status &&
       ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(currentWorkflowRun.status)
 
+  const isWorkflowRunning =
+    currentWorkflowRun?.status === 'RUNNING_MIGRATIONS' ||
+    currentWorkflowRun?.status === 'CREATING_PROJECT'
+
   const addWorkflowRun = useCallback(
     (workflowRunId: string) => {
       router.push({
@@ -179,6 +185,19 @@ const MergePage: NextPageWithLayout = () => {
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
     })
+  }
+
+  const handleShowConfirmDialog = () => {
+    setShowConfirmDialog(true)
+  }
+
+  const handleConfirmMerge = () => {
+    setShowConfirmDialog(false)
+    handleMerge()
+  }
+
+  const handleCancelMerge = () => {
+    setShowConfirmDialog(false)
   }
 
   const breadcrumbs = useMemo(
@@ -259,7 +278,8 @@ const MergePage: NextPageWithLayout = () => {
     )
   }
 
-  const isMergeDisabled = !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall
+  const isMergeDisabled =
+    !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
 
   // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
@@ -268,13 +288,17 @@ const MergePage: NextPageWithLayout = () => {
         <ButtonTooltip
           tooltip={{
             content: {
-              text: !combinedHasChanges ? 'No changes to merge' : 'Branch is out of date',
+              text: !combinedHasChanges
+                ? 'No changes to merge'
+                : isWorkflowRunning
+                  ? 'Workflow is currently running'
+                  : 'Branch is out of date',
             },
           }}
           type="primary"
           loading={isMerging || isSubmitting}
           disabled={isMergeDisabled}
-          onClick={handleMerge}
+          onClick={handleShowConfirmDialog}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
         >
           Merge branch
@@ -283,7 +307,7 @@ const MergePage: NextPageWithLayout = () => {
         <Button
           type="primary"
           loading={isMerging || isSubmitting}
-          onClick={handleMerge}
+          onClick={handleShowConfirmDialog}
           disabled={isBranchOutOfDateOverall}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
         >
@@ -423,6 +447,17 @@ const MergePage: NextPageWithLayout = () => {
           />
         )}
       </ScaffoldContainer>
+
+      <ConfirmationModal
+        visible={showConfirmDialog}
+        title="Confirm Branch Merge"
+        description={`Are you sure you want to merge "${currentBranch?.name}" into "${mainBranch?.name || 'main'}"? This action cannot be undone.`}
+        confirmLabel="Merge Branch"
+        confirmLabelLoading="Merging..."
+        onConfirm={handleConfirmMerge}
+        onCancel={handleCancelMerge}
+        loading={isMerging || isSubmitting}
+      />
     </PageLayout>
   )
 }
