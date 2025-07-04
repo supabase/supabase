@@ -34,7 +34,6 @@ export default function App({ Component, pageProps }: AppProps) {
   useThemeSandbox()
 
   const site_title = `${APP_NAME} | The Postgres Development Platform.`
-  const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const forceDarkMode = isDarkLaunchWeek
@@ -71,7 +70,7 @@ export default function App({ Component, pageProps }: AppProps) {
           site_name: 'Supabase',
           images: [
             {
-              url: `https://supabase.com${basePath}/images/og/supabase-og.png`,
+              url: `https://supabase.com${router.basePath}/images/og/supabase-og.png`,
               width: 800,
               height: 600,
               alt: 'Supabase Og Image',

@@ -18,10 +18,14 @@ import { getSharedTelemetryData } from './telemetry-utils'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
-// Reexports GoogleTagManager with the right API key set
-export const TelemetryTagManager = () => {
-  const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+type TelemetryTagManagerProps = {
+  isGTMEnabled?: boolean
+}
 
+// Reexports GoogleTagManager with the right API key set
+export const TelemetryTagManager = ({
+  isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID),
+}: TelemetryTagManagerProps) => {
   if (!isGTMEnabled) {
     return
   }
