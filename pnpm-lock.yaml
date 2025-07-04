@@ -31190,7 +31190,7 @@ snapshots:
   flags@4.0.1(@opentelemetry/api@1.9.0)(next@15.3.1(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@edge-runtime/cookies': 5.0.2
-      jose: 5.2.1
+      jose: 5.9.6
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       next: 15.3.1(@babel/core@7.26.10(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
