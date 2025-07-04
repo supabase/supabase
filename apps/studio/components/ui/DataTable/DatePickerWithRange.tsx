@@ -98,6 +98,7 @@ export function DatePickerWithRange({
               selected={date}
               onSelect={setDate}
               numberOfMonths={1}
+              disabled={{ after: new Date() }}
             />
           </div>
           <PopoverSeparator />

@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common'
-// import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
@@ -20,11 +19,6 @@ import { FilterBar } from 'ui-patterns/FilterBar'
 import { DatePickerValue } from './Logs.DatePickers'
 import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
-
-interface CustomDateRangePickerProps {
-  value?: { from: Date; to?: Date }
-  onChange: (range: { from: Date; to?: Date } | undefined) => void
-}
 
 function CustomDateRangePicker({ onChange, onCancel }: CustomOptionProps) {
   const [dateRange, setDateRange] = useState<any | undefined>()
