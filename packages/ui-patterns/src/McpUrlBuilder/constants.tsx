@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { CodeBlock } from 'ui/src/components/CodeBlock'
 import type {
   ClaudeCodeMcpConfig,
@@ -101,13 +100,7 @@ export const MCP_CLIENTS: McpClient[] = [
         mcpServers: {
           supabase: {
             command: 'npx',
-            args: [
-              '-y',
-              'mcp-remote',
-              config.mcpServers.supabase.url,
-              '--header',
-              'Authorization:Bearer YOUR_PERSONAL_ACCESS_TOKEN',
-            ],
+            args: ['-y', 'mcp-remote', config.mcpServers.supabase.url],
           },
         },
       }
@@ -115,10 +108,7 @@ export const MCP_CLIENTS: McpClient[] = [
     alternateInstructions: () => (
       <p className="text-xs text-foreground-light">
         Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
-        the mcp-remote package as a proxy, and authenticate with a{' '}
-        <Link href="https://supabase.com/dashboard/account/tokens">personal access token</Link>.{' '}
-        <span className="font-medium">Never</span> commit your personal access token to source
-        control.
+        the mcp-remote package as a proxy.
       </p>
     ),
   },

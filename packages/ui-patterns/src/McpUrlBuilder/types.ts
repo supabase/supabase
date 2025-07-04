@@ -45,13 +45,7 @@ export interface WindsurfMcpConfig {
   mcpServers: {
     supabase: {
       command: 'npx'
-      args: [
-        '-y',
-        'mcp-remote',
-        string,
-        '--header',
-        'Authorization:Bearer YOUR_PERSONAL_ACCESS_TOKEN',
-      ]
+      args: ['-y', 'mcp-remote', string]
     }
   }
 }
