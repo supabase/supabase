@@ -159,7 +159,7 @@ const DestinationRow = ({
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader></ShimmeringLoader>
             ) : (
-              pipeline.publication_name
+              pipeline.config.publication_name
             )}
           </Table.td>
           <Table.td>
