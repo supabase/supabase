@@ -11,12 +11,12 @@ import TicketURLCopy from './TicketURLCopy'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 import { updateTicketColors } from '../hooks/use-registration'
 
-const LW15TicketPage = ({ user: userFromProps }: { user: UserTicketData }) => {
+const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
   const register = useRegistration()
   const [state, setState] = useState({ saving: false })
   const [confState] = useLw15ConfData()
   const isGuest = !confState.sessionLoaded || !confState.session
-  const user = userFromProps || confState.userTicketData
+  const user = confState.userTicketData || userFromProps
   const selectedFg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const selectedBg = user?.metadata?.colors?.background || BG_COLORS[0]
 
@@ -50,12 +50,12 @@ const LW15TicketPage = ({ user: userFromProps }: { user: UserTicketData }) => {
             <div className="w-full grid grid-cols-3">
               <p>Typo color</p>
               <div className="flex flex-col col-span-2">
-                <div className="flex gap-2 flex-wrap justify-between">
+                <div className="flex gap-2 flex-wrap justify-end">
                   {TYPO_COLORS.map((color) => (
                     <button
                       key={color}
                       className={cn(
-                        'flex-1 max-w-6 aspect-square rounded-full border flex items-center justify-center transition-all',
+                        'flex-1 max-w-5 aspect-square rounded-full border flex items-center justify-center transition-all',
                         selectedFg === color && 'border-background ring-1 ring-foreground scale-110'
                       )}
                       style={{ background: color }}
@@ -70,12 +70,12 @@ const LW15TicketPage = ({ user: userFromProps }: { user: UserTicketData }) => {
             <div className="w-full grid grid-cols-3">
               <p>Bg color</p>
               <div className="flex flex-col col-span-2">
-                <div className="flex gap-2 flex-wrap justify-between">
+                <div className="flex gap-2 flex-wrap justify-end">
                   {BG_COLORS.map((color) => (
                     <button
                       key={color}
                       className={cn(
-                        'flex-1 max-w-6 aspect-square rounded-full border flex items-center justify-center transition-all',
+                        'flex-1 max-w-5 aspect-square rounded-full border flex items-center justify-center transition-all',
                         selectedBg === color && 'border-background ring-1 ring-foreground scale-110'
                       )}
                       style={{ background: color }}

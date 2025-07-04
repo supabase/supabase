@@ -4,7 +4,7 @@ export const TYPO_COLORS = [
   '#90EBFE',
   '#FF8BFD',
   '#A6B1FF',
-  '#FF7023',
+  // '#FF7023',
   '#FFD794',
   '#D0D0D0',
   '#FBED00',
@@ -17,7 +17,7 @@ export const BG_COLORS = [
   '#4F1C09',
   '#982E00',
   '#32056E',
-  '#434343',
+  // '#434343',
   '#604F41',
   '#012AE2',
 ]
