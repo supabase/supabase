@@ -108,7 +108,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   )
 
   const { data: existingBranches } = useBranchesQuery(
-    { projectRef: selectedProject?.ref },
+    { projectRef: selectedProject?.parent_project_ref || selectedProject?.ref },
     { enabled: !!selectedProject?.ref }
   )
 
