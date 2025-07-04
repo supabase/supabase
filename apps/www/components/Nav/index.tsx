@@ -71,7 +71,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
-    <AnnouncementBanner />
+      <AnnouncementBanner />
       <div
         className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
