@@ -293,36 +293,32 @@ export const BranchRow = ({
                     </TooltipContent>
                   )}
                 </Tooltip>
-
-                {branch.git_branch && (
-                  <Tooltip>
-                    <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
-                      <DropdownMenuItem
-                        className="gap-x-2"
-                        onSelect={() => setShowBranchModeSwitch(true)}
-                        onClick={() => setShowBranchModeSwitch(true)}
-                        disabled={!isBranchActiveHealthy}
-                      >
-                        {branch.persistent ? (
-                          <>
-                            <Clock size={14} /> Switch to ephemeral
-                          </>
-                        ) : (
-                          <>
-                            <Infinity size={14} className="scale-110" /> Switch to persistent
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    {!isBranchActiveHealthy && (
-                      <TooltipContent side="left">
-                        Branch is still initializing. Please wait for the branch to become healthy
-                        before switching modes
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                )}
-
+                <Tooltip>
+                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onSelect={() => setShowBranchModeSwitch(true)}
+                      onClick={() => setShowBranchModeSwitch(true)}
+                      disabled={!isBranchActiveHealthy}
+                    >
+                      {branch.persistent ? (
+                        <>
+                          <Clock size={14} /> Switch to ephemeral
+                        </>
+                      ) : (
+                        <>
+                          <Infinity size={14} className="scale-110" /> Switch to persistent
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                  </TooltipTrigger>
+                  {!isBranchActiveHealthy && (
+                    <TooltipContent side="left">
+                      Branch is still initializing. Please wait for the branch to become healthy
+                      before switching modes
+                    </TooltipContent>
+                  )}
+                </Tooltip>
                 {gitlessBranching && (
                   <Tooltip>
                     <TooltipTrigger
