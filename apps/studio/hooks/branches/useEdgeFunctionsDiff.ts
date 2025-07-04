@@ -10,6 +10,7 @@ import {
   type EdgeFunctionsData,
 } from 'data/edge-functions/edge-functions-query'
 import { basename } from 'path'
+import { edgeFunctionsKeys } from 'data/edge-functions/keys'
 
 interface UseEdgeFunctionsDiffProps {
   currentBranchRef?: string
@@ -256,12 +257,9 @@ export const useEdgeFunctionsDiff = ({
   const hasChanges = addedSlugs.length > 0 || removedSlugs.length > 0 || modifiedSlugs.length > 0
 
   const clearDiffsOptimistically = useCallback(() => {
-    if (!currentBranchRef || !mainBranchRef || !mainBranchFunctions) return
+    if (!currentBranchRef || !mainBranchFunctions) return
 
-    queryClient.setQueryData(
-      ['edge-functions', { projectRef: currentBranchRef }],
-      mainBranchFunctions
-    )
+    queryClient.setQueryData(edgeFunctionsKeys.list(currentBranchRef), mainBranchFunctions)
 
     mainBranchFunctions.forEach((func) => {
       const mainBody = mainBodiesMap[func.slug]
@@ -269,7 +267,7 @@ export const useEdgeFunctionsDiff = ({
         queryClient.setQueryData(['edge-function-body', currentBranchRef, func.slug], mainBody)
       }
     })
-  }, [currentBranchRef, mainBranchRef, mainBranchFunctions, mainBodiesMap, queryClient])
+  }, [currentBranchRef, mainBranchFunctions, mainBodiesMap, queryClient])
 
   return {
     addedSlugs,
