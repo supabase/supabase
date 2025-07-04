@@ -144,3 +144,4 @@ const GuideTemplate = ({
 }
 
 export { GuideTemplate, newEditLink }
+export type { EditLink }

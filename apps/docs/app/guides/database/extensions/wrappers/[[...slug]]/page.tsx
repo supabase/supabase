@@ -7,7 +7,8 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { Guide, GuideArticle, GuideHeader, GuideFooter, GuideMdxContent } from '~/features/ui/guide'
+import { newEditLink } from '~/features/docs/GuidesMdx.template'
 import {
   genGuideMeta,
   genGuidesStaticParams,
@@ -261,16 +262,24 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
   const dashboardIntegrationURL = getDashboardIntegrationURL(meta.dashboardIntegrationPath)
 
   return (
-    <GuideTemplate meta={meta} mdxOptions={options} {...data} childrenPosition="before">
-      {dashboardIntegrationURL && (
-        <Admonition type="tip">
-          <p>You can enable the {meta.title} wrapper right from the Supabase dashboard.</p>
-          <Button asChild>
-            <Link href={dashboardIntegrationURL}>Open in dashboard</Link>
-          </Button>
-        </Admonition>
-      )}
-    </GuideTemplate>
+    <Guide meta={meta}>
+      <GuideArticle>
+        <GuideHeader />
+
+        {dashboardIntegrationURL && (
+          <Admonition type="tip" className="mb-4">
+            <p>You can enable the {meta.title} wrapper right from the Supabase dashboard.</p>
+            <Button asChild>
+              <Link href={dashboardIntegrationURL}>Open in dashboard</Link>
+            </Button>
+          </Admonition>
+        )}
+
+        <GuideMdxContent content={data.content} mdxOptions={options} />
+
+        <GuideFooter editLink={data.editLink} />
+      </GuideArticle>
+    </Guide>
   )
 }
 
@@ -309,12 +318,11 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    // const tag = await getLatestRelease()
-    // if (!tag) {
-    //   throw new Error('No latest release found for federated wrappers pages')
-    // }
+    const tag = (await getLatestRelease())
+    if (!tag) {
+      throw new Error('No latest release found for federated wrappers pages')
+    }
 
-    const tag = 'main'
     const repoPath = `${org}/${repo}/${tag}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 
