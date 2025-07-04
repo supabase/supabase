@@ -9,7 +9,6 @@ import { type GuideFrontmatter } from '~/lib/docs'
 
 interface GuideContextValue {
   meta?: GuideFrontmatter
-  content?: string
 }
 
 const GuideContext = createContext<GuideContextValue | undefined>(undefined)
@@ -24,16 +23,15 @@ export const useGuide = () => {
 
 interface GuideProps {
   meta?: GuideFrontmatter
-  content?: string
   children?: ReactNode
   className?: string
 }
 
-export function Guide({ meta, content, children, className }: GuideProps) {
+export function Guide({ meta, children, className }: GuideProps) {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
 
   return (
-    <GuideContext.Provider value={{ meta, content }}>
+    <GuideContext.Provider value={{ meta }}>
       <TocAnchorsProvider>
         <div className={cn('grid grid-cols-12 relative gap-4', className)}>
           <div

@@ -25,7 +25,6 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
     <Guide meta={meta}>
       <GuideArticle>
         <GuideHeader />
-        Hello from the new GuideTemplate
         <GuideMdxContent content={content} mdxOptions={mdxOptions}></GuideMdxContent>
         {children}
         <GuideFooter editLink={editLink} />
