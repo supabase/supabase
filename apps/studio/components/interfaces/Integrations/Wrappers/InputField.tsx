@@ -68,7 +68,7 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
         error={error}
         value={loading ? 'Fetching value from Vault...' : undefined}
         type={!option.secureEntry || loading ? 'text' : showHidden ? 'text' : 'password'}
-        disabled={loading}
+        disabled={loading || option.readOnly}
         actions={
           loading ? (
             <div className="flex items-center justify-center mr-1">

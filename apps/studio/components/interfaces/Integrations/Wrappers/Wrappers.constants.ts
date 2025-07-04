@@ -1181,6 +1181,16 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
     ],
+    canTargetSchema: true,
+    sourceSchemaOption: {
+      name: 'source_schema',
+      label: 'Source Schema',
+      required: true,
+      encrypted: false,
+      secureEntry: false,
+      readOnly: true,
+      defaultValue: 'stripe',
+    },
   },
   {
     name: 'firebase_wrapper',
@@ -1764,6 +1774,16 @@ export const WRAPPERS: WrapperMeta[] = [
           secureEntry: false,
         },
       ],
+    },
+    canTargetSchema: true,
+    sourceSchemaOption: {
+      name: 'source_schema',
+      label: 'Source Schema',
+      required: true,
+      encrypted: false,
+      secureEntry: false,
+      readOnly: true,
+      defaultValue: 'cognito',
     },
     tables: [
       {
