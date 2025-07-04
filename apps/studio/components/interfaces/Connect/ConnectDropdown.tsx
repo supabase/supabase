@@ -21,6 +21,8 @@ interface ConnectDropdownProps {
   updateState: (state: string) => void
   label: string
   items: any[]
+  iconFolder?: string
+  supportsDarkMode?: boolean
 }
 
 const ConnectDropdown = ({
@@ -29,6 +31,8 @@ const ConnectDropdown = ({
   label,
 
   items,
+  iconFolder,
+  supportsDarkMode,
 }: ConnectDropdownProps) => {
   const [open, setOpen] = useState(false)
 
@@ -54,7 +58,11 @@ const ConnectDropdown = ({
           >
             <div className="flex items-center gap-2">
               {selectedItem?.icon ? (
-                <ConnectionIcon connection={selectedItem.icon} />
+                <ConnectionIcon
+                  connection={selectedItem.icon}
+                  iconFolder={iconFolder}
+                  supportsDarkMode={supportsDarkMode}
+                />
               ) : (
                 <Box size={12} />
               )}
@@ -79,7 +87,15 @@ const ConnectDropdown = ({
                   }}
                   className="flex gap-2 items-center"
                 >
-                  {item.icon ? <ConnectionIcon connection={item.icon} /> : <Box size={12} />}
+                  {item.icon ? (
+                    <ConnectionIcon
+                      connection={item.icon}
+                      iconFolder={iconFolder}
+                      supportsDarkMode={supportsDarkMode}
+                    />
+                  ) : (
+                    <Box size={12} />
+                  )}
                   {item.label}
                   <Check
                     size={15}
