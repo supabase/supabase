@@ -159,23 +159,26 @@ export const BranchDropdown = () => {
               <p>Create branch</p>
             </div>
           </CommandItem_Shadcn_>
-          {gitlessBranching && isBranch && selectedBranch && !selectedBranch.is_default && (
-            <>
-              <CommandItem_Shadcn_
-                className="cursor-pointer w-full"
-                onSelect={() => {
-                  setOpen(false)
-                  router.push(`/project/${ref}/merge`)
-                }}
-                onClick={() => setOpen(false)}
-              >
-                <Link href={`/project/${ref}/merge`} className="w-full flex items-center gap-2">
-                  <GitMerge size={14} strokeWidth={1.5} />
-                  Review changes
-                </Link>
-              </CommandItem_Shadcn_>
-            </>
-          )}
+          {gitlessBranching &&
+            isBranchingEnabled &&
+            selectedBranch &&
+            !selectedBranch.is_default && (
+              <>
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
+                    setOpen(false)
+                    router.push(`/project/${ref}/merge`)
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  <Link href={`/project/${ref}/merge`} className="w-full flex items-center gap-2">
+                    <GitMerge size={14} strokeWidth={1.5} />
+                    Review changes
+                  </Link>
+                </CommandItem_Shadcn_>
+              </>
+            )}
           <CommandItem_Shadcn_
             className="cursor-pointer w-full"
             onSelect={() => {

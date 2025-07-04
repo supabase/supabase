@@ -104,8 +104,7 @@ const MergePage: NextPageWithLayout = () => {
       onWorkflowComplete: (status) => {
         setWorkflowFinalStatus(status)
         refetchDiff()
-        edgeFunctionsDiff.refetchCurrentBranchFunctions()
-        edgeFunctionsDiff.refetchMainBranchFunctions()
+        edgeFunctionsDiff.clearDiffsOptimistically()
       },
     })
 
