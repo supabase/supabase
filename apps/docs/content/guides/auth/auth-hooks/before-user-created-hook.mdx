@@ -18,8 +18,10 @@ Supabase Auth will send a payload containing these fields to your hook:
 | `user`     | `object` | The user record that is about to be created. Matches the shape of the `auth.users` table. |
 
 <Admonition type="note">
+
   Because the hook is ran just before the insertion into the database, this user will not be found
   in Postgres at the time the hook is called.
+
 </Admonition>
 
 <Tabs
