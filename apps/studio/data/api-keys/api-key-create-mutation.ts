@@ -2,6 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
+import { secretsKeys } from 'data/secrets/keys'
 import type { ResponseError } from 'types'
 import { apiKeysKeys } from './keys'
 
@@ -40,7 +41,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
               role: 'service_role', // @mildtomato (Jonny) this should be default in API for type secret
             },
           }
-        : name),
+        : null),
 
       type: payload.type,
       name: payload.name,
@@ -71,9 +72,11 @@ export const useAPIKeyCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
-
-        await onSuccess?.(data, variables, context)
+        await Promise.all([
+          queryClient.invalidateQueries(apiKeysKeys.list(projectRef)),
+          queryClient.invalidateQueries(secretsKeys.list(projectRef)),
+        ])
+        await await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {

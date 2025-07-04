@@ -23,7 +23,11 @@ import {
   DialogTrigger,
   Form_Shadcn_,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
   FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   Switch,
 } from 'ui'
@@ -67,6 +71,7 @@ const CreateSecretAPIKeyDialog = () => {
   const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    console.log(values)
     createAPIKey(
       {
         projectRef,
@@ -142,24 +147,36 @@ const CreateSecretAPIKeyDialog = () => {
               <FormField_Shadcn_
                 key="expose_as_env"
                 name="expose_as_env"
-                className="flex-row"
                 control={form.control}
                 render={({ field }) => {
-                  const name = form.watch('name').toUpperCase()
+                  const secretName = form.watch('name').toUpperCase()
 
                   return (
-                    <FormItemLayout
-                      label="Expose as environment variable"
-                      description={`Will be available as SUPABASE_SECRET_KEY_${name || '<NAME>'} in Edge Functions and other integrations that support them.`}
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          key="expose_as_env"
-                          checked={field.value}
-                          onCheckedChange={(value) => field.onChange(value)}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
+                    <FormItem_Shadcn_>
+                      <div className="flex flex-row gap-2">
+                        <FormControl_Shadcn_>
+                          <Switch
+                            id="expose_as_env"
+                            checked={field.value}
+                            onCheckedChange={(value) => field.onChange(value)}
+                          />
+                        </FormControl_Shadcn_>
+                        <div>
+                          <FormLabel_Shadcn_ className="text-foreground" htmlFor="expose_as_env">
+                            Expose as environment variable
+                          </FormLabel_Shadcn_>
+                          <FormDescription_Shadcn_ className="text-foreground-lighter">
+                            Will be available as{' '}
+                            <span className="text-brand font-mono">
+                              SUPABASE_SECRET_KEY_{secretName || '<NAME>'}
+                            </span>{' '}
+                            in Edge Functions and other integrations that support them.
+                          </FormDescription_Shadcn_>
+                        </div>
+                      </div>
+
+                      <FormMessage_Shadcn_ />
+                    </FormItem_Shadcn_>
                   )
                 }}
               />
