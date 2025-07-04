@@ -628,7 +628,11 @@ const SidePanelEditor = ({
         saveChanges={saveTable}
         updateEditorDirty={() => setIsEdited(true)}
       />
-      <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
+      <SchemaEditor
+        visible={snap.sidePanel?.type === 'schema'}
+        onSuccess={onClosePanel}
+        closePanel={onClosePanel}
+      />
       <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}
