@@ -1,17 +1,28 @@
 import Link from 'next/link'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import _errorCodes from '~/content/errorCodes/authErrorCodes.toml'
+import _authErrorCodes from '~/content/errorCodes/authErrorCodes.toml'
+import _realtimeErrorCodes from '~/content/errorCodes/realtimeErrorCodes.toml'
 import { type ErrorCodeDefinition } from '~/resources/error/errorTypes'
 
-const errorCodes: Record<string, ErrorCodeDefinition> = _errorCodes
+const errorCodesByService = {
+  auth: _authErrorCodes as Record<string, ErrorCodeDefinition>,
+  realtime: _realtimeErrorCodes as Record<string, ErrorCodeDefinition>,
+}
 
-export function AuthErrorCodes() {
+interface ErrorCodesProps {
+  service: keyof typeof errorCodesByService
+}
+
+export function ErrorCodes({ service }: ErrorCodesProps) {
+  const errorCodes = errorCodesByService[service]
+  const hasResolutions = Object.values(errorCodes).some((code) => code.resolution)
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Error code</TableHead>
           <TableHead>Description</TableHead>
+          {hasResolutions && <TableHead>Action</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -37,6 +48,9 @@ export function AuthErrorCodes() {
                   </>
                 )}
               </TableCell>
+              {hasResolutions && (
+                <TableCell>{!!definition.resolution && <p>{definition.resolution}</p>}</TableCell>
+              )}
             </TableRow>
           ))}
       </TableBody>
