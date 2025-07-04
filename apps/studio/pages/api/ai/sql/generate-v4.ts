@@ -13,12 +13,12 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getUnifiedLogsChart } from 'data/logs/unified-logs-chart-query'
 import { getUnifiedLogs } from 'data/logs/unified-logs-infinite-query'
+import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
 import {
-  createSupabaseMCPClient,
-  expectedToolsSchema,
   filterToolsByOptInLevel,
+  toolSetValidationSchema,
   transformToolResult,
-} from './supabase-mcp'
+} from 'lib/ai/tool-filter'
 import { getTools } from './tools'
 
 export const maxDuration = 120
@@ -345,10 +345,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
 
       const availableMcpTools = await mcpClient.tools()
+      // Filter tools based on the AI opt-in level
+      const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
 
-      // Validate that the expected tools are available
+      // Validate that only known tools are provided
       const { data: validatedTools, error: validationError } =
-        expectedToolsSchema.safeParse(availableMcpTools)
+        toolSetValidationSchema.safeParse(allowedMcpTools)
 
       if (validationError) {
         console.error('MCP tools validation error:', validationError)
@@ -358,32 +360,34 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         })
       }
 
-      // Modify the execute_sql tool to add manualToolCallId
-      const modifiedMcpTools = {
-        ...availableMcpTools,
-        execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
-          const manualToolCallId = `manual_${crypto.randomUUID()}`
+      // Modify the execute_sql tool to add manualToolCallId (if it exists)
+      mcpTools = {
+        ...validatedTools,
+        ...(validatedTools.execute_sql && {
+          execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
+            const manualToolCallId = `manual_${crypto.randomUUID()}`
 
-          if (typeof result === 'object') {
-            return { ...result, manualToolCallId }
-          } else {
-            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
-            return {
-              error: 'Internal error: Unexpected tool result format',
-              manualToolCallId,
+            if (typeof result === 'object') {
+              return { ...result, manualToolCallId }
+            } else {
+              console.warn('execute_sql result is not an object, cannot add manualToolCallId')
+              return {
+                error: 'Internal error: Unexpected tool result format',
+                manualToolCallId,
+              }
             }
-          }
+          }),
         }),
       }
-
-      // Filter tools based on the AI opt-in level
-      mcpTools = filterToolsByOptInLevel(modifiedMcpTools, aiOptInLevel)
     }
 
-    // Combine MCP tools with custom tools
+    // Filter local tools based on the AI opt-in level
+    const filteredLocalTools = filterToolsByOptInLevel(localTools, aiOptInLevel)
+
+    // Combine MCP tools with filtered local tools
     const tools: ToolSet = {
       ...mcpTools,
-      ...localTools,
+      ...filteredLocalTools,
     }
 
     const system = source`
