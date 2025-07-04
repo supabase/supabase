@@ -27,13 +27,8 @@ import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow, MergeRequestRow } from './BranchPanels'
-import { CreateBranchModal } from './CreateBranchModal'
-import {
-  BranchingEmptyState,
-  PreviewBranchesEmptyState,
-  PullRequestsEmptyState,
-} from './EmptyStates'
-import Overview from './Overview'
+import { PreviewBranchesEmptyState, PullRequestsEmptyState } from './EmptyStates'
+import { Overview } from './Overview'
 
 type Tab = 'overview' | 'prs' | 'branches'
 

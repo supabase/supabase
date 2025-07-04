@@ -36,6 +36,7 @@ import {
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const BranchLink = ({
   branch,
@@ -80,11 +81,11 @@ export const BranchDropdown = () => {
   const gitlessBranching = useFlag('gitlessBranching')
   const projectDetails = useSelectedProject()
   const snap = useAppStateSnapshot()
+  const [open, setOpen] = useState(false)
+  const [showDeployRequestModal, setShowDeployRequestModal] = useState(false)
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
-  const [open, setOpen] = useState(false)
-  const [showDeployRequestModal, setShowDeployRequestModal] = useState(false)
   const {
     data: branches,
     isLoading,
@@ -115,8 +116,6 @@ export const BranchDropdown = () => {
       : [defaultMainBranch]
 
   const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
-
-  const [open, setOpen] = useState(false)
 
   const MenuContent = ({
     branchList,
@@ -162,23 +161,26 @@ export const BranchDropdown = () => {
               <p>Create branch</p>
             </div>
           </CommandItem_Shadcn_>
-          {gitlessBranching && isBranch && selectedBranch && !selectedBranch.is_default && (
-            <>
-              <CommandItem_Shadcn_
-                className="cursor-pointer w-full"
-                onSelect={() => {
-                  setOpen(false)
-                  setShowDeployRequestModal(true)
-                }}
-                onClick={() => setOpen(false)}
-              >
-                <div className="w-full flex items-center gap-2">
-                  <Send size={14} strokeWidth={1.5} />
-                  Create deploy request
-                </div>
-              </CommandItem_Shadcn_>
-            </>
-          )}
+          {gitlessBranching &&
+            isBranchingEnabled &&
+            selectedBranch &&
+            !selectedBranch.is_default && (
+              <>
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
+                    setOpen(false)
+                    setShowDeployRequestModal(true)
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  <div className="w-full flex items-center gap-2">
+                    <Send size={14} strokeWidth={1.5} />
+                    Create deploy request
+                  </div>
+                </CommandItem_Shadcn_>
+              </>
+            )}
           <CommandItem_Shadcn_
             className="cursor-pointer w-full"
             onSelect={() => {

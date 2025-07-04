@@ -15,9 +15,7 @@ export type MergeRequest = {
   title: string
   description?: string
   merge_requested_by: string | null
-  merge_approved_by: string | null
   merge_requested_at: string | null
-  merge_approved_at: string | null
   created_at: string
   updated_at: string
 }
@@ -36,13 +34,11 @@ export async function getMergeRequests(
           id: 'mr-1',
           project_ref: projectRef,
           base: '6b3b94fe-f9f9-4c12-8796-ff67db250757',
-          head: '7902c891-5286-4366-a44d-007b39e0782d',
+          head: '3b13fe5b-a529-4bc4-a0c8-a333f83f03e9',
           title: 'Deploy feature-auth to production',
           description: 'This PR includes new authentication features and bug fixes.',
           merge_requested_by: 'user-123',
-          merge_approved_by: null,
           merge_requested_at: '2024-01-15T10:30:00Z',
-          merge_approved_at: null,
           created_at: '2024-01-15T10:30:00Z',
           updated_at: '2024-01-15T10:30:00Z',
         },
@@ -50,13 +46,11 @@ export async function getMergeRequests(
           id: 'mr-2',
           project_ref: projectRef,
           base: '6b3b94fe-f9f9-4c12-8796-ff67db250757',
-          head: '7902c891-5286-4366-a44d-007b39e0782d',
+          head: '3b13fe5b-a529-4bc4-a0c8-a333f83f03e9',
           title: 'Deploy hotfix-db-migration to production',
           description: 'Critical database schema updates for user table.',
           merge_requested_by: 'user-456',
-          merge_approved_by: 'user-789',
           merge_requested_at: '2024-01-14T14:20:00Z',
-          merge_approved_at: '2024-01-14T15:45:00Z',
           created_at: '2024-01-14T14:20:00Z',
           updated_at: '2024-01-14T15:45:00Z',
         },

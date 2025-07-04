@@ -27,7 +27,7 @@ export async function createMergeRequest({
         id: `mr-${Date.now()}`,
         project_ref: projectRef,
         base: '6b3b94fe-f9f9-4c12-8796-ff67db250757',
-        head: '7902c891-5286-4366-a44d-007b39e0782d',
+        head: '3b13fe5b-a529-4bc4-a0c8-a333f83f03e9',
         title,
         description,
         merge_requested_by: 'current-user-id',

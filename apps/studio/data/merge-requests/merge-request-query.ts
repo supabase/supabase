@@ -22,14 +22,12 @@ export async function getMergeRequest(
         id: id,
         project_ref: 'mock-project-ref',
         base: '6b3b94fe-f9f9-4c12-8796-ff67db250757',
-        head: '7902c891-5286-4366-a44d-007b39e0782d',
+        head: '3b13fe5b-a529-4bc4-a0c8-a333f83f03e9',
         title: 'Deploy feature-auth to production',
         description:
           'This deploy request includes new authentication features, improved error handling, and several bug fixes. The changes have been thoroughly tested in the staging environment.',
         merge_requested_by: 'user-123',
-        merge_approved_by: null,
         merge_requested_at: '2024-01-15T10:30:00Z',
-        merge_approved_at: null,
         created_at: '2024-01-15T10:30:00Z',
         updated_at: '2024-01-15T10:30:00Z',
       })

@@ -12,7 +12,7 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
 import { useMergeRequestQuery } from 'data/merge-requests/merge-request-query'
-import { useMergeRequestUpdateMutation } from 'data/merge-requests/merge-request-update-mutation'
+import { useMergeRequestDeleteMutation } from 'data/merge-requests/merge-request-delete-mutation'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
@@ -31,6 +31,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
+  Trash,
 } from 'lucide-react'
 import Link from 'next/link'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -49,7 +50,6 @@ const MergeRequestPage: NextPageWithLayout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
 
-  const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref || project?.ref
 
   const parentProject = useProjectByRef(parentProjectRef)
@@ -124,8 +124,7 @@ const MergeRequestPage: NextPageWithLayout = () => {
       onWorkflowComplete: (status) => {
         setWorkflowFinalStatus(status)
         refetchDiff()
-        edgeFunctionsDiff.refetchCurrentBranchFunctions()
-        edgeFunctionsDiff.refetchMainBranchFunctions()
+        edgeFunctionsDiff.clearDiffsOptimistically()
       },
     })
 
@@ -136,8 +135,7 @@ const MergeRequestPage: NextPageWithLayout = () => {
       onWorkflowComplete: (status) => {
         setWorkflowFinalStatus(status)
         refetchDiff()
-        edgeFunctionsDiff.refetchCurrentBranchFunctions()
-        edgeFunctionsDiff.refetchMainBranchFunctions()
+        edgeFunctionsDiff.clearDiffsOptimistically()
       },
     })
 
@@ -186,18 +184,11 @@ const MergeRequestPage: NextPageWithLayout = () => {
   const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
       setIsSubmitting(false)
-      if (data.hadChanges) {
-        if (data.migrationCreated) {
-          toast.success('Migration created and branch merge initiated!')
-        } else {
-          toast.success('Branch merge initiated!')
-        }
-        // Add workflow run ID to URL for persistence
-        if (data.workflowRunId) {
-          addWorkflowRun(data.workflowRunId)
-        }
+      if (data.workflowRunId) {
+        toast.success('Branch merge initiated!')
+        addWorkflowRun(data.workflowRunId)
       } else {
-        toast.info('No changes to merge - branch merged successfully!')
+        toast.info('No changes to merge')
       }
     },
     onError: (error) => {
@@ -206,15 +197,15 @@ const MergeRequestPage: NextPageWithLayout = () => {
     },
   })
 
-  const { mutate: updateMergeRequest, isLoading: isUpdatingMergeRequest } =
-    useMergeRequestUpdateMutation({
+  const { mutate: deleteMergeRequest, isLoading: isDeletingMergeRequest } =
+    useMergeRequestDeleteMutation({
       onSuccess: () => {
-        toast.success('Merge request approved!')
-        // Proceed with actual merge
-        handleMerge()
+        toast.success('Merge request deleted!')
+        // Navigate back to merge requests list
+        router.push(`/project/${parentProjectRef}/branches?tab=prs`)
       },
-      onError: (error) => {
-        toast.error(`Failed to approve merge request: ${error.message}`)
+      onError: (error: any) => {
+        toast.error(`Failed to delete merge request: ${error.message}`)
       },
     })
 
@@ -237,13 +228,11 @@ const MergeRequestPage: NextPageWithLayout = () => {
     })
   }
 
-  const handleApproveMerge = () => {
+  const handleDeleteMergeRequest = () => {
     if (!mergeRequest?.id || !parentProjectRef) return
-    // TODO: Get current user ID
-    updateMergeRequest({
+    deleteMergeRequest({
       id: mergeRequest.id,
       projectRef: parentProjectRef,
-      merge_approved_by: 'current-user-id', // This should be replaced with actual user ID
     })
   }
 
@@ -355,25 +344,11 @@ const MergeRequestPage: NextPageWithLayout = () => {
     )
   }
 
-  const isMergeDisabled =
-    !combinedHasChanges ||
-    isCombinedDiffLoading ||
-    isBranchOutOfDateOverall ||
-    !mergeRequest.merge_approved_by
+  const isMergeDisabled = !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall
 
-  // Update primary actions - separate approve and merge actions
+  // Update primary actions - just merge action
   const primaryActions = (
     <div className="flex items-end gap-2">
-      {!mergeRequest.merge_approved_by && (
-        <Button
-          type="default"
-          loading={isUpdatingMergeRequest}
-          onClick={handleApproveMerge}
-          icon={<CheckCircle size={16} strokeWidth={1.5} />}
-        >
-          Approve
-        </Button>
-      )}
       {isMergeDisabled ? (
         <ButtonTooltip
           tooltip={{
@@ -403,20 +378,15 @@ const MergeRequestPage: NextPageWithLayout = () => {
     </div>
   )
 
-  const pageTitle = () => (
-    <div className="flex items-center gap-4 flex-wrap">
-      <span>{mergeRequest?.title || `${mergeRequest?.head} → ${mergeRequest?.base}`}</span>
-    </div>
-  )
+  const pageTitle = () => mergeRequest?.title || `${mergeRequest?.head} → ${mergeRequest?.base}`
 
   const pageSubtitle = () => {
     if (!mergeRequest?.merge_requested_at) return 'Merge request information unavailable'
 
     const requestedTime = dayjs(mergeRequest.merge_requested_at).fromNow()
-    const approvalStatus = mergeRequest.merge_approved_by ? 'Approved' : 'Open'
     return (
       <div className="flex items-center gap-2 mt-2">
-        <Badge variant="warning">{approvalStatus}</Badge>
+        <Badge variant="warning">Open</Badge>
         {mergeRequest.merge_requested_by} requested to merge
         <Link
           href={`/project/${headBranch?.project_ref}/editor`}
@@ -485,13 +455,36 @@ const MergeRequestPage: NextPageWithLayout = () => {
                 }
                 overrideAction={
                   hasCurrentWorkflowFailed ? (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="default"
+                        asChild
+                        icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+                        className="shrink-0"
+                      >
+                        <Link href={`/project/${parentProjectRef}/branches`}>
+                          Create new branch
+                        </Link>
+                      </Button>
+                      <Button
+                        type="outline"
+                        loading={isDeletingMergeRequest}
+                        onClick={handleDeleteMergeRequest}
+                        icon={<Trash size={16} strokeWidth={1.5} />}
+                        className="shrink-0"
+                      >
+                        Delete merge request
+                      </Button>
+                    </div>
+                  ) : currentWorkflowRun?.status === 'FUNCTIONS_DEPLOYED' ? (
                     <Button
-                      type="default"
-                      asChild
-                      icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+                      type="outline"
+                      loading={isDeletingMergeRequest}
+                      onClick={handleDeleteMergeRequest}
+                      icon={<Trash size={16} strokeWidth={1.5} />}
                       className="shrink-0"
                     >
-                      <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
+                      Delete merge request
                     </Button>
                   ) : undefined
                 }

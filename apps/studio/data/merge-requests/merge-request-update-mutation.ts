@@ -22,7 +22,7 @@ export async function updateMergeRequest({
         id: id,
         project_ref: 'mock-project-ref',
         base: '6b3b94fe-f9f9-4c12-8796-ff67db250757',
-        head: '7902c891-5286-4366-a44d-007b39e0782d',
+        head: '3b13fe5b-a529-4bc4-a0c8-a333f83f03e9',
         title: 'Deploy feature-auth to production',
         description:
           'This deploy request includes new authentication features, improved error handling, and several bug fixes.',
