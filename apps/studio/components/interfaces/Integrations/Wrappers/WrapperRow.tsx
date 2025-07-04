@@ -95,10 +95,14 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               {/* <p className="text-foreground-light">{metadata.label}:</p> */}
               <Link
                 href={`/project/${ref}/settings/vault/secrets?search=${wrapper.name}_${metadata.name}`}
-                className="transition text-foreground-light hover:text-foreground flex items-center space-x-2"
+                className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
               >
-                <span>Vault</span>
-                <ExternalLink size={12} strokeWidth={1.5} className="text-foreground-lighter" />
+                <span className="truncate" title={metadata.label}>
+                  {metadata.label}
+                </span>
+                <div>
+                  <ExternalLink size={12} strokeWidth={1.5} className="text-foreground-lighter" />
+                </div>
               </Link>
             </div>
           ))}
