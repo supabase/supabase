@@ -1,0 +1,54 @@
+---
+title: 'Gitless branching (Alpha)'
+subtitle: 'Create and manage branches without using Git'
+---
+
+Gitless branching allows you to create and manage Supabase branches without connecting to a Git repository. This is useful for quick testing, prototyping, or when you prefer to manage your database changes outside of Git.
+
+<Admonition type="note" label="Public Alpha">
+
+Gitless branching is currently in public alpha. Features and functionality may change.
+
+</Admonition>
+
+## How Gitless branching works
+
+With Gitless branching, you can do the following directly from the Supabase dashboard:
+
+- Create preview branches
+- Pull production branch changes into a branch
+- Merge a branch into production to deploy the changes
+
+## Enable Gitless branching
+
+Gitless branching is available as a Feature Preview. To enable Gitless branching in the Supabase Dashboard:
+
+1. Open the user menu by clicking on your user icon in the top right.
+1. Select **Gitless branching**.
+1. Click **Enable feature**.
+
+## Creating a Gitless branch
+
+Once you've enabled Gitless branching, you can create a new branch:
+
+1. Click the arrows next to the branch name in the top menu bar. (The top menu bar has the format `YOUR_ORGANIZATION / YOUR_PROJECT / CURRENT_BRANCH_NAME`.)
+2. Click `Create branch`.
+
+## Making changes to a branch
+
+Use the branch selector in the top bar to change to your branch. Any changes you make (including SQL run in the SQL editor, table editor changes, and configuration changes) are now made against the currently selected branch.
+
+You can also use the branch's API keys and connection strings to run changes against the branch from your own code or SQL client.
+
+## Pulling changes from production into a branch
+
+1. Change to your branch using the branch selector in the top menu.
+1. Open the branch selector again, and click **Review changes**.
+1. If there are changes that you need to pull from production, a message will show, prompting you to update your branch. Click **Update branch**.
+
+## Merging changes from a branch into production
+
+1. Change to your branch using the branch selector in the top menu.
+1. Open the branch selector again, and click **Review changes**.
+1. [Pull any changes](#pulling-changes-from-production-into-a-branch) if necessary.
+1. Click **Merge branch**.
