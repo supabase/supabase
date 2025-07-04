@@ -164,9 +164,19 @@ const TriggerList = ({
                               title:
                                 'I can help you make a change to this trigger, here are a few example prompts to get you started:',
                               prompts: [
-                                'Rename this trigger to ...',
-                                'Change the events this trigger responds to ...',
-                                'Modify this trigger to run after instead of before ...',
+                                {
+                                  label: 'Rename Trigger',
+                                  description: 'Rename this trigger to ...',
+                                },
+                                {
+                                  label: 'Change Events',
+                                  description: 'Change the events this trigger responds to ...',
+                                },
+                                {
+                                  label: 'Modify Timing',
+                                  description:
+                                    'Modify this trigger to run after instead of before ...',
+                                },
                               ],
                             },
                             sqlSnippets: [sql],

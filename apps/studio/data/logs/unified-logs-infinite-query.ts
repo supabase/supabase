@@ -42,9 +42,10 @@ export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
   return { isoTimestampStart, isoTimestampEnd }
 }
 
-async function getUnifiedLogs(
+export async function getUnifiedLogs(
   { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam },
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined')
     throw new Error('projectRef is required for getUnifiedLogs')
@@ -94,10 +95,13 @@ async function getUnifiedLogs(
     timestampEnd = isoTimestampEnd
   }
 
+  let headers = new Headers(headersInit)
+
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
     signal,
+    headers,
   })
 
   if (error) handleError(error)

@@ -8,7 +8,8 @@ import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs
 
 export async function getUnifiedLogsChart(
   { projectRef, search }: UnifiedLogsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getUnifiedLogsChart')
@@ -36,10 +37,13 @@ export async function getUnifiedLogsChart(
   // Get SQL query from utility function (with dynamic bucketing)
   const sql = getLogsChartQuery(search)
 
+  let headers = new Headers(headersInit)
+
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
     params: { path: { ref: projectRef } },
     body: { sql, iso_timestamp_start: dateStart, iso_timestamp_end: dateEnd },
     signal,
+    headers,
   })
 
   if (error) handleError(error)

@@ -1,4 +1,4 @@
-import { Check, Edit, MessageSquare, Plus, Trash, X } from 'lucide-react'
+import { Check, ChevronDown, Edit, MessageSquare, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -30,6 +30,7 @@ export const AIAssistantChatSelector = ({
   disabled = false,
 }: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
+  const currentChat = snap.activeChat?.name
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
@@ -91,15 +92,16 @@ export const AIAssistantChatSelector = ({
   return (
     <Popover_Shadcn_ open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <ButtonTooltip
-          type="default"
+        <Button
+          type="text"
           size="tiny"
-          icon={<MessageSquare size={14} />}
-          className={cn('h-7 w-7', className)}
-          tooltip={{ content: { side: 'bottom', text: 'View chats' } }}
-        />
+          iconRight={<ChevronDown size={14} />}
+          className="max-w-64 truncate"
+        >
+          {currentChat}
+        </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[250px] p-0" align="end">
+      <PopoverContent_Shadcn_ className="w-[250px] p-0" align="start">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search chats..." />
           <CommandList_Shadcn_>
