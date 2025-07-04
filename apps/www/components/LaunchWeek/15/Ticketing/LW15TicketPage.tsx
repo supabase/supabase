@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import dayjs from 'dayjs'
 import { Button, cn } from 'ui'
 import SectionContainer from 'components/Layouts/SectionContainer'
@@ -104,7 +104,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user: UserTicketData }) => {
 
   return (
     <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-4 !py-10 h-full">
-      <div className="flex flex-col h-full justify-between">
+      <div className="flex flex-col h-full justify-between gap-32">
         <div className="grid grid-cols-6 gap-4">
           <div className="col-span-full w-full flex items-center justify-between h-[60px] md:h-[90px] lg:h-[120px] gap-4">
             <h1 className="sr-only">Supabase Launch Week 15</h1>
@@ -113,7 +113,11 @@ const LW15TicketPage = ({ user: userFromProps }: { user: UserTicketData }) => {
           </div>
           <div className="col-span-5 text-2xl lg:text-4xl">
             {isGuest ? (
-              <>Join {user.name?.split(' ')[0]} and customize your Launch Week ticket</>
+              <>
+                {user.name?.split(' ')[0]}'s Ticket
+                <br />
+                Want your own?
+              </>
             ) : (
               <>Hey @{user.username}, customize your Launch Week ticket</>
             )}
@@ -135,7 +139,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user: UserTicketData }) => {
       </div>
       <div
         className="w-full border border-muted min-h-fit h-full bg-surface-300 flex items-center justify-center p-8 transition-colors duration-300"
-        style={{ background: `${selectedFg}95` }}
+        style={{ background: `${selectedFg}` }}
       >
         <div className="flex flex-col justify-center gap-8 min-h-fit h-full">
           <LW15Ticket user={user} />

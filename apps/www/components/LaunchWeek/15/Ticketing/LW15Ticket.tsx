@@ -20,7 +20,7 @@ const LW15Ticket = ({
   return (
     <div
       className={cn(
-        'min-h-[443px] transition-colors duration-300 [&_*]:transition-colors [&_*]:duration-300 max-h-[550px] h-full w-auto aspect-[278/443] flex flex-col shadow-2xl rounded-md overflow-hidden',
+        'min-h-[400px] transition-colors duration-300 [&_*]:transition-colors [&_*]:duration-300 max-h-[550px] h-[70%] w-auto aspect-[278/443] flex flex-col shadow-2xl rounded-md overflow-hidden',
         className
       )}
       style={{ background: bg, color: fg }}
