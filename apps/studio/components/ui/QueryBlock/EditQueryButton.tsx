@@ -62,7 +62,7 @@ export const EditQueryButton = ({
         type={type}
         size="tiny"
         className={cn('w-7 h-7', className)}
-        icon={<Edit size={14} />}
+        icon={<Edit size={14} strokeWidth={1.5} />}
         tooltip={tooltip}
       >
         <Link href={`/project/${ref}/sql/${id}`} />
@@ -75,7 +75,7 @@ export const EditQueryButton = ({
       type={type}
       size="tiny"
       className={cn('w-7 h-7', className)}
-      icon={<Edit size={14} />}
+      icon={<Edit size={14} strokeWidth={1.5} />}
       onClick={() => {
         if (isInlineEditorEnabled) {
           setEditorPanel({
@@ -105,7 +105,7 @@ export const EditQueryButton = ({
           size="tiny"
           disabled={!sql}
           className={cn('w-7 h-7', className)}
-          icon={<Edit size={14} />}
+          icon={<Edit size={14} strokeWidth={1.5} />}
           tooltip={!!sql ? tooltip : { content: { side: 'bottom', text: undefined } }}
         />
       </DropdownMenuTrigger>

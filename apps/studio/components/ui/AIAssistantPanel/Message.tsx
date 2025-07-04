@@ -1,10 +1,12 @@
 import { Message as VercelMessage } from 'ai/react'
-import { User } from 'lucide-react'
+import { Loader2, User } from 'lucide-react'
 import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
 
+import { ProfileImage } from 'components/ui/ProfileImage'
+import { useProfile } from 'lib/profile'
 import { cn, markdownComponents, WarningIcon } from 'ui'
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
@@ -59,6 +61,7 @@ export const Message = function Message({
   variant = 'default',
   onResults,
 }: PropsWithChildren<MessageProps>) {
+  const { profile } = useProfile()
   const allMarkdownComponents: Partial<Components> = useMemo(
     () => ({
       ...markdownComponents,
@@ -88,7 +91,7 @@ export const Message = function Message({
     <MessageContext.Provider value={{ isLoading, readOnly }}>
       <div
         className={cn(
-          'mb-4 text-foreground-light text-sm',
+          'text-foreground-light text-sm',
           isUser && 'text-foreground',
           variant === 'warning' && 'bg-warning-200'
         )}
@@ -99,9 +102,11 @@ export const Message = function Message({
 
         <div className="flex gap-4 w-auto overflow-hidden">
           {isUser && (
-            <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
-              <User size={16} strokeWidth={1.5} className="text-background" />
-            </figure>
+            <ProfileImage
+              alt={profile?.username}
+              src={profile?.profileImageUrl}
+              className="w-5 h-5 shrink-0 rounded-full"
+            />
           )}
 
           <div className="flex-1 min-w-0 space-y-2">
@@ -116,8 +121,8 @@ export const Message = function Message({
                           <ReactMarkdown
                             key={`${id}-part-${index}`}
                             className={cn(
-                              'prose prose-sm max-w-full [&_h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 [&_li>p]:mt-0 space-y-5 [&>*>code]:text-xs [&>*>*>code]:text-xs [&_li]:space-y-4',
-                              isUser && 'text-foreground font-semibold'
+                              'prose prose-sm prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+                              isUser && 'text-foreground [&>p]:font-medium'
                             )}
                             remarkPlugins={[remarkGfm]}
                             components={allMarkdownComponents}
@@ -130,15 +135,15 @@ export const Message = function Message({
                         const { toolCallId, toolName, args, state } = part.toolInvocation
                         if (state === 'call' || state === 'partial-call') {
                           if (shownLoadingTools.has(toolName)) {
-                            // Already shown loading for this toolName in this step
                             return null
                           }
                           shownLoadingTools.add(toolName)
                           return (
                             <div
                               key={`${id}-tool-loading-${toolName}`}
-                              className="rounded border text-xs font-mono text-xs text-foreground-lighter py-2 px-3"
+                              className="rounded-lg border bg-surface-75 text-xs font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
                             >
+                              <Loader2 className="w-4 h-4 animate-spin" />
                               {`Calling ${toolName}...`}
                             </div>
                           )
@@ -191,7 +196,7 @@ export const Message = function Message({
               })()
             ) : hasTextContent ? (
               <ReactMarkdown
-                className="prose prose-sm [&_>h3]:text-base [&_ol>li]:pl-4 [&_ol>li]:my-0 space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
+                className="prose prose-sm max-w-none break-words"
                 remarkPlugins={[remarkGfm]}
                 components={allMarkdownComponents}
               >
