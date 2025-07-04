@@ -47,7 +47,7 @@ export const useProjectsQuery = <TData = ProjectsData>({
 }
 
 export function prefetchProjects(client: QueryClient) {
-  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects(signal))
+  return client.prefetchQuery(projectKeys.list(), ({ signal }) => getProjects({ signal }))
 }
 
 export function useProjectsPrefetch() {
