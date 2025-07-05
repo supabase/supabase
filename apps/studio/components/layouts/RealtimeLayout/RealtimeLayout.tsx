@@ -14,7 +14,18 @@ export interface RealtimeLayoutProps {
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
-  const enableRealtimeSettings = useFlag('enableRealtimeSettings')
+  // the flag is used to enable/disable the realtime settings for all projects
+  const enableRealtimeSettingsFlag = useFlag('enableRealtimeSettings')
+  // the flag is used to enable/disable the realtime settings for specific projects. Will be overridden by the enableRealtimeSettingsFlag if it is enabled.
+  const approvedProjects = useFlag<string>('isRealtimeSettingsEnabledOnProjects')
+
+  const isEnabledOnProject =
+    !!project?.ref &&
+    typeof approvedProjects === 'string' &&
+    (approvedProjects ?? '')
+      .split(',')
+      .map((it) => it.trim())
+      .includes(project?.ref)
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
@@ -26,7 +37,9 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateRealtimeMenu(project!, { enableRealtimeSettings })}
+          menu={generateRealtimeMenu(project!, {
+            enableRealtimeSettings: enableRealtimeSettingsFlag || isEnabledOnProject,
+          })}
         />
       }
     >
