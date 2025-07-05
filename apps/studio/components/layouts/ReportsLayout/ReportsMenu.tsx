@@ -101,7 +101,7 @@ const ReportsMenu = () => {
       key: 'builtin-reports',
       items: [
         {
-          name: 'API',
+          name: 'API Gateway',
           key: 'api-overview',
           url: `/project/${ref}/reports/api-overview`,
         },
