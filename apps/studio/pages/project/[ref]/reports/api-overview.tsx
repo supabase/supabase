@@ -45,7 +45,7 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="API" />
+      <ReportHeader title="API Gateway" />
       <div className="w-full flex flex-col gap-1">
         <ReportFilterBar
           onRemoveFilters={removeFilters}
