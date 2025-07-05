@@ -1741,19 +1741,13 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     if (!isPaused && hasDataReady && isDifferentProject && serviceKey) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
       const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          storage: {
-            getItem: (key) => {
-              return null
-            },
-            setItem: (key, value) => {},
-            removeItem: (key) => {},
-          },
+        accessToken: async () => {
+          return serviceKey.api_key
         },
       })
+
+      // when using this inside a proxied object it fails due to accessing client.auth.Symbol()
+      ;(supabaseClient as any).auth = null
 
       setState(
         createStorageExplorerState({
