@@ -25,6 +25,7 @@ export async function getBranches({ projectRef }: BranchesVariables, signal?: Ab
       handleError(error)
     }
   }
+
   return data
 }
 
