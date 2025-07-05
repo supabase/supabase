@@ -1,13 +1,15 @@
 import pgMeta from '@supabase/pg-meta'
+import { streamText, tool, ToolSet } from 'ai'
+import { source } from 'common-tags'
 import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { streamText, tool, ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
-import { source } from 'common-tags'
+import { getOrganizations } from 'data/organizations/organizations-query'
+import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { aiOptInLevelSchema } from 'hooks/misc/useOrgOptedIntoAi'
+import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
@@ -45,10 +47,10 @@ export default wrapper
 const requestBodySchema = z.object({
   messages: z.array(z.any()),
   projectRef: z.string(),
-  aiOptInLevel: aiOptInLevelSchema,
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  orgSlug: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -66,7 +68,33 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, aiOptInLevel } = data
+  const { messages, projectRef, connectionString, orgSlug } = data
+
+  // Get organizations and compute opt in level server-side
+  const [organizations, projects] = await Promise.all([
+    getOrganizations({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+    getProjects({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+  ])
+
+  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+  const selectedProject = projects.find((project) => project.ref === projectRef)
+
+  // If the project is not in the organization specific by the org slug, return an error
+  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+    return res.status(400).json({ error: 'Project and organization do not match' })
+  }
+
+  const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
 
   const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
 
