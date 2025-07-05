@@ -54,6 +54,7 @@ interface BaseGuideTemplateProps {
   children?: ReactNode
   editLink: EditLink
   mdxOptions?: SerializeOptions
+  childrenPosition?: 'before' | 'after'
 }
 
 type GuideTemplateProps =
@@ -92,6 +93,7 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
 
             {content && <MDXRemoteBase source={content} options={mdxOptions} />}
             {children}
+
             <footer className="mt-16 not-prose">
               <a
                 href={
@@ -134,4 +136,5 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
   )
 }
 
-export { GuideTemplate, newEditLink }
+export { GuideTemplate, EDIT_LINK_SYMBOL, newEditLink }
+export type { EditLink }
