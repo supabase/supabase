@@ -109,12 +109,11 @@ const MergePage: NextPageWithLayout = () => {
         setWorkflowFinalStatus(status)
         refetchDiff()
         edgeFunctionsDiff.clearDiffsOptimistically()
-        // Clear the review_requested_at field
         if (parentProjectRef) {
           updateBranch({
             id: currentBranch.id,
             projectRef: parentProjectRef,
-            reviewRequestedAt: null,
+            requestReview: false,
           })
         }
       },
@@ -245,7 +244,7 @@ const MergePage: NextPageWithLayout = () => {
     () => [
       {
         label: 'Branches',
-        href: `/project/${parentProjectRef}/branches`,
+        href: `/project/${project?.ref}/branches?tab=prs`,
       },
     ],
     [parentProjectRef]
@@ -384,7 +383,8 @@ const MergePage: NextPageWithLayout = () => {
     if (!currentBranch?.created_at) return 'Branch information unavailable'
 
     const createdTime = dayjs(currentBranch.created_at).fromNow()
-    return `Branch created ${createdTime}`
+    const reviewRequestedTime = dayjs(currentBranch.review_requested_at).fromNow()
+    return `Review requested ${reviewRequestedTime}`
   }
 
   return (

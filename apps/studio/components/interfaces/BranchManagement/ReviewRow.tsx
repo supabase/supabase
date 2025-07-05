@@ -47,7 +47,7 @@ export const ReviewRow = ({ branch }: ReviewRowProps) => {
     updateBranch({
       id: branch.id,
       projectRef,
-      reviewRequestedAt: null,
+      requestReview: false,
     })
   }
 
@@ -65,7 +65,7 @@ export const ReviewRow = ({ branch }: ReviewRowProps) => {
           <h4 className="text-sm text-foreground" title={branch.name}>
             {branch.name}
           </h4>
-          <p className="text-foreground-light">Requested review {formattedReviewDate}</p>
+          <p className="text-foreground-light">{formattedReviewDate}</p>
         </div>
       </div>
 

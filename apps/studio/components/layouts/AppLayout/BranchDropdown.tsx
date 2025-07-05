@@ -187,7 +187,7 @@ export const BranchDropdown = () => {
                         updateBranch({
                           id: selectedBranch.id,
                           projectRef,
-                          request_review: true,
+                          requestReview: true,
                         })
                       }
                     }

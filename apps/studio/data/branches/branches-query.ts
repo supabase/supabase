@@ -8,9 +8,7 @@ export type BranchesVariables = {
   projectRef?: string
 }
 
-export type Branch = components['schemas']['BranchResponse'] & {
-  review_requested_at?: string | null
-}
+export type Branch = components['schemas']['BranchResponse']
 
 export async function getBranches({ projectRef }: BranchesVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -27,14 +25,8 @@ export async function getBranches({ projectRef }: BranchesVariables, signal?: Ab
       handleError(error)
     }
   }
-  
-  // Mock review_requested_at field for now until API is ready
-  const branchesWithReviewField = data?.map((branch: any) => ({
-    ...branch,
-    review_requested_at: branch.review_requested_at || null
-  }))
-  
-  return branchesWithReviewField
+
+  return data
 }
 
 export type BranchesData = Awaited<ReturnType<typeof getBranches>>
