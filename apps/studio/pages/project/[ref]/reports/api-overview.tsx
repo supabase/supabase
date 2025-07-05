@@ -91,7 +91,7 @@ export const ApiReport: NextPageWithLayout = () => {
         isLoading={isLoading}
         params={params.responseSpeed}
         title="Response Speed"
-        tooltip="Average response speed (in miliseconds) of a request"
+        tooltip="Average response speed of a request (in ms)"
         data={data.responseSpeed || []}
         error={error.responseSpeed}
         renderer={ResponseSpeedChartRenderer}

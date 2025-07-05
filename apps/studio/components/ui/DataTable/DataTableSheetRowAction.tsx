@@ -55,7 +55,6 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         return (
           <DropdownMenuItem
             onClick={() => {
-              // FIXME:
               const filterValue = column?.getFilterValue() as undefined | Array<unknown>
               const newValue = filterValue?.includes(value)
                 ? filterValue

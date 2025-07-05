@@ -43,7 +43,6 @@ export type OrganizationBillingSubscriptionPreviewResponse = {
     ref: string
   }[]
   billed_via_partner?: boolean
-  pending_subscription_flow?: boolean
 }
 
 export async function previewOrganizationBillingSubscription({

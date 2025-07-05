@@ -29,7 +29,9 @@ interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
   table: Table<TData>
   filterFields: DataTableFilterField<TData>[]
   columns: ColumnDef<TData, TValue>[]
+  isFetching?: boolean
   isLoading?: boolean
+  isLoadingCounts?: boolean
   getFacetedUniqueValues?: (table: Table<TData>, columnId: string) => Map<string, number>
   getFacetedMinMaxValues?: (table: Table<TData>, columnId: string) => undefined | [number, number]
 }

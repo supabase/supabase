@@ -16,7 +16,8 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import RequestADemoForm from '../components/Forms/RequestADemoForm'
+import RequestADemoForm from 'components/Forms/RequestADemoForm'
+import { companyStats } from 'data/company-stats'
 
 export default {
   metadata: {
@@ -139,11 +140,11 @@ export default {
     highlights: [
       {
         heading: 'Databases managed',
-        subheading: '1,000,000+',
+        subheading: companyStats.databasesManaged,
       },
       {
         heading: 'Databases launched daily',
-        subheading: '3,500+',
+        subheading: companyStats.databasesLaunchedDaily,
       },
     ],
   },

@@ -31,7 +31,7 @@ export const filterFields = [
       const value = props.value as (typeof LEVELS)[number]
       return (
         <div className="flex w-full max-w-28 items-center justify-between gap-2 font-mono">
-          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground">
+          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
             {props.label}
           </span>
           <div className="flex items-center gap-2">
@@ -51,10 +51,11 @@ export const filterFields = [
     component: (props: Option) => {
       return (
         <div className="flex w-full items-center justify-between gap-2 font-mono">
-          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground">
-            {props.label}
+          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
+            {props.label.replace('_', ' ')}
           </span>
-          <span className="text-xs text-muted-foreground/70">{props.value}</span>
+          {/* [Joshen] Temporarily hiding, this feels excessive */}
+          {/* <span className="text-xs text-muted-foreground/70">{props.value}</span> */}
         </div>
       )
     },
@@ -106,7 +107,7 @@ export const filterFields = [
 
 export const sheetFields = [
   {
-    id: 'uuid',
+    id: 'id',
     label: 'Request ID',
     type: 'readonly',
     skeletonClassName: 'w-64',

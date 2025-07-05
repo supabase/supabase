@@ -34,7 +34,7 @@ export const CHART_CONFIG = {
 } satisfies ChartConfig
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
-export const METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const
+export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES = [
   'auth',
   'edge function',
@@ -87,5 +87,5 @@ export const SEARCH_PARAMS_PARSER = {
   uuid: parseAsString,
   // WORKAROUND: Store real database log ID for service flow queries
   // TODO: Remove once repeated logs issue is fixed
-  logId: parseAsString,
+  id: parseAsString,
 }
