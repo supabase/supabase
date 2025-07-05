@@ -2,7 +2,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { ArrowRight, Info, Key, Timer } from 'lucide-react'
+import { ArrowRight, Info, Key, Timer, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -10,6 +10,7 @@ import {
   Button,
   Checkbox_Shadcn_,
   cn,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -196,10 +197,7 @@ export function RotateKeyDialog({
                     text: (
                       <p>
                         Rotating the signing key only changes what key is used by Supabase Auth to
-                        issue{' '}
-                        <strong>
-                          <em>new tokens</em>
-                        </strong>
+                        issue <em className="text-brand not-italic">new tokens</em>
                         .<br />
                         <br />
                         To prevent users from being prematurely signed out, you have to manually
@@ -224,14 +222,23 @@ export function RotateKeyDialog({
                   onCheckedChange={(value) => setEdgeFunctionsVerifyJWTUnderstood(!!value)}
                 />
                 <p className="text-sm text-foreground-light">
-                  The following Edge Functions may stop funtioning as they verify the legacy JWT
-                  secret:{' '}
+                  The following Edge Functions may stop funtioning for signed-in users as they
+                  verify the legacy JWT secret:{' '}
                   {verifyJWTEdgeFunctions
-                    .map(({ name }) => <code>{name}</code>)
-                    .reduce<
-                      React.ReactNode[]
-                    >((arr, v) => (arr.length > 0 ? [...arr, ', ', v] : [v]), [])}
-                  .
+                    .map(({ name }) => (
+                      <a
+                        className=""
+                        href={`../../functions/${name}/details`}
+                        target="_blank"
+                        title={name}
+                      >
+                        <ExternalLink className="size-3 inline-block" /> <code>{name}</code>
+                      </a>
+                    ))
+                    .reduce<React.ReactNode[]>(
+                      (arr, v) => (arr.length > 0 ? [...arr, ', ', v] : [v]),
+                      []
+                    )}
                 </p>
                 <ButtonTooltip
                   type="default"
@@ -242,14 +249,19 @@ export function RotateKeyDialog({
                       className: 'max-w-[320px] p-4',
                       text: (
                         <p>
-                          Edge Functions can verify only the legacy JWT secret. Since rotation will
-                          change they key that signs JWTs if your Edge Function is set up to reject
-                          JWTs not signed by the legacy JWT secret they might stop functioning.
+                          Some of your Edge Functions are set up to require a JWT in the{' '}
+                          <code>Authorization</code> header signed with the{' '}
+                          <em className="text-brand not-italic">legacy JWT secret</em>. Rotation
+                          causes{' '}
+                          <em className="text-brand not-italic">invocations by signed-in users</em>{' '}
+                          to fail with HTTP 401 Unauthorized, as the JWT no longer meets this
+                          requirement.
                           <br />
                           <br />
-                          Recommendation: Change all of your Edge Functions to use the{' '}
-                          <code>--no-verify-jwt</code> option and implement JWT verification logic
-                          within the function's body.
+                          Recommendation: Change all of your Edge Functions to no longer verify JWT
+                          and implement the verification logic in the function's code yourself by
+                          using the Supabase client library or any other library for working with
+                          JWT.
                         </p>
                       ),
                     },
