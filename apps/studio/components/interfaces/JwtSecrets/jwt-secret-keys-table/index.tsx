@@ -146,35 +146,50 @@ export default function JWTSecretKeysTable() {
   }
 
   const handlePreviouslyUsedKey = async (keyId: string) => {
-    updateMutation.mutate({ projectRef, keyId, status: 'previously_used' }, {
-      onSuccess: () => {
-        resetDialog()
-      },
-    })
-  }
-
-  const handleStandbyKey = (keyId: string) => {
-      updateMutation.mutate({ projectRef: projectRef!, keyId, status: 'standby' }, {
+    updateMutation.mutate(
+      { projectRef, keyId, status: 'previously_used' },
+      {
         onSuccess: () => {
           resetDialog()
         },
-      })
+      }
+    )
+  }
+
+  const handleStandbyKey = (keyId: string) => {
+    updateMutation.mutate(
+      { projectRef: projectRef!, keyId, status: 'standby' },
+      {
+        onSuccess: () => {
+          resetDialog()
+        },
+      }
+    )
   }
 
   const handleRevokeKey = (keyId: string) => {
-    updateMutation.mutate({ projectRef: projectRef!, keyId, status: 'revoked' }, {
-      onSuccess: () => {
-        resetDialog()
-      },
-    })
+    updateMutation.mutate(
+      { projectRef: projectRef!, keyId, status: 'revoked' },
+      {
+        onSuccess: () => {
+          resetDialog()
+        },
+      }
+    )
   }
 
   const handleDeleteKey = (keyId: string) => {
-    deleteMutation.mutate({ projectRef: projectRef!, keyId }, { onSuccess: () => {
-      resetDialog()
-    }, onError: () => {
-      resetDialog()
-    }})
+    deleteMutation.mutate(
+      { projectRef: projectRef!, keyId },
+      {
+        onSuccess: () => {
+          resetDialog()
+        },
+        onError: () => {
+          resetDialog()
+        },
+      }
+    )
   }
 
   if (isLoading) {
@@ -281,7 +296,9 @@ export default function JWTSecretKeysTable() {
             <div className="flex flex-col gap-2">
               <h2 className="text-xl">Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
-                These JWT signing keys are still used to <em className="text-brand not-italic">verify tokens</em> that are yet to expire. Revoke once all tokens have expired.
+                These JWT signing keys are still used to{' '}
+                <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
+                Revoke once all tokens have expired.
               </p>
             </div>
             <Card className="overflow-hidden">
@@ -307,15 +324,16 @@ export default function JWTSecretKeysTable() {
                     <TableBody>
                       <AnimatePresence>
                         {previouslyUsedKeys.map((key) => (
-                        <SigningKeyRow
-                          key={key.id}
-                          signingKey={key}
-                          setSelectedKey={setSelectedKey}
-                          setShownDialog={setShownDialog}
-                          handleStandbyKey={handleStandbyKey}
-                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                          legacyKey={legacyKey}
-                          standbyKey={standbyKey} />
+                          <SigningKeyRow
+                            key={key.id}
+                            signingKey={key}
+                            setSelectedKey={setSelectedKey}
+                            setShownDialog={setShownDialog}
+                            handleStandbyKey={handleStandbyKey}
+                            handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                            legacyKey={legacyKey}
+                            standbyKey={standbyKey}
+                          />
                         ))}
                       </AnimatePresence>
                     </TableBody>
@@ -332,8 +350,8 @@ export default function JWTSecretKeysTable() {
       )}
 
       {revokedKeys.length > 0 && (
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <h2 className="text-xl">Revoked keys</h2>
             <p className="text-sm text-foreground-lighter">
               These keys are no longer used to verify or sign JWTs.
@@ -361,15 +379,16 @@ export default function JWTSecretKeysTable() {
                 <TableBody>
                   <AnimatePresence>
                     {revokedKeys.map((key) => (
-                        <SigningKeyRow
-                          key={key.id}
-                          signingKey={key}
-                          setSelectedKey={setSelectedKey}
-                          setShownDialog={setShownDialog}
-                          handleStandbyKey={handleStandbyKey}
-                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                          legacyKey={legacyKey}
-                          standbyKey={standbyKey} />
+                      <SigningKeyRow
+                        key={key.id}
+                        signingKey={key}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                      />
                     ))}
                   </AnimatePresence>
                 </TableBody>

@@ -1,5 +1,14 @@
 import { motion } from 'framer-motion'
-import { CircleArrowDown, CircleArrowUp, Trash2, Eye, Key, MoreVertical, ShieldOff, Timer } from 'lucide-react'
+import {
+  CircleArrowDown,
+  CircleArrowUp,
+  Trash2,
+  Eye,
+  Key,
+  MoreVertical,
+  ShieldOff,
+  Timer,
+} from 'lucide-react'
 
 import { components } from 'api-types'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
@@ -20,13 +29,7 @@ import { statusColors, statusLabels } from '../jwt.constants'
 interface SigningKeyRowProps {
   signingKey: components['schemas']['SigningKeyResponse']
   setSelectedKey: (key: JWTSigningKey | null) => void
-  setShownDialog: (
-    dialog:
-      | 'key-details'
-      | 'revoke'
-      | 'delete'
-      | null
-  ) => void
+  setShownDialog: (dialog: 'key-details' | 'revoke' | 'delete' | null) => void
   handlePreviouslyUsedKey: (keyId: string) => void
   handleStandbyKey: (keyId: string) => void
   legacyKey?: JWTSigningKey | null
@@ -69,7 +72,11 @@ export const SigningKeyRow = ({
             'border-r-0'
           )}
         >
-          {signingKey.status === 'standby' ? <Timer className="size-4" /> : <Key className="size-4" />}
+          {signingKey.status === 'standby' ? (
+            <Timer className="size-4" />
+          ) : (
+            <Key className="size-4" />
+          )}
           {statusLabels[signingKey.status]}
         </Badge>
       </div>
@@ -121,26 +128,26 @@ export const SigningKeyRow = ({
           )}
           {signingKey.status === 'previously_used' && (
             <>
-            <DropdownMenuItem
-              onSelect={() => {
-                handleStandbyKey(signingKey.id)
-              }}
-              disabled={!!standbyKey}
-            >
-              <CircleArrowUp className="mr-2 size-4" />
-              Move to standby key
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => {
-                setSelectedKey(signingKey)
-                setShownDialog('revoke')
-              }}
-              className="text-destructive"
-            >
-              <ShieldOff className="mr-2 size-4" />
-              Revoke key
-            </DropdownMenuItem>
-          </>
+              <DropdownMenuItem
+                onSelect={() => {
+                  handleStandbyKey(signingKey.id)
+                }}
+                disabled={!!standbyKey}
+              >
+                <CircleArrowUp className="mr-2 size-4" />
+                Move to standby key
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  setSelectedKey(signingKey)
+                  setShownDialog('revoke')
+                }}
+                className="text-destructive"
+              >
+                <ShieldOff className="mr-2 size-4" />
+                Revoke key
+              </DropdownMenuItem>
+            </>
           )}
           {signingKey.status === 'revoked' && (
             <DropdownMenuItem

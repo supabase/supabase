@@ -165,9 +165,11 @@ export const CreateKeyDialog = ({
       <DialogSectionSeparator />
       <DialogSection className="space-y-4">
         <p className="text-sm text-foreground-light">
-          Adds a new JSON Web Token signing key. Once all of your application's components have picked it up you can rotate the current key with it.
-          <br /><br />
-    This action does not invalidate existing tokens, so your users remain signed in.
+          Adds a new JSON Web Token signing key. Once all of your application's components have
+          picked it up you can rotate the current key with it.
+          <br />
+          <br />
+          This action does not invalidate existing tokens, so your users remain signed in.
         </p>
       </DialogSection>
       <DialogSectionSeparator />

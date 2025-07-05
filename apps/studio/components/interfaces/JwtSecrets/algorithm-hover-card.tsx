@@ -15,12 +15,36 @@ export const AlgorithmHoverCard: React.FC<AlgorithmHoverCardProps> = ({ algorith
   return (
     <InfoPill
       label={<span className="pt-1 h-6">{legacy ? `Legacy ${details.label}` : details.label}</span>}
-      icon={algorithm === 'HS256' ? <RectangleEllipsis className="size-4" /> : <LockKeyholeOpen className="size-4" />}
+      icon={
+        algorithm === 'HS256' ? (
+          <RectangleEllipsis className="size-4" />
+        ) : (
+          <LockKeyholeOpen className="size-4" />
+        )
+      }
       title={details.name}
-      description={<div className="flex flex-col gap-2"><p>{details.description}</p><p>Pros:<ul className="list-disc">{details.pros.map((pro, i) => <li key={i}>{pro}</li>)}</ul></p>
-        <p>Cons: <ul className="list-disc">{details.cons.map((con, i) => <li key={i}>{con}</li>)}</ul><br /></p>
-      </div>
-    }
+      description={
+        <div className="flex flex-col gap-2">
+          <p>{details.description}</p>
+          <p>
+            Pros:
+            <ul className="list-disc">
+              {details.pros.map((pro, i) => (
+                <li key={i}>{pro}</li>
+              ))}
+            </ul>
+          </p>
+          <p>
+            Cons:{' '}
+            <ul className="list-disc">
+              {details.cons.map((con, i) => (
+                <li key={i}>{con}</li>
+              ))}
+            </ul>
+            <br />
+          </p>
+        </div>
+      }
       links={details.links}
     />
   )

@@ -13,10 +13,7 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
     label: 'HS256 (Shared Secret)',
     name: 'HMAC with SHA-256',
     description: 'JWT signatures are produced by a shared secret.',
-    pros: [
-      'Simple to use',
-      'Verifying and creating JWTs is very fast and not resource intensive'
-    ],
+    pros: ['Simple to use', 'Verifying and creating JWTs is very fast and not resource intensive'],
     cons: [
       'Usually not compatible with SOC2 and other security compliance frameworks',
       'Requires secure key exchange',
@@ -55,16 +52,15 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
   ES256: {
     label: 'ECC (P-256)',
     name: 'ECDSA with SHA-256',
-    description: 'JWT is signed with a private and verified with a public ECC key using the NIST P-256 curve.',
+    description:
+      'JWT is signed with a private and verified with a public ECC key using the NIST P-256 curve.',
     pros: [
       'Compatible with SOC2 and other security compliance frameworks',
       'Faster to create and verify signatures than RSA',
       'Ideal tradeoff between JWT size and efficiency',
       'Public key does not need to be kept secret',
     ],
-    cons: [
-      'Wide support but some libraries might make it harder to work with than RSA',
-    ],
+    cons: ['Wide support but some libraries might make it harder to work with than RSA'],
     shortDescription: 'ECDSA with SHA-256: Faster, more efficient alternative to RSA',
     links: [
       {

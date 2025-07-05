@@ -197,8 +197,7 @@ export function RotateKeyDialog({
                     text: (
                       <p>
                         Rotating the signing key only changes what key is used by Supabase Auth to
-                        issue{' '}
-                          <em className="text-brand not-italic">new tokens</em>
+                        issue <em className="text-brand not-italic">new tokens</em>
                         .<br />
                         <br />
                         To prevent users from being prematurely signed out, you have to manually
@@ -223,13 +222,23 @@ export function RotateKeyDialog({
                   onCheckedChange={(value) => setEdgeFunctionsVerifyJWTUnderstood(!!value)}
                 />
                 <p className="text-sm text-foreground-light">
-                  The following Edge Functions may stop funtioning for signed-in users as they verify the legacy JWT
-                  secret:{' '}
+                  The following Edge Functions may stop funtioning for signed-in users as they
+                  verify the legacy JWT secret:{' '}
                   {verifyJWTEdgeFunctions
-                      .map(({ name }) => <a className="" href={`../../functions/${name}/details`} target="_blank" title={name}><ExternalLink className="size-3 inline-block" />{' '}<code>{name}</code></a>)
-                    .reduce<
-                      React.ReactNode[]
-                    >((arr, v) => (arr.length > 0 ? [...arr, ', ', v] : [v]), [])}
+                    .map(({ name }) => (
+                      <a
+                        className=""
+                        href={`../../functions/${name}/details`}
+                        target="_blank"
+                        title={name}
+                      >
+                        <ExternalLink className="size-3 inline-block" /> <code>{name}</code>
+                      </a>
+                    ))
+                    .reduce<React.ReactNode[]>(
+                      (arr, v) => (arr.length > 0 ? [...arr, ', ', v] : [v]),
+                      []
+                    )}
                 </p>
                 <ButtonTooltip
                   type="default"
@@ -240,10 +249,20 @@ export function RotateKeyDialog({
                       className: 'max-w-[320px] p-4',
                       text: (
                         <p>
-                          Some of your Edge Functions are set up to require a JWT in the <code>Authorization</code> header signed with the <em className="text-brand not-italic">legacy JWT secret</em>. Rotation causes <em className="text-brand not-italic">invocations by signed-in users</em> to fail with HTTP 401 Unauthorized, as the JWT no longer meets this requirement.
+                          Some of your Edge Functions are set up to require a JWT in the{' '}
+                          <code>Authorization</code> header signed with the{' '}
+                          <em className="text-brand not-italic">legacy JWT secret</em>. Rotation
+                          causes{' '}
+                          <em className="text-brand not-italic">invocations by signed-in users</em>{' '}
+                          to fail with HTTP 401 Unauthorized, as the JWT no longer meets this
+                          requirement.
                           <br />
                           <br />
-                          Recommendation: Change all of your Edge Functions to no longer verify JWT and implement the verification logic in the function's code yourself by using the Supabase client library or any other library for working with JWT.</p>
+                          Recommendation: Change all of your Edge Functions to no longer verify JWT
+                          and implement the verification logic in the function's code yourself by
+                          using the Supabase client library or any other library for working with
+                          JWT.
+                        </p>
                       ),
                     },
                   }}
