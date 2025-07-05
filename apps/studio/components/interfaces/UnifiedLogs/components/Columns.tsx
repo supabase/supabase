@@ -113,8 +113,8 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
     },
     filterFn: (row, columnId, filterValue) => true,
     enableResizing: false,
-    size: 50,
-    minSize: 50,
+    size: 55,
+    minSize: 55,
     meta: {
       headerClassName:
         'w-[--header-status-size] max-w-[--header-status-size] min-w-[--header-status-size]',

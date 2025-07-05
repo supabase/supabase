@@ -313,6 +313,7 @@ const getPostgresLogsQuery = () => {
       CASE
           WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
           ELSE null
       END as level,
@@ -420,31 +421,34 @@ const getAuthLogsQuery = () => {
 
 /**
  * Supavisor logs query fragment
+ *
+ * Currently not in use
  */
-const getSupavisorLogsQuery = () => {
-  return `
-    select 
-      id, 
-      svl.timestamp as timestamp, 
-      'supavisor' as log_type,
-      'undefined' as status,
-      CASE
-          WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
-          WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
-          ELSE 'success'
-      END as level,
-      null as pathname,
-      null as host,
-      null as event_message,
-      null as method,
-      'api_role' as api_role,
-      null as auth_user,
-      null as log_count,
-      null as logs
-    from supavisor_logs as svl
-    cross join unnest(metadata) as svl_metadata
-  `
-}
+// const getSupavisorLogsQuery = () => {
+//   return `
+//     select
+//       id,
+//       svl.timestamp as timestamp,
+//       'supavisor' as log_type,
+//       'undefined' as status,
+//       CASE
+//           WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
+//           WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
+//           ELSE 'success'
+//       END as level,
+//       null as status,
+//       null as pathname,
+//       null as host,
+//       null as event_message,
+//       null as method,
+//       'api_role' as api_role,
+//       null as auth_user,
+//       null as log_count,
+//       null as logs
+//     from supavisor_logs as svl
+//     cross join unnest(metadata) as svl_metadata
+//   `
+// }
 
 // WHERE pathname includes `/storage/`
 const getSupabaseStorageLogsQuery = () => {
@@ -497,11 +501,14 @@ WITH unified_logs AS (
     union all
     ${getAuthLogsQuery()}
     union all
-    ${getSupavisorLogsQuery()}
-    union all
     ${getSupabaseStorageLogsQuery()}
 )
   `
+  // logs not in use yet
+
+  // requires more work to be done
+  // logging structure not complete.
+  // ${getSupavisorLogsQuery()}
 }
 
 /**

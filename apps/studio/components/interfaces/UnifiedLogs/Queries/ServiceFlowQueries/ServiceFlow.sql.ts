@@ -124,15 +124,7 @@ export const getPostgrestServiceFlowQuery = (logId: string): string => {
       JSON_EXTRACT_SCALAR(TO_JSON_STRING(authorization_payload), '$.subject') as jwt_auth_subject,
       
       -- Raw data
-      el as raw_log_data,
-      
-      -- Legacy fields for compatibility
-      edge_logs_request.path as path,
-      edge_logs_request.host as host,
-      edge_logs_request.method as method,
-      null as event_message,
-      null as log_count,
-      null as logs
+      el as raw_log_data
       
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
@@ -273,15 +265,7 @@ export const getAuthServiceFlowQuery = (logId: string): string => {
       JSON_EXTRACT_SCALAR(TO_JSON_STRING(authorization_payload), '$.subject') as jwt_auth_subject,
       
       -- Raw data
-      el as raw_log_data,
-      
-      -- Legacy fields for compatibility
-      edge_logs_request.path as path,
-      edge_logs_request.host as host,
-      edge_logs_request.method as method,
-      null as event_message,
-      null as log_count,
-      null as logs
+      el as raw_log_data
       
     -- Start with auth_logs and JOIN to edge_logs (same pattern as UnifiedLogs.queries.ts)
     from auth_logs as al
@@ -432,15 +416,7 @@ export const getEdgeFunctionServiceFlowQuery = (logId: string): string => {
       function_logs_agg.last_event_message as last_event_message,
       
       -- Raw data
-      fel as raw_log_data,
-      
-      -- Legacy fields for compatibility
-      fel_request.pathname as path,
-      fel_request.host as host,
-      fel_request.method as method,
-      COALESCE(function_logs_agg.last_event_message, '') as event_message,
-      function_logs_agg.function_log_count as log_count,
-      function_logs_agg.logs as logs
+      fel as raw_log_data
       
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
@@ -476,16 +452,22 @@ WHERE
 
 /**
  * Storage Service Flow Query for /storage/ requests
- * Fetches enriched edge log data for Storage requests with service-specific metadata
+ * Fetches enriched edge log data correlated with storage logs using cf_ray -> metadata.reqId
+ *
+ * Correlation: edge_logs.metadata.response.headers.cf_ray = storage_logs.metadata.reqId
+ *
+ * Example correlation:
+ * Edge: metadata.response.headers.cf_ray = "959f51c468dfbc5a-ZRH"
+ * Storage: metadata.reqId = "959f51c468dfbc5a-ZRH"
  */
 export const getStorageServiceFlowQuery = (logId: string): string => {
-  // Query for the specific log ID only
+  // Query correlates edge logs with storage logs using cf_ray -> reqId relationship
   if (DEBUG_SERVICE_FLOW) {
-    console.log('🔍 Generated Storage SQL for logId:', logId)
+    console.log('🔍 Generated Storage SQL with storage_logs correlation for logId:', logId)
   }
   return `
   select 
-      id,
+      el.id as id,
       el.timestamp as timestamp,
       'storage' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
@@ -531,7 +513,7 @@ export const getStorageServiceFlowQuery = (logId: string): string => {
       
       -- Auth data
       authorization_payload.role as api_role,
-  COALESCE(sb.auth_user, null) as auth_user,
+      COALESCE(sb.auth_user, null) as auth_user,
       
       -- JWT Key Authentication (old keys)
       CASE
@@ -589,23 +571,15 @@ export const getStorageServiceFlowQuery = (logId: string): string => {
       JSON_EXTRACT_SCALAR(TO_JSON_STRING(authorization_payload), '$.session_id') as jwt_auth_session_id,
       JSON_EXTRACT_SCALAR(TO_JSON_STRING(authorization_payload), '$.subject') as jwt_auth_subject,
       
-      -- Storage specific data
-      edge_logs_request_headers.content_length as storage_content_length,
-      edge_logs_request_headers.content_type as storage_request_content_type,
-      edge_logs_response_headers.content_disposition as storage_content_disposition,
-      edge_logs_response_headers.etag as storage_etag,
-      edge_logs_response_headers.last_modified as storage_last_modified,
+      -- Storage specific data from edge logs (only fields that actually exist)
+      edge_logs_response_headers.sb_gateway_mode as storage_edge_gateway_mode,
+      edge_logs_response_headers.sb_gateway_version as storage_edge_gateway_version,
+      
+      -- Cloudflare correlation info
+      edge_logs_response_headers.cf_ray as correlation_cf_ray,
       
       -- Raw data
-      el as raw_log_data,
-      
-      -- Legacy fields for compatibility
-      edge_logs_request.path as path,
-      edge_logs_request.host as host,
-      edge_logs_request.method as method,
-      null as event_message,
-      null as log_count,
-      null as logs
+      el as raw_log_data
       
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
@@ -623,7 +597,7 @@ export const getStorageServiceFlowQuery = (logId: string): string => {
     left join unnest(sb.apikey) as sb_apikey_outer
     left join unnest(sb_apikey_outer.apikey) as sb_apikey_inner
 
-    -- ONLY include logs where the path includes /storage/
+    -- Filter for storage requests and specific log ID
 WHERE 
   el.id = '${logId}'
   AND edge_logs_request.path LIKE '%/storage/%'
@@ -631,10 +605,70 @@ WHERE
 }
 
 /**
+ * Postgres Service Flow Query for database operations
+ * Fetches enriched postgres log data with database-specific metadata
+ *
+ * This handles direct database operations, connections, and queries
+ */
+export const getPostgresServiceFlowQuery = (logId: string): string => {
+  if (DEBUG_SERVICE_FLOW) {
+    console.log('🔍 Generated Postgres SQL for logId:', logId)
+  }
+  return `
+  select 
+      pgl.id as id,
+      pgl.timestamp as timestamp,
+      'postgres' as log_type,
+      pgl_parsed.sql_state_code as status,
+      CASE
+          WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
+          WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
+          WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+          ELSE 'success'
+      END as level,
+      
+      -- Database connection details
+      pgl_parsed.database_name as database_name,
+      pgl_parsed.user_name as database_user,
+      pgl_parsed.connection_from as connection_from,
+      pgl_metadata.host as database_host,
+      
+      -- Query/Operation details
+      pgl_parsed.command_tag as command_tag,
+      pgl_parsed.backend_type as backend_type,
+      pgl_parsed.query_id as query_id,
+      
+      -- Session details
+      pgl_parsed.session_id as session_id,
+      pgl_parsed.process_id as process_id,
+      pgl_parsed.virtual_transaction_id as virtual_transaction_id,
+      pgl_parsed.transaction_id as transaction_id,
+      pgl_parsed.session_start_time as session_start_time,
+      pgl_parsed.session_line_num as session_line_num,
+      
+      -- Error/Status details
+      pgl_parsed.error_severity as error_severity,
+      pgl_parsed.sql_state_code as sql_state_code,
+      pgl.event_message as event_message,
+      
+      -- Timing
+      pgl_parsed.timestamp as operation_timestamp,
+      
+      -- Raw data
+      pgl as raw_log_data
+      
+    from postgres_logs as pgl
+    cross join unnest(pgl.metadata) as pgl_metadata
+    cross join unnest(pgl_metadata.parsed) as pgl_parsed
+    
+WHERE 
+  pgl.id = '${logId}'
+`
+}
+
+/**
  * Placeholder for other service flow queries
  * TODO: Add separate queries for:
- * - getAuthServiceFlowQuery()
- * - getStorageServiceFlowQuery()
- * - getFunctionServiceFlowQuery()
  * - getRealtimeServiceFlowQuery()
  */

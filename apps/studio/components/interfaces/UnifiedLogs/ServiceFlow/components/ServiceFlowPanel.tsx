@@ -189,7 +189,14 @@ const LayerSpecificDetails = ({ log, layer }: { log: ServiceLogEntry; layer: str
       )
 
     case 'postgres':
-      return <div className="text-xs text-foreground-light">Database query execution</div>
+      return (
+        <div className="text-xs text-foreground-light space-y-1">
+          {log.database_name && <div>Database: {log.database_name}</div>}
+          {log.database_user && <div>User: {log.database_user}</div>}
+          {log.command_tag && <div>Command: {log.command_tag}</div>}
+          {log.backend_type && <div>Type: {log.backend_type}</div>}
+        </div>
+      )
 
     default:
       return null

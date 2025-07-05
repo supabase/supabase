@@ -42,10 +42,6 @@ import {
 interface ServiceFlowPanelProps {
   selectedRow: any
   selectedRowKey: string
-  totalDBRowCount: number | undefined
-  filterDBRowCount: number | undefined
-  totalFetched: number | undefined
-  metadata: any
   searchParameters: any
   search: any // Raw search object to get logId
 }
@@ -53,26 +49,26 @@ interface ServiceFlowPanelProps {
 export function ServiceFlowPanel({
   selectedRow,
   selectedRowKey,
-  totalDBRowCount,
-  filterDBRowCount,
-  totalFetched,
-  metadata,
   searchParameters,
   search,
 }: ServiceFlowPanelProps) {
-  const { table, filterFields } = useDataTable()
+  const { table, filterFields, totalRows } = useDataTable()
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('details')
+
+  // Get all metadata values from the table/provider
+  const totalDBRowCount = totalRows ?? 0
+  const filterDBRowCount = table.getCoreRowModel().flatRows.length
+  const totalFetched = table.getCoreRowModel().flatRows.length
+  const currentPercentiles = { 50: 0, 75: 0, 90: 0, 95: 0, 99: 0 } // Empty percentiles since not used in UI
 
   // WORKAROUND: Use the real database logId from search params instead of fabricated selectedRow.id
   // This is needed because we create fake UUIDs to handle repeated logs issue
   // TODO: Remove once repeated logs issue is fixed - should use selectedRow.id directly
-  const realLogId = search?.logId || selectedRow?.id
+  const realLogId = selectedRow?.id
 
   if (DEBUG_SERVICE_FLOW) {
     console.log('🔍 Log ID extraction debug:', {
-      'search.logId': search?.logId,
-      'selectedRow.log_id': selectedRow?.log_id,
       'selectedRow.uuid_id': selectedRow?.uuid_id,
       'selectedRow.id': selectedRow?.id,
       'final realLogId': realLogId,
@@ -92,6 +88,8 @@ export function ServiceFlowPanel({
         return 'storage'
       case 'postgrest':
         return 'postgrest'
+      case 'postgres':
+        return 'postgres'
       default:
         return undefined
     }
@@ -107,6 +105,7 @@ export function ServiceFlowPanel({
   const isAuthFlow = serviceFlowType === 'auth'
   const isEdgeFunctionFlow = serviceFlowType === 'edge-function'
   const isStorageFlow = serviceFlowType === 'storage'
+  const isPostgresFlow = serviceFlowType === 'postgres'
 
   // Query the logs API directly
   const {
@@ -134,6 +133,7 @@ export function ServiceFlowPanel({
       isAuthFlow,
       isEdgeFunctionFlow,
       isStorageFlow,
+      isPostgresFlow,
       serviceFlowType,
       serviceFlowData,
       isLoading,
@@ -192,11 +192,10 @@ export function ServiceFlowPanel({
                     filterFields={filterFields}
                     fields={sheetFields}
                     metadata={{
-                      totalRows: totalDBRowCount ?? 0,
-                      filterRows: filterDBRowCount ?? 0,
-                      totalRowsFetched: totalFetched ?? 0,
-                      currentPercentiles: metadata?.currentPercentiles ?? ({} as any),
-                      ...metadata,
+                      totalRows: totalDBRowCount,
+                      filterRows: filterDBRowCount,
+                      totalRowsFetched: totalFetched,
+                      currentPercentiles: currentPercentiles,
                     }}
                   />
 
@@ -350,65 +349,87 @@ export function ServiceFlowPanel({
                         </div>
                       ) : (
                         <>
-                          <MemoizedRequestStartedBlock
-                            data={selectedRow}
-                            enrichedData={serviceFlowData?.result?.[0]}
-                          />
-
-                          <MemoizedNetworkBlock
-                            data={selectedRow}
-                            enrichedData={serviceFlowData?.result?.[0]}
-                            isLoading={isLoading}
-                            filterFields={filterFields}
-                            table={table}
-                          />
-
-                          {isAuthFlow ? (
-                            <MemoizedGoTrueBlock
-                              data={selectedRow}
-                              enrichedData={serviceFlowData?.result?.[0]}
-                              isLoading={isLoading}
-                              filterFields={filterFields}
-                              table={table}
-                            />
-                          ) : isEdgeFunctionFlow ? (
-                            <MemoizedEdgeFunctionBlock
-                              data={selectedRow}
-                              enrichedData={serviceFlowData?.result?.[0]}
-                              isLoading={isLoading}
-                              filterFields={filterFields}
-                              table={table}
-                            />
-                          ) : isStorageFlow ? (
-                            <MemoizedStorageBlock
-                              data={selectedRow}
-                              enrichedData={serviceFlowData?.result?.[0]}
-                              isLoading={isLoading}
-                              filterFields={filterFields}
-                              table={table}
-                            />
-                          ) : (
+                          {isPostgresFlow ? (
+                            // Postgres flows: Connection Started -> Postgres -> Operation Completed
                             <>
-                              <MemoizedPostgRESTBlock
+                              <MemoizedRequestStartedBlock
                                 data={selectedRow}
                                 enrichedData={serviceFlowData?.result?.[0]}
-                                isLoading={isLoading}
-                                filterFields={filterFields}
-                                table={table}
                               />
 
                               <MemoizedPostgresBlock
                                 data={selectedRow}
                                 enrichedData={serviceFlowData?.result?.[0]}
                                 isLoading={isLoading}
-                                isLast={false}
+                                isLast={true}
                                 filterFields={filterFields}
                                 table={table}
                               />
                             </>
-                          )}
+                          ) : (
+                            // HTTP-based flows: Request Started -> Network -> Service -> Response
+                            <>
+                              <MemoizedRequestStartedBlock
+                                data={selectedRow}
+                                enrichedData={serviceFlowData?.result?.[0]}
+                              />
 
-                          <MemoizedResponseCompletedBlock data={selectedRow} />
+                              <MemoizedNetworkBlock
+                                data={selectedRow}
+                                enrichedData={serviceFlowData?.result?.[0]}
+                                isLoading={isLoading}
+                                filterFields={filterFields}
+                                table={table}
+                              />
+
+                              {isAuthFlow ? (
+                                <MemoizedGoTrueBlock
+                                  data={selectedRow}
+                                  enrichedData={serviceFlowData?.result?.[0]}
+                                  isLoading={isLoading}
+                                  filterFields={filterFields}
+                                  table={table}
+                                />
+                              ) : isEdgeFunctionFlow ? (
+                                <MemoizedEdgeFunctionBlock
+                                  data={selectedRow}
+                                  enrichedData={serviceFlowData?.result?.[0]}
+                                  isLoading={isLoading}
+                                  filterFields={filterFields}
+                                  table={table}
+                                />
+                              ) : isStorageFlow ? (
+                                <MemoizedStorageBlock
+                                  data={selectedRow}
+                                  enrichedData={serviceFlowData?.result?.[0]}
+                                  isLoading={isLoading}
+                                  filterFields={filterFields}
+                                  table={table}
+                                />
+                              ) : (
+                                <>
+                                  <MemoizedPostgRESTBlock
+                                    data={selectedRow}
+                                    enrichedData={serviceFlowData?.result?.[0]}
+                                    isLoading={isLoading}
+                                    filterFields={filterFields}
+                                    table={table}
+                                  />
+
+                                  <MemoizedPostgresBlock
+                                    data={selectedRow}
+                                    enrichedData={serviceFlowData?.result?.[0]}
+                                    isLoading={isLoading}
+                                    isLast={false}
+                                    filterFields={filterFields}
+                                    table={table}
+                                  />
+                                </>
+                              )}
+
+                              <MemoizedResponseCompletedBlock data={selectedRow} />
+                            </>
+                          )}
                         </>
                       )}
                     </div>

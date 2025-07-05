@@ -28,6 +28,21 @@ export interface ServiceLogEntry {
   cf_datacenter?: string
   user_agent?: string
   ip_address?: string
+
+  // Postgres specific info
+  database_name?: string
+  database_user?: string
+  command_tag?: string
+  backend_type?: string
+  connection_from?: string
+  session_id?: string
+  process_id?: number
+  query_id?: number
+  transaction_id?: number
+  virtual_transaction_id?: string
+  session_start_time?: string
+  error_severity?: string
+  sql_state_code?: string
 }
 
 export interface ServiceLayer {

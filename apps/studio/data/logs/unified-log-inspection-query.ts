@@ -5,6 +5,7 @@ import {
   getAuthServiceFlowQuery,
   getEdgeFunctionServiceFlowQuery,
   getStorageServiceFlowQuery,
+  getPostgresServiceFlowQuery,
 } from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { ResponseError } from 'types'
@@ -15,7 +16,13 @@ import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 const DEBUG_SERVICE_FLOW = false
 
 // Service flow types - subset of LOG_TYPES that support service flows
-export const SERVICE_FLOW_TYPES = ['postgrest', 'auth', 'edge-function', 'storage'] as const
+export const SERVICE_FLOW_TYPES = [
+  'postgrest',
+  'auth',
+  'edge-function',
+  'storage',
+  'postgres',
+] as const
 export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
 
 export type UnifiedLogInspectionVariables = {
@@ -142,6 +149,9 @@ export async function getUnifiedLogInspection(
       break
     case 'storage':
       sql = getStorageServiceFlowQuery(logId)
+      break
+    case 'postgres':
+      sql = getPostgresServiceFlowQuery(logId)
       break
     default:
       throw new Error('Invalid type')

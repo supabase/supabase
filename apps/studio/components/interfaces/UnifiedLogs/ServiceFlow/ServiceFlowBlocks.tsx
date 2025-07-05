@@ -11,9 +11,6 @@ import {
   Globe,
   Server,
   X,
-  ExternalLink,
-  AlertCircle,
-  FileX,
 } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { memo, useState } from 'react'
@@ -736,45 +733,106 @@ const postgrestResponseFields: BlockFieldConfig[] = [
   },
 ]
 
-const postgresFields: BlockFieldConfig[] = [
+// Primary Postgres Fields (Always Visible)
+const postgresPrimaryFields: BlockFieldConfig[] = [
   {
-    id: 'run_statement',
-    label: 'Run statement',
-    getValue: (data, enrichedData) =>
-      enrichedData?.statement_count ? `${enrichedData.statement_count} spans` : null,
+    id: 'status',
+    label: 'Status',
+    getValue: (data, enrichedData) => enrichedData?.status || data?.status,
+  },
+  {
+    id: 'command_tag',
+    label: 'Command',
+    getValue: (data, enrichedData) => enrichedData?.command_tag || data?.command_tag,
     requiresEnrichedData: true,
   },
   {
-    id: 'execution_time',
-    label: 'Execution time',
+    id: 'database_name',
+    label: 'Database',
+    getValue: (data, enrichedData) => enrichedData?.database_name || data?.database_name,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'database_user',
+    label: 'User',
+    getValue: (data, enrichedData) => enrichedData?.database_user || data?.database_user,
+    requiresEnrichedData: true,
+  },
+]
+
+// Postgres Details (Collapsible)
+const postgresDetailsFields: BlockFieldConfig[] = [
+  {
+    id: 'backend_type',
+    label: 'Backend Type',
+    getValue: (data, enrichedData) => enrichedData?.backend_type || data?.backend_type,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'connection_from',
+    label: 'Connection From',
+    getValue: (data, enrichedData) => enrichedData?.connection_from || data?.connection_from,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'session_id',
+    label: 'Session ID',
     getValue: (data, enrichedData) => {
-      const time = enrichedData?.execution_time || enrichedData?.query_duration
-      return time ? `${time}s` : null
+      const sessionId = enrichedData?.session_id || data?.session_id
+      return sessionId ? `${sessionId.substring(0, 12)}...` : null
     },
     requiresEnrichedData: true,
   },
   {
-    id: 'postgres_version',
-    label: 'Postgres version',
-    getValue: (data, enrichedData) => enrichedData?.postgres_version,
+    id: 'process_id',
+    label: 'Process ID',
+    getValue: (data, enrichedData) => enrichedData?.process_id || data?.process_id,
     requiresEnrichedData: true,
   },
   {
-    id: 'environment',
-    label: 'Environment',
-    getValue: (data, enrichedData) => enrichedData?.environment,
+    id: 'query_id',
+    label: 'Query ID',
+    getValue: (data, enrichedData) => {
+      const queryId = enrichedData?.query_id || data?.query_id
+      return queryId ? String(queryId) : null
+    },
     requiresEnrichedData: true,
   },
   {
-    id: 'region',
-    label: 'Region',
-    getValue: (data, enrichedData) => enrichedData?.region,
+    id: 'transaction_id',
+    label: 'Transaction ID',
+    getValue: (data, enrichedData) => {
+      const txId = enrichedData?.transaction_id || data?.transaction_id
+      return txId ? String(txId) : null
+    },
     requiresEnrichedData: true,
   },
   {
-    id: 'memory_used',
-    label: 'Estimated memory used',
-    getValue: (data, enrichedData) => enrichedData?.memory_used,
+    id: 'virtual_transaction_id',
+    label: 'Virtual TX ID',
+    getValue: (data, enrichedData) =>
+      enrichedData?.virtual_transaction_id || data?.virtual_transaction_id,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'session_start_time',
+    label: 'Session Started',
+    getValue: (data, enrichedData) => {
+      const startTime = enrichedData?.session_start_time || data?.session_start_time
+      return startTime ? new Date(startTime).toLocaleString() : null
+    },
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'error_severity',
+    label: 'Severity',
+    getValue: (data, enrichedData) => enrichedData?.error_severity || data?.error_severity,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'sql_state_code',
+    label: 'SQL State',
+    getValue: (data, enrichedData) => enrichedData?.sql_state_code || data?.sql_state_code,
     requiresEnrichedData: true,
   },
 ]
@@ -1410,230 +1468,6 @@ const isPreviewable = (path: string, contentType?: string): boolean => {
   )
 }
 
-// Helper function to construct storage object URL
-const getStorageObjectUrl = (projectRef: string, path: string): string => {
-  // Extract bucket and object path from the full path
-  // Path format: /storage/v1/object/bucketName/objectPath
-  const match = path.match(/\/storage\/v1\/object\/([^\/]+)\/(.+)/)
-  if (!match) return ''
-
-  const [, bucketName, objectPath] = match
-  return `https://${projectRef}.supabase.co/storage/v1/object/public/${bucketName}/${objectPath}`
-}
-
-// Empty State Component (like InnerSideBarEmptyPanel)
-const StorageEmptyState = ({
-  illustration,
-  title,
-  description,
-  actions,
-}: {
-  illustration?: React.ReactNode
-  title: string
-  description?: string | React.ReactNode
-  actions?: React.ReactNode
-}) => {
-  return (
-    <div className="border border-muted bg-surface-100 dark:bg-surface-75 flex flex-col gap-y-3 items-center justify-center rounded-md px-5 py-4">
-      <div className="w-full flex flex-col gap-y-1 items-center">
-        {illustration}
-        <p className="text-xs text-foreground-light">{title}</p>
-        {description && (
-          <p className="text-xs text-foreground-lighter text-center">{description}</p>
-        )}
-        {actions && <div className="mt-2">{actions}</div>}
-      </div>
-    </div>
-  )
-}
-
-// Storage Object Preview Component
-const StorageObjectPreview = ({
-  data,
-  enrichedData,
-  projectRef,
-}: {
-  data: any
-  enrichedData?: any
-  projectRef: string
-}) => {
-  const path = enrichedData?.path || enrichedData?.request_path || data?.path
-  const status = enrichedData?.status || data?.status
-  const [mediaError, setMediaError] = useState(false)
-
-  // Get metadata like PreviewPane does
-  const metadata = getStorageMetadata(data, enrichedData)
-  const mimeType = metadata?.mimetype
-
-  // Fallback to headers if metadata not available
-  const contentType =
-    mimeType || enrichedData?.response_content_type || enrichedData?.storage_request_content_type
-
-  // Check if object was deleted or not found
-  const isObjectDeleted = status === 404 || status === '404'
-  const isObjectForbidden = status === 403 || status === '403'
-  const hasError = status && Number(status) >= 400
-
-  if (!path) return null
-
-  const objectUrl = getStorageObjectUrl(projectRef, path)
-  const canPreview = isPreviewable(path, contentType)
-
-  const renderPreview = () => {
-    if (!contentType || !objectUrl || mediaError) return null
-
-    if (contentType.includes('image')) {
-      return (
-        <img
-          src={objectUrl}
-          alt="Storage object preview"
-          className="max-w-full h-auto max-h-48 object-contain"
-          onError={() => setMediaError(true)}
-          loading="lazy"
-        />
-      )
-    }
-
-    if (contentType.includes('video')) {
-      return (
-        <div className="flex h-48 w-full items-center justify-center p-2">
-          <video
-            key={objectUrl}
-            controls
-            className="max-h-full max-w-full"
-            onError={() => setMediaError(true)}
-          >
-            <source src={objectUrl} type={contentType} />
-            <p className="text-sm text-foreground-light">
-              Your browser does not support the video tag.
-            </p>
-          </video>
-        </div>
-      )
-    }
-
-    if (contentType.includes('audio')) {
-      return (
-        <div className="flex h-24 w-full items-center justify-center p-4">
-          <audio key={objectUrl} controls className="w-full" onError={() => setMediaError(true)}>
-            <source src={objectUrl} type={contentType} />
-            <p className="text-sm text-foreground-light">
-              Your browser does not support the audio element.
-            </p>
-          </audio>
-        </div>
-      )
-    }
-
-    return null
-  }
-
-  return (
-    <div className="mt-3">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="text-xs font-medium text-foreground">
-          {canPreview && !hasError && !mediaError ? 'Preview' : 'Object Status'}
-        </h4>
-        {canPreview && !hasError && !mediaError && objectUrl && (
-          <Button
-            type="text"
-            size="tiny"
-            className="text-xs"
-            iconRight={<ExternalLink className="h-3 w-3" />}
-            onClick={() => window.open(objectUrl, '_blank')}
-          >
-            Open
-          </Button>
-        )}
-      </div>
-
-      {isObjectDeleted ? (
-        <StorageEmptyState
-          illustration={<FileX className="h-8 w-8 text-foreground-lighter" />}
-          title="Object Not Found"
-          description="This storage object has been deleted"
-        />
-      ) : isObjectForbidden ? (
-        <StorageEmptyState
-          illustration={<AlertCircle className="h-8 w-8 text-foreground-lighter" />}
-          title="Access Forbidden"
-          description="No permission to access this object"
-          actions={
-            objectUrl ? (
-              <Button
-                type="text"
-                size="tiny"
-                iconRight={<ExternalLink className="h-3 w-3" />}
-                onClick={() => window.open(objectUrl, '_blank')}
-              >
-                Try to open anyway
-              </Button>
-            ) : undefined
-          }
-        />
-      ) : hasError ? (
-        <StorageEmptyState
-          illustration={<X className="h-8 w-8 text-foreground-lighter" />}
-          title={`Error ${status}`}
-          description="Unable to access storage object"
-          actions={
-            objectUrl ? (
-              <Button
-                type="text"
-                size="tiny"
-                iconRight={<ExternalLink className="h-3 w-3" />}
-                onClick={() => window.open(objectUrl, '_blank')}
-              >
-                Try to open anyway
-              </Button>
-            ) : undefined
-          }
-        />
-      ) : canPreview && !mediaError ? (
-        <div className="border border-border rounded-lg overflow-hidden bg-surface-100">
-          {renderPreview()}
-        </div>
-      ) : canPreview && mediaError ? (
-        <StorageEmptyState
-          illustration={<X className="h-8 w-8 text-foreground-lighter" />}
-          title="Preview Unavailable"
-          description="Could not load media preview"
-          actions={
-            objectUrl ? (
-              <Button
-                type="text"
-                size="tiny"
-                iconRight={<ExternalLink className="h-3 w-3" />}
-                onClick={() => window.open(objectUrl, '_blank')}
-              >
-                Open original
-              </Button>
-            ) : undefined
-          }
-        />
-      ) : (
-        <StorageEmptyState
-          illustration={<Storage className="h-8 w-8 text-foreground-lighter" />}
-          title="Preview Not Available"
-          description={`${getFileName(path)} • ${contentType || 'Unknown type'}`}
-          actions={
-            objectUrl ? (
-              <Button
-                type="text"
-                size="tiny"
-                iconRight={<ExternalLink className="h-3 w-3" />}
-                onClick={() => window.open(objectUrl, '_blank')}
-              >
-                Open file
-              </Button>
-            ) : undefined
-          }
-        />
-      )}
-    </div>
-  )
-}
-
 // Storage
 export const StorageBlock = memo(
   ({ data, enrichedData, isLoading, filterFields, table }: ServiceFlowBlockProps) => {
@@ -1663,17 +1497,183 @@ export const StorageBlock = memo(
           filterFields={filterFields}
           table={table}
         />
-
-        {/* Object Preview */}
-        {projectRef && (
-          <StorageObjectPreview data={data} enrichedData={enrichedData} projectRef={projectRef} />
-        )}
       </TimelineStep>
     )
   }
 )
 
 StorageBlock.displayName = 'StorageBlock'
+
+// Postgres Event Message Component
+const PostgresEventMessage = ({ message, severity }: { message: string; severity?: string }) => {
+  const getSeverityColor = (severity?: string) => {
+    switch (severity?.toLowerCase()) {
+      case 'error':
+      case 'fatal':
+        return 'border-destructive/20 bg-destructive/5 text-destructive'
+      case 'warning':
+        return 'border-warning/20 bg-warning/5 text-warning-foreground'
+      case 'log':
+        return 'border-border bg-surface-100 text-foreground'
+      default:
+        return 'border-border bg-surface-100 text-foreground'
+    }
+  }
+
+  const getSeverityIcon = (severity?: string) => {
+    switch (severity?.toLowerCase()) {
+      case 'error':
+      case 'fatal':
+        return 'text-destructive'
+      case 'warning':
+        return 'text-warning'
+      default:
+        return 'text-foreground-light'
+    }
+  }
+
+  // Enhanced message parsing for common postgres error patterns
+  const parsePostgresMessage = (message: string) => {
+    // Pattern: invalid input syntax for type <type>: "<value>"
+    const invalidSyntaxMatch = message.match(/invalid input syntax for type (\w+): "([^"]+)"/i)
+    if (invalidSyntaxMatch) {
+      const [, type, value] = invalidSyntaxMatch
+      return (
+        <div className="space-y-1">
+          <div className="text-sm font-medium">Invalid Input Syntax</div>
+          <div className="text-sm">
+            Expected type:{' '}
+            <code className="px-1 py-0.5 rounded bg-surface-200 text-foreground font-mono text-xs">
+              {type}
+            </code>
+          </div>
+          <div className="text-sm">
+            Received value:{' '}
+            <code className="px-1 py-0.5 rounded bg-surface-200 text-destructive font-mono text-xs">
+              "{value}"
+            </code>
+          </div>
+        </div>
+      )
+    }
+
+    // Pattern: duplicate key value violates unique constraint
+    const duplicateKeyMatch = message.match(
+      /duplicate key value violates unique constraint "([^"]+)"/i
+    )
+    if (duplicateKeyMatch) {
+      const [, constraint] = duplicateKeyMatch
+      return (
+        <div className="space-y-1">
+          <div className="text-sm font-medium">Unique Constraint Violation</div>
+          <div className="text-sm">
+            Constraint:{' '}
+            <code className="px-1 py-0.5 rounded bg-surface-200 text-foreground font-mono text-xs">
+              {constraint}
+            </code>
+          </div>
+          <div className="text-xs text-foreground-light mt-1">
+            A record with this value already exists
+          </div>
+        </div>
+      )
+    }
+
+    // Pattern: relation "<table>" does not exist
+    const relationMatch = message.match(/relation "([^"]+)" does not exist/i)
+    if (relationMatch) {
+      const [, relation] = relationMatch
+      return (
+        <div className="space-y-1">
+          <div className="text-sm font-medium">Relation Not Found</div>
+          <div className="text-sm">
+            Missing relation:{' '}
+            <code className="px-1 py-0.5 rounded bg-surface-200 text-destructive font-mono text-xs">
+              {relation}
+            </code>
+          </div>
+          <div className="text-xs text-foreground-light mt-1">
+            Table, view, or sequence does not exist
+          </div>
+        </div>
+      )
+    }
+
+    // Pattern: column "<column>" does not exist
+    const columnMatch = message.match(/column "([^"]+)" does not exist/i)
+    if (columnMatch) {
+      const [, column] = columnMatch
+      return (
+        <div className="space-y-1">
+          <div className="text-sm font-medium">Column Not Found</div>
+          <div className="text-sm">
+            Missing column:{' '}
+            <code className="px-1 py-0.5 rounded bg-surface-200 text-destructive font-mono text-xs">
+              {column}
+            </code>
+          </div>
+        </div>
+      )
+    }
+
+    // Pattern: permission denied for <object>
+    const permissionMatch = message.match(/permission denied for (\w+) "?([^"]+)"?/i)
+    if (permissionMatch) {
+      const [, objectType, objectName] = permissionMatch
+      return (
+        <div className="space-y-1">
+          <div className="text-sm font-medium">Permission Denied</div>
+          <div className="text-sm">
+            {objectType}:{' '}
+            <code className="px-1 py-0.5 rounded bg-surface-200 text-foreground font-mono text-xs">
+              {objectName}
+            </code>
+          </div>
+          <div className="text-xs text-foreground-light mt-1">User lacks required privileges</div>
+        </div>
+      )
+    }
+
+    // Connection/authentication messages
+    if (message.includes('connection authorized')) {
+      const parts = message.split(' ')
+      return (
+        <div className="space-y-1">
+          <div className="text-sm font-medium text-success">Connection Authorized</div>
+          <div className="text-sm text-foreground-light">{message}</div>
+        </div>
+      )
+    }
+
+    // Default: show original message with basic formatting
+    return (
+      <div className="text-sm font-mono break-words whitespace-pre-wrap leading-relaxed">
+        {message}
+      </div>
+    )
+  }
+
+  return (
+    <div className="mt-3 border-t border-border pt-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Database size={14} className={getSeverityIcon(severity)} />
+        <span className="text-xs font-medium text-foreground-light">
+          Database Event
+          {severity && (
+            <span
+              className={`ml-2 px-1.5 py-0.5 rounded text-xs font-medium ${getSeverityColor(severity)}`}
+            >
+              {severity.toUpperCase()}
+            </span>
+          )}
+        </span>
+      </div>
+      <div className={`p-3 rounded-lg border ${getSeverityColor(severity)}`}>
+        {parsePostgresMessage(message)}
+      </div>
+    </div>
+  )
+}
 
 // Postgres
 export const PostgresBlock = memo(
@@ -1685,25 +1685,37 @@ export const PostgresBlock = memo(
     filterFields,
     table,
   }: ServiceFlowBlockProps) => {
-    const hasError = data?.status && Number(data.status) >= 400
-    const isSkipped = hasError
-
     return (
-      <TimelineStep
-        title="Postgres"
-        status={isSkipped ? undefined : data?.status}
-        statusText={isSkipped ? 'SKIPPED' : undefined}
-        isLast={isLast}
-      >
-        {isSkipped ? (
-          <div className="text-sm text-foreground-light italic py-2">
-            Skipped due to PostgREST error
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-4 text-center">
-            <BarChart3 size={20} className="text-foreground-lighter mb-2" />
-            <div className="text-sm text-foreground-light">More data insights coming soon</div>
-          </div>
+      <TimelineStep title="Postgres" status={data?.status} isLast={isLast}>
+        {/* Primary Display Fields */}
+        {postgresPrimaryFields.map((field) => (
+          <BlockField
+            key={field.id}
+            config={field}
+            data={data}
+            enrichedData={enrichedData}
+            isLoading={isLoading}
+            filterFields={filterFields}
+            table={table}
+          />
+        ))}
+
+        <CollapsibleSection
+          title="Connection & Session Details"
+          fields={postgresDetailsFields}
+          data={data}
+          enrichedData={enrichedData}
+          isLoading={isLoading}
+          filterFields={filterFields}
+          table={table}
+        />
+
+        {/* Event Message */}
+        {(enrichedData?.event_message || data?.event_message) && (
+          <PostgresEventMessage
+            message={enrichedData?.event_message || data?.event_message}
+            severity={enrichedData?.error_severity || data?.error_severity}
+          />
         )}
       </TimelineStep>
     )

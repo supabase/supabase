@@ -36,13 +36,13 @@ export const CHART_CONFIG = {
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES = [
-  'auth',
-  'edge function',
   'postgres',
-  'postgres_upgrade',
   'postgrest',
+  'auth',
   'storage',
-  'supavisor',
+  'edge function',
+  // 'postgres_upgrade',
+  // 'supavisor',
 ] as const
 
 const parseAsSort = createParser({
