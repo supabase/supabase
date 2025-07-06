@@ -81,7 +81,7 @@ const ServiceLayerCard = ({ layer }: { layer: ServiceLayer }) => {
       {/* Layer Header */}
       <div className="flex items-center justify-between p-3 bg-surface-100">
         <div className="flex items-center gap-2">
-          <Icon size={16} className={getLayerIconColor(layer.layer)} />
+          <Icon size={16} className="text-foreground-light" />
           <span className="text-sm font-medium">{layer.display_name}</span>
           <StatusBadge status={layer.status} size="small" />
         </div>
@@ -226,55 +226,36 @@ const StatusDot = ({ status }: { status: string }) => {
   return <div className={`w-2 h-2 rounded-full ${color}`} />
 }
 
-const getLayerIcon = (layer: string) => {
-  switch (layer) {
-    case 'network':
-      return Globe
-    case 'api':
-      return Key
-    case 'user':
-      return User
-    case 'postgrest':
-      return Zap
-    case 'postgres':
-      return Database
-    default:
-      return CheckCircle
-  }
-}
+// Layer configuration object to replace switch statements
+const LAYER_CONFIG = {
+  network: {
+    icon: Globe,
+    order: 1,
+  },
+  api: {
+    icon: Key,
+    order: 2,
+  },
+  user: {
+    icon: User,
+    order: 3,
+  },
+  postgrest: {
+    icon: Zap,
+    order: 4,
+  },
+  postgres: {
+    icon: Database,
+    order: 5,
+  },
+} as const
 
-const getLayerIconColor = (layer: string) => {
-  switch (layer) {
-    case 'network':
-      return 'text-blue-500'
-    case 'api':
-      return 'text-purple-500'
-    case 'user':
-      return 'text-green-500'
-    case 'postgrest':
-      return 'text-orange-500'
-    case 'postgres':
-      return 'text-indigo-500'
-    default:
-      return 'text-foreground-light'
-  }
+const getLayerIcon = (layer: string) => {
+  return (LAYER_CONFIG as any)[layer]?.icon ?? CheckCircle
 }
 
 const getLayerOrder = (layer: string): number => {
-  switch (layer) {
-    case 'network':
-      return 1
-    case 'api':
-      return 2
-    case 'user':
-      return 3
-    case 'postgrest':
-      return 4
-    case 'postgres':
-      return 5
-    default:
-      return 999
-  }
+  return (LAYER_CONFIG as any)[layer]?.order ?? 999
 }
 
 const formatTime = (timestamp: string) => {

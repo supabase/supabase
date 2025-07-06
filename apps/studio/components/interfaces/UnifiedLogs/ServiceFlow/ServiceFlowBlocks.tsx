@@ -58,18 +58,26 @@ import {
   postgresDetailsFields,
 } from './config/serviceFlowFields'
 
-// Import individual service block components from separate files
+// Import individual service block components from unified system
 // These are the main visual blocks that represent each stage of the request flow
 import {
   RequestStartedBlock,
   MemoizedRequestStartedBlock,
 } from './components/blocks/RequestStartedBlock'
-import { NetworkBlock, MemoizedNetworkBlock } from './components/blocks/NetworkBlock'
-import { PostgRESTBlock, MemoizedPostgRESTBlock } from './components/blocks/PostgRESTBlock'
-import { GoTrueBlock, MemoizedGoTrueBlock } from './components/blocks/GoTrueBlock'
-import { EdgeFunctionBlock, MemoizedEdgeFunctionBlock } from './components/blocks/EdgeFunctionBlock'
-import { StorageBlock, MemoizedStorageBlock } from './components/blocks/StorageBlock'
-import { PostgresBlock, MemoizedPostgresBlock } from './components/blocks/PostgresBlock'
+import {
+  NetworkBlock,
+  MemoizedNetworkBlock,
+  PostgRESTBlock,
+  MemoizedPostgRESTBlock,
+  GoTrueBlock,
+  MemoizedGoTrueBlock,
+  EdgeFunctionBlock,
+  MemoizedEdgeFunctionBlock,
+  StorageBlock,
+  MemoizedStorageBlock,
+  PostgresBlock,
+  MemoizedPostgresBlock,
+} from './components/ServiceBlocks'
 import {
   ResponseCompletedBlock,
   MemoizedResponseCompletedBlock,

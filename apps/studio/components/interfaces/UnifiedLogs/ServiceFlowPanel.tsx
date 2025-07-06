@@ -1,41 +1,37 @@
+import { Table } from '@tanstack/react-table'
 import { useState } from 'react'
 
-import { Table } from '@tanstack/react-table'
-
-// Debug flag for console logs - set to true for debugging
-const DEBUG_SERVICE_FLOW = false
 import { useParams } from 'common'
 import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
-import { useUnifiedLogInspectionQuery, ServiceFlowType } from 'data/logs'
+import { ServiceFlowType, useUnifiedLogInspectionQuery } from 'data/logs'
 import {
+  CodeBlock,
   ResizableHandle,
   ResizablePanel,
+  Skeleton,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  CodeBlock,
-  Separator,
-  Skeleton,
-  cn,
 } from 'ui'
 import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
+import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
+import {
+  MemoizedEdgeFunctionBlock,
+  MemoizedGoTrueBlock,
+  MemoizedNetworkBlock,
+  MemoizedPostgRESTBlock,
+  MemoizedPostgresBlock,
+  MemoizedRequestStartedBlock,
+  MemoizedResponseCompletedBlock,
+  MemoizedStorageBlock,
+} from './ServiceFlow/ServiceFlowBlocks'
 import { sheetFields } from './UnifiedLogs.fields'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta } from './UnifiedLogs.types'
-import {
-  MemoizedRequestStartedBlock,
-  MemoizedNetworkBlock,
-  MemoizedPostgRESTBlock,
-  MemoizedGoTrueBlock,
-  MemoizedEdgeFunctionBlock,
-  MemoizedStorageBlock,
-  MemoizedPostgresBlock,
-  MemoizedResponseCompletedBlock,
-} from './ServiceFlow/ServiceFlowBlocks'
-import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
-// import { useServiceFlowData, shouldShowServiceFlow } from './ServiceFlow.queries'
-// import { ServiceFlowPanel as EnhancedServiceFlowPanel } from './ServiceFlow/components/ServiceFlowPanel'
+
+// Debug flag for console logs - set to true for debugging
+const DEBUG_SERVICE_FLOW = false
 
 interface ServiceFlowPanelProps {
   selectedRow: any
@@ -137,10 +133,6 @@ export function ServiceFlowPanel({
       isLoading,
       error,
     })
-
-    console.log('🔍 Raw selectedRow fields:', Object.keys(selectedRow || {}))
-    console.log('🔍 selectedRow.id value:', selectedRow?.id, 'type:', typeof selectedRow?.id)
-    console.log('🔍 realLogId value:', selectedRow?.log_id, 'type:', typeof selectedRow?.log_id)
   }
 
   // Log the enriched service flow data
