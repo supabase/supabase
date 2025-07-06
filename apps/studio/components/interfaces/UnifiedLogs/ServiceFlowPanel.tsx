@@ -22,10 +22,10 @@ import {
   MemoizedNetworkBlock,
   MemoizedPostgRESTBlock,
   MemoizedPostgresBlock,
-  MemoizedRequestStartedBlock,
-  MemoizedResponseCompletedBlock,
   MemoizedStorageBlock,
-} from './ServiceFlow/ServiceFlowBlocks'
+} from './ServiceFlow/components/ServiceBlocks'
+import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
+import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import { sheetFields } from './UnifiedLogs.fields'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta } from './UnifiedLogs.types'
