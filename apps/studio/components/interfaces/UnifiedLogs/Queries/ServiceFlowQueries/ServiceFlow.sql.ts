@@ -5,9 +5,6 @@
  * showing how requests flow through different layers of the infrastructure.
  */
 
-// Debug flag for console logs - set to true for debugging
-const DEBUG_SERVICE_FLOW = false
-
 // Service configuration for different log types
 const SERVICE_CONFIGS = {
   postgrest: {
@@ -33,10 +30,6 @@ type EdgeServiceType = keyof typeof SERVICE_CONFIGS
  */
 const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType): string => {
   const config = SERVICE_CONFIGS[serviceType]
-
-  if (DEBUG_SERVICE_FLOW) {
-    console.log(`🔍 Generated ${serviceType} SQL for logId:`, logId)
-  }
 
   return `
   select 
@@ -214,9 +207,6 @@ export const getStorageServiceFlowQuery = (logId: string): string => {
  * NOTE: Uses postgres_logs table instead of edge_logs, so kept separate
  */
 export const getPostgresServiceFlowQuery = (logId: string): string => {
-  if (DEBUG_SERVICE_FLOW) {
-    console.log('🔍 Generated Postgres SQL for logId:', logId)
-  }
   return `
   select 
       pgl.id as id,

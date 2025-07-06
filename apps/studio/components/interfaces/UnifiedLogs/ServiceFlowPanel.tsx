@@ -30,9 +30,6 @@ import { sheetFields } from './UnifiedLogs.fields'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta, QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
-// Debug flag for console logs - set to true for debugging
-const DEBUG_SERVICE_FLOW = false
-
 interface ServiceFlowPanelProps {
   selectedRow: ColumnSchema
   selectedRowKey: string
@@ -49,14 +46,6 @@ export function ServiceFlowPanel({
   const { table, filterFields } = useDataTable()
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('service-flow')
-
-  if (DEBUG_SERVICE_FLOW) {
-    console.log('🔍 Log ID extraction debug:', {
-      'selectedRow.id': selectedRow?.id,
-      'full search object': search,
-      'full searchParameters object': searchParameters,
-    })
-  }
 
   // Helper function to map log_type to service flow type
   const getServiceFlowType = (logType: string): ServiceFlowType | undefined => {
@@ -99,40 +88,6 @@ export function ServiceFlowPanel({
     type: serviceFlowType,
     search: searchParameters,
   })
-
-  if (DEBUG_SERVICE_FLOW) {
-    console.log('🔍 Service Flow Panel:', {
-      selectedRow,
-      selectedRowKey,
-      selectedRowId: selectedRow?.id,
-      selectedRowPathname: selectedRow?.pathname,
-      selectedRowFullObject: selectedRow,
-      shouldShowServiceFlow,
-      isPostgrestFlow,
-      isAuthFlow,
-      isEdgeFunctionFlow,
-      isStorageFlow,
-      isPostgresFlow,
-      serviceFlowType,
-      serviceFlowData,
-      isLoading,
-      error,
-    })
-  }
-
-  // Log the enriched service flow data
-  if (DEBUG_SERVICE_FLOW) {
-    if (serviceFlowData?.result?.[0]) {
-      console.log('📋 Service Flow Enriched Data:', serviceFlowData.result[0])
-      console.log('🔍 raw_log_data exists?', !!serviceFlowData.result[0].raw_log_data)
-      console.log('🔍 raw_log_data value:', serviceFlowData.result[0].raw_log_data)
-    }
-
-    // Log the raw log data if available
-    if (serviceFlowData?.result?.[0]?.raw_log_data) {
-      console.log('🗂️ Complete Raw Log Data:', serviceFlowData.result[0].raw_log_data)
-    }
-  }
 
   // Prepare JSON data for Raw JSON tab
   const jsonData =
