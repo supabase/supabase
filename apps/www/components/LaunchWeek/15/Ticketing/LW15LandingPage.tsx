@@ -4,6 +4,7 @@ import { LoaderCircle } from 'lucide-react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useRegistration } from '../hooks/use-registration'
 import useUserPresence from '../hooks/useUserPresence'
+import { createTimeline } from 'animejs'
 
 import SectionContainer from 'components/Layouts/SectionContainer'
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
@@ -49,20 +50,130 @@ const LW15LandingPage = () => {
     }
   }, [videoRef])
 
+  useEffect(() => {
+    const tl = createTimeline({ defaults: { duration: 750 } })
+
+    tl.add('.lw15-logo', {
+      opacity: [0, 1],
+      easing: 'inOutCubic',
+      duration: 300,
+    })
+      .add(
+        '.lw15-logo-left',
+        {
+          translateX: ['100%', 1],
+          easing: 'cubicBezier(.1,0,1,1)',
+          duration: 800,
+        },
+        400
+      )
+      .add(
+        '.lw15-logo-right',
+        {
+          translateX: ['-100%', 1],
+          easing: 'cubicBezier(.5,0,.5,1)',
+          duration: 800,
+        },
+        400
+      )
+      .add(
+        '.lw15-galaxy',
+        {
+          height: ['0%', '100%'],
+          scale: [0.9, 1],
+          opacity: [0, 1],
+          easing: 'cubicBezier(.5,0,.5,1)',
+          duration: 1200,
+        },
+        '-=700'
+      )
+      .add('.anim-last', {
+        opacity: [0, 1],
+        translateY: ['100%', 0],
+        easing: 'cubicBezier(.5,0,.5,1)',
+        duration: 600,
+      })
+      .add(
+        '.animate-line',
+        {
+          width: [0, '100%'],
+          easing: 'inOutCubic',
+          duration: 400,
+        },
+        '-=600'
+      )
+      .add(
+        '.animate-cta',
+        {
+          opacity: [0, 1],
+          translateY: [10, 0],
+          easing: 'cubicBezier(.1,0,1,1)',
+          duration: 1000,
+        },
+        '-=100'
+      )
+
+    const elements = document.querySelectorAll('[data-animate]')
+    elements.forEach((element) => {
+      if (element.getAttribute('data-animate-processed')) return
+      element.setAttribute('data-animate-processed', 'true')
+
+      const originalContent = element.innerHTML || ''
+      element.classList.add('overflow-hidden')
+
+      const span = document.createElement('span')
+      span.innerHTML = originalContent
+      span.style.display = 'inline-block'
+      span.style.transform = 'translateY(100%)'
+      span.style.transition = 'transform ease-[.25,.25,0,1]'
+
+      element.innerHTML = ''
+      element.appendChild(span)
+
+      const delay = parseInt(element.getAttribute('data-animate-delay') || '100')
+      const duration = parseInt(element.getAttribute('data-animate-duration') || '900')
+
+      setTimeout(() => {
+        setTimeout(() => {
+          element.classList.add('opacity-100')
+          span.style.transitionDuration = `${duration}ms`
+          span.style.transform = 'translateY(0)'
+        }, delay)
+        // Delay after initial animejs animation
+      }, 1800)
+    })
+  }, [])
+
   return (
     <SectionContainer className="flex flex-col justify-between gap-12 !py-10 h-full">
       <div className="flex justify-between items-start text-xs">
         <div className="flex flex-col">
-          <div>Detected timezone: {detectedTimezone}</div>
-          <div>Time: {currentTime}</div>
+          <div
+            data-animate
+            data-animate-delay={100}
+            data-animate-duration={600}
+            className="opacity-0"
+          >
+            Detected timezone: {detectedTimezone}
+          </div>
+          <div
+            data-animate
+            data-animate-delay={300}
+            data-animate-duration={600}
+            className="opacity-0"
+          >
+            Time: {currentTime}
+          </div>
         </div>
-        <LW15ThemeSwitcher />
+        <div className="overflow-hidden">
+          <LW15ThemeSwitcher className="anim-last opacity-0" />
+        </div>
       </div>
       <div className="flex flex-col gap-4">
         <div className="w-full flex items-center justify-center h-[60px] md:h-[100px] lg:h-[145px] gap-4">
           <h1 className="sr-only">Supabase Launch Week 15</h1>
-          <LWSVG className="h-full w-auto" />
-          <div className="relative h-full flex-1 dark:mix-blend-screen">
+          <LWSVG className="opacity-0 translate-x-[100%] lw15-logo lw15-logo-left h-full w-auto" />
+          <div className="lw15-galaxy opacity-0 relative h-full flex-1 dark:mix-blend-screen overflow-hidden">
             <video
               ref={videoRef}
               src="/images/launchweek/15/lw15-galaxy.mp4"
@@ -72,19 +183,28 @@ const LW15LandingPage = () => {
               className="h-full w-full object-cover"
             />
           </div>
-          <FifteenSVG className="h-full w-auto" />
+          <FifteenSVG className="opacity-0 -translate-x-[100%] lw15-logo lw15-logo-right h-full w-auto" />
         </div>
         <div className="grid md:grid-cols-12 gap-4 delay-100">
-          <div className="hidden md:block md:col-span-4 text-sm">
+          <div
+            data-animate
+            data-animate-delay={300}
+            className="hidden md:inline-block opacity-0 md:col-span-4 text-sm overflow-hidden h-fit"
+          >
             Celebrate our launch week with exciting new features designed to take your development
             skills to the next level.
           </div>
           <div className={cn('flex flex-col items-start gap-4', centerColClassNames)}>
-            <h2 className="text-3xl lg:text-4xl">
+            <h2
+              data-animate
+              data-animate-delay={400}
+              data-animate-duration={800}
+              className="text-3xl lg:text-4xl opacity-0"
+            >
               Discover fresh tools, <br />
               unlock new possibilities.
             </h2>
-            <div>
+            <div className="opacity-0 animate-cta">
               {user.id ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -118,21 +238,38 @@ const LW15LandingPage = () => {
               )}
             </div>
           </div>
-          <div className="md:col-start-12 text-right hidden md:block">{year}</div>
+          <div
+            data-animate
+            data-animate-delay={300}
+            className="md:col-start-12 text-right hidden md:block h-fit opacity-0"
+          >
+            {year}
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-12 gap-4 text-xs items-end">
         <div className="md:col-span-4 hidden md:block">
-          <div className="w-full h-px bg-foreground" />
+          <div className="w-0 h-px bg-foreground animate-line" />
         </div>
         <div className={cn(centerColClassNames)}>
-          <p>
+          <p
+            data-animate
+            data-animate-delay={300}
+            data-animate-duration={200}
+            className="opacity-0"
+          >
             {user.id
               ? `Nice to see you back, ${user.name?.split(' ')[0]}`
               : 'Claim your ticket to enter LW15'}
           </p>
         </div>
-        <div className="md:col-start-12 text-right text-nowrap">Online users: {onlineUsers}</div>
+        <div
+          data-animate
+          data-animate-delay={600}
+          className="md:col-start-12 text-right text-nowrap items-end opacity-0"
+        >
+          Online: {onlineUsers}
+        </div>
       </div>
     </SectionContainer>
   )

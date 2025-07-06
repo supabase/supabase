@@ -43,12 +43,15 @@ export const FifteenSVG = (props: React.SVGProps<SVGSVGElement>) => {
   )
 }
 
-export const LW15ThemeSwitcher = (props: React.HTMLAttributes<HTMLDivElement>) => {
+export const LW15ThemeSwitcher = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
   const { resolvedTheme, setTheme } = useTheme()
   const isDarkMode = resolvedTheme?.includes('dark')
 
   return (
-    <div className="flex items-center justify-start gap-2" {...props}>
+    <div className={cn('flex items-center justify-start gap-2', className)} {...props}>
       <button
         onClick={() => setTheme('dark')}
         className={cn(isDarkMode ? 'text-foreground' : 'text-foreground-lighter')}
