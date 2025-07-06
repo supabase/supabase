@@ -2,10 +2,11 @@ import { memo } from 'react'
 import { Clock } from 'lucide-react'
 import { StyledIcon } from '../shared/TimelineStep'
 import { PostgresEventMessage } from '../specialized/PostgresEventMessage'
+import { ColumnSchema } from '../../../UnifiedLogs.schema'
 
 interface ResponseCompletedBlockProps {
-  data: any
-  enrichedData?: any
+  data: ColumnSchema
+  enrichedData?: Record<string, any>
 }
 
 // Response (final step) - Shows completion details for HTTP or database operations

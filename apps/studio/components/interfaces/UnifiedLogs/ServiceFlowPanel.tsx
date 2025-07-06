@@ -28,16 +28,16 @@ import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/Req
 import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import { sheetFields } from './UnifiedLogs.fields'
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { LogsMeta } from './UnifiedLogs.types'
+import { LogsMeta, QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
 // Debug flag for console logs - set to true for debugging
 const DEBUG_SERVICE_FLOW = false
 
 interface ServiceFlowPanelProps {
-  selectedRow: any
+  selectedRow: ColumnSchema
   selectedRowKey: string
-  searchParameters: any
-  search: any // Raw search object to get logId
+  searchParameters: QuerySearchParamsType
+  search: SearchParamsType
 }
 
 export function ServiceFlowPanel({
@@ -46,26 +46,13 @@ export function ServiceFlowPanel({
   searchParameters,
   search,
 }: ServiceFlowPanelProps) {
-  const { table, filterFields, totalRows } = useDataTable()
+  const { table, filterFields } = useDataTable()
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('service-flow')
 
-  // Get all metadata values from the table/provider
-  const totalDBRowCount = totalRows ?? 0
-  const filterDBRowCount = table.getCoreRowModel().flatRows.length
-  const totalFetched = table.getCoreRowModel().flatRows.length
-  const currentPercentiles = { 50: 0, 75: 0, 90: 0, 95: 0, 99: 0 } // Empty percentiles since not used in UI
-
-  // WORKAROUND: Use the real database logId from search params instead of fabricated selectedRow.id
-  // This is needed because we create fake UUIDs to handle repeated logs issue
-  // TODO: Remove once repeated logs issue is fixed - should use selectedRow.id directly
-  const realLogId = selectedRow?.id
-
   if (DEBUG_SERVICE_FLOW) {
     console.log('🔍 Log ID extraction debug:', {
-      'selectedRow.uuid_id': selectedRow?.uuid_id,
       'selectedRow.id': selectedRow?.id,
-      'final realLogId': realLogId,
       'full search object': search,
       'full searchParameters object': searchParameters,
     })
@@ -108,7 +95,7 @@ export function ServiceFlowPanel({
     error,
   } = useUnifiedLogInspectionQuery({
     projectRef: projectRef,
-    logId: realLogId,
+    logId: selectedRow?.id,
     type: serviceFlowType,
     search: searchParameters,
   })
@@ -118,8 +105,6 @@ export function ServiceFlowPanel({
       selectedRow,
       selectedRowKey,
       selectedRowId: selectedRow?.id,
-      logId: searchParameters?.logId,
-      originalLogId: selectedRow?.original_log_id,
       selectedRowPathname: selectedRow?.pathname,
       selectedRowFullObject: selectedRow,
       shouldShowServiceFlow,
@@ -294,12 +279,6 @@ export function ServiceFlowPanel({
                     data={selectedRow}
                     filterFields={filterFields}
                     fields={sheetFields}
-                    metadata={{
-                      totalRows: totalDBRowCount,
-                      filterRows: filterDBRowCount,
-                      totalRowsFetched: totalFetched,
-                      currentPercentiles: currentPercentiles,
-                    }}
                   />
                 </TabsContent>
               </Tabs>

@@ -11,19 +11,15 @@ const DEBUG_SERVICE_FLOW = false
 // Service configuration for different log types
 const SERVICE_CONFIGS = {
   postgrest: {
-    logType: 'postgrest',
     pathFilter: '%/rest/%',
   },
   auth: {
-    logType: 'auth',
     pathFilter: '%/auth/%',
   },
   'edge-function': {
-    logType: 'edge-function',
     pathFilter: '%/functions/%',
   },
   storage: {
-    logType: 'storage',
     pathFilter: '%/storage/%',
   },
 } as const
@@ -46,7 +42,7 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
   select 
       id,
       el.timestamp as timestamp,
-      '${config.logType}' as log_type,
+      '${serviceType}' as log_type,
       CAST(edge_logs_response.status_code AS STRING) as status,
       CASE
         WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'

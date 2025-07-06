@@ -15,10 +15,11 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
+import { ColumnSchema } from '../../UnifiedLogs.schema'
 
 interface ServiceFlowHeaderProps {
-  selectedRow: any
-  enrichedData?: any
+  selectedRow: ColumnSchema
+  enrichedData?: Record<string, any>
 }
 
 export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHeaderProps) => {

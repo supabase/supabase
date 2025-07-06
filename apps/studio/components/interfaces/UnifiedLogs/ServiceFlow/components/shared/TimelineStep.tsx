@@ -3,9 +3,13 @@ import { Clock, Globe, Server, Database } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { cn } from 'ui'
 import { getStatusLevel } from '../../../UnifiedLogs.utils'
+import { LucideIcon } from 'lucide-react'
+
+// Type for icon components (covers both lucide-react and our icon library)
+type IconComponent = LucideIcon | React.ComponentType<any>
 
 // Reusable styled icon component
-const StyledIcon = ({ icon: Icon, title }: { icon: any; title: string }) => (
+const StyledIcon = ({ icon: Icon, title }: { icon: IconComponent; title: string }) => (
   <div className="flex items-center gap-2 bg-surface-300 rounded p-0.5 border justify-center border-foreground-muted">
     <Icon className="w-4 h-4 text-foreground-lighter" strokeWidth={1} />
   </div>

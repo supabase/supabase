@@ -1,10 +1,11 @@
 import { memo } from 'react'
 import { StyledIcon } from '../shared/TimelineStep'
 import { Clock } from 'lucide-react'
+import { ColumnSchema } from '../../../UnifiedLogs.schema'
 
 // Request Started - Simple header component with connecting line
 export const RequestStartedBlock = memo(
-  ({ data, enrichedData }: { data: any; enrichedData?: any }) => {
+  ({ data, enrichedData }: { data: ColumnSchema; enrichedData?: Record<string, any> }) => {
     const timestamp = data?.timestamp || data?.date
     const formattedTime = timestamp ? new Date(timestamp).toLocaleString() : null
 
