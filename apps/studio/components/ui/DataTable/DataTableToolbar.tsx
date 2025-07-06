@@ -1,4 +1,4 @@
-import { PanelLeftClose } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { ReactNode, useMemo } from 'react'
 
 import { useHotKey } from 'hooks/ui/useHotKey'
@@ -39,7 +39,7 @@ export function DataTableToolbar({ renderActions }: DataTableToolbarProps) {
               <Button
                 size="tiny"
                 type="outline"
-                icon={<PanelLeftClose />}
+                icon={open ? <PanelLeftClose /> : <PanelLeftOpen />}
                 onClick={() => setOpen((prev) => !prev)}
                 className="hidden sm:flex"
               >
