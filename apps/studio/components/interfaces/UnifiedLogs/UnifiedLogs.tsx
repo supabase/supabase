@@ -307,7 +307,6 @@ export const UnifiedLogs = () => {
       isLoading={isLoading}
       isLoadingCounts={isLoadingCounts}
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
-      totalRows={totalDBRowCount}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
         <FilterSideBar />
