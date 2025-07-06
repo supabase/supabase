@@ -4,6 +4,7 @@ import useLw15ConfData, { UserTicketData } from '../hooks/use-conf-data'
 import { FifteenSVG, LWSVG } from '../lw15.components'
 import Image from 'next/image'
 import { TYPO_COLORS, BG_COLORS } from './colors'
+import useTicketBg from '../hooks/use-ticket-bg'
 
 const LW15Ticket = ({
   user: userFromProps,
@@ -11,6 +12,8 @@ const LW15Ticket = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { user: UserTicketData }) => {
   const [state] = useLw15ConfData()
+  const ticketBg = useTicketBg()
+
   const user = userFromProps || state.userTicketData
   const fg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const bg = user?.metadata?.colors?.background || BG_COLORS[0]
@@ -28,7 +31,10 @@ const LW15Ticket = ({
         <div className="absolute w-full h-full inset-0 bg-cover">
           <Image
             alt=""
-            src="/images/launchweek/15/lw15-galaxy.png"
+            src={ticketBg}
+            blurDataURL="/images/launchweek/15/lw15-galaxy.png"
+            placeholder="blur"
+            quality={100}
             width={600}
             height={600}
             className="absolute w-full h-full inset-0 bg-cover mix-blend-screen"

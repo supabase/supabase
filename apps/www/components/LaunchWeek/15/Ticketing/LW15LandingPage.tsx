@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { LoaderCircle } from 'lucide-react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { useRegistration } from '../hooks/use-registration'
+import useUserPresence from '../hooks/useUserPresence'
 
 import SectionContainer from 'components/Layouts/SectionContainer'
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
-import { useRegistration } from '../hooks/use-registration'
 import { FifteenSVG, LW15ThemeSwitcher, LWSVG } from '../lw15.components'
-import { LoaderCircle } from 'lucide-react'
-import useUserPresence from './UsersPresence'
 
 const LW15LandingPage = () => {
   const onlineUsers = useUserPresence()
@@ -41,15 +41,10 @@ const LW15LandingPage = () => {
       const promise = videoRef.current.play()
       videoRef.current.play()
       if (promise !== undefined) {
-        promise
-          .catch((error) => {
-            // Auto-play was prevented
-            // Show a UI element to let the user manually start playback
-          })
-          .then(() => {
-            // Auto-play started
-            videoRef.current?.play()
-          })
+        promise.then(() => {
+          // Auto-play started
+          videoRef.current?.play()
+        })
       }
     }
   }, [videoRef])
@@ -137,9 +132,7 @@ const LW15LandingPage = () => {
               : 'Claim your ticket to enter LW15'}
           </p>
         </div>
-        <div className="md:col-start-12 text-right text-nowrap">
-          Online users: {onlineUsers}
-        </div>
+        <div className="md:col-start-12 text-right text-nowrap">Online users: {onlineUsers}</div>
       </div>
     </SectionContainer>
   )
