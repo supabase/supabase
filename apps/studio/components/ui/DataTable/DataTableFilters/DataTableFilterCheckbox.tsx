@@ -45,7 +45,21 @@ export function DataTableFilterCheckbox<TData>({
       </div>
     )
 
-  if (!filterOptions?.length) return null
+  // Show empty state when no options are available
+  if (!filterOptions?.length)
+    return (
+      <div className="flex items-center justify-center px-2 py-6 text-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">No options available</p>
+            <p className="text-xs text-muted-foreground/70">Try adjusting your filters</p>
+          </div>
+        </div>
+      </div>
+    )
 
   return (
     <div className="grid gap-2">

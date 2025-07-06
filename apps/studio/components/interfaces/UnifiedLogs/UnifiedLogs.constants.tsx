@@ -34,7 +34,7 @@ export const CHART_CONFIG = {
 } satisfies ChartConfig
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
-export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
+export const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES = [
   'postgres',
   'postgrest',

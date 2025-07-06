@@ -347,7 +347,7 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.pathname as path,
+      fel_request.pathname as pathname,
       fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
@@ -432,7 +432,7 @@ const getSupabaseStorageLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
@@ -504,13 +504,42 @@ ${finalWhere}
 }
 
 /**
+ * Builds query conditions from only hardcoded field selections
+ * Used for filtering dynamic facets without self-filtering
+ */
+const buildHardcodedFilterConditions = (search: QuerySearchParamsType) => {
+  const whereConditions: string[] = []
+  const hardcodedFields = ['log_type', 'method', 'level']
+
+  // Process only hardcoded fields for filtering
+  Object.entries(search).forEach(([key, value]) => {
+    if (!hardcodedFields.includes(key)) return
+
+    // Handle array filters (IN clause)
+    if (Array.isArray(value) && value.length > 0) {
+      whereConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      return
+    }
+
+    // Handle scalar values
+    if (value !== null && value !== undefined) {
+      whereConditions.push(`${key} = '${value}'`)
+    }
+  })
+
+  // Create final WHERE clause
+  const hardcodedWhere = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+
+  return { whereConditions, hardcodedWhere }
+}
+
+/**
  * Get a count query for the total logs within the timeframe
- * Also returns facets for all filter dimensions
+ * Hardcoded fields show global facets, dynamic fields show filtered facets
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   const { finalWhere } = buildQueryConditions(search)
-  const methodWhere =
-    finalWhere.length > 0 ? `${finalWhere} AND method is NOT NULL` : 'WHERE method IS NOT NULL'
+  const { hardcodedWhere } = buildHardcodedFilterConditions(search)
 
   // Create a count query using the same unified logs CTE
   const sql = `
@@ -522,27 +551,61 @@ ${finalWhere}
 
 UNION ALL
 
--- Get counts by level
+-- HARDCODED FIELDS - Global facets (no filtering)
+-- Get counts by level (global - always show all levels)
 SELECT 'level' as dimension, level as value, COUNT(*) as count
 FROM unified_logs
-${finalWhere}
+WHERE level IS NOT NULL
 GROUP BY level
 
 UNION ALL
 
--- Get counts by log_type
+-- Get counts by log_type (global - always show all log types)
 SELECT 'log_type' as dimension, log_type as value, COUNT(*) as count
 FROM unified_logs
-${finalWhere}
+WHERE log_type IS NOT NULL
 GROUP BY log_type
 
 UNION ALL
 
--- Get counts by method
+-- Get counts by method (global - always show all methods)
 SELECT 'method' as dimension, method as value, COUNT(*) as count
 FROM unified_logs
-${methodWhere}
+WHERE method IS NOT NULL
 GROUP BY method
+
+UNION ALL
+
+-- DYNAMIC FIELDS - Filtered facets (filtered by hardcoded fields only)
+-- Get counts by status (filtered by hardcoded fields only)
+SELECT 'status' as dimension, status as value, COUNT(*) as count
+FROM unified_logs
+${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} status IS NOT NULL
+GROUP BY status
+
+UNION ALL
+
+-- Get counts by host (filtered by hardcoded fields only)
+SELECT 'host' as dimension, host as value, COUNT(*) as count
+FROM unified_logs
+${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} host IS NOT NULL
+GROUP BY host
+
+UNION ALL
+
+-- Get counts by pathname (filtered by hardcoded fields only)
+SELECT 'pathname' as dimension, pathname as value, COUNT(*) as count
+FROM unified_logs
+${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} pathname IS NOT NULL
+GROUP BY pathname
+
+UNION ALL
+
+-- Get counts by auth_user (filtered by hardcoded fields only)
+SELECT 'auth_user' as dimension, auth_user as value, COUNT(*) as count
+FROM unified_logs
+${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} auth_user IS NOT NULL
+GROUP BY auth_user
 `
 
   return sql

@@ -213,10 +213,11 @@ export const UnifiedLogs = () => {
   const filterFields = useMemo(() => {
     return defaultFilterFields.map((field) => {
       const facetsField = facets?.[field.value]
-      if (!facetsField) return field
-      if (field.options && field.options.length > 0) return field
 
-      // REMINDER: if no options are set, we need to set them via the API
+      // If no facets data available, use the predefined field
+      if (!facetsField) return field
+
+      // Use dynamic options from facets data
       const options = facetsField.rows.map(({ value }) => ({ label: `${value}`, value }))
 
       if (field.type === ('slider' as any)) {

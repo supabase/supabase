@@ -51,10 +51,12 @@ export const filterFields = [
     component: (props: Option) => {
       if (typeof props.value === 'boolean') return null
       if (typeof props.value === 'undefined') return null
-      if (typeof props.value === 'string') return null
-      return (
-        <span className={cn('font-mono', getStatusColor(props.value).text)}>{props.value}</span>
-      )
+
+      // Convert string status codes to numbers for styling
+      const statusCode = typeof props.value === 'string' ? parseInt(props.value, 10) : props.value
+      if (isNaN(statusCode)) return null
+
+      return <span className={cn('font-mono', getStatusColor(statusCode).text)}>{statusCode}</span>
     },
   },
   {
@@ -92,17 +94,37 @@ export const filterFields = [
   {
     label: 'Host',
     value: 'host',
-    type: 'input',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [], // Will be populated dynamically from facets
+    component: (props: Option) => {
+      return <span className="font-mono">{props.value}</span>
+    },
   },
   {
     label: 'Pathname',
     value: 'pathname',
-    type: 'input',
+    type: 'checkbox',
+    defaultOpen: true,
+    options: [], // Will be populated dynamically from facets
+    component: (props: Option) => {
+      return <span className="font-mono">{props.value}</span>
+    },
   },
   {
     label: 'Auth User',
     value: 'auth_user',
-    type: 'input',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [], // Will be populated dynamically from facets
+    component: (props: Option) => {
+      return (
+        <div className="flex items-center gap-2">
+          <User size={14} className="text-foreground-lighter" />
+          <span className="font-mono">{props.value}</span>
+        </div>
+      )
+    },
   },
 ] satisfies DataTableFilterField<ColumnSchema>[]
 
