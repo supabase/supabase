@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { LoaderCircle } from 'lucide-react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -19,7 +19,7 @@ const LW15LandingPage = () => {
   const isLoading = !state.sessionLoaded
 
   const detectedTimezone = 'GMT+1'
-  const currentTime = '17:03:45'
+  const [currentTime, setCurrentTime] = useState('')
   const year = '2025'
 
   const centerColClassNames = cn(
@@ -29,6 +29,26 @@ const LW15LandingPage = () => {
   )
 
   const handleClaimTicket = () => register.signIn()
+
+  // Update current time every second
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      const hours = now.getHours().toString().padStart(2, '0')
+      const minutes = now.getMinutes().toString().padStart(2, '0')
+      const seconds = now.getSeconds().toString().padStart(2, '0')
+      setCurrentTime(`${hours}:${minutes}:${seconds}`)
+    }
+
+    // Set initial time
+    updateTime()
+
+    // Update every second
+    const interval = setInterval(updateTime, 1000)
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval)
+  }, [])
 
   // Force play video
   useEffect(() => {
@@ -87,12 +107,16 @@ const LW15LandingPage = () => {
         },
         '-=700'
       )
-      .add('.anim-last', {
-        opacity: [0, 1],
-        translateY: ['100%', 0],
-        easing: 'cubicBezier(.5,0,.5,1)',
-        duration: 600,
-      })
+      .add(
+        '.anim-last',
+        {
+          opacity: [0, 1],
+          translateY: ['100%', 0],
+          easing: 'cubicBezier(.5,0,.5,1)',
+          duration: 600,
+        },
+        '+=300'
+      )
       .add(
         '.animate-line',
         {
@@ -156,17 +180,12 @@ const LW15LandingPage = () => {
           >
             Detected timezone: {detectedTimezone}
           </div>
-          <div
-            data-animate
-            data-animate-delay={300}
-            data-animate-duration={600}
-            className="opacity-0"
-          >
-            Time: {currentTime}
+          <div className="overflow-hidden">
+            <span className="opacity-0 anim-last inline-block">Time: {currentTime}</span>
           </div>
         </div>
         <div className="overflow-hidden">
-          <LW15ThemeSwitcher className="anim-last opacity-0" />
+          <LW15ThemeSwitcher className="anim-last" />
         </div>
       </div>
       <div className="flex flex-col gap-4">
