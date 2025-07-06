@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -7,8 +7,11 @@ import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { useRegistration } from '../hooks/use-registration'
 import { FifteenSVG, LW15ThemeSwitcher, LWSVG } from '../lw15.components'
 import { LoaderCircle } from 'lucide-react'
+import useUserPresence from './UsersPresence'
 
 const LW15LandingPage = () => {
+  const onlineUsers = useUserPresence()
+  const videoRef = useRef<HTMLVideoElement>(null)
   const register = useRegistration()
   const [state] = useLw15ConfData()
   const user = state.userTicketData
@@ -26,6 +29,31 @@ const LW15LandingPage = () => {
 
   const handleClaimTicket = () => register.signIn()
 
+  // Force play video
+  useEffect(() => {
+    if (!videoRef || !videoRef.current) return
+
+    //open bug since 2017 that you cannot set muted in video element https://github.com/facebook/react/issues/10389
+    videoRef.current.defaultMuted = true
+    videoRef.current.muted = true
+
+    if (!!videoRef && !!videoRef.current) {
+      const promise = videoRef.current.play()
+      videoRef.current.play()
+      if (promise !== undefined) {
+        promise
+          .catch((error) => {
+            // Auto-play was prevented
+            // Show a UI element to let the user manually start playback
+          })
+          .then(() => {
+            // Auto-play started
+            videoRef.current?.play()
+          })
+      }
+    }
+  }, [videoRef])
+
   return (
     <SectionContainer className="flex flex-col justify-between gap-12 !py-10 h-full">
       <div className="flex justify-between items-start text-xs">
@@ -41,6 +69,7 @@ const LW15LandingPage = () => {
           <LWSVG className="h-full w-auto" />
           <div className="relative h-full flex-1 dark:mix-blend-screen">
             <video
+              ref={videoRef}
               src="/images/launchweek/15/lw15-galaxy.mp4"
               autoPlay
               muted
@@ -108,7 +137,9 @@ const LW15LandingPage = () => {
               : 'Claim your ticket to enter LW15'}
           </p>
         </div>
-        <div className="md:col-start-12 text-right text-nowrap">Online users: 9</div>
+        <div className="md:col-start-12 text-right text-nowrap">
+          Online users: {onlineUsers}
+        </div>
       </div>
     </SectionContainer>
   )
