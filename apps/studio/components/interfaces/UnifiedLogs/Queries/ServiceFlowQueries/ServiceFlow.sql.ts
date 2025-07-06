@@ -273,9 +273,3 @@ WHERE
   pgl.id = '${logId}'
 `
 }
-
-/**
- * Placeholder for other service flow queries
- * TODO: Add separate queries for:
- * - getRealtimeServiceFlowQuery()
- */
