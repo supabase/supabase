@@ -1,6 +1,7 @@
 import React from 'react'
 import { ImageResponse } from '@vercel/og'
 import { createClient } from '@supabase/supabase-js'
+import useTicketBg from 'components/LaunchWeek/15/hooks/use-ticket-bg'
 
 export const runtime = 'edge' // 'nodejs' is the default
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -75,7 +76,9 @@ export async function GET(req: Request, res: Response) {
     )
     const CIRCULAR_FONT_DATA = await FONT_CIRCULAR
 
-    const { metadata } = user
+    const { metadata, ticket_number } = user
+
+    const ticketBg = useTicketBg(ticket_number)
 
     // Generate image and upload to storage.
     const ticketType = 'regular'
@@ -83,8 +86,7 @@ export async function GET(req: Request, res: Response) {
     const STYLING_CONFIG = {
       TICKET_FOREGROUND: metadata.colors?.foreground ?? '#ffffff',
       TICKET_BACKGROUND: metadata.colors?.background ?? '#000000',
-      // IMG: `${STORAGE_URL}/assets/bg/${ticket_number}.png`,
-      IMG: `${STORAGE_URL}/assets/bg/001.png`,
+      IMG: ticketBg,
     }
 
     const OG_WIDTH = 1200
@@ -104,8 +106,8 @@ export async function GET(req: Request, res: Response) {
     const LW15_RIGHT = `${STORAGE_URL}/assets/LW15_RIGHT.png`
     const LW15_RIGHT_RATIO = 145 / 116
     const LW15_TEXT_LOGO_FONT_SIZE = 90
-    const USERNAME_FONT_SIZE = 38
-    const TICKET_BOTTOM_TEXT_FONT_SIZE = 16
+    const USERNAME_FONT_SIZE = 40
+    const TICKET_BOTTOM_TEXT_FONT_SIZE = 20
 
     const generatedTicketImage = new ImageResponse(
       (

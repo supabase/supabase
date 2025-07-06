@@ -12,11 +12,12 @@ const LW15Ticket = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { user: UserTicketData }) => {
   const [state] = useLw15ConfData()
-  const ticketBg = useTicketBg()
 
   const user = userFromProps || state.userTicketData
   const fg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const bg = user?.metadata?.colors?.background || BG_COLORS[0]
+
+  const ticketBg = useTicketBg(user.ticket_number!)
 
   return (
     <div
