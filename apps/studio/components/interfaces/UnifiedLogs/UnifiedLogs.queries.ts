@@ -10,6 +10,7 @@ const SPECIAL_FILTER_PARAMS = ['date'] as const
 
 // Combined list of all parameters to exclude from standard filtering
 const EXCLUDED_QUERY_PARAMS = [...PAGINATION_PARAMS, ...SPECIAL_FILTER_PARAMS] as const
+const BASE_CONDITIONS_EXCLUDED_PARAMS = [...PAGINATION_PARAMS, 'date', 'level'] as const
 
 /**
  * Builds query conditions from search parameters and returns WHERE clause
@@ -46,6 +47,118 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
   const finalWhere = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
 
   return { whereConditions, finalWhere }
+}
+
+/**
+ * Builds level-specific condition for different log types
+ */
+const buildLevelConditions = (logType: string, levelFilter: string[]) => {
+  const conditions = []
+
+  switch (logType) {
+    case 'edge':
+      if (levelFilter.includes('success'))
+        conditions.push('edge_logs_response.status_code BETWEEN 200 AND 299')
+      if (levelFilter.includes('warning'))
+        conditions.push('edge_logs_response.status_code BETWEEN 400 AND 499')
+      if (levelFilter.includes('error')) conditions.push('edge_logs_response.status_code >= 500')
+      break
+    case 'postgres':
+      if (levelFilter.includes('success')) conditions.push("pgl_parsed.error_severity = 'LOG'")
+      if (levelFilter.includes('warning')) conditions.push("pgl_parsed.error_severity = 'WARNING'")
+      if (levelFilter.includes('error')) conditions.push("pgl_parsed.error_severity = 'ERROR'")
+      break
+    case 'edge function':
+      if (levelFilter.includes('success'))
+        conditions.push('fel_response.status_code BETWEEN 200 AND 299')
+      if (levelFilter.includes('warning'))
+        conditions.push('fel_response.status_code BETWEEN 400 AND 499')
+      if (levelFilter.includes('error')) conditions.push('fel_response.status_code >= 500')
+      break
+    case 'auth':
+      if (levelFilter.includes('success'))
+        conditions.push('el_in_al_response.status_code BETWEEN 200 AND 299')
+      if (levelFilter.includes('warning'))
+        conditions.push('el_in_al_response.status_code BETWEEN 400 AND 499')
+      if (levelFilter.includes('error')) conditions.push('el_in_al_response.status_code >= 500')
+      break
+    case 'supavisor':
+      if (levelFilter.includes('success'))
+        conditions.push("LOWER(svl_metadata.level) NOT IN ('error', 'warn', 'warning')")
+      if (levelFilter.includes('warning'))
+        conditions.push(
+          "(LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning')"
+        )
+      if (levelFilter.includes('error')) conditions.push("LOWER(svl_metadata.level) = 'error'")
+      break
+  }
+
+  return conditions
+}
+
+/**
+ * Creates WHERE clause for a specific log type including level filtering
+ */
+const createFilterWhereClause = (
+  logType: string,
+  levelFilter: string[],
+  baseConditions: string[]
+) => {
+  const hasLevelFilter = levelFilter.length > 0
+
+  let where = ''
+
+  if (hasLevelFilter) {
+    const levelConditions = buildLevelConditions(logType, levelFilter)
+
+    if (levelConditions.length > 0) {
+      if (baseConditions.length > 0) {
+        where = `WHERE (${levelConditions.join(' OR ')}) AND ${baseConditions.join(' AND ')}`
+      } else {
+        where = `WHERE (${levelConditions.join(' OR ')})`
+      }
+    } else if (baseConditions.length > 0) {
+      where = `WHERE ${baseConditions.join(' AND ')}`
+    }
+  } else if (baseConditions.length > 0) {
+    where = `WHERE ${baseConditions.join(' AND ')}`
+  }
+
+  // Special case for auth logs
+  if (logType === 'auth') {
+    if (where) {
+      where = where.replace('WHERE', 'WHERE al_metadata.request_id is not null AND')
+    } else {
+      where = 'WHERE al_metadata.request_id is not null'
+    }
+  }
+
+  return where
+}
+
+/**
+ * Builds base conditions array from search params
+ */
+const buildBaseConditions = (search: SearchParamsType): string[] => {
+  const baseConditions: string[] = []
+
+  Object.entries(search).forEach(([key, value]) => {
+    // Skip pagination/control parameters, date and level (handled separately)
+    if (BASE_CONDITIONS_EXCLUDED_PARAMS.includes(key as any)) {
+      return
+    }
+
+    // Handle array filters (IN clause)
+    if (Array.isArray(value) && value.length > 0) {
+      baseConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(', ')})`)
+    }
+    // Handle scalar values
+    else if (value !== null && value !== undefined) {
+      baseConditions.push(`${key} = '${value}'`)
+    }
+  })
+
+  return baseConditions
 }
 
 /**
@@ -105,6 +218,48 @@ const calculateChartBucketing = (search: SearchParamsType | Record<string, any>)
   }
 
   return truncationLevel
+}
+
+/**
+ * Edge logs query fragment
+ *
+ * excludes `/rest/` in the path
+ */
+const getEdgeLogsQuery = () => {
+  return `
+    select 
+      id,
+      el.timestamp as timestamp,
+      'edge' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
+      CASE
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      edge_logs_request.path as pathname,
+      edge_logs_request.host as host,
+      null as event_message,
+      edge_logs_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
+      null as log_count,
+      null as logs
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    left join unnest(edge_logs_request.sb) as sb
+    left join unnest(sb.jwt) as jwt
+    left join unnest(jwt.authorization) as auth
+    left join unnest(auth.payload) as authorization_payload
+
+    -- ONLY include logs where the path does not include /rest/
+    WHERE edge_logs_request.path NOT LIKE '%/rest/%'
+    AND edge_logs_request.path NOT LIKE '%/storage/%'
+    
+  `
 }
 
 // Postgrest logs
