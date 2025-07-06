@@ -21,7 +21,7 @@ const formatStorageDate = (dateString: string): string => {
 }
 
 // =============================================================================
-// NETWORK FIELDS (From networkFields.ts)
+// NETWORK FIELDS
 // =============================================================================
 
 // Field configurations - using filterable field IDs where possible
@@ -315,7 +315,7 @@ export const techDetailsFields: BlockFieldConfig[] = [
 ]
 
 // =============================================================================
-// POSTGREST FIELDS (From postgrestFields.ts)
+// POSTGREST FIELDS
 // =============================================================================
 
 // Primary PostgREST Fields (Always Visible) - FILTERABLE
@@ -365,7 +365,7 @@ export const postgrestResponseFields: BlockFieldConfig[] = [
 ]
 
 // =============================================================================
-// AUTH FIELDS (From authFields.ts)
+// AUTH FIELDS
 // =============================================================================
 
 // Primary GoTrue/Auth Fields (Always Visible)
@@ -397,7 +397,7 @@ export const authPrimaryFields: BlockFieldConfig[] = [
 ]
 
 // =============================================================================
-// EDGE FUNCTION FIELDS (From edgeFunctionFields.ts)
+// EDGE FUNCTION FIELDS
 // =============================================================================
 
 // Primary Edge Function Fields (Always Visible)
@@ -483,7 +483,7 @@ export const edgeFunctionDetailsFields: BlockFieldConfig[] = [
 ]
 
 // =============================================================================
-// STORAGE FIELDS (From storageFields.ts)
+// STORAGE FIELDS
 // =============================================================================
 
 // Primary Storage Fields (Always Visible)
@@ -650,7 +650,7 @@ export const storageDetailsFields: BlockFieldConfig[] = [
 ]
 
 // =============================================================================
-// POSTGRES FIELDS (From postgresFields.ts)
+// POSTGRES FIELDS
 // =============================================================================
 
 // Primary Postgres Fields (Always Visible)

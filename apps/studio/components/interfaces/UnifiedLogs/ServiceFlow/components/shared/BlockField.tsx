@@ -1,28 +1,9 @@
-import { Table } from '@tanstack/react-table'
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
-import { getStatusLevel } from '../../../UnifiedLogs.utils'
-import { TruncatedTextWithPopover } from './TruncatedTextWithPopover'
 import { Skeleton, cn } from 'ui'
-
-interface BlockFieldConfig {
-  id: string
-  label: string
-  getValue: (data: any, enrichedData?: any) => string | number | null | undefined
-  skeletonClassName?: string
-  requiresEnrichedData?: boolean
-  maxLength?: number // Optional max length for truncation
-}
-
-interface BlockFieldProps {
-  config: BlockFieldConfig
-  data: any
-  enrichedData?: any
-  isLoading?: boolean
-  filterFields: DataTableFilterField<any>[]
-  table: Table<any>
-}
+import { getStatusLevel } from '../../../UnifiedLogs.utils'
+import { BlockFieldProps } from '../../types'
+import { TruncatedTextWithPopover } from './TruncatedTextWithPopover'
 
 const BlockField = ({
   config,
@@ -104,5 +85,4 @@ const BlockField = ({
   return <div className="flex justify-between items-center py-1 px-2">{fieldContent}</div>
 }
 
-export type { BlockFieldConfig, BlockFieldProps }
 export { BlockField }

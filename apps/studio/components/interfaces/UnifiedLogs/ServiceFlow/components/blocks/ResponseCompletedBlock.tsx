@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { Clock } from 'lucide-react'
 import { StyledIcon } from '../shared/TimelineStep'
-import { PostgresEventMessage } from '../specialized/PostgresEventMessage'
+import { EventMessage } from '../shared/EventMessage'
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
 
 interface ResponseCompletedBlockProps {
@@ -79,7 +79,7 @@ export const ResponseCompletedBlock = memo(
           ? // Show postgres event message
             eventMessage && (
               <div className="px-2">
-                <PostgresEventMessage message={eventMessage} severity={severity} />
+                <EventMessage message={eventMessage} severity={severity} />
               </div>
             )
           : // Show HTTP error details

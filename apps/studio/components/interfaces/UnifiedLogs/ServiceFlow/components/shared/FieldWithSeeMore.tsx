@@ -9,7 +9,8 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
   Skeleton,
 } from 'ui'
-import { BlockField, BlockFieldConfig } from './BlockField'
+import { BlockField } from './BlockField'
+import { BlockFieldConfig } from '../../types'
 
 // Single source of truth for field row styling
 const FieldRow = ({

@@ -8,7 +8,8 @@ import {
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
-import { BlockField, BlockFieldConfig } from './BlockField'
+import { BlockField } from './BlockField'
+import { BlockFieldConfig } from '../../types'
 
 interface CollapsibleSectionProps {
   title: string
