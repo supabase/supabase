@@ -14,9 +14,9 @@ export function FilterSideBar() {
         'hidden sm:flex'
       )}
     >
-      <div className="border-b border-border bg-background px-2 md:top-0">
+      <div className="border-b border-border px-2 md:top-0">
         <div className="flex h-[48px] items-center justify-between gap-3">
-          <p className="px-2 font-medium text-foreground">Logs</p>
+          <p className="px-2 text-foreground text-lg">Logs</p>
           <div>{table.getState().columnFilters.length ? <DataTableResetButton /> : null}</div>
         </div>
       </div>

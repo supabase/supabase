@@ -50,6 +50,18 @@ export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
   }
 }
 
+// Helper function to determine level from HTTP status code
+export const getStatusLevel = (status?: number | string): string => {
+  if (!status) return 'success'
+  const statusNum = Number(status)
+  if (statusNum >= 500) return 'error'
+  if (statusNum >= 400) return 'warning'
+  if (statusNum >= 300) return 'info' // 3xx redirects are informational
+  if (statusNum >= 200) return 'success'
+  if (statusNum >= 100) return 'info'
+  return 'success'
+}
+
 export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
   switch (value) {
     case 'success':

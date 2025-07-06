@@ -491,8 +491,6 @@ const getSupabaseStorageLogsQuery = () => {
 const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
-    ${getEdgeLogsQuery()}
-    union all
     ${getPostgrestLogsQuery()}
     union all
     ${getPostgresLogsQuery()}
@@ -509,6 +507,9 @@ WITH unified_logs AS (
   // requires more work to be done
   // logging structure not complete.
   // ${getSupavisorLogsQuery()}
+
+  // removed
+  // ${getEdgeLogsQuery()}
 }
 
 /**

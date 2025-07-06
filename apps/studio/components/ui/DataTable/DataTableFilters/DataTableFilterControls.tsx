@@ -34,12 +34,12 @@ export function DataTableFilterControls() {
             <AccordionTrigger className="w-full px-2 py-0 hover:no-underline data-[state=closed]:text-muted-foreground data-[state=open]:text-foreground focus-within:data-[state=closed]:text-foreground hover:data-[state=closed]:text-foreground">
               <div className="flex w-full items-center justify-between gap-2 truncate py-2 pr-2">
                 <div className="flex items-center gap-2 truncate">
-                  <p className="text-sm font-medium">{field.label}</p>
-                  {value !== field.label.toLowerCase() && !field.commandDisabled ? (
+                  <p className="text-sm">{field.label}</p>
+                  {/* {value !== field.label.toLowerCase() && !field.commandDisabled ? (
                     <p className="mt-px truncate font-mono text-[10px] text-muted-foreground">
                       {value}
                     </p>
-                  ) : null}
+                  ) : null} */}
                 </div>
                 <DataTableFilterResetButton {...field} />
               </div>

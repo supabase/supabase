@@ -79,6 +79,12 @@ export function getLevelColor(
         border: 'border-destructive',
       }
     case 'info':
+    case 'live':
+      return {
+        text: 'text-brand',
+        bg: 'bg-brand-300',
+        border: 'border border-brand',
+      }
     default:
       return {
         text: 'text-info',
