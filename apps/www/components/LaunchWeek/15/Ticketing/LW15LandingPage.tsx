@@ -18,7 +18,7 @@ const LW15LandingPage = () => {
   const user = state.userTicketData
   const isLoading = !state.sessionLoaded
 
-  const detectedTimezone = 'GMT+1'
+  const [detectedTimezone, setDetectedTimezone] = useState('')
   const [currentTime, setCurrentTime] = useState('')
   const year = '2025'
 
@@ -29,6 +29,26 @@ const LW15LandingPage = () => {
   )
 
   const handleClaimTicket = () => register.signIn()
+
+  // Detect user's timezone
+  useEffect(() => {
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      const now = new Date()
+
+      // Get timezone offset in a readable format
+      const offsetString = now
+        .toLocaleString('en', {
+          timeZoneName: 'short',
+        })
+        .split(' ')
+        .pop()
+
+      setDetectedTimezone(`${timezone} (${offsetString})`)
+    } catch (error) {
+      setDetectedTimezone('Unknown')
+    }
+  }, [])
 
   // Update current time every second
   useEffect(() => {
@@ -172,20 +192,17 @@ const LW15LandingPage = () => {
     <SectionContainer className="flex flex-col justify-between gap-12 !py-10 h-full">
       <div className="flex justify-between items-start text-xs">
         <div className="flex flex-col">
-          <div
-            data-animate
-            data-animate-delay={100}
-            data-animate-duration={600}
-            className="opacity-0"
-          >
-            Detected timezone: {detectedTimezone}
+          <div className="overflow-hidden">
+            <span className="opacity-0 anim-last inline-block">
+              Detected timezone: {detectedTimezone}
+            </span>
           </div>
           <div className="overflow-hidden">
             <span className="opacity-0 anim-last inline-block">Time: {currentTime}</span>
           </div>
         </div>
         <div className="overflow-hidden">
-          <LW15ThemeSwitcher className="anim-last" />
+          <LW15ThemeSwitcher className="opacity-0 anim-last" />
         </div>
       </div>
       <div className="flex flex-col gap-4">
