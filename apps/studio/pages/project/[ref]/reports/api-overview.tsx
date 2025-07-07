@@ -1,8 +1,6 @@
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -10,7 +8,6 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -18,28 +15,45 @@ import { useApiReport } from 'data/reports/api-report-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { NextPageWithLayout } from 'types'
 
+import { useState } from 'react'
+import dayjs from 'dayjs'
+import { ArrowRight, RefreshCw } from 'lucide-react'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
+import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
+import { useParams } from 'common'
+
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
   const organization = useSelectedOrganization()
+  const { ref } = useParams()
 
-  const {
-    data,
-    error,
-    filters,
-    isLoading,
-    params,
-    mergeParams,
-    removeFilters,
-    addFilter,
-    refresh,
-  } = report
+  const defaultStart = dayjs().subtract(1, 'day').toISOString()
+  const defaultEnd = dayjs().toISOString()
 
-  const plan = organization?.plan
+  const [dateRange, setDateRange] = useState<any>({
+    period_start: { date: defaultStart, time_period: '1d' },
+    period_end: { date: defaultEnd, time_period: 'today' },
+    interval: '1h',
+  })
 
-  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const { data, error, isLoading, params, mergeParams, refresh } = report
+
+  const onRefreshReport = async () => {
+    setIsRefreshing(true)
+    refresh()
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
+
+  const onPickerChange = (values: any) => {
+    const newValues = values.interval === '1d' ? { ...values, interval: '1h' } : values
+    setDateRange(newValues)
     mergeParams({
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
+      iso_timestamp_start: newValues.period_start.date,
+      iso_timestamp_end: newValues.period_end.date,
+      interval: newValues.interval,
     })
   }
 
@@ -47,17 +61,37 @@ export const ApiReport: NextPageWithLayout = () => {
     <ReportPadding>
       <ReportHeader title="API Gateway" />
       <div className="w-full flex flex-col gap-1">
-        <ReportFilterBar
-          onRemoveFilters={removeFilters}
-          onDatepickerChange={handleDatepickerChange}
-          datepickerFrom={params.totalRequests.iso_timestamp_start}
-          datepickerTo={params.totalRequests.iso_timestamp_end}
-          onAddFilter={addFilter}
-          onRefresh={refresh}
-          isLoading={isLoading}
-          filters={filters}
-          datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
-        />
+        <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto dark:bg-background-200 bg-background z-10">
+          <ButtonTooltip
+            type="default"
+            disabled={isRefreshing}
+            icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={onRefreshReport}
+          />
+          <div className="flex items-center gap-3">
+            <DateRangePicker
+              loading={isLoading}
+              value={'1d'}
+              options={TIME_PERIODS_INFRA}
+              onChange={onPickerChange}
+            />
+            {dateRange && (
+              <div className="flex items-center gap-x-2 text-xs">
+                <p className="text-foreground-light">
+                  {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+                </p>
+                <p className="text-foreground-light">
+                  <ArrowRight size={12} />
+                </p>
+                <p className="text-foreground-light">
+                  {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
         <div className="h-2 w-full">
           <ShimmerLine active={isLoading} />
         </div>

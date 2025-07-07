@@ -1,13 +1,11 @@
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   NetworkTrafficRenderer,
@@ -22,30 +20,42 @@ import { useStorageReport } from 'data/reports/storage-report-query'
 
 import type { NextPageWithLayout } from 'types'
 import Link from 'next/link'
-import { ExternalLinkIcon } from 'lucide-react'
+import { ExternalLinkIcon, RefreshCw, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import dayjs from 'dayjs'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DateRangePicker } from 'components/ui/DateRangePicker'
+import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
   const organization = useSelectedOrganization()
 
-  const {
-    data,
-    error,
-    filters,
-    isLoading,
-    params,
-    mergeParams,
-    removeFilters,
-    addFilter,
-    refresh,
-  } = report
+  const defaultStart = dayjs().subtract(1, 'day').toISOString()
+  const defaultEnd = dayjs().toISOString()
 
-  const plan = organization?.plan
+  const [dateRange, setDateRange] = useState<any>({
+    period_start: { date: defaultStart, time_period: '1d' },
+    period_end: { date: defaultEnd, time_period: 'today' },
+    interval: '1h',
+  })
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const handleDatepickerChange = (vals: DatePickerValue) => {
+  const { data, error, isLoading, params, mergeParams, refresh } = report
+
+  const onRefreshReport = async () => {
+    setIsRefreshing(true)
+    refresh()
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
+
+  const onPickerChange = (values: any) => {
+    const newValues = values.interval === '1d' ? { ...values, interval: '1h' } : values
+    setDateRange(newValues)
     mergeParams({
-      iso_timestamp_start: vals.from || '',
-      iso_timestamp_end: vals.to || '',
+      iso_timestamp_start: newValues.period_start.date,
+      iso_timestamp_end: newValues.period_end.date,
+      interval: newValues.interval,
     })
   }
 
@@ -54,20 +64,38 @@ export const StorageReport: NextPageWithLayout = () => {
       <ReportHeader title="Storage" />
       <section className="relative pt-20 -mt-2 flex flex-col gap-3">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg dark:bg-200 pt-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
-            <ReportFilterBar
-              onRemoveFilters={removeFilters}
-              onDatepickerChange={handleDatepickerChange}
-              datepickerFrom={params.totalRequests.iso_timestamp_start}
-              datepickerTo={params.totalRequests.iso_timestamp_end}
-              onAddFilter={addFilter}
-              onRefresh={refresh}
-              isLoading={isLoading}
-              filters={filters}
-              selectedProduct="storage"
-              datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
-              className="w-full"
-            />
+          <div className="sticky top-0 bg dark:bg-200 pt-4 mb-4 flex flex-col items-start pointer-events-auto gap-4">
+            <div className="flex items-center space-x-3">
+              <ButtonTooltip
+                type="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+                onClick={onRefreshReport}
+              />
+              <div className="flex items-center gap-3">
+                <DateRangePicker
+                  loading={isLoading}
+                  value={'1d'}
+                  options={TIME_PERIODS_INFRA}
+                  onChange={onPickerChange}
+                />
+                {dateRange && (
+                  <div className="flex items-center gap-x-2 text-xs">
+                    <p className="text-foreground-light">
+                      {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+                    </p>
+                    <p className="text-foreground-light">
+                      <ArrowRight size={12} />
+                    </p>
+                    <p className="text-foreground-light">
+                      {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="h-px w-full">
               <ShimmerLine active={report.isLoading} />
             </div>
