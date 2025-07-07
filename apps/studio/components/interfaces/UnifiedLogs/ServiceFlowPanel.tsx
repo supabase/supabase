@@ -192,13 +192,23 @@ export function ServiceFlowPanel({
                                   table={table}
                                 />
                               ) : (
-                                <MemoizedPostgRESTBlock
-                                  data={selectedRow}
-                                  enrichedData={serviceFlowData?.result?.[0]}
-                                  isLoading={isLoading}
-                                  filterFields={filterFields}
-                                  table={table}
-                                />
+                                <>
+                                  <MemoizedPostgRESTBlock
+                                    data={selectedRow}
+                                    enrichedData={serviceFlowData?.result?.[0]}
+                                    isLoading={isLoading}
+                                    filterFields={filterFields}
+                                    table={table}
+                                  />
+
+                                  <MemoizedPostgresBlock
+                                    data={selectedRow}
+                                    enrichedData={serviceFlowData?.result?.[0]}
+                                    isLoading={isLoading}
+                                    filterFields={filterFields}
+                                    table={table}
+                                  />
+                                </>
                               )}
 
                               <MemoizedResponseCompletedBlock
