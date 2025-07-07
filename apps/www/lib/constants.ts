@@ -75,9 +75,6 @@ export const LW15_LAUNCH_DATE_END = '2025-07-14T23:59:59.000-07:00'
 export const LW15_TITLE = 'Launch Week 15'
 export const LW15_TWEET_TEXT =
   'Launch Week 15 is just around the corner at @supabase. \nClaim your ticket and stay tuned for all the announcements! \n#launchweek'
-export const LW15_TWEET_TEXT_PLATINUM =
-  'Just conquered a platinum @supabase Launch Week 15 ticket. Share twice to get one! \n#launchweek'
-export const LW15_TWEET_TEXT_SECRET = `Found the secret golden ticket for @supabase's Launch Week 15. \nCan you find it? \n#launchweek`
 export const LW15_URL = `${SITE_ORIGIN}/launch-week`
 
 export const SITE_NAME = 'Supabase'

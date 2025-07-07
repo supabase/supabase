@@ -6,30 +6,21 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import useConfData from '../hooks/use-conf-data'
-import {
-  LW15_TWEET_TEXT,
-  LW15_TWEET_TEXT_PLATINUM,
-  LW15_TWEET_TEXT_SECRET,
-  LW15_URL,
-} from '~/lib/constants'
+import { LW15_TWEET_TEXT, LW15_URL } from '~/lib/constants'
 import supabase from '../supabase'
 
 export default function LW15TicketShare() {
   const { resolvedTheme } = useTheme()
   const [state] = useConfData()
   const userData = state.userTicketData
-  const { platinum, username, metadata, secret: hasSecretTicket } = userData
+  const { username, metadata } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const isLessThanMd = useBreakpoint()
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${LW15_URL}/tickets/${username}&t=${dayjs(new Date()).format('DHHmmss')}`
+  const link = `${LW15_URL}/tickets/${username}?lw=15&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
-  const text = hasSecretTicket
-    ? LW15_TWEET_TEXT_SECRET
-    : platinum
-      ? LW15_TWEET_TEXT_PLATINUM
-      : LW15_TWEET_TEXT
+  const text = LW15_TWEET_TEXT
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}&text=${encodedText}`
@@ -59,7 +50,7 @@ export default function LW15TicketShare() {
           .from(TICKETS_TABLE)
           .update({
             shared_on_twitter: 'now',
-            metadata: { ...metadata, theme: resolvedTheme, hasSharedSecret: hasSecretTicket },
+            metadata: { ...metadata, theme: resolvedTheme },
           })
           .eq('launch_week', 'lw15')
           .eq('username', username)
@@ -68,7 +59,7 @@ export default function LW15TicketShare() {
           .from(TICKETS_TABLE)
           .update({
             shared_on_linkedin: 'now',
-            metadata: { ...metadata, theme: resolvedTheme, hasSharedSecret: hasSecretTicket },
+            metadata: { ...metadata, theme: resolvedTheme },
           })
           .eq('launch_week', 'lw15')
           .eq('username', username)

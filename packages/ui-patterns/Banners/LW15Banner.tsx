@@ -7,7 +7,7 @@ import { Button } from 'ui/src/components/Button'
 export function LW15Banner() {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
-  const isLWPage = pathname.includes('/launch-week')
+  const isLWPage = pathname?.includes('/launch-week')
 
   if (isHomePage || isLWPage) return null
 
