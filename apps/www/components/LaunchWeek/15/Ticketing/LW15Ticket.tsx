@@ -79,7 +79,7 @@ const LW15Ticket = ({
             <div className="col-span-2 flex flex-col">
               <p>
                 Monday / 14th July <br />
-                Time begins. US West Coast. 8AM{' '}
+                US West Coast. 8AM
               </p>
             </div>
           </div>
