@@ -17,7 +17,7 @@ const Lw15Page = () => {
 
   return (
     <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
-      <DefaultLayout className="!min-h-fit h-fit lg:h-[calc(100dvh-66px)]">
+      <DefaultLayout className="!min-h-fit !h-fit lg:!min-h-[calc(100dvh-66px)] lg:!h-full">
         <LW15TicketPageProxy />
       </DefaultLayout>
     </Lw15ConfDataProvider>

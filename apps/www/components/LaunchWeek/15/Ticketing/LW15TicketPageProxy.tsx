@@ -19,14 +19,14 @@ const LW15TicketRedirect = () => {
 
   if (!confState.sessionLoaded)
     return (
-      <div className="h-full min-h-[100vh-66px] w-full flex items-center justify-center opacity-0 animate-fade-in">
+      <div className="h-full min-h-[calc(100dvh-66px)] w-full flex items-center justify-center opacity-0 animate-fade-in">
         Loading...
       </div>
     )
 
   if (!user.id)
     return (
-      <div className="h-full min-h-[100vh-66px] w-full flex items-center justify-center opacity-0 animate-fade-in">
+      <div className="h-full min-h-[calc(100dvh-66px)] w-full flex items-center justify-center opacity-0 animate-fade-in">
         Loading...
       </div>
     )

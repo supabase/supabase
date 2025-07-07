@@ -36,7 +36,6 @@ const LW15LandingPage = () => {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       const now = new Date()
 
-      // Get timezone offset in a readable format
       const offsetString = now
         .toLocaleString('en', {
           timeZoneName: 'short',
@@ -50,7 +49,6 @@ const LW15LandingPage = () => {
     }
   }, [])
 
-  // Update current time every second
   useEffect(() => {
     const updateTime = () => {
       const now = new Date()
@@ -60,13 +58,10 @@ const LW15LandingPage = () => {
       setCurrentTime(`${hours}:${minutes}:${seconds}`)
     }
 
-    // Set initial time
     updateTime()
 
-    // Update every second
     const interval = setInterval(updateTime, 1000)
 
-    // Cleanup interval on component unmount
     return () => clearInterval(interval)
   }, [])
 
@@ -194,6 +189,7 @@ const LW15LandingPage = () => {
             <video
               ref={videoRef}
               src="/images/launchweek/15/lw15-galaxy.mp4"
+              poster="/images/launchweek/15/lw15-galaxy.png"
               autoPlay
               muted
               loop
@@ -269,12 +265,7 @@ const LW15LandingPage = () => {
           <div className="w-0 h-px bg-foreground animate-line" />
         </div>
         <div className={cn(centerColClassNames)}>
-          <p
-            data-animate
-            data-animate-delay={300}
-            data-animate-duration={200}
-            className="opacity-0"
-          >
+          <p data-animate data-animate-delay={1200} className="opacity-0">
             {user.id
               ? `Nice to see you back, ${user.name?.split(' ')[0]}`
               : 'Claim your ticket to enter LW15'}

@@ -41,7 +41,13 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
   }
 
   const TicketCustomizationSection = ({ className }: { className?: string }) => (
-    <div className={cn('flex flex-col gap-12 border-t pt-4 w-full', className)}>
+    <div
+      className={cn(
+        'flex flex-col gap-12 pt-4 w-full border-t',
+        isGuest && 'border-t-0 lg:border-t pt-0 lg:pt-4',
+        className
+      )}
+    >
       {!isGuest && (
         <div className="grid grid-cols-6 w-full gap-4">
           <p className="col-span-full xl:col-span-2 lg:text-xs tracking-[-0.25px]">
@@ -104,10 +110,10 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
   const handleClaimTicket = () => register.signIn()
 
   return (
-    <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-4 !py-10 h-full">
-      <div className="flex flex-col h-full justify-between gap-32">
+    <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-6 !py-8 md:!py-10 h-full !min-h-[calc(100dvh-66px)]">
+      <div className="flex flex-col h-full justify-between gap-6 lg:gap-20">
         <div className="grid grid-cols-6 gap-4">
-          <div className="col-span-full w-full flex items-center justify-between h-[60px] md:h-[90px] lg:h-[120px] gap-4">
+          <div className="col-span-full w-full hidden lg:flex items-center justify-between h-[60px] md:h-[90px] lg:h-[120px] gap-4">
             <h1 className="sr-only">Supabase Launch Week 15</h1>
             <LWSVG className="h-full w-auto" />
             <FifteenSVG className="h-full w-auto" />
@@ -136,13 +142,13 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
             </div>
           )}
         </div>
-        <TicketCustomizationSection className="hidden lg:flex" />
+        <TicketCustomizationSection />
       </div>
       <div
-        className="w-full border border-muted min-h-fit h-full bg-surface-300 flex items-center justify-center p-8 transition-colors duration-300"
+        className="w-full border border-muted h-full bg-surface-300 flex items-center justify-center p-8 transition-colors duration-300"
         style={{ background: `${selectedFg}` }}
       >
-        <div className="flex flex-col justify-center gap-8 min-h-fit h-full">
+        <div className="flex flex-col justify-center gap-8 h-fit">
           <LW15Ticket user={user} />
           <div className="flex flex-col gap-1">
             <TicketURLCopy />
@@ -150,7 +156,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
           </div>
         </div>
       </div>
-      <TicketCustomizationSection className="lg:hidden" />
+      {/* <TicketCustomizationSection className="lg:hidden" /> */}
     </SectionContainer>
   )
 }
