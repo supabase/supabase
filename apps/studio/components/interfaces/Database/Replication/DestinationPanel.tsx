@@ -119,7 +119,7 @@ const DestinationPanel = ({
       serviceAccountKey: '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxSize: pipelineData?.config?.batch?.max_size ?? 1000,
-      maxFillSecs: pipelineData?.config?.batch?.max_fill_ms ?? 10,
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? 10,
       maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins ?? 5,
       enabled: existingDestination?.enabled ?? true,
     }),
