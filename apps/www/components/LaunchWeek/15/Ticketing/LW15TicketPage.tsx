@@ -30,8 +30,8 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
     setState({ saving: true })
     try {
       await updateTicketColors({
-        username: user.username!,
-        userMetadata: user.metadata,
+        username: user?.username!,
+        userMetadata: user?.metadata,
         background: newColors.background,
         foreground: newColors.foreground,
       })
@@ -93,8 +93,8 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
       )}
       <div className="hidden lg:flex justify-between items-end gap-4 text-xs">
         <div className="flex flex-col">
-          <p>Ticket ID: #{user.ticket_number}</p>
-          <p>Claimed at: {dayjs(user.created_at).format('DD MMM / HH:mm')}</p>
+          <p>Ticket ID: #{user?.ticket_number}</p>
+          <p>Claimed at: {dayjs(user?.created_at).format('DD MMM / HH:mm')}</p>
         </div>
         <LW15ThemeSwitcher />
       </div>
@@ -115,12 +115,12 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
           <div className="col-span-5 text-2xl lg:text-4xl">
             {isGuest ? (
               <>
-                {user.name?.split(' ')[0]}'s Ticket
+                {user?.name?.split(' ')[0]}'s Ticket
                 <br />
                 Want your own?
               </>
             ) : (
-              <>Hey @{user.username}, customize your Launch Week ticket</>
+              <>Hey @{user?.username}, customize your Launch Week ticket</>
             )}
           </div>
           {isGuest && (

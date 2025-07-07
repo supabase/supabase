@@ -10,14 +10,14 @@ const LW15Ticket = ({
   user: userFromProps,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { user: UserTicketData }) => {
+}: React.HTMLAttributes<HTMLDivElement> & { user?: UserTicketData }) => {
   const [state] = useLw15ConfData()
 
   const user = userFromProps || state.userTicketData
   const fg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const bg = user?.metadata?.colors?.background || BG_COLORS[0]
 
-  const ticketBg = useTicketBg(user.ticket_number!)
+  const ticketBg = useTicketBg(user?.ticket_number!)
 
   return (
     <div
@@ -59,7 +59,7 @@ const LW15Ticket = ({
       </div>
       <div className="relative flex flex-col p-4 w-full flex-1 justify-between">
         <div className="flex flex-col gap-4 w-full">
-          <div className="text-2xl lg:text-3xl">@{user.username}</div>
+          <div className="text-2xl lg:text-3xl">@{user?.username}</div>
           <div className="w-full grid grid-cols-3 gap-4 text-sm">
             <div className="flex flex-col">
               <p>Company</p>
