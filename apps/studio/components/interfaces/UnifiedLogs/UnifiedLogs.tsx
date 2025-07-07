@@ -217,7 +217,13 @@ export const UnifiedLogs = () => {
       // If no facets data available, use the predefined field
       if (!facetsField) return field
 
-      // Use dynamic options from facets data
+      // For hardcoded enum fields, keep the predefined options (facets only used for counts)
+      const isHardcodedField = ['log_type', 'method', 'level'].includes(field.value as string)
+      if (isHardcodedField) {
+        return field // Keep original predefined options
+      }
+
+      // For dynamic fields, use faceted options
       const options = facetsField.rows.map(({ value }) => ({ label: `${value}`, value }))
 
       if (field.type === ('slider' as any)) {

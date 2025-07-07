@@ -5,7 +5,7 @@ import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from 'components/ui/DataTable/DataTable.types'
 import { getLevelColor, getStatusColor } from 'components/ui/DataTable/DataTable.utils'
 import { cn } from 'ui'
-import { LOG_TYPES, METHODS } from './UnifiedLogs.constants'
+import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta, SheetField } from './UnifiedLogs.types'
 import { getLevelLabel } from './UnifiedLogs.utils'
@@ -28,7 +28,7 @@ export const filterFields = [
     options: LOG_TYPES.map((type) => ({ label: type, value: type })),
     component: (props: Option) => {
       return (
-        <div className="flex w-full items-center justify-between gap-2 font-mono">
+        <div className="flex w-full items-center justify-between gap-2">
           <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
             {props.label.replace('_', ' ')}
           </span>
@@ -52,11 +52,23 @@ export const filterFields = [
       if (typeof props.value === 'boolean') return null
       if (typeof props.value === 'undefined') return null
 
-      // Convert string status codes to numbers for styling
-      const statusCode = typeof props.value === 'string' ? parseInt(props.value, 10) : props.value
-      if (isNaN(statusCode)) return null
+      const statusValue = String(props.value)
+      const statusLabel = STATUS_CODE_LABELS[statusValue as keyof typeof STATUS_CODE_LABELS]
 
-      return <span className={cn('font-mono', getStatusColor(statusCode).text)}>{statusCode}</span>
+      // Convert string status codes to numbers for HTTP status styling
+      const statusCode = typeof props.value === 'string' ? parseInt(props.value, 10) : props.value
+      const isHttpStatus = !isNaN(statusCode) && statusCode >= 100 && statusCode < 600
+
+      return (
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <span className="flex-shrink-0 text-foreground">{statusValue}</span>
+          {statusLabel && (
+            <span className="text-[0.7rem] text-foreground-lighter truncate" title={statusLabel}>
+              {statusLabel}
+            </span>
+          )}
+        </div>
+      )
     },
   },
   {
@@ -69,7 +81,7 @@ export const filterFields = [
       // TODO: type `Option` with `options` values via Generics
       const value = props.value as (typeof LEVELS)[number]
       return (
-        <div className="flex w-full max-w-28 items-center justify-between gap-2 font-mono">
+        <div className="flex w-full max-w-28 items-center justify-between gap-2">
           <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
             {props.label}
           </span>
@@ -88,7 +100,11 @@ export const filterFields = [
     defaultOpen: true,
     options: METHODS.map((method) => ({ label: method, value: method })),
     component: (props: Option) => {
-      return <span className="font-mono">{props.value}</span>
+      return (
+        <span className="truncate block text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
+      )
     },
   },
   {
@@ -98,7 +114,11 @@ export const filterFields = [
     defaultOpen: false,
     options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
-      return <span className="font-mono">{props.value}</span>
+      return (
+        <span className="truncate block text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
+      )
     },
   },
   {
@@ -108,7 +128,11 @@ export const filterFields = [
     defaultOpen: true,
     options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
-      return <span className="font-mono">{props.value}</span>
+      return (
+        <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
+      )
     },
   },
   {
@@ -119,9 +143,11 @@ export const filterFields = [
     options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
       return (
-        <div className="flex items-center gap-2">
-          <User size={14} className="text-foreground-lighter" />
-          <span className="font-mono">{props.value}</span>
+        <div className="flex items-center gap-2 min-w-0">
+          <User size={14} className="text-foreground-lighter flex-shrink-0" />
+          <span className="truncate text-[0.75rem]" title={props.value as string}>
+            {props.value}
+          </span>
         </div>
       )
     },

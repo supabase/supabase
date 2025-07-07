@@ -309,7 +309,7 @@ const getPostgresLogsQuery = () => {
       id,
       pgl.timestamp as timestamp,
       'postgres' as log_type,
-      pgl_parsed.sql_state_code as status,
+      CAST(pgl_parsed.sql_state_code AS STRING) as status,
       CASE
           WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
@@ -504,42 +504,38 @@ ${finalWhere}
 }
 
 /**
- * Builds query conditions from only hardcoded field selections
- * Used for filtering dynamic facets without self-filtering
- */
-const buildHardcodedFilterConditions = (search: QuerySearchParamsType) => {
-  const whereConditions: string[] = []
-  const hardcodedFields = ['log_type', 'method', 'level']
-
-  // Process only hardcoded fields for filtering
-  Object.entries(search).forEach(([key, value]) => {
-    if (!hardcodedFields.includes(key)) return
-
-    // Handle array filters (IN clause)
-    if (Array.isArray(value) && value.length > 0) {
-      whereConditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
-      return
-    }
-
-    // Handle scalar values
-    if (value !== null && value !== undefined) {
-      whereConditions.push(`${key} = '${value}'`)
-    }
-  })
-
-  // Create final WHERE clause
-  const hardcodedWhere = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
-
-  return { whereConditions, hardcodedWhere }
-}
-
-/**
  * Get a count query for the total logs within the timeframe
- * Hardcoded fields show global facets, dynamic fields show filtered facets
+ * Uses proper faceted search behavior where facets show "what would I get if I selected ONLY this option"
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   const { finalWhere } = buildQueryConditions(search)
-  const { hardcodedWhere } = buildHardcodedFilterConditions(search)
+
+  // Helper function to build WHERE clause excluding a specific field
+  const buildFacetWhere = (excludeField: string): string => {
+    const conditions: string[] = []
+
+    Object.entries(search).forEach(([key, value]) => {
+      if (key === excludeField) return // Skip the field we're getting facets for
+      if (EXCLUDED_QUERY_PARAMS.includes(key as any)) return // Skip pagination and special params
+
+      // Handle array filters (IN clause)
+      if (Array.isArray(value) && value.length > 0) {
+        conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+        return
+      }
+
+      // Handle scalar values
+      if (value !== null && value !== undefined) {
+        if (['host', 'pathname'].includes(key)) {
+          conditions.push(`${key} LIKE '%${value}%'`)
+        } else {
+          conditions.push(`${key} = '${value}'`)
+        }
+      }
+    })
+
+    return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+  }
 
   // Create a count query using the same unified logs CTE
   const sql = `
@@ -551,60 +547,65 @@ ${finalWhere}
 
 UNION ALL
 
--- HARDCODED FIELDS - Global facets (no filtering)
--- Get counts by level (global - always show all levels)
-SELECT 'level' as dimension, level as value, COUNT(*) as count
-FROM unified_logs
-WHERE level IS NOT NULL
-GROUP BY level
-
-UNION ALL
-
--- Get counts by log_type (global - always show all log types)
+-- Get counts by log_type (exclude log_type filter to avoid self-filtering)
 SELECT 'log_type' as dimension, log_type as value, COUNT(*) as count
 FROM unified_logs
-WHERE log_type IS NOT NULL
+${buildFacetWhere('log_type') || 'WHERE log_type IS NOT NULL'}
+${buildFacetWhere('log_type') ? ' AND log_type IS NOT NULL' : ''}
 GROUP BY log_type
 
 UNION ALL
 
--- Get counts by method (global - always show all methods)
+-- Get counts by method (exclude method filter to avoid self-filtering)  
 SELECT 'method' as dimension, method as value, COUNT(*) as count
 FROM unified_logs
-WHERE method IS NOT NULL
+${buildFacetWhere('method') || 'WHERE method IS NOT NULL'}
+${buildFacetWhere('method') ? ' AND method IS NOT NULL' : ''}
 GROUP BY method
 
 UNION ALL
 
--- DYNAMIC FIELDS - Filtered facets (filtered by hardcoded fields only)
--- Get counts by status (filtered by hardcoded fields only)
+-- Get counts by level (exclude level filter to avoid self-filtering)
+SELECT 'level' as dimension, level as value, COUNT(*) as count
+FROM unified_logs
+${buildFacetWhere('level') || 'WHERE level IS NOT NULL'}
+${buildFacetWhere('level') ? ' AND level IS NOT NULL' : ''}
+GROUP BY level
+
+UNION ALL
+
+-- Get counts by status (exclude status filter to avoid self-filtering)
 SELECT 'status' as dimension, status as value, COUNT(*) as count
 FROM unified_logs
-${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} status IS NOT NULL
+${buildFacetWhere('status') || 'WHERE status IS NOT NULL'}
+${buildFacetWhere('status') ? ' AND status IS NOT NULL' : ''}
 GROUP BY status
 
 UNION ALL
 
--- Get counts by host (filtered by hardcoded fields only)
+-- Get counts by host (exclude host filter to avoid self-filtering)
 SELECT 'host' as dimension, host as value, COUNT(*) as count
 FROM unified_logs
-${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} host IS NOT NULL
+${buildFacetWhere('host') || 'WHERE host IS NOT NULL'}
+${buildFacetWhere('host') ? ' AND host IS NOT NULL' : ''}
 GROUP BY host
 
 UNION ALL
 
--- Get counts by pathname (filtered by hardcoded fields only)
+-- Get counts by pathname (exclude pathname filter to avoid self-filtering)
 SELECT 'pathname' as dimension, pathname as value, COUNT(*) as count
 FROM unified_logs
-${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} pathname IS NOT NULL
+${buildFacetWhere('pathname') || 'WHERE pathname IS NOT NULL'}
+${buildFacetWhere('pathname') ? ' AND pathname IS NOT NULL' : ''}
 GROUP BY pathname
 
 UNION ALL
 
--- Get counts by auth_user (filtered by hardcoded fields only)
+-- Get counts by auth_user (exclude auth_user filter to avoid self-filtering)
 SELECT 'auth_user' as dimension, auth_user as value, COUNT(*) as count
 FROM unified_logs
-${hardcodedWhere ? `${hardcodedWhere} AND` : 'WHERE'} auth_user IS NOT NULL
+${buildFacetWhere('auth_user') || 'WHERE auth_user IS NOT NULL'}
+${buildFacetWhere('auth_user') ? ' AND auth_user IS NOT NULL' : ''}
 GROUP BY auth_user
 `
 
