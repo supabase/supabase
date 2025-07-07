@@ -14,7 +14,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import { MemoizedDataTableSheetContent } from './components/DataTableSheetContent'
+
 import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
 import {
   MemoizedEdgeFunctionBlock,
@@ -26,9 +26,9 @@ import {
 } from './ServiceFlow/components/ServiceBlocks'
 import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
 import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
-import { sheetFields } from './UnifiedLogs.fields'
+
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { LogsMeta, QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
 interface ServiceFlowPanelProps {
   selectedRow: ColumnSchema
@@ -117,7 +117,6 @@ export function ServiceFlowPanel({
                     <TabsTrigger value="service-flow">Overview</TabsTrigger>
                   )}
                   <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
-                  <TabsTrigger value="log-details">Log Details</TabsTrigger>
                 </TabsList>
 
                 {shouldShowServiceFlow && (
@@ -236,15 +235,6 @@ export function ServiceFlowPanel({
                   >
                     {JSON.stringify(jsonData, null, 2)}
                   </CodeBlock>
-                </TabsContent>
-
-                <TabsContent value="log-details" className="flex-grow overflow-auto px-5">
-                  <MemoizedDataTableSheetContent<ColumnSchema, LogsMeta>
-                    table={table as Table<ColumnSchema>}
-                    data={selectedRow}
-                    filterFields={filterFields}
-                    fields={sheetFields}
-                  />
                 </TabsContent>
               </Tabs>
             </div>
