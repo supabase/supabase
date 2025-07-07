@@ -33,7 +33,7 @@ export const TermsUpdateBanner = () => {
         to support our evolving business, legal requirements, and include a new arbitration-based
         dispute resolution process. By continuing to use Supabase after July 8, you agree to the new
         terms. Questions? Contact{' '}
-        <a href="mailto:privacy@supabase.com" target="_blank" className="text hover:text-brand">
+        <a href="mailto:legal@supabase.io" target="_blank" className="text hover:text-brand">
           our team
         </a>
         .
