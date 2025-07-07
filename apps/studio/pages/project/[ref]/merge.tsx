@@ -17,13 +17,31 @@ import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import DatabaseDiffPanel from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import EdgeFunctionsDiffPanel from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
 import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
-import { Badge, Button, NavMenu, NavMenuItem, cn, Alert } from 'ui'
+import {
+  Badge,
+  Button,
+  NavMenu,
+  NavMenuItem,
+  cn,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenu,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { toast } from 'sonner'
 import type { NextPageWithLayout } from 'types'
 
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { GitBranchIcon, GitMerge, Shield, ExternalLink, AlertTriangle, X } from 'lucide-react'
+import {
+  GitBranchIcon,
+  GitMerge,
+  Shield,
+  ExternalLink,
+  AlertTriangle,
+  X,
+  MoreVertical,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
@@ -109,7 +127,7 @@ const MergePage: NextPageWithLayout = () => {
         setWorkflowFinalStatus(status)
         refetchDiff()
         edgeFunctionsDiff.clearDiffsOptimistically()
-        if (parentProjectRef) {
+        if (parentProjectRef && currentBranch?.id) {
           updateBranch({
             id: currentBranch.id,
             projectRef: parentProjectRef,
@@ -227,6 +245,15 @@ const MergePage: NextPageWithLayout = () => {
     })
   }
 
+  const handleReadyForReview = () => {
+    if (!currentBranch?.id || !parentProjectRef) return
+    updateBranch({
+      id: currentBranch.id,
+      projectRef: parentProjectRef,
+      requestReview: true,
+    })
+  }
+
   const handleShowConfirmDialog = () => {
     setShowConfirmDialog(true)
   }
@@ -321,10 +348,21 @@ const MergePage: NextPageWithLayout = () => {
   const isMergeDisabled =
     !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
 
+  const isReadyForReview = !!currentBranch?.review_requested_at
+
   // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
     <div className="flex items-end gap-2">
-      {isMergeDisabled ? (
+      {!isReadyForReview ? (
+        <Button
+          type="primary"
+          onClick={handleReadyForReview}
+          disabled={!combinedHasChanges || isCombinedDiffLoading}
+          icon={<Shield size={16} strokeWidth={1.5} className="text-brand" />}
+        >
+          Ready for review
+        </Button>
+      ) : isMergeDisabled ? (
         <ButtonTooltip
           tooltip={{
             content: {
@@ -354,6 +392,27 @@ const MergePage: NextPageWithLayout = () => {
           Merge branch
         </Button>
       )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="bottom" align="end" className="w-52">
+          <DropdownMenuItem
+            className="gap-x-2"
+            onClick={() => {
+              if (!currentBranch?.id || !parentProjectRef) return
+              updateBranch({
+                id: currentBranch.id,
+                projectRef: parentProjectRef,
+                requestReview: false,
+              })
+              router.push(`/project/${project?.ref}/branches?tab=prs`)
+            }}
+          >
+            Not ready for review
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 
@@ -382,7 +441,10 @@ const MergePage: NextPageWithLayout = () => {
   const pageSubtitle = () => {
     if (!currentBranch?.created_at) return 'Branch information unavailable'
 
-    const createdTime = dayjs(currentBranch.created_at).fromNow()
+    if (!currentBranch?.review_requested_at) {
+      return 'Not ready for review'
+    }
+
     const reviewRequestedTime = dayjs(currentBranch.review_requested_at).fromNow()
     return `Review requested ${reviewRequestedTime}`
   }

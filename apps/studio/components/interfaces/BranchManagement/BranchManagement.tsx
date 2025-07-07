@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { MessageCircle } from 'lucide-react'
+import { GitMerge, MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -85,6 +86,11 @@ const BranchManagement = () => {
     (branch) => branch.review_requested_at !== undefined && branch.review_requested_at !== null
   )
 
+  // Get current branch info
+  const currentBranch = branches?.find((branch) => branch.project_ref === ref)
+  const isCurrentBranchReadyForReview =
+    currentBranch?.review_requested_at !== undefined && currentBranch?.review_requested_at !== null
+
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
 
@@ -113,6 +119,15 @@ const BranchManagement = () => {
     },
   })
 
+  const { mutate: updateBranch } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Branch updated successfully')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update branch: ${error.message}`)
+    },
+  })
+
   const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
 
@@ -131,6 +146,16 @@ const BranchManagement = () => {
     if (projectRef == undefined) return console.error('Project ref is required')
     if (!previewBranches) return console.error('No branches available')
     disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
+  }
+
+  const handleReadyForReview = () => {
+    if (!currentBranch?.id || !projectRef) return
+    updateBranch({
+      id: currentBranch.id,
+      projectRef,
+      requestReview: true,
+    })
+    router.push(`/project/${projectRef}/merge`)
   }
 
   return (
@@ -246,6 +271,29 @@ const BranchManagement = () => {
                             <BranchManagementSection
                               header={`${branchesReadyForReview.length} branches ready for review`}
                             >
+                              {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
+                                <div className="bg-background px-6 py-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-sm text-foreground-light">
+                                      <GitMerge
+                                        strokeWidth={1.5}
+                                        size={16}
+                                        className="text-brand"
+                                      />
+                                      Mark{' '}
+                                      <span className="text-foreground">{currentBranch.name}</span>{' '}
+                                      ready for review
+                                    </div>
+                                    <Button
+                                      type="primary"
+                                      size="tiny"
+                                      onClick={handleReadyForReview}
+                                    >
+                                      Ready for review
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
                               {branchesReadyForReview.length > 0 ? (
                                 branchesReadyForReview.map((branch) => {
                                   return <ReviewRow key={branch.id} branch={branch} />

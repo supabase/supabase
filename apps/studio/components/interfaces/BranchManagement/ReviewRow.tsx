@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 interface ReviewRowProps {
   branch: Branch
@@ -22,13 +23,16 @@ interface ReviewRowProps {
 
 export const ReviewRow = ({ branch }: ReviewRowProps) => {
   const router = useRouter()
+  const project = useSelectedProject()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess: () => {
       toast.success('Branch marked as not ready for review')
-      queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
+      queryClient.invalidateQueries({
+        queryKey: branchKeys.list(project?.parent_project_ref || projectRef),
+      })
     },
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
