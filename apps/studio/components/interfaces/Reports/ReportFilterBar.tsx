@@ -1,4 +1,4 @@
-import { ChevronDown, Database, RefreshCw } from 'lucide-react'
+import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
 import { ComponentProps, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
@@ -10,18 +10,18 @@ import { Auth, Realtime, Storage } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Input,
+  Popover,
+  Select,
+  cn,
 } from 'ui'
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
-import { ReportFilterPopover } from './ReportFilterPopover'
-import { useReportFilters } from './useReportFilters'
-
 import type { ReportFilterItem } from './Reports.types'
 
 interface ReportFilterBarProps {
@@ -29,13 +29,15 @@ interface ReportFilterBarProps {
   isLoading: boolean
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
-  onRefresh: () => void
-  onDatepickerChange: ComponentProps<typeof LogsDatePicker>['onSubmit']
+  onRefresh?: () => void
+  onDatepickerChange?: ComponentProps<typeof LogsDatePicker>['onSubmit']
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
-  selectedProduct?: string
   className?: string
+  selectedProduct?: string
+  showDatabaseSelector?: boolean
+  hideDatepicker?: boolean
 }
 
 const PRODUCT_FILTERS = [
@@ -86,27 +88,45 @@ const ReportFilterBar = ({
   isLoading = false,
   onAddFilter,
   onDatepickerChange,
+  hideDatepicker = false,
   onRemoveFilters,
   onRefresh,
   datepickerHelpers,
-  selectedProduct,
   className,
+  selectedProduct,
+  showDatabaseSelector = true,
 }: ReportFilterBarProps) => {
-  //const { ref } = useParams()
-  //const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
+  const { ref } = useParams()
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
+
+  const filterKeys = [
+    'request.path',
+    'request.method',
+    'request.search',
+    'request.headers.x_client_info',
+    'request.headers.user_agent',
+    'response.status_code',
+  ]
+  const [showAdder, setShowAdder] = useState(false)
   const [currentProductFilter, setCurrentProductFilter] = useState<
     null | (typeof PRODUCT_FILTERS)[number]
   >(null)
+  const [addFilterValues, setAddFilterValues] = useState<ReportFilterItem>({
+    key: filterKeys[0],
+    compare: 'matches',
+    value: '',
+  })
 
-  // Use the custom hook for filter management
-  // const { localFilters, filterProperties, handleFilterChange } = useReportFilters({
-  //   onAddFilter,
-  //   onRemoveFilters,
-  //   filters,
-  // })
+  const resetFilterValues = () => {
+    setAddFilterValues({
+      key: filterKeys[0],
+      compare: 'matches',
+      value: '',
+    })
+  }
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
-    onDatepickerChange(vals)
+    onDatepickerChange && onDatepickerChange(vals)
     setSelectedRange(vals)
   }
 
@@ -132,6 +152,12 @@ const ReportFilterBar = ({
     setCurrentProductFilter(nextProductFilter)
   }
 
+  useEffect(() => {
+    if (selectedProduct) {
+      handleProductFilterChange(PRODUCT_FILTERS.find((p) => p.key === selectedProduct) ?? null)
+    }
+  }, [])
+
   const defaultHelper = datepickerHelpers[0]
   const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
     to: defaultHelper.calcTo(),
@@ -140,28 +166,26 @@ const ReportFilterBar = ({
     text: defaultHelper.text,
   })
 
-  useEffect(() => {
-    if (selectedProduct) {
-      handleProductFilterChange(PRODUCT_FILTERS.find((p) => p.key === selectedProduct) ?? null)
-    }
-  }, [])
-
   return (
-    <div className={cn('flex flex-wrap md:items-center justify-between gap-2', className)}>
-      <div className="flex gap-2">
-        <ButtonTooltip
-          type="default"
-          disabled={isLoading}
-          icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
-          className="w-7"
-          tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-          onClick={() => onRefresh()}
-        />
-        <LogsDatePicker
-          onSubmit={handleDatepickerChange}
-          value={selectedRange}
-          helpers={datepickerHelpers}
-        />
+    <div className={cn('flex items-center justify-between', className)}>
+      <div className="flex flex-row justify-start items-center flex-wrap gap-2">
+        {onRefresh && (
+          <ButtonTooltip
+            type="default"
+            disabled={isLoading}
+            icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={() => onRefresh()}
+          />
+        )}
+        {!hideDatepicker && (
+          <LogsDatePicker
+            onSubmit={handleDatepickerChange}
+            value={selectedRange}
+            helpers={datepickerHelpers}
+          />
+        )}
         {!selectedProduct && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -180,17 +204,17 @@ const ReportFilterBar = ({
                 <p>All Requests</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {PRODUCT_FILTERS.map((productFilterItem) => {
-                const Icon = productFilterItem.icon
+              {PRODUCT_FILTERS.map((productFilter) => {
+                const Icon = productFilter.icon
 
                 return (
                   <DropdownMenuItem
-                    key={productFilterItem.key}
+                    key={productFilter.key}
                     className="space-x-2"
-                    disabled={productFilterItem.key === currentProductFilter?.key}
-                    onClick={() => handleProductFilterChange(productFilterItem)}
+                    disabled={productFilter.key === currentProductFilter?.key}
+                    onClick={() => handleProductFilterChange(productFilter)}
                   >
-                    {productFilterItem.key === 'graphql' ? (
+                    {productFilter.key === 'graphql' ? (
                       <SVG
                         src={`${BASE_PATH}/img/graphql.svg`}
                         className="w-[20px] h-[20px] mr-2"
@@ -204,14 +228,14 @@ const ReportFilterBar = ({
                     <div className="flex flex-col">
                       <p
                         className={cn(
-                          productFilterItem.key === currentProductFilter?.key ? 'font-bold' : '',
+                          productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
                           'inline-block'
                         )}
                       >
-                        {productFilterItem.label}
+                        {productFilter.label}
                       </p>
                       <p className=" text-left text-foreground-light inline-block w-[180px]">
-                        {productFilterItem.description}
+                        {productFilter.description}
                       </p>
                     </div>
                   </DropdownMenuItem>
@@ -220,20 +244,119 @@ const ReportFilterBar = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </div>
-      {/* <div className="order-last md:order-none flex-1">
-        <ReportFilterPopover
-          filterProperties={filterProperties}
-          filters={localFilters}
-          onFiltersChange={handleFilterChange}
-        />
-      </div> */}
+        {filters
+          .filter(
+            (filter) =>
+              filter.value !== currentProductFilter?.filterValue ||
+              filter.key !== currentProductFilter?.filterKey
+          )
+          .map((filter) => (
+            <div
+              key={`${filter.key}-${filter.compare}-${filter.value}`}
+              className="text-xs rounded border border-foreground-lighter bg-surface-300 px-2 h-7 flex flex-row justify-center gap-1 items-center"
+            >
+              {filter.key} {filter.compare} {filter.value}
+              <Button
+                type="text"
+                size="tiny"
+                className="!p-0 !space-x-0"
+                onClick={() => onRemoveFilters([filter])}
+                icon={<X className="text-foreground-light" />}
+              >
+                <span className="sr-only">Remove</span>
+              </Button>
+            </div>
+          ))}
+        <Popover
+          align="end"
+          header={
+            <div className="flex justify-between items-center py-1">
+              <h5 className="text-sm text-foreground">Add Filter</h5>
 
-      {/* <DatabaseSelector
-        additionalOptions={
-          (loadBalancers ?? []).length > 0 ? [{ id: `${ref}-all`, name: 'API Load Balancer' }] : []
-        }
-      /> */}
+              <Button
+                type="primary"
+                size="tiny"
+                onClick={() => {
+                  onAddFilter(addFilterValues)
+                  setShowAdder(false)
+                  resetFilterValues()
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          }
+          open={showAdder}
+          onOpenChange={(openValue) => setShowAdder(openValue)}
+          overlay={
+            <div className="px-3 py-3 flex flex-col gap-2">
+              <Select
+                size="tiny"
+                value={addFilterValues.key}
+                onChange={(e) => {
+                  setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
+                }}
+                label="Attribute Filter"
+              >
+                {filterKeys.map((key) => (
+                  <Select.Option key={key} value={key}>
+                    {key}
+                  </Select.Option>
+                ))}
+              </Select>
+              <Select
+                size="tiny"
+                value={addFilterValues.compare}
+                onChange={(e) => {
+                  setAddFilterValues((prev) => ({
+                    ...prev,
+                    compare: e.target.value as ReportFilterItem['compare'],
+                  }))
+                }}
+                label="Comparison"
+              >
+                {['matches', 'is'].map((value) => (
+                  <Select.Option key={value} value={value}>
+                    {value}
+                  </Select.Option>
+                ))}
+              </Select>
+              <Input
+                size="tiny"
+                label="Value"
+                placeholder={
+                  addFilterValues.compare === 'matches'
+                    ? 'Provide a regex expression'
+                    : 'Provide a string'
+                }
+                onChange={(e) => {
+                  setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
+                }}
+              />
+            </div>
+          }
+          showClose
+        >
+          <Button
+            asChild
+            type="default"
+            size="tiny"
+            icon={<Plus className={`text-foreground-light `} />}
+          >
+            <span>Add filter</span>
+          </Button>
+        </Popover>
+      </div>
+
+      {showDatabaseSelector && (
+        <DatabaseSelector
+          additionalOptions={
+            (loadBalancers ?? []).length > 0
+              ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
+              : []
+          }
+        />
+      )}
     </div>
   )
 }

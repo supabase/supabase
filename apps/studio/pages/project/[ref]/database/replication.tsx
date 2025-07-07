@@ -21,10 +21,9 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           <ScaffoldContainer>
             <ScaffoldHeader>
               <ScaffoldTitle>Replication</ScaffoldTitle>
-              <ScaffoldDescription>Send data to other destinations</ScaffoldDescription>
+              <Destinations />
             </ScaffoldHeader>
           </ScaffoldContainer>
-          <Destinations />
         </>
       ) : (
         <>
@@ -34,7 +33,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               <ScaffoldDescription>Send data to other destinations</ScaffoldDescription>
             </ScaffoldHeader>
           </ScaffoldContainer>
-          <ReplicationComingSoon />
+          <Destinations />
         </>
       )}
     </>
