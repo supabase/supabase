@@ -83,7 +83,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (username) {
     const { data, error } = await supabaseAdmin!
       .from('tickets_view')
-      .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
+      .select('name, username, ticket_number, metadata, role, company, location')
       .eq('launch_week', 'lw15')
       .eq('username', username)
       .single()
@@ -91,20 +91,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     user = data
   }
 
-  // fetch the platinum ticket
-  // stores the og images in supabase storage
-  if (user?.secret) {
-    fetch(
-      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`
-    )
-  } else if (user?.platinum) {
-    // fetch /api-v2/ticket-og
-    fetch(
-      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
-    )
-  }
-
-  const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
+  const ticketType = 'regular'
   const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {

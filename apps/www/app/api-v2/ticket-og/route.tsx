@@ -62,7 +62,7 @@ export async function GET(req: Request, res: Response) {
     const { data: user, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
       .select(
-        'id, name, metadata, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location, ticket_number'
+        'id, name, metadata, shared_on_twitter, shared_on_linkedin, role, company, location, ticket_number'
       )
       .eq('launch_week', 'lw15')
       .eq('username', username)
