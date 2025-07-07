@@ -18,8 +18,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15`
 // Load custom fonts
 const FONT_URLS = {
-  CIRCULAR:
-    'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/fonts/CircularStd-Book.otf',
+  SANS: 'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/fonts/CircularStd-Book.otf',
 }
 
 const LW_TABLE = 'tickets'
@@ -71,10 +70,10 @@ export async function GET(req: Request, res: Response) {
     if (error) console.log('Failed to fetch user. Inner error:', error.message)
     if (!user) throw new Error(error?.message ?? 'user not found')
 
-    const FONT_CIRCULAR = fetch(new URL(FONT_URLS['CIRCULAR'], import.meta.url)).then((res) =>
+    const FONT_SANS = fetch(new URL(FONT_URLS['SANS'], import.meta.url)).then((res) =>
       res.arrayBuffer()
     )
-    const CIRCULAR_FONT_DATA = await FONT_CIRCULAR
+    const FONT_DATA = await FONT_SANS
 
     const { metadata, ticket_number } = user
 
@@ -474,7 +473,7 @@ export async function GET(req: Request, res: Response) {
         fonts: [
           {
             name: 'CircularStd-Book',
-            data: CIRCULAR_FONT_DATA,
+            data: FONT_DATA,
             style: 'normal',
           },
         ],

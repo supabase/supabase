@@ -204,7 +204,7 @@ const LW15LandingPage = () => {
           <div
             data-animate
             data-animate-delay={300}
-            className="hidden md:inline-block opacity-0 md:col-span-4 text-sm overflow-hidden h-fit"
+            className="hidden md:inline-block opacity-0 md:col-span-4 text-xs overflow-hidden h-fit"
           >
             Celebrate our launch week with exciting new features designed to take your development
             skills to the next level.

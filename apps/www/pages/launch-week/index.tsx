@@ -39,8 +39,16 @@ const Lw15Page = () => {
       />
 
       <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
-        <DefaultLayout className="!min-h-[calc(100dvh-66px)] h-[calc(100dvh-66px)]">
-          <LW15LandingPage />
+        <DefaultLayout className="!min-h-[calc(100dvh-66px)] h-[calc(100dvh-66px)] dark:bg-black">
+          <div
+            style={{
+              fontFamily:
+                "SuisseIntl, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+            }}
+            className="h-full"
+          >
+            <LW15LandingPage />
+          </div>
         </DefaultLayout>
       </Lw15ConfDataProvider>
     </>

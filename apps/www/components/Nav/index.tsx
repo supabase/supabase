@@ -47,7 +47,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isGAWeekSection = router.pathname.startsWith('/ga-week')
   const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
-  const showLaunchWeekNavMode = (isLaunchWeekPage || isGAWeekSection) && !open
+  const showLaunchWeekNavMode = !isLaunchWeekXPage && (isLaunchWeekPage || isGAWeekSection) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -67,7 +67,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     return null
   }
 
-  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
+  // const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
 
   return (
     <>
@@ -80,14 +80,14 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            showLaunchWeekNavMode && '!bg-transparent dark:!bg-black transition-all',
             isGAWeekSection && 'dark:!bg-alternative'
           )}
         />
         <nav
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && 'border-muted border-b bg-alternative/50'
+            showLaunchWeekNavMode && 'border-muted border-b bg-transparent'
           )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">

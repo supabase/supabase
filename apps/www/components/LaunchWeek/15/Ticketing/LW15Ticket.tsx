@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import useLw15ConfData, { UserTicketData } from '../hooks/use-conf-data'
 import { FifteenSVG, LWSVG } from '../lw15.components'
 import Image from 'next/image'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 import useTicketBg from '../hooks/use-ticket-bg'
+import VanillaTilt from 'vanilla-tilt'
 
 const LW15Ticket = ({
   user: userFromProps,
@@ -19,8 +20,25 @@ const LW15Ticket = ({
 
   const ticketBg = useTicketBg(user?.ticket_number!)
 
+  const tilt = useRef(null)
+
+  const options = {
+    scale: 1,
+    speed: 1000,
+    max: 10,
+    glare: true,
+    'max-glare': 0.2,
+    'glare-prerender': false,
+  }
+
+  useEffect(() => {
+    if (!tilt.current) return
+    VanillaTilt.init(tilt.current, options)
+  }, [options])
+
   return (
     <div
+      ref={tilt}
       className={cn(
         'min-h-[400px] transition-colors duration-300 [&_*]:transition-colors [&_*]:duration-300 max-h-[500px] h-[70%] w-auto aspect-[278/443] flex flex-col shadow-2xl rounded-md overflow-hidden',
         className

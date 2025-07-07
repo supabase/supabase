@@ -53,8 +53,16 @@ const Lw15Page = ({ user, ogImageUrl }: Props) => {
       />
 
       <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
-        <DefaultLayout className="!min-h-fit !h-fit lg:!min-h-[calc(100dvh-66px)] lg:!h-full">
-          <LW15TicketPage user={user} />
+        <DefaultLayout className="!min-h-fit !h-fit lg:!min-h-[calc(100dvh-66px)] lg:!h-full dark:bg-black">
+          <div
+            style={{
+              fontFamily:
+                "SuisseIntl, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+            }}
+            className="h-full"
+          >
+            <LW15TicketPage user={user} />
+          </div>
         </DefaultLayout>
       </Lw15ConfDataProvider>
     </>
