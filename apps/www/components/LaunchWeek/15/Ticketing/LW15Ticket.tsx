@@ -63,7 +63,7 @@ const LW15Ticket = ({
             style={{ background: bg }}
           />
           <span
-            className="absolute top-5 mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg shadow-inner"
+            className="absolute top-5 mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg z-20"
             style={{ background: fg }}
           />
         </div>
