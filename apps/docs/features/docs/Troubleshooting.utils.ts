@@ -67,7 +67,7 @@ export async function getAllTroubleshootingErrors() {
   const entries = await getAllTroubleshootingEntries()
   const allErrors = new Set(
     entries
-      .flatMap((entry) => entry.data.errors)
+      .flatMap((entry) => entry.data.errors ?? [])
       .filter((error) => error?.http_status_code || error?.code)
   )
 
@@ -81,8 +81,8 @@ export async function getAllTroubleshootingErrors() {
   }
 
   function sortErrors(
-    a: ITroubleshootingMetadata['errors'][number],
-    b: ITroubleshootingMetadata['errors'][number]
+    a: NonNullable<ITroubleshootingMetadata['errors']>[number],
+    b: NonNullable<ITroubleshootingMetadata['errors']>[number]
   ) {
     return formatError(a).localeCompare(formatError(b))
   }

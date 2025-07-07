@@ -19,7 +19,6 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
-  Button,
   Input,
   Tooltip,
   TooltipContent,
@@ -27,6 +26,13 @@ import {
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import {
+  DatabaseExtensionsWarning,
+  ObjectsToBeDroppedWarning,
+  ReadReplicasWarning,
+  UnsupportedExtensionsWarning,
+  UserDefinedObjectsInInternalSchemasWarning,
+} from './UpgradeWarnings'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
@@ -72,6 +78,12 @@ const InfrastructureInfo = () => {
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
+
+  // @ts-ignore [Bobbie] to be removed after 2025-06-30 prod deploy
+  const hasExtensionDependentObjects = (data?.extension_dependent_objects ?? []).length > 0
+  const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
+  const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
+  const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
 
   return (
     <>
@@ -181,62 +193,38 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
-                    {data.eligible && hasReadReplicas && (
-                      <Alert_Shadcn_>
-                        <AlertTitle_Shadcn_>
-                          A new version of Postgres is available for your project
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          You will need to remove all read replicas prior to upgrading your Postgres
-                          version to the latest available ({latestPgVersion}).
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-                    {!data?.eligible && (data?.extension_dependent_objects || []).length > 0 && (
-                      <Alert_Shadcn_
-                        variant="warning"
-                        title="A new version of Postgres is available for your project"
-                      >
-                        <AlertTitle_Shadcn_>
-                          A new version of Postgres is available
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                          <div>
-                            <p className="mb-1">
-                              You'll need to remove the following extensions before upgrading:
-                            </p>
+                    {data.eligible ? (
+                      hasReadReplicas ? (
+                        <ReadReplicasWarning latestPgVersion={latestPgVersion} />
+                      ) : (
+                        <ProjectUpgradeAlert />
+                      )
+                    ) : null}
 
-                            <ul className="pl-4">
-                              {(data?.extension_dependent_objects || []).map((obj) => (
-                                <li className="list-disc" key={obj}>
-                                  {obj}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <p>
-                            {projectUpgradeEligibilityData?.potential_breaking_changes?.includes(
-                              'pg17_upgrade_unsupported_extensions'
-                            )
-                              ? 'These extensions are not supported in newer versions of Supabase Postgres.'
-                              : 'You can add them back after the upgrade is done. Check the docs for which ones might need to be removed.'}
-                          </p>
-
-                          <div>
-                            <Button size="tiny" type="default" asChild>
-                              <a
-                                href="https://supabase.com/docs/guides/platform/upgrading#extensions"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                View docs
-                              </a>
-                            </Button>
-                          </div>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
+                    {!data.eligible ? (
+                      hasExtensionDependentObjects ? (
+                        <DatabaseExtensionsWarning
+                          // @ts-ignore
+                          extensions={data.extension_dependent_objects ?? []}
+                          potentialBreakingChanges={
+                            // @ts-ignore
+                            projectUpgradeEligibilityData?.potential_breaking_changes
+                          }
+                        />
+                      ) : hasObjectsToBeDropped ? (
+                        <ObjectsToBeDroppedWarning
+                          objectsToBeDropped={data.objects_to_be_dropped}
+                        />
+                      ) : hasUnsupportedExtensions ? (
+                        <UnsupportedExtensionsWarning
+                          unsupportedExtensions={data.unsupported_extensions}
+                        />
+                      ) : hasObjectsInternalSchema ? (
+                        <UserDefinedObjectsInInternalSchemasWarning
+                          objects={data.user_defined_objects_in_internal_schemas}
+                        />
+                      ) : null
+                    ) : null}
                   </>
                 )}
               </>

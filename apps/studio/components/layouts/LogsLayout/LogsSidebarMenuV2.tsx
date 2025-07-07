@@ -80,22 +80,27 @@ export function SidebarCollapsible({
 }
 
 export function LogsSidebarMenuV2() {
+  const router = useRouter()
+  const { ref } = useParams() as { ref: string }
+  const warehouseEnabled = useFlag('warehouse')
+
   const [searchText, setSearchText] = useState('')
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
   const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
-  const router = useRouter()
-  const { ref } = useParams() as { ref: string }
+
   const { data: tenantData } = useWarehouseTenantQuery({ projectRef: ref })
+
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
     realtimeAll: realtimeEnabled,
   } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
-  const warehouseEnabled = useFlag('warehouse')
+
   const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef: ref },
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
+
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
@@ -218,22 +223,24 @@ export function LogsSidebarMenuV2() {
             onChange={(e) => setSearchText(e.target.value)}
           ></InnerSideBarFilterSearchInput>
         </InnerSideBarFilters>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="default"
-              icon={<Plus className="text-foreground" />}
-              className="w-[26px]"
-            />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem className="gap-x-2" asChild>
-              <Link href={`/project/${ref}/logs/explorer`}>
-                <FilePlus size={14} />
-                Create query
-              </Link>
-            </DropdownMenuItem>
-            {warehouseEnabled && (
+
+        {warehouseEnabled ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="default"
+                icon={<Plus className="text-foreground" />}
+                className="w-[26px]"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem className="gap-x-2" asChild>
+                <Link href={`/project/${ref}/logs/explorer`}>
+                  <FilePlus size={14} />
+                  Create query
+                </Link>
+              </DropdownMenuItem>
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <DropdownMenuItem className="gap-x-2" asChild>
@@ -253,9 +260,17 @@ export function LogsSidebarMenuV2() {
                   </TooltipContent>
                 )}
               </Tooltip>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button
+            type="default"
+            icon={<Plus className="text-foreground" />}
+            className="w-[26px]"
+            onClick={() => router.push(`/project/${ref}/logs/explorer`)}
+          />
+        )}
+
         <CreateWarehouseCollectionModal
           open={createCollectionOpen}
           onOpenChange={setCreateCollectionOpen}
