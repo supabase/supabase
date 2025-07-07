@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { DollarSign, Github, GitMerge, Loader2 } from 'lucide-react'
+import { DollarSign, Github, GitMerge, Loader2, Merge } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect } from 'react'
@@ -12,6 +12,7 @@ import * as z from 'zod'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
@@ -21,7 +22,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
@@ -35,7 +36,6 @@ import {
   DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_ as Label,
@@ -52,6 +52,10 @@ export const CreateBranchModal = () => {
   const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useFlag('gitlessBranching')
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
+
+  const organization = useSelectedOrganization()
+  const isProPlanAndUp = organization?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -166,14 +170,36 @@ export const CreateBranchModal = () => {
 
   return (
     <Dialog open={showCreateBranchModal} onOpenChange={(open) => setShowCreateBranchModal(open)}>
-      <DialogContent size="large" hideClose>
+      <DialogContent
+        size="large"
+        hideClose
+        onOpenAutoFocus={(e) => {
+          if (promptProPlanUpgrade) {
+            e.preventDefault()
+          }
+        }}
+      >
         <DialogHeader padding="small">
           <DialogTitle>Create a new preview branch</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
+
         <Form_Shadcn_ {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection padding="medium" className="space-y-4">
+            {promptProPlanUpgrade && (
+              <>
+                <UpgradeToPro
+                  primaryText="Upgrade to unlock branching"
+                  secondaryText="Create and test schema changes, functions, and more in a separate, temporary instance without affecting production"
+                  source="create-branch"
+                />
+                <DialogSectionSeparator />
+              </>
+            )}
+            <DialogSection
+              padding="medium"
+              className={cn('space-y-4', promptProPlanUpgrade && 'opacity-25 pointer-events-none')}
+            >
               <FormField_Shadcn_
                 control={form.control}
                 name="branchName"
@@ -186,7 +212,6 @@ export const CreateBranchModal = () => {
                         autoComplete="off"
                       />
                     </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
                   </FormItemLayout>
                 )}
               />
@@ -274,7 +299,13 @@ export const CreateBranchModal = () => {
 
             <DialogSectionSeparator />
 
-            <DialogSection padding="medium" className="flex flex-col gap-4">
+            <DialogSection
+              padding="medium"
+              className={cn(
+                'flex flex-col gap-4',
+                promptProPlanUpgrade && 'opacity-25 pointer-events-none'
+              )}
+            >
               {githubConnection && (
                 <div className="flex flex-row gap-4">
                   <div>
@@ -342,7 +373,8 @@ export const CreateBranchModal = () => {
                   isCreating ||
                   !canSubmit ||
                   isChecking ||
-                  (!gitlessBranching && !githubConnection)
+                  (!gitlessBranching && !githubConnection) ||
+                  promptProPlanUpgrade
                 }
                 loading={isCreating}
                 type="primary"

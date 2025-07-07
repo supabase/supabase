@@ -32,7 +32,7 @@ describe('getModel', () => {
     console.log('Model:', model)
 
     expect(model).toEqual('bedrock-model')
-    expect(bedrockModule.bedrockForRegion).toHaveBeenCalledWith('us')
+    expect(bedrockModule.bedrockForRegion).toHaveBeenCalledWith('us1')
     expect(error).toBeUndefined()
   })
 

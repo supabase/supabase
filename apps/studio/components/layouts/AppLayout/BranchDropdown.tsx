@@ -2,7 +2,7 @@ import {
   AlertCircle,
   Check,
   ChevronsUpDown,
-  GitBranch,
+  GitMerge,
   ListTree,
   MessageCircle,
   Plus,
@@ -34,6 +34,7 @@ import {
   cn,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const BranchLink = ({
   branch,
@@ -75,13 +76,18 @@ const BranchLink = ({
 export const BranchDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const gitlessBranching = useFlag('gitlessBranching')
   const projectDetails = useSelectedProject()
   const snap = useAppStateSnapshot()
 
-  const isBranch = projectDetails?.parent_project_ref !== undefined
-  const projectRef =
-    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
-  const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
+  const projectRef = projectDetails?.parent_project_ref || ref
+
+  const {
+    data: branches,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
 
   const isBranchingEnabled = projectDetails?.is_branch_enabled === true
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
@@ -153,6 +159,26 @@ export const BranchDropdown = () => {
               <p>Create branch</p>
             </div>
           </CommandItem_Shadcn_>
+          {gitlessBranching &&
+            isBranchingEnabled &&
+            selectedBranch &&
+            !selectedBranch.is_default && (
+              <>
+                <CommandItem_Shadcn_
+                  className="cursor-pointer w-full"
+                  onSelect={() => {
+                    setOpen(false)
+                    router.push(`/project/${ref}/merge`)
+                  }}
+                  onClick={() => setOpen(false)}
+                >
+                  <Link href={`/project/${ref}/merge`} className="w-full flex items-center gap-2">
+                    <GitMerge size={14} strokeWidth={1.5} />
+                    Review changes
+                  </Link>
+                </CommandItem_Shadcn_>
+              </>
+            )}
           <CommandItem_Shadcn_
             className="cursor-pointer w-full"
             onSelect={() => {

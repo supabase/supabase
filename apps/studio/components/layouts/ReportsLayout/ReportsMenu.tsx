@@ -25,9 +25,14 @@ const ReportsMenu = () => {
   const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
-  const storageEnabled = useIsFeatureEnabled('project_storage:all')
   const authEnabled = useFlag('authreportv2')
   const edgeFnEnabled = useFlag('edgefunctionreport')
+  const realtimeEnabled = useFlag('realtimeReport')
+  const storageReportEnabled = useFlag('storagereport')
+
+  // b/c fly doesn't support storage
+  const storageSupported = useIsFeatureEnabled('project_storage:all')
+  const storageEnabled = storageReportEnabled && storageSupported
 
   const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
@@ -96,7 +101,7 @@ const ReportsMenu = () => {
       key: 'builtin-reports',
       items: [
         {
-          name: 'API',
+          name: 'API Gateway',
           key: 'api-overview',
           url: `/project/${ref}/reports/api-overview`,
         },
@@ -114,6 +119,15 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
+        ...(realtimeEnabled
+          ? [
+              {
+                name: 'Realtime',
+                key: 'realtime',
+                url: `/project/${ref}/reports/realtime`,
+              },
+            ]
+          : []),
         ...(edgeFnEnabled
           ? [
               {
