@@ -44,7 +44,7 @@ const LW15LandingPage = () => {
         .split(' ')
         .pop()
 
-      setDetectedTimezone(`${timezone} (${offsetString})`)
+      setDetectedTimezone(`${offsetString}`)
     } catch (error) {
       setDetectedTimezone('Unknown')
     }
@@ -95,44 +95,25 @@ const LW15LandingPage = () => {
 
     tl.add('.lw15-logo', {
       opacity: [0, 1],
-      easing: 'inOutCubic',
-      duration: 300,
+      scale: [0.9, 1],
+      translateY: [20, 0],
+      easing: 'outQuad',
+      duration: 1500,
     })
-      .add(
-        '.lw15-logo-left',
-        {
-          translateX: ['100%', 1],
-          easing: 'cubicBezier(.1,0,1,1)',
-          duration: 800,
-        },
-        400
-      )
-      .add(
-        '.lw15-logo-right',
-        {
-          translateX: ['-100%', 1],
-          easing: 'cubicBezier(.5,0,.5,1)',
-          duration: 800,
-        },
-        400
-      )
-      .add(
-        '.lw15-galaxy',
-        {
-          height: ['0%', '100%'],
-          scale: [0.9, 1],
-          opacity: [0, 1],
-          easing: 'cubicBezier(.5,0,.5,1)',
-          duration: 1200,
-        },
-        '-=700'
-      )
+      .add('.lw15-galaxy', {
+        width: ['0%', '100%'],
+        flex: [0, 1],
+        scale: [0.9, 1],
+        opacity: [0, 1],
+        easing: 'cubicBezier(0.25, 0.1, 0.25, 1)',
+        duration: 500,
+      })
       .add(
         '.anim-last',
         {
           opacity: [0, 1],
           translateY: ['100%', 0],
-          easing: 'cubicBezier(.5,0,.5,1)',
+          easing: 'cubicBezier(0.25, 0.1, 0.25, 1)',
           duration: 600,
         },
         '+=300'
@@ -184,7 +165,7 @@ const LW15LandingPage = () => {
           span.style.transform = 'translateY(0)'
         }, delay)
         // Delay after initial animejs animation
-      }, 1800)
+      }, 1500)
     })
   }, [])
 
@@ -206,10 +187,10 @@ const LW15LandingPage = () => {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="w-full flex items-center justify-center h-[60px] md:h-[100px] lg:h-[145px] gap-4">
+        <div className="w-full flex items-center justify-center h-[60px] md:h-[100px] lg:h-[120px] xl:h-[145px] gap-4">
           <h1 className="sr-only">Supabase Launch Week 15</h1>
-          <LWSVG className="opacity-0 translate-x-[100%] lw15-logo lw15-logo-left h-full w-auto" />
-          <div className="lw15-galaxy opacity-0 relative h-full flex-1 dark:mix-blend-screen overflow-hidden">
+          <LWSVG className="opacity-0 lw15-logo lw15-logo-left h-full w-auto" />
+          <div className="lw15-galaxy opacity-0 relative h-full w-0 flex-0 dark:mix-blend-screen overflow-hidden">
             <video
               ref={videoRef}
               src="/images/launchweek/15/lw15-galaxy.mp4"
@@ -219,7 +200,7 @@ const LW15LandingPage = () => {
               className="h-full w-full object-cover"
             />
           </div>
-          <FifteenSVG className="opacity-0 -translate-x-[100%] lw15-logo lw15-logo-right h-full w-auto" />
+          <FifteenSVG className="opacity-0 lw15-logo lw15-logo-right h-full w-auto mr-0.5" />
         </div>
         <div className="grid md:grid-cols-12 gap-4 delay-100">
           <div
