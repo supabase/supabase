@@ -6,12 +6,14 @@ import Image from 'next/image'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 import useTicketBg from '../hooks/use-ticket-bg'
 import VanillaTilt from 'vanilla-tilt'
+import useUserPresence from '../hooks/useUserPresence'
 
 const LW15Ticket = ({
   user: userFromProps,
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { user?: UserTicketData }) => {
+  useUserPresence()
   const [state] = useLw15ConfData()
 
   const user = userFromProps || state.userTicketData

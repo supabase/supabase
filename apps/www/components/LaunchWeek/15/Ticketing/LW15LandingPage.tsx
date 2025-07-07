@@ -273,12 +273,8 @@ const LW15LandingPage = () => {
               : 'Claim your ticket to enter LW15'}
           </p>
         </div>
-        <div
-          data-animate
-          data-animate-delay={600}
-          className="md:col-start-12 text-right text-nowrap items-end opacity-0"
-        >
-          Online: {onlineUsers}
+        <div className="md:col-start-12 text-right text-nowrap items-end overflow-hidden">
+          <span className="opacity-0 anim-last inline-block">Online: {onlineUsers}</span>
         </div>
       </div>
     </SectionContainer>
