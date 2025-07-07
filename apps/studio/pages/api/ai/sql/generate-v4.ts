@@ -69,7 +69,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, orgSlug } = data
+  const { messages, projectRef, connectionString, orgSlug, chatName } = data
 
   // Get organizations and compute opt in level server-side
   const [organizations, projects] = await Promise.all([
