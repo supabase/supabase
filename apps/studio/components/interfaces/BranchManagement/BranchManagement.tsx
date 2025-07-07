@@ -86,7 +86,6 @@ const BranchManagement = () => {
     (branch) => branch.review_requested_at !== undefined && branch.review_requested_at !== null
   )
 
-  // Get current branch info
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const isCurrentBranchReadyForReview =
     currentBranch?.review_requested_at !== undefined && currentBranch?.review_requested_at !== null
