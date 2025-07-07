@@ -69,8 +69,8 @@ export const LW14_TWEET_TEXT_PLATINUM =
 export const LW14_TWEET_TEXT_SECRET = `Found the secret golden ticket for @supabase's Launch Week 14. \nCan you find it? \n#launchweek`
 export const LW14_URL = `${SITE_ORIGIN}/launch-week`
 
-export const LW15_DATE = '14 — 18 Jul / 7am PT'
-export const LW15_LAUNCH_DATE = '2025-07-14T07:00:00.000-07:00'
+export const LW15_DATE = '14 — 18 Jul / 8am PT'
+export const LW15_LAUNCH_DATE = '2025-07-14T08:00:00.000-07:00'
 export const LW15_LAUNCH_DATE_END = '2025-07-14T23:59:59.000-07:00'
 export const LW15_TITLE = 'Launch Week 15'
 export const LW15_TWEET_TEXT =
