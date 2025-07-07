@@ -234,7 +234,7 @@ const GitHubIntegrationConnectionForm = ({
     if (!prodBranch?.id) {
       createBranch({
         projectRef: selectedProject.ref,
-        branchName: 'main',
+        branchName: data.branchName,
         gitBranch: data.branchName,
         is_default: true,
       })
@@ -287,6 +287,7 @@ const GitHubIntegrationConnectionForm = ({
         id: prodBranch.id,
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
+        branchName: data.branchName,
       })
     }
 
