@@ -16,7 +16,8 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
   const [state, setState] = useState({ saving: false })
   const [confState] = useLw15ConfData()
   const isGuest = !confState.sessionLoaded || !confState.session
-  const user = confState.userTicketData || userFromProps
+  const user = isGuest ? userFromProps : confState.userTicketData
+
   const selectedFg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const selectedBg = user?.metadata?.colors?.background || BG_COLORS[0]
 
