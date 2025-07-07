@@ -91,7 +91,7 @@ export async function GET(req: Request, res: Response) {
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
     const OG_PADDING_Y = 100
-    const OG_PADDING_X = 80
+    const OG_PADDING_X = 60
     const TICKET_RATIO = 940 / 1500
     const TICKET_WIDTH = 480
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
@@ -243,6 +243,7 @@ export async function GET(req: Request, res: Response) {
                     backgroundSize: 'contain',
                     height: `${SUPABASE_LOGO_HEIGHT}px`,
                     width: `${SUPABASE_LOGO_RATIO * SUPABASE_LOGO_HEIGHT}px`,
+                    marginBottom: '20px',
                   }}
                 />
               </div>
