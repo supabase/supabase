@@ -26,13 +26,13 @@ export const TermsUpdateBanner = () => {
         Terms of Service Update – Effective Aug 1, 2025
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        We’ve updated our Terms of Service! The new terms take effect on August 1, 2025 and reflect
-        changes to support our evolving business, legal requirements, and include a new
-        arbitration-based dispute resolution process. Read the updated terms{' '}
+        We’ve updated our{' '}
         <a href="https://supabase.com/terms" target="_blank" className="text hover:text-brand">
-          here
+          Terms of Service
         </a>
-        . Questions? Contact{' '}
+        . The new terms take effect on August 1, 2025 and reflect changes to support our evolving
+        business, legal requirements, and a new arbitration-based dispute resolution process.
+        Questions? Contact{' '}
         <a href="mailto:legal@supabase.io" target="_blank" className="text hover:text-brand">
           our team
         </a>
