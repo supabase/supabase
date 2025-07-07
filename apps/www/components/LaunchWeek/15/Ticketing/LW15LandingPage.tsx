@@ -193,6 +193,8 @@ const LW15LandingPage = () => {
               autoPlay
               muted
               loop
+              playsInline
+              controls={false}
               className="h-full w-full object-cover"
             />
           </div>
