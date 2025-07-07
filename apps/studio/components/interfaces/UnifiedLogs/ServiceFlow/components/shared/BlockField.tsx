@@ -14,7 +14,7 @@ const BlockField = ({
   table,
 }: BlockFieldProps) => {
   const value = config.getValue(data, enrichedData)
-  const displayValue = value ?? 'N/A'
+  const displayValue = value ?? 'No value'
   const stringValue = String(displayValue)
 
   const shouldShowSkeleton = config.requiresEnrichedData && isLoading && !value
