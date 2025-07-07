@@ -30,8 +30,9 @@ export const TermsUpdateBanner = () => {
         <a href="https://supabase.com/terms" target="_blank" className="text hover:text-brand">
           Terms of Service
         </a>{' '}
-        to clarify how we use AI features, marketing tools, cookies, and your data. By continuing to
-        use Supabase after May 28, you agree to the new terms. Questions? Contact{' '}
+        to support our evolving business, legal requirements, and include a new arbitration-based
+        dispute resolution process. By continuing to use Supabase after July 8, you agree to the new
+        terms. Questions? Contact{' '}
         <a href="mailto:privacy@supabase.com" target="_blank" className="text hover:text-brand">
           our team
         </a>
