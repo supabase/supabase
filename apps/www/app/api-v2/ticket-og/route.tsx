@@ -261,6 +261,7 @@ export async function GET(req: Request, res: Response) {
                 borderRadius: '12px',
                 display: 'flex',
                 flexDirection: 'column',
+                border: '1px solid #ffffff30',
                 overflow: 'hidden',
                 boxShadow: '0 0 60px 0 rgba(0, 0, 0, 0.5)',
               }}
@@ -325,6 +326,7 @@ export async function GET(req: Request, res: Response) {
                       width: '70px',
                       height: '20px',
                       backgroundColor: '#000',
+                      border: '1px solid #ffffff30',
                       borderRadius: '10px',
                     }}
                   />
@@ -432,7 +434,7 @@ export async function GET(req: Request, res: Response) {
                     {metadata.company ?? '—'}
                   </p>
                 </div>
-                <div
+                {/* <div
                   style={{
                     display: 'flex',
                     position: 'relative',
@@ -461,7 +463,7 @@ export async function GET(req: Request, res: Response) {
                   >
                     {metadata.location ?? '—'}
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
