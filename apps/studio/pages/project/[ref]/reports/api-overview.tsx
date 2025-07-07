@@ -10,23 +10,18 @@ import {
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { NextPageWithLayout } from 'types'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
-import { useParams } from 'common'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
-  const organization = useSelectedOrganization()
-  const { ref } = useParams()
 
   const defaultStart = dayjs().subtract(1, 'day').toISOString()
   const defaultEnd = dayjs().toISOString()
@@ -47,15 +42,16 @@ export const ApiReport: NextPageWithLayout = () => {
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
-  const onPickerChange = (values: any) => {
-    const newValues = values.interval === '1d' ? { ...values, interval: '1h' } : values
-    setDateRange(newValues)
-    mergeParams({
-      iso_timestamp_start: newValues.period_start.date,
-      iso_timestamp_end: newValues.period_end.date,
-      interval: newValues.interval,
-    })
-  }
+  const onPickerChange = useCallback(
+    (values: any) => {
+      setDateRange(values)
+      mergeParams({
+        iso_timestamp_start: values.period_start.date,
+        iso_timestamp_end: values.period_end.date,
+      })
+    },
+    [mergeParams]
+  )
 
   return (
     <ReportPadding>
