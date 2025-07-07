@@ -5,6 +5,8 @@ import { useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Branch } from 'data/branches/branches-query'
+import { tablesToSQL } from 'lib/helpers'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface ReviewWithAIProps {
   currentBranch?: Branch
@@ -45,62 +47,6 @@ export const ReviewWithAI = ({
     },
     { enabled: !!parentProjectRef && !!parentProject }
   )
-
-  const tablesToSQL = (tables: typeof productionTables) => {
-    if (!Array.isArray(tables)) return ''
-
-    const warning =
-      '-- PRODUCTION SCHEMA (for context only - not meant to be run)\n-- Table order and constraints may not be valid for execution.\n\n'
-
-    const sql = tables
-      .map((table) => {
-        if (!table || !Array.isArray((table as any).columns)) return ''
-
-        const columns = (table as { columns?: any[] }).columns ?? []
-        const columnLines = columns.map((c) => {
-          let line = `  ${c.name} ${c.data_type}`
-          if (c.is_identity) {
-            line += ' GENERATED ALWAYS AS IDENTITY'
-          }
-          if (c.is_nullable === false) {
-            line += ' NOT NULL'
-          }
-          if (c.default_value !== null && c.default_value !== undefined) {
-            line += ` DEFAULT ${c.default_value}`
-          }
-          if (c.is_unique) {
-            line += ' UNIQUE'
-          }
-          if (c.check) {
-            line += ` CHECK (${c.check})`
-          }
-          return line
-        })
-
-        const constraints: string[] = []
-
-        if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
-          const pkCols = table.primary_keys.map((pk) => pk.name).join(', ')
-          constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
-        }
-
-        if (Array.isArray(table.relationships)) {
-          table.relationships.forEach((rel) => {
-            if (rel && rel.source_table_name === table.name) {
-              constraints.push(
-                `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
-              )
-            }
-          })
-        }
-
-        const allLines = [...columnLines, ...constraints]
-        return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
-      })
-      .join('\n\n')
-
-    return warning + sql
-  }
 
   const handleReviewWithAssistant = () => {
     if (!currentBranch || !mainBranch) return
@@ -192,14 +138,20 @@ Please be concise with your response.`,
   }
 
   return (
-    <Button
+    <ButtonTooltip
       type="default"
-      onClick={handleReviewWithAssistant}
       disabled={disabled || !currentBranch || !mainBranch}
-      icon={<AiIconAnimation size={16} />}
-      className={className}
+      className="px-1"
+      onClick={handleReviewWithAssistant}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'Ask Supabase Assistant to review the merge request',
+        },
+      }}
     >
-      Review with assistant
-    </Button>
+      <AiIconAnimation size={16} />
+      <span className="sr-only">Review with Assistant</span>
+    </ButtonTooltip>
   )
 }
