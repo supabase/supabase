@@ -17,7 +17,7 @@ interface Props {
 const Lw15Page = ({ user, ogImageUrl }: Props) => {
   const username = user?.username
   const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
-  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
+  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8AM PT.'
   const PAGE_URL = `${LW15_URL}/tickets/${username}`
   const { query } = useRouter()
   const ticketNumber = query.ticketNumber?.toString()
