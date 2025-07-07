@@ -42,17 +42,19 @@ const requiredFields: Record<Target, { name: string; required: boolean }[]> = {
     { name: 's3.endpoint', required: true },
     { name: 'catalog_uri', required: true },
   ],
-  SupabaseStorage: [
-    { name: 'vault_aws_access_key_id', required: true },
-    { name: 'vault_aws_secret_access_key', required: true },
-    { name: 'vault_token', required: true },
-    { name: 'warehouse', required: true },
-    { name: 's3.endpoint', required: true },
-    { name: 'catalog_uri', required: true },
+  IcebergRestCatalog: [
+    { name: 'vault_aws_access_key_id', required: false },
+    { name: 'vault_aws_secret_access_key', required: false },
+    { name: 'region_name', required: false },
+    { name: 'vault_aws_s3table_bucket_arn', required: false },
+    { name: 'vault_token', required: false },
+    { name: 'warehouse', required: false },
+    { name: 's3.endpoint', required: false },
+    { name: 'catalog_uri', required: false },
   ],
 } as const
 
-type Target = 'S3Tables' | 'R2Catalog' | 'SupabaseStorage'
+type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
 
 export const CreateIcebergWrapperSheet = ({
   wrapperMeta: wrapperMetaOriginal,
@@ -187,13 +189,13 @@ export const CreateIcebergWrapperSheet = ({
                         <RadioGroupStackedItem
                           key="S3Tables"
                           value="S3Tables"
-                          label="S3 Table"
+                          label="AWS S3 Tables"
                           showIndicator={false}
                         >
-                          <div className="flex  gap-x-5">
+                          <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                S3 Tables are tables that are stored in an S3 bucket.
+                                AWS S3 storage that's optimized for analytics workloads.
                               </p>
                             </div>
                           </div>
@@ -201,27 +203,27 @@ export const CreateIcebergWrapperSheet = ({
                         <RadioGroupStackedItem
                           key="R2Catalog"
                           value="R2Catalog"
-                          label="R2 Catalog"
+                          label="Cloudflare R2 Catalog"
                           showIndicator={false}
                         >
-                          <div className="flex  gap-x-5">
+                          <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                R2 Catalog is a catalog that is stored in an R2 bucket.
+                                Managed Apache Iceberg built directly into your R2 bucket.
                               </p>
                             </div>
                           </div>
                         </RadioGroupStackedItem>
                         <RadioGroupStackedItem
-                          key="SupabaseStorage"
-                          value="SupabaseStorage"
-                          label="Supabase Storage"
+                          key="IcebergRestCatalog"
+                          value="IcebergRestCatalog"
+                          label="Iceberg REST Catalog"
                           showIndicator={false}
                         >
-                          <div className="flex  gap-x-5">
+                          <div className="flex gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Supabase Storage is a storage that is stored in an Supabase bucket.
+                                Can be used with any S3-compatible storage.
                               </p>
                             </div>
                           </div>
