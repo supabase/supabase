@@ -8,7 +8,7 @@ import LW15LandingPage from 'components/LaunchWeek/15/Ticketing/LW15LandingPage'
 
 const Lw15Page = () => {
   const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
-  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
+  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8AM PT.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/15/lw15-og.png?lw=15`
 
   const { query } = useRouter()
