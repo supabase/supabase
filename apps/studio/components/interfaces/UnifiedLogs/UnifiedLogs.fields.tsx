@@ -86,7 +86,7 @@ export const filterFields = [
     value: 'method',
     type: 'checkbox',
     defaultOpen: true,
-    options: METHODS.map((region) => ({ label: region, value: region })),
+    options: METHODS.map((method) => ({ label: method, value: method })),
     component: (props: Option) => {
       return <span className="font-mono">{props.value}</span>
     },
