@@ -96,9 +96,6 @@ export const StorageReport: NextPageWithLayout = () => {
                 )}
               </div>
             </div>
-            <div className="h-px w-full">
-              <ShimmerLine active={report.isLoading} />
-            </div>
           </div>
         </div>
 

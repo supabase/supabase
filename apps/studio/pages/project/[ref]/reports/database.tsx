@@ -208,11 +208,6 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={report.isLoading} />
-        </div>
-      </div>
       <GrafanaPromoBanner />
       <section className="relative pt-16 -mt-2">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">

@@ -92,9 +92,6 @@ export const ApiReport: NextPageWithLayout = () => {
             )}
           </div>
         </div>
-        <div className="h-2 w-full">
-          <ShimmerLine active={isLoading} />
-        </div>
       </div>
 
       <ReportWidget
