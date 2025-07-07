@@ -1,4 +1,5 @@
 import { expect, Page } from '@playwright/test'
+import fs from 'fs'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
 
@@ -15,8 +16,9 @@ const getSelectors = (tableName: string) => ({
   saveBtn: (page) => page.getByRole('button', { name: 'Save' }),
   definitionTab: (page) => page.getByText('definition', { exact: true }),
   viewLines: (page) => page.locator('div.view-lines'),
-  insertRowBtn: (page) => page.getByTestId('table-editor-insert-new-row'),
-  insertModal: (page) => page.getByText('Insert a new row into'),
+  insertBtn: (page) => page.getByTestId('table-editor-insert-new-row'),
+  insertRow: (page) => page.getByText('Insert a new row into'),
+  insertColumn: (page) => page.getByText('Insert a new column into'),
   defaultValueInput: (page) => page.getByTestId('defaultValueColumn-input'),
   actionBarSaveRow: (page) => page.getByTestId('action-bar-save-row'),
   grid: (page) => page.getByRole('grid'),
@@ -94,11 +96,31 @@ const deleteTables = async (page: Page, tableName: string) => {
   ).toBeVisible()
 }
 
+const deleteEnum = async (page: Page, enumName: string) => {
+  // give it a second for interactions to load
+  await page.waitForTimeout(1000)
+
+  // if enum (test) exists, delete it.
+  const exists = (await page.getByRole('cell', { name: enumName, exact: true }).count()) > 0
+  if (!exists) return
+
+  await page
+    .getByRole('row', { name: `public ${enumName}` })
+    .getByRole('button')
+    .click()
+  await page.getByRole('menuitem', { name: 'Delete type' }).click()
+  await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
+  await page.getByRole('button', { name: 'Confirm delete' }).click()
+  await expect(page.getByText(`Successfully deleted "${enumName}"`)).toBeVisible()
+}
+
 test.describe('Table Editor', () => {
   let page: Page
   const testTableName = `pw-test-table-editor`
   const tableNameRlsEnabled = `pw-test-rls-enabled`
   const tableNameRlsDisabled = `pw-test-rls-disabled`
+  const tableNameEnum = `pw-test-enum`
+  const tableNameCsv = `pw-test-csv`
 
   test.beforeAll(async ({ browser, ref }) => {
     test.setTimeout(60000)
@@ -114,6 +136,8 @@ test.describe('Table Editor', () => {
     await deleteTables(page, testTableName)
     await deleteTables(page, tableNameRlsEnabled)
     await deleteTables(page, tableNameRlsDisabled)
+    await deleteTables(page, tableNameEnum)
+    await deleteTables(page, tableNameCsv)
   })
 
   test.afterAll(async () => {
@@ -123,6 +147,8 @@ test.describe('Table Editor', () => {
     await deleteTables(page, testTableName)
     await deleteTables(page, tableNameRlsEnabled)
     await deleteTables(page, tableNameRlsDisabled)
+    await deleteTables(page, tableNameEnum)
+    await deleteTables(page, tableNameCsv)
   })
 
   test('should perform all table operations sequentially', async ({ ref }) => {
@@ -143,14 +169,14 @@ test.describe('Table Editor', () => {
 
     // 2. Insert test data
     await page.getByRole('button', { name: `View ${testTableName}` }).click()
-    await s.insertRowBtn(page).click()
-    await s.insertModal(page).click()
+    await s.insertBtn(page).click()
+    await s.insertRow(page).click()
     await s.defaultValueInput(page).fill('100')
     await s.actionBarSaveRow(page).click()
 
     await page.getByRole('button', { name: `View ${testTableName}` }).click()
-    await s.insertRowBtn(page).click()
-    await s.insertModal(page).click()
+    await s.insertBtn(page).click()
+    await s.insertRow(page).click()
     await s.defaultValueInput(page).fill('4')
     await s.actionBarSaveRow(page).click()
 
@@ -255,5 +281,122 @@ test.describe('Table Editor', () => {
 
     await deleteTables(page, tableNameRlsEnabled)
     await deleteTables(page, tableNameRlsDisabled)
+  })
+
+  test('add enums and show enums on table', async ({ ref }) => {
+    const ENUM_NAME = 'priority'
+    const ENUM_COLUMN_NAME = 'order_priority_level'
+    // clear local storage, as it might result in some flakiness
+    await page.evaluate(() => window.localStorage.clear())
+
+    await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
+
+    // delete enum if it exists
+    await deleteEnum(page, ENUM_NAME)
+
+    // create a new enum
+    await page.getByRole('button', { name: 'Create type' }).click()
+    await page.getByRole('textbox', { name: 'Name' }).fill(ENUM_NAME)
+    await page.locator('input[name="values.0.value"]').fill('medium')
+    await page.getByRole('button', { name: 'Add value' }).click()
+    await page.locator('input[name="values.1.value"]').fill('high')
+    await page.getByRole('button', { name: 'Create type' }).click()
+
+    // Wait for enum response to be completed
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes(`pg-meta/${ref}/types`) ||
+        response.url().includes('pg-meta/default/types')
+    )
+
+    // verify enum is created
+    await expect(page.getByRole('cell', { name: ENUM_NAME, exact: true })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'medium, high', exact: true })).toBeVisible()
+
+    // create a new table with new column for enums
+    await page.goto(toUrl(`/project/${ref}/editor`))
+    await createTable(page, tableNameEnum)
+    const s = getSelectors(testTableName)
+    await s.insertBtn(page).click()
+    await s.insertColumn(page).click()
+
+    await page.getByRole('textbox', { name: 'column_name', exact: true }).fill(ENUM_COLUMN_NAME)
+    await page.getByRole('combobox').click()
+    await page.getByPlaceholder('Search types...').fill(ENUM_NAME)
+    await page.getByRole('option', { name: ENUM_NAME }).click()
+    await page.getByRole('button', { name: 'Save' }).click()
+
+    // Wait for the grid to be visible and data to be loaded
+    await expect(s.grid(page), 'Grid should be visible after inserting data').toBeVisible()
+    await expect(page.getByRole('columnheader', { name: ENUM_NAME })).toBeVisible()
+
+    // insert row with enum value
+    await s.insertBtn(page).click()
+    await s.insertRow(page).click()
+    await page.getByRole('combobox').selectOption('medium')
+    await s.actionBarSaveRow(page).click()
+    await expect(page.getByRole('gridcell', { name: 'medium' })).toBeVisible()
+
+    // update enum value
+    await page.getByRole('gridcell', { name: 'medium' }).click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Edit' }).click()
+    await page.getByRole('combobox').selectOption('high')
+    await s.actionBarSaveRow(page).click()
+    await expect(page.getByRole('gridcell', { name: 'high' })).toBeVisible()
+
+    // delete enum and enum table
+    await deleteTables(page, tableNameEnum)
+    await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
+    await deleteEnum(page, ENUM_NAME)
+
+    // should end at the init link
+    // clear local storage, as it might result in some flakiness
+    await page.evaluate(() => window.localStorage.clear())
+    await page.goto(toUrl(`/project/${ref}/editor`))
+  })
+
+  test('csv import works properly', async () => {
+    // create a new table and insert some data
+    await createTable(page, tableNameCsv)
+    const s = getSelectors(tableNameCsv)
+    await page.getByRole('button', { name: `View ${tableNameCsv}` }).click()
+    await s.insertBtn(page).click()
+    await s.insertRow(page).click()
+    await s.defaultValueInput(page).fill('123')
+    await s.actionBarSaveRow(page).click()
+    await s.insertBtn(page).click()
+    await s.insertRow(page).click()
+    await s.defaultValueInput(page).fill('456')
+    await s.actionBarSaveRow(page).click()
+    await s.insertBtn(page).click()
+    await s.insertRow(page).click()
+    await s.defaultValueInput(page).fill('789')
+    await s.actionBarSaveRow(page).click()
+
+    // download csv
+    const tableBtn = await page.getByRole('button', { name: 'View pw-test-csv' })
+    await tableBtn.getByRole('button').last().click()
+    await page.getByRole('menuitem', { name: 'Export data' }).click()
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByRole('menuitem', { name: 'Export table as CSV' }).click()
+    const download = await downloadPromise
+    expect(download.suggestedFilename()).toContain('.csv')
+    const downloadPath = await download.path()
+
+    // verify file contents
+    const csvContent = fs.readFileSync(downloadPath, 'utf-8').replace(/\r?\n/g, '\n')
+    const rows = csvContent.trim().split('\n')
+    const defaultColumnValues = rows.map((row) => {
+      const columns = row.split(',')
+      return columns[2].trim()
+    })
+    const expectedDefaultColumnValues = ['defaultValueColumn', '123', '456', '789']
+    defaultColumnValues.forEach((expectedValue) => {
+      expect(expectedDefaultColumnValues).toContain(expectedValue)
+    })
+
+    // remove the downloaded file + clean up tables
+    fs.unlinkSync(downloadPath)
+    deleteTables(page, tableNameCsv)
   })
 })
