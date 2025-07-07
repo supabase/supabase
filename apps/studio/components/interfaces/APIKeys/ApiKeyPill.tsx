@@ -79,7 +79,7 @@ export function ApiKeyPill({
 
   async function onCopy() {
     // If key is already revealed, use that value
-    if (data?.api_key) return data?.api_key
+    if (data?.api_key) return data?.api_key ?? ''
 
     try {
       // Fetch full key and immediately clear from cache after copying
@@ -89,13 +89,15 @@ export function ApiKeyPill({
         exact: true,
       })
 
-      if (result.isSuccess) return result.data.api_key
+      if (result.isSuccess) return result.data.api_key ?? ''
 
       if (error) {
         toast.error('Failed to copy secret API key')
+        return ''
       }
     } catch (error) {
       console.error('Failed to fetch API key:', error)
+      return ''
     }
 
     // Fallback to the masked version if fetch fails
@@ -116,7 +118,7 @@ export function ApiKeyPill({
             isSecret ? 'overflow-hidden' : '',
             show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
             'transition-all',
-            'max-w-[380px]',
+            'max-w-[340px]',
             'cursor-text',
             'relative'
           )}

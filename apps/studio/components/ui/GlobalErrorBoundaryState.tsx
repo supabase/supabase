@@ -58,7 +58,7 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
       <div className="flex flex-col gap-y-4 max-w-full sm:max-w-[660px] px-4 sm:px-0">
         <div className="flex flex-col gap-y-1 text-left py-2 w-full">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-lg font-bold">Sorry! An unexpected error occured.</p>
+            <p className="text-lg font-bold">Sorry! An unexpected error occurred.</p>
             <CopyButton type="outline" text={errorMessage} copyLabel="Copy error" />
           </div>
           <p className="text-sm">

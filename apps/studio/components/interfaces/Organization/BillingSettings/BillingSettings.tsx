@@ -82,7 +82,7 @@ export const BillingSettings = () => {
         </>
       )}
 
-      {isBillingCreditsEnabledOnProfileLevel && isNotOrgWithPartnerBilling && (
+      {isBillingCreditsEnabledOnProfileLevel && (
         <>
           <ScaffoldDivider />
 

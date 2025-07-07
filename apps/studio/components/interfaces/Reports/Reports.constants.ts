@@ -15,13 +15,13 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
     text: 'Last 10 minutes',
     calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 30 minutes',
     calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
-    availableIn: ['team', 'enterprise'],
+    availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
     text: 'Last 60 minutes',
@@ -82,13 +82,32 @@ export const generateRegexpWhere = (filters: ReportFilterItem[], prepend = true)
       const normalizedKey = [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
       const filterKey = filter.key.includes('.') ? normalizedKey : filter.key
 
-      if (filter.compare === 'matches') {
-        return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
-      } else if (filter.compare === 'is') {
-        return `${filterKey} = ${filter.value}`
+      // Handle different comparison operators
+      switch (filter.compare) {
+        case 'matches':
+          return `REGEXP_CONTAINS(${filterKey}, '${filter.value}')`
+        case 'is':
+          return `${filterKey} = ${filter.value}`
+        case '!=':
+          return `${filterKey} != ${filter.value}`
+        case '>=':
+          return `${filterKey} >= ${filter.value}`
+        case '<=':
+          return `${filterKey} <= ${filter.value}`
+        case '>':
+          return `${filterKey} > ${filter.value}`
+        case '<':
+          return `${filterKey} < ${filter.value}`
+        default:
+          // Fallback to exact match for unknown operators
+          return `${filterKey} = ${filter.value}`
       }
     })
+    .filter(Boolean) // Remove any null/undefined conditions
     .join(' AND ')
+
+  if (conditions === '') return ''
+
   if (prepend) {
     return 'WHERE ' + conditions
   } else {
@@ -281,7 +300,7 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
       cacheHitRate: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (_filters) => `
+        sql: (filters) => `
         -- reports-storage-cache-hit-rate
 SELECT
   timestamp_trunc(timestamp, hour) as timestamp,
@@ -293,6 +312,7 @@ from edge_logs f
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
 where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
+  ${generateRegexpWhere(filters, false)}
 group by timestamp
 order by timestamp desc
 `,
@@ -300,7 +320,7 @@ order by timestamp desc
       topCacheMisses: {
         queryType: 'logs',
         // storage report does not perform any filtering
-        sql: (_filters) => `
+        sql: (filters) => `
         -- reports-storage-top-cache-misses
 SELECT
   r.path as path,
@@ -311,9 +331,10 @@ from edge_logs f
   cross join unnest(m.request) as r
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
-where starts_with(r.path, '/storage/v1/object') 
+where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+  ${generateRegexpWhere(filters, false)} 
 group by path, search
 order by count desc
 limit 12

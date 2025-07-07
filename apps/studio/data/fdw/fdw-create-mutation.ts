@@ -20,14 +20,23 @@ export type FDWCreateVariables = {
   formState: {
     [k: string]: string
   }
+  mode: 'tables' | 'schema'
   tables: any[]
+  sourceSchema: string
+  targetSchema: string
 }
 
 export function getCreateFDWSql({
   wrapperMeta,
   formState,
+  mode,
   tables,
-}: Pick<FDWCreateVariables, 'wrapperMeta' | 'formState' | 'tables'>) {
+  sourceSchema,
+  targetSchema,
+}: Pick<
+  FDWCreateVariables,
+  'wrapperMeta' | 'formState' | 'tables' | 'mode' | 'sourceSchema' | 'targetSchema'
+>) {
   const newSchemasSql = tables
     .filter((table) => table.is_new_schema)
     .map((table) => /* SQL */ `create schema if not exists ${table.schema_name};`)
@@ -103,10 +112,13 @@ export function getCreateFDWSql({
 
   const createEncryptedKeysSql = createEncryptedKeysSqlArray.join('\n')
 
-  const encryptedOptionsSqlArray = encryptedOptions.map((option) => `${option.name} ''%s''`)
-  const unencryptedOptionsSqlArray = unencryptedOptions.map(
-    (option) => `${option.name} ''${formState[option.name]}''`
-  )
+  const encryptedOptionsSqlArray = encryptedOptions
+    .filter((option) => formState[option.name])
+    .map((option) => `${option.name} ''%s''`)
+  const unencryptedOptionsSqlArray = unencryptedOptions
+    .filter((option) => formState[option.name])
+    // wrap all options in double quotes, some option names have dots in them
+    .map((option) => `"${option.name}" ''${formState[option.name]}''`)
   const optionsSqlArray = [...encryptedOptionsSqlArray, ...unencryptedOptionsSqlArray].join(',')
 
   const createServerSql = /* SQL */ `
@@ -158,12 +170,11 @@ export function getCreateFDWSql({
         .join('\n')}
     
       execute format(
-        E'create server ${formState.server_name}\\n'
-        '   foreign data wrapper ${formState.wrapper_name}\\n'
-        '   options (\\n'
-        '     ${optionsSqlArray}\\n'
-        '   );',
-        ${encryptedOptions.map((option) => `v_${option.name}`).join(',\n')}
+        E'create server ${formState.server_name} foreign data wrapper ${formState.wrapper_name} options (${optionsSqlArray});',
+        ${encryptedOptions
+          .filter((option) => formState[option.name])
+          .map((option) => `v_${option.name}`)
+          .join(',\n')}
       );
     end $$;
   `
@@ -195,6 +206,10 @@ export function getCreateFDWSql({
     })
     .join('\n\n')
 
+  const importForeignSchemaSql = /* SQL */ `
+  import foreign schema "${sourceSchema}" from server ${formState.server_name} into ${targetSchema} options (strict 'true');
+`
+
   const sql = /* SQL */ `
     ${newSchemasSql}
 
@@ -204,20 +219,16 @@ export function getCreateFDWSql({
 
     ${createServerSql}
 
-    ${createTablesSql}
+    ${mode === 'tables' ? createTablesSql : ''}
+
+    ${mode === 'schema' ? importForeignSchemaSql : ''}
   `
 
   return sql
 }
 
-export async function createFDW({
-  projectRef,
-  connectionString,
-  wrapperMeta,
-  formState,
-  tables,
-}: FDWCreateVariables) {
-  const sql = wrapWithTransaction(getCreateFDWSql({ wrapperMeta, formState, tables }))
+export async function createFDW({ projectRef, connectionString, ...rest }: FDWCreateVariables) {
+  const sql = wrapWithTransaction(getCreateFDWSql(rest))
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

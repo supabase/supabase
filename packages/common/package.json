@@ -13,7 +13,7 @@
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
     "@usercentrics/cmp-browser-sdk": "^4.42.0",
-    "@vercel/flags": "^2.6.0",
+    "flags": "^4.0.0",
     "api-types": "workspace:*",
     "config": "workspace:*",
     "dat.gui": "^0.7.9",

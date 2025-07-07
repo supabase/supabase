@@ -1,5 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { toast } from 'sonner'
 
 import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
@@ -7,25 +15,51 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { getURL } from 'lib/helpers'
 import { AlertCircle, CreditCard, Loader, Plus } from 'lucide-react'
 import { Listbox } from 'ui'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
+import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
+import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
+import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { useTheme } from 'next-themes'
+import { Elements } from '@stripe/react-stripe-js'
+import { NewPaymentMethodElement } from '../PaymentMethods/NewPaymentMethodElement'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
+  createPaymentMethodInline: boolean
+  readOnly: boolean
 }
 
-const PaymentMethodSelection = ({
-  selectedPaymentMethod,
-  onSelectPaymentMethod,
-  layout = 'vertical',
-}: PaymentMethodSelectionProps) => {
+const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
+  {
+    selectedPaymentMethod,
+    onSelectPaymentMethod,
+    layout = 'vertical',
+    createPaymentMethodInline = false,
+    readOnly,
+  }: PaymentMethodSelectionProps,
+  ref
+) {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
   const [showAddNewPaymentMethodModal, setShowAddNewPaymentMethodModal] = useState(false)
+  const captchaLoaded = useIsHCaptchaLoaded()
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+  const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
+  const { resolvedTheme } = useTheme()
+  const paymentRef = useRef<{ createPaymentMethod: () => Promise<PaymentMethod | undefined> }>(null)
+  const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
 
   const {
     data: paymentMethods,
@@ -33,9 +67,75 @@ const PaymentMethodSelection = ({
     refetch: refetchPaymentMethods,
   } = useOrganizationPaymentMethodsQuery({ slug })
 
+  const captchaRefCallback = useCallback((node: any) => {
+    setCaptchaRef(node)
+  }, [])
+
+  const { mutate: initSetupIntent, isLoading: setupIntentLoading } =
+    useOrganizationPaymentMethodSetupIntent({
+      onSuccess: (intent) => {
+        setSetupIntent(intent)
+      },
+      onError: (error) => {
+        toast.error(`Failed to setup intent: ${error.message}`)
+      },
+    })
+
+  useEffect(() => {
+    if (paymentMethods?.data && paymentMethods.data.length === 0 && setupNewPaymentMethod == null) {
+      setSetupNewPaymentMethod(true)
+    }
+  }, [paymentMethods])
+
+  useEffect(() => {
+    const loadSetupIntent = async (hcaptchaToken: string | undefined) => {
+      const slug = selectedOrganization?.slug
+      if (!slug) return console.error('Slug is required')
+      if (!hcaptchaToken) return console.error('HCaptcha token required')
+
+      setSetupIntent(undefined)
+      initSetupIntent({ slug: slug!, hcaptchaToken })
+    }
+
+    const loadPaymentForm = async () => {
+      if (setupNewPaymentMethod && createPaymentMethodInline && captchaRef && captchaLoaded) {
+        let token = captchaToken
+
+        try {
+          if (!token) {
+            const captchaResponse = await captchaRef.execute({ async: true })
+            token = captchaResponse?.response ?? null
+          }
+        } catch (error) {
+          return
+        }
+
+        await loadSetupIntent(token ?? undefined)
+        resetCaptcha()
+      }
+    }
+
+    loadPaymentForm()
+  }, [createPaymentMethodInline, captchaRef, captchaLoaded, setupNewPaymentMethod])
+
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef?.resetCaptcha()
+  }
+
   const canUpdatePaymentMethods = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.payment_methods'
+  )
+
+  const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
+    () =>
+      ({
+        clientSecret: setupIntent ? setupIntent.client_secret! : '',
+        appearance: getStripeElementsAppearanceOptions(resolvedTheme),
+        paymentMethodCreation: 'manual',
+      }) as const,
+    [setupIntent, resolvedTheme]
   )
 
   useEffect(() => {
@@ -55,15 +155,49 @@ const PaymentMethodSelection = ({
     }
   }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
 
+  // If createPaymentMethod already exists, use it. Otherwise, define it here.
+  const createPaymentMethod = async () => {
+    if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
+      return paymentRef.current?.createPaymentMethod()
+    } else {
+      return { id: selectedPaymentMethod }
+    }
+  }
+
+  useImperativeHandle(ref, () => ({
+    createPaymentMethod,
+  }))
+
   return (
     <>
+      <HCaptcha
+        ref={captchaRefCallback}
+        sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+        size="invisible"
+        onOpen={() => {
+          // [Joshen] This is to ensure that hCaptcha popup remains clickable
+          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+        }}
+        onClose={() => {
+          setSetupIntent(undefined)
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+        }}
+        onVerify={(token) => {
+          setCaptchaToken(token)
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+        }}
+        onExpire={() => {
+          setCaptchaToken(null)
+        }}
+      />
+
       <div>
         {isLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
             <Loader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
-        ) : paymentMethods?.data.length === 0 ? (
+        ) : paymentMethods?.data.length === 0 && !createPaymentMethodInline ? (
           <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-alternative">
             <div className="flex items-center space-x-4 text-foreground-light">
               <AlertCircle size={16} strokeWidth={1.5} />
@@ -74,7 +208,13 @@ const PaymentMethodSelection = ({
               type="default"
               disabled={!canUpdatePaymentMethods}
               icon={<CreditCard />}
-              onClick={() => setShowAddNewPaymentMethodModal(true)}
+              onClick={() => {
+                if (createPaymentMethodInline) {
+                  setSetupNewPaymentMethod(true)
+                } else {
+                  setShowAddNewPaymentMethodModal(true)
+                }
+              }}
               htmlType="button"
               tooltip={{
                 content: {
@@ -93,7 +233,7 @@ const PaymentMethodSelection = ({
               Add new
             </ButtonTooltip>
           </div>
-        ) : (
+        ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
           <Listbox
             layout={layout}
             label="Payment method"
@@ -126,7 +266,13 @@ const PaymentMethodSelection = ({
             })}
             <div
               className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
-              onClick={() => setShowAddNewPaymentMethodModal(true)}
+              onClick={() => {
+                if (createPaymentMethodInline) {
+                  setSetupNewPaymentMethod(true)
+                } else {
+                  setShowAddNewPaymentMethodModal(true)
+                }
+              }}
             >
               <Plus size={16} />
               <p className="transition text-foreground-light group-hover:text-foreground">
@@ -134,6 +280,27 @@ const PaymentMethodSelection = ({
               </p>
             </div>
           </Listbox>
+        ) : null}
+
+        {stripePromise && setupIntent && (
+          <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
+            <NewPaymentMethodElement
+              ref={paymentRef}
+              email={selectedOrganization?.billing_email ?? undefined}
+              readOnly={readOnly}
+            />
+          </Elements>
+        )}
+
+        {setupIntentLoading && (
+          <div className="space-y-2">
+            <ShimmeringLoader className="h-10" />
+            <div className="grid grid-cols-2 gap-4">
+              <ShimmeringLoader className="h-10" />
+              <ShimmeringLoader className="h-10" />
+            </div>
+            <ShimmeringLoader className="h-10" />
+          </div>
         )}
       </div>
 
@@ -158,6 +325,8 @@ const PaymentMethodSelection = ({
       />
     </>
   )
-}
+})
+
+PaymentMethodSelection.displayName = 'PaymentMethodSelection'
 
 export default PaymentMethodSelection

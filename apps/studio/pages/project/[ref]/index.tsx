@@ -49,7 +49,7 @@ const Home: NextPageWithLayout = () => {
   useEffect(() => {
     if (enableBranching && !hasShownEnableBranchingModalRef.current) {
       hasShownEnableBranchingModalRef.current = true
-      snap.setShowEnableBranchingModal(true)
+      snap.setShowCreateBranchModal(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableBranching])
@@ -126,21 +126,23 @@ const Home: NextPageWithLayout = () => {
                     </p>
                   </div>
 
-                  <div className="flex flex-col gap-y-1">
-                    <Link
-                      href={`/project/${ref}/functions`}
-                      className="transition text-foreground-light hover:text-foreground text-sm"
-                    >
-                      Functions
-                    </Link>
-                    <p className="text-2xl tabular-nums">
-                      {isLoadingFunctions ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        functionsCount
-                      )}
-                    </p>
-                  </div>
+                  {IS_PLATFORM && (
+                    <div className="flex flex-col gap-y-1">
+                      <Link
+                        href={`/project/${ref}/functions`}
+                        className="transition text-foreground-light hover:text-foreground text-sm"
+                      >
+                        Functions
+                      </Link>
+                      <p className="text-2xl tabular-nums">
+                        {isLoadingFunctions ? (
+                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                        ) : (
+                          functionsCount
+                        )}
+                      </p>
+                    </div>
+                  )}
 
                   {IS_PLATFORM && (
                     <div className="flex flex-col gap-y-1">
