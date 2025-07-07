@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Loader2, PlusIcon } from 'lucide-react'
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -81,8 +81,7 @@ const GitHubIntegrationConnectionForm = ({
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } = useGitHubRepositoriesQuery<
     any[]
@@ -244,6 +243,7 @@ const GitHubIntegrationConnectionForm = ({
         id: prodBranch.id,
         projectRef: selectedProject.ref,
         gitBranch: data.branchName,
+        branchName: data.branchName,
       })
     }
     toast.success('GitHub integration successfully updated')
