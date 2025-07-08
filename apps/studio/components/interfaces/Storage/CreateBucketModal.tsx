@@ -26,7 +26,10 @@ import {
   Input_Shadcn_,
   Listbox,
   Modal,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Toggle,
+  WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -50,6 +53,7 @@ const FormSchema = z.object({
       (value) => value !== 'public',
       '"public" is a reserved name. Please choose another name'
     ),
+  type: z.enum(['STANDARD', 'ICEBERG']).default('STANDARD'),
   public: z.boolean().default(false),
   has_file_size_limit: z.boolean().default(false),
   formatted_size_limit: z.coerce
@@ -88,6 +92,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     defaultValues: {
       name: '',
       public: false,
+      type: 'STANDARD',
       has_file_size_limit: false,
       formatted_size_limit: 0,
       allowed_mime_types: '',
@@ -95,23 +100,32 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   })
 
   const isPublicBucket = form.watch('public')
+  const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
   const formattedSizeLimit = form.watch('formatted_size_limit')
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
 
+    if (values.type === 'ICEBERG' && !icebergCatalogEnabled) {
+      toast.error(
+        'The Iceberg catalog feature is not enabled for your project. Please contact support to enable it.'
+      )
+      return
+    }
+
     createBucket({
       projectRef: ref,
       id: values.name,
+      type: values.type,
       isPublic: values.public,
       file_size_limit: values.has_file_size_limit
         ? convertToBytes(values.formatted_size_limit, selectedUnit)
-        : null,
+        : undefined,
       allowed_mime_types:
         values.allowed_mime_types.length > 0
           ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
-          : null,
+          : undefined,
     })
   }
 
@@ -123,6 +137,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     }
   }, [visible, form])
 
+  const icebergCatalogEnabled = (data?.features as any).icebergCatalog?.enabled
+
   return (
     <Modal
       hideFooter
@@ -133,7 +149,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     >
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Modal.Content className={cn('!px-0', isPublicBucket && '!pb-0')}>
+          <Modal.Content>
             <FormField_Shadcn_
               control={form.control}
               name="name"
@@ -143,7 +159,6 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   labelOptional="Buckets cannot be renamed once created."
                   description="Only lowercase letters, numbers, dots, and hyphens"
                   layout="vertical"
-                  className="px-5"
                 >
                   <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} placeholder="Enter bucket name" />
@@ -151,158 +166,226 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                 </FormItemLayout>
               )}
             />
+
             <div className="flex flex-col gap-y-2 mt-6">
               <FormField_Shadcn_
                 control={form.control}
-                name="public"
+                name="type"
                 render={({ field }) => (
-                  <FormItemLayout className="px-5">
+                  <FormItemLayout>
                     <FormControl_Shadcn_>
-                      <Toggle
-                        id="public"
-                        checked={field.value}
-                        onChange={field.onChange}
-                        layout="flex"
-                        label="Public bucket"
-                        descriptionText="Anyone can read any object without any authorization"
-                      />
+                      <RadioGroupStacked
+                        id="type"
+                        onValueChange={(v) => field.onChange(v)}
+                        value={field.value}
+                      >
+                        <RadioGroupStackedItem
+                          value="STANDARD"
+                          id="STANDARD"
+                          label="Standard bucket"
+                          showIndicator={false}
+                        >
+                          <div className="flex  gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                Compatible with S3 buckets.
+                              </p>
+                            </div>
+                          </div>
+                        </RadioGroupStackedItem>
+                        <RadioGroupStackedItem
+                          value="ICEBERG"
+                          id="ICEBERG"
+                          label="Iceberg bucket"
+                          showIndicator={false}
+                          disabled={!icebergCatalogEnabled}
+                        >
+                          <div className="flex  gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                Compatible with Iceberg catalogs.
+                              </p>
+                            </div>
+                          </div>
+                          {icebergCatalogEnabled ? null : (
+                            <div className="w-full flex gap-x-2 py-2 items-center">
+                              <WarningIcon />
+                              <span className="text-xs text-left">
+                                The Iceberg catalog feature is not enabled for your project. Please
+                                contact support to enable it.
+                              </span>
+                            </div>
+                          )}
+                        </RadioGroupStackedItem>
+                      </RadioGroupStacked>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
-              {isPublicBucket && (
-                <Admonition
-                  type="warning"
-                  className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
-                  title="Public buckets are not protected"
-                >
-                  <p className="mb-2">
-                    Users can read objects in public buckets without any authorization.
-                  </p>
-                  <p>
-                    Row level security (RLS) policies are still required for other operations such
-                    as object uploads and deletes.
-                  </p>
-                </Admonition>
-              )}
             </div>
           </Modal.Content>
-          <Collapsible
-            open={showConfiguration}
-            onOpenChange={() => setShowConfiguration(!showConfiguration)}
-          >
-            <Collapsible.Trigger asChild>
-              <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
-                <p className="text-sm">Additional restrictions</p>
-                <ChevronDown
-                  size={18}
-                  strokeWidth={2}
-                  className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
-                />
-              </div>
-            </Collapsible.Trigger>
-            <Collapsible.Content className="py-4">
-              <div className="w-full space-y-5 px-5">
-                <div className="space-y-5">
+          {isStandardBucket ? (
+            <>
+              <Modal.Separator />
+              <Modal.Content className="!px-0 !pb-0">
+                <div className="flex flex-col gap-y-2">
                   <FormField_Shadcn_
                     control={form.control}
-                    name="has_file_size_limit"
+                    name="public"
                     render={({ field }) => (
-                      <FormItemLayout>
+                      <FormItemLayout className="px-5">
                         <FormControl_Shadcn_>
                           <Toggle
-                            id="has_file_size_limit"
+                            id="public"
                             checked={field.value}
                             onChange={field.onChange}
                             layout="flex"
-                            label="Restrict file upload size for bucket"
-                            descriptionText="Prevent uploading of file sizes greater than a specified limit"
+                            label="Public bucket"
+                            descriptionText="Anyone can read any object without any authorization"
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
                   />
-                  {hasFileSizeLimit && (
-                    <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
-                      <div className="col-span-8">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="formatted_size_limit"
-                          render={({ field }) => (
-                            <FormItemLayout>
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  type="number"
-                                  step={1}
-                                  {...field}
-                                  onKeyPress={(event) => {
-                                    if (event.charCode < 48 || event.charCode > 57) {
-                                      event.preventDefault()
-                                    }
-                                  }}
-                                />
-                              </FormControl_Shadcn_>
-                              <span className="text-foreground-light text-xs">
-                                Equivalent to{' '}
-                                {convertToBytes(formattedSizeLimit, selectedUnit).toLocaleString()}{' '}
-                                bytes.
-                              </span>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
-                      <div className="col-span-4">
-                        <Listbox
-                          id="size_limit_units"
-                          value={selectedUnit}
-                          onChange={setSelectedUnit}
-                        >
-                          {Object.values(StorageSizeUnits).map((unit: string) => (
-                            <Listbox.Option key={unit} label={unit} value={unit}>
-                              <div>{unit}</div>
-                            </Listbox.Option>
-                          ))}
-                        </Listbox>
-                      </div>
-                      {IS_PLATFORM && (
-                        <div className="col-span-12">
-                          <p className="text-foreground-light text-sm">
-                            Note: Individual bucket uploads will still be capped at the{' '}
-                            <Link
-                              href={`/project/${ref}/settings/storage`}
-                              className="font-bold underline"
+                  {isPublicBucket && (
+                    <Admonition
+                      type="warning"
+                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
+                      title="Public buckets are not protected"
+                    >
+                      <p className="mb-2">
+                        Users can read objects in public buckets without any authorization.
+                      </p>
+                      <p>
+                        Row level security (RLS) policies are still required for other operations
+                        such as object uploads and deletes.
+                      </p>
+                    </Admonition>
+                  )}
+                </div>
+              </Modal.Content>
+              <Collapsible
+                className="pb-2"
+                open={showConfiguration}
+                onOpenChange={() => setShowConfiguration(!showConfiguration)}
+              >
+                <Collapsible.Trigger asChild>
+                  <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between">
+                    <p className="text-sm">Additional restrictions</p>
+                    <ChevronDown
+                      size={18}
+                      strokeWidth={2}
+                      className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
+                    />
+                  </div>
+                </Collapsible.Trigger>
+                <Collapsible.Content className="py-4">
+                  <div className="w-full space-y-5 px-5">
+                    <div className="space-y-5">
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="has_file_size_limit"
+                        render={({ field }) => (
+                          <FormItemLayout>
+                            <FormControl_Shadcn_>
+                              <Toggle
+                                id="has_file_size_limit"
+                                checked={field.value}
+                                onChange={field.onChange}
+                                layout="flex"
+                                label="Restrict file upload size for bucket"
+                                descriptionText="Prevent uploading of file sizes greater than a specified limit"
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                      {hasFileSizeLimit && (
+                        <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
+                          <div className="col-span-8">
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name="formatted_size_limit"
+                              render={({ field }) => (
+                                <FormItemLayout>
+                                  <FormControl_Shadcn_>
+                                    <Input_Shadcn_
+                                      type="number"
+                                      step={1}
+                                      {...field}
+                                      onKeyPress={(event) => {
+                                        if (event.charCode < 48 || event.charCode > 57) {
+                                          event.preventDefault()
+                                        }
+                                      }}
+                                    />
+                                  </FormControl_Shadcn_>
+                                  <span className="text-foreground-light text-xs">
+                                    Equivalent to{' '}
+                                    {convertToBytes(
+                                      formattedSizeLimit,
+                                      selectedUnit
+                                    ).toLocaleString()}{' '}
+                                    bytes.
+                                  </span>
+                                </FormItemLayout>
+                              )}
+                            />
+                          </div>
+                          <div className="col-span-4">
+                            <Listbox
+                              id="size_limit_units"
+                              value={selectedUnit}
+                              onChange={setSelectedUnit}
                             >
-                              global upload limit
-                            </Link>{' '}
-                            of {formattedGlobalUploadLimit}
-                          </p>
+                              {Object.values(StorageSizeUnits).map((unit: string) => (
+                                <Listbox.Option key={unit} label={unit} value={unit}>
+                                  <div>{unit}</div>
+                                </Listbox.Option>
+                              ))}
+                            </Listbox>
+                          </div>
+                          {IS_PLATFORM && (
+                            <div className="col-span-12">
+                              <p className="text-foreground-light text-sm">
+                                Note: Individual bucket uploads will still be capped at the{' '}
+                                <Link
+                                  href={`/project/${ref}/settings/storage`}
+                                  className="font-bold underline"
+                                >
+                                  global upload limit
+                                </Link>{' '}
+                                of {formattedGlobalUploadLimit}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="allowed_mime_types"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Allowed MIME types"
-                      labelOptional="Comma separated values"
-                      description="Wildcards are allowed, e.g. image/*. Leave blank to allow any MIME type."
-                      layout="vertical"
-                    >
-                      <FormControl_Shadcn_>
-                        <Input_Shadcn_
-                          {...field}
-                          placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </div>
-            </Collapsible.Content>
-          </Collapsible>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="allowed_mime_types"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          label="Allowed MIME types"
+                          labelOptional="Comma separated values"
+                          description="Wildcards are allowed, e.g. image/*. Leave blank to allow any MIME type."
+                          layout="vertical"
+                        >
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </div>
+                </Collapsible.Content>
+              </Collapsible>
+            </>
+          ) : null}
           <Modal.Separator />
           <Modal.Content className="flex items-center space-x-2 justify-end">
             <Button
