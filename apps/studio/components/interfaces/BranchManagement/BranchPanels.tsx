@@ -222,11 +222,37 @@ export const BranchRow = ({
                 <Button type="text" icon={<MoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <Link passHref href={`/project/${projectRef}/settings/integrations`}>
-                  <DropdownMenuItem asChild className="gap-x-2">
-                    <a>Change production branch</a>
-                  </DropdownMenuItem>
-                </Link>
+                {repo ? (
+                  <Link passHref href={`/project/${projectRef}/settings/integrations`}>
+                    <DropdownMenuItem asChild className="gap-x-2">
+                      <a>Change production branch</a>
+                    </DropdownMenuItem>
+                  </Link>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger
+                      asChild={canUpdateBranches && isBranchActiveHealthy}
+                      className="w-full"
+                    >
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdating}
+                        onSelect={() => setShowEditBranchModal(true)}
+                        onClick={() => setShowEditBranchModal(true)}
+                      >
+                        <Pencil size={14} />
+                        Edit Branch
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    {(!canUpdateBranches || !isBranchActiveHealthy) && (
+                      <TooltipContent side="left">
+                        {!canUpdateBranches
+                          ? 'You need additional permissions to edit branches'
+                          : 'Branch is still initializing. Please wait for the branch to become healthy before editing.'}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
