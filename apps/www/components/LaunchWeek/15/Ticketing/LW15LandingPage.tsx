@@ -214,7 +214,7 @@ const LW15LandingPage = () => {
               data-animate
               data-animate-delay={400}
               data-animate-duration={800}
-              className="text-3xl lg:text-4xl opacity-0"
+              className="text-3xl lg:text-4xl opacity-0 tracking-[-0.25px]"
             >
               Discover fresh tools, <br />
               unlock new possibilities.

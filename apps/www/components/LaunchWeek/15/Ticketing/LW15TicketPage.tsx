@@ -50,7 +50,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
     >
       {!isGuest && (
         <div className="grid grid-cols-6 w-full gap-4">
-          <p className="col-span-full xl:col-span-2 lg:text-xs tracking-[-0.25px]">
+          <p className="col-span-full xl:col-span-3 lg:text-xs xl:max-w-[230px] tracking-[-0.2px]">
             No templates, just tools to help you shape the output exactly how you want it.
           </p>
           <div className="col-span-full xl:col-span-3 xl:col-start-4 flex flex-col gap-4">
@@ -126,7 +126,11 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
                 Want your own?
               </>
             ) : (
-              <>Hey @{user?.username}, customize your Launch Week ticket</>
+              <>
+                Hey @{user?.username}, <br />
+                customize your <br className="hidden lg:block" />
+                Launch Week ticket
+              </>
             )}
           </div>
           {isGuest && (
