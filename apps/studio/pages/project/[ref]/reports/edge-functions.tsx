@@ -22,6 +22,7 @@ import ReportChart from 'components/interfaces/Reports/ReportChart'
 import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { Label } from '@ui/components/shadcn/ui/label'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
 
 const EdgeFunctionsReport: NextPageWithLayout = () => {
   return (
@@ -258,6 +259,9 @@ const EdgeFunctionsUsage = () => {
               />
             ))}
         </div>
+        {/* <div className="mt-8 border-t pt-8">
+          <SharedAPIReport filterBy="functions" />
+        </div> */}
       </section>
     </>
   )

@@ -17,6 +17,7 @@ import { getAuthReportAttributes } from 'data/reports/auth-charts'
 
 import ReportChart from 'components/interfaces/Reports/ReportChart'
 import type { NextPageWithLayout } from 'types'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -159,6 +160,13 @@ const AuthUsage = () => {
                 updateDateRange={updateDateRange}
               />
             ))}
+        </div>
+        <div className="relative pt-8 mt-8 border-t">
+          <SharedAPIReport
+            filterBy="auth"
+            start={dateRange?.period_start?.date}
+            end={dateRange?.period_end?.date}
+          />
         </div>
       </section>
     </>

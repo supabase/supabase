@@ -30,6 +30,7 @@ import { useApiReport } from 'data/reports/api-report-query'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -249,26 +250,10 @@ const RealtimeUsage = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4">
-            <ReportWidget
-              isLoading={isLoading}
-              params={params.totalRequests}
-              title="Total Requests"
-              data={data.totalRequests || []}
-              error={error.totalRequest}
-              renderer={TotalRequestsChartRenderer}
-              append={TopApiRoutesRenderer}
-              appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
-            />
-            <ReportWidget
-              isLoading={isLoading}
-              params={params.responseSpeed}
-              title="Response Speed"
-              tooltip="Average response speed (in miliseconds) of a request"
-              data={data.responseSpeed || []}
-              error={error.responseSpeed}
-              renderer={ResponseSpeedChartRenderer}
-              appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
-              append={TopApiRoutesRenderer}
+            <SharedAPIReport
+              filterBy="realtime"
+              start={dateRange.period_start.date}
+              end={dateRange.period_end.date}
             />
           </div>
         </div>
