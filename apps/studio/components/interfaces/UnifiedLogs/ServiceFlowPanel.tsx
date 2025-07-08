@@ -26,20 +26,18 @@ import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
 import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
 import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { QuerySearchParamsType } from './UnifiedLogs.types'
 
 interface ServiceFlowPanelProps {
   selectedRow: ColumnSchema
   selectedRowKey: string
   searchParameters: QuerySearchParamsType
-  search: SearchParamsType
 }
 
 export function ServiceFlowPanel({
   selectedRow,
   selectedRowKey,
   searchParameters,
-  search,
 }: ServiceFlowPanelProps) {
   const { table, filterFields } = useDataTable()
   const { ref: projectRef } = useParams()
@@ -124,10 +122,7 @@ export function ServiceFlowPanel({
                           {serviceFlowType === 'postgres' ? (
                             // Postgres flows: Connection Started -> Postgres -> Response
                             <>
-                              <MemoizedRequestStartedBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                              />
+                              <MemoizedRequestStartedBlock data={selectedRow} />
 
                               <MemoizedPostgresBlock
                                 data={selectedRow}
@@ -146,10 +141,7 @@ export function ServiceFlowPanel({
                           ) : (
                             // HTTP-based flows: Request Started -> Network -> Service -> Response
                             <>
-                              <MemoizedRequestStartedBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                              />
+                              <MemoizedRequestStartedBlock data={selectedRow} />
 
                               <MemoizedNetworkBlock
                                 data={selectedRow}

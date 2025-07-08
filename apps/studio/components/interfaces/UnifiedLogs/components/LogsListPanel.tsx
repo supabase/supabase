@@ -1,15 +1,16 @@
+import type { Row } from '@tanstack/react-table'
+import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button, cn, ResizableHandle, ResizablePanel } from 'ui'
 import { LogsList } from './LogsList'
-import { ChevronDown } from 'lucide-react'
 
-export const LogsListPanel = ({ selectedRow }: { selectedRow: any }) => {
+export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {
   const [open, setOpenState] = useState(true)
 
   return (
     selectedRow?.original?.logs &&
-    selectedRow?.original?.logs?.length > 0 && (
+    selectedRow.original.logs.length > 0 && (
       <>
         <ResizableHandle withHandle disabled={!open} />
         <ResizablePanel

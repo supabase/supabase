@@ -1,11 +1,11 @@
+import { SquareDashedBottomCode } from 'lucide-react'
 import { memo } from 'react'
-import { ServiceFlowBlockProps } from '../../types'
-import { TimelineStep } from './TimelineStep'
+
+import { BlockFieldConfig, ServiceFlowBlockProps } from '../../types'
 import { BlockField } from './BlockField'
 import { CollapsibleSection } from './CollapsibleSection'
 import { FieldWithSeeMore } from './FieldWithSeeMore'
-import { BlockFieldConfig } from '../../types'
-import { SquareDashedBottomCode } from 'lucide-react'
+import { TimelineStep } from './TimelineStep'
 
 export interface BlockSection {
   title: string
@@ -24,10 +24,6 @@ export interface BlockConfig {
   title: string
   primaryFields?: BlockFieldConfig[]
   sections?: (BlockSection | FieldWithSeeMoreSection)[]
-}
-
-interface BlockProps extends ServiceFlowBlockProps {
-  config: BlockConfig
 }
 
 // Simple check: show empty state only for Postgres blocks in non-postgres logs
@@ -50,8 +46,15 @@ const BlockEmptyState = ({ title }: { title: string }) => (
   </div>
 )
 
-export const Block = memo(
-  ({ config, data, enrichedData, isLoading, isLast, filterFields, table }: BlockProps) => {
+export function createBlock(config: BlockConfig) {
+  const Block = memo(function Block({
+    data,
+    enrichedData,
+    isLoading,
+    isLast,
+    filterFields,
+    table,
+  }: ServiceFlowBlockProps) {
     return (
       <TimelineStep title={config.title} isLast={isLast}>
         {shouldShowEmptyState(config, data) ? (
@@ -122,19 +125,9 @@ export const Block = memo(
         )}
       </TimelineStep>
     )
-  }
-)
+  })
 
-Block.displayName = 'Block'
+  Block.displayName = 'Block'
 
-export const MemoizedBlock = memo(Block, (prev, next) => {
-  return (
-    prev.data === next.data &&
-    prev.enrichedData === next.enrichedData &&
-    prev.isLoading === next.isLoading &&
-    prev.isLast === next.isLast &&
-    prev.filterFields === next.filterFields &&
-    prev.table === next.table &&
-    prev.config === next.config
-  )
-}) as typeof Block
+  return Block
+}

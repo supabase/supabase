@@ -1,15 +1,16 @@
 import { Table } from '@tanstack/react-table'
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
+
+import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
 import {
   Button,
   Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
-import { BlockField } from './BlockField'
 import { BlockFieldConfig } from '../../types'
+import { BlockField } from './BlockField'
 
 interface CollapsibleSectionProps {
   title: string

@@ -1,66 +1,39 @@
-import { memo } from 'react'
-import { ServiceFlowBlockProps } from '../types'
-import { Block, MemoizedBlock, BlockConfig } from './shared/Block'
 import {
   authBlockConfig,
-  postgrestBlockConfig,
-  networkBlockConfig,
   edgeFunctionBlockConfig,
-  storageBlockConfig,
+  networkBlockConfig,
   postgresBlockConfig,
+  postgrestBlockConfig,
+  storageBlockConfig,
 } from '../config/blockConfigs'
-
-// Factory function to create block components
-const createBlockComponent = (config: BlockConfig) => {
-  const BlockComponent = memo((props: ServiceFlowBlockProps) => {
-    return <Block config={config} {...props} />
-  })
-
-  const MemoizedBlockComponent = memo((props: ServiceFlowBlockProps) => {
-    return <MemoizedBlock config={config} {...props} />
-  })
-
-  return { BlockComponent, MemoizedBlockComponent }
-}
+import { createBlock } from './shared/Block'
 
 // Generate all block components
-const { BlockComponent: GoTrueBlock, MemoizedBlockComponent: MemoizedGoTrueBlock } =
-  createBlockComponent(authBlockConfig)
+const MemoizedGoTrueBlock = createBlock(authBlockConfig)
 
-const { BlockComponent: PostgRESTBlock, MemoizedBlockComponent: MemoizedPostgRESTBlock } =
-  createBlockComponent(postgrestBlockConfig)
+const MemoizedPostgRESTBlock = createBlock(postgrestBlockConfig)
 
-const { BlockComponent: NetworkBlock, MemoizedBlockComponent: MemoizedNetworkBlock } =
-  createBlockComponent(networkBlockConfig)
+const MemoizedNetworkBlock = createBlock(networkBlockConfig)
 
-const { BlockComponent: EdgeFunctionBlock, MemoizedBlockComponent: MemoizedEdgeFunctionBlock } =
-  createBlockComponent(edgeFunctionBlockConfig)
+const MemoizedEdgeFunctionBlock = createBlock(edgeFunctionBlockConfig)
 
-const { BlockComponent: StorageBlock, MemoizedBlockComponent: MemoizedStorageBlock } =
-  createBlockComponent(storageBlockConfig)
+const MemoizedStorageBlock = createBlock(storageBlockConfig)
 
-const { BlockComponent: PostgresBlock, MemoizedBlockComponent: MemoizedPostgresBlock } =
-  createBlockComponent(postgresBlockConfig)
+const MemoizedPostgresBlock = createBlock(postgresBlockConfig)
 
 // Set display names for debugging
-GoTrueBlock.displayName = 'GoTrueBlock'
-PostgRESTBlock.displayName = 'PostgRESTBlock'
-NetworkBlock.displayName = 'NetworkBlock'
-EdgeFunctionBlock.displayName = 'EdgeFunctionBlock'
-StorageBlock.displayName = 'StorageBlock'
-PostgresBlock.displayName = 'PostgresBlock'
+MemoizedGoTrueBlock.displayName = 'MemoizedGoTrueBlock'
+MemoizedPostgRESTBlock.displayName = 'MemoizedPostgRESTBlock'
+MemoizedNetworkBlock.displayName = 'MemoizedNetworkBlock'
+MemoizedEdgeFunctionBlock.displayName = 'MemoizedEdgeFunctionBlock'
+MemoizedStorageBlock.displayName = 'MemoizedStorageBlock'
+MemoizedPostgresBlock.displayName = 'MemoizedPostgresBlock'
 
 export {
-  GoTrueBlock,
-  MemoizedGoTrueBlock,
-  PostgRESTBlock,
-  MemoizedPostgRESTBlock,
-  NetworkBlock,
-  MemoizedNetworkBlock,
-  EdgeFunctionBlock,
   MemoizedEdgeFunctionBlock,
-  StorageBlock,
-  MemoizedStorageBlock,
-  PostgresBlock,
+  MemoizedGoTrueBlock,
+  MemoizedNetworkBlock,
   MemoizedPostgresBlock,
+  MemoizedPostgRESTBlock,
+  MemoizedStorageBlock,
 }
