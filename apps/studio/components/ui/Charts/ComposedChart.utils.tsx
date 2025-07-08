@@ -165,8 +165,6 @@ const CustomTooltip = ({
     const getIcon = (color: string, isMax: boolean) =>
       isMax ? <MaxConnectionsIcon /> : <CustomIcon color={color} />
 
-    console.log('total', total)
-
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
       const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
