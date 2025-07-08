@@ -1,5 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
@@ -8,16 +9,7 @@ import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
 
-export type Bucket = {
-  id: string
-  name: string
-  owner: string
-  public: boolean
-  created_at: string
-  updated_at: string
-  file_size_limit: null | number
-  allowed_mime_types: null | string[]
-}
+export type Bucket = components['schemas']['StorageBucketResponse']
 
 export async function getBuckets({ projectRef }: BucketsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -28,7 +20,7 @@ export async function getBuckets({ projectRef }: BucketsVariables, signal?: Abor
   })
 
   if (error) handleError(error)
-  return data as Bucket[]
+  return data
 }
 
 export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
