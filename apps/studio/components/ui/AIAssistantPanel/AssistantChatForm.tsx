@@ -3,9 +3,8 @@
 import { useBreakpoint } from 'common'
 import { ArrowUp, Loader2, X } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
-import { Badge, Button, CodeBlock, ExpandingTextArea } from 'ui'
+import { Button, CodeBlock, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
-import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { HoverCard_Shadcn_, HoverCardTrigger_Shadcn_, HoverCardContent_Shadcn_ } from 'ui'
 
 export interface FormProps {
