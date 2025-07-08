@@ -79,7 +79,7 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
 
-  HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw13-d1',
+  HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
 
   /**
    * WWW
