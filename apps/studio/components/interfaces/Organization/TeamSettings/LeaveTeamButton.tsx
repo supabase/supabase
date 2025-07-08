@@ -37,8 +37,13 @@ export const LeaveTeamButton = () => {
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
 
-  const isOwner = selectedOrganization?.is_owner
   const roles = allRoles?.org_scoped_roles ?? []
+  const currentUserMember = members?.find((member) => member.gotrue_id === profile?.gotrue_id)
+  const currentUserRoleId = currentUserMember?.role_ids?.[0]
+  const currentUserRole = roles.find((role) => role.id === currentUserRoleId)
+  const isAdmin = currentUserRole?.name === 'Administrator'
+  const isOwner = selectedOrganization?.is_owner
+
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
 
   const { mutate: deleteMember } = useOrganizationMemberDeleteMutation({
@@ -106,6 +111,22 @@ export const LeaveTeamButton = () => {
                 <li>Custom reports</li>
                 <li>Log Explorer queries</li>
               </ul>
+              {(isOwner || isAdmin) && (
+                <div className="mt-2">
+                  <p>
+                    <span className="text-foreground">
+                      Leaving won't remove your payment method or stop payments.
+                    </span>
+                  </p>
+                  <ul className="list-disc pl-4">
+                    <li>
+                      The current payment method will remain active and may still be charged after
+                      you leave.
+                    </li>
+                    <li>The billing address will remain unchanged.</li>
+                  </ul>
+                </div>
+              )}
             </div>
           ),
         }}

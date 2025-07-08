@@ -1,13 +1,15 @@
 import pgMeta from '@supabase/pg-meta'
+import { streamText, tool, ToolSet } from 'ai'
+import { source } from 'common-tags'
 import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { streamText, tool, ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
-import { source } from 'common-tags'
+import { getOrganizations } from 'data/organizations/organizations-query'
+import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { aiOptInLevelSchema } from 'hooks/misc/useOrgOptedIntoAi'
+import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
@@ -45,10 +47,11 @@ export default wrapper
 const requestBodySchema = z.object({
   messages: z.array(z.any()),
   projectRef: z.string(),
-  aiOptInLevel: aiOptInLevelSchema,
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  chatName: z.string().optional(),
+  orgSlug: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -59,12 +62,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
 
-  const { model, error: modelError } = await getModel()
-
-  if (modelError) {
-    return res.status(500).json({ error: modelError.message })
-  }
-
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const { data, error: parseError } = requestBodySchema.safeParse(body)
 
@@ -72,7 +69,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, aiOptInLevel } = data
+  const { messages, projectRef, connectionString, orgSlug, chatName } = data
+
+  // Get organizations and compute opt in level server-side
+  const [organizations, projects] = await Promise.all([
+    getOrganizations({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+    getProjects({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+  ])
+
+  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+  const selectedProject = projects.find((project) => project.ref === projectRef)
+
+  // If the project is not in the organization specific by the org slug, return an error
+  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+    return res.status(400).json({ error: 'Project and organization do not match' })
+  }
+
+  const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+
+  const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
+
+  if (modelError) {
+    return res.status(500).json({ error: modelError.message })
+  }
 
   try {
     let mcpTools: ToolSet = {}
@@ -126,6 +155,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         }),
         execute: async () => {
           return { status: 'Tool call sent to client for rendering.' }
+        },
+      }),
+      rename_chat: tool({
+        description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
+        parameters: z.object({
+          newName: z.string().describe('The new name for the chat session. Five words or less.'),
+        }),
+        execute: async () => {
+          return { status: 'Chat request sent to client' }
         },
       }),
     }
@@ -230,6 +268,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # Core Principles:
       - **Tool Usage Strategy**:
+          - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**. Current chat name: ${chatName}
           - **Always attempt to use MCP tools** like \`list_tables\` and \`list_extensions\` to gather schema information if available. If these tools are not available or return a privacy message, state that you cannot access schema information and will proceed based on general Postgres/Supabase knowledge.
           - For **READ ONLY** queries:
               - Explain your plan.
@@ -297,6 +336,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                   - UPDATE: \`USING (condition) WITH CHECK (condition)\` (often the same or related conditions)
                   - DELETE: \`USING (condition)\`
               - Prefer \`PERMISSIVE\` policies unless \`RESTRICTIVE\` is explicitly needed.
+              - Avoid recursion errors when writing RLS policies that reference the same table. Use security definer functions to avoid this when needed.
               - Leverage Supabase helper functions: \`auth.uid()\` for the user's ID, \`auth.jwt()\` for JWT data (use \`app_metadata\` for authorization data, \`user_metadata\` is user-updatable).
               - **Performance**: Add indexes on columns used in RLS policies. Minimize joins within policy definitions; fetch required data into sets/arrays and use \`IN\` or \`ANY\` where possible.
       - **Functions**:
@@ -358,6 +398,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           \`\`\`
 
       # General Instructions:
+      
       - **Available Schemas**: ${schemasString}
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
@@ -373,7 +414,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     result.pipeDataStreamToResponse(res, {
       getErrorMessage: (error) => {
         if (error == null) {
-          return 'unknown error'
+          return 'Untitled error'
         }
 
         if (typeof error === 'string') {

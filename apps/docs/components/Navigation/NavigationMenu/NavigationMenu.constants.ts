@@ -702,6 +702,10 @@ export const auth = {
               name: 'Password verification hook',
               url: '/guides/auth/auth-hooks/password-verification-hook',
             },
+            {
+              name: 'Before User Created hook',
+              url: '/guides/auth/auth-hooks/before-user-created-hook',
+            },
           ],
         },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
@@ -2206,6 +2210,7 @@ export const platform: NavMenuConstant = {
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
         { name: 'Default Platform Permissions', url: '/guides/platform/permissions' },
+        { name: 'PrivateLink', url: '/guides/platform/privatelink' },
       ],
     },
     {

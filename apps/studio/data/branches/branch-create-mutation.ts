@@ -6,6 +6,7 @@ import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchCreateVariables = {
+  is_default?: boolean
   projectRef: string
   branchName: string
   gitBranch?: string
@@ -13,6 +14,7 @@ export type BranchCreateVariables = {
 }
 
 export async function createBranch({
+  is_default,
   projectRef,
   branchName,
   gitBranch,
@@ -23,6 +25,7 @@ export async function createBranch({
       path: { ref: projectRef },
     },
     body: {
+      is_default,
       branch_name: branchName,
       git_branch: gitBranch,
       region: region,

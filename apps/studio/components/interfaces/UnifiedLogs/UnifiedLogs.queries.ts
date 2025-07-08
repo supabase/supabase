@@ -257,6 +257,7 @@ const getEdgeLogsQuery = () => {
 
     -- ONLY include logs where the path does not include /rest/
     WHERE edge_logs_request.path NOT LIKE '%/rest/%'
+    AND edge_logs_request.path NOT LIKE '%/storage/%'
     
   `
 }
@@ -312,6 +313,7 @@ const getPostgresLogsQuery = () => {
       CASE
           WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
           ELSE null
       END as level,
@@ -345,7 +347,7 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.url as pathname,
+      fel_request.pathname as pathname,
       fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
@@ -418,30 +420,39 @@ const getAuthLogsQuery = () => {
 }
 
 /**
- * Supavisor logs query fragment
+ * Supabase storage logs query fragment
  */
-const getSupavisorLogsQuery = () => {
+const getSupabaseStorageLogsQuery = () => {
   return `
     select 
-      id, 
-      svl.timestamp as timestamp, 
-      'supavisor' as log_type,
-      'undefined' as status,
+      id,
+      el.timestamp as timestamp,
+      'storage' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
       CASE
-          WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
-          WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      null as pathname,
-      null as host,
+      edge_logs_request.path as pathname,
+      edge_logs_request.host as host,
       null as event_message,
-      null as method,
-      'api_role' as api_role,
-      null as auth_user,
+      edge_logs_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
-    from supavisor_logs as svl
-    cross join unnest(metadata) as svl_metadata
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    left join unnest(edge_logs_request.sb) as sb
+    left join unnest(sb.jwt) as jwt
+    left join unnest(jwt.authorization) as auth
+    left join unnest(auth.payload) as authorization_payload
+    -- ONLY include logs where the path includes /storage/
+    WHERE edge_logs_request.path LIKE '%/storage/%'
   `
 }
 
@@ -451,8 +462,6 @@ const getSupavisorLogsQuery = () => {
 const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
-    ${getEdgeLogsQuery()}
-    union all
     ${getPostgrestLogsQuery()}
     union all
     ${getPostgresLogsQuery()}
@@ -461,7 +470,7 @@ WITH unified_logs AS (
     union all
     ${getAuthLogsQuery()}
     union all
-    ${getSupavisorLogsQuery()}
+    ${getSupabaseStorageLogsQuery()}
 )
   `
 }
