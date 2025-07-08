@@ -35,25 +35,15 @@ export const CHART_CONFIG = {
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
-export const LOG_TYPES = [
-  'auth',
-  'edge',
-  'edge_function',
-  'function_events',
-  'postgres',
-  'postgres_upgrade',
-  'postgrest',
-  'storage',
-  'supavisor',
-] as const
+export const LOG_TYPES = ['postgres', 'postgrest', 'auth', 'storage', 'edge function'] as const
 
 const parseAsSort = createParser({
-  parse(queryValue) {
+  parse(queryValue: string) {
     const [id, desc] = queryValue.split(SORT_DELIMITER)
     if (!id && !desc) return null
     return { id, desc: desc === 'desc' }
   },
-  serialize(value) {
+  serialize(value: { id: string; desc: boolean }) {
     return `${value.id}.${value.desc ? 'desc' : 'asc'}`
   },
 })
@@ -85,6 +75,6 @@ export const SEARCH_PARAMS_PARSER = {
   cursor: parseAsTimestamp.withDefault(new Date()),
   live: parseAsBoolean.withDefault(false),
 
-  // REQUIRED FOR SELECTION
+  uuid: parseAsString,
   id: parseAsString,
 }

@@ -141,12 +141,11 @@ const CustomTooltip = ({
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
     const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
-    const isDiskSpaceChart = payload?.some((p: any) =>
-      p.dataKey.toLowerCase().includes('disk_space_')
-    )
-    const isDBSizeChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_'))
+    const isDBSizeChart =
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+    const shouldFormatBytes = isRamChart || isDBSizeChart || isNetworkChart
 
     const attributesToIgnore =
       attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
@@ -168,7 +167,7 @@ const CustomTooltip = ({
 
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
-      const percentage = ((entry.value / maxValue) * 100).toFixed(1)
+      const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
       const isMax = entry.dataKey === maxValueAttribute?.attribute
 
       return (
@@ -213,10 +212,7 @@ const CustomTooltip = ({
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {shouldFormatBytes
-                    ? formatBytes(
-                        isDBSizeChart ? (total as number) * 1024 * 1024 : (total as number),
-                        valuePrecision
-                      )
+                    ? formatBytes(total as number, valuePrecision)
                     : numberFormatter(total as number, valuePrecision)}
                   {isPercentage ? '%' : ''}
                 </span>
