@@ -30,16 +30,6 @@ export async function getUnifiedLogsCount(
 
   if (error) handleError(error)
 
-  // DEBUG: Log what we're getting back to see what's missing
-  console.log(
-    '🔍 Count Response - All dimensions:',
-    data?.result?.map((r: any) => r.dimension)
-  )
-  console.log('🔍 Count Response - Unique dimensions:', [
-    ...new Set(data?.result?.map((r: any) => r.dimension)),
-  ])
-  console.log('🔍 Count Response - Sample rows:', data?.result?.slice(0, 5))
-
   // Process count results into facets structure
   const facets: Record<string, FacetMetadataSchema> = {}
   const countsByDimension: Record<string, Map<string, number>> = {}
