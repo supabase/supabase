@@ -10,6 +10,7 @@ import LW15TicketShare from './LW15TicketShare'
 import TicketURLCopy from './TicketURLCopy'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 import { updateTicketColors } from '../hooks/use-registration'
+import Link from 'next/link'
 
 const LW15TicketPage = ({
   user: userFromProps,
@@ -22,6 +23,7 @@ const LW15TicketPage = ({
   const [state, setState] = useState({ saving: false })
   const [confState] = useLw15ConfData()
   const user = isSharePage ? userFromProps : confState.userTicketData
+  const isLoggedTicketOwner = user?.username === confState.userTicketData?.username
 
   const selectedFg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const selectedBg = user?.metadata?.colors?.background || BG_COLORS[0]
@@ -138,7 +140,7 @@ const LW15TicketPage = ({
               </>
             )}
           </div>
-          {isSharePage && (
+          {isSharePage && !isLoggedTicketOwner && (
             <div className="col-span-full">
               <Button
                 className="h-auto py-1 px-2 min-w-[125px] min-h-[28px]"
@@ -147,6 +149,13 @@ const LW15TicketPage = ({
                 onClick={handleClaimTicket}
               >
                 Claim your ticket
+              </Button>
+            </div>
+          )}
+          {isSharePage && isLoggedTicketOwner && (
+            <div className="col-span-full">
+              <Button className="h-auto py-1 px-2" type="secondary" size="medium" asChild>
+                <Link href="/launch-week/ticket">Customize your ticket</Link>
               </Button>
             </div>
           )}
