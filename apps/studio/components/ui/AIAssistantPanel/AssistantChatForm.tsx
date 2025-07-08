@@ -101,7 +101,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
                   <HoverCardTrigger_Shadcn_ asChild>
                     <div
                       tabIndex={0}
-                      className="border inline-flex gap-1 items-center shrink-0 py-1.5 pl-3 rounded-full pr-1 text-xs cursor-pointer"
+                      className="border inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
                     >
                       Snippet {idx + 1}
                       {onRemoveSnippet && (
