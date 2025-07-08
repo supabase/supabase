@@ -1,9 +1,8 @@
+import { Clock, Database, Globe, LucideIcon, Server } from 'lucide-react'
+
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { Clock, Globe, Server, Database } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
-import { cn } from 'ui'
 import { getStatusLevel } from '../../../UnifiedLogs.utils'
-import { LucideIcon } from 'lucide-react'
 
 // Type for icon components (covers both lucide-react and our icon library)
 type IconComponent = LucideIcon | React.ComponentType<any>
@@ -20,14 +19,12 @@ const TimelineStep = ({
   status,
   statusText,
   children,
-  completionTime,
   isLast = false,
 }: {
   title: string
   status?: number | string
   statusText?: string
   children: React.ReactNode
-  completionTime?: string
   isLast?: boolean
 }) => (
   <>
@@ -73,4 +70,4 @@ const TimelineStep = ({
   </>
 )
 
-export { TimelineStep, StyledIcon }
+export { StyledIcon, TimelineStep }

@@ -83,15 +83,19 @@ export const UnifiedLogs = () => {
 
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
-  const searchParameters = Object.entries(search).reduce(
-    (acc, [key, value]) => {
-      if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
-        acc[key] = value
-      }
-      return acc
-    },
-    {} as Record<string, any>
-  ) as QuerySearchParamsType
+  const searchParameters = useMemo(
+    () =>
+      Object.entries(search).reduce(
+        (acc, [key, value]) => {
+          if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
+            acc[key] = value
+          }
+          return acc
+        },
+        {} as Record<string, any>
+      ) as QuerySearchParamsType,
+    [search]
+  )
 
   const {
     data: unifiedLogsData,
@@ -145,9 +149,6 @@ export const UnifiedLogs = () => {
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
-  // Get the last page from the unified logs data for metadata
-  const lastPage = unifiedLogsData?.pages?.[unifiedLogsData.pages.length - 1]
-
   // Create a filtered version of the chart config based on selected levels
   const filteredChartConfig = useMemo(() => {
     const levelFilter = search.level || ['success', 'warning', 'error']
@@ -193,14 +194,12 @@ export const UnifiedLogs = () => {
     getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
   })
 
+  const selectedRowKey = Object.keys(rowSelection)?.[0]
   const selectedRow = useMemo(() => {
     if ((isLoading || isFetching) && !flatData.length) return
-    const selectedRowKey = Object.keys(rowSelection)?.[0]
-    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowSelection, flatData])
 
-  const selectedRowKey = Object.keys(rowSelection)?.[0]
+    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
+  }, [isLoading, isFetching, flatData.length, table, selectedRowKey])
 
   // REMINDER: this is currently needed for the cmdk search
   // TODO: auto search via API when the user changes the filter instead of hardcoded
@@ -362,7 +361,6 @@ export const UnifiedLogs = () => {
                   selectedRow={selectedRow?.original}
                   selectedRowKey={selectedRowKey}
                   searchParameters={searchParameters}
-                  search={search}
                 />
               )}
             </ResizablePanelGroup>
