@@ -85,7 +85,7 @@ export const UnifiedLogs = () => {
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = Object.entries(search).reduce(
     (acc, [key, value]) => {
-      if (!['id', 'live', 'logId'].includes(key) && value !== null && value !== undefined) {
+      if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
         acc[key] = value
       }
       return acc

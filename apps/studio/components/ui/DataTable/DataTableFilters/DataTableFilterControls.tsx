@@ -35,11 +35,6 @@ export function DataTableFilterControls() {
               <div className="flex w-full items-center justify-between gap-2 truncate py-2 pr-2">
                 <div className="flex items-center gap-2 truncate">
                   <p className="text-sm">{field.label}</p>
-                  {/* {value !== field.label.toLowerCase() && !field.commandDisabled ? (
-                    <p className="mt-px truncate font-mono text-[10px] text-muted-foreground">
-                      {value}
-                    </p>
-                  ) : null} */}
                 </div>
                 <DataTableFilterResetButton {...field} />
               </div>
