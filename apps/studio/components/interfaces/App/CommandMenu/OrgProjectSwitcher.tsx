@@ -77,6 +77,54 @@ export function useConfigureOrganizationCommand() {
               icon: () => <Building />,
             })) ?? [],
         },
+        {
+          id: 'configure-organization-billing',
+          name: 'Billing',
+          commands:
+            organizations?.map(({ name, slug }) => ({
+              id: `organization-${slug}`,
+              name,
+              value: `${name} (${slug})`,
+              route: `/org/${slug}/billing`,
+              icon: () => <Building />,
+            })) ?? [],
+        },
+        {
+          id: 'configure-organization-usage',
+          name: 'Usage',
+          commands:
+            organizations?.map(({ name, slug }) => ({
+              id: `organization-${slug}`,
+              name,
+              value: `${name} (${slug})`,
+              route: `/org/${slug}/usage`,
+              icon: () => <Building />,
+            })) ?? [],
+        },
+        {
+          id: 'configure-organization-integrations',
+          name: 'Integrations',
+          commands:
+            organizations?.map(({ name, slug }) => ({
+              id: `organization-${slug}`,
+              name,
+              value: `${name} (${slug})`,
+              route: `/org/${slug}/integrations`,
+              icon: () => <Building />,
+            })) ?? [],
+        },
+        {
+          id: 'configure-organization-team',
+          name: 'Manage Team',
+          commands:
+            organizations?.map(({ name, slug }) => ({
+              id: `organization-${slug}`,
+              name,
+              value: `${name} (${slug})`,
+              route: `/org/${slug}/team`,
+              icon: () => <Building />,
+            })) ?? [],
+        },
       ],
     },
     { deps: [organizations], enabled: !!organizations && organizations.length > 0 }
