@@ -2354,6 +2354,10 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/log-drains',
         },
         {
+          name: 'Reports',
+          url: '/guides/telemetry/reports',
+        },
+        {
           name: 'Metrics',
           url: '/guides/telemetry/metrics',
         },
