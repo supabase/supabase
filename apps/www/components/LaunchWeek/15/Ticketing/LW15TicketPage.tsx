@@ -150,7 +150,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
       </div>
       <div
         className="w-full border border-muted h-full bg-surface-300 flex items-center justify-center p-8 transition-colors duration-300"
-        style={{ background: `${selectedFg}` }}
+        style={{ background: `${selectedFg}07` }}
       >
         <div className="flex flex-col justify-center gap-8 h-fit">
           <LW15Ticket user={user} />
