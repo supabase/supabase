@@ -1,14 +1,13 @@
-import type { Message as MessageType } from 'ai/react'
-import { useChat } from 'ai/react'
+import type { Message as MessageType } from '@ai-sdk/react'
+import { useChat } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, FileText, Info, RefreshCw, X } from 'lucide-react'
+import { ArrowDown, FileText, Info, RefreshCw, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { Markdown } from 'components/interfaces/Markdown'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -22,18 +21,9 @@ import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import {
-  AiIconAnimation,
-  Button,
-  cn,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from 'ui'
+import { AiIconAnimation, Button, cn } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { DotGrid } from '../DotGrid'
 import { ErrorBoundary } from '../ErrorBoundary'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
@@ -42,10 +32,7 @@ import { AIOptInModal } from './AIOptInModal'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
-
-type ExtendedMessage = MessageType & {
-  results?: any[]
-}
+import type { AssistantMessageType } from 'state/ai-assistant-state'
 
 const MemoizedMessage = memo(
   ({
@@ -142,16 +129,17 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   // Handle completion of the assistant's response
-  const handleChatFinish = useCallback((message: MessageType) => {
-    // If we have a user message stored in the ref, save both messages
-    if (lastUserMessageRef.current) {
-      snap.saveMessage([lastUserMessageRef.current, message])
-      lastUserMessageRef.current = null
-    } else {
-      // Otherwise just save the assistant message
-      snap.saveMessage(message)
-    }
-  }, [])
+  const handleChatFinish = useCallback(
+    (message: MessageType, options: { finishReason: string }) => {
+      if (lastUserMessageRef.current) {
+        snap.saveMessage([lastUserMessageRef.current, message])
+        lastUserMessageRef.current = null
+      } else {
+        snap.saveMessage(message)
+      }
+    },
+    [snap]
+  )
 
   // TODO(refactor): This useChat hook should be moved down into each chat session.
   // That way we won't have to disable switching chats while the chat is loading,
@@ -170,6 +158,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
     initialMessages: snap.activeChat?.messages as unknown as MessageType[] | undefined,
+    async onToolCall({ toolCall }) {
+      if (toolCall.toolName === 'rename_chat') {
+        const { newName } = toolCall.args as { newName: string }
+        if (snap.activeChatId && newName?.trim()) {
+          snap.renameChat(snap.activeChatId, newName.trim())
+          return `Chat renamed to "${newName.trim()}"`
+        }
+        return 'Failed to rename chat: Invalid chat or name'
+      }
+    },
     experimental_prepareRequestBody: ({ messages }) => {
       // [Joshen] Specifically limiting the chat history that get's sent to reduce the
       // size of the context that goes into the model. This should always be an odd number
@@ -180,8 +178,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
       // Filter out results from messages before sending to the model
       const cleanedMessages = slicedMessages.map((message) => {
-        const cleanedMessage = { ...message } as ExtendedMessage
-        if (message.role === 'assistant' && (message as ExtendedMessage).results) {
+        const cleanedMessage = { ...message } as AssistantMessageType
+        if (message.role === 'assistant' && (message as AssistantMessageType).results) {
           delete cleanedMessage.results
         }
         return cleanedMessage
@@ -244,9 +242,26 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   )
 
   const hasMessages = chatMessages.length > 0
+  const isShowingOnboarding = !hasMessages && isApiKeySet
 
   const sendMessageToAssistant = (content: string) => {
-    const payload = { role: 'user', createdAt: new Date(), content, id: uuidv4() } as MessageType
+    let finalContent = content
+
+    // Handle SQL snippets based on opt-in level
+    if (aiOptInLevel !== 'disabled') {
+      const sqlSnippetsString =
+        snap.sqlSnippets?.map((snippet: string) => '```sql\n' + snippet + '\n```').join('\n') || ''
+      finalContent = [content, sqlSnippetsString].filter(Boolean).join('\n\n')
+    } else {
+      snap.setSqlSnippets([])
+    }
+
+    const payload = {
+      role: 'user',
+      createdAt: new Date(),
+      content: finalContent,
+      id: uuidv4(),
+    } as MessageType
     snap.clearSqlSnippets()
 
     // Store the user message in the ref before appending
@@ -329,56 +344,56 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       <div className={cn('flex flex-col h-full', className)}>
         <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-30 sticky top-0">
-            <div className="border-b flex items-center bg gap-x-3 pl-5 pr-4 h-[46px]">
-              <AiIconAnimation allowHoverEffect />
-
-              <div className="text-sm flex-1 flex items-center gap-x-2">
-                Assistant
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info size={14} className="text-foreground-light" />
-                  </TooltipTrigger>
-                  <TooltipContent className="w-80">
-                    The Assistant is in Alpha and your prompts might be rate limited.{' '}
-                    {aiOptInLevel === 'schema_and_log_and_data' &&
-                      'Schema, logs, and query data are being shared to improve Assistant responses.'}
-                    {aiOptInLevel === 'schema_and_log' &&
-                      'Schema and logs are being shared to improve Assistant responses.'}
-                    {aiOptInLevel === 'schema' &&
-                      'Only schema metadata is being shared to improve Assistant responses.'}
-                    {aiOptInLevel === 'disabled' &&
-                      'Project metadata is not being shared. Opt in to improve Assistant responses.'}
-                  </TooltipContent>
-                </Tooltip>
+            <div className="border-b border-b-muted flex items-center bg gap-x-4 px-3 h-[46px]">
+              <div className="text-sm flex-1 flex items-center">
+                <AiIconAnimation size={20} allowHoverEffect={false} />
+                <span className="text-border-stronger dark:text-border-strong ml-3">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    shapeRendering="geometricPrecision"
+                  >
+                    <path d="M16 3.549L7.12 20.600"></path>
+                  </svg>
+                </span>
+                <AIAssistantChatSelector disabled={isChatLoading} />
               </div>
               <div className="flex items-center gap-x-4">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <p
-                      title={currentChat}
-                      className="text-xs text-foreground-light truncate max-w-[145px] 2xl:max-w-full"
-                    >
-                      {currentChat}
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Current chat: {currentChat}</TooltipContent>
-                </Tooltip>
-                <div className="flex items-center gap-x-2">
-                  <AIAssistantChatSelector disabled={isChatLoading} />
+                <div className="flex items-center">
                   <ButtonTooltip
-                    type="default"
+                    type="text"
                     size="tiny"
-                    icon={<RefreshCw size={14} />}
+                    icon={<Settings strokeWidth={1.5} size={14} />}
+                    onClick={() => setIsConfirmOptInModalOpen(true)}
+                    className="h-7 w-7 p-0"
+                    disabled={isChatLoading}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'Permission settings',
+                      },
+                    }}
+                  />
+                  <ButtonTooltip
+                    type="text"
+                    size="tiny"
+                    icon={<RefreshCw strokeWidth={1.5} size={14} />}
                     onClick={handleClearMessages}
                     className="h-7 w-7 p-0"
                     disabled={isChatLoading}
                     tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
                   />
                   <ButtonTooltip
-                    type="default"
+                    type="text"
                     className="w-7 h-7"
                     onClick={snap.closeAssistant}
-                    icon={<X />}
+                    icon={<X strokeWidth={1.5} size={14} />}
                     tooltip={{ content: { side: 'bottom', text: 'Close assistant' } }}
                   />
                 </div>
@@ -421,13 +436,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               </Admonition>
             )}
           </div>
-          {!hasMessages && (
-            <div className="h-48 flex-0 m-8">
-              <DotGrid rows={10} columns={10} count={33} />
-            </div>
-          )}
           {hasMessages ? (
-            <div className="w-full p-5">
+            <div className="w-full px-7 py-8 space-y-6">
               {renderedMessages}
               <AnimatePresence>
                 {isChatLoading && (
@@ -465,94 +475,27 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 )}
               </AnimatePresence>
             </div>
-          ) : snap.suggestions ? (
-            <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
-              <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
-                Suggestions
-              </h3>
-              {snap.suggestions.title && <p>{snap.suggestions.title}</p>}
-              <div className="-mx-3 mt-4 mb-12">
-                {snap.suggestions?.prompts?.map((prompt: string, idx: number) => (
-                  <Button
-                    key={`suggestion-${idx}`}
-                    size="small"
-                    icon={<FileText strokeWidth={1.5} size={16} />}
-                    type="text"
-                    className="w-full justify-start py-1 h-auto"
-                    onClick={() => {
-                      setValue(prompt)
-                      if (inputRef.current && snap.initialInput) {
-                        inputRef.current.focus()
-                        inputRef.current.setSelectionRange(
-                          snap.initialInput.length,
-                          snap.initialInput.length
-                        )
-                      }
-                    }}
-                  >
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
-            </div>
           ) : isLoadingTables && isApiKeySet ? (
-            <div className="w-full h-full flex-1 flex flex-col justify-end items-start p-5">
-              {/* [Joshen] We could try play around with a custom loader for the assistant here */}
-              <GenericSkeletonLoader className="w-4/5" />
+            <div className="w-full h-full flex-1 flex flex-col justify-center items-center p-5">
+              <GenericSkeletonLoader className="w-4/5 flex flex-col items-center" />
             </div>
-          ) : (tables ?? [])?.length > 0 ? (
-            <AIOnboarding onSendMessage={sendMessageToAssistant} />
-          ) : isApiKeySet ? (
-            <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
-              <h2 className="text-base mb-2">Welcome to Supabase!</h2>
-              <p className="text-sm text-foreground-lighter mb-6">
-                This is the Supabase assistant which will help you create, debug and modify tables,
-                policies, functions and more. You can even use it to query your data using just your
-                words. It looks like we have a blank canvas though, so what are you looking to
-                build? Here are some ideas.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={() => setValue('Generate a database schema for ...')}
-                  className="rounded-full"
-                >
-                  Generate a ...
-                </Button>
-                {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
-                  <TooltipProvider key={qs.title}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          type="outline"
-                          className="rounded-full"
-                          onClick={() => {
-                            setMessages([
-                              {
-                                id: uuidv4(),
-                                role: 'user',
-                                createdAt: new Date(Date.now() - 3000),
-                                content: qs.description,
-                              },
-                              {
-                                id: uuidv4(),
-                                role: 'assistant',
-                                createdAt: new Date(),
-                                content: `Sure! I can help you with that. Here is a starting point you can run directly or customize further. Would you like to make any changes?  \n\n\`\`\`sql\n-- props: {"title": "${qs.title}"}\n${qs.sql}\n\`\`\``,
-                              },
-                            ])
-                          }}
-                        >
-                          {qs.title}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{qs.description}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ))}
-              </div>
-            </div>
+          ) : isShowingOnboarding ? (
+            <AIOnboarding
+              onMessageSend={sendMessageToAssistant}
+              value={value}
+              onValueChange={setValue}
+              sqlSnippets={snap.sqlSnippets as string[] | undefined}
+              onRemoveSnippet={(index) => {
+                const newSnippets = [...(snap.sqlSnippets ?? [])]
+                newSnippets.splice(index, 1)
+                snap.setSqlSnippets(newSnippets)
+              }}
+              suggestions={
+                snap.suggestions as
+                  | { title?: string; prompts?: { label: string; description: string }[] }
+                  | undefined
+              }
+            />
           ) : null}
         </div>
 
@@ -565,109 +508,102 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 exit={{ opacity: 0 }}
                 className="pointer-events-none z-10 -mt-24"
               >
-                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent" />
-              </motion.div>
-              <motion.div
-                className="absolute bottom-20 left-1/2 -translate-x-1/2"
-                variants={{
-                  hidden: { y: 5, opacity: 0 },
-                  show: { y: 0, opacity: 1 },
-                }}
-                transition={{ duration: 0.1 }}
-                initial="hidden"
-                animate="show"
-                exit="hidden"
-              >
-                <Button
-                  type="default"
-                  className="rounded-full w-8 h-8 p-1.5"
-                  onClick={() => {
-                    scrollToEnd()
-                    if (inputRef.current) inputRef.current.focus()
-                  }}
-                >
-                  <ArrowDown size={16} />
-                </Button>
+                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+                  <motion.div
+                    className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto"
+                    variants={{
+                      hidden: { y: 5, opacity: 0 },
+                      show: { y: 0, opacity: 1 },
+                    }}
+                    transition={{ duration: 0.1 }}
+                    initial="hidden"
+                    animate="show"
+                    exit="hidden"
+                  >
+                    <Button
+                      type="default"
+                      className="rounded-full w-8 h-8 p-1.5"
+                      onClick={() => {
+                        scrollToEnd()
+                        if (inputRef.current) inputRef.current.focus()
+                      }}
+                    >
+                      <ArrowDown size={16} />
+                    </Button>
+                  </motion.div>
+                </div>
               </motion.div>
             </>
           )}
         </AnimatePresence>
 
-        <div className="p-5 pt-0 z-20 relative">
-          {snap.sqlSnippets && snap.sqlSnippets.length > 0 && (
-            <div className="mb-2">
-              {snap.sqlSnippets.map((snippet: string, index: number) => (
-                <CollapsibleCodeBlock
-                  key={index}
-                  hideLineNumbers
-                  value={snippet}
-                  onRemove={() => {
-                    const newSnippets = [...(snap.sqlSnippets ?? [])]
-                    newSnippets.splice(index, 1)
-                    snap.setSqlSnippets(newSnippets)
-                  }}
-                  className="text-xs"
-                />
-              ))}
-            </div>
-          )}
-          {disablePrompts && (
-            <Admonition
-              showIcon={false}
-              type="default"
-              title="Assistant has been temporarily disabled"
-              description="We're currently looking into getting it back online"
-            />
-          )}
-
-          {isSuccess && !isApiKeySet && (
-            <Admonition
-              type="default"
-              title="OpenAI API key not set"
-              description={
-                <Markdown
-                  content={
-                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
-                  }
-                />
-              }
-            />
-          )}
-
-          <AssistantChatForm
-            textAreaRef={inputRef}
-            className={cn(
-              'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+        {!isShowingOnboarding && (
+          <div className="px-3 pb-3 z-20 relative">
+            {snap.sqlSnippets && snap.sqlSnippets.length > 0 && (
+              <div className="mb-0 mx-4">
+                {snap.sqlSnippets.map((snippet: string, index: number) => (
+                  <CollapsibleCodeBlock
+                    key={index}
+                    hideLineNumbers
+                    value={snippet}
+                    onRemove={() => {
+                      const newSnippets = [...(snap.sqlSnippets ?? [])]
+                      newSnippets.splice(index, 1)
+                      snap.setSqlSnippets(newSnippets)
+                    }}
+                    className="text-xs rounded-b-none border-b-0"
+                  />
+                ))}
+              </div>
             )}
-            loading={isChatLoading}
-            disabled={!isApiKeySet || disablePrompts || isChatLoading}
-            placeholder={
-              hasMessages
-                ? 'Reply to the assistant...'
-                : (snap.sqlSnippets ?? [])?.length > 0
-                  ? 'Ask a question or make a change...'
-                  : 'Chat to Postgres...'
-            }
-            value={value}
-            onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(event) => {
-              event.preventDefault()
-              if (aiOptInLevel !== 'disabled') {
-                const sqlSnippetsString =
-                  snap.sqlSnippets
-                    ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
-                    .join('\n') || ''
-                const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
-                sendMessageToAssistant(valueWithSnippets)
-                scrollToEnd()
-              } else {
-                sendMessageToAssistant(value)
-                snap.setSqlSnippets([])
-                scrollToEnd()
+            {disablePrompts && (
+              <Admonition
+                showIcon={false}
+                type="default"
+                title="Assistant has been temporarily disabled"
+                description="We're currently looking into getting it back online"
+              />
+            )}
+
+            {isSuccess && !isApiKeySet && (
+              <Admonition
+                type="default"
+                title="OpenAI API key not set"
+                description={
+                  <Markdown
+                    content={
+                      'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                    }
+                  />
+                }
+              />
+            )}
+
+            <AssistantChatForm
+              textAreaRef={inputRef}
+              className={cn(
+                'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+              )}
+              loading={isChatLoading}
+              disabled={!isApiKeySet || disablePrompts || isChatLoading}
+              placeholder={
+                hasMessages
+                  ? 'Ask a follow up question...'
+                  : (snap.sqlSnippets ?? [])?.length > 0
+                    ? 'Ask a question or make a change...'
+                    : 'Chat to Postgres...'
               }
-            }}
-          />
-        </div>
+              value={value}
+              autoFocus
+              onValueChange={(e) => setValue(e.target.value)}
+              onSubmit={(event) => {
+                event.preventDefault()
+                sendMessageToAssistant(value)
+                scrollToEnd()
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <AIOptInModal
