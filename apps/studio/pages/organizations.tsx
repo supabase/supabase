@@ -23,6 +23,7 @@ import {
   Skeleton,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { TermsUpdateBanner } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 
 const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -63,7 +64,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       )}
-
+      <TermsUpdateBanner />
       <ScaffoldTitle>Your Organizations</ScaffoldTitle>
 
       {organizations.length === 0 && orgNotFound && (
