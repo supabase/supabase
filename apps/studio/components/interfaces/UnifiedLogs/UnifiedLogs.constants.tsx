@@ -38,12 +38,12 @@ export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES = ['postgres', 'postgrest', 'auth', 'storage', 'edge function'] as const
 
 const parseAsSort = createParser({
-  parse(queryValue) {
+  parse(queryValue: string) {
     const [id, desc] = queryValue.split(SORT_DELIMITER)
     if (!id && !desc) return null
     return { id, desc: desc === 'desc' }
   },
-  serialize(value) {
+  serialize(value: { id: string; desc: boolean }) {
     return `${value.id}.${value.desc ? 'desc' : 'asc'}`
   },
 })
