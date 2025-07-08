@@ -42,7 +42,7 @@ const LW15Ticket = ({
     <div
       ref={tilt}
       className={cn(
-        'min-h-[400px] transition-colors border border-muted duration-300 [&_*]:transition-colors [&_*]:duration-300 max-h-[500px] h-[70%] w-auto aspect-[278/443] flex flex-col shadow-2xl rounded-md overflow-hidden',
+        'min-h-[400px] transition-colors border duration-300 [&_*]:transition-colors [&_*]:duration-300 max-h-[500px] h-[70%] w-auto aspect-[278/443] flex flex-col shadow-2xl rounded-md overflow-hidden',
         className
       )}
       style={{ background: bg, color: fg }}
@@ -72,7 +72,6 @@ const LW15Ticket = ({
           <div className="absolute top-5 bg-background dark:bg-black mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg z-30 overflow-hidden">
             <span className="absolute inset-0 w-full h-full" style={{ background: `${fg}07` }} />
           </div>
-          <div>Launch Week</div>
           <div className="w-full h-[50px] flex items-center justify-between">
             <LWSVG className="h-full w-auto" />
             <FifteenSVG className="h-full w-auto" />

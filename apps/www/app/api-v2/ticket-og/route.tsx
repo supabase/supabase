@@ -133,10 +133,10 @@ export async function GET(req: Request, res: Response) {
                 position: 'relative',
                 width: '1204px',
                 height: '634px',
-                top: '0px',
-                left: '0px',
-                bottom: '0px',
-                right: '0px',
+                top: '-2px',
+                left: '-2px',
+                bottom: '-2px',
+                right: '-2px',
                 backgroundSize: 'cover',
                 opacity: 0.25,
               }}
@@ -327,7 +327,7 @@ export async function GET(req: Request, res: Response) {
                       width: '70px',
                       height: '20px',
                       backgroundColor: '#000',
-                      border: '1px solid #ffffff30',
+                      border: '1px solid #ffffff40',
                       borderRadius: '10px',
                     }}
                   />
@@ -338,25 +338,18 @@ export async function GET(req: Request, res: Response) {
                       display: 'flex',
                       flexDirection: 'column',
                       zIndex: 2,
-                      padding: '27px 20px',
+                      padding: '0px 18px',
                       gap: '10px',
                     }}
                   >
-                    <p
-                      style={{
-                        fontSize: `21px`,
-                        padding: '0',
-                        margin: '0',
-                      }}
-                    >
-                      Launch Week
-                    </p>
                     <div
                       style={{
                         position: 'relative',
                         width: '100%',
                         display: 'flex',
                         justifyContent: 'space-between',
+                        margin: '0',
+                        padding: '0',
                       }}
                     >
                       <p
