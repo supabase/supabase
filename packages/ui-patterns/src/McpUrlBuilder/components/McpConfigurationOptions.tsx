@@ -37,7 +37,7 @@ export function McpConfigurationOptions({
           <Label htmlFor="readonly" className="text-sm">
             Read-only
           </Label>
-          <InfoTooltip>Only allow read operations</InfoTooltip>
+          <InfoTooltip>Only allow read operations on your database</InfoTooltip>
         </div>
         <div className="flex items-center space-x-2">
           <Switch id="readonly" checked={readonly} onCheckedChange={onReadonlyChange} />
@@ -57,7 +57,7 @@ export function McpConfigurationOptions({
         <MultiSelector values={selectedFeatures} onValuesChange={onFeaturesChange}>
           <MultiSelectorTrigger
             className="w-full"
-            label="All features enabled by default"
+            label="All features except Storage enabled by default"
             badgeLimit="wrap"
             showIcon={true}
           />
