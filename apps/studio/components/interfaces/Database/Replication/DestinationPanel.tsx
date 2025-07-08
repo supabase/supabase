@@ -116,7 +116,7 @@ const DestinationPanel = ({
       projectId: destinationData?.config?.big_query?.project_id ?? '',
       datasetId: destinationData?.config?.big_query?.dataset_id ?? '',
       // For now, the password will always be set as empty for security reasons.
-      serviceAccountKey: '',
+      serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
       publicationName: pipelineData?.config.publication_name ?? '',
       maxSize: pipelineData?.config?.batch?.max_size ?? 1000,
       maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? 10,

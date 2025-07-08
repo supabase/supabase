@@ -7287,6 +7287,8 @@ export interface components {
           max_staleness_mins: number
           /** @description BigQuery project id */
           project_id: string
+          /** @description BigQuery service account key */
+          service_account_key: string
         }
       }
       /** @description Destination id */
@@ -7308,6 +7310,8 @@ export interface components {
             max_staleness_mins: number
             /** @description BigQuery project id */
             project_id: string
+            /** @description BigQuery service account key */
+            service_account_key: string
           }
         }
         /** @description Destination id */
