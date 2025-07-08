@@ -5,15 +5,8 @@ import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColu
 import { LogTypeIcon } from '../../components/LogTypeIcon'
 import { getStatusLevel } from '../../UnifiedLogs.utils'
 import { TruncatedTextWithPopover } from './shared/TruncatedTextWithPopover'
-import {
-  Badge,
-  Button,
-  Separator,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, Button, Separator } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
 import { ColumnSchema } from '../../UnifiedLogs.schema'
 
@@ -31,7 +24,7 @@ export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHead
 
   // Display logic: path → event_message → grayed out "/"
   const displayPath = useMemo(() => {
-    const actualPath = enrichedData?.request_path || selectedRow?.pathname || selectedRow?.path
+    const actualPath = enrichedData?.request_path || selectedRow?.pathname
     if (actualPath && actualPath !== '/') {
       return { text: actualPath, isDefault: false, isTruncatable: false }
     }
@@ -136,44 +129,40 @@ export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHead
             className="text-xs"
           />
         )}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="text"
-                disabled={!prevId}
-                onClick={onPrev}
-                className="px-1"
-                icon={<ChevronUp />}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                Navigate <Kbd>↑</Kbd>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="text"
-                disabled={!nextId}
-                onClick={onNext}
-                className="px-1"
-                icon={<ChevronDown />}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                Navigate <Kbd>↓</Kbd>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <ButtonTooltip
+          size="tiny"
+          type="text"
+          disabled={!prevId}
+          onClick={onPrev}
+          className="px-1"
+          icon={<ChevronUp />}
+          tooltip={{
+            content: {
+              text: (
+                <p>
+                  Navigate <Kbd>↑</Kbd>
+                </p>
+              ),
+            },
+          }}
+        />
+        <ButtonTooltip
+          size="tiny"
+          type="text"
+          disabled={!nextId}
+          onClick={onNext}
+          className="px-1"
+          icon={<ChevronDown />}
+          tooltip={{
+            content: {
+              text: (
+                <p>
+                  Navigate <Kbd>↓</Kbd>
+                </p>
+              ),
+            },
+          }}
+        />
         <Separator orientation="vertical" className="mx-1" />
 
         <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />

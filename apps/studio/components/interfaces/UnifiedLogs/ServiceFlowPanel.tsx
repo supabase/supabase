@@ -45,35 +45,10 @@ export function ServiceFlowPanel({
   const { ref: projectRef } = useParams()
   const [activeTab, setActiveTab] = useState('service-flow')
 
-  // Helper function to map log_type to service flow type
-  const getServiceFlowType = (logType: string): ServiceFlowType | undefined => {
-    switch (logType) {
-      case 'auth':
-        return 'auth'
-      case 'edge function':
-        return 'edge-function'
-      case 'storage':
-        return 'storage'
-      case 'postgrest':
-        return 'postgrest'
-      case 'postgres':
-        return 'postgres'
-      default:
-        return undefined
-    }
-  }
-
-  // Determine service flow type based on log_type
   const logType = selectedRow?.log_type
-  const serviceFlowType = getServiceFlowType(logType)
-  const shouldShowServiceFlow = serviceFlowType !== undefined
-
-  // Individual flow type checks for conditional rendering
-  const isPostgrestFlow = serviceFlowType === 'postgrest'
-  const isAuthFlow = serviceFlowType === 'auth'
-  const isEdgeFunctionFlow = serviceFlowType === 'edge-function'
-  const isStorageFlow = serviceFlowType === 'storage'
-  const isPostgresFlow = serviceFlowType === 'postgres'
+  const serviceFlowType: ServiceFlowType | undefined =
+    logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
+  const shouldShowServiceFlow = !!serviceFlowType
 
   // Query the logs API directly
   const {
@@ -146,7 +121,7 @@ export function ServiceFlowPanel({
                         </div>
                       ) : (
                         <>
-                          {isPostgresFlow ? (
+                          {serviceFlowType === 'postgres' ? (
                             // Postgres flows: Connection Started -> Postgres -> Response
                             <>
                               <MemoizedRequestStartedBlock
@@ -184,7 +159,7 @@ export function ServiceFlowPanel({
                                 table={table}
                               />
 
-                              {isAuthFlow ? (
+                              {serviceFlowType === 'auth' ? (
                                 <MemoizedGoTrueBlock
                                   data={selectedRow}
                                   enrichedData={serviceFlowData?.result?.[0]}
@@ -192,7 +167,7 @@ export function ServiceFlowPanel({
                                   filterFields={filterFields}
                                   table={table}
                                 />
-                              ) : isEdgeFunctionFlow ? (
+                              ) : serviceFlowType === 'edge-function' ? (
                                 <MemoizedEdgeFunctionBlock
                                   data={selectedRow}
                                   enrichedData={serviceFlowData?.result?.[0]}
@@ -200,7 +175,7 @@ export function ServiceFlowPanel({
                                   filterFields={filterFields}
                                   table={table}
                                 />
-                              ) : isStorageFlow ? (
+                              ) : serviceFlowType === 'storage' ? (
                                 <MemoizedStorageBlock
                                   data={selectedRow}
                                   enrichedData={serviceFlowData?.result?.[0]}
