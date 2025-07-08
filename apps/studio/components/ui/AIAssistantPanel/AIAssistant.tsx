@@ -149,6 +149,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     isLoading: isChatLoading,
     append,
     setMessages,
+    error,
+    reload,
   } = useChat({
     id: snap.activeChatId,
     api: useBedrockAssistant
@@ -439,6 +441,17 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           {hasMessages ? (
             <div className="w-full px-7 py-8 space-y-6">
               {renderedMessages}
+              {error && (
+                <div className="border rounded-md pl-2 pr-1 py-1 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-foreground-light text-sm">
+                    <Info size={16} />
+                    <p>Sorry, I'm having trouble responding right now</p>
+                  </div>
+                  <Button type="text" size="tiny" onClick={() => reload()} className="text-xs">
+                    Retry
+                  </Button>
+                </div>
+              )}
               <AnimatePresence>
                 {isChatLoading && (
                   <motion.div
