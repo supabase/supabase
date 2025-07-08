@@ -13,10 +13,10 @@ interface Link {
 }
 
 interface InfoPillProps {
-  label: string
+  label: string | React.ReactNode
   icon: React.ReactNode
   title: string
-  description: string
+  description: string | React.ReactNode
   links?: Link[]
 }
 
