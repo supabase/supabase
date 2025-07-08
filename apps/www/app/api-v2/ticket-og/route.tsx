@@ -262,7 +262,7 @@ export async function GET(req: Request, res: Response) {
                 borderRadius: '12px',
                 display: 'flex',
                 flexDirection: 'column',
-                border: '1px solid #ffffff30',
+                border: '1px solid #ffffff40',
                 overflow: 'hidden',
                 boxShadow: '0 0 60px 0 rgba(0, 0, 0, 0.5)',
               }}

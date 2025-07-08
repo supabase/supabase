@@ -42,7 +42,8 @@ const Lw15Page = () => {
         <DefaultLayout className="!min-h-[calc(100dvh-66px)] h-[calc(100dvh-66px)] dark:bg-black">
           <div
             style={{
-              fontFamily: 'SuisseIntl-Book',
+              fontFamily:
+                "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
             }}
             className="h-full"
           >

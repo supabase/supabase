@@ -160,7 +160,6 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
           </div>
         </div>
       </div>
-      {/* <TicketCustomizationSection className="lg:hidden" /> */}
     </SectionContainer>
   )
 }
