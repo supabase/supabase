@@ -255,6 +255,7 @@ const BranchManagement = () => {
                           ) : (
                             <PullRequestsEmptyState
                               url={generateCreatePullRequestURL()}
+                              projectRef={projectRef ?? '_'}
                               hasBranches={previewBranches.length > 0}
                               githubConnection={githubConnection}
                               gitlessBranching={gitlessBranching}
