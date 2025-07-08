@@ -51,7 +51,7 @@ export const StorageReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="Storage" />
+      <ReportHeader title="Storage" showDatabaseSelector={false} />
       <section className="relative pt-20 -mt-2 flex flex-col gap-3">
         <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
           <div className="sticky top-0 bg dark:bg-200 pt-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
