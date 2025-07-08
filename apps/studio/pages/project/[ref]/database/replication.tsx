@@ -6,12 +6,10 @@ import {
   ScaffoldContainer,
   ScaffoldDescription,
   ScaffoldHeader,
-  ScaffoldSection,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import { useFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
-import { Admonition } from 'ui-patterns'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
   const enablePgReplicate = useFlag('enablePgReplicate')
