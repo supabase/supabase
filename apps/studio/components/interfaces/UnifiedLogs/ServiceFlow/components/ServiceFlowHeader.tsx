@@ -25,9 +25,9 @@ interface ServiceFlowHeaderProps {
 export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHeaderProps) => {
   const { table, rowSelection, isLoading } = useDataTable()
 
-  const method = enrichedData?.method || selectedRow?.method
-  const logType = enrichedData?.log_type || selectedRow?.log_type
-  const status = enrichedData?.status || selectedRow?.status
+  const method = selectedRow?.method
+  const logType = selectedRow?.log_type
+  const status = selectedRow?.status
 
   // Display logic: path → event_message → grayed out "/"
   const displayPath = useMemo(() => {
