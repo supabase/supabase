@@ -13,6 +13,7 @@ import {
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
@@ -64,17 +65,20 @@ import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
 import { CreateKeyDialog } from './create-key-dialog'
 import { RotateKeyDialog } from './rotate-key-dialog'
+import { KeyDetailsDialog } from './key-details-dialog'
 import { SigningKeyRow } from './signing-key-row'
 
 const MotionTableRow = motion(TableRow)
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
+  const { project, isLoading: isProjectLoading } = useProjectContext()
+
   const newJwtSecrets = useFlag('newJwtSecrets')
 
   const [selectedKey, setSelectedKey] = useState<JWTSigningKey | null>(null)
   const [shownDialog, setShownDialog] = useState<
-    'legacy' | 'create' | 'rotate' | 'confirm-rotate' | 'key-details' | 'revoke' | 'delete' | null
+    'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete' | null
   >(null)
 
   const resetDialog = () => {
@@ -100,7 +104,8 @@ export default function JWTSecretKeysTable() {
 
   const isLoadingMutation =
     updateMutation.isLoading || deleteMutation.isLoading || legacyMutation.isLoading
-  const isLoading = isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
+  const isLoading =
+    isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
 
   const sortedKeys = useMemo(() => {
     if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
@@ -141,42 +146,50 @@ export default function JWTSecretKeysTable() {
   }
 
   const handlePreviouslyUsedKey = async (keyId: string) => {
-    if (!projectRef) {
-      return
-    }
-    try {
-      await updateMutation.mutateAsync({ projectRef, keyId, status: 'previously_used' })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to move key to previously used', error)
-    }
+    updateMutation.mutate(
+      { projectRef, keyId, status: 'previously_used' },
+      {
+        onSuccess: () => {
+          resetDialog()
+        },
+      }
+    )
   }
 
-  const handleStandbyKey = async (keyId: string) => {
-    try {
-      await updateMutation.mutateAsync({ projectRef: projectRef!, keyId, status: 'standby' })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to move key to standby', error)
-    }
+  const handleStandbyKey = (keyId: string) => {
+    updateMutation.mutate(
+      { projectRef: projectRef!, keyId, status: 'standby' },
+      {
+        onSuccess: () => {
+          resetDialog()
+        },
+      }
+    )
   }
 
-  const handleRevokeKey = async (keyId: string) => {
-    try {
-      await updateMutation.mutateAsync({ projectRef: projectRef!, keyId, status: 'revoked' })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to revoke key', error)
-    }
+  const handleRevokeKey = (keyId: string) => {
+    updateMutation.mutate(
+      { projectRef: projectRef!, keyId, status: 'revoked' },
+      {
+        onSuccess: () => {
+          resetDialog()
+        },
+      }
+    )
   }
 
-  const handleDeleteKey = async (keyId: string) => {
-    try {
-      await deleteMutation.mutateAsync({ projectRef: projectRef!, keyId })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to delete key', error)
-    }
+  const handleDeleteKey = (keyId: string) => {
+    deleteMutation.mutate(
+      { projectRef: projectRef!, keyId },
+      {
+        onSuccess: () => {
+          resetDialog()
+        },
+        onError: () => {
+          resetDialog()
+        },
+      }
+    )
   }
 
   if (isLoading) {
@@ -195,24 +208,24 @@ export default function JWTSecretKeysTable() {
             {standbyKey && (
               <ActionPanel
                 title="Rotate Signing Key"
-                description="Promote the standby key to in use. All new JWTs will be signed with this key. Make sure the standby key has been received by all of your application's components to avoid downtime."
+                description="Switch the standby key to in use. All new JSON Web Tokens issued by Supabase Auth will be signed with this key."
                 buttonLabel="Rotate keys"
                 onClick={() => setShownDialog('rotate')}
                 loading={isLoadingMutation}
-                icon={<RotateCw />}
-                type="warning"
+                icon={<RotateCw className="size-4" />}
+                type="primary"
               />
             )}
 
             {!standbyKey && (
               <ActionPanel
                 title="Create standby key"
-                description="Create a standby key for the next rotation which will be used on next key rotation."
+                description="Set up a new key which you can switch to once it has been picked up by all components of your application."
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isLoadingMutation}
                 type="primary"
-                icon={<Timer />}
+                icon={<Timer className="size-4" />}
               />
             )}
           </>
@@ -254,8 +267,10 @@ export default function JWTSecretKeysTable() {
                           signingKey={standbyKey}
                           setSelectedKey={setSelectedKey}
                           setShownDialog={setShownDialog}
+                          handleStandbyKey={handleStandbyKey}
                           handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                           legacyKey={legacyKey}
+                          standbyKey={standbyKey}
                         />
                       )}
                       {inUseKey && (
@@ -264,8 +279,10 @@ export default function JWTSecretKeysTable() {
                           signingKey={inUseKey}
                           setSelectedKey={setSelectedKey}
                           setShownDialog={setShownDialog}
+                          handleStandbyKey={handleStandbyKey}
                           handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                           legacyKey={legacyKey}
+                          standbyKey={standbyKey}
                         />
                       )}
                     </AnimatePresence>
@@ -275,12 +292,13 @@ export default function JWTSecretKeysTable() {
             </Card>
           </div>
 
-          <div className="flex flex-col space-y-2">
-            <div>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <h2 className="text-xl">Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
-                These JWT signing keys are still used to <strong>verify</strong> JWTs already
-                issued. Revoke them once all JWTs have expired.
+                These JWT signing keys are still used to{' '}
+                <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
+                Revoke once all tokens have expired.
               </p>
             </div>
             <Card className="overflow-hidden">
@@ -306,97 +324,16 @@ export default function JWTSecretKeysTable() {
                     <TableBody>
                       <AnimatePresence>
                         {previouslyUsedKeys.map((key) => (
-                          <MotionTableRow
+                          <SigningKeyRow
                             key={key.id}
-                            layout
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{
-                              opacity: 1,
-                              height: 'auto',
-                              transition: { duration: 0.2 },
-                            }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="border-b border-dashed border-border"
-                          >
-                            <TableCell className="w-[150px] pr-0 py-2">
-                              <div className="flex -space-x-px items-center">
-                                <Badge
-                                  className={cn(
-                                    statusColors[key.status],
-                                    'rounded-r-none',
-                                    'gap-2 w-full h-6',
-                                    'uppercase font-mono',
-                                    'border-r-0'
-                                  )}
-                                >
-                                  <Key size={13} />
-                                  {statusLabels[key.status]}
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
-                              <div className="">
-                                <Badge
-                                  className={cn(
-                                    'bg-opacity-100 bg-200 border-foreground-muted',
-                                    'rounded-l-none',
-                                    'gap-2 py-2 h-6'
-                                  )}
-                                >
-                                  <span className="truncate">{key.id}</span>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedKey(key)
-                                      setShownDialog('key-details')
-                                    }}
-                                  >
-                                    <Eye size={13} strokeWidth={1.5} />
-                                  </button>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="truncate max-w-[100px] py-2">
-                              <AlgorithmHoverCard
-                                algorithm={key.algorithm}
-                                legacy={key.id === legacyKey?.id}
-                              />
-                            </TableCell>
-                            <TableCell className="text-right py-2">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button type="text" className="px-2" icon={<MoreVertical />} />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onSelect={() => {
-                                      setSelectedKey(key)
-                                      setShownDialog('key-details')
-                                    }}
-                                  >
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    View key details
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    disabled={!!standbyKey}
-                                    onSelect={() => handleStandbyKey(key.id)}
-                                  >
-                                    <CircleArrowUp className="mr-2 h-4 w-4" />
-                                    Set as standby key
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onSelect={() => {
-                                      setSelectedKey(key)
-                                      setShownDialog('revoke')
-                                    }}
-                                    className="text-destructive"
-                                  >
-                                    <ShieldOff className="mr-2 h-4 w-4" />
-                                    Revoke key
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </MotionTableRow>
+                            signingKey={key}
+                            setSelectedKey={setSelectedKey}
+                            setShownDialog={setShownDialog}
+                            handleStandbyKey={handleStandbyKey}
+                            handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                            legacyKey={legacyKey}
+                            standbyKey={standbyKey}
+                          />
                         ))}
                       </AnimatePresence>
                     </TableBody>
@@ -413,8 +350,8 @@ export default function JWTSecretKeysTable() {
       )}
 
       {revokedKeys.length > 0 && (
-        <div className="flex flex-col space-y-2">
-          <div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <h2 className="text-xl">Revoked keys</h2>
             <p className="text-sm text-foreground-lighter">
               These keys are no longer used to verify or sign JWTs.
@@ -442,98 +379,16 @@ export default function JWTSecretKeysTable() {
                 <TableBody>
                   <AnimatePresence>
                     {revokedKeys.map((key) => (
-                      <MotionTableRow
+                      <SigningKeyRow
                         key={key.id}
-                        layout
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{
-                          opacity: 1,
-                          height: 'auto',
-                          transition: { duration: 0.2 },
-                        }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="border-b border-dashed border-border"
-                      >
-                        <TableCell className="w-[150px] pr-0 py-2">
-                          <div className="flex -space-x-px items-center">
-                            <Badge
-                              className={cn(
-                                statusColors[key.status],
-                                'rounded-r-none',
-                                'gap-2 w-full h-6',
-                                'uppercase font-mono',
-                                'border-r-0'
-                              )}
-                            >
-                              <Key size={13} />
-                              {statusLabels[key.status]}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
-                          <div className="">
-                            <Badge
-                              className={cn(
-                                'bg-opacity-100 bg-200 border-foreground-muted',
-                                'rounded-l-none',
-                                'gap-2 py-2 h-6'
-                              )}
-                            >
-                              <span className="truncate">{key.id}</span>
-                              <button
-                                onClick={() => {
-                                  setSelectedKey(key)
-                                  setShownDialog('key-details')
-                                }}
-                              >
-                                <Eye size={13} strokeWidth={1.5} />
-                              </button>
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell className="truncate max-w-[100px] py-2">
-                          <AlgorithmHoverCard
-                            algorithm={key.algorithm}
-                            legacy={key.id === legacyKey?.id}
-                          />
-                        </TableCell>
-                        <TableCell className="text-right py-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button type="text" className="px-2" icon={<MoreVertical />} />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onSelect={() => {
-                                  setSelectedKey(key)
-                                  setShownDialog('key-details')
-                                }}
-                              >
-                                <Eye className="mr-2 h-4 w-4" />
-                                View key details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                disabled={!!standbyKey}
-                                onSelect={() => handleStandbyKey(key.id)}
-                              >
-                                <CircleArrowUp className="mr-2 h-4 w-4" />
-                                Set as standby key
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                disabled={key.id === legacyKey?.id}
-                                onSelect={() => {
-                                  setSelectedKey(key)
-                                  setShownDialog('delete')
-                                }}
-                                className="text-destructive"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Permanently delete key
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </MotionTableRow>
+                        signingKey={key}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                      />
                     ))}
                   </AnimatePresence>
                 </TableBody>
@@ -629,37 +484,17 @@ export default function JWTSecretKeysTable() {
         </Dialog>
       )}
 
-      <Dialog open={shownDialog === 'key-details'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-medium">Key Details</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection className="flex flex-col gap-6">
-            {selectedKey && (
-              <>
-                <div className="bg-surface-100/50 border rounded-md">
-                  <div className="flex items-center gap-2 px-3 py-2 border-b">
-                    <FileKey strokeWidth={1.5} size={15} className="text-foreground-light" />
-                    <h4 className="text-xs font-mono">Public Key (PEM format)</h4>
-                  </div>
-                  <pre className="bg-surface-100 p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all max-h-40">
-                    {typeof selectedKey.public_jwk === 'string'
-                      ? selectedKey.public_jwk
-                      : JSON.stringify(selectedKey.public_jwk ?? '', null, 2)}
-                  </pre>
-                </div>
-                <div>
-                  <h4 className="text-sm mb-2">JWKS URL</h4>
-                  <pre className="bg-surface-100 border p-3 rounded-md text-xs overflow-x-auto break-all">
-                    {`${window.location.origin}/jwt/v1/jwks.json`}
-                  </pre>
-                </div>
-              </>
-            )}
-          </DialogSection>
-        </DialogContent>
-      </Dialog>
+      {selectedKey && project && (
+        <Dialog open={shownDialog === 'key-details'} onOpenChange={resetDialog}>
+          <DialogContent className="sm:max-w-lg">
+            <KeyDetailsDialog
+              selectedKey={selectedKey}
+              restURL={project.restUrl}
+              onClose={resetDialog}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {selectedKey &&
         selectedKey.status === 'previously_used' &&
