@@ -320,7 +320,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
               {
                 projectRef,
                 search,
-                pageParam: { cursor: 0, direction: 'next' },
               },
               undefined,
               headers
