@@ -35,15 +35,7 @@ export const CHART_CONFIG = {
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
-export const LOG_TYPES = [
-  'postgres',
-  'postgrest',
-  'auth',
-  'storage',
-  'edge function',
-  // 'postgres_upgrade',
-  // 'supavisor',
-] as const
+export const LOG_TYPES = ['postgres', 'postgrest', 'auth', 'storage', 'edge function'] as const
 
 const parseAsSort = createParser({
   parse(queryValue) {
@@ -83,9 +75,6 @@ export const SEARCH_PARAMS_PARSER = {
   cursor: parseAsTimestamp.withDefault(new Date()),
   live: parseAsBoolean.withDefault(false),
 
-  // REQUIRED FOR SELECTION
   uuid: parseAsString,
-  // WORKAROUND: Store real database log ID for service flow queries
-  // TODO: Remove once repeated logs issue is fixed
   id: parseAsString,
 }
