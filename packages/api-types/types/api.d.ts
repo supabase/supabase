@@ -1845,8 +1845,10 @@ export interface components {
         | 'RESIZING'
     }
     BranchResponse: {
+      /** Format: date-time */
       created_at: string
       git_branch?: string
+      /** Format: uuid */
       id: string
       is_default: boolean
       /**
@@ -1860,6 +1862,8 @@ export interface components {
       /** Format: int32 */
       pr_number?: number
       project_ref: string
+      /** Format: date-time */
+      review_requested_at?: string
       /** @enum {string} */
       status:
         | 'CREATING_PROJECT'
@@ -1868,6 +1872,7 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+      /** Format: date-time */
       updated_at: string
     }
     BranchUpdateResponse: {
@@ -2136,6 +2141,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2923,6 +2929,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       persistent?: boolean
+      request_review?: boolean
       /**
        * @deprecated
        * @description This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.

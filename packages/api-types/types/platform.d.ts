@@ -854,6 +854,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/oauth/apps/register': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Dynamically register an OAuth client (RFC-7591) */
+    post: operations['PlatformOAuthAppsController_dynamicRegister']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/oauth/authorizations/{id}': {
     parameters: {
       query?: never
@@ -3232,6 +3249,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/projects/available-regions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the list of available regions that can be used for a new project */
+    get: operations['ProjectsController_getRegions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/fly/{fly_extension_id}': {
     parameters: {
       query?: never
@@ -4579,7 +4613,9 @@ export interface components {
     CreateOAuthAppResponse: {
       client_id: string
       client_secret: string
+      client_secret_expires_at: number
       id: string
+      redirect_uris: string[]
     }
     CreateOrganizationBody: {
       address?: {
@@ -4660,10 +4696,10 @@ export interface components {
       db_pass: string
       db_pricing_tier_id?: string
       /**
-       * @description Provider region description
+       * @description Provider region description. Only one of db_region or region_selection can be specified.
        * @example Southeast Asia (Singapore)
        */
-      db_region: string
+      db_region?: string
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
@@ -4694,6 +4730,23 @@ export interface components {
        * @enum {string}
        */
       postgres_engine?: '13' | '14' | '15' | '17' | '17-oriole'
+      /** @description Provider region selection. Only one of db_region or region_selection can be specified. */
+      region_selection?:
+        | {
+            code: string
+            /** @enum {string} */
+            type: 'specific'
+          }
+        | {
+            /**
+             * @description The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.
+             * @example apac
+             * @enum {string}
+             */
+            code: 'americas' | 'emea' | 'apac'
+            /** @enum {string} */
+            type: 'smartGroup'
+          }
       /**
        * @description Release channel. If not provided, GA will be used.
        * @enum {string}
@@ -4840,6 +4893,8 @@ export interface components {
       file_size_limit?: number
       id: string
       public: boolean
+      /** @enum {string} */
+      type?: 'STANDARD' | 'ICEBERG'
     }
     CreateStorageCredentialBody: {
       description: string
@@ -5186,6 +5241,19 @@ export interface components {
       }
       path: string
     }
+    DynamicRegisterOAuthAppBody: {
+      client_name: string
+      /** Format: uri */
+      client_uri?: string
+      grant_types?: string[]
+      /** Format: uri */
+      logo_uri?: string
+      redirect_uris: string[]
+      response_types?: string[]
+      /** @default analytics:read */
+      scope?: string
+      token_endpoint_auth_method?: string
+    }
     FormatQueryBody: {
       query: string
     }
@@ -5193,6 +5261,10 @@ export interface components {
       archive_empty: boolean
       file_url: string
       fileUrl: string
+    }
+    GetAvailableRegionsBody: {
+      cloud_provider: string
+      organization_slug: string
     }
     GetContentCountResponse: {
       count: number
@@ -7165,6 +7237,46 @@ export interface components {
       /** @description Whether to only allow private channels */
       private_only: boolean | null
     }
+    RegionsInfo: {
+      all: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }[]
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+      recommendations: {
+        smartGroup: {
+          /** @enum {string} */
+          code: 'americas' | 'emea' | 'apac'
+          name: string
+          /** @enum {string} */
+          type: 'smartGroup'
+        }
+        specific: {
+          code: string
+          name: string
+          /** @enum {string} */
+          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          /** @enum {string} */
+          status?: 'capacity' | 'other'
+          /** @enum {string} */
+          type: 'specific'
+        }[]
+      }
+    }
     ReplicationDestinationResponse: {
       /** @description Destination config */
       config: {
@@ -7510,6 +7622,8 @@ export interface components {
       name: string
       owner: string
       public: boolean
+      /** @enum {string} */
+      type?: 'STANDARD' | 'ICEBERG'
       updated_at: string
     }
     StorageConfigResponse: {
@@ -7534,6 +7648,8 @@ export interface components {
         name: string
         owner: string
         public: boolean
+        /** @enum {string} */
+        type?: 'STANDARD' | 'ICEBERG'
         updated_at: string
       }
       created_at: string
@@ -10434,6 +10550,29 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['NotificationsSummary']
+        }
+      }
+    }
+  }
+  PlatformOAuthAppsController_dynamicRegister: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DynamicRegisterOAuthAppBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOAuthAppResponse']
         }
       }
     }
@@ -17780,6 +17919,29 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  ProjectsController_getRegions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GetAvailableRegionsBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RegionsInfo']
+        }
       }
     }
   }
