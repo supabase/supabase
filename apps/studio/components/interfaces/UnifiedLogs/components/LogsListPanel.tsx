@@ -1,26 +1,47 @@
-import { ResizableHandle, ResizablePanel } from 'ui'
-import { LogsList } from './LogsList'
+import { useState } from 'react'
 
-export const LogsListPanel = (selectedRow: any) => {
+import { Button, cn, ResizableHandle, ResizablePanel } from 'ui'
+import { LogsList } from './LogsList'
+import { ChevronDown } from 'lucide-react'
+
+export const LogsListPanel = ({ selectedRow }: { selectedRow: any }) => {
+  const [open, setOpenState] = useState(true)
+
   return (
     selectedRow?.original?.logs &&
     selectedRow?.original?.logs?.length > 0 && (
       <>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={20} minSize={20}>
+        <ResizableHandle withHandle disabled={!open} />
+        <ResizablePanel
+          order={2}
+          defaultSize={1}
+          maxSize={50}
+          minSize={open ? 16 : 12}
+          className={cn(!open ? '!h-12 max-h-12' : 'h-min-16 h-max-32')}
+        >
           <div className="h-full flex flex-col overflow-hidden">
-            <div className="px-5 py-3 border-b border-border flex justify-between items-center">
-              <h3 className="text-sm font-medium">
-                Function Logs (
-                {selectedRow?.original?.logs && Array.isArray(selectedRow?.original?.logs)
-                  ? selectedRow?.original?.logs?.length
-                  : 0}
-                )
-              </h3>
+            <div className="min-h-12 flex justify-between items-center px-5">
+              <div className="flex flex-row items-center gap-2">
+                <h3 className="text-sm font-medium">Event logs</h3>
+                <span className="text-muted-foreground text-xs bg-muted rounded-md px-1.5 py-0.5">
+                  {selectedRow?.original?.logs && Array.isArray(selectedRow?.original?.logs)
+                    ? selectedRow?.original?.logs?.length
+                    : 0}
+                </span>
+              </div>
+              <Button
+                type="default"
+                onClick={() => setOpenState(!open)}
+                icon={<ChevronDown className={cn('w-4 h-4', !open ? 'rotate-180' : 'rotate-0')} />}
+              >
+                {open ? 'Close' : 'Open'}
+              </Button>
             </div>
-            <div className="flex-grow overflow-auto">
-              <LogsList logs={selectedRow?.original?.logs} />
-            </div>
+            {open && (
+              <div className="flex-grow overflow-auto border-t">
+                <LogsList logs={selectedRow?.original?.logs} />
+              </div>
+            )}
           </div>
         </ResizablePanel>
       </>

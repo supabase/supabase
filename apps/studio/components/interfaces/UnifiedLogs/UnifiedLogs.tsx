@@ -335,7 +335,7 @@ export const UnifiedLogs = () => {
                 className="h-full"
               >
                 <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
-                  <ResizablePanel defaultSize={100} minSize={30}>
+                  <ResizablePanel defaultSize={100} minSize={30} className="bg">
                     <DataTableInfinite
                       columns={UNIFIED_LOGS_COLUMNS}
                       totalRows={totalDBRowCount}

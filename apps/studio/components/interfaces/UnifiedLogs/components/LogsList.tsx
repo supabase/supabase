@@ -29,17 +29,17 @@ export const LogsList = ({ logs = [] }: LogsListProps) => {
           const date = new Date(Number(log.timestamp) / 1000)
 
           return (
-            <div key={log.id} className="py-3 px-4 border-b border-border last:border-0">
+            <div key={log.id} className="py-1.5 px-4 border-b border-border last:border-0">
               <div className="flex items-start gap-5">
-                <div className="flex flex-row items-center gap-5">
-                  <HoverCardTimestamp date={date} className="min-w-20 ml-14 flex-shrink-0" />
+                <div className="flex flex-row items-center gap-5 flex-shrink-0">
+                  <HoverCardTimestamp date={date} className="flex-shrink-0" />
                   <DataTableColumnStatusCode
                     value={log.level}
                     level={log.level}
                     className="min-w-20 flex-shrink-0"
                   />
                 </div>
-                <div className="mt-1 whitespace-pre-wrap break-all pl-2 text-[0.8rem]">
+                <div className="mt-1 whitespace-pre-wrap break-all pl-2 text-[0.8rem] flex-shrink-0 overflow-x-auto">
                   {log.event_message}
                 </div>
               </div>

@@ -85,8 +85,7 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
       CASE
           WHEN apikey_payload.algorithm = 'HS256' AND 
                apikey_payload.issuer = 'supabase' AND 
-               apikey_payload.role IN ('anon', 'service_role') AND 
-               apikey_payload.subject IS NULL
+               apikey_payload.role IN ('anon', 'service_role')
           THEN apikey_payload.role
           WHEN sb_apikey.invalid IS NOT NULL THEN '<invalid>'
           WHEN apikey_payload IS NOT NULL THEN '<unrecognized>'
@@ -109,7 +108,7 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
       
       -- User Authorization 
       authorization_payload.role as authorization_role,
-      authorization_payload.subject as user_id,
+      null as user_id,
       null as user_email,
       
       -- Cloudflare Network Info
@@ -121,21 +120,21 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
       -- JWT data
       apikey_payload.role as jwt_apikey_role,
       apikey_payload.algorithm as jwt_apikey_algorithm, 
-      apikey_payload.expires_at as jwt_apikey_expires_at,
+      null as jwt_apikey_expires_at,
       apikey_payload.issuer as jwt_apikey_issuer,
-      apikey_payload.signature_prefix as jwt_apikey_signature_prefix,
-      apikey_payload.key_id as jwt_apikey_key_id,
-      apikey_payload.session_id as jwt_apikey_session_id,
-      apikey_payload.subject as jwt_apikey_subject,
+      null as jwt_apikey_signature_prefix,
+      null as jwt_apikey_key_id,
+      null as jwt_apikey_session_id,
+      null as jwt_apikey_subject,
       
       authorization_payload.role as jwt_auth_role,
       authorization_payload.algorithm as jwt_auth_algorithm,
-      authorization_payload.expires_at as jwt_auth_expires_at, 
+      null as jwt_auth_expires_at, 
       authorization_payload.issuer as jwt_auth_issuer,
-      authorization_payload.signature_prefix as jwt_auth_signature_prefix,
-      authorization_payload.key_id as jwt_auth_key_id,
-      authorization_payload.session_id as jwt_auth_session_id,
-      authorization_payload.subject as jwt_auth_subject,
+      null as jwt_auth_signature_prefix,
+      null as jwt_auth_key_id,
+      null as jwt_auth_session_id,
+      null as jwt_auth_subject,
       
       -- Storage specific data (included for all but only populated for storage)
       edge_logs_response_headers.sb_gateway_mode as storage_edge_gateway_mode,
