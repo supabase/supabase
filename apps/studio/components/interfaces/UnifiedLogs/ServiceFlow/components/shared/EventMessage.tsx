@@ -1,6 +1,8 @@
 import { Database, LucideIcon } from 'lucide-react'
 import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { LOG_TYPES } from '../../../UnifiedLogs.constants'
+import { formatServiceTypeForDisplay } from '../../../UnifiedLogs.utils'
+import { Badge } from 'ui'
 
 type LogType = (typeof LOG_TYPES)[number]
 type Level = (typeof LEVELS)[number]
@@ -18,17 +20,6 @@ export const EventMessage = ({
   icon: Icon = Database,
   serviceType = 'postgres',
 }: EventMessageProps) => {
-  const getSeverityColor = (severity?: Level) => {
-    switch (severity) {
-      case 'error':
-        return 'border-destructive/20 bg-destructive/5 text-destructive'
-      case 'warning':
-        return 'border-warning/20 bg-warning/5 text-warning-foreground'
-      default:
-        return 'border-border bg-surface-100 text-foreground'
-    }
-  }
-
   const getSeverityIcon = (severity?: Level) => {
     switch (severity) {
       case 'error':
@@ -40,29 +31,30 @@ export const EventMessage = ({
     }
   }
 
-  // Format service type for display (capitalize edge function)
-  const displayServiceType =
-    serviceType === 'edge function'
-      ? 'Edge Function'
-      : serviceType.charAt(0).toUpperCase() + serviceType.slice(1)
-
   return (
     <div className="mt-3 border-t border-border pt-3">
       <div className="flex items-center gap-2 mb-2">
         <Icon size={14} className={getSeverityIcon(severity)} />
         <span className="text-xs font-medium text-foreground-light">
-          {displayServiceType} Event
+          {formatServiceTypeForDisplay(serviceType)} Event
           {severity && (
-            <span
-              className={`ml-2 px-1.5 py-0.5 rounded text-xs font-medium ${getSeverityColor(severity)}`}
+            <Badge
+              variant={
+                severity === 'error'
+                  ? 'destructive'
+                  : severity === 'warning'
+                    ? 'warning'
+                    : 'default'
+              }
+              className="ml-2 text-xs"
             >
               {severity.toUpperCase()}
-            </span>
+            </Badge>
           )}
         </span>
       </div>
-      <div className={`p-3 rounded-lg border ${getSeverityColor(severity)}`}>
-        <div className="text-sm font-mono break-words whitespace-pre-wrap leading-relaxed">
+      <div className="p-3 rounded-lg border border-border bg-surface-100">
+        <div className="text-xs font-mono break-all whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto">
           {message}
         </div>
       </div>

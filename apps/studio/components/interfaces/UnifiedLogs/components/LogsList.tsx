@@ -1,7 +1,7 @@
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 
-interface FunctionLogEntry {
+interface LogEntry {
   id: string
   timestamp: string
   event_message: string
@@ -9,11 +9,11 @@ interface FunctionLogEntry {
   event_type: string
 }
 
-interface FunctionLogsTabProps {
-  logs?: FunctionLogEntry[]
+interface LogsListProps {
+  logs?: LogEntry[]
 }
 
-export const FunctionLogsTab = ({ logs = [] }: FunctionLogsTabProps) => {
+export const LogsList = ({ logs = [] }: LogsListProps) => {
   if (!logs || logs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-6">
@@ -33,7 +33,6 @@ export const FunctionLogsTab = ({ logs = [] }: FunctionLogsTabProps) => {
               <div className="flex items-start gap-5">
                 <div className="flex flex-row items-center gap-5">
                   <HoverCardTimestamp date={date} className="min-w-20 ml-14 flex-shrink-0" />
-
                   <DataTableColumnStatusCode
                     value={log.level}
                     level={log.level}

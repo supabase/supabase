@@ -13,7 +13,7 @@ import { logsKeys } from './keys'
 import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 
 // Debug flag for console logs - set to true for debugging
-const DEBUG_SERVICE_FLOW = false
+const DEBUG_SERVICE_FLOW = true
 
 // Service flow types - subset of LOG_TYPES that support service flows
 export const SERVICE_FLOW_TYPES = [
@@ -23,6 +23,7 @@ export const SERVICE_FLOW_TYPES = [
   'storage',
   'postgres',
 ] as const
+
 export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
 
 export type UnifiedLogInspectionVariables = {

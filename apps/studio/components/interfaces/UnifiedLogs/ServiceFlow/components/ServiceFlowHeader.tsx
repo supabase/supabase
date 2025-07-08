@@ -76,7 +76,6 @@ export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHead
     table.resetRowSelection()
   }, [table])
 
-  // Keyboard navigation - THIS WAS MISSING!
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (!selectedRowKey) return

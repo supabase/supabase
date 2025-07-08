@@ -49,20 +49,18 @@ const CollapsibleSection = ({
             </div>
           </Button>
         </CollapsibleTrigger>
-        <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-          <div className="mt-1">
-            {fields.map((field) => (
-              <BlockField
-                key={field.id}
-                config={field}
-                data={data}
-                enrichedData={enrichedData}
-                isLoading={isLoading}
-                filterFields={filterFields}
-                table={table}
-              />
-            ))}
-          </div>
+        <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down pt-1">
+          {fields.map((field) => (
+            <BlockField
+              key={field.id}
+              config={field}
+              data={data}
+              enrichedData={enrichedData}
+              isLoading={isLoading}
+              filterFields={filterFields}
+              table={table}
+            />
+          ))}
         </CollapsibleContent>
       </Collapsible>
     </div>
