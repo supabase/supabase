@@ -67,6 +67,7 @@ export const StorageReport: NextPageWithLayout = () => {
               selectedProduct="storage"
               datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
               className="w-full"
+              showDatabaseSelector={false}
             />
             <div className="h-px w-full">
               <ShimmerLine active={report.isLoading} />
