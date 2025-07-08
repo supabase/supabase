@@ -32,8 +32,6 @@ export const filterFields = [
           <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
             {props.label.replace('_', ' ')}
           </span>
-          {/* [Joshen] Temporarily hiding, this feels excessive */}
-          {/* <span className="text-xs text-muted-foreground/70">{props.value}</span> */}
         </div>
       )
     },
