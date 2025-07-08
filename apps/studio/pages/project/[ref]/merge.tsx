@@ -290,7 +290,6 @@ const MergePage: NextPageWithLayout = () => {
         mainBranch={mainBranch}
         parentProjectRef={parentProjectRef}
         diffContent={diffContent}
-        edgeFunctionsDiff={edgeFunctionsDiff}
         disabled={!currentBranch || !mainBranch}
       />
       {isMergeDisabled ? (

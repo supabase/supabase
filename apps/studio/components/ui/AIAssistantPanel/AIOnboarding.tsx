@@ -3,11 +3,11 @@ import { FileText } from 'lucide-react'
 import { useRef } from 'react'
 
 import { Button, cn } from 'ui'
-import { AssistantChatForm } from './AssistantChatForm'
+import { AssistantChatForm, type SqlSnippet } from './AssistantChatForm'
 
 interface AIOnboardingProps {
   onMessageSend: (message: string) => void
-  sqlSnippets?: string[]
+  sqlSnippets?: SqlSnippet[]
   onRemoveSnippet?: (index: number) => void
   suggestions?: {
     title?: string

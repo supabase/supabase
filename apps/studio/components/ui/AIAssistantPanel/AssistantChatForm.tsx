@@ -7,6 +7,22 @@ import { Button, CodeBlock, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 import { HoverCard_Shadcn_, HoverCardTrigger_Shadcn_, HoverCardContent_Shadcn_ } from 'ui'
 
+export type SqlSnippet = string | { label: string; content: string }
+
+const getSnippetLabel = (snippet: SqlSnippet, index: number): string => {
+  if (typeof snippet === 'string') {
+    return `Snippet ${index + 1}`
+  }
+  return snippet.label
+}
+
+const getSnippetContent = (snippet: SqlSnippet): string => {
+  if (typeof snippet === 'string') {
+    return snippet
+  }
+  return snippet.content
+}
+
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
   textAreaRef?: React.RefObject<HTMLTextAreaElement>
@@ -28,8 +44,8 @@ export interface FormProps {
   onSubmit: (message: string) => void
   /* The placeholder of the textarea */
   placeholder?: string
-  /* SQL snippets to display above the form */
-  sqlSnippets?: string[]
+  /* SQL snippets to display above the form - can be strings or objects with label and content */
+  sqlSnippets?: SqlSnippet[]
   /* Function to handle removing a SQL snippet */
   onRemoveSnippet?: (index: number) => void
   /* Additional class name for the snippets container */
@@ -67,7 +83,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
         const sqlSnippetsString = sqlSnippets
-          .map((snippet: string) => '```sql\n' + snippet + '\n```')
+          .map((snippet: SqlSnippet) => '```sql\n' + getSnippetContent(snippet) + '\n```')
           .join('\n')
         finalMessage = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
       }
@@ -103,7 +119,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
                       tabIndex={0}
                       className="border inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
                     >
-                      Snippet {idx + 1}
+                      {getSnippetLabel(snippet, idx)}
                       {onRemoveSnippet && (
                         <Button
                           size="tiny"
@@ -113,7 +129,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
                             e.stopPropagation()
                             onRemoveSnippet(idx)
                           }}
-                          aria-label={`Remove snippet ${idx + 1}`}
+                          aria-label={`Remove ${getSnippetLabel(snippet, idx)}`}
                           icon={<X strokeWidth={1.5} className="!h-3 !w-3" />}
                         ></Button>
                       )}
@@ -125,7 +141,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
                       className="text-xs font-mono whitespace-pre-wrap break-words p-2 border-0"
                       language="sql"
                     >
-                      {snippet}
+                      {getSnippetContent(snippet)}
                     </CodeBlock>
                   </HoverCardContent_Shadcn_>
                 </HoverCard_Shadcn_>

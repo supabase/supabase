@@ -13,13 +13,6 @@ interface ReviewWithAIProps {
   mainBranch?: Branch
   parentProjectRef?: string
   diffContent?: string
-  edgeFunctionsDiff?: {
-    hasChanges: boolean
-    addedSlugs: string[]
-    removedSlugs: string[]
-    modifiedSlugs: string[]
-  }
-  className?: string
   disabled?: boolean
 }
 
@@ -28,8 +21,6 @@ export const ReviewWithAI = ({
   mainBranch,
   parentProjectRef,
   diffContent,
-  edgeFunctionsDiff,
-  className,
   disabled = false,
 }: ReviewWithAIProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
@@ -58,41 +49,19 @@ export const ReviewWithAI = ({
     if (productionTables && productionTables.length > 0) {
       const productionSQL = tablesToSQL(productionTables)
       if (productionSQL.trim()) {
-        sqlSnippets.push(productionSQL)
+        sqlSnippets.push({
+          label: 'Production Schema',
+          content: productionSQL,
+        })
       }
     }
 
     // Add database diff content if available
     if (diffContent && diffContent.trim()) {
-      sqlSnippets.push('-- DATABASE CHANGES:\n' + diffContent)
-    }
-
-    // Add edge functions diff if available
-    if (edgeFunctionsDiff && edgeFunctionsDiff.hasChanges) {
-      const functionDiffs = []
-
-      // Add added functions
-      if (edgeFunctionsDiff.addedSlugs.length > 0) {
-        functionDiffs.push(`-- Added Edge Functions:\n${edgeFunctionsDiff.addedSlugs.join(', ')}`)
-      }
-
-      // Add removed functions
-      if (edgeFunctionsDiff.removedSlugs.length > 0) {
-        functionDiffs.push(
-          `-- Removed Edge Functions:\n${edgeFunctionsDiff.removedSlugs.join(', ')}`
-        )
-      }
-
-      // Add modified functions
-      if (edgeFunctionsDiff.modifiedSlugs.length > 0) {
-        functionDiffs.push(
-          `-- Modified Edge Functions:\n${edgeFunctionsDiff.modifiedSlugs.join(', ')}`
-        )
-      }
-
-      if (functionDiffs.length > 0) {
-        sqlSnippets.push(functionDiffs.join('\n\n'))
-      }
+      sqlSnippets.push({
+        label: 'Database Changes',
+        content: '-- DATABASE CHANGES:\n' + diffContent,
+      })
     }
 
     aiSnap.newChat({
@@ -101,19 +70,18 @@ export const ReviewWithAI = ({
       sqlSnippets: sqlSnippets.length > 0 ? sqlSnippets : undefined,
       initialInput: `Please review this merge request from branch "${currentBranch.name}" into "${mainBranch.name || 'main'}". 
 
-I've included the current production schema as context, along with the proposed changes.
+I've included the current production schema as context, along with the proposed database changes.
 
 Analyze the changes and provide feedback on:
 - Database schema changes and potential impacts on the production schema
 - Migration safety and rollback considerations
-- Edge function modifications if any
 - Overall code quality and best practices
 - Potential breaking changes or compatibility issues
 - Data integrity and constraint implications
 
 Please be concise with your response.`,
       suggestions: {
-        title: `I can help you review the merge from "${currentBranch.name}" to "${mainBranch.name}", here are some specific areas I can focus on:`,
+        title: `I can help you review the database schema changes from "${currentBranch.name}" to "${mainBranch.name}", here are some specific areas I can focus on:`,
         prompts: [
           {
             label: 'Schema Impact',

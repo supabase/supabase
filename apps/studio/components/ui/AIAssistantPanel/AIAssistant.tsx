@@ -29,10 +29,18 @@ import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOnboarding } from './AIOnboarding'
 import { AIOptInModal } from './AIOptInModal'
-import { AssistantChatForm } from './AssistantChatForm'
+import { AssistantChatForm, type SqlSnippet } from './AssistantChatForm'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
 import type { AssistantMessageType } from 'state/ai-assistant-state'
+
+// Helper function to get content from snippet
+const getSnippetContent = (snippet: SqlSnippet): string => {
+  if (typeof snippet === 'string') {
+    return snippet
+  }
+  return snippet.content
+}
 
 const MemoizedMessage = memo(
   ({
@@ -303,7 +311,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   useEffect(() => {
     if (snap.open && isInSQLEditor && !!snippetContent) {
-      snap.setSqlSnippets([snippetContent])
+      snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
@@ -470,7 +478,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               onMessageSend={sendMessageToAssistant}
               value={value}
               onValueChange={setValue}
-              sqlSnippets={snap.sqlSnippets as string[] | undefined}
+              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
               onRemoveSnippet={(index) => {
                 const newSnippets = [...(snap.sqlSnippets ?? [])]
                 newSnippets.splice(index, 1)
@@ -568,7 +576,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                 sendMessageToAssistant(finalMessage)
                 scrollToEnd()
               }}
-              sqlSnippets={snap.sqlSnippets as string[] | undefined}
+              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
               onRemoveSnippet={(index) => {
                 const newSnippets = [...(snap.sqlSnippets ?? [])]
                 newSnippets.splice(index, 1)
