@@ -85,3 +85,23 @@ export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
       return ''
   }
 }
+
+/**
+ * Formats service type strings for display purposes
+ * Handles special cases like "edge function" -> "Edge Function"
+ * and applies proper capitalization to other service types
+ */
+export function formatServiceTypeForDisplay(serviceType: string): string {
+  if (!serviceType) return ''
+
+  // Handle special cases
+  const specialCases: Record<string, string> = {
+    'edge function': 'Edge Function',
+    postgrest: 'PostgREST',
+    postgres: 'Postgres',
+    auth: 'Auth',
+    storage: 'Storage',
+  }
+
+  return specialCases[serviceType.toLowerCase()] || serviceType
+}
