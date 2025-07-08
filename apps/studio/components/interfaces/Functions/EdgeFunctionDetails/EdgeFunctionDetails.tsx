@@ -173,9 +173,18 @@ export const EdgeFunctionDetails = () => {
                     name="verify_jwt"
                     render={({ field }) => (
                       <FormItemLayout
-                        label="Enforce JWT Verification"
+                        label="Verify JWT with legacy secret"
                         layout="flex-row-reverse"
-                        description="Require a valid JWT in the authorization header when invoking the function"
+                        description={
+                          <>
+                            Requires that a JWT signed{' '}
+                            <em className="text-brand not-italic">only by the legacy JWT secret</em>{' '}
+                            is present in the <code>Authorization</code> header. The easy to obtain{' '}
+                            <code>anon</code> key can be used to satisfy this requirement.
+                            Recommendation: OFF with JWT and additional authorization logic
+                            implemented inside your function's code.
+                          </>
+                        }
                       >
                         <FormControl_Shadcn_>
                           <Switch
