@@ -216,8 +216,9 @@ const LW15LandingPage = () => {
               data-animate-duration={800}
               className="text-3xl lg:text-4xl opacity-0 tracking-[-0.25px]"
             >
-              Discover fresh tools, <br />
-              unlock new possibilities.
+              Five days of launches
+              <br /> to supercharge
+              <br /> your app development.
             </h2>
             <div className="opacity-0 animate-cta">
               {user.id ? (

@@ -55,26 +55,6 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
           </p>
           <div className="col-span-full xl:col-span-3 xl:col-start-4 flex flex-col gap-4">
             <div className="w-full grid grid-cols-3">
-              <p>Typo color</p>
-              <div className="flex flex-col col-span-2">
-                <div className="flex gap-2 flex-wrap justify-end">
-                  {TYPO_COLORS.map((color) => (
-                    <button
-                      key={color}
-                      className={cn(
-                        'flex-1 max-w-5 aspect-square rounded-full border flex items-center justify-center transition-all',
-                        selectedFg === color && 'border-background ring-1 ring-foreground scale-110'
-                      )}
-                      style={{ background: color }}
-                      aria-label={color}
-                      onClick={() => handleColorChange('foreground', color)}
-                      disabled={state.saving}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="w-full grid grid-cols-3">
               <p>Bg color</p>
               <div className="flex flex-col col-span-2">
                 <div className="flex gap-2 flex-wrap justify-end">
