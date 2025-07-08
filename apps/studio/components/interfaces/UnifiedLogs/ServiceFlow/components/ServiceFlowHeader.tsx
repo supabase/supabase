@@ -53,25 +53,29 @@ export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHead
   }, [selectedRowKey, isLoading, table])
 
   const index = table.getCoreRowModel().flatRows.findIndex((row) => row.id === selectedRowData?.id)
-
+  // Get the ID of the next row in the table for navigation
   const nextId = useMemo(
     () => table.getCoreRowModel().flatRows[index + 1]?.id,
     [index, isLoading, table]
   )
 
+  // Get the ID of the previous row in the table for navigation
   const prevId = useMemo(
     () => table.getCoreRowModel().flatRows[index - 1]?.id,
     [index, isLoading, table]
   )
 
+  // Navigate to the previous row when called
   const onPrev = useCallback(() => {
     if (prevId) table.setRowSelection({ [prevId]: true })
   }, [prevId, table])
 
+  // Navigate to the next row when called
   const onNext = useCallback(() => {
     if (nextId) table.setRowSelection({ [nextId]: true })
   }, [nextId, table])
 
+  // Close the current row selection
   const onClose = useCallback(() => {
     table.resetRowSelection()
   }, [table])
