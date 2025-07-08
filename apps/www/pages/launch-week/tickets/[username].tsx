@@ -61,7 +61,7 @@ const Lw15Page = ({ user, ogImageUrl }: Props) => {
             }}
             className="h-full"
           >
-            <LW15TicketPage user={user} />
+            <LW15TicketPage user={user} isSharePage />
           </div>
         </DefaultLayout>
       </Lw15ConfDataProvider>

@@ -218,7 +218,7 @@ const LW15LandingPage = () => {
             >
               Five days of launches
               <br /> to supercharge
-              <br /> your app development.
+              <br /> your development.
             </h2>
             <div className="opacity-0 animate-cta">
               {user.id ? (

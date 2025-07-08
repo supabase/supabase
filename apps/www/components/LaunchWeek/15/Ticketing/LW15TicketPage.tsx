@@ -11,12 +11,19 @@ import TicketURLCopy from './TicketURLCopy'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 import { updateTicketColors } from '../hooks/use-registration'
 
-const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
+const LW15TicketPage = ({
+  user: userFromProps,
+  isSharePage,
+}: {
+  user?: UserTicketData
+  isSharePage?: boolean
+}) => {
   const register = useRegistration()
   const [state, setState] = useState({ saving: false })
-  const [confState] = useLw15ConfData()
-  const isGuest = !confState.sessionLoaded || !confState.session
-  const user = isGuest ? userFromProps : confState.userTicketData
+  const [confState, loading] = useLw15ConfData()
+  const user = isSharePage ? userFromProps : confState.userTicketData
+  const isLoggedTicketOwner = user?.username === confState.userTicketData?.username
+  const showGuestLayout = !confState.sessionLoaded || !confState.session || !isLoggedTicketOwner
 
   const selectedFg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const selectedBg = user?.metadata?.colors?.background || BG_COLORS[0]
@@ -44,16 +51,36 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
     <div
       className={cn(
         'flex flex-col gap-12 pt-4 w-full border-t',
-        isGuest && 'border-t-0 lg:border-t pt-0 lg:pt-4',
+        showGuestLayout && 'border-t-0 lg:border-t pt-0 lg:pt-4',
         className
       )}
     >
-      {!isGuest && (
+      {!showGuestLayout && (
         <div className="grid grid-cols-6 w-full gap-4">
           <p className="col-span-full xl:col-span-3 lg:text-xs xl:max-w-[230px]">
             Customize your ticket
           </p>
           <div className="col-span-full xl:col-span-3 xl:col-start-4 flex flex-col gap-4">
+            <div className="w-full grid grid-cols-3">
+              <p>Typo color</p>
+              <div className="flex flex-col col-span-2">
+                <div className="flex gap-2 flex-wrap justify-end">
+                  {TYPO_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      className={cn(
+                        'flex-1 max-w-5 aspect-square rounded-full border flex items-center justify-center transition-all',
+                        selectedFg === color && 'border-background ring-1 ring-foreground scale-110'
+                      )}
+                      style={{ background: color }}
+                      aria-label={color}
+                      onClick={() => handleColorChange('foreground', color)}
+                      disabled={state.saving}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
             <div className="w-full grid grid-cols-3">
               <p>Bg color</p>
               <div className="flex flex-col col-span-2">
@@ -99,7 +126,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
             <FifteenSVG className="h-full w-auto" />
           </div>
           <div className="col-span-5 text-2xl lg:text-4xl">
-            {isGuest ? (
+            {showGuestLayout ? (
               <>
                 {user?.name?.split(' ')[0]}'s Ticket
                 <br />
@@ -113,7 +140,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
               </>
             )}
           </div>
-          {isGuest && (
+          {!isLoggedTicketOwner && showGuestLayout && (
             <div className="col-span-full">
               <Button
                 className="h-auto py-1 px-2 min-w-[125px] min-h-[28px]"
@@ -136,7 +163,7 @@ const LW15TicketPage = ({ user: userFromProps }: { user?: UserTicketData }) => {
           <LW15Ticket user={user} />
           <div className="flex flex-col gap-1">
             <TicketURLCopy />
-            {!isGuest && <LW15TicketShare />}
+            {!showGuestLayout && <LW15TicketShare />}
           </div>
         </div>
       </div>
