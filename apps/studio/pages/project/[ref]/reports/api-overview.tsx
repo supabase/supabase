@@ -45,7 +45,7 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="API Gateway" />
+      <ReportHeader title="API Gateway" showDatabaseSelector={false} />
       <div className="w-full flex flex-col gap-1">
         <ReportFilterBar
           onRemoveFilters={removeFilters}
@@ -57,6 +57,7 @@ export const ApiReport: NextPageWithLayout = () => {
           isLoading={isLoading}
           filters={filters}
           datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
+          showDatabaseSelector={false}
         />
         <div className="h-2 w-full">
           <ShimmerLine active={isLoading} />
