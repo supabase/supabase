@@ -14,10 +14,10 @@ export function DataTableResetButton() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            type="text"
-            size="small"
+            type="default"
+            size="tiny"
             onClick={() => table.resetColumnFilters()}
-            icon={<X className="h-4 w-4" />}
+            icon={<X />}
           >
             Reset
           </Button>

@@ -21,6 +21,41 @@ export const filterFields = [
     commandDisabled: true,
   },
   {
+    label: 'Log Type',
+    value: 'log_type',
+    type: 'checkbox',
+    defaultOpen: true,
+    options: LOG_TYPES.map((type) => ({ label: type, value: type })),
+    component: (props: Option) => {
+      return (
+        <div className="flex w-full items-center justify-between gap-2 font-mono">
+          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
+            {props.label.replace('_', ' ')}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    label: 'Status',
+    value: 'status',
+    type: 'checkbox',
+    defaultOpen: true,
+    options: [
+      { label: '2xx', value: 200 },
+      { label: '4xx', value: 400 },
+      { label: '4xx', value: 500 },
+    ], // REMINDER: this is a placeholder to set the type in the client.tsx
+    component: (props: Option) => {
+      if (typeof props.value === 'boolean') return null
+      if (typeof props.value === 'undefined') return null
+      if (typeof props.value === 'string') return null
+      return (
+        <span className={cn('font-mono', getStatusColor(props.value).text)}>{props.value}</span>
+      )
+    },
+  },
+  {
     label: 'Level',
     value: 'level',
     type: 'checkbox',
@@ -43,21 +78,13 @@ export const filterFields = [
     },
   },
   {
-    label: 'Log Type',
-    value: 'log_type',
+    label: 'Method',
+    value: 'method',
     type: 'checkbox',
     defaultOpen: true,
-    options: LOG_TYPES.map((type) => ({ label: type, value: type })),
+    options: METHODS.map((region) => ({ label: region, value: region })),
     component: (props: Option) => {
-      return (
-        <div className="flex w-full items-center justify-between gap-2 font-mono">
-          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
-            {props.label.replace('_', ' ')}
-          </span>
-          {/* [Joshen] Temporarily hiding, this feels excessive */}
-          {/* <span className="text-xs text-muted-foreground/70">{props.value}</span> */}
-        </div>
-      )
+      return <span className="font-mono">{props.value}</span>
     },
   },
   {
@@ -74,34 +101,6 @@ export const filterFields = [
     label: 'Auth User',
     value: 'auth_user',
     type: 'input',
-  },
-  {
-    label: 'Status Code',
-    value: 'status',
-    type: 'checkbox',
-    options: [
-      { label: '200', value: 200 },
-      { label: '400', value: 400 },
-      { label: '404', value: 404 },
-      { label: '500', value: 500 },
-    ], // REMINDER: this is a placeholder to set the type in the client.tsx
-    component: (props: Option) => {
-      if (typeof props.value === 'boolean') return null
-      if (typeof props.value === 'undefined') return null
-      if (typeof props.value === 'string') return null
-      return (
-        <span className={cn('font-mono', getStatusColor(props.value).text)}>{props.value}</span>
-      )
-    },
-  },
-  {
-    label: 'Method',
-    value: 'method',
-    type: 'checkbox',
-    options: METHODS.map((region) => ({ label: region, value: region })),
-    component: (props: Option) => {
-      return <span className="font-mono">{props.value}</span>
-    },
   },
 ] satisfies DataTableFilterField<ColumnSchema>[]
 
@@ -149,26 +148,6 @@ export const sheetFields = [
       </div>
     ),
     skeletonClassName: 'w-56',
-  },
-  {
-    id: 'status',
-    label: 'Status',
-    type: 'checkbox',
-    component: (props) => {
-      return (
-        <span className={cn('font-mono', getStatusColor(props.status).text)}>{props.status}</span>
-      )
-    },
-    skeletonClassName: 'w-12',
-  },
-  {
-    id: 'method',
-    label: 'Method',
-    type: 'checkbox',
-    component: (props) => {
-      return <span className="font-mono">{props.method}</span>
-    },
-    skeletonClassName: 'w-10',
   },
   {
     id: 'host',
