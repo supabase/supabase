@@ -22,8 +22,9 @@ export async function getUnifiedLogsChart(
   let endTime: Date
 
   if (search.date && search.date.length === 2) {
-    startTime = new Date(search.date[0])
-    endTime = new Date(search.date[1])
+    const parseDate = (d: string | Date) => (d instanceof Date ? d : new Date(d))
+    startTime = parseDate(search.date[0])
+    endTime = parseDate(search.date[1])
     dateStart = startTime.toISOString()
     dateEnd = endTime.toISOString()
   } else {

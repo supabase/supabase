@@ -30,8 +30,9 @@ export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
   let isoTimestampEnd: string
 
   if (search.date && search.date.length === 2) {
-    isoTimestampStart = new Date(search.date[0]).toISOString()
-    isoTimestampEnd = new Date(search.date[1]).toISOString()
+    const parseDate = (d: string | Date) => (d instanceof Date ? d : new Date(d))
+    isoTimestampStart = parseDate(search.date[0]).toISOString()
+    isoTimestampEnd = parseDate(search.date[1]).toISOString()
   } else {
     const now = new Date()
     isoTimestampEnd = now.toISOString()

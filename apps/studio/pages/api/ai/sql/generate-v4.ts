@@ -15,6 +15,7 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getUnifiedLogsChart } from 'data/logs/unified-logs-chart-query'
 import { getUnifiedLogs } from 'data/logs/unified-logs-infinite-query'
+import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
 import {
   filterToolsByOptInLevel,
@@ -164,15 +165,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           'Get log counts aggregated by time buckets to understand system health and activity levels. Returns success, warning, and error counts over time. Can filter by log types (edge, auth, postgres, etc.) and levels.',
         parameters: z.object({
           dateStart: z
-            .union([z.string(), z.number()])
+            .string()
             .optional()
-            .describe(
-              'Start date as ISO string or Unix timestamp in milliseconds (defaults to 1 hour ago)'
-            ),
-          dateEnd: z
-            .union([z.string(), z.number()])
-            .optional()
-            .describe('End date as ISO string or Unix timestamp in milliseconds (defaults to now)'),
+            .describe('Start date as ISO string (defaults to 1 hour ago)'),
+          dateEnd: z.string().optional().describe('End date as ISO string (defaults to now)'),
           level: z
             .array(z.enum(['success', 'warning', 'error']))
             .optional()
@@ -196,16 +192,33 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         }),
         execute: async (args) => {
           try {
-            let dateArray: [any, any] | undefined = undefined
+            let dateArray: Date[] | null = null
             if (args.dateStart && args.dateEnd) {
-              dateArray = [args.dateStart, args.dateEnd]
+              dateArray = [new Date(args.dateStart), new Date(args.dateEnd)]
             }
 
-            const search = {
+            const search: QuerySearchParamsType = {
               date: dateArray,
-              level: args.level,
-              log_type: args.log_type,
-            } as any
+              level: args.level || null,
+              log_type: args.log_type || null,
+              latency: null,
+              'timing.dns': null,
+              'timing.connection': null,
+              'timing.tls': null,
+              'timing.ttfb': null,
+              'timing.transfer': null,
+              status: null,
+              regions: null,
+              method: null,
+              host: null,
+              pathname: null,
+              sort: null,
+              size: 40,
+              start: 0,
+              direction: 'next',
+              cursor: new Date(),
+              id: null,
+            }
 
             let headers = new Headers()
             if (authorization) headers.set('Authorization', authorization)
@@ -239,15 +252,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           'Get detailed log entries for analysis and debugging. Use this after get_log_counts to examine specific logs during time periods with errors or unusual activity.',
         parameters: z.object({
           dateStart: z
-            .union([z.string(), z.number()])
+            .string()
             .optional()
-            .describe(
-              'Start date as ISO string or Unix timestamp in milliseconds (defaults to 1 hour ago)'
-            ),
-          dateEnd: z
-            .union([z.string(), z.number()])
-            .optional()
-            .describe('End date as ISO string or Unix timestamp in milliseconds (defaults to now)'),
+            .describe('Start date as ISO string (defaults to 1 hour ago)'),
+          dateEnd: z.string().optional().describe('End date as ISO string (defaults to now)'),
           level: z
             .array(z.enum(['success', 'warning', 'error']))
             .optional()
@@ -277,16 +285,33 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         }),
         execute: async (args) => {
           try {
-            let dateArray: [any, any] | undefined = undefined
+            let dateArray: Date[] | null = null
             if (args.dateStart && args.dateEnd) {
-              dateArray = [args.dateStart, args.dateEnd]
+              dateArray = [new Date(args.dateStart), new Date(args.dateEnd)]
             }
 
-            const search = {
+            const search: QuerySearchParamsType = {
               date: dateArray,
-              level: args.level,
-              log_type: args.log_type,
-            } as any
+              level: args.level || null,
+              log_type: args.log_type || null,
+              latency: null,
+              'timing.dns': null,
+              'timing.connection': null,
+              'timing.tls': null,
+              'timing.ttfb': null,
+              'timing.transfer': null,
+              status: null,
+              regions: null,
+              method: null,
+              host: null,
+              pathname: null,
+              sort: null,
+              size: 40,
+              start: 0,
+              direction: 'next',
+              cursor: new Date(),
+              id: null,
+            }
 
             let headers = new Headers()
             if (authorization) headers.set('Authorization', authorization)
@@ -295,13 +320,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
               {
                 projectRef,
                 search,
-                pageParam: null as any, // No cursor for initial fetch within date range
+                pageParam: { cursor: 0, direction: 'next' },
               },
               undefined,
               headers
             )
 
-            const logs = logsData.data.slice(0, args.limit || 20)
+            const logs = logsData.data.slice(0, args.limit)
 
             return {
               status: 'success',
@@ -580,7 +605,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     result.pipeDataStreamToResponse(res, {
       getErrorMessage: (error) => {
         if (error == null) {
-          return 'Untitled error'
+          return 'unknown error'
         }
 
         if (typeof error === 'string') {
