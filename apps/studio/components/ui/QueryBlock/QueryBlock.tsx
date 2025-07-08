@@ -258,7 +258,7 @@ export const QueryBlock = ({
             type="text"
             size="tiny"
             className="w-7 h-7"
-            icon={<Code size={14} />}
+            icon={<Code size={14} strokeWidth={1.5} />}
             onClick={() => setShowSql(!showSql)}
             tooltip={{
               content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
@@ -302,7 +302,7 @@ export const QueryBlock = ({
               type="text"
               size="tiny"
               className="w-7 h-7"
-              icon={<Play size={14} />}
+              icon={<Play size={14} strokeWidth={1.5} />}
               loading={isExecuting || isLoading}
               disabled={isLoading}
               onClick={() => {

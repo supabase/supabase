@@ -128,9 +128,18 @@ const PolicyRow = ({
                     suggestions: {
                       title: `I can help you make a change to the policy "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
                       prompts: [
-                        'Tell me how I can improve this policy...',
-                        'Duplicate this policy for another table...',
-                        'Add extra conditions to this policy...',
+                        {
+                          label: 'Improve Policy',
+                          description: 'Tell me how I can improve this policy...',
+                        },
+                        {
+                          label: 'Duplicate Policy',
+                          description: 'Duplicate this policy for another table...',
+                        },
+                        {
+                          label: 'Add Conditions',
+                          description: 'Add extra conditions to this policy...',
+                        },
                       ],
                     },
                   })
