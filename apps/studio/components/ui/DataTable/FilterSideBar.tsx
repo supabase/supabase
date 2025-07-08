@@ -1,4 +1,4 @@
-import { cn } from 'ui'
+import { cn, ResizablePanel } from 'ui'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
@@ -7,9 +7,14 @@ export function FilterSideBar() {
   const { table } = useDataTable()
 
   return (
-    <div
+    <ResizablePanel
+      order={1}
+      maxSize={33}
+      defaultSize={1}
+      id="panel-left"
       className={cn(
-        'flex flex-col w-72',
+        'flex flex-col w-full',
+        'min-w-64 max-w-[32rem]',
         'group-data-[expanded=false]/controls:hidden',
         'hidden sm:flex'
       )}
@@ -23,6 +28,6 @@ export function FilterSideBar() {
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls />
       </div>
-    </div>
+    </ResizablePanel>
   )
 }

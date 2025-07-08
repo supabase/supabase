@@ -14,7 +14,7 @@ const BlockField = ({
   table,
 }: BlockFieldProps) => {
   const value = config.getValue(data, enrichedData)
-  const displayValue = value ?? 'N/A'
+  const displayValue = value ?? 'No value'
   const stringValue = String(displayValue)
 
   const shouldShowSkeleton = config.requiresEnrichedData && isLoading && !value
@@ -34,7 +34,7 @@ const BlockField = ({
       <dt className="text-[13.5px] text-foreground-light">{config.label}</dt>
       <dd className="text-right">
         {shouldShowSkeleton ? (
-          <Skeleton className={cn('h-4 w-24', config.skeletonClassName)} />
+          <Skeleton className="h-4 w-24" />
         ) : isStatusField && displayValue !== 'N/A' ? (
           <DataTableColumnStatusCode
             value={displayValue}

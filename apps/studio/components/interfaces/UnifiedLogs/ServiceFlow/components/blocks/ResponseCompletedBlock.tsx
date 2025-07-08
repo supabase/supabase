@@ -12,17 +12,17 @@ interface ResponseCompletedBlockProps {
 // Response (final step) - Shows completion details for HTTP or database operations
 export const ResponseCompletedBlock = memo(
   ({ data, enrichedData }: ResponseCompletedBlockProps) => {
-    // Check if this is a postgres log (no HTTP status but has event_message)
-    const isPostgresLog = !data?.status && (enrichedData?.event_message || data?.event_message)
+    // Check if this is a postgres log
+    const isPostgresLog = (enrichedData?.log_type || data?.log_type) === 'postgres'
 
     // HTTP response handling
     const hasError = data?.status && Number(data.status) >= 400
-    const responseTime = data?.response_time_ms || data?.duration_ms
+    const responseTime = enrichedData?.response_time_ms || enrichedData?.duration_ms
     const status = Number(data?.status)
 
     // Postgres operation handling
-    const eventMessage = enrichedData?.event_message || data?.event_message
-    const severity = enrichedData?.error_severity || data?.error_severity
+    const eventMessage = enrichedData?.event_message || (data as any)?.event_message
+    const severity = enrichedData?.error_severity
     const hasPostgresError = severity && ['error', 'fatal'].includes(severity.toLowerCase())
 
     return (

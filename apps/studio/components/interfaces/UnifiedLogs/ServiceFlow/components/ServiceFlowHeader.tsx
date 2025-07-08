@@ -5,15 +5,8 @@ import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColu
 import { LogTypeIcon } from '../../components/LogTypeIcon'
 import { getStatusLevel } from '../../UnifiedLogs.utils'
 import { TruncatedTextWithPopover } from './shared/TruncatedTextWithPopover'
-import {
-  Badge,
-  Button,
-  Separator,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, Button, Separator } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
 import { ColumnSchema } from '../../UnifiedLogs.schema'
 
@@ -25,13 +18,13 @@ interface ServiceFlowHeaderProps {
 export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHeaderProps) => {
   const { table, rowSelection, isLoading } = useDataTable()
 
-  const method = enrichedData?.method || selectedRow?.method
-  const logType = enrichedData?.log_type || selectedRow?.log_type
-  const status = enrichedData?.status || selectedRow?.status
+  const method = selectedRow?.method
+  const logType = selectedRow?.log_type
+  const status = selectedRow?.status
 
   // Display logic: path → event_message → grayed out "/"
   const displayPath = useMemo(() => {
-    const actualPath = enrichedData?.request_path || selectedRow?.pathname || selectedRow?.path
+    const actualPath = enrichedData?.request_path || selectedRow?.pathname
     if (actualPath && actualPath !== '/') {
       return { text: actualPath, isDefault: false, isTruncatable: false }
     }
@@ -53,30 +46,33 @@ export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHead
   }, [selectedRowKey, isLoading, table])
 
   const index = table.getCoreRowModel().flatRows.findIndex((row) => row.id === selectedRowData?.id)
-
+  // Get the ID of the next row in the table for navigation
   const nextId = useMemo(
     () => table.getCoreRowModel().flatRows[index + 1]?.id,
     [index, isLoading, table]
   )
 
+  // Get the ID of the previous row in the table for navigation
   const prevId = useMemo(
     () => table.getCoreRowModel().flatRows[index - 1]?.id,
     [index, isLoading, table]
   )
 
+  // Navigate to the previous row when called
   const onPrev = useCallback(() => {
     if (prevId) table.setRowSelection({ [prevId]: true })
   }, [prevId, table])
 
+  // Navigate to the next row when called
   const onNext = useCallback(() => {
     if (nextId) table.setRowSelection({ [nextId]: true })
   }, [nextId, table])
 
+  // Close the current row selection
   const onClose = useCallback(() => {
     table.resetRowSelection()
   }, [table])
 
-  // Keyboard navigation - THIS WAS MISSING!
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (!selectedRowKey) return
@@ -133,44 +129,40 @@ export const ServiceFlowHeader = ({ selectedRow, enrichedData }: ServiceFlowHead
             className="text-xs"
           />
         )}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="text"
-                disabled={!prevId}
-                onClick={onPrev}
-                className="px-1"
-                icon={<ChevronUp />}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                Navigate <Kbd>↑</Kbd>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="text"
-                disabled={!nextId}
-                onClick={onNext}
-                className="px-1"
-                icon={<ChevronDown />}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                Navigate <Kbd>↓</Kbd>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <ButtonTooltip
+          size="tiny"
+          type="text"
+          disabled={!prevId}
+          onClick={onPrev}
+          className="px-1"
+          icon={<ChevronUp />}
+          tooltip={{
+            content: {
+              text: (
+                <p>
+                  Navigate <Kbd>↑</Kbd>
+                </p>
+              ),
+            },
+          }}
+        />
+        <ButtonTooltip
+          size="tiny"
+          type="text"
+          disabled={!nextId}
+          onClick={onNext}
+          className="px-1"
+          icon={<ChevronDown />}
+          tooltip={{
+            content: {
+              text: (
+                <p>
+                  Navigate <Kbd>↓</Kbd>
+                </p>
+              ),
+            },
+          }}
+        />
         <Separator orientation="vertical" className="mx-1" />
 
         <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />

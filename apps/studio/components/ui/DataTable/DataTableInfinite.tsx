@@ -127,7 +127,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           <Fragment>
             {renderLiveRow?.()}
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-[60vh] text-center">
+              <TableCell colSpan={columns.length} className="h-[32vh] text-center">
                 <div className="flex flex-col items-center justify-center h-full gap-3">
                   {isLoading ? (
                     <>

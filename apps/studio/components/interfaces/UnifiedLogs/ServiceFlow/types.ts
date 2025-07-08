@@ -25,7 +25,6 @@ export interface BlockFieldConfig {
   id: string // Unique identifier for the field
   label: string // Display label for the field
   getValue: (data: any, enrichedData?: any) => string | number | null | undefined // Function to extract value
-  skeletonClassName?: string // Custom skeleton styling while loading
   requiresEnrichedData?: boolean // Whether field needs enriched data to display
   maxLength?: number // Maximum length for truncation
 }
