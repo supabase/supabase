@@ -13,7 +13,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
-  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged',
+  TERMS_OF_SERVICE_ACKNOWLEDGED: 'terms-of-service-acknowledged',
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
