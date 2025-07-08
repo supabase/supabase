@@ -69,7 +69,10 @@ const LW15Ticket = ({
             style={{ background: fg }}
           />
         </div>
-        <div className="relative z-10 flex flex-col p-4 gap-4 w-full h-full bg-background/30">
+        <div
+          className="relative z-10 flex flex-col p-4 gap-4 w-full h-full"
+          style={{ backgroundColor: `${bg}30` }}
+        >
           <div>Launch Week</div>
           <div className="w-full h-[50px] flex items-center justify-between">
             <LWSVG className="h-full w-auto" />
