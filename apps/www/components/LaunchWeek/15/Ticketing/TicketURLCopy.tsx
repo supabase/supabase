@@ -1,14 +1,18 @@
 import { useState, useRef } from 'react'
-import { LW14_URL } from '~/lib/constants'
+import { LW14_URL } from 'lib/constants'
 import { Check, Copy } from 'lucide-react'
-import useConfData from '../hooks/use-conf-data'
+import { UserTicketData } from '../hooks/use-conf-data'
 import { cn } from 'ui'
 
-export default function TicketURLCopy({ className }: { className?: string }) {
-  const [state] = useConfData()
-  const userData = state.userTicketData
-  const { username } = userData
+export default function TicketURLCopy({
+  user,
+  className,
+}: {
+  user?: UserTicketData
+  className?: string
+}) {
   const [copied, setCopied] = useState(false)
+  const username = user?.username
   const buttonRef = useRef<HTMLButtonElement>(null)
   const displayUrl = `.../launch-week/tickets/${username}`
   const link = `${LW14_URL}/tickets/${username}`

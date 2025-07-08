@@ -110,7 +110,7 @@ const LW15Ticket = ({
               <p>Meetups</p>
             </div>
             <div className="col-span-2 flex flex-col">
-              <p>Supabase Meetups happening in +60 countries.</p>
+              <p>Supabase Meetups happening in +80 cities</p>
             </div>
           </div>
         </div>

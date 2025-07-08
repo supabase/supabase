@@ -20,10 +20,8 @@ const LW15TicketPage = ({
 }) => {
   const register = useRegistration()
   const [state, setState] = useState({ saving: false })
-  const [confState, loading] = useLw15ConfData()
+  const [confState] = useLw15ConfData()
   const user = isSharePage ? userFromProps : confState.userTicketData
-  const isLoggedTicketOwner = user?.username === confState.userTicketData?.username
-  const showGuestLayout = !confState.sessionLoaded || !confState.session || !isLoggedTicketOwner
 
   const selectedFg = user?.metadata?.colors?.foreground || TYPO_COLORS[0]
   const selectedBg = user?.metadata?.colors?.background || BG_COLORS[0]
@@ -51,11 +49,11 @@ const LW15TicketPage = ({
     <div
       className={cn(
         'flex flex-col gap-12 pt-4 w-full border-t',
-        showGuestLayout && 'border-t-0 lg:border-t pt-0 lg:pt-4',
+        isSharePage && 'border-t-0 lg:border-t pt-0 lg:pt-4',
         className
       )}
     >
-      {!showGuestLayout && (
+      {!isSharePage && (
         <div className="grid grid-cols-6 w-full gap-4">
           <p className="col-span-full xl:col-span-3 lg:text-xs xl:max-w-[230px]">
             Customize your ticket
@@ -126,7 +124,7 @@ const LW15TicketPage = ({
             <FifteenSVG className="h-full w-auto" />
           </div>
           <div className="col-span-5 text-2xl lg:text-4xl">
-            {showGuestLayout ? (
+            {isSharePage ? (
               <>
                 {user?.name?.split(' ')[0]}'s Ticket
                 <br />
@@ -140,7 +138,7 @@ const LW15TicketPage = ({
               </>
             )}
           </div>
-          {!isLoggedTicketOwner && showGuestLayout && (
+          {isSharePage && (
             <div className="col-span-full">
               <Button
                 className="h-auto py-1 px-2 min-w-[125px] min-h-[28px]"
@@ -162,8 +160,8 @@ const LW15TicketPage = ({
         <div className="flex flex-col justify-center gap-8 h-fit">
           <LW15Ticket user={user} />
           <div className="flex flex-col gap-1">
-            <TicketURLCopy />
-            {!showGuestLayout && <LW15TicketShare />}
+            <TicketURLCopy user={user} />
+            {!isSharePage && <LW15TicketShare />}
           </div>
         </div>
       </div>
