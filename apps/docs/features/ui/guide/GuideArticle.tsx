@@ -22,5 +22,3 @@ export function GuideArticle({ children, className }: GuideArticleProps) {
     </>
   )
 }
-
-GuideArticle.displayName = 'GuideArticle'

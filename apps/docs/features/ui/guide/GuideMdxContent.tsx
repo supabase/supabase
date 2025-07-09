@@ -9,5 +9,3 @@ interface GuideArticleProps {
 export function GuideMdxContent({ content, mdxOptions }: GuideArticleProps) {
   return content ? <MDXRemoteBase source={content} options={mdxOptions} /> : null
 }
-
-GuideMdxContent.displayName = 'GuideMdxContent'

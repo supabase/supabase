@@ -24,5 +24,3 @@ export function GuideHeader({ className }: GuideHeaderProps) {
     </div>
   )
 }
-
-GuideHeader.displayName = 'GuideHeader'

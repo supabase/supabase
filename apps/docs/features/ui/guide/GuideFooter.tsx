@@ -28,5 +28,3 @@ export function GuideFooter({ className, editLink }: GuideFooterProps) {
     </footer>
   )
 }
-
-GuideFooter.displayName = 'GuideFooter'

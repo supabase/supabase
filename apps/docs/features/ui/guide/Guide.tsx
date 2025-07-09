@@ -67,5 +67,3 @@ export function Guide({ meta, children, className }: GuideProps) {
     </GuideContext.Provider>
   )
 }
-
-Guide.displayName = 'Guide'
