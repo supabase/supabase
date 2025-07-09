@@ -254,6 +254,7 @@ const RealtimeUsage = () => {
               filterBy="realtime"
               start={dateRange.period_start.date}
               end={dateRange.period_end.date}
+              hiddenReports={['networkTraffic']}
             />
           </div>
         </div>

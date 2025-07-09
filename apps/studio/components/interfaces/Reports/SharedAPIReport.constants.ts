@@ -176,6 +176,8 @@ export const SHARED_API_REPORT_SQL = {
   },
 }
 
+export type SharedAPIReportKey = keyof typeof SHARED_API_REPORT_SQL
+
 const fetchLogs = async ({
   projectRef,
   sql,
