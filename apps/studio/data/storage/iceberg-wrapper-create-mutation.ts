@@ -47,14 +47,14 @@ export const useIcebergWrapperCreateMutation = () => {
       description: `${snakeCase(bucketName)}_keys`,
     })
 
-    const wrapperName = 'iceberg_wrapper'
+    const wrapperName = `${snakeCase(bucketName)}_fdw`
 
     const params: FDWCreateVariables = {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: `${snakeCase(bucketName)}_fdw`,
+        wrapper_name: wrapperName,
         server_name: `${wrapperName}_server`,
         vault_aws_access_key_id: createS3KeyData?.secret_key,
         vault_aws_secret_access_key: createS3KeyData?.access_key,
