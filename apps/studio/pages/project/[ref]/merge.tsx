@@ -47,6 +47,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useFlag } from 'hooks/ui/useFlag'
+import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithAI'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -353,6 +354,13 @@ const MergePage: NextPageWithLayout = () => {
   // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
     <div className="flex items-end gap-2">
+      <ReviewWithAI
+        currentBranch={currentBranch}
+        mainBranch={mainBranch}
+        parentProjectRef={parentProjectRef}
+        diffContent={diffContent}
+        disabled={!currentBranch || !mainBranch || isCombinedDiffLoading}
+      />
       {!isReadyForReview ? (
         <Button
           type="primary"

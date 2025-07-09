@@ -88,7 +88,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const selectedProject = projects.find((project) => project.ref === projectRef)
+  const selectedProject = projects.find(
+    (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
+  )
 
   // If the project is not in the organization specific by the org slug, return an error
   if (selectedProject?.organization_slug !== selectedOrg?.slug) {
