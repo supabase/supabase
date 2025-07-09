@@ -98,7 +98,7 @@ const EdgeFunctionsUsage = () => {
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={onRefreshReport}
             />
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}

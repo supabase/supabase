@@ -25,7 +25,6 @@ interface StoredDateRange {
 
 const RANGE_STORAGE_KEY = LOCAL_STORAGE_KEYS.REPORT_DATERANGE
 
-// Helper functions for localStorage
 const getStoredDateRange = (): StoredDateRange | null => {
   try {
     const stored = localStorage.getItem(RANGE_STORAGE_KEY)
@@ -55,7 +54,6 @@ export const useReportDateRange = (
   // Get filtered date picker helpers based on organization plan
   const datePickerHelpers = createFilteredDatePickerHelpers(orgPlan?.id || 'free')
 
-  // Find the specified default helper
   const getDefaultHelper = () => {
     let targetHelper: ReportsDatetimeHelper | undefined
 
@@ -112,7 +110,6 @@ export const useReportDateRange = (
     }
   }
 
-  // Initialize from localStorage or fallback to default
   const getInitialDateRange = () => {
     const stored = getStoredDateRange()
 
