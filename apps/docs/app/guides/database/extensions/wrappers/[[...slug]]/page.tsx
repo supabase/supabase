@@ -269,8 +269,11 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
         {dashboardIntegrationURL && (
           <Admonition type="tip" className="mb-4">
             <p>You can enable the {meta.title} wrapper right from the Supabase dashboard.</p>
+
             <Button asChild>
-              <Link href={dashboardIntegrationURL}>Open in dashboard</Link>
+              <Link href={dashboardIntegrationURL} className="no-underline">
+                Enable wrapper
+              </Link>
             </Button>
           </Admonition>
         )}
@@ -318,7 +321,7 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
+    const tag = (await getLatestRelease()) || 'main'
     if (!tag) {
       throw new Error('No latest release found for federated wrappers pages')
     }
