@@ -165,9 +165,11 @@ export const CreateKeyDialog = ({
       <DialogSectionSeparator />
       <DialogSection className="space-y-4">
         <p className="text-sm text-foreground-light">
-          This will create a new JWT signing key in standby mode. The key will be available for your
-          application to use, but won't be used for signing new JWTs until you activate it. Once
-          you've updated your application to trust this key, you can switch to it for new JWTs.
+          Adds a new JSON Web Token signing key. Once all of your application's components have
+          picked it up you can rotate the current key with it.
+          <br />
+          <br />
+          This action does not invalidate existing tokens, so your users remain signed in.
         </p>
       </DialogSection>
       <DialogSectionSeparator />
@@ -183,14 +185,14 @@ export const CreateKeyDialog = ({
               <SelectValue_Shadcn_ placeholder="Select algorithm" />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
-              <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
               <SelectItem_Shadcn_ value="ES256">
                 <span>ES256 (ECC)</span>
                 <Badge variant="brand" className="ml-2">
                   Recommended
                 </Badge>
               </SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="HS256">HS256 (Shared Secret)</SelectItem_Shadcn_>
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </div>

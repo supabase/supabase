@@ -313,6 +313,7 @@ const getPostgresLogsQuery = () => {
       CASE
           WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
           ELSE null
       END as level,
@@ -346,7 +347,7 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.path as pathname,
+      fel_request.pathname as pathname,
       fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
@@ -419,34 +420,8 @@ const getAuthLogsQuery = () => {
 }
 
 /**
- * Supavisor logs query fragment
+ * Supabase storage logs query fragment
  */
-const getSupavisorLogsQuery = () => {
-  return `
-    select 
-      id, 
-      svl.timestamp as timestamp, 
-      'supavisor' as log_type,
-      'undefined' as status,
-      CASE
-          WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
-          WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
-          ELSE 'success'
-      END as level,
-      null as pathname,
-      null as host,
-      null as event_message,
-      null as method,
-      'api_role' as api_role,
-      null as auth_user,
-      null as log_count,
-      null as logs
-    from supavisor_logs as svl
-    cross join unnest(metadata) as svl_metadata
-  `
-}
-
-// WHERE pathname includes `/storage/`
 const getSupabaseStorageLogsQuery = () => {
   return `
     select 
@@ -487,8 +462,6 @@ const getSupabaseStorageLogsQuery = () => {
 const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
-    ${getEdgeLogsQuery()}
-    union all
     ${getPostgrestLogsQuery()}
     union all
     ${getPostgresLogsQuery()}
@@ -496,8 +469,6 @@ WITH unified_logs AS (
     ${getEdgeFunctionLogsQuery()}
     union all
     ${getAuthLogsQuery()}
-    union all
-    ${getSupavisorLogsQuery()}
     union all
     ${getSupabaseStorageLogsQuery()}
 )
