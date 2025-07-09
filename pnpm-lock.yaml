@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@supabase/auth-js':
-      specifier: 2.71.0-rc.7
-      version: 2.71.0-rc.7
+      specifier: 2.71.0-rc.8
+      version: 2.71.0-rc.8
     '@supabase/realtime-js':
       specifier: ^2.11.3
       version: 2.11.3
@@ -41,7 +41,7 @@ catalogs:
       version: 6.3.5
 
 overrides:
-  '@supabase/supabase-js>@supabase/auth-js': 2.71.0-rc.7
+  '@supabase/supabase-js>@supabase/auth-js': 2.71.0-rc.8
   '@tanstack/directive-functions-plugin>vite': ^6.2.7
   '@tanstack/react-start-plugin>vite': ^6.2.7
   esbuild: ^0.25.2
@@ -737,7 +737,7 @@ importers:
         version: 5.5.0
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.71.0-rc.7
+        version: 2.71.0-rc.8
       '@supabase/mcp-server-supabase':
         specifier: ^0.4.4
         version: 0.4.4(supports-color@8.1.1)
@@ -1710,7 +1710,7 @@ importers:
     dependencies:
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.71.0-rc.7
+        version: 2.71.0-rc.8
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -7865,8 +7865,8 @@ packages:
     resolution: {integrity: sha512-lkfjyAd34aeMpTKKcEVfy8IUyEsjuAT3t9EXr5yZDtdIUncnZpedl/xLV16Dkd4z+fQwixScsCCDxSMNtBOgpQ==}
     engines: {node: '>=12.16'}
 
-  '@supabase/auth-js@2.71.0-rc.7':
-    resolution: {integrity: sha512-1EEURtVUHKSUN3KQRf9STjCg6GAjRF2l0D28J+Ev4/ux+OD2N5trmoDgZtD03YyZwdZSWxpbmWA1qteXQrE4gQ==}
+  '@supabase/auth-js@2.71.0-rc.8':
+    resolution: {integrity: sha512-GX4UDxkhzk9Es8dGSJIcxVrgOPm9pUoEubNavShylpcCfDm5DELzTsc09GRUFaItfmnh5rWXDhV97PfLz1J6zA==}
 
   '@supabase/functions-js@2.4.4':
     resolution: {integrity: sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==}
@@ -26581,7 +26581,7 @@ snapshots:
 
   '@stripe/stripe-js@5.5.0': {}
 
-  '@supabase/auth-js@2.71.0-rc.7':
+  '@supabase/auth-js@2.71.0-rc.8':
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
@@ -26738,7 +26738,7 @@ snapshots:
 
   '@supabase/supabase-js@2.49.3':
     dependencies:
-      '@supabase/auth-js': 2.71.0-rc.7
+      '@supabase/auth-js': 2.71.0-rc.8
       '@supabase/functions-js': 2.4.4
       '@supabase/node-fetch': 2.6.15
       '@supabase/postgrest-js': 1.19.2
