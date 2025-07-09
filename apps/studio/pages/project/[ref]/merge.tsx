@@ -290,7 +290,7 @@ const MergePage: NextPageWithLayout = () => {
         mainBranch={mainBranch}
         parentProjectRef={parentProjectRef}
         diffContent={diffContent}
-        disabled={!currentBranch || !mainBranch}
+        disabled={!currentBranch || !mainBranch || isCombinedDiffLoading}
       />
       {isMergeDisabled ? (
         <ButtonTooltip
