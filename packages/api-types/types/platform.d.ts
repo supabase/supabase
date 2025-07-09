@@ -7636,7 +7636,7 @@ export interface components {
     }
     StorageConfigResponse: {
       features: {
-        icebergCatalog: {
+        icebergCatalog?: {
           enabled: boolean
         }
         imageTransformation: {
@@ -8522,7 +8522,7 @@ export interface components {
     }
     UpdateStorageConfigBody: {
       features?: {
-        icebergCatalog: {
+        icebergCatalog?: {
           enabled: boolean
         }
         imageTransformation: {
