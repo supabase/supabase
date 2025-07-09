@@ -181,48 +181,46 @@ const RealtimeUsage = () => {
               defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
             />
           ))}
-        <div className="relative pt-16 mt-4 border-t">
-          <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-            <div className="sticky top-0 bg-200 py-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
-              <ReportFilterBar
-                onRemoveFilters={removeFilters}
-                hideDatepicker={true}
-                datepickerFrom={selectedDateRange.period_start.date}
-                datepickerTo={selectedDateRange.period_end.date}
-                onAddFilter={addFilter}
-                isLoading={isLoading}
-                filters={filters}
-                selectedProduct="realtime"
-                datepickerHelpers={datePickerHelpers}
-                className="w-full"
-                showDatabaseSelector={false}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            <ReportWidget
+        <ReportStickyNav
+          className="mt-0 border-t"
+          content={
+            <ReportFilterBar
+              onRemoveFilters={removeFilters}
+              hideDatepicker={true}
+              datepickerFrom={selectedDateRange.period_start.date}
+              datepickerTo={selectedDateRange.period_end.date}
+              onAddFilter={addFilter}
               isLoading={isLoading}
-              params={params.totalRequests}
-              title="Total Requests"
-              data={data.totalRequests || []}
-              error={error.totalRequest}
-              renderer={TotalRequestsChartRenderer}
-              append={TopApiRoutesRenderer}
-              appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
+              filters={filters}
+              selectedProduct="realtime"
+              datepickerHelpers={datePickerHelpers}
+              className="w-full"
+              showDatabaseSelector={false}
             />
-            <ReportWidget
-              isLoading={isLoading}
-              params={params.responseSpeed}
-              title="Response Speed"
-              tooltip="Average response speed (in miliseconds) of a request"
-              data={data.responseSpeed || []}
-              error={error.responseSpeed}
-              renderer={ResponseSpeedChartRenderer}
-              appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
-              append={TopApiRoutesRenderer}
-            />
-          </div>
-        </div>
+          }
+        >
+          <ReportWidget
+            isLoading={isLoading}
+            params={params.totalRequests}
+            title="Total Requests"
+            data={data.totalRequests || []}
+            error={error.totalRequest}
+            renderer={TotalRequestsChartRenderer}
+            append={TopApiRoutesRenderer}
+            appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
+          />
+          <ReportWidget
+            isLoading={isLoading}
+            params={params.responseSpeed}
+            title="Response Speed"
+            tooltip="Average response speed (in miliseconds) of a request"
+            data={data.responseSpeed || []}
+            error={error.responseSpeed}
+            renderer={ResponseSpeedChartRenderer}
+            appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
+            append={TopApiRoutesRenderer}
+          />
+        </ReportStickyNav>
       </ReportStickyNav>
     </>
   )
