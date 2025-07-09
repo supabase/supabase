@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { snakeCase } from 'lodash'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -15,7 +16,8 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
-import { IS_PLATFORM } from 'lib/constants'
+import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   cn,
@@ -24,6 +26,7 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  Label_Shadcn_,
   Listbox,
   Modal,
   RadioGroupStacked,
@@ -31,7 +34,7 @@ import {
   Toggle,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface CreateBucketModalProps {
@@ -69,18 +72,11 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ref } = useParams()
   const router = useRouter()
 
-  const { mutate: createBucket, isLoading: isCreating } = useBucketCreateMutation({
-    onSuccess: (res) => {
-      toast.success(`Successfully created bucket ${res.name}`)
-      router.push(`/project/${ref}/storage/buckets/${res.name}`)
-      onClose()
-    },
-  })
+  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation()
+  const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
+    useIcebergWrapperCreateMutation()
 
-  const { data } = useProjectStorageConfigQuery(
-    { projectRef: ref },
-    { enabled: IS_PLATFORM && visible }
-  )
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
@@ -99,6 +95,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     },
   })
 
+  const bucketName = snakeCase(form.watch('name'))
   const isPublicBucket = form.watch('public')
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
@@ -114,19 +111,35 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       return
     }
 
-    createBucket({
-      projectRef: ref,
-      id: values.name,
-      type: values.type,
-      isPublic: values.public,
-      file_size_limit: values.has_file_size_limit
+    try {
+      const fileSizeLimit = values.has_file_size_limit
         ? convertToBytes(values.formatted_size_limit, selectedUnit)
-        : undefined,
-      allowed_mime_types:
+        : undefined
+
+      const allowedMimeTypes =
         values.allowed_mime_types.length > 0
-          ? values.allowed_mime_types.split(',').map((x: string) => x.trim())
-          : undefined,
-    })
+          ? values.allowed_mime_types.split(',').map((x) => x.trim())
+          : undefined
+
+      await createBucket({
+        projectRef: ref,
+        id: values.name,
+        type: values.type,
+        isPublic: values.public,
+        file_size_limit: fileSizeLimit,
+        allowed_mime_types: allowedMimeTypes,
+      })
+
+      if (values.type === 'ICEBERG') {
+        await createIcebergWrapper({ bucketName: values.name })
+      }
+      toast.success(`Successfully created bucket ${values.name}`)
+      router.push(`/project/${ref}/storage/buckets/${values.name}`)
+      onClose()
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to create bucket')
+    }
   }
 
   useEffect(() => {
@@ -224,9 +237,9 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               />
             </div>
           </Modal.Content>
+          <Modal.Separator />
           {isStandardBucket ? (
             <>
-              <Modal.Separator />
               <Modal.Content className="!px-0 !pb-0">
                 <div className="flex flex-col gap-y-2">
                   <FormField_Shadcn_
@@ -264,6 +277,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                   )}
                 </div>
               </Modal.Content>
+              <Modal.Separator />
               <Collapsible
                 className="pb-2"
                 open={showConfiguration}
@@ -385,18 +399,79 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                 </Collapsible.Content>
               </Collapsible>
             </>
-          ) : null}
+          ) : (
+            <Modal.Content className="flex flex-col gap-y-4">
+              <div>
+                <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
+                  <p>
+                    <span>Supabase will setup a </span>
+                    <a
+                      href={`${BASE_PATH}/project/${ref}/integrations/iceberg_wrapper/overview`}
+                      target="_blank"
+                      className="underline text-foreground-light"
+                    >
+                      foreign data wrapper
+                      {bucketName && <span className="text-brand"> {`${bucketName}_fdw`}</span>}
+                    </a>
+                    <span>
+                      {' '}
+                      for easier access to the data. This action will also create{' '}
+                      <a
+                        href={`${BASE_PATH}/project/${ref}/storage/access-keys`}
+                        target="_blank"
+                        className="underline text-foreground-light"
+                      >
+                        S3 Access Keys
+                        {bucketName && (
+                          <>
+                            {' '}
+                            named <span className="text-brand"> {`${bucketName}_keys`}</span>
+                          </>
+                        )}
+                      </a>
+                      <span> and </span>
+                      <a
+                        href={`${BASE_PATH}/project/${ref}/integrations/vault/secrets`}
+                        target="_blank"
+                        className="underline text-foreground-light"
+                      >
+                        four Vault Secrets
+                        {bucketName && (
+                          <>
+                            {' '}
+                            prefixed with{' '}
+                            <span className="text-brand"> {`${bucketName}_vault_`}</span>
+                          </>
+                        )}
+                      </a>
+                      .
+                    </span>
+                  </p>
+                  <p>
+                    As a final step, you'll need to create an{' '}
+                    <span className="text-foreground-light">Iceberg namespace</span> before you
+                    connect the Iceberg data to your database.
+                  </p>
+                </Label_Shadcn_>
+              </div>
+            </Modal.Content>
+          )}
           <Modal.Separator />
           <Modal.Content className="flex items-center space-x-2 justify-end">
             <Button
               type="default"
               htmlType="button"
-              disabled={isCreating}
+              disabled={isCreating || isCreatingIcebergWrapper}
               onClick={() => onClose()}
             >
               Cancel
             </Button>
-            <Button type="primary" htmlType="submit" loading={isCreating} disabled={isCreating}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isCreating || isCreatingIcebergWrapper}
+              disabled={isCreating || isCreatingIcebergWrapper}
+            >
               Save
             </Button>
           </Modal.Content>
