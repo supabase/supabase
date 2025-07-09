@@ -86,7 +86,7 @@ export const BranchDropdown = () => {
 
   const { mutate: updateBranch, isLoading: isUpdatingBranch } = useBranchUpdateMutation({
     onSuccess: (_, variables) => {
-      if (variables.reviewRequestedAt) {
+      if (variables.requestReview) {
         router.push(`/project/${ref}/merge`)
       }
       setOpen(false)
