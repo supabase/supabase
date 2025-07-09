@@ -1,6 +1,4 @@
-import { MessageSquare } from 'lucide-react'
-import { useParams } from 'common'
-import { AiIconAnimation, Button } from 'ui'
+import { AiIconAnimation } from 'ui'
 import { useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
