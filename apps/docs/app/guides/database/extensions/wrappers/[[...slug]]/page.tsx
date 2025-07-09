@@ -141,11 +141,25 @@ const pageMap = [
     remoteFile: 'cognito.md',
   },
   {
+    slug: 'duckdb',
+    meta: {
+      title: 'DuckDB',
+    },
+    remoteFile: 'duckdb.md',
+  },
+  {
     slug: 'firebase',
     meta: {
       title: 'Firebase',
     },
     remoteFile: 'firebase.md',
+  },
+  {
+    slug: 'iceberg',
+    meta: {
+      title: 'Iceberg',
+    },
+    remoteFile: 'iceberg.md',
   },
   {
     slug: 'logflare',
