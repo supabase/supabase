@@ -168,21 +168,19 @@ const RealtimeUsage = () => {
           </>
         }
       >
-        <div className="grid grid-cols-1 gap-4">
-          {selectedDateRange &&
-            REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-              <ComposedChartHandler
-                key={chart.id}
-                {...chart}
-                attributes={chart.attributes as MultiAttribute[]}
-                interval={selectedDateRange.interval}
-                startDate={selectedDateRange?.period_start?.date}
-                endDate={selectedDateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-              />
-            ))}
-        </div>
+        {selectedDateRange &&
+          REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
+            <ComposedChartHandler
+              key={chart.id}
+              {...chart}
+              attributes={chart.attributes as MultiAttribute[]}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+              defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+            />
+          ))}
         <div className="relative pt-16 mt-4 border-t">
           <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
             <div className="sticky top-0 bg-200 py-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">

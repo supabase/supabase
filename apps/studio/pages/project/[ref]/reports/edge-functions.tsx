@@ -203,20 +203,18 @@ const EdgeFunctionsUsage = () => {
           </>
         }
       >
-        <div className="grid grid-cols-1 gap-4">
-          {selectedDateRange &&
-            EDGEFN_CHARTS.filter((attr) => !attr.hide).map((attr, i) => (
-              <ReportChart
-                key={`${attr.id}-${i}`}
-                chart={attr}
-                interval={selectedDateRange.interval}
-                startDate={selectedDateRange?.period_start?.date}
-                endDate={selectedDateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-                functionIds={functionIds}
-              />
-            ))}
-        </div>
+        {selectedDateRange &&
+          EDGEFN_CHARTS.filter((attr) => !attr.hide).map((attr, i) => (
+            <ReportChart
+              key={`${attr.id}-${i}`}
+              chart={attr}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+              functionIds={functionIds}
+            />
+          ))}
       </ReportStickyNav>
     </>
   )

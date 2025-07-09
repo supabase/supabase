@@ -221,26 +221,24 @@ const DatabaseUsage = () => {
         }
       >
         {showChartsV2 ? (
-          <div className="grid grid-cols-1 gap-4">
-            {selectedDateRange &&
-              REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
-                  key={chart.id}
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={selectedDateRange.interval}
-                  startDate={selectedDateRange?.period_start?.date}
-                  endDate={selectedDateRange?.period_end?.date}
-                  updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  showMaxValue={
-                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
-                />
-              ))}
-          </div>
+          selectedDateRange &&
+          REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
+            <ComposedChartHandler
+              key={chart.id}
+              {...chart}
+              attributes={chart.attributes as MultiAttribute[]}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+              defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+              showMaxValue={
+                chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                  ? true
+                  : chart.showMaxValue
+              }
+            />
+          ))
         ) : (
           <Panel title={<h2>Database health</h2>}>
             <Panel.Content className="grid grid-cols-1 gap-4">

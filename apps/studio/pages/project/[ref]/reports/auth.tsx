@@ -115,19 +115,17 @@ const AuthUsage = () => {
           </>
         }
       >
-        <div className="grid grid-cols-1 gap-4">
-          {selectedDateRange &&
-            AUTH_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
-              <ReportChart
-                key={`${attr.id}-${i}`}
-                chart={attr}
-                interval={selectedDateRange.interval}
-                startDate={selectedDateRange?.period_start?.date}
-                endDate={selectedDateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-              />
-            ))}
-        </div>
+        {selectedDateRange &&
+          AUTH_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
+            <ReportChart
+              key={`${attr.id}-${i}`}
+              chart={attr}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+            />
+          ))}
       </ReportStickyNav>
     </>
   )
