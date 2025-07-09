@@ -63,7 +63,7 @@ export const PullRequestsEmptyState = ({
     <div className="flex items-center flex-col justify-center w-full py-10">
       <p>No pull requests made yet for this repository</p>
       <p className="text-foreground-light">
-        Only pull requests with the ./migration directory changes will show here.
+        Only pull requests with the ./migrations directory changes will show here.
       </p>
       {hasBranches && (
         <div className="w-96 border rounded-md mt-4">
