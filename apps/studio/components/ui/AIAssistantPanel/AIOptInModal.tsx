@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 
 import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
