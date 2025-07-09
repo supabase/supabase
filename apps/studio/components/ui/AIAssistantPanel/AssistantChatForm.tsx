@@ -1,11 +1,11 @@
 'use client'
 
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2, X } from 'lucide-react'
+import { ArrowUp, Loader2 } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
-import { Button, CodeBlock, ExpandingTextArea } from 'ui'
+import { Button, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
-import { HoverCard_Shadcn_, HoverCardTrigger_Shadcn_, HoverCardContent_Shadcn_ } from 'ui'
+import { SnippetRow } from './SnippetRow'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -93,44 +93,12 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
           onSubmit={handleSubmit}
           className={cn('relative overflow-hidden', className)}
         >
-          {/* Snippet badges row */}
           {sqlSnippets && sqlSnippets.length > 0 && (
-            <div className="absolute top-0 left-0 flex gap-2 overflow-x-auto right-0 px-1.5 py-1.5">
-              {sqlSnippets.map((snippet, idx) => (
-                <HoverCard_Shadcn_ key={idx}>
-                  <HoverCardTrigger_Shadcn_ asChild>
-                    <div
-                      tabIndex={0}
-                      className="border inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
-                    >
-                      Snippet {idx + 1}
-                      {onRemoveSnippet && (
-                        <Button
-                          size="tiny"
-                          type="text"
-                          className="!h-4 !w-4 rounded-full p-0"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onRemoveSnippet(idx)
-                          }}
-                          aria-label={`Remove snippet ${idx + 1}`}
-                          icon={<X strokeWidth={1.5} className="!h-3 !w-3" />}
-                        ></Button>
-                      )}
-                    </div>
-                  </HoverCardTrigger_Shadcn_>
-                  <HoverCardContent_Shadcn_ className="w-96 max-h-64 overflow-auto p-0">
-                    <CodeBlock
-                      hideLineNumbers
-                      className="text-xs font-mono whitespace-pre-wrap break-words p-2 border-0"
-                      language="sql"
-                    >
-                      {snippet}
-                    </CodeBlock>
-                  </HoverCardContent_Shadcn_>
-                </HoverCard_Shadcn_>
-              ))}
-            </div>
+            <SnippetRow
+              snippets={sqlSnippets}
+              onRemoveSnippet={onRemoveSnippet}
+              className="absolute top-0 left-0 right-0 px-1.5 py-1.5"
+            />
           )}
           <ExpandingTextArea
             ref={textAreaRef}
