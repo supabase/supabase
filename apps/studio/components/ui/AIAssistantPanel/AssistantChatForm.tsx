@@ -5,7 +5,7 @@ import { ArrowUp, Loader2 } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
 import { Button, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
-import { SnippetRow } from './SnippetRow'
+import { SnippetRow, getSnippetContent } from './SnippetRow'
 import { type SqlSnippet } from './AIAssistant.types'
 
 export interface FormProps {

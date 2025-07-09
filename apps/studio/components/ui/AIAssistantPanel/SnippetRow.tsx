@@ -4,14 +4,14 @@ import { HoverCard_Shadcn_, HoverCardTrigger_Shadcn_, HoverCardContent_Shadcn_ }
 import { X } from 'lucide-react'
 import { type SqlSnippet } from './AIAssistant.types'
 
-const getSnippetLabel = (snippet: SqlSnippet, index: number): string => {
+export const getSnippetLabel = (snippet: SqlSnippet, index: number): string => {
   if (typeof snippet === 'string') {
     return `Snippet ${index + 1}`
   }
   return snippet.label
 }
 
-const getSnippetContent = (snippet: SqlSnippet): string => {
+export const getSnippetContent = (snippet: SqlSnippet): string => {
   if (typeof snippet === 'string') {
     return snippet
   }
