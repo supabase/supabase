@@ -31,22 +31,22 @@ export function DataTableSheetDetails({
 
   const selectedRow = useMemo(() => {
     if (isLoading && !selectedRowKey) return
-    return table.getCoreRowModel().flatRows.find((row) => row.id === selectedRowKey)
-  }, [selectedRowKey, isLoading])
+    return table.getRowModel().rows.find((row) => row.id === selectedRowKey)
+  }, [selectedRowKey, isLoading, table])
 
-  const index = table.getCoreRowModel().flatRows.findIndex((row) => row.id === selectedRow?.id)
+  const index = table.getRowModel().rows.findIndex((row) => row.id === selectedRow?.id)
 
-  const nextId = useMemo(() => table.getCoreRowModel().flatRows[index + 1]?.id, [index, isLoading])
+  const nextId = useMemo(() => table.getRowModel().rows[index + 1]?.id, [index, table])
 
-  const prevId = useMemo(() => table.getCoreRowModel().flatRows[index - 1]?.id, [index, isLoading])
+  const prevId = useMemo(() => table.getRowModel().rows[index - 1]?.id, [index, table])
 
   const onPrev = useCallback(() => {
     if (prevId) table.setRowSelection({ [prevId]: true })
-  }, [prevId, isLoading])
+  }, [prevId, table])
 
   const onNext = useCallback(() => {
     if (nextId) table.setRowSelection({ [nextId]: true })
-  }, [nextId, isLoading])
+  }, [nextId, table])
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

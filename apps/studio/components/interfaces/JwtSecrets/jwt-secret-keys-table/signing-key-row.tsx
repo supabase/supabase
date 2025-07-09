@@ -1,5 +1,14 @@
 import { motion } from 'framer-motion'
-import { CircleArrowDown, Eye, Key, MoreVertical, ShieldOff, Timer } from 'lucide-react'
+import {
+  CircleArrowDown,
+  CircleArrowUp,
+  Trash2,
+  Eye,
+  Key,
+  MoreVertical,
+  ShieldOff,
+  Timer,
+} from 'lucide-react'
 
 import { components } from 'api-types'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
@@ -20,19 +29,11 @@ import { statusColors, statusLabels } from '../jwt.constants'
 interface SigningKeyRowProps {
   signingKey: components['schemas']['SigningKeyResponse']
   setSelectedKey: (key: JWTSigningKey | null) => void
-  setShownDialog: (
-    dialog:
-      | 'legacy'
-      | 'create'
-      | 'rotate'
-      | 'confirm-rotate'
-      | 'key-details'
-      | 'revoke'
-      | 'delete'
-      | null
-  ) => void
+  setShownDialog: (dialog: 'key-details' | 'revoke' | 'delete' | null) => void
   handlePreviouslyUsedKey: (keyId: string) => void
-  legacyKey?: components['schemas']['SigningKeyResponse'] | null
+  handleStandbyKey: (keyId: string) => void
+  legacyKey?: JWTSigningKey | null
+  standbyKey?: JWTSigningKey | null
 }
 
 const MotionTableRow = motion(TableRow)
@@ -42,7 +43,9 @@ export const SigningKeyRow = ({
   setSelectedKey,
   setShownDialog,
   handlePreviouslyUsedKey,
+  handleStandbyKey,
   legacyKey,
+  standbyKey,
 }: SigningKeyRowProps) => (
   <MotionTableRow
     key={signingKey.id}
@@ -69,7 +72,11 @@ export const SigningKeyRow = ({
             'border-r-0'
           )}
         >
-          {signingKey.status === 'standby' ? <Timer size={13} /> : <Key size={13} />}
+          {signingKey.status === 'standby' ? (
+            <Timer className="size-4" />
+          ) : (
+            <Key className="size-4" />
+          )}
           {statusLabels[signingKey.status]}
         </Badge>
       </div>
@@ -83,15 +90,7 @@ export const SigningKeyRow = ({
             'gap-2 py-2 h-6'
           )}
         >
-          <span className="truncate">{signingKey.id}</span>
-          <button
-            onClick={() => {
-              setSelectedKey(signingKey)
-              setShownDialog('key-details')
-            }}
-          >
-            <Eye size={13} strokeWidth={1.5} />
-          </button>
+          {signingKey.id}
         </Badge>
       </div>
     </TableCell>
@@ -102,46 +101,84 @@ export const SigningKeyRow = ({
       />
     </TableCell>
     <TableCell className="text-right py-2">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button type="text" className="px-2" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onSelect={() => {
-              setSelectedKey(signingKey)
-              setShownDialog('key-details')
-            }}
-          >
-            <Eye className="mr-2 h-4 w-4" />
-            View key details
-          </DropdownMenuItem>
-          {signingKey.status === 'standby' && (
-            <>
+      {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button type="text" className="px-2" icon={<MoreVertical className="size-4" />} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {signingKey.algorithm !== 'HS256' && (
               <DropdownMenuItem
-                onSelect={() => handlePreviouslyUsedKey(signingKey.id)}
-                className="text-destructive"
+                onSelect={() => {
+                  setSelectedKey(signingKey)
+                  setShownDialog('key-details')
+                }}
               >
-                <CircleArrowDown className="mr-2 h-4 w-4" />
-                Move to previously used
+                <Eye className="mr-2 size-4" />
+                View key details
               </DropdownMenuItem>
-            </>
-          )}
-          {signingKey.status === 'previously_used' && (
-            <DropdownMenuItem
-              onSelect={() => {
-                setSelectedKey(signingKey)
-                setShownDialog('revoke')
-              }}
-              className="text-destructive"
-            >
-              <ShieldOff className="mr-2 h-4 w-4" />
-              Revoke key
-              <span className="text-xs text-foreground-light ml-2">(after 30 days)</span>
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+            )}
+            {signingKey.status === 'standby' && (
+              <>
+                <DropdownMenuItem
+                  onSelect={() => handlePreviouslyUsedKey(signingKey.id)}
+                  className="text-destructive"
+                >
+                  <CircleArrowDown className="mr-2 size-4" />
+                  Move to previously used
+                </DropdownMenuItem>
+              </>
+            )}
+            {signingKey.status === 'previously_used' && (
+              <>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    handleStandbyKey(signingKey.id)
+                  }}
+                  disabled={!!standbyKey}
+                >
+                  <CircleArrowUp className="mr-2 size-4" />
+                  Move to standby key
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setSelectedKey(signingKey)
+                    setShownDialog('revoke')
+                  }}
+                  className="text-destructive"
+                >
+                  <ShieldOff className="mr-2 size-4" />
+                  Revoke key
+                </DropdownMenuItem>
+              </>
+            )}
+            {signingKey.status === 'revoked' && (
+              <>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    handleStandbyKey(signingKey.id)
+                  }}
+                  disabled={!!standbyKey}
+                >
+                  <CircleArrowUp className="mr-2 size-4" />
+                  Move to standby key
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setSelectedKey(signingKey)
+                    setShownDialog('delete')
+                  }}
+                  className="text-destructive"
+                  disabled={legacyKey?.id === signingKey.id}
+                >
+                  <Trash2 className="mr-2 size-4" />
+                  Delete permanently
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </TableCell>
   </MotionTableRow>
 )

@@ -6,6 +6,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
+import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import Panel from '../Panel'
@@ -16,6 +17,8 @@ export const ToggleLegacyApiKeysPanel = () => {
 
   const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
     useLegacyAPIKeysStatusQuery({ projectRef })
+
+  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery({ projectRef })
 
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
     useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
@@ -31,27 +34,32 @@ export const ToggleLegacyApiKeysPanel = () => {
       <Panel>
         <Panel.Content>
           <div className="flex justify-between">
-            <div>
+            <div className="flex flex-col gap-2">
               <p className="text-sm">
                 {isLegacyKeysEnabled ? 'Disable legacy API keys' : 'Re-enabling legacy API keys'}
               </p>
               <p className="text-foreground-light text-sm">
                 {isLegacyKeysEnabled
                   ? 'Make sure you are no longer using your legacy API keys before proceeding.'
-                  : 'Ensure that your RLS policies are in place prior to re-enabling legacy keys.'}
+                  : 'We recommend you use the new API keys whenever possible, but re-enabling is an option.'}
               </p>
             </div>
             <div className="flex items-center">
               <ButtonTooltip
                 type="default"
                 onClick={() => setIsConfirmOpen(true)}
-                disabled={!canUpdateAPIKeys}
+                disabled={
+                  !canUpdateAPIKeys ||
+                  (!isLegacyKeysEnabled && legacyJWTSecret?.status === 'revoked')
+                }
                 tooltip={{
                   content: {
                     side: 'bottom',
                     text: !canUpdateAPIKeys
                       ? 'You need additional permissions to enable or disable JWT-based API keys'
-                      : undefined,
+                      : !isLegacyKeysEnabled && legacyJWTSecret?.status === 'revoked'
+                        ? 'The legacy JWT secret is revoked. Re-enabling is not possible until it is at least moved to previously used.'
+                        : undefined,
                   },
                 }}
               >
@@ -126,7 +134,8 @@ const ToggleApiKeysModal = ({
                 <span className="prose text-sm">
                   Disabling <code>anon</code> and <code>service_role</code> keys while they are in
                   use will cause downtime for your application. Ensure they are no longer in use
-                  before proceeding.
+                  before proceeding. If you have not created a publishable and at least one secret
+                  API key, some dashboard functionality may become unavailable.
                 </span>
               ),
             }
@@ -136,7 +145,7 @@ const ToggleApiKeysModal = ({
                 <span className="prose text-sm">
                   Re-enabling <code>anon</code> and <code>service_role</code> keys may be
                   appropriate in certain cases, but using a publishable and secret key is more
-                  secure. We recommend against re-enabling legacy API keys
+                  secure. We recommend against re-enabling legacy API keys.
                 </span>
               ),
             }

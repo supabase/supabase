@@ -1,7 +1,7 @@
-import { GlobeLock } from 'lucide-react'
+import { LockKeyholeOpen, RectangleEllipsis } from 'lucide-react'
 import React from 'react'
 
-import { InfoPill } from '../../ui/InfoPill'
+import { InfoPill } from 'components/ui/InfoPill'
 import { AlgorithmDetail, algorithmDetails } from './algorithm-details'
 
 interface AlgorithmHoverCardProps {
@@ -14,10 +14,37 @@ export const AlgorithmHoverCard: React.FC<AlgorithmHoverCardProps> = ({ algorith
 
   return (
     <InfoPill
-      label={legacy ? `Legacy JWT Secret ${details.label}` : details.label}
-      icon={<GlobeLock className="w-4" strokeWidth={1} />}
+      label={<span className="pt-1 h-6">{legacy ? `Legacy ${details.label}` : details.label}</span>}
+      icon={
+        algorithm === 'HS256' ? (
+          <RectangleEllipsis className="size-4" />
+        ) : (
+          <LockKeyholeOpen className="size-4" />
+        )
+      }
       title={details.name}
-      description={details.description}
+      description={
+        <div className="flex flex-col gap-2">
+          <p>{details.description}</p>
+          <p>
+            Pros:
+            <ul className="list-disc">
+              {details.pros.map((pro, i) => (
+                <li key={i}>{pro}</li>
+              ))}
+            </ul>
+          </p>
+          <p>
+            Cons:{' '}
+            <ul className="list-disc">
+              {details.cons.map((con, i) => (
+                <li key={i}>{con}</li>
+              ))}
+            </ul>
+            <br />
+          </p>
+        </div>
+      }
       links={details.links}
     />
   )
