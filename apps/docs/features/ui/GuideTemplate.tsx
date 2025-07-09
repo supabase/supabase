@@ -13,7 +13,6 @@ interface BaseGuideTemplateProps {
   children?: ReactNode
   editLink: EditLink
   mdxOptions?: SerializeOptions
-  childrenPosition?: 'before' | 'after'
 }
 
 type GuideTemplateProps =

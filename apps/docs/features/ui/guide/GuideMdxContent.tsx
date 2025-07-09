@@ -3,7 +3,7 @@ import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 interface GuideArticleProps {
   content?: string
-  mdxOptions: SerializeOptions
+  mdxOptions?: SerializeOptions
 }
 
 export function GuideMdxContent({ content, mdxOptions }: GuideArticleProps) {

@@ -8,7 +8,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 import { Guide, GuideArticle, GuideHeader, GuideFooter, GuideMdxContent } from '~/features/ui/guide'
-import { newEditLink } from '~/features/docs/GuidesMdx.template'
+import { newEditLink } from '~/features/helpers.edit-link'
 import {
   genGuideMeta,
   genGuidesStaticParams,
@@ -349,8 +349,10 @@ const getContent = async (params: Params) => {
   }
 }
 
-const getDashboardIntegrationURL = (wrapperPath: string) => {
-  return `https://supabase.com/dashboard/project/_/integrations/${wrapperPath}/overview`
+const getDashboardIntegrationURL = (wrapperPath?: string) => {
+  return wrapperPath
+    ? `https://supabase.com/dashboard/project/_/integrations/${wrapperPath}/overview`
+    : null
 }
 
 const assetUrlTransform = (url: string, baseUrl: string): string => {
