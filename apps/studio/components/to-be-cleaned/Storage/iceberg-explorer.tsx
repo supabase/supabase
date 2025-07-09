@@ -1,6 +1,6 @@
 import { SquareArrowOutUpRight } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
@@ -9,6 +9,7 @@ import {
   convertKVStringArrayToJson,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/import-foreign-schema-dialog'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -36,6 +37,7 @@ import { DecryptedReadOnlyInput } from './decrypted-read-only-input'
 
 export const IcebergExplorer = ({ bucket }: { bucket: Bucket }) => {
   const { project } = useProjectContext()
+  const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
 
   const { data: extensionsData, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -89,6 +91,8 @@ export const IcebergExplorer = ({ bucket }: { bucket: Bucket }) => {
           : 'needs-upgrade'
         : ('not-installed' as const)
 
+  const isWrapperSchemaInstalled = (wrapper?.tables || []).length > 0
+
   return (
     <div className="flex flex-col w-full">
       <ScaffoldContainer>
@@ -117,25 +121,45 @@ export const IcebergExplorer = ({ bucket }: { bucket: Bucket }) => {
         {state === 'installed' && wrapper && (
           <>
             <Alert_Shadcn_ className="p-10">
-              <AlertTitle_Shadcn_ className="flex flex-col">
-                <div className="flex flex-row justify-between items-center">
-                  <div className="col-span-2 space-y-1">
-                    <p className="block">You're all set!</p>
-                    <p className="text-sm opacity-50">
-                      A wrapper has been setup for this bucket. You can use the Table Editor or SQL
-                      Editor to view the tables.
-                    </p>
+              {isWrapperSchemaInstalled ? (
+                <AlertTitle_Shadcn_ className="flex flex-col">
+                  <div className="flex flex-row justify-between items-center">
+                    <div className="col-span-2 space-y-1">
+                      <p className="block">You're all set!</p>
+                      <p className="text-sm opacity-50">
+                        A wrapper has been setup for this bucket. You can use the Table Editor or
+                        SQL Editor to view the tables.
+                      </p>
+                    </div>
+                    <div className="flex items-end justify-end gap-2">
+                      <Button type="default" icon={<SquareArrowOutUpRight />}>
+                        Table Editor
+                      </Button>
+                      <Button type="default" icon={<SquareArrowOutUpRight />}>
+                        SQL Editor
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-end justify-end gap-2">
-                    <Button type="default" icon={<SquareArrowOutUpRight />}>
-                      Table Editor
-                    </Button>
-                    <Button type="default" icon={<SquareArrowOutUpRight />}>
-                      SQL Editor
-                    </Button>
+                </AlertTitle_Shadcn_>
+              ) : (
+                <AlertTitle_Shadcn_ className="flex flex-col">
+                  <div className="flex flex-row justify-between items-center space-x-10">
+                    <div className="col-span-2 space-y-1">
+                      <p className="block">You need to set the namespace</p>
+                      <p className="text-sm opacity-50">
+                        The foreign data wrapper which connects the Iceberg data to the database is
+                        not fully setup. Once you've created the namespace in the Iceberg catalog,
+                        you'll need to set the namespace in the wrapper.
+                      </p>
+                    </div>
+                    <div className="flex items-end justify-end gap-2">
+                      <Button type="default" onClick={() => setImportForeignSchemaShown(true)}>
+                        Set namespace
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </AlertTitle_Shadcn_>
+                </AlertTitle_Shadcn_>
+              )}
             </Alert_Shadcn_>
 
             <div>
@@ -164,6 +188,11 @@ export const IcebergExplorer = ({ bucket }: { bucket: Bucket }) => {
         )}
         {state === 'missing' && <WrapperMissing projectRef={project?.ref!} />}
       </ScaffoldContainer>
+      <ImportForeignSchemaDialog
+        bucketName={bucket.name}
+        visible={importForeignSchemaShown}
+        onClose={() => setImportForeignSchemaShown(false)}
+      />
     </div>
   )
 }
