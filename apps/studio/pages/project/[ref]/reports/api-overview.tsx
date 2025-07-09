@@ -10,6 +10,7 @@ import {
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import type { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
+import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
@@ -33,12 +34,17 @@ export const ApiReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { datePickerHelpers } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const { datePickerHelpers, datePickerValue, handleDatePickerChange } = useReportDateRange(
+    REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
+  )
 
-  const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
+  const handleDatepickerChange = (vals: DatePickerValue) => {
+    // Update localStorage and hook state
+    handleDatePickerChange(vals)
+    // Update query params for the report
     mergeParams({
-      iso_timestamp_start: from || '',
-      iso_timestamp_end: to || '',
+      iso_timestamp_start: vals.from || '',
+      iso_timestamp_end: vals.to || '',
     })
   }
 
@@ -56,6 +62,7 @@ export const ApiReport: NextPageWithLayout = () => {
           isLoading={isLoading}
           filters={filters}
           datepickerHelpers={datePickerHelpers}
+          initialDatePickerValue={datePickerValue}
           showDatabaseSelector={false}
         />
         <div className="h-2 w-full">

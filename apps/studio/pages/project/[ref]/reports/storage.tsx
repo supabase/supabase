@@ -41,9 +41,14 @@ export const StorageReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { datePickerHelpers } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  const { datePickerHelpers, datePickerValue, handleDatePickerChange } = useReportDateRange(
+    REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
+  )
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
+    // Update localStorage and hook state
+    handleDatePickerChange(vals)
+    // Update query params for the report
     mergeParams({
       iso_timestamp_start: vals.from || '',
       iso_timestamp_end: vals.to || '',
@@ -67,6 +72,7 @@ export const StorageReport: NextPageWithLayout = () => {
               filters={filters}
               selectedProduct="storage"
               datepickerHelpers={datePickerHelpers}
+              initialDatePickerValue={datePickerValue}
               className="w-full"
               showDatabaseSelector={false}
             />

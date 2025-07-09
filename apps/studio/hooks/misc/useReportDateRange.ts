@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import dayjs from 'dayjs'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
@@ -15,6 +15,34 @@ export interface ReportDateRange {
   interval: string
 }
 
+interface StoredDateRange {
+  from: string
+  to: string
+  isHelper: boolean
+  helperText?: string
+}
+
+const STORAGE_KEY = 'supabase-reports-daterange'
+
+// Helper functions for localStorage
+const getStoredDateRange = (): StoredDateRange | null => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    return stored ? JSON.parse(stored) : null
+  } catch (error) {
+    console.warn('Failed to parse stored date range:', error)
+    return null
+  }
+}
+
+const setStoredDateRange = (range: StoredDateRange): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(range))
+  } catch (error) {
+    console.warn('Failed to store date range:', error)
+  }
+}
+
 export const useReportDateRange = (
   defaultHelper:
     | REPORT_DATERANGE_HELPER_LABELS
@@ -23,14 +51,18 @@ export const useReportDateRange = (
 ) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
 
+  // Get filtered date picker helpers based on organization plan
   const datePickerHelpers = createFilteredDatePickerHelpers(orgPlan?.id || 'free')
 
+  // Find the specified default helper
   const getDefaultHelper = () => {
     let targetHelper: ReportsDatetimeHelper | undefined
 
     if (typeof defaultHelper === 'string') {
+      // Find helper by text (supports both enum values and direct strings)
       targetHelper = REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === defaultHelper)
     } else if (defaultHelper && typeof defaultHelper === 'object' && 'text' in defaultHelper) {
+      // Use the provided helper object directly
       targetHelper = defaultHelper
     }
 
@@ -43,6 +75,7 @@ export const useReportDateRange = (
       }
     }
 
+    // Fallback: look for default helper marked in REPORTS_DATEPICKER_HELPERS
     const fallbackHelper = REPORTS_DATEPICKER_HELPERS.find(
       (helper) => helper.default && helper.availableIn?.includes(orgPlan?.id || 'free')
     )
@@ -68,6 +101,7 @@ export const useReportDateRange = (
       }
     }
 
+    // Ultimate fallback to manual date calculation (should rarely happen)
     const defaultStart = dayjs().subtract(1, 'hour').toISOString()
     const defaultEnd = dayjs().toISOString()
     return {
@@ -77,11 +111,40 @@ export const useReportDateRange = (
     }
   }
 
-  const { start: defaultStart, end: defaultEnd, helper: defaultHelperState } = getDefaultHelper()
+  // Initialize from localStorage or fallback to default
+  const getInitialDateRange = () => {
+    const stored = getStoredDateRange()
+
+    if (stored) {
+      // Validate that stored dates are still reasonable (not too far in the past/future)
+      const storedFrom = dayjs(stored.from)
+      const storedTo = dayjs(stored.to)
+      const now = dayjs()
+
+      // Only use stored value if it's within last 90 days and not in future
+      if (
+        storedFrom.isValid() &&
+        storedTo.isValid() &&
+        storedFrom.isAfter(now.subtract(90, 'day')) &&
+        storedTo.isBefore(now.add(1, 'day'))
+      ) {
+        return {
+          start: stored.from,
+          end: stored.to,
+          helper: { isHelper: stored.isHelper, text: stored.helperText },
+        }
+      }
+    }
+
+    // Fallback to default helper
+    return getDefaultHelper()
+  }
+
+  const { start: initialStart, end: initialEnd, helper: initialHelper } = getInitialDateRange()
 
   const [selectedDateRange, setSelectedDateRange] = useState<ReportDateRange>({
-    period_start: { date: defaultStart, time_period: '1d' },
-    period_end: { date: defaultEnd, time_period: 'today' },
+    period_start: { date: initialStart, time_period: '1d' },
+    period_end: { date: initialEnd, time_period: 'today' },
     interval: '1h',
   })
 
@@ -89,7 +152,18 @@ export const useReportDateRange = (
   const [currentHelper, setCurrentHelper] = useState<{
     isHelper: boolean
     text?: string
-  }>(defaultHelperState)
+  }>(initialHelper)
+
+  // Update localStorage whenever date range changes
+  useEffect(() => {
+    const storedRange: StoredDateRange = {
+      from: selectedDateRange.period_start.date,
+      to: selectedDateRange.period_end.date,
+      isHelper: currentHelper.isHelper,
+      helperText: currentHelper.text,
+    }
+    setStoredDateRange(storedRange)
+  }, [selectedDateRange, currentHelper])
 
   const handleIntervalGranularity = useCallback((from: string, to: string) => {
     const conditions = {
