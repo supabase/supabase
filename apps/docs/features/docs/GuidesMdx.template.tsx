@@ -136,5 +136,5 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
   )
 }
 
-export { GuideTemplate, EDIT_LINK_SYMBOL, newEditLink }
+export { GuideTemplate, newEditLink }
 export type { EditLink }
