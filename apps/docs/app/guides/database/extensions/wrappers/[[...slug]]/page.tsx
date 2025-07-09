@@ -169,6 +169,7 @@ const pageMap = [
     slug: 'iceberg',
     meta: {
       title: 'Iceberg',
+      dashboardIntegrationPath: 'iceberg_wrapper',
     },
     remoteFile: 'iceberg.md',
   },
