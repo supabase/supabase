@@ -4,6 +4,7 @@ import { ChevronDown, ExternalLink } from 'lucide-react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 import {
   Button,
   DialogFooter,
@@ -54,8 +55,12 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
       { name: values.tokenName, scope: tokenScope },
       {
         onSuccess: (data) => {
+          toast.success(`Your access token "${data.name}" is ready.`)
           onCreateToken(data)
           setVisible(false)
+        },
+        onError: () => {
+          toast.error(`Failed to create access token.`)
         },
       }
     )
