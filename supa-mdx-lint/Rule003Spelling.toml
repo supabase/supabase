@@ -327,7 +327,6 @@ allow_list = [
     "pgsodium",
     "pgvector",
     "plpgsql",
-    "programatically",
     "psql",
     "scrypt",
     "sessionStorage",
