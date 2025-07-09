@@ -16,9 +16,11 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
-import { sidePanelsState } from 'state/side-panels'
+import { useRouter } from 'next/router'
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -29,7 +31,6 @@ import {
   DialogTitle,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
@@ -46,8 +47,10 @@ interface EditBranchModalProps {
 
 export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
   const { ref } = useParams()
+  const router = useRouter()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
@@ -100,13 +103,18 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             val === branch?.name || (branches ?? []).every((b) => b.name !== val),
           'A branch with this name already exists'
         ),
-      gitBranchName: z.string().optional(),
+      gitBranchName: z
+        .string()
+        .refine(
+          (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
+          'Git branch name is required when GitHub is connected'
+        ),
     })
     .superRefine(async (val, ctx) => {
-      if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.id) {
+      if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
         try {
           await checkGithubBranchValidity({
-            repositoryId: githubConnection.id,
+            repositoryId: githubConnection.repository.id,
             branchName: val.gitBranchName,
           })
           setIsGitBranchValid(true)
@@ -119,8 +127,10 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
           })
         }
       } else {
-        // If git branch is empty or removed, it's valid
-        setIsGitBranchValid(!val.gitBranchName || val.gitBranchName.length === 0)
+        // If git branch is empty or removed, it's valid for gitless branching
+        setIsGitBranchValid(
+          !val.gitBranchName || val.gitBranchName.length === 0 || gitlessBranching
+        )
       }
     })
 
@@ -162,35 +172,44 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   // Pre-fill form when the modal becomes visible and branch data is available
   useEffect(() => {
     if (visible && branch) {
-      setIsGitBranchValid(!!branch.git_branch) // Initial validity based on existing link
+      setIsGitBranchValid(!!branch.git_branch || gitlessBranching) // Initial validity based on existing link or gitless branching
       form.reset({
         branchName: branch.name ?? '',
         gitBranchName: branch.git_branch ?? '',
       })
     }
-  }, [branch, visible, form])
+  }, [branch, visible, form, gitlessBranching])
 
   // Handle initial state and changes for git branch validity
   useEffect(() => {
     setIsGitBranchValid(
-      !form.getValues('gitBranchName') || form.getValues('gitBranchName')?.length === 0
+      !form.getValues('gitBranchName') ||
+        form.getValues('gitBranchName')?.length === 0 ||
+        gitlessBranching
     )
     // Trigger validation if a git branch name exists initially or is entered
     if (form.getValues('gitBranchName')) {
       form.trigger('gitBranchName')
     }
-  }, [githubConnection?.id, form.getValues('gitBranchName'), form.trigger, visible, branch])
+  }, [
+    githubConnection?.id,
+    form.getValues('gitBranchName'),
+    form.trigger,
+    visible,
+    branch,
+    gitlessBranching,
+  ])
 
   const openLinkerPanel = () => {
     onClose()
-    sidePanelsState.setGithubConnectionsOpen(true)
+    router.push(`/project/${projectRef}/settings/integrations`)
   }
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
       <DialogContent size="large" hideClose>
         <DialogHeader padding="small">
-          <DialogTitle>Edit branch "{branch?.name}"</DialogTitle> {/* Update title */}
+          <DialogTitle>Edit branch "{branch?.name}"</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <Form_Shadcn_ {...form}>
@@ -217,27 +236,37 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   control={form.control}
                   name="gitBranchName"
                   render={({ field }) => (
-                    <FormItem_Shadcn_>
-                      <div className="flex items-center justify-between mb-2">
-                        <Label>Link to Git Branch (Optional)</Label>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Image
-                            className={cn('dark:invert')}
-                            src={`${BASE_PATH}/img/icons/github-icon.svg`}
-                            width={16}
-                            height={16}
-                            alt={`GitHub icon`}
-                          />
-                          <Link
-                            href={`https://github.com/${repoOwner}/${repoName}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-foreground hover:underline"
-                          >
-                            {repoOwner}/{repoName}
-                          </Link>
+                    <FormItemLayout
+                      label={
+                        <div className="flex items-center justify-between w-full gap-4">
+                          <span className="flex-1">
+                            Sync with Git branch {gitlessBranching ? '(optional)' : ''}
+                          </span>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Image
+                              className={cn('dark:invert')}
+                              src={`${BASE_PATH}/img/icons/github-icon.svg`}
+                              width={16}
+                              height={16}
+                              alt={`GitHub icon`}
+                            />
+                            <Link
+                              href={`https://github.com/${repoOwner}/${repoName}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-foreground hover:underline"
+                            >
+                              {repoOwner}/{repoName}
+                            </Link>
+                          </div>
                         </div>
-                      </div>
+                      }
+                      description={
+                        gitlessBranching
+                          ? 'Automatically deploy changes on every commit'
+                          : 'If linked, migrations from this Git branch will be automatically deployed.'
+                      }
+                    >
                       <div className="relative">
                         <FormControl_Shadcn_>
                           <Input_Shadcn_
@@ -253,11 +282,8 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-foreground-light mt-2">
-                        If linked, migrations from this Git branch will be automatically deployed.
-                      </p>
                       <FormMessage_Shadcn_ />
-                    </FormItem_Shadcn_>
+                    </FormItemLayout>
                   )}
                 />
               )}
@@ -270,15 +296,23 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
               )}
               {isSuccessConnections && !githubConnection && (
                 <div className="flex items-center gap-2 justify-between">
-                  <div>
-                    <Label>GitHub Repository</Label>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <Label>Sync with a GitHub branch</Label>
+                      {!gitlessBranching && (
+                        <Badge variant="warning" size="small">
+                          Required
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-sm text-foreground-light">
-                      Optionally connect to a GitHub repository to manage migrations automatically
-                      for this branch.
+                      {gitlessBranching
+                        ? 'Optionally connect to a GitHub repository to manage migrations automatically for this branch.'
+                        : 'Keep this preview branch in sync with a chosen GitHub branch'}
                     </p>
                   </div>
                   <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
-                    Connect to GitHub
+                    {gitlessBranching ? 'Connect to GitHub' : 'Configure'}
                   </Button>
                 </div>
               )}
@@ -290,7 +324,13 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
               </Button>
               <Button
                 form={formId}
-                disabled={!isSuccessConnections || isUpdating || !canSubmit || isChecking}
+                disabled={
+                  !isSuccessConnections ||
+                  isUpdating ||
+                  !canSubmit ||
+                  isChecking ||
+                  (!gitlessBranching && !githubConnection)
+                }
                 loading={isUpdating}
                 type="primary"
                 htmlType="submit"

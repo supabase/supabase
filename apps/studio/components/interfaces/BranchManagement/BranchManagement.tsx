@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { MessageCircle } from 'lucide-react'
+import { GitMerge, MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -28,6 +29,7 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
 import { PreviewBranchesEmptyState, PullRequestsEmptyState } from './EmptyStates'
 import { Overview } from './Overview'
+import { ReviewRow } from './ReviewRow'
 
 type Tab = 'overview' | 'prs' | 'branches'
 
@@ -80,6 +82,13 @@ const BranchManagement = () => {
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
+  const branchesReadyForReview = previewBranches.filter(
+    (branch) => branch.review_requested_at !== undefined && branch.review_requested_at !== null
+  )
+
+  const currentBranch = branches?.find((branch) => branch.project_ref === ref)
+  const isCurrentBranchReadyForReview =
+    currentBranch?.review_requested_at !== undefined && currentBranch?.review_requested_at !== null
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
@@ -109,6 +118,15 @@ const BranchManagement = () => {
     },
   })
 
+  const { mutate: updateBranch } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Branch updated successfully')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update branch: ${error.message}`)
+    },
+  })
+
   const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
 
@@ -127,6 +145,16 @@ const BranchManagement = () => {
     if (projectRef == undefined) return console.error('Project ref is required')
     if (!previewBranches) return console.error('No branches available')
     disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
+  }
+
+  const handleReadyForReview = () => {
+    if (!currentBranch?.id || !projectRef) return
+    updateBranch({
+      id: currentBranch.id,
+      projectRef,
+      requestReview: true,
+    })
+    router.push(`/project/${currentBranch.project_ref}/merge`)
   }
 
   return (
@@ -155,7 +183,7 @@ const BranchManagement = () => {
                     }`}
                     onClick={() => setTab('prs')}
                   >
-                    Pull requests
+                    Merge requests
                   </Button>
                   <Button
                     type="default"
@@ -237,30 +265,71 @@ const BranchManagement = () => {
                         />
                       )}
                       {tab === 'prs' && (
-                        <BranchManagementSection
-                          header={`${branchesWithPRs.length} branches with pull requests found`}
-                        >
-                          {branchesWithPRs.length > 0 ? (
-                            branchesWithPRs.map((branch) => {
-                              return (
-                                <BranchRow
-                                  key={branch.id}
-                                  repo={repo}
-                                  branch={branch}
-                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
-                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
-                                />
-                              )
-                            })
-                          ) : (
-                            <PullRequestsEmptyState
-                              url={generateCreatePullRequestURL()}
-                              hasBranches={previewBranches.length > 0}
-                              githubConnection={githubConnection}
-                              gitlessBranching={gitlessBranching}
-                            />
+                        <div className="space-y-4">
+                          {gitlessBranching && (
+                            <BranchManagementSection
+                              header={`${branchesReadyForReview.length} branches ready for review`}
+                            >
+                              {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
+                                <div className="bg-background px-6 py-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-sm text-foreground-light">
+                                      <GitMerge
+                                        strokeWidth={1.5}
+                                        size={16}
+                                        className="text-brand"
+                                      />
+                                      Mark{' '}
+                                      <span className="text-foreground">{currentBranch.name}</span>{' '}
+                                      ready for review
+                                    </div>
+                                    <Button
+                                      type="primary"
+                                      size="tiny"
+                                      onClick={handleReadyForReview}
+                                    >
+                                      Ready for review
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                              {branchesReadyForReview.length > 0 ? (
+                                branchesReadyForReview.map((branch) => {
+                                  return <ReviewRow key={branch.id} branch={branch} />
+                                })
+                              ) : (
+                                <div className="px-6 py-4 text-sm text-foreground-light">
+                                  No branches are currently ready for review
+                                </div>
+                              )}
+                            </BranchManagementSection>
                           )}
-                        </BranchManagementSection>
+                          <BranchManagementSection
+                            header={`${branchesWithPRs.length} branches with pull requests`}
+                          >
+                            {branchesWithPRs.length > 0 ? (
+                              branchesWithPRs.map((branch) => {
+                                return (
+                                  <BranchRow
+                                    key={branch.id}
+                                    repo={repo}
+                                    branch={branch}
+                                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                                    onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                                  />
+                                )
+                              })
+                            ) : (
+                              <PullRequestsEmptyState
+                                url={generateCreatePullRequestURL()}
+                                projectRef={projectRef ?? '_'}
+                                hasBranches={previewBranches.length > 0}
+                                githubConnection={githubConnection}
+                                gitlessBranching={gitlessBranching}
+                              />
+                            )}
+                          </BranchManagementSection>
+                        </div>
                       )}
                       {tab === 'branches' && (
                         <BranchManagementSection
