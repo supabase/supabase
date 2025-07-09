@@ -81,13 +81,13 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   display_query: TOOL_CATEGORIES.UI,
   display_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
+  search_docs: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,
   list_extensions: TOOL_CATEGORIES.SCHEMA,
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
-  search_docs: TOOL_CATEGORIES.SCHEMA,
 
   // Log tools - MCP and local
   get_logs: TOOL_CATEGORIES.LOG,

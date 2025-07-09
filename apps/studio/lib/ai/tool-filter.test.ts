@@ -28,12 +28,12 @@ describe('tool allowance by opt-in level', () => {
       display_query: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       display_edge_function: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       rename_chat: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Schema tools
       list_tables: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_extensions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_edge_functions: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       list_branches: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-      search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Log tools
       get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
@@ -61,6 +61,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('display_query')
     expect(tools).toContain('display_edge_function')
     expect(tools).toContain('rename_chat')
+    expect(tools).toContain('search_docs')
     expect(tools).not.toContain('list_tables')
     expect(tools).not.toContain('list_extensions')
     expect(tools).not.toContain('list_edge_functions')
@@ -189,7 +190,6 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
-      'search_docs',
       'get_logs',
       'get_advisors',
       'get_log_counts',
@@ -205,7 +205,6 @@ describe('filterToolsByOptInLevel', () => {
       'list_extensions',
       'list_edge_functions',
       'list_branches',
-      'search_docs',
       'get_logs',
       'get_advisors',
       'get_log_counts',
