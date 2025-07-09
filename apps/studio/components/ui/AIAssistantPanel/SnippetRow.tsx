@@ -32,13 +32,13 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
   if (!snippets || snippets.length === 0) return null
 
   return (
-    <div className={`w-full overflow-x-auto flex gap-2 ${className}`}>
+    <div className={`w-full overflow-x-auto flex ${className}`}>
       {snippets.map((snippet, idx) => (
         <HoverCard_Shadcn_ key={idx}>
           <HoverCardTrigger_Shadcn_ asChild>
             <div
               tabIndex={0}
-              className="border inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
+              className="border bg inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
             >
               {getSnippetLabel(snippet, idx)}
               {onRemoveSnippet && (
