@@ -1,13 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight, Clipboard, Download, Edit, Move, Trash2 } from 'lucide-react'
-import { observer } from 'mobx-react-lite'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
+import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
+import { downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 
 interface ItemContextMenuProps {
@@ -15,17 +16,17 @@ interface ItemContextMenuProps {
 }
 
 const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
-  const storageExplorerStore = useStorageStore()
+  const { ref: projectRef, bucketId } = useParams()
+  const snap = useStorageExplorerStateSnapshot()
+  const { setSelectedFileCustomExpiry } = snap
+
   const {
-    getFileUrl,
-    downloadFile,
     selectedBucket,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    setSelectedFileCustomExpiry,
-  } = storageExplorerStore
-  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
+  } = useStorageExplorerStateSnapshot()
+  const { onCopyUrl } = useCopyUrl()
   const isPublic = selectedBucket.public
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
@@ -34,13 +35,13 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     switch (event) {
       case 'copy':
         if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
-        else return onCopyUrl(item.name, getFileUrl(item, expiresIn))
+        else return onCopyUrl(item.name, expiresIn)
       case 'rename':
         return setSelectedItemToRename(item)
       case 'move':
         return setSelectedItemsToMove([item])
       case 'download':
-        return await downloadFile(item)
+        return await downloadFile({ projectRef, bucketId, file: item })
       default:
         break
     }
@@ -106,4 +107,4 @@ const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
   )
 }
 
-export default observer(ItemContextMenu)
+export default ItemContextMenu

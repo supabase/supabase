@@ -1,10 +1,13 @@
+import { sep } from 'node:path'
+
 import {
   GitHubDiscussionLoader,
   type GitHubDiscussionSource,
   fetchDiscussions,
-} from './github-discussion'
-import { MarkdownLoader, type MarkdownSource } from './markdown'
-import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations'
+} from './github-discussion.js'
+import { LintWarningsGuideLoader, type LintWarningsGuideSource } from './lint-warnings-guide.js'
+import { MarkdownLoader, type MarkdownSource } from './markdown.js'
+import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations.js'
 import {
   CliReferenceLoader,
   type CliReferenceSource,
@@ -12,8 +15,8 @@ import {
   type ClientLibReferenceSource,
   OpenApiReferenceLoader,
   type OpenApiReferenceSource,
-} from './reference-doc'
-import { walk } from './util'
+} from './reference-doc.js'
+import { walk } from './util.js'
 
 const ignoredFiles = ['pages/404.mdx']
 
@@ -24,94 +27,157 @@ export type SearchSource =
   | CliReferenceSource
   | GitHubDiscussionSource
   | IntegrationSource
+  | LintWarningsGuideSource
 
-/**
- * Fetches all the sources we want to index for search
- */
-export async function fetchSources() {
-  const openApiReferenceSource = new OpenApiReferenceLoader(
+export async function fetchGuideSources() {
+  return (
+    await Promise.all(
+      (await walk('content/guides'))
+        .filter(
+          ({ path }) =>
+            /\.mdx?$/.test(path) &&
+            !ignoredFiles.includes(path) &&
+            !path.split(sep).some((part) => part.startsWith('_'))
+        )
+        .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
+    )
+  ).flat()
+}
+
+export async function fetchOpenApiReferenceSource() {
+  return new OpenApiReferenceLoader(
     'api',
     '/reference/api',
     { title: 'Management API Reference' },
     'spec/transforms/api_v1_openapi_deparsed.json',
     'spec/common-api-sections.json'
   ).load()
+}
 
-  const jsLibReferenceSource = new ClientLibReferenceLoader(
+export async function fetchJsLibReferenceSource() {
+  return new ClientLibReferenceLoader(
     'js-lib',
     '/reference/javascript',
-    { title: 'JavaScript Reference' },
+    { title: 'JavaScript Reference', language: 'JavaScript' },
     'spec/supabase_js_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
+}
 
-  const dartLibReferenceSource = new ClientLibReferenceLoader(
+export async function fetchDartLibReferenceSource() {
+  return new ClientLibReferenceLoader(
     'dart-lib',
     '/reference/dart',
-    { title: 'Dart Reference' },
+    { title: 'Dart Reference', language: 'Dart' },
     'spec/supabase_dart_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
+}
 
-  const pythonLibReferenceSource = new ClientLibReferenceLoader(
+export async function fetchPythonLibReferenceSource() {
+  return new ClientLibReferenceLoader(
     'python-lib',
     '/reference/python',
-    { title: 'Python Reference' },
+    { title: 'Python Reference', language: 'Python' },
     'spec/supabase_py_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
+}
 
-  const cSharpLibReferenceSource = new ClientLibReferenceLoader(
+export async function fetchCSharpLibReferenceSource() {
+  return new ClientLibReferenceLoader(
     'csharp-lib',
     '/reference/csharp',
-    { title: 'C# Reference' },
+    { title: 'C# Reference', language: 'C#' },
     'spec/supabase_csharp_v0.yml',
     'spec/common-client-libs-sections.json'
   ).load()
+}
 
-  const swiftLibReferenceSource = new ClientLibReferenceLoader(
+export async function fetchSwiftLibReferenceSource() {
+  return new ClientLibReferenceLoader(
     'swift-lib',
     '/reference/swift',
-    { title: 'Swift Reference' },
+    { title: 'Swift Reference', language: 'Swift' },
     'spec/supabase_swift_v2.yml',
     'spec/common-client-libs-sections.json'
   ).load()
+}
 
-  const ktLibReferenceSource = new ClientLibReferenceLoader(
+export async function fetchKtLibReferenceSource() {
+  return new ClientLibReferenceLoader(
     'kt-lib',
     '/reference/kotlin',
-    { title: 'Kotlin Reference' },
+    { title: 'Kotlin Reference', language: 'Kotlin' },
     'spec/supabase_kt_v1.yml',
     'spec/common-client-libs-sections.json'
   ).load()
+}
 
-  const cliReferenceSource = new CliReferenceLoader(
+export async function fetchCliLibReferenceSource() {
+  return new CliReferenceLoader(
     'cli',
     '/reference/cli',
-    { title: 'CLI Reference' },
+    { title: 'CLI Reference', platform: 'cli' },
     'spec/cli_v1_commands.yaml',
     'spec/common-cli-sections.json'
   ).load()
+}
 
-  const guideSources = (await walk('content'))
-    .filter(({ path }) => /\.mdx?$/.test(path))
-    .filter(({ path }) => !ignoredFiles.includes(path))
-    .map((entry) => new MarkdownLoader('guide', entry.path, { yaml: true }).load())
+export async function fetchLintWarningsGuideSources() {
+  return new LintWarningsGuideLoader(
+    'guide',
+    '/guides/database/database-advisors',
+    'supabase',
+    'splinter',
+    'main',
+    'docs'
+  ).load()
+}
 
-  const partnerIntegrationSources = (await fetchPartners()).map((partner) =>
-    new IntegrationLoader(partner.slug, partner).load()
-  )
+/**
+ * Fetches all the sources we want to index for search
+ */
+export async function fetchAllSources() {
+  const guideSources = fetchGuideSources()
+  const lintWarningsGuideSources = fetchLintWarningsGuideSources()
+  const openApiReferenceSource = fetchOpenApiReferenceSource()
+  const jsLibReferenceSource = fetchJsLibReferenceSource()
+  const dartLibReferenceSource = fetchDartLibReferenceSource()
+  const pythonLibReferenceSource = fetchPythonLibReferenceSource()
+  const cSharpLibReferenceSource = fetchCSharpLibReferenceSource()
+  const swiftLibReferenceSource = fetchSwiftLibReferenceSource()
+  const ktLibReferenceSource = fetchKtLibReferenceSource()
+  const cliReferenceSource = fetchCliLibReferenceSource()
 
-  const githubDiscussionSources = (
-    await fetchDiscussions(
-      'supabase',
-      'supabase',
-      'DIC_kwDODMpXOc4CUvEr' // 'Troubleshooting' category
+  const partnerIntegrationSources = fetchPartners()
+    .then((partners) =>
+      partners
+        ? Promise.all(
+            partners.map((partner) => new IntegrationLoader(partner.slug, partner).load())
+          )
+        : []
     )
-  ).map((discussion) => new GitHubDiscussionLoader('supabase/supabase', discussion).load())
+    .then((data) => data.flat())
+
+  const githubDiscussionSources = fetchDiscussions(
+    'supabase',
+    'supabase',
+    'DIC_kwDODMpXOc4CUvEr' // 'Troubleshooting' category
+  )
+    .then((discussions) =>
+      Promise.all(
+        discussions.map((discussion) =>
+          new GitHubDiscussionLoader('supabase/supabase', discussion).load()
+        )
+      )
+    )
+    .then((data) => data.flat())
 
   const sources: SearchSource[] = (
     await Promise.all([
+      guideSources,
+      lintWarningsGuideSources,
       openApiReferenceSource,
       jsLibReferenceSource,
       dartLibReferenceSource,
@@ -120,9 +186,8 @@ export async function fetchSources() {
       swiftLibReferenceSource,
       ktLibReferenceSource,
       cliReferenceSource,
-      ...githubDiscussionSources,
-      ...partnerIntegrationSources,
-      ...guideSources,
+      partnerIntegrationSources,
+      githubDiscussionSources,
     ])
   ).flat()
 

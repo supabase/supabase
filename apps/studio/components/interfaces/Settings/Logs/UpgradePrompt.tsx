@@ -16,7 +16,6 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
     <Modal
       hideFooter
       visible={show}
-      closable
       size="medium"
       header="Log retention"
       onCancel={() => setShowUpgradePrompt(false)}
@@ -59,7 +58,11 @@ const UpgradePrompt: React.FC<Props> = ({ show, setShowUpgradePrompt }) => {
           Close
         </Button>
         <Button asChild size="tiny">
-          <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>Upgrade</Link>
+          <Link
+            href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=logsRetentionUpgradePrompt`}
+          >
+            Upgrade
+          </Link>
         </Button>
       </Modal.Content>
     </Modal>

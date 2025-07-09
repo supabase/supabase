@@ -12,7 +12,7 @@
       - [Shared components](#shared-components)
       - [Installing packages](#installing-packages)
   - [Running Docker for Supabase Studio](#running-docker-for-supabase-studio)
-    - [Prerequsites](#prerequsites)
+    - [Prerequisites](#prerequisites)
     - [Get Started](#get-started)
   - [Create a pull request](#create-a-pull-request)
   - [Issue assignment](#issue-assignment)
@@ -22,8 +22,6 @@
   - [Community channels](#community-channels)
   - [Contributors](#contributors)
 
-- [Common tasks](#common-tasks)
-  - [Add a redirect](#add-a-redirect)
 - [Community channels](#community-channels)
 
 ## Getting started
@@ -36,9 +34,9 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](http://git-scm.com/)
-- [Node.js v20.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 10.x.x or higher
+- [Git](https://git-scm.com/)
+- [Node.js v20.x (LTS)](https://nodejs.org)
+- [pnpm](https://pnpm.io/) version 9.x.x or higher
 - [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
 
@@ -70,7 +68,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 1. Install the dependencies in the root of the repo.
 
    ```sh
-   npm install # install dependencies
+   pnpm install # install dependencies
    ```
 
 2. Copy the example `.env.local.example` to `.env.local`
@@ -81,7 +79,7 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
 
 3. After that you can run the apps simultaneously with the following.
    ```sh
-   npm run dev # start all the applications
+   pnpm dev # start all the applications
    ```
 
 Then visit, and edit, any of the following sites:
@@ -97,7 +95,7 @@ Then visit, and edit, any of the following sites:
 You can run any of the sites individually by using the scope name. For example:
 
 ```sh
-npm run dev:www
+pnpm dev:www
 ```
 
 Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
@@ -115,17 +113,13 @@ The monorepo has a set of shared components under `/packages`:
 
 #### Installing packages
 
-Installing a package with NPM workspaces requires you to add the `-w` flag to tell NPM which workspace you want to install into. Do not install dependencies in their local folder, install them from the route using the `-w` flag.
-
-The format is: `npm install <package name> -w=<workspace to install in>`.
+Installing a package in a specific workspace requires you to move to the workspace and then run the install command.
 
 For example:
 
-- `npm install react -w common`: installs into `./packages/common`
-- `npm install react -w www`: installs into `./apps/www`
-- `npm install react -w studio`: installs into `./apps/studio`
+1. `cd apps/studio`: move to the `studio` workspace
+2. `pnpm add react`: installs `react` into `studio` workspace
 
-You do not need to install `devDependencies` in each workspace. These can all be installed in the root package.
 
 ---
 
@@ -133,7 +127,7 @@ You do not need to install `devDependencies` in each workspace. These can all be
 
 To run Studio locally, you'll need to setup Docker in addition to your NextJS frontend.
 
-#### Prerequsites
+#### Prerequisites
 
 First, make sure you have the Docker installed on your device. You can download and install it from [here](https://docs.docker.com/get-docker/).
 

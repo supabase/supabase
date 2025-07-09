@@ -6,7 +6,6 @@
   "printWidth": 100,
   "endOfLine": "lf",
   "sqlKeywordCase": "lower",
-  "pluginSearchDirs": false,
   "plugins": ["prettier-plugin-sql-cst"],
   "overrides": [
     {

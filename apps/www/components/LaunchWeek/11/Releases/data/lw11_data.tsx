@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { products } from 'shared-data/products'
+import ProductModules from '../../../../../data/ProductModules'
 
 type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog' | 'podcast'
 
@@ -108,7 +109,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         url: 'https://supabase.com/docs/guides/realtime',
       },
       {
-        icon: products.vector.icon[16],
+        icon: ProductModules.vector.icon[16],
         title: 'Vector',
         description: 'AI toolkit to manage embeddings',
         url: 'https://supabase.com/docs/guides/ai',

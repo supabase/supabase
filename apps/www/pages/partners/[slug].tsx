@@ -36,26 +36,16 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     .eq('slug', params!.slug as string)
     .single()
 
-  if (!partner || process.env.npm_lifecycle_event === 'build') {
+  if (!partner || partner.type === 'expert' || process.env.npm_lifecycle_event === 'build') {
     return {
       notFound: true,
     }
   }
 
-  let redirectUrl: string
-  switch (partner.type) {
-    case 'technology':
-      redirectUrl = `/partners/integrations/${partner.slug}`
-      break
-    case 'expert':
-      redirectUrl = `/partners/experts/${partner.slug}`
-      break
-  }
-
   return {
     redirect: {
       permanent: false,
-      destination: redirectUrl,
+      destination: `/partners/integrations/${partner.slug}`,
     },
   }
 }

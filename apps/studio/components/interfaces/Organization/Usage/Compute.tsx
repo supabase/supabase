@@ -48,6 +48,14 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
     [ComputeUsageMetric.COMPUTE_HOURS_8XL]: 'red',
     [ComputeUsageMetric.COMPUTE_HOURS_12XL]: 'dark-red',
     [ComputeUsageMetric.COMPUTE_HOURS_16XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_OPTIMIZED_CPU]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_24XL_HIGH_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_OPTIMIZED_CPU]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY]: 'purple',
+    [ComputeUsageMetric.COMPUTE_HOURS_48XL_HIGH_MEMORY]: 'purple',
   }
 
   const attributes: Attribute[] = Object.keys(ComputeUsageMetric).map((it) => ({
@@ -78,7 +86,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
             },
             {
               name: 'Usage-billing for Compute',
-              url: 'https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
+              url: 'https://supabase.com/docs/guides/platform/manage-your-usage/compute',
             },
           ],
         }}

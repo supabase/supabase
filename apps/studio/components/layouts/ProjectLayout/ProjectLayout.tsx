@@ -1,36 +1,38 @@
-import { useParams } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
+import { useParams } from 'common'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
+import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import AISettingsModal from 'components/ui/AISettingsModal'
+import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
+import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
-import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { PROJECT_STATUS } from 'lib/constants'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
-import AppLayout from '../AppLayout/AppLayout'
-import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
-import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
-import { ProjectContextProvider } from './ProjectContext'
+import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ResizingState } from './ResizingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -63,47 +65,85 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
-  hideHeader?: boolean
-  hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
 }
 
-const ProjectLayout = ({
-  title,
-  isLoading = false,
-  isBlocking = true,
-  product = '',
-  productMenu,
-  children,
-  hideHeader = false,
-  hideIconBar = false,
-  selectedTable,
-  resizableSidebar = false,
-}: PropsWithChildren<ProjectLayoutProps>) => {
-  const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-  const projectName = selectedProject?.name
-  const organizationName = selectedOrganization?.name
+const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
+  (
+    {
+      title,
+      isLoading = false,
+      isBlocking = true,
+      product = '',
+      productMenu,
+      children,
+      selectedTable,
+      resizableSidebar = false,
+    },
+    ref
+  ) => {
+    const router = useRouter()
+    const [isClient, setIsClient] = useState(false)
+    const selectedOrganization = useSelectedOrganization()
+    const selectedProject = useSelectedProject()
+    const projectRefForGitHubLinker = selectedProject?.parent_project_ref ?? selectedProject?.ref
+    const {
+      editorPanel,
+      mobileMenuOpen,
+      showSidebar,
+      setMobileMenuOpen,
+      toggleEditorPanel,
+      setEditorPanel,
+    } = useAppStateSnapshot()
+    const aiSnap = useAiAssistantStateSnapshot()
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+    const editor = useEditorType()
+    const forceShowProductMenu = editor === undefined
+    const sideBarIsOpen = forceShowProductMenu || showSidebar
 
-  const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-  const showProductMenu = selectedProject
-    ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-      (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-        router.pathname.includes('/project/[ref]/settings'))
-    : true
+    const projectName = selectedProject?.name
+    const organizationName = selectedOrganization?.name
 
-  const ignorePausedState =
-    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
-  const showPausedState = isPaused && !ignorePausedState
+    const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+    const showProductMenu = selectedProject
+      ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+        (selectedProject.status === PROJECT_STATUS.COMING_UP &&
+          router.pathname.includes('/project/[ref]/settings'))
+      : true
 
-  return (
-    <AppLayout>
-      <ProjectContextProvider projectRef={projectRef}>
+    const ignorePausedState =
+      router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+    const showPausedState = isPaused && !ignorePausedState
+
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+
+    useEffect(() => {
+      const handler = (e: KeyboardEvent) => {
+        // Cmd+I: Open AI Assistant, close Editor Panel
+        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
+          setEditorPanel({ open: false })
+          aiSnap.toggleAssistant()
+          e.preventDefault()
+          e.stopPropagation()
+        }
+        // Cmd+E: Toggle Editor Panel, always close AI Assistant
+        if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
+          aiSnap.closeAssistant()
+          toggleEditorPanel()
+          e.preventDefault()
+          e.stopPropagation()
+        }
+      }
+      window.addEventListener('keydown', handler)
+      return () => window.removeEventListener('keydown', handler)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setEditorPanel, aiSnap, editorPanel.open])
+
+    return (
+      <>
         <Head>
           <title>
             {title
@@ -118,62 +158,118 @@ const ProjectLayout = ({
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        <div className="flex h-full">
-          {/* Left-most navigation side bar to access products */}
-          {!hideIconBar && <NavigationBar />}
-          {/* Product menu bar */}
-          <ResizablePanelGroup
-            className="flex h-full"
-            direction="horizontal"
-            autoSaveId="project-layout"
-          >
-            <ResizablePanel
-              id="panel-left"
-              className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                hidden: !showProductMenu || !productMenu,
-              })}
-              defaultSize={0} // forces panel to smallest width possible, at w-64
-            >
-              <MenuBarWrapper
-                isLoading={isLoading}
-                isBlocking={isBlocking}
-                productMenu={productMenu}
-              >
-                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-              </MenuBarWrapper>
-            </ResizablePanel>
-            <ResizableHandle
-              className={cn({ hidden: !showProductMenu || !productMenu })}
-              withHandle
-              disabled={resizableSidebar ? false : true}
-            />
-            <ResizablePanel id="panel-right" className="h-full flex flex-col">
-              {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                    <div className="w-full">
-                      <ProjectPausedState product={product} />
-                    </div>
-                  </div>
-                ) : (
-                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                    <ResourceExhaustionWarningBanner />
-                    {children}
-                  </ContentWrapper>
+        <div className="flex flex-row h-full w-full">
+          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
+            {showProductMenu && productMenu && (
+              <ResizablePanel
+                order={1}
+                maxSize={33}
+                defaultSize={1}
+                id="panel-left"
+                className={cn(
+                  'hidden md:block',
+                  'transition-all duration-[120ms]',
+                  sideBarIsOpen
+                    ? resizableSidebar
+                      ? 'min-w-64 max-w-[32rem]'
+                      : 'min-w-64 max-w-64'
+                    : 'w-0 flex-shrink-0 max-w-0'
                 )}
-              </main>
+              >
+                {sideBarIsOpen && (
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      initial={{ width: 0, opacity: 0, height: '100%' }}
+                      animate={{ width: 'auto', opacity: 1, height: '100%' }}
+                      exit={{ width: 0, opacity: 0, height: '100%' }}
+                      className="h-full"
+                      transition={{ duration: 0.12 }}
+                    >
+                      <MenuBarWrapper
+                        isLoading={isLoading}
+                        isBlocking={isBlocking}
+                        productMenu={productMenu}
+                      >
+                        <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                      </MenuBarWrapper>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+              </ResizablePanel>
+            )}
+            {showProductMenu && productMenu && sideBarIsOpen && (
+              <ResizableHandle
+                withHandle
+                disabled={resizableSidebar ? false : true}
+                className="hidden md:flex"
+              />
+            )}
+            <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
+              <ResizablePanelGroup
+                direction="horizontal"
+                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+                autoSaveId="project-layout-content"
+              >
+                <ResizablePanel
+                  id="panel-content"
+                  className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
+                >
+                  <main
+                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
+                    ref={ref}
+                  >
+                    {showPausedState ? (
+                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                        <div className="w-full">
+                          <ProjectPausedState product={product} />
+                        </div>
+                      </div>
+                    ) : (
+                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                        <ResourceExhaustionWarningBanner />
+                        {children}
+                      </ContentWrapper>
+                    )}
+                  </main>
+                </ResizablePanel>
+                {isClient && (aiSnap.open || editorPanel.open) && (
+                  <>
+                    <ResizableHandle withHandle />
+                    <ResizablePanel
+                      id="panel-assistant"
+                      minSize={30}
+                      maxSize={50}
+                      className={cn(
+                        'border-l bg fixed z-40 right-0 top-0 bottom-0',
+                        'w-screen h-[100dvh]',
+                        'md:absolute md:h-auto md:w-3/4',
+                        'xl:relative xl:border-l-0'
+                      )}
+                    >
+                      {aiSnap.open ? (
+                        <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
+                      ) : editorPanel.open ? (
+                        <EditorPanel />
+                      ) : null}
+                    </ResizablePanel>
+                  </>
+                )}
+              </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-
-        <EnableBranchingModal />
-        <AISettingsModal />
+        <CreateBranchModal />
+        <SidePanelGitHubRepoLinker projectRef={projectRefForGitHubLinker} />
         <ProjectAPIDocs />
-      </ProjectContextProvider>
-    </AppLayout>
-  )
-}
+        <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          {productMenu}
+        </MobileSheetNav>
+      </>
+    )
+  }
+)
+
+ProjectLayout.displayName = 'ProjectLayout'
 
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
 

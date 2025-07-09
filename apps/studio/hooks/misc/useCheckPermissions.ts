@@ -3,11 +3,11 @@ import jsonLogic from 'json-logic-js'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
 import { useSelectedProject } from './useSelectedProject'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -80,12 +80,11 @@ export function useGetProjectPermissions(
   projectRefOverride?: string,
   enabled = true
 ) {
-  const permissionsResult = usePermissionsQuery({
+  const { data, isLoading, isSuccess } = usePermissionsQuery({
     enabled: permissionsOverride === undefined && enabled,
   })
 
-  const permissions =
-    permissionsOverride === undefined ? permissionsResult.data : permissionsOverride
+  const permissions = permissionsOverride === undefined ? data : permissionsOverride
 
   const organizationResult = useSelectedOrganization({
     enabled: organizationSlugOverride === undefined && enabled,
@@ -109,6 +108,8 @@ export function useGetProjectPermissions(
     permissions,
     organizationSlug,
     projectRef,
+    isLoading,
+    isSuccess,
   }
 }
 
@@ -171,4 +172,46 @@ export function usePermissionsLoaded() {
   }
 
   return isLoggedIn && isPermissionsFetched && isOrganizationsFetched
+}
+
+// Useful when you want to avoid layout changes while waiting for permissions to load
+export function useAsyncCheckProjectPermissions(
+  action: string,
+  resource: string,
+  data?: object,
+  overrides?: {
+    organizationSlug?: string
+    projectRef?: string
+    permissions?: Permission[]
+  }
+) {
+  const isLoggedIn = useIsLoggedIn()
+  const { organizationSlug, projectRef, permissions } = overrides ?? {}
+
+  const {
+    permissions: allPermissions,
+    organizationSlug: _organizationSlug,
+    projectRef: _projectRef,
+    isLoading: isPermissionsLoading,
+    isSuccess: isPermissionsSuccess,
+  } = useGetProjectPermissions(permissions, organizationSlug, projectRef, isLoggedIn)
+
+  if (!isLoggedIn)
+    return {
+      isLoading: true,
+      isSuccess: false,
+      can: false,
+    }
+  if (!IS_PLATFORM)
+    return {
+      isLoading: false,
+      isSuccess: true,
+      can: true,
+    }
+
+  return {
+    isLoading: isPermissionsLoading,
+    isSuccess: isPermissionsSuccess,
+    can: doPermissionsCheck(allPermissions, action, resource, data, _organizationSlug, _projectRef),
+  }
 }

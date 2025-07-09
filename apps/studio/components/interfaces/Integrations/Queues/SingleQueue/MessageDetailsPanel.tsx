@@ -47,8 +47,7 @@ export const MessageDetailsPanel = ({
   selectedMessage,
   setSelectedMessage,
 }: MessageDetailsPanelProps) => {
-  const { id: _id } = useParams()
-  const { name: queueName } = useParams()
+  const { id: _id, childId: queueName } = useParams()
   const project = useSelectedProject()
 
   useEscapeKeydown(() => setSelectedMessage(null))

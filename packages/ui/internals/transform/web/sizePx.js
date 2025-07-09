@@ -5,5 +5,5 @@ module.exports = {
   },
   transformer: function (token) {
     return `${token.value}px`
-  }
+  },
 }

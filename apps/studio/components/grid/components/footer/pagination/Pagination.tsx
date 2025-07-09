@@ -2,18 +2,18 @@ import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
+import { isTable } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useUrlState } from 'hooks/ui/useUrlState'
+import { RoleImpersonationState } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useDispatch, useTrackedState } from '../../../store/Store'
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
 
@@ -27,10 +27,9 @@ const Pagination = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const state = useTrackedState()
-  const dispatch = useDispatch()
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
+  const snap = useTableEditorTableStateSnapshot()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -39,10 +38,9 @@ const Pagination = () => {
   })
 
   // rowsCountEstimate is only applicable to table entities
-  const rowsCountEstimate = isTableLike(selectedTable) ? selectedTable.live_rows_estimate : null
+  const rowsCountEstimate = isTable(selectedTable) ? selectedTable.live_rows_estimate : null
 
-  const [{ filter }] = useUrlState({ arrayKeys: ['filter'] })
-  const filters = formatFilterURLParams(filter as string[])
+  const { filters } = useTableFilter()
   const page = snap.page
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -57,33 +55,27 @@ const Pagination = () => {
     setValue(String(page))
   }, [page])
 
-  const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
+  const { data, isLoading, isSuccess, isError, isFetching, error } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      tableId: id,
+      tableId: snap.table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
       keepPreviousData: true,
-      onSuccess(data) {
-        dispatch({
-          type: 'SET_ROWS_COUNT',
-          payload: data.count,
-        })
-      },
     }
   )
 
   const count = data?.is_estimate ? formatEstimatedCount(data.count) : data?.count.toLocaleString()
-  const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
+  const maxPages = Math.ceil((data?.count ?? 0) / tableEditorSnap.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
   const onPreviousPage = () => {
     if (page > 1) {
-      if (state.selectedRows.size >= 1) {
+      if (snap.selectedRows.size >= 1) {
         setIsConfirmPreviousModalOpen(true)
       } else {
         goToPreviousPage()
@@ -93,15 +85,11 @@ const Pagination = () => {
 
   const onConfirmPreviousPage = () => {
     goToPreviousPage()
-    dispatch({
-      type: 'SELECTED_ROWS_CHANGE',
-      payload: { selectedRows: new Set() },
-    })
   }
 
   const onNextPage = () => {
     if (page < maxPages) {
-      if (state.selectedRows.size >= 1) {
+      if (snap.selectedRows.size >= 1) {
         setIsConfirmNextModalOpen(true)
       } else {
         goToNextPage()
@@ -111,10 +99,6 @@ const Pagination = () => {
 
   const onConfirmNextPage = () => {
     goToNextPage()
-    dispatch({
-      type: 'SELECTED_ROWS_CHANGE',
-      payload: { selectedRows: new Set() },
-    })
   }
 
   const goToPreviousPage = () => {
@@ -134,7 +118,7 @@ const Pagination = () => {
 
   const onRowsPerPageChange = (value: string | number) => {
     const rowsPerPage = Number(value)
-    snap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
+    tableEditorSnap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
   }
 
   useEffect(() => {
@@ -148,6 +132,14 @@ const Pagination = () => {
       snap.setEnforceExactCount(rowsCountEstimate !== null && rowsCountEstimate <= THRESHOLD_COUNT)
     }
   }, [id])
+
+  useEffect(() => {
+    // If the count query encountered a timeout error with exact count
+    // turn off the exact count to rely on approximate
+    if (isError && snap.enforceExactCount && error?.code === 408) {
+      snap.setEnforceExactCount(false)
+    }
+  }, [isError, snap.enforceExactCount, error?.code])
 
   return (
     <div className="flex items-center gap-x-4">
@@ -201,7 +193,7 @@ const Pagination = () => {
               align="start"
             >
               <Button asChild type="outline" style={{ padding: '3px 10px' }}>
-                <span>{`${snap.rowsPerPage} rows`}</span>
+                <span>{`${tableEditorSnap.rowsPerPage} rows`}</span>
               </Button>
             </DropdownControl>
           </div>
@@ -213,8 +205,8 @@ const Pagination = () => {
             </p>
 
             {data.is_estimate && (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
                     size="tiny"
                     type="text"
@@ -228,15 +220,15 @@ const Pagination = () => {
                       } else snap.setEnforceExactCount(true)
                     }}
                   />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="top" className="w-72">
+                </TooltipTrigger>
+                <TooltipContent side="top" className="w-72">
                   This is an estimated value as your table has more than{' '}
                   {THRESHOLD_COUNT.toLocaleString()} rows. <br />
                   <span className="text-brand">
                     Click to retrieve the exact count of the table.
                   </span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </>

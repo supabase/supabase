@@ -10,7 +10,6 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
@@ -25,8 +24,6 @@ const SignInMfaForm = () => {
   const queryClient = useQueryClient()
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
 
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const {
     data: factors,
     error: factorsError,
@@ -40,7 +37,6 @@ const SignInMfaForm = () => {
     isSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {
-      sendEvent({ category: 'account', action: 'sign_in', label: '' })
       await queryClient.resetQueries()
       router.push(getReturnToPath())
     },
@@ -150,6 +146,9 @@ const SignInMfaForm = () => {
               }?`}</a>
             </li>
           )}
+          <li>
+            <Link href="/logout">Force sign out and clear cookies</Link>
+          </li>
           <li>
             <Link
               target="_blank"

@@ -9,7 +9,7 @@ export {
   isResponseOk,
 } from './base'
 export { delete_ } from './delete'
-export { get, getWithTimeout } from './get'
+export { get } from './get'
 export { head, headWithTimeout } from './head'
 export { patch } from './patch'
 export { post } from './post'

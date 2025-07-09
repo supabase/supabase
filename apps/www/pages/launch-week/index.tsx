@@ -1,42 +1,18 @@
-import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
-import { GetServerSideProps } from 'next'
-import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { Session } from '@supabase/supabase-js'
-import { LW12_DATE, LW12_TITLE, LW_URL, SITE_ORIGIN } from '~/lib/constants'
-import supabase from '~/lib/supabase'
+import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
+import { useRouter } from 'next/router'
 
-import DefaultLayout from '~/components/Layouts/Default'
-import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Meetup } from '~/components/LaunchWeek/12/LWMeetups'
-import LWStickyNav from '~/components/LaunchWeek/12/Releases/LWStickyNav'
-import LWHeader from '~/components/LaunchWeek/12/Releases/LWHeader'
-import MainStage from '~/components/LaunchWeek/12/Releases/MainStage'
+import { Lw15ConfDataProvider } from 'components/LaunchWeek/15/hooks/use-conf-data'
+import DefaultLayout from 'components/Layouts/Default'
+import LW15LandingPage from 'components/LaunchWeek/15/Ticketing/LW15LandingPage'
 
-const BuildStage = dynamic(() => import('~/components/LaunchWeek/12/Releases/BuildStage'))
-const CTABanner = dynamic(() => import('~/components/CTABanner'))
-const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/12/LaunchWeekPrizeSection')
-)
-const LW12Meetups = dynamic(() => import('~/components/LaunchWeek/12/LWMeetups'))
+const Lw15Page = () => {
+  const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
+  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8AM PT.'
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/15/lw15-og.png?lw=15`
 
-interface Props {
-  meetups?: Meetup[]
-}
-
-export default function LaunchWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
-
-  const TITLE = `${LW12_TITLE} | ${LW12_DATE}`
-  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/12/lw12-og.png?lw=12`
-
   const ticketNumber = query.ticketNumber?.toString()
-  const [session, setSession] = useState<Session | null>(null)
-  const [showCustomizationForm, setShowCustomizationForm] = useState<boolean>(false)
-
   const defaultUserData = {
     id: query.id?.toString(),
     ticket_number: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
@@ -44,32 +20,6 @@ export default function LaunchWeekIndex({ meetups }: Props) {
     username: query.username?.toString(),
     platinum: !!query.platinum,
   }
-
-  const [userData, setUserData] = useState<UserData>(defaultUserData)
-  const [ticketState, setTicketState] = useState<TicketState>('loading')
-
-  useEffect(() => {
-    if (supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session)
-      })
-
-      return () => subscription.unsubscribe()
-    }
-  }, [supabase])
-
-  useEffect(() => {
-    if (session?.user) {
-      if (userData?.id) {
-        return setTicketState('ticket')
-      }
-      return setTicketState('loading')
-    }
-    if (!session) return setTicketState('registration')
-  }, [session, userData])
 
   return (
     <>
@@ -79,7 +29,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: LW_URL,
+          url: LW15_URL,
           images: [
             {
               url: OG_IMAGE,
@@ -87,47 +37,22 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           ],
         }}
       />
-      <ConfDataContext.Provider
-        value={{
-          supabase,
-          session,
-          userData,
-          setUserData,
-          ticketState,
-          setTicketState,
-          showCustomizationForm,
-          setShowCustomizationForm,
-        }}
-      >
-        <DefaultLayout>
-          <LWStickyNav />
-          <LWHeader />
-          <MainStage className="relative z-10" />
-          <BuildStage />
-          <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor">
-            <LW12Meetups meetups={meetups} />
-          </SectionContainer>
-          <SectionContainer className="!pt-8 scroll-mt-[60px] lw-nav-anchor" id="awards">
-            <LaunchWeekPrizeSection />
-          </SectionContainer>
-          <CTABanner />
+
+      <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
+        <DefaultLayout className="!min-h-[calc(100dvh-66px)] h-[calc(100dvh-66px)] dark:bg-black">
+          <div
+            style={{
+              fontFamily:
+                "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+            }}
+            className="h-full"
+          >
+            <LW15LandingPage />
+          </div>
         </DefaultLayout>
-      </ConfDataContext.Provider>
+      </Lw15ConfDataProvider>
     </>
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { data: meetups } = await supabase!
-    .from('meetups')
-    .select('*')
-    .eq('launch_week', 'lw12')
-    .neq('is_published', false)
-    .order('start_at')
-
-  return {
-    props: {
-      meetups,
-    },
-  }
-}
+export default Lw15Page

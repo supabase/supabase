@@ -1,10 +1,12 @@
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -27,6 +29,8 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   )
   const jwtSecret = postgrestConfig?.jwt_secret
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   // only send a telemetry event if the user changes the role. Don't send an event during initial render.
@@ -35,12 +39,12 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   useEffect(() => {
     if (isMounted.current) {
       sendEvent({
-        category: 'realtime_inspector',
-        action: 'changed_database_role',
-        label: 'realtime_inspector_config',
+        action: 'realtime_inspector_database_role_updated',
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
     isMounted.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.role])
 
   useEffect(() => {
@@ -67,6 +71,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     }
 
     triggerUpdateTokenBearer()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.role, anonKey, serviceKey])
 
   return <RoleImpersonationPopover align="start" variant="connected-on-both" />

@@ -1,13 +1,12 @@
-import { toString as CronToString } from 'cronstrue'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { useDebounce } from 'use-debounce'
 
-import { useCompletion } from 'ai/react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
 import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
-import { BASE_PATH } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -19,50 +18,45 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   SheetSection,
   Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
+import { formatScheduleString, getScheduleMessage } from './CronJobs.utils'
 import CronSyntaxChart from './CronSyntaxChart'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
+  supportsSeconds: boolean
 }
 
-const presets = [
-  { name: 'Every minute', expression: '* * * * * *' },
-  { name: 'Every 5 minutes', expression: '*/5 * * * *' },
-  { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
-  { name: 'Every Monday at midnight', expression: '0 0 * * 1' },
-  { name: 'Every night at midnight', expression: '0 0 0 * * *' },
-] as const
-
-export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) => {
+export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
   const { project } = useProjectContext()
-  const initialValue = form.getValues('schedule')
-  const { schedule } = form.watch()
 
-  const [presetValue, setPresetValue] = useState<string>(initialValue)
-  const [inputValue, setInputValue] = useState(initialValue)
-  const [debouncedValue] = useDebounce(inputValue, 500)
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
+  const [inputValue, setInputValue] = useState('')
+  const [debouncedValue] = useDebounce(inputValue, 750)
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
-  const [scheduleString, setScheduleString] = useState('')
 
-  const { complete: generateCronSyntax, isLoading: isGeneratingCron } = useCompletion({
-    api: `${BASE_PATH}/api/ai/sql/cron`,
-    onResponse: async (response) => {
-      if (response.ok) {
-        // remove quotes from the cron expression
-        const expression = (await response.text()).trim().replace(/^"|"$/g, '')
-        form.setValue('schedule', expression)
-        setPresetValue(expression)
-        setScheduleString(CronToString(expression))
-      }
-    },
-    onError: (error) => {
-      console.error('Error generating cron:', error)
+  const PRESETS = [
+    ...(supportsSeconds ? [{ name: 'Every 30 seconds', expression: '30 seconds' }] : []),
+    { name: 'Every minute', expression: '* * * * *' },
+    { name: 'Every 5 minutes', expression: '*/5 * * * *' },
+    { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
+    { name: 'Every night at midnight', expression: '0 0 * * *' },
+    { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
+  ] as const
+
+  const { mutate: generateCronSyntax, isLoading: isGeneratingCron } = useSqlCronGenerateMutation({
+    onSuccess: (expression) => {
+      form.setValue('schedule', expression, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      })
     },
   })
 
@@ -72,27 +66,14 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
   })
 
   useEffect(() => {
-    if (!useNaturalLanguage || !debouncedValue) return
-    generateCronSyntax(debouncedValue)
+    if (useNaturalLanguage && debouncedValue) {
+      generateCronSyntax({ prompt: debouncedValue, useBedrockAssistant })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, useNaturalLanguage])
 
-  useEffect(() => {
-    if (!inputValue) return
-
-    // update the cronstrue string when the input value changes
-    try {
-      setScheduleString(CronToString(inputValue))
-      form.setValue('schedule', inputValue)
-    } catch {}
-  }, [form, inputValue])
-
-  useEffect(() => {
-    if (!useNaturalLanguage) {
-      setPresetValue(schedule)
-      setScheduleString(CronToString(schedule))
-    }
-  }, [schedule])
+  const schedule = form.watch('schedule')
+  const scheduleString = formatScheduleString(schedule)
 
   return (
     <SheetSection>
@@ -102,127 +83,111 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
         render={({ field }) => {
           return (
             <FormItem_Shadcn_ className="flex flex-col gap-1">
-              <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
-              <FormLabel_Shadcn_ className="text-foreground-lighter">
-                {useNaturalLanguage ? 'Describe your schedule in words' : 'Enter a cron expression'}
-              </FormLabel_Shadcn_>
+              <div className="flex flex-row justify-between">
+                <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
+                <span className="text-foreground-lighter text-xs">
+                  {useNaturalLanguage
+                    ? 'Describe your schedule in words'
+                    : 'Enter a cron expression'}
+                </span>
+              </div>
+
               <FormControl_Shadcn_>
-                <div className="flex flex-col gap-y-2">
-                  {useNaturalLanguage ? (
-                    <Input
-                      value={inputValue}
-                      placeholder="E.g. every 5 minutes"
-                      className={cn(!useNaturalLanguage && 'hidden')}
-                      onChange={(e) => setInputValue(e.target.value)}
-                    />
-                  ) : (
-                    <Input_Shadcn_
-                      {...field}
-                      autoComplete="off"
-                      placeholder="* * * * *"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                        }
-                      }}
-                    />
-                  )}
-
-                  <div className="flex items-center gap-2 mt-2">
-                    <Switch
-                      checked={useNaturalLanguage}
-                      onCheckedChange={() => {
-                        setUseNaturalLanguage(!useNaturalLanguage)
-                        setInputValue('')
-                        setPresetValue('')
-                        setScheduleString('')
-                      }}
-                    />
-                    <p className="text-sm text-foreground-light">Use natural language</p>
-                  </div>
-
-                  <div className="mt-2">
-                    <ul className="flex gap-2 flex-wrap mt-2">
-                      {presets.map((preset) => (
-                        <li key={preset.name}>
-                          <Button
-                            type="outline"
-                            onClick={() => {
-                              setUseNaturalLanguage(false)
-                              form.setValue('schedule', preset.expression)
-                              setPresetValue(preset.expression)
-                            }}
-                          >
-                            {preset.name}
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <Accordion_Shadcn_ type="single" collapsible className="mt-2 pb-2">
-                    <AccordionItem_Shadcn_ value="item-1" className="border-none">
-                      <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
-                        View syntax chart
-                      </AccordionTrigger_Shadcn_>
-                      <AccordionContent_Shadcn_ asChild className="!pb-0">
-                        <CronSyntaxChart />
-                      </AccordionContent_Shadcn_>
-                    </AccordionItem_Shadcn_>
-                  </Accordion_Shadcn_>
-                </div>
+                {useNaturalLanguage ? (
+                  <Input
+                    value={inputValue}
+                    placeholder="E.g. every 5 minutes"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                      }
+                    }}
+                    onChange={(e) => setInputValue(e.target.value)}
+                  />
+                ) : (
+                  <Input_Shadcn_
+                    {...field}
+                    autoComplete="off"
+                    placeholder="* * * * *"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                      }
+                    }}
+                  />
+                )}
               </FormControl_Shadcn_>
+              <FormMessage_Shadcn_ />
+              <div className="flex flex-col gap-y-4 mt-3 mb-2">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={useNaturalLanguage}
+                    onCheckedChange={() => {
+                      setUseNaturalLanguage(!useNaturalLanguage)
+                      setInputValue('')
+                    }}
+                  />
+                  <p className="text-sm text-foreground-light">Use natural language</p>
+                </div>
 
+                <ul className="flex gap-2 flex-wrap mt-2">
+                  {PRESETS.map((preset) => (
+                    <li key={preset.name}>
+                      <Button
+                        type="outline"
+                        onClick={() => {
+                          if (useNaturalLanguage) {
+                            setUseNaturalLanguage(false)
+                          }
+                          form.setValue('schedule', preset.expression, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          })
+                        }}
+                      >
+                        {preset.name}
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+                <Accordion_Shadcn_ type="single" collapsible>
+                  <AccordionItem_Shadcn_ value="item-1" className="border-none">
+                    <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
+                      View syntax chart
+                    </AccordionTrigger_Shadcn_>
+                    <AccordionContent_Shadcn_ asChild className="!pb-0">
+                      <CronSyntaxChart />
+                    </AccordionContent_Shadcn_>
+                  </AccordionItem_Shadcn_>
+                </Accordion_Shadcn_>
+              </div>
               <div className="bg-surface-100 p-4 rounded grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">
                   Schedule {timezone ? `(${timezone})` : ''}
                 </h4>
-                {scheduleString ? (
-                  <span
-                    className={cn(
-                      'text-xl font-mono',
-                      isGeneratingCron ? 'animate-pulse text-foreground-lighter' : 'text-foreground'
-                    )}
-                  >
-                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
-                  </span>
-                ) : (
-                  <span className="text-xl font-mono text-foreground-lighter">
-                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
-                  </span>
-                )}
+                <span
+                  className={cn(
+                    'text-xl font-mono',
+                    scheduleString
+                      ? isGeneratingCron
+                        ? 'animate-pulse text-foreground-lighter'
+                        : 'text-foreground'
+                      : 'text-foreground-lighter'
+                  )}
+                >
+                  {isGeneratingCron ? <CronSyntaxLoader /> : schedule || '* * * * * *'}
+                </span>
+
                 {!inputValue && !isGeneratingCron && !scheduleString ? (
                   <span className="text-sm text-foreground-light">
                     Describe your schedule above
                   </span>
-                ) : scheduleString ? (
+                ) : (
                   <span className="text-sm text-foreground-light flex items-center gap-2">
-                    The cron will be run {/* lowercase the first letter */}
-                    {isGeneratingCron ? (
-                      <span className="inline-flex items-center">
-                        {[0, 1, 2].map((i) => (
-                          <motion.span
-                            key={i}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{
-                              duration: 0.5,
-                              repeat: Infinity,
-                              repeatType: 'reverse',
-                              delay: i * 0.2,
-                            }}
-                          >
-                            .
-                          </motion.span>
-                        ))}
-                      </span>
-                    ) : (
-                      scheduleString
-                        .split(' ')
-                        .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
-                        .join(' ') + '.'
-                    )}
+                    {isGeneratingCron ? <LoadingDots /> : getScheduleMessage(scheduleString)}
                   </span>
-                ) : null}
+                )}
               </div>
             </FormItem_Shadcn_>
           )
@@ -235,7 +200,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
 const CronSyntaxLoader = () => {
   return (
     <div className="flex gap-2">
-      {['*', '*', '*', '*', '*', '*'].map((char, i) => (
+      {['*', '*', '*', '*', '*'].map((char, i) => (
         <motion.span
           key={i}
           initial={{ opacity: 0.3 }}
@@ -251,5 +216,27 @@ const CronSyntaxLoader = () => {
         </motion.span>
       ))}
     </div>
+  )
+}
+
+const LoadingDots = () => {
+  return (
+    <span className="inline-flex items-center">
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            delay: i * 0.2,
+          }}
+        >
+          .
+        </motion.span>
+      ))}
+    </span>
   )
 }

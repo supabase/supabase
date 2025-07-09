@@ -25,7 +25,7 @@ with records as (
         'NO_TRIGGERS'
       )
       when 'v' then concat(
-        'create view ', concat(nc.nspname, '.', c.relname), ' as', 
+        'create view ', concat(nc.nspname, '.', c.relname), ' as',
         pg_get_viewdef(concat(nc.nspname, '.', c.relname), true)
       )
       when 'm' then concat(
@@ -78,7 +78,7 @@ from records r;
 export type EntityDefinitionsVariables = {
   limit?: number
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schemas: string[]
 }
 

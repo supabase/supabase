@@ -1,14 +1,14 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
   ArrowRight,
   Clock,
   ExternalLink,
   GitPullRequest,
+  Github,
   Infinity,
   MoreVertical,
+  Pencil,
   RefreshCw,
   Shield,
   Trash2,
@@ -18,6 +18,8 @@ import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
@@ -32,12 +34,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
+import { EditBranchModal } from './EditBranchModal'
 import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
@@ -105,8 +108,10 @@ export const BranchRow = ({
 }: BranchRowProps) => {
   const { ref: projectRef } = useParams()
   const isActive = projectRef === branch?.project_ref
+  const gitlessBranching = useFlag('gitlessBranching')
 
   const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
+  const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
@@ -114,14 +119,6 @@ export const BranchRow = ({
 
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
-
-  const branchingWorkflowLogsEnabled = useFlag('branchingWorkflowLogs')
-
-  const shouldRenderGitHubLogsButton =
-    !branchingWorkflowLogsEnabled &&
-    branch.pr_number !== undefined &&
-    branch.latest_check_run_id !== undefined
-  const checkRunLogsURL = `https://github.com/${repo}/pull/${branch.pr_number}/checks?check_run_id=${branch.latest_check_run_id}`
 
   const { ref, inView } = useInView()
   const { data } = useBranchQuery(
@@ -142,6 +139,7 @@ export const BranchRow = ({
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+  const [showEditBranchModal, setShowEditBranchModal] = useState(false)
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onSuccess() {
@@ -170,44 +168,33 @@ export const BranchRow = ({
   return (
     <div className="w-full flex items-center justify-between px-6 py-2.5" ref={ref}>
       <div className="flex items-center gap-x-4">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button
-              asChild
-              type="default"
-              className="max-w-[300px]"
-              icon={
-                isMain ? (
-                  <Shield strokeWidth={2} className="text-amber-900" />
-                ) : branch.persistent ? (
-                  <Infinity size={16} />
-                ) : null
-              }
-            >
-              <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
-                {branch.name}
-              </Link>
-            </Button>
-          </Tooltip.Trigger>
-          {branch.persistent && (
-            <Tooltip.Portal>
-              <Tooltip.Content side="top">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    {branch.name} is a persistent branch and will remain active even after the
-                    underlying PR is closed
-                  </span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
+        <ButtonTooltip
+          asChild
+          type="default"
+          className="max-w-[300px]"
+          icon={
+            isMain ? (
+              <Shield strokeWidth={2} className="text-amber-900" />
+            ) : branch.persistent ? (
+              <Infinity size={16} />
+            ) : null
+          }
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: branch.persistent
+                ? `${branch.name} is a persistent branch and will remain active even after the
+                    underlying PR is closed`
+                : 'Switch to branch',
+            },
+          }}
+        >
+          <Link href={`/project/${branch.project_ref}`} title={branch.name}>
+            {branch.name}
+          </Link>
+        </ButtonTooltip>
+
+        {branch.git_branch && <Github size={14} className="text-foreground-light" />}
 
         {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
@@ -234,8 +221,8 @@ export const BranchRow = ({
                     View Repository
                   </Link>
                 </Button>
-                {branchingWorkflowLogsEnabled && <WorkflowLogs projectRef={branch.project_ref} />}
-                <DropdownMenu modal={false}>
+                <WorkflowLogs projectRef={branch.project_ref} />
+                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
                   </DropdownMenuTrigger>
@@ -252,13 +239,13 @@ export const BranchRow = ({
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
-            {branch.pr_number === undefined ? (
+            {branch.git_branch && branch.pr_number === undefined ? (
               <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
                 <Link passHref target="_blank" rel="noreferrer" href={createPullRequestURL}>
                   Create Pull Request
                 </Link>
               </Button>
-            ) : (
+            ) : branch.pr_number !== undefined ? (
               <div className="flex items-center">
                 <Link
                   href={`https://github.com/${repo}/pull/${branch.pr_number}`}
@@ -280,25 +267,15 @@ export const BranchRow = ({
                   </Link>
                 </Button>
               </div>
-            )}
-
-            {shouldRenderGitHubLogsButton ? (
-              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                <Link passHref target="_blank" rel="noreferrer" href={checkRunLogsURL}>
-                  View Logs
-                </Link>
-              </Button>
-            ) : (
-              <WorkflowLogs projectRef={branch.project_ref} />
-            )}
-
-            <DropdownMenu modal={false}>
+            ) : null}
+            <WorkflowLogs projectRef={branch.project_ref} />
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<MoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" side="bottom" align="end">
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+                <Tooltip>
+                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowConfirmResetModal(true)}
@@ -308,17 +285,16 @@ export const BranchRow = ({
                       <RefreshCw size={14} />
                       Reset Branch
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="left">
+                    <TooltipContent side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before resetting
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
-
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowBranchModeSwitch(true)}
@@ -335,17 +311,42 @@ export const BranchRow = ({
                         </>
                       )}
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!isBranchActiveHealthy && (
-                    <TooltipContent_Shadcn_ side="left">
+                    <TooltipContent side="left">
                       Branch is still initializing. Please wait for the branch to become healthy
                       before switching modes
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
+                {gitlessBranching && (
+                  <Tooltip>
+                    <TooltipTrigger
+                      asChild={canUpdateBranches && isBranchActiveHealthy}
+                      className="w-full"
+                    >
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdating}
+                        onSelect={() => setShowEditBranchModal(true)}
+                        onClick={() => setShowEditBranchModal(true)}
+                      >
+                        <Pencil size={14} />
+                        Edit Branch
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    {(!canUpdateBranches || !isBranchActiveHealthy) && (
+                      <TooltipContent side="left">
+                        {!canUpdateBranches
+                          ? 'You need additional permissions to edit branches'
+                          : 'Branch is still initializing. Please wait for the branch to become healthy before editing.'}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
 
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={canDeleteBranches} className="w-full">
+                <Tooltip>
+                  <TooltipTrigger asChild={canDeleteBranches} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       disabled={!canDeleteBranches}
@@ -355,13 +356,13 @@ export const BranchRow = ({
                       <Trash2 size={14} />
                       Delete branch
                     </DropdownMenuItem>
-                  </TooltipTrigger_Shadcn_>
+                  </TooltipTrigger>
                   {!canDeleteBranches && (
-                    <TooltipContent_Shadcn_ side="left">
+                    <TooltipContent side="left">
                       You need additional permissions to delete branches
-                    </TooltipContent_Shadcn_>
+                    </TooltipContent>
                   )}
-                </Tooltip_Shadcn_>
+                </Tooltip>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -405,6 +406,12 @@ export const BranchRow = ({
           </div>
         )}
       </div>
+
+      <EditBranchModal
+        branch={branch}
+        visible={showEditBranchModal}
+        onClose={() => setShowEditBranchModal(false)}
+      />
     </div>
   )
 }

@@ -1,26 +1,28 @@
-import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { MB, PROJECT_STATUS } from 'lib/constants'
 import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
 } from 'lib/role-impersonation'
 import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
-import { MB, PROJECT_STATUS } from 'lib/constants'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   sql: string
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
+  isStatementTimeoutDisabled?: boolean
   autoLimit?: number
+  contextualInvalidation?: boolean
 }
 
-export async function executeSql(
+export async function executeSql<T = any>(
   {
     projectRef,
     connectionString,
@@ -28,6 +30,7 @@ export async function executeSql(
     queryKey,
     handleError,
     isRoleImpersonationEnabled = false,
+    isStatementTimeoutDisabled = false,
   }: Pick<
     ExecuteSqlVariables,
     | 'projectRef'
@@ -36,9 +39,15 @@ export async function executeSql(
     | 'queryKey'
     | 'handleError'
     | 'isRoleImpersonationEnabled'
+    | 'isStatementTimeoutDisabled'
   >,
-  signal?: AbortSignal
-): Promise<{ result: any }> {
+  signal?: AbortSignal,
+  headersInit?: HeadersInit,
+  fetcherOverride?: (
+    sql: string,
+    headers?: HeadersInit
+  ) => Promise<{ data: T } | { error: ResponseError }>
+): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const sqlSize = new Blob([sql]).size
@@ -47,24 +56,40 @@ export async function executeSql(
     throw new Error('Query is too large to be run via the SQL Editor')
   }
 
-  let headers = new Headers()
+  let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  let { data, error } = await post('/platform/pg-meta/{ref}/query', {
-    signal,
-    params: {
-      header: { 'x-connection-encrypted': connectionString ?? '' },
-      path: { ref: projectRef },
-      // @ts-ignore: This is just a client side thing to identify queries better
-      query: {
-        key:
-          queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
-          '',
+  let data
+  let error
+
+  if (fetcherOverride) {
+    const result = await fetcherOverride(sql, headers)
+    if ('data' in result) {
+      data = result.data
+    } else {
+      error = result.error
+    }
+  } else {
+    const result = await post('/platform/pg-meta/{ref}/query', {
+      signal,
+      params: {
+        header: { 'x-connection-encrypted': connectionString ?? '' },
+        path: { ref: projectRef },
+        // @ts-expect-error: This is just a client side thing to identify queries better
+        query: {
+          key:
+            queryKey
+              ?.filter((seg) => typeof seg === 'string' || typeof seg === 'number')
+              .join('-') ?? '',
+        },
       },
-    },
-    body: { query: sql },
-    headers: Object.fromEntries(headers),
-  } as any) // Needed to fix generated api types for now
+      body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
+      headers,
+    })
+
+    data = result.data
+    error = result.error
+  }
 
   if (error) {
     if (
@@ -105,15 +130,18 @@ export async function executeSql(
     Array.isArray(data) &&
     data?.[0]?.[ROLE_IMPERSONATION_NO_RESULTS] === 1
   ) {
-    return { result: [] }
+    return { result: [] as T }
   }
 
-  return { result: data }
+  return { result: data as T }
 }
 
-export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
+export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql<any[]>>>
 export type ExecuteSqlError = ResponseError
 
+/**
+ * @deprecated Use the regular useQuery with a function that calls executeSql() instead
+ */
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   {
     projectRef,

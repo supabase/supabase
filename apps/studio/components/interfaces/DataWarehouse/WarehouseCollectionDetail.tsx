@@ -1,26 +1,24 @@
-import { RefreshCcw, Rewind, Terminal } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
+import { useWarehouseLogDetailQuery } from 'data/analytics/warehouse-collection-log-detail-query'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import dayjs from 'dayjs'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Button } from 'ui'
+import { RefreshCcw, Rewind, Terminal } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
+import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import LogTable from '../Settings/Logs/LogTable'
 import { TestCollectionDialog } from './TestCollectionDialog'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
-import { Input } from '@ui/components/shadcn/ui/input'
-import DatePickers from '../Settings/Logs/Logs.DatePickers'
-import { DatetimeHelper } from '../Settings/Logs/Logs.types'
-import dayjs from 'dayjs'
-import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
-import { useWarehouseLogDetailQuery } from 'data/analytics/warehouse-collection-log-detail-query'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 
 const INTERVALS: DatetimeHelper[] = [
   {
@@ -204,11 +202,13 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               /> */}
-              <DatePickers
-                to={filters.interval?.to()}
-                from={filters.interval?.from()}
+              <LogsDatePicker
                 helpers={INTERVALS}
-                onChange={(e) =>
+                value={{
+                  from: filters.interval.from(),
+                  to: filters.interval.to(),
+                }}
+                onSubmit={(e) =>
                   setFilters({
                     ...filters,
                     interval: {
@@ -220,10 +220,6 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               />
             </form>
             <div className="flex items-center gap-2">
-              <Button asChild type={'text'}>
-                <Link href={`/project/${projectRef}/settings/warehouse`}>Access tokens</Link>
-              </Button>
-
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button asChild className="px-1.5" type="outline" icon={<Terminal />}>

@@ -6,7 +6,7 @@ subtitle: 'Migrate your Heroku Postgres database to Supabase.'
 tocVideo: 'xsRhPMphtZ4'
 ---
 
-Supabase is one of the best [free alternatives to Heroku Postgres](https://supabase.com/alternatives/supabase-vs-heroku-postgres). This guide shows how to migrate your Heroku Postgres database to Supabase. This migration requires the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) CLI tools, which are installed automatically as part of the complete PostgreSQL installation package.
+Supabase is one of the best [free alternatives to Heroku Postgres](https://supabase.com/alternatives/supabase-vs-heroku-postgres). This guide shows how to migrate your Heroku Postgres database to Supabase. This migration requires the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) CLI tools, which are installed automatically as part of the complete Postgres installation package.
 
 Alternatively, use the [Heroku to Supabase migration tool](https://migrate.supabase.com/) to migrate in just a few clicks.
 
@@ -35,8 +35,8 @@ Alternatively, use the [Heroku to Supabase migration tool](https://migrate.supab
 ## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
 
 1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
-1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
-1. Under **Connection string**, make sure `Use connection pooling` is enabled. Copy the URI and replace the password placeholder with your database password.
+1. Get your project's Session pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+1. Replace [YOUR-PASSWORD] in the connection string with your database password. You can reset your database password on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database) if you do not have it.
 
 ## Export your Heroku database to a file [#export-heroku-database]
 
@@ -65,7 +65,7 @@ psql -d "$YOUR_CONNECTION_STRING" -f heroku_dump.sql
 
 Run `pg_dump --help` for a full list of options.
 
-<MigrationWarnings />
+<$Partial path="migration_warnings.mdx" />
 
 ## Enterprise
 

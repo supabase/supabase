@@ -29,8 +29,9 @@ When [developing locally](/docs/guides/functions/local-development) you will see
 - **Boot and Shutdown Logs**: The Logs tool extends its coverage to include logs for the boot and shutdown of functions.
 
 <Admonition type="note">
-  A custom log message can contain up to 10,000 characters. A function can log up to 100 events
-  within a 10 second period.
+
+A custom log message can contain up to 10,000 characters. A function can log up to 100 events within a 10 second period.
+
 </Admonition>
 
 Here is an example of how to use custom logs events in your function:
@@ -52,7 +53,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
   } catch (error) {
-    console.error(`Error processing request: ${error.message}`)
+    console.error(`Error processing request: ${error}`)
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -61,9 +62,9 @@ Deno.serve(async (req) => {
 })
 ```
 
-## Logging Tips
+## Logging tips
 
-### Logging Request Headers
+### Logging request headers
 
 When debugging Edge Functions, a common mistake is to try to log headers to the developer console via code like this:
 
@@ -88,7 +89,7 @@ The reason behind this behavior is that [Headers](https://developer.mozilla.org/
 
 However, `Headers` objects are iterable. You can utilize this feature to craft a couple of succinct one-liners for debugging and printing headers.
 
-### Convert headers into an object with Object.fromEntries:
+### Convert headers into an object with `Object.fromEntries`:
 
 You can use `Object.fromEntries` which is a call to convert the headers into an object:
 
@@ -108,7 +109,7 @@ Deno.serve(async (req) => {
 
 This results in something like:
 
-```ts index.ts
+```
 Request headers: {
     "accept": "*/*",
     "accept-encoding": "gzip",
