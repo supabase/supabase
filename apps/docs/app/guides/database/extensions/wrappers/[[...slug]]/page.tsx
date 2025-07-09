@@ -272,7 +272,7 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
 
             <Button asChild>
               <Link href={dashboardIntegrationURL} className="no-underline">
-                Enable wrapper
+                Open wrapper in dashboard
               </Link>
             </Button>
           </Admonition>
