@@ -25,6 +25,7 @@ import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -133,9 +134,9 @@ const RealtimeUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="Realtime" />
-      <section className="relative pt-16 -mt-2">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+      <ReportStickyNav
+        content={
+          <>
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -164,9 +165,9 @@ const RealtimeUsage = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
+          </>
+        }
+      >
         <div className="grid grid-cols-1 gap-4">
           {selectedDateRange &&
             REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
@@ -224,7 +225,7 @@ const RealtimeUsage = () => {
             />
           </div>
         </div>
-      </section>
+      </ReportStickyNav>
     </>
   )
 }

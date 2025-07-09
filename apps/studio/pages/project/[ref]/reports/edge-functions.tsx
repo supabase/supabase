@@ -8,9 +8,12 @@ import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
+import ReportChart from 'components/interfaces/Reports/ReportChart'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { Label } from '@ui/components/shadcn/ui/label'
 
 import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
@@ -18,10 +21,6 @@ import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 
 import type { NextPageWithLayout } from 'types'
-
-import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
-import { Label } from '@ui/components/shadcn/ui/label'
 
 const EdgeFunctionsReport: NextPageWithLayout = () => {
   return (
@@ -88,14 +87,9 @@ const EdgeFunctionsUsage = () => {
   return (
     <>
       <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={isRefreshing || isLoadingFunctions} />
-        </div>
-      </div>
-      <section className="relative pt-16 -mt-2">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+      <ReportStickyNav
+        content={
+          <>
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -206,9 +200,9 @@ const EdgeFunctionsUsage = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
+          </>
+        }
+      >
         <div className="grid grid-cols-1 gap-4">
           {selectedDateRange &&
             EDGEFN_CHARTS.filter((attr) => !attr.hide).map((attr, i) => (
@@ -223,7 +217,7 @@ const EdgeFunctionsUsage = () => {
               />
             ))}
         </div>
-      </section>
+      </ReportStickyNav>
     </>
   )
 }

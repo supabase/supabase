@@ -19,10 +19,10 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
 import { analyticsKeys } from 'data/analytics/keys'
@@ -178,27 +178,6 @@ const DatabaseUsage = () => {
     }
   }, [db, chart])
 
-  const handleIntervalGranularity = (from: string, to: string) => {
-    const conditions = {
-      '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
-      '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
-      '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
-      '1h': dayjs(to).diff(from, 'day') < 10, // less than 10 days
-      '1d': dayjs(to).diff(from, 'day') >= 10, // more than 10 days
-    }
-
-    switch (true) {
-      case conditions['1m']:
-        return '1m'
-      case conditions['10m']:
-        return '10m'
-      case conditions['30m']:
-        return '30m'
-      default:
-        return '1h'
-    }
-  }
-
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     updateDateRangeFromHook(from, to)
   }
@@ -206,15 +185,10 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={report.isLoading} />
-        </div>
-      </div>
       <GrafanaPromoBanner />
-      <section className="relative pt-16 -mt-2">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+      <ReportStickyNav
+        content={
+          <>
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -243,8 +217,9 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
+          </>
+        }
+      >
         {showChartsV2 ? (
           <div className="grid grid-cols-1 gap-4">
             {selectedDateRange &&
@@ -301,7 +276,7 @@ const DatabaseUsage = () => {
             </Panel.Content>
           </Panel>
         )}
-      </section>
+      </ReportStickyNav>
       <section id="database-size-report">
         <ReportWidget
           isLoading={isLoading}

@@ -10,12 +10,13 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import ReportChart from 'components/interfaces/Reports/ReportChart'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 
 import { getAuthReportAttributes } from 'data/reports/auth-charts'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 
-import ReportChart from 'components/interfaces/Reports/ReportChart'
 import type { NextPageWithLayout } from 'types'
 
 const AuthReport: NextPageWithLayout = () => {
@@ -80,9 +81,9 @@ const AuthUsage = () => {
   return (
     <>
       <ReportHeader title="Auth" showDatabaseSelector={false} />
-      <section className="relative pt-16 -mt-2">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 py-4 mb-4 flex items-center space-x-3 pointer-events-auto dark:bg-background-200 bg-background">
+      <ReportStickyNav
+        content={
+          <>
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -111,9 +112,9 @@ const AuthUsage = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
+          </>
+        }
+      >
         <div className="grid grid-cols-1 gap-4">
           {selectedDateRange &&
             AUTH_REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr, i) => (
@@ -127,7 +128,7 @@ const AuthUsage = () => {
               />
             ))}
         </div>
-      </section>
+      </ReportStickyNav>
     </>
   )
 }
