@@ -34,6 +34,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { formatBytes } from 'lib/helpers'
 
 import type { NextPageWithLayout } from 'types'
@@ -70,7 +71,7 @@ const DatabaseUsage = () => {
     datePickerHelpers,
     isOrgPlanLoading,
     orgPlan,
-  } = useReportDateRange(1) // Default to 1 day as in original
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
   const isTeamsOrEnterprisePlan =

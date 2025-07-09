@@ -15,6 +15,7 @@ import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePic
 import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 
 import type { NextPageWithLayout } from 'types'
 
@@ -60,7 +61,7 @@ const EdgeFunctionsUsage = () => {
     handleDatePickerChange,
     datePickerValue,
     datePickerHelpers,
-  } = useReportDateRange(1) // Default to 1 day as in original
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)

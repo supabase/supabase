@@ -158,7 +158,7 @@ const ReportFilterBar = ({
     }
   }, [])
 
-  const defaultHelper = datepickerHelpers[0]
+  const defaultHelper = datepickerHelpers.find((h) => h.default) || datepickerHelpers[0]
   const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
     to: defaultHelper.calcTo(),
     from: defaultHelper.calcFrom(),

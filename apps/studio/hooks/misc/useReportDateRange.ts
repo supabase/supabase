@@ -1,7 +1,12 @@
 import { useState, useCallback } from 'react'
 import dayjs from 'dayjs'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
+import {
+  createFilteredDatePickerHelpers,
+  REPORTS_DATEPICKER_HELPERS,
+  ReportsDatetimeHelper,
+  REPORT_DATERANGE_HELPER_LABELS,
+} from 'components/interfaces/Reports/Reports.constants'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 
 export interface ReportDateRange {
@@ -10,35 +15,60 @@ export interface ReportDateRange {
   interval: string
 }
 
-export const useReportDateRange = (defaultDays: number = 7) => {
+export const useReportDateRange = (
+  defaultHelper:
+    | REPORT_DATERANGE_HELPER_LABELS
+    | string
+    | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
+) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
 
-  // Get filtered date picker helpers based on organization plan
   const datePickerHelpers = createFilteredDatePickerHelpers(orgPlan?.id || 'free')
 
-  // Find a suitable default helper based on defaultDays
   const getDefaultHelper = () => {
-    // Map common defaultDays values to helper text
-    const helperMap: Record<number, string> = {
-      1: 'Last 24 hours',
-      7: 'Last 7 days',
-      14: 'Last 14 days',
-      28: 'Last 28 days',
+    let targetHelper: ReportsDatetimeHelper | undefined
+
+    if (typeof defaultHelper === 'string') {
+      targetHelper = REPORTS_DATEPICKER_HELPERS.find((helper) => helper.text === defaultHelper)
+    } else if (defaultHelper && typeof defaultHelper === 'object' && 'text' in defaultHelper) {
+      targetHelper = defaultHelper
     }
 
-    const targetText = helperMap[defaultDays]
-    const helper = datePickerHelpers.find((h) => h.text === targetText && !h.disabled)
-
-    if (helper) {
+    // Check if the target helper is available for the current plan
+    if (targetHelper && targetHelper.availableIn?.includes(orgPlan?.id || 'free')) {
       return {
-        start: helper.calcFrom(),
-        end: helper.calcTo(),
-        helper: { isHelper: true, text: helper.text },
+        start: targetHelper.calcFrom(),
+        end: targetHelper.calcTo(),
+        helper: { isHelper: true, text: targetHelper.text },
       }
     }
 
-    // Fallback to manual date calculation
-    const defaultStart = dayjs().subtract(defaultDays, 'day').toISOString()
+    const fallbackHelper = REPORTS_DATEPICKER_HELPERS.find(
+      (helper) => helper.default && helper.availableIn?.includes(orgPlan?.id || 'free')
+    )
+
+    if (fallbackHelper) {
+      return {
+        start: fallbackHelper.calcFrom(),
+        end: fallbackHelper.calcTo(),
+        helper: { isHelper: true, text: fallbackHelper.text },
+      }
+    }
+
+    // Final fallback: use first available helper
+    const firstAvailable = REPORTS_DATEPICKER_HELPERS.find((helper) =>
+      helper.availableIn?.includes(orgPlan?.id || 'free')
+    )
+
+    if (firstAvailable) {
+      return {
+        start: firstAvailable.calcFrom(),
+        end: firstAvailable.calcTo(),
+        helper: { isHelper: true, text: firstAvailable.text },
+      }
+    }
+
+    const defaultStart = dayjs().subtract(1, 'hour').toISOString()
     const defaultEnd = dayjs().toISOString()
     return {
       start: defaultStart,
@@ -47,7 +77,7 @@ export const useReportDateRange = (defaultDays: number = 7) => {
     }
   }
 
-  const { start: defaultStart, end: defaultEnd, helper: defaultHelper } = getDefaultHelper()
+  const { start: defaultStart, end: defaultEnd, helper: defaultHelperState } = getDefaultHelper()
 
   const [selectedDateRange, setSelectedDateRange] = useState<ReportDateRange>({
     period_start: { date: defaultStart, time_period: '1d' },
@@ -59,7 +89,7 @@ export const useReportDateRange = (defaultDays: number = 7) => {
   const [currentHelper, setCurrentHelper] = useState<{
     isHelper: boolean
     text?: string
-  }>(defaultHelper)
+  }>(defaultHelperState)
 
   const handleIntervalGranularity = useCallback((from: string, to: string) => {
     const conditions = {

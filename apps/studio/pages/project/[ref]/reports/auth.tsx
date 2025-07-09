@@ -13,6 +13,7 @@ import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePic
 
 import { getAuthReportAttributes } from 'data/reports/auth-charts'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 
 import ReportChart from 'components/interfaces/Reports/ReportChart'
 import type { NextPageWithLayout } from 'types'
@@ -45,7 +46,7 @@ const AuthUsage = () => {
     datePickerHelpers,
     isOrgPlanLoading,
     orgPlan,
-  } = useReportDateRange(1) // Default to 1 day as in original
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)

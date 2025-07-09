@@ -24,6 +24,7 @@ import { analyticsKeys } from 'data/analytics/keys'
 import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -71,7 +72,7 @@ const RealtimeUsage = () => {
     datePickerHelpers,
     isOrgPlanLoading,
     orgPlan,
-  } = useReportDateRange(7)
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const queryClient = useQueryClient()
 

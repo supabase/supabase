@@ -19,6 +19,7 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useStorageReport } from 'data/reports/storage-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 
 import type { NextPageWithLayout } from 'types'
 import Link from 'next/link'
@@ -40,9 +41,7 @@ export const StorageReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { selectedDateRange, datePickerHelpers } = useReportDateRange(1)
-
-  const plan = organization?.plan
+  const { datePickerHelpers } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
     mergeParams({

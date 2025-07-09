@@ -14,13 +14,12 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
-  const organization = useSelectedOrganization()
 
   const {
     data,
@@ -34,9 +33,7 @@ export const ApiReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { datePickerHelpers } = useReportDateRange(1)
-
-  const plan = organization?.plan
+  const { datePickerHelpers } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const handleDatepickerChange = ({ from, to }: DatePickerToFrom) => {
     mergeParams({
