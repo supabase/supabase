@@ -13,7 +13,7 @@ export interface ReportWidgetProps<T = any> {
   title: string
   description?: string
   error?: string | Object | null
-  tooltip?: string
+  tooltip?: string | ReactNode
   className?: string
   renderer: (props: ReportWidgetRendererProps) => ReactNode
   append?: (props: ReportWidgetRendererProps) => ReactNode

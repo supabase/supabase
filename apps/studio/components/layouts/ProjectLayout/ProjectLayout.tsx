@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
@@ -18,7 +19,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { EnableBranchingModal } from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -86,6 +86,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
+    const projectRefForGitHubLinker = selectedProject?.parent_project_ref ?? selectedProject?.ref
     const {
       editorPanel,
       mobileMenuOpen,
@@ -256,7 +257,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <EnableBranchingModal />
+        <CreateBranchModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}

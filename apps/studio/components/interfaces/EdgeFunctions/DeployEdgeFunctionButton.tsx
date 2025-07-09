@@ -93,9 +93,19 @@ export const DeployEdgeFunctionButton = () => {
                 title:
                   'I can help you create a new edge function. Here are a few example prompts to get you started:',
                 prompts: [
-                  'Create a new edge function that processes payments with Stripe',
-                  'Create a new edge function that sends emails with Resend',
-                  'Create a new edge function that generates PDFs from HTML templates',
+                  {
+                    label: 'Stripe Payments',
+                    description: 'Create a new edge function that processes payments with Stripe',
+                  },
+                  {
+                    label: 'Email with Resend',
+                    description: 'Create a new edge function that sends emails with Resend',
+                  },
+                  {
+                    label: 'PDF Generator',
+                    description:
+                      'Create a new edge function that generates PDFs from HTML templates',
+                  },
                 ],
               },
             })

@@ -69,6 +69,8 @@ curl --request POST 'https://<project_ref>.supabase.co/functions/v1/function-nam
 
 </$CodeTabs>
 
+In case you cannot add the `x-region` header to the request (e.g.: CORS requests, Webhooks), you can use `forceFunctionRegion` query parameter.
+
 <Admonition type="note">
   You can verify the execution region by looking at the `x-sb-edge-region` HTTP header in the
   response. You can also find it as metadata in [Edge Function
