@@ -41,7 +41,7 @@ export const columnFilterSchema = z.object({
   status: z
     .string()
     .transform((val) => val.split(ARRAY_DELIMITER))
-    .pipe(z.coerce.number().array())
+    .pipe(z.string().array())
     .optional(),
   regions: z
     .string()

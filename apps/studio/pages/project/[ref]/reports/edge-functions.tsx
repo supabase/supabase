@@ -114,7 +114,7 @@ const EdgeFunctionsUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Edge Functions" />
+      <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
       <div className="w-full flex flex-col gap-1">
         <div className="h-2 w-full">
           <ShimmerLine active={isRefreshing || isLoadingFunctions} />

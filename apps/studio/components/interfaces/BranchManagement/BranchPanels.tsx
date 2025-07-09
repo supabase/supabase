@@ -210,32 +210,51 @@ export const BranchRow = ({
         {isMain ? (
           <div className="flex items-center gap-x-2">
             {repo && (
-              <>
-                <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                  <Link
-                    target="_blank"
-                    rel="noreferrer"
-                    passHref
-                    href={`https://github.com/${repo}`}
-                  >
-                    View Repository
-                  </Link>
-                </Button>
-                <WorkflowLogs projectRef={branch.project_ref} />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button type="text" icon={<MoreVertical />} className="px-1" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                    <Link passHref href={`/project/${projectRef}/settings/integrations`}>
-                      <DropdownMenuItem asChild className="gap-x-2">
-                        <a>Change production branch</a>
-                      </DropdownMenuItem>
-                    </Link>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                <Link target="_blank" rel="noreferrer" passHref href={`https://github.com/${repo}`}>
+                  View Repository
+                </Link>
+              </Button>
             )}
+            <WorkflowLogs projectRef={branch.project_ref} />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="text" icon={<MoreVertical />} className="px-1" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
+                {repo ? (
+                  <Link passHref href={`/project/${projectRef}/settings/integrations`}>
+                    <DropdownMenuItem asChild className="gap-x-2">
+                      <a>Change production branch</a>
+                    </DropdownMenuItem>
+                  </Link>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger
+                      asChild={canUpdateBranches && isBranchActiveHealthy}
+                      className="w-full"
+                    >
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdating}
+                        onSelect={() => setShowEditBranchModal(true)}
+                        onClick={() => setShowEditBranchModal(true)}
+                      >
+                        <Pencil size={14} />
+                        Edit Branch
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    {(!canUpdateBranches || !isBranchActiveHealthy) && (
+                      <TooltipContent side="left">
+                        {!canUpdateBranches
+                          ? 'You need additional permissions to edit branches'
+                          : 'Branch is still initializing. Please wait for the branch to become healthy before editing.'}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
