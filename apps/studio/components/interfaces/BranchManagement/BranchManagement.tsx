@@ -154,7 +154,7 @@ const BranchManagement = () => {
       projectRef,
       requestReview: true,
     })
-    router.push(`/project/${projectRef}/merge`)
+    router.push(`/project/${currentBranch.project_ref}/merge`)
   }
 
   return (
