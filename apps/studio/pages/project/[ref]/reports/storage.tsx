@@ -2,7 +2,6 @@ import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
@@ -19,6 +18,7 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useStorageReport } from 'data/reports/storage-report-query'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 
 import type { NextPageWithLayout } from 'types'
 import Link from 'next/link'
@@ -39,6 +39,8 @@ export const StorageReport: NextPageWithLayout = () => {
     addFilter,
     refresh,
   } = report
+
+  const { selectedDateRange, datePickerHelpers } = useReportDateRange(1)
 
   const plan = organization?.plan
 
@@ -65,7 +67,7 @@ export const StorageReport: NextPageWithLayout = () => {
               isLoading={isLoading}
               filters={filters}
               selectedProduct="storage"
-              datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
+              datepickerHelpers={datePickerHelpers}
               className="w-full"
               showDatabaseSelector={false}
             />

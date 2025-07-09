@@ -2,7 +2,6 @@ import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -16,6 +15,7 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { NextPageWithLayout } from 'types'
 
 export const ApiReport: NextPageWithLayout = () => {
@@ -33,6 +33,8 @@ export const ApiReport: NextPageWithLayout = () => {
     addFilter,
     refresh,
   } = report
+
+  const { datePickerHelpers } = useReportDateRange(1)
 
   const plan = organization?.plan
 
@@ -56,7 +58,7 @@ export const ApiReport: NextPageWithLayout = () => {
           onRefresh={refresh}
           isLoading={isLoading}
           filters={filters}
-          datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
+          datepickerHelpers={datePickerHelpers}
           showDatabaseSelector={false}
         />
         <div className="h-2 w-full">
