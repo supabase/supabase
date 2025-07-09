@@ -1,11 +1,11 @@
 import { type ReactNode } from 'react'
 
 import type { WithRequired } from '~/features/helpers.types'
+import { EditLink } from '~/features/helpers.edit-link'
 import { type GuideFrontmatter } from '~/lib/docs'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 import { Guide, GuideArticle, GuideFooter, GuideHeader, GuideMdxContent } from './guide'
-import { EditLink } from '../docs/GuidesMdx.template'
 
 interface BaseGuideTemplateProps {
   meta?: GuideFrontmatter
