@@ -35,14 +35,6 @@ import { Message } from './Message'
 import { useAutoScroll } from './hooks'
 import type { AssistantMessageType } from 'state/ai-assistant-state'
 
-// Helper function to get content from snippet
-const getSnippetContent = (snippet: SqlSnippet): string => {
-  if (typeof snippet === 'string') {
-    return snippet
-  }
-  return snippet.content
-}
-
 const MemoizedMessage = memo(
   ({
     message,
