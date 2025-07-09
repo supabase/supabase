@@ -8,6 +8,7 @@ import {
   REPORT_DATERANGE_HELPER_LABELS,
 } from 'components/interfaces/Reports/Reports.constants'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 export interface ReportDateRange {
   period_start: { date: string; time_period: string }
@@ -22,12 +23,12 @@ interface StoredDateRange {
   helperText?: string
 }
 
-const STORAGE_KEY = 'supabase-reports-daterange'
+const RANGE_STORAGE_KEY = LOCAL_STORAGE_KEYS.REPORT_DATERANGE
 
 // Helper functions for localStorage
 const getStoredDateRange = (): StoredDateRange | null => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(RANGE_STORAGE_KEY)
     return stored ? JSON.parse(stored) : null
   } catch (error) {
     console.warn('Failed to parse stored date range:', error)
@@ -37,7 +38,7 @@ const getStoredDateRange = (): StoredDateRange | null => {
 
 const setStoredDateRange = (range: StoredDateRange): void => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(range))
+    localStorage.setItem(RANGE_STORAGE_KEY, JSON.stringify(range))
   } catch (error) {
     console.warn('Failed to store date range:', error)
   }

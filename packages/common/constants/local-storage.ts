@@ -53,6 +53,7 @@ export const LOCAL_STORAGE_KEYS = {
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  REPORT_DATERANGE: 'supabase-report-daterange',
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
