@@ -148,6 +148,13 @@ const pageMap = [
     remoteFile: 'firebase.md',
   },
   {
+    slug: 'iceberg',
+    meta: {
+      title: 'Iceberg',
+    },
+    remoteFile: 'iceberg.md',
+  },
+  {
     slug: 'logflare',
     meta: {
       title: 'Logflare',

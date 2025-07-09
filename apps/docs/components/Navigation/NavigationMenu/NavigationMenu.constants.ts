@@ -1130,6 +1130,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/firebase',
         },
         {
+          name: 'Connecting to Iceberg',
+          url: '/guides/database/extensions/wrappers/iceberg',
+        },
+        {
           name: 'Connecting to Logflare',
           url: '/guides/database/extensions/wrappers/logflare',
         },
