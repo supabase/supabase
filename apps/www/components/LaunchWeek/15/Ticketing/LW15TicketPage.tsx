@@ -11,6 +11,7 @@ import TicketURLCopy from './TicketURLCopy'
 import { TYPO_COLORS, BG_COLORS } from './colors'
 import { updateTicketColors } from '../hooks/use-registration'
 import Link from 'next/link'
+import { fetchGitHubUser } from '../utils/github-api'
 
 const LW15TicketPage = ({
   user: userFromProps,
@@ -36,9 +37,17 @@ const LW15TicketPage = ({
     }
     setState({ saving: true })
     try {
+      const githubUserData = await fetchGitHubUser(user?.username!)
+      const metadata = {
+        ...user?.metadata,
+        ...(githubUserData && {
+          company: githubUserData.company || undefined,
+          location: githubUserData.location || undefined,
+        }),
+      }
       await updateTicketColors({
         username: user?.username!,
-        userMetadata: user?.metadata,
+        userMetadata: metadata,
         background: newColors.background,
         foreground: newColors.foreground,
       })
