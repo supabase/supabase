@@ -153,12 +153,12 @@ const getBaseEdgeServiceFlowQuery = (logId: string, serviceType: EdgeServiceType
     left join unnest(edge_logs_request.cf) as edge_logs_cf
     left join unnest(edge_logs_request.sb) as sb
     left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.apikey) as sb_apikey
-    left join unnest(sb_apikey.payload) as apikey_payload
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
-    left join unnest(sb.apikey) as sb_apikey_outer
-    left join unnest(sb_apikey_outer.apikey) as sb_apikey_inner
+    left join unnest(COALESCE(jwt.apikey, [])) as sb_apikey
+    left join unnest(COALESCE(sb_apikey.payload, [])) as apikey_payload
+    left join unnest(COALESCE(jwt.authorization, [])) as auth
+    left join unnest(COALESCE(auth.payload, [])) as authorization_payload
+    left join unnest(COALESCE(sb.apikey, [])) as sb_apikey_outer
+    left join unnest(COALESCE(sb_apikey_outer.apikey, [])) as sb_apikey_inner
 
 WHERE 
   el.id = '${logId}'
@@ -305,12 +305,12 @@ export const getEdgeFunctionServiceFlowQuery = (logId: string): string => {
     left join unnest(fel_request.headers) as fel_request_headers
     left join unnest(fel_request.sb) as sb
     left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.apikey) as sb_apikey
-    left join unnest(sb_apikey.payload) as apikey_payload
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
-    left join unnest(sb.apikey) as sb_apikey_outer
-    left join unnest(sb_apikey_outer.apikey) as sb_apikey_inner
+    left join unnest(COALESCE(jwt.apikey, [])) as sb_apikey
+    left join unnest(COALESCE(sb_apikey.payload, [])) as apikey_payload
+    left join unnest(COALESCE(jwt.authorization, [])) as auth
+    left join unnest(COALESCE(auth.payload, [])) as authorization_payload
+    left join unnest(COALESCE(sb.apikey, [])) as sb_apikey_outer
+    left join unnest(COALESCE(sb_apikey_outer.apikey, [])) as sb_apikey_inner
     left join (
       SELECT
           fl_metadata.execution_id,
