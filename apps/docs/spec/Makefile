@@ -131,4 +131,4 @@ validate.analytics.v0:
 # Format everything - easier for git to track changes.
 ###############################################################################
 format:
-	npx prettier --write .
+	npx prettier --cache --write .

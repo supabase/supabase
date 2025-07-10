@@ -45,8 +45,6 @@ export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
       return '4xx'
     case 'error':
       return '5xx'
-    default:
-      return 'Unknown'
   }
 }
 
@@ -75,11 +73,6 @@ export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
       return cn(
         'bg-destructive/5 hover:bg-destructive/10 data-[state=selected]:bg-destructive/20 focus-visible:bg-destructive/10',
         'dark:bg-error/10 dark:hover:bg-destructive/20 dark:data-[state=selected]:bg-destructive/30 dark:focus-visible:bg-destructive/20'
-      )
-    case 'info':
-      return cn(
-        'bg-info/5 hover:bg-info/10 data-[state=selected]:bg-info/20 focus-visible:bg-info/10',
-        'dark:bg-info/10 dark:hover:bg-info/20 dark:data-[state=selected]:bg-info/30 dark:focus-visible:bg-info/20'
       )
     default:
       return ''

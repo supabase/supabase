@@ -47,6 +47,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import WorkflowLogsCard from 'components/interfaces/BranchManagement/WorkflowLogsCard'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { useFlag } from 'hooks/ui/useFlag'
+import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithAI'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -102,39 +103,67 @@ const MergePage: NextPageWithLayout = () => {
     currentBranchCreatedAt: currentBranch?.created_at,
   })
 
+  const { mutate: updateBranch } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Branch updated successfully')
+    },
+    onError: (error) => {
+      toast.error(`Failed to update branch: ${error.message}`)
+    },
+  })
+
+  const clearDiffsOptimistically = edgeFunctionsDiff.clearDiffsOptimistically
+
   const currentWorkflowRunId = router.query.workflow_run_id as string | undefined
 
   useEffect(() => {
     setWorkflowFinalStatus(null)
   }, [currentWorkflowRunId])
 
+  const handleCurrentBranchWorkflowComplete = useCallback(
+    (status: string) => {
+      setWorkflowFinalStatus(status)
+      refetchDiff()
+      clearDiffsOptimistically()
+    },
+    [refetchDiff, clearDiffsOptimistically]
+  )
+
+  const handleParentBranchWorkflowComplete = useCallback(
+    (status: string) => {
+      setWorkflowFinalStatus(status)
+      refetchDiff()
+      clearDiffsOptimistically()
+      if (parentProjectRef && currentBranch?.id && currentBranch.review_requested_at) {
+        updateBranch({
+          id: currentBranch.id,
+          projectRef: parentProjectRef,
+          requestReview: false,
+        })
+      }
+    },
+    [
+      refetchDiff,
+      clearDiffsOptimistically,
+      parentProjectRef,
+      currentBranch?.id,
+      updateBranch,
+      currentBranch?.review_requested_at,
+    ]
+  )
+
   const { currentWorkflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
     useWorkflowManagement({
       workflowRunId: currentWorkflowRunId,
       projectRef: ref,
-      onWorkflowComplete: (status) => {
-        setWorkflowFinalStatus(status)
-        refetchDiff()
-        edgeFunctionsDiff.clearDiffsOptimistically()
-      },
+      onWorkflowComplete: handleCurrentBranchWorkflowComplete,
     })
 
   const { currentWorkflowRun: parentBranchWorkflow, workflowRunLogs: parentBranchLogs } =
     useWorkflowManagement({
       workflowRunId: currentWorkflowRunId,
       projectRef: parentProjectRef,
-      onWorkflowComplete: (status) => {
-        setWorkflowFinalStatus(status)
-        refetchDiff()
-        edgeFunctionsDiff.clearDiffsOptimistically()
-        if (parentProjectRef && currentBranch?.id) {
-          updateBranch({
-            id: currentBranch.id,
-            projectRef: parentProjectRef,
-            requestReview: false,
-          })
-        }
-      },
+      onWorkflowComplete: handleParentBranchWorkflowComplete,
     })
 
   const currentWorkflowRun = currentBranchWorkflow || parentBranchWorkflow
@@ -206,15 +235,6 @@ const MergePage: NextPageWithLayout = () => {
     },
     onError: (error) => {
       toast.error(`Failed to close branch: ${error.message}`)
-    },
-  })
-
-  const { mutate: updateBranch } = useBranchUpdateMutation({
-    onSuccess: () => {
-      toast.success('Branch updated successfully')
-    },
-    onError: (error) => {
-      toast.error(`Failed to update branch: ${error.message}`)
     },
   })
 
@@ -353,6 +373,13 @@ const MergePage: NextPageWithLayout = () => {
   // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
     <div className="flex items-end gap-2">
+      <ReviewWithAI
+        currentBranch={currentBranch}
+        mainBranch={mainBranch}
+        parentProjectRef={parentProjectRef}
+        diffContent={diffContent}
+        disabled={!currentBranch || !mainBranch || isCombinedDiffLoading}
+      />
       {!isReadyForReview ? (
         <Button
           type="primary"
