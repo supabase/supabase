@@ -1,13 +1,15 @@
 import 'swiper/css'
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 import { useTheme } from 'next-themes'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import SectionContainer from 'components/Layouts/SectionContainer'
 import { mainDays, WeekDayProps } from './data'
+import { useWindowSize } from 'react-use'
+import { useBreakpoint } from 'common'
 
 const LW15MainStage = ({ className }: { className?: string }) => {
   const { resolvedTheme } = useTheme()
@@ -35,23 +37,69 @@ const LW15MainStage = ({ className }: { className?: string }) => {
   )
 }
 
-const DayCard = ({ day }: { day: WeekDayProps }) => (
-  <Link
-    href={day.blog!}
-    className={cn(
-      'group/main block w-full h-full xl:flex-1 xl:h-auto xl:aspect-[217/275] relative overflow-hidden rounded border text-white'
-    )}
-  >
-    <CardBG day={day} />
-    <div className="w-full h-full relative z-10 flex flex-col justify-between gap-4 p-4">
-      <div>{day.dd}</div>
-      <div className="flex flex-col gap-2">
-        <span className="text-xs opacity-40">{day.date}</span>
-        <h4 className="text-lg leading-snug">{day.title}</h4>
+const DayCard = ({ day }: { day: WeekDayProps }) =>
+  day.shipped ? (
+    <DayCardShipped day={day} />
+  ) : (
+    <div
+      className={cn(
+        'group/main block w-full bg-surface-200 dark:bg-transparent h-full xl:flex-1 xl:h-auto xl:aspect-[217/275] relative overflow-hidden rounded border dark:border-muted'
+      )}
+    >
+      <div className="w-full h-full relative z-10 flex flex-col justify-between gap-4">
+        <div></div>
+        <div className="flex flex-col gap-2 p-4">
+          <span className="text-xs text-foreground-lighter">{day.date}</span>
+          <h4 className="text-lg leading-snug text-foreground-light">&#91; Access locked &#93;</h4>
+        </div>
       </div>
     </div>
-  </Link>
-)
+  )
+
+const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
+  const hiddenRef = useRef<HTMLDivElement>(null)
+  const isTablet = useBreakpoint(1024)
+  const [hiddenHeight, setHiddenHeight] = useState(0)
+  const { width } = useWindowSize()
+  const padding = 16
+
+  useEffect(() => {
+    if (hiddenRef?.current) {
+      const { height } = hiddenRef.current.getBoundingClientRect()
+      setHiddenHeight(height + padding)
+    }
+
+    console.log(hiddenHeight)
+  }, [hiddenRef, width])
+
+  return (
+    <Link
+      href={day.blog!}
+      className={cn(
+        'group/main block w-full h-full xl:flex-1 xl:h-auto xl:aspect-[217/275] relative overflow-hidden rounded border hover:border-black dark:hover:border-stronger text-white'
+      )}
+    >
+      <CardBG day={day} />
+      <div className="w-full h-full relative z-10 flex flex-col justify-between gap-4 overflow-hidden">
+        <div></div>
+        <div
+          className="flex flex-col p-4 gap-2 relative group-hover/main:!bottom-0 !ease-[.25,.25,0,1] duration-300"
+          style={{
+            bottom: isTablet ? 0 : -hiddenHeight + 'px',
+          }}
+        >
+          <span className="text-xs opacity-40">{day.date}</span>
+          <h4 className="text-lg leading-snug">{day.title}</h4>
+          <div className="block mt-2 opacity-0 group-hover/main:lg:opacity-100" ref={hiddenRef}>
+            <Button type="outline" size="small" className="text-current rounded-sm border-dashed">
+              <Link href={day.blog!}>Read more</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
+}
 
 const CardBG = ({ day }: { day: WeekDayProps }) => (
   <div className="absolute inset-0 z-0 w-full h-full">
@@ -65,7 +113,7 @@ const CardBG = ({ day }: { day: WeekDayProps }) => (
                 'absolute inset-0 w-full h-full -z-10',
                 'transition-all duration-300 !ease-[.24,0,.22,.99]',
                 'dark:opacity-40 scale-100',
-                'group-hover/main:dark:opacity-100 group-hover/main:scale-[104%]'
+                'group-hover/main:dark:opacity-100'
               )}
             >
               <Image
