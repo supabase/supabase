@@ -130,9 +130,9 @@ export const PreviewBranchesEmptyState = ({
   onSelectCreateBranch: () => void
 }) => {
   return (
-    <div className="flex items-center flex-col justify-center w-full py-10">
+    <div className="flex items-center flex-col justify-center w-full p-10 text-center">
       <p>Create your first preview branch</p>
-      <p className="text-foreground-light mb-4">
+      <p className="text-foreground-light mb-4 text-center">
         Preview branches are used to experiment with changes to your database schema in a safe,
         non-destructive environment.
       </p>
