@@ -7,6 +7,9 @@ import { mswServer } from './lib/msw'
 
 mswServer.listen({ onUnhandledRequest: 'error' })
 
+// Warning: `restoreMocks: true` in vitest.config.ts will
+// cause this global mockImplementation to be **reset**
+// before any tests are run!
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
