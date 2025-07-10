@@ -70,7 +70,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         )
       )
       .find((w) => w.name === snakeCase(`${bucket.name}_fdw`))
-  }, [data])
+  }, [data, bucket.name])
 
   const extensionState = useIcebergWrapperExtension()
 
