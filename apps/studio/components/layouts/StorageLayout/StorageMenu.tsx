@@ -25,6 +25,7 @@ import {
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
 import BucketRow from './BucketRow'
+import { IS_PLATFORM } from 'lib/constants'
 
 const StorageMenu = () => {
   const router = useRouter()
@@ -194,7 +195,8 @@ const StorageMenu = () => {
                 <p className="truncate">Policies</p>
               </Menu.Item>
             </Link>
-            <Link href={`/project/${ref}/settings/storage`}>
+            {IS_PLATFORM && (
+              <Link href={`/project/${ref}/settings/storage`}>
               <Menu.Item rounded>
                 <div className="flex items-center justify-between">
                   <p className="truncate">Settings</p>
@@ -202,6 +204,7 @@ const StorageMenu = () => {
                 </div>
               </Menu.Item>
             </Link>
+          )}
           </div>
         </div>
       </Menu>
