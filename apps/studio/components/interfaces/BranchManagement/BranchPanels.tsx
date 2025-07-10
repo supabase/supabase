@@ -44,7 +44,7 @@ import { EditBranchModal } from './EditBranchModal'
 import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
-  header: string
+  header: string | ReactNode
   footer?: ReactNode
 }
 
@@ -56,7 +56,7 @@ export const BranchManagementSection = ({
   return (
     <div className="border rounded-lg">
       <div className="bg-surface-100 shadow-sm flex justify-between items-center px-6 py-2 rounded-t-lg text-sm">
-        {header}
+        {typeof header === 'string' ? <span>{header}</span> : header}
       </div>
       <div className="bg-surface border-t shadow-sm rounded-b-lg text-sm divide-y">{children}</div>
       {footer !== undefined && <div className="bg-surface-100 px-6 py-1 border-t">{footer}</div>}
