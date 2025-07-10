@@ -58,7 +58,9 @@ export const EditWrapperSheet = ({
     },
   })
 
-  const [wrapperTables, setWrapperTables] = useState(formatWrapperTables(wrapper, wrapperMeta))
+  const [wrapperTables, setWrapperTables] = useState(() =>
+    formatWrapperTables(wrapper, wrapperMeta)
+  )
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
     undefined

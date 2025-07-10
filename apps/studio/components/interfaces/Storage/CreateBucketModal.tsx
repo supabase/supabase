@@ -284,7 +284,6 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               </Modal.Content>
               <Modal.Separator />
               <Collapsible
-                className="pb-2"
                 open={showConfiguration}
                 onOpenChange={() => setShowConfiguration(!showConfiguration)}
               >
