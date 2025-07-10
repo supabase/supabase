@@ -181,6 +181,10 @@ services:
         strip_path: true
         paths:
           - /storage/v1/
+      - name: storage-v1-self-hosted-resumable-file
+        strip_path: false
+        paths:
+          - /upload/resumable
     plugins:
       - name: cors
 
