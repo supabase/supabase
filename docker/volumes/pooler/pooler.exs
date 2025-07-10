@@ -8,7 +8,7 @@
 
 params = %{
   "external_id" => System.get_env("POOLER_TENANT_ID"),
-  "db_host" => "db",
+  "db_host" => System.get_env("POSTGRES_HOST"),
   "db_port" => System.get_env("POSTGRES_PORT"),
   "db_database" => System.get_env("POSTGRES_DB"),
   "require_user" => false,
