@@ -5,13 +5,11 @@ import { useState } from 'react'
 import { Button, Input } from 'ui'
 
 export const DecryptedReadOnlyInput = ({
-  secretName,
   value,
   secureEntry,
   descriptionText,
   label,
 }: {
-  secretName: string
   value?: string
   secureEntry: boolean
   descriptionText: string

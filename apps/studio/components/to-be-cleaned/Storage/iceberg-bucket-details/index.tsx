@@ -1,3 +1,4 @@
+import { snakeCase } from 'lodash'
 import { SquareArrowOutUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
@@ -33,24 +34,17 @@ import {
   WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { DESCRIPTIONS } from './constants'
 import { DecryptedReadOnlyInput } from './decrypted-read-only-input'
 import { DownloadEnvButton } from './download-env-button'
+import { SimpleConfigurationDetails } from './simple-configuration-details'
 import { useIcebergWrapperExtension } from './use-iceberg-wrapper'
-
-const DESCRIPTIONS: Record<string, string> = {
-  vault_aws_access_key_id: 'Matches the AWS access key ID from a S3 Access Key.',
-  vault_aws_secret_access_key: 'Matches the AWS secret access from a S3 Access Key.',
-  vault_token: 'Corresponds to the service role key.',
-  warehouse: 'Matches the name of the bucket.',
-  's3.endpoint': '',
-  catalog_uri: '',
-}
 
 export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   const { project } = useProjectContext()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
 
-  const { data: extensionsData, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
+  const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -74,7 +68,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           wrapper
         )
       )
-      .find((w) => w.name === 'iceberg_wrapper')
+      .find((w) => w.name === snakeCase(`${bucket.name}_fdw`))
   }, [data])
 
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper')!
@@ -114,6 +108,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         {state === 'loading' && <GenericSkeletonLoader />}
         {state === 'not-installed' && (
           <ExtensionNotInstalled
+            bucketName={bucket.name}
             projectRef={project?.ref!}
             wrapperMeta={wrapperMeta}
             wrappersExtension={wrappersExtension!}
@@ -121,6 +116,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         )}
         {state === 'needs-upgrade' && (
           <ExtensionNeedsUpgrade
+            bucketName={bucket.name}
             projectRef={project?.ref!}
             wrapperMeta={wrapperMeta}
             wrappersExtension={wrappersExtension!}
@@ -186,7 +182,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                   values={values}
                 />
               </div>
-              <Card className="flex flex-col gap-6 p-6">
+              <Card className="flex flex-col gap-6 p-6 pb-0">
                 {wrapperMeta.server.options
                   .filter((option) => !option.hidden && values[option.name])
                   .map((option) => {
@@ -194,7 +190,6 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                       <DecryptedReadOnlyInput
                         key={option.name}
                         label={option.label}
-                        secretName={`${wrapperInstance.name}_${option.name}`}
                         value={values[option.name]}
                         secureEntry={option.secureEntry}
                         descriptionText={DESCRIPTIONS[option.name]}
@@ -205,7 +200,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             </div>
           </>
         )}
-        {state === 'missing' && <WrapperMissing projectRef={project?.ref!} />}
+        {state === 'missing' && <WrapperMissing bucketName={bucket.name} />}
       </ScaffoldContainer>
       <ImportForeignSchemaDialog
         bucketName={bucket.name}
@@ -217,10 +212,12 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
 }
 
 const ExtensionNotInstalled = ({
+  bucketName,
   projectRef,
   wrapperMeta,
   wrappersExtension,
 }: {
+  bucketName: string
   projectRef: string
   wrapperMeta: WrapperMeta
   wrappersExtension: DatabaseExtension
@@ -229,43 +226,48 @@ const ExtensionNotInstalled = ({
     (wrappersExtension?.default_version ?? '') < (wrapperMeta?.minimumExtensionVersion ?? '')
 
   return (
-    <Alert_Shadcn_ variant="warning">
-      <WarningIcon />
-      <AlertTitle_Shadcn_>
-        You need to install the wrappers extension to connect this Iceberg bucket to the database.
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-        <p>
-          The {wrapperMeta.label} wrapper requires the Wrappers extension to be installed. You can
-          install version {wrappersExtension?.installed_version}
-          {databaseNeedsUpgrading &&
-            ' which is below the minimum version that supports Iceberg wrapper'}
-          . Please {databaseNeedsUpgrading && 'upgrade your database then '}install the{' '}
-          <code className="text-xs">wrappers</code> extension to create this wrapper.
-        </p>
-      </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="mt-3">
-        <Button asChild type="default">
-          <Link
-            href={
-              databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
-                : `/project/${projectRef}/database/extensions?filter=wrappers`
-            }
-          >
-            {databaseNeedsUpgrading ? 'Upgrade database' : 'Install wrappers extension'}
-          </Link>
-        </Button>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+    <>
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>
+          You need to install the wrappers extension to connect this Iceberg bucket to the database.
+        </AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+          <p>
+            The {wrapperMeta.label} wrapper requires the Wrappers extension to be installed. You can
+            install version {wrappersExtension?.installed_version}
+            {databaseNeedsUpgrading &&
+              ' which is below the minimum version that supports Iceberg wrapper'}
+            . Please {databaseNeedsUpgrading && 'upgrade your database then '}install the{' '}
+            <code className="text-xs">wrappers</code> extension to create this wrapper.
+          </p>
+        </AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_ className="mt-3">
+          <Button asChild type="default">
+            <Link
+              href={
+                databaseNeedsUpgrading
+                  ? `/project/${projectRef}/settings/infrastructure`
+                  : `/project/${projectRef}/database/extensions?filter=wrappers`
+              }
+            >
+              {databaseNeedsUpgrading ? 'Upgrade database' : 'Install wrappers extension'}
+            </Link>
+          </Button>
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+      <SimpleConfigurationDetails bucketName={bucketName} />
+    </>
   )
 }
 
 const ExtensionNeedsUpgrade = ({
+  bucketName,
   projectRef,
   wrapperMeta,
   wrappersExtension,
 }: {
+  bucketName: string
   projectRef: string
   wrapperMeta: WrapperMeta
   wrappersExtension: DatabaseExtension
@@ -276,57 +278,67 @@ const ExtensionNeedsUpgrade = ({
     wrappersExtension?.installed_version === wrappersExtension?.default_version
 
   return (
-    <Alert_Shadcn_ variant="warning">
-      <WarningIcon />
-      <AlertTitle_Shadcn_>Your extension version is outdated for this wrapper.</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-        <p>
-          The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
-          {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-          {wrappersExtension?.installed_version} installed. Please{' '}
-          {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by disabling
-          and enabling the <code className="text-xs">wrappers</code> extension to create this
-          wrapper.
-        </p>
-        <p className="text-warning">
-          Warning: Before reinstalling the wrapper extension, you must first remove all existing
-          wrappers. Afterward, you can recreate the wrappers.
-        </p>
-      </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="mt-3">
-        <Button asChild type="default">
-          <Link
-            href={
-              databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
-                : `/project/${projectRef}/database/extensions?filter=wrappers`
-            }
-          >
-            {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
-          </Link>
-        </Button>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+    <>
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>
+          Your extension version is outdated for this wrapper.
+        </AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+          <p>
+            The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
+            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+            {wrappersExtension?.installed_version} installed. Please{' '}
+            {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
+            disabling and enabling the <code className="text-xs">wrappers</code> extension to create
+            this wrapper.
+          </p>
+          <p className="text-warning">
+            Warning: Before reinstalling the wrapper extension, you must first remove all existing
+            wrappers. Afterward, you can recreate the wrappers.
+          </p>
+        </AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_ className="mt-3">
+          <Button asChild type="default">
+            <Link
+              href={
+                databaseNeedsUpgrading
+                  ? `/project/${projectRef}/settings/infrastructure`
+                  : `/project/${projectRef}/database/extensions?filter=wrappers`
+              }
+            >
+              {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
+            </Link>
+          </Button>
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+      <SimpleConfigurationDetails bucketName={bucketName} />
+    </>
   )
 }
 
-const WrapperMissing = ({ projectRef }: { projectRef: string }) => {
+const WrapperMissing = ({ bucketName }: { bucketName: string }) => {
+  const { project } = useProjectContext()
+
   return (
-    <Alert_Shadcn_ variant="warning">
-      <WarningIcon />
-      <AlertTitle_Shadcn_>
-        This Iceberg bucket does not have a foreign data wrapper setup.
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-        <p>You need to setup a wrapper to connect this Iceberg bucket to the database.</p>
-      </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="mt-3">
-        <Button asChild type="default">
-          <Link href={`/project/${projectRef}/integrations/iceberg_wrapper/overview`}>
-            Setup a wrapper
-          </Link>
-        </Button>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+    <>
+      <Alert_Shadcn_ variant="warning">
+        <WarningIcon />
+        <AlertTitle_Shadcn_>
+          This Iceberg bucket does not have a foreign data wrapper setup.
+        </AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+          <p>You need to setup a wrapper to connect this Iceberg bucket to the database.</p>
+        </AlertDescription_Shadcn_>
+        <AlertDescription_Shadcn_ className="mt-3">
+          <Button asChild type="default">
+            <Link href={`/project/${project?.ref}/integrations/iceberg_wrapper/overview`}>
+              Setup a wrapper
+            </Link>
+          </Button>
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+      <SimpleConfigurationDetails bucketName={bucketName} />
+    </>
   )
 }

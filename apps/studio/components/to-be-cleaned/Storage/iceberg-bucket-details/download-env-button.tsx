@@ -2,7 +2,6 @@ import { Download } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-import { ServerOption } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
@@ -12,7 +11,7 @@ export const DownloadEnvButton = ({
   serverOptions,
   values,
 }: {
-  serverOptions: ServerOption[]
+  serverOptions: { name: string; secureEntry: boolean }[]
   values: Record<string, string>
 }) => {
   const { project } = useProjectContext()
