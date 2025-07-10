@@ -34,6 +34,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DecryptedReadOnlyInput } from './decrypted-read-only-input'
+import { DownloadEnvButton } from './download-env-button'
 
 const DESCRIPTIONS: Record<string, string> = {
   vault_aws_access_key_id: 'Matches the AWS access key ID from a S3 Access Key.',
@@ -180,6 +181,12 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                     your code.
                   </ScaffoldSectionDescription>
                 </div>
+                <DownloadEnvButton
+                  serverOptions={wrapperMeta.server.options.filter(
+                    (option) => !option.hidden && values[option.name]
+                  )}
+                  values={values}
+                />
               </div>
               <Card className="flex flex-col gap-6 p-6">
                 {wrapperMeta.server.options

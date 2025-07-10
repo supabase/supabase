@@ -1,6 +1,5 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { Eye, EyeOff, Loader } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Input } from 'ui'
@@ -20,28 +19,16 @@ export const DecryptedReadOnlyInput = ({
 }) => {
   const [showHidden, setShowHidden] = useState(false)
   const { project } = useProjectContext()
-  const {
-    data: secrets,
-    isLoading: isSecretsLoading,
-    isSuccess: isSecretsSuccess,
-  } = useVaultSecretsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
-  const secret = secrets?.find((secret) => secret.name === secretName)
-  const {
-    isInitialLoading: isDecryptedValueInitialLoading,
-    isLoading: isDecryptedValueLoading,
-    data: decryptedValue,
-  } = useVaultSecretDecryptedValueQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: secret?.id ?? '',
-    },
-    { enabled: !!(isSecretsSuccess && secret?.id && secureEntry && showHidden) }
-  )
+  const { isLoading: isDecryptedValueLoading, data: decryptedValue } =
+    useVaultSecretDecryptedValueQuery(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        id: value ?? '',
+      },
+      { enabled: secureEntry && showHidden }
+    )
 
   const isLoading = isDecryptedValueLoading && showHidden
 
