@@ -24,7 +24,10 @@ export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 
-export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
+export const getUnifiedLogsISOStartEnd = (
+  search: QuerySearchParamsType,
+  endHoursFromNow: number = 1
+) => {
   // Extract date range from search or use default (last hour)
   let isoTimestampStart: string
   let isoTimestampEnd: string
@@ -36,8 +39,8 @@ export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
   } else {
     const now = new Date()
     isoTimestampEnd = now.toISOString()
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000)
-    isoTimestampStart = oneHourAgo.toISOString()
+    const nHoursAgo = new Date(now.getTime() - 60 * 60 * (endHoursFromNow * 1000))
+    isoTimestampStart = nHoursAgo.toISOString()
   }
 
   return { isoTimestampStart, isoTimestampEnd }
