@@ -492,7 +492,7 @@ const RowHeader = () => {
             <Separator orientation="vertical" />
           </div>
           <Button type="text" onClick={() => onSelectAllRows()}>
-            Select all rows in table
+            {filters.length > 0 ? 'Select all filtered rows in table' : 'Select all rows in table'}
           </Button>
         </>
       )}
