@@ -155,7 +155,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
     }
   }, [visible, form])
 
-  const icebergCatalogEnabled = (data?.features as any).icebergCatalog?.enabled
+  const icebergCatalogEnabled = data?.features?.icebergCatalog?.enabled
 
   return (
     <Modal
