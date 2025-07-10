@@ -258,23 +258,53 @@ const DatabaseUsage = () => {
         {showChartsV2 ? (
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
-              REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
-                  key={chart.id}
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  showMaxValue={
-                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
-                />
-              ))}
+              REPORT_ATTRIBUTES_V2.map((chart) => {
+                const isAvailable =
+                  chart.availableIn === undefined ||
+                  (orgPlan?.id && chart.availableIn.includes(orgPlan?.id))
+
+                if (!isAvailable && !isOrgPlanLoading) {
+                  return (
+                    <Panel
+                      key={chart.id}
+                      title={<h2 className="text-sm">{chart.label}</h2>}
+                      className="h-[260px] relative"
+                    >
+                      <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-background/80 backdrop-blur-md">
+                        <h2 className="">{chart.label}</h2>
+                        <p className="text-sm">Upgrade your plan to see this chart</p>
+                        <Button asChild type="primary">
+                          <Link
+                            href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=reports`}
+                          >
+                            Upgrade to Pro
+                          </Link>
+                        </Button>
+                      </div>
+                    </Panel>
+                  )
+                }
+                return (
+                  <ComposedChartHandler
+                    key={chart.id}
+                    {...chart}
+                    attributes={chart.attributes as MultiAttribute[]}
+                    interval={dateRange.interval}
+                    startDate={dateRange?.period_start?.date}
+                    endDate={dateRange?.period_end?.date}
+                    updateDateRange={updateDateRange}
+                    defaultChartStyle={
+                      chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
+                    }
+                    showMaxValue={
+                      chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                        ? true
+                        : chart.showMaxValue
+                    }
+                    isLoading={isLoading || isRefreshing || isOrgPlanLoading}
+                  />
+                )
+              })}
           </div>
         ) : (
           <Panel title={<h2>Database health</h2>}>

@@ -278,7 +278,6 @@ const METRIC_FORMATTER: Record<
     return { data, chartAttributes }
   },
   ExecutionTime: (rawData, attributes, logsMetric, functionIds, edgeFnIdToName) => {
-    // Always use dynamic attributes, so the chart can show per-function stats.
     if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
 
@@ -307,7 +306,7 @@ const METRIC_FORMATTER: Record<
         })
         const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
         matchingPoints.forEach((p: any) => {
-          point[p.function_id as string] = p.avg_execution_time
+          point[p.function_id || 'ERROR'] = p.avg_execution_time
         })
         return point
       })

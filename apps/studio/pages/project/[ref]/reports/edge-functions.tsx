@@ -66,7 +66,7 @@ const EdgeFunctionsUsage = () => {
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  useCurrentOrgPlan()
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
 
   const EDGEFN_CHARTS = getEdgeFunctionReportAttributes()
 
@@ -255,6 +255,8 @@ const EdgeFunctionsUsage = () => {
                 endDate={dateRange?.period_end?.date}
                 updateDateRange={updateDateRange}
                 functionIds={functionIds}
+                orgPlanId={orgPlan?.id}
+                isLoading={isOrgPlanLoading}
               />
             ))}
         </div>
