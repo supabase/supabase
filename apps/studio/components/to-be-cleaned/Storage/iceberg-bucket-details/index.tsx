@@ -25,6 +25,7 @@ import {
 } from 'data/database-extensions/database-extensions-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { Bucket } from 'data/storage/buckets-query'
+import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -319,7 +320,12 @@ const ExtensionNeedsUpgrade = ({
 }
 
 const WrapperMissing = ({ bucketName }: { bucketName: string }) => {
-  const { project } = useProjectContext()
+  const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
+    useIcebergWrapperCreateMutation()
+
+  const onSetupWrapper = async () => {
+    await createIcebergWrapper({ bucketName })
+  }
 
   return (
     <>
@@ -332,10 +338,8 @@ const WrapperMissing = ({ bucketName }: { bucketName: string }) => {
           <p>You need to setup a wrapper to connect this Iceberg bucket to the database.</p>
         </AlertDescription_Shadcn_>
         <AlertDescription_Shadcn_ className="mt-3">
-          <Button asChild type="default">
-            <Link href={`/project/${project?.ref}/integrations/iceberg_wrapper/overview`}>
-              Setup a wrapper
-            </Link>
+          <Button type="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
+            Setup a wrapper
           </Button>
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>
