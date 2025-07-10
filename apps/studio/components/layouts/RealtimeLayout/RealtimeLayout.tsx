@@ -7,6 +7,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
+import { useRealtimePrivateOnlyModeEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export interface RealtimeLayoutProps {
   title: string
@@ -14,7 +15,8 @@ export interface RealtimeLayoutProps {
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
-  // the flag is used to enable/disable the realtime settings for all projects
+  const isRealtimePrivateOnlyModeEnabled = useRealtimePrivateOnlyModeEnabled()
+  // the flag is used to enable/disable the realtime settings for all projects. Will be overridden by the isRealtimePrivateOnlyModeEnabled if it is enabled.
   const enableRealtimeSettingsFlag = useFlag('enableRealtimeSettings')
   // the flag is used to enable/disable the realtime settings for specific projects. Will be overridden by the enableRealtimeSettingsFlag if it is enabled.
   const approvedProjects = useFlag<string>('isRealtimeSettingsEnabledOnProjects')
@@ -38,7 +40,7 @@ const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutPro
         <ProductMenu
           page={page}
           menu={generateRealtimeMenu(project!, {
-            enableRealtimeSettings: enableRealtimeSettingsFlag || isEnabledOnProject,
+            enableRealtimeSettings: isRealtimePrivateOnlyModeEnabled || enableRealtimeSettingsFlag || isEnabledOnProject,
           })}
         />
       }

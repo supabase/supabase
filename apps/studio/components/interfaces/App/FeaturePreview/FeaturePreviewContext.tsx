@@ -79,3 +79,8 @@ export const useIsInlineEditorEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }
+
+export const useRealtimePrivateOnlyModeEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.REALTIME_PRIVATE_ONLY_MODE]
+}

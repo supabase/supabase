@@ -16,6 +16,8 @@ export const LOCAL_STORAGE_KEYS = {
   TERMS_OF_SERVICE_ACKNOWLEDGED: 'terms-of-service-acknowledged',
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
+  REALTIME_PRIVATE_ONLY_MODE: 'supabase-realtime-private-only-mode',
+
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
 
@@ -104,6 +106,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+  LOCAL_STORAGE_KEYS.REALTIME_PRIVATE_ONLY_MODE,
 ]
 
 export function clearLocalStorage() {
