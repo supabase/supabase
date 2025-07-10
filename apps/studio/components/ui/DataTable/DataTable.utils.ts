@@ -78,7 +78,6 @@ export function getLevelColor(
         bg: 'bg-destructive',
         border: 'border-destructive',
       }
-    case 'info':
     default:
       return {
         text: 'text-info',
