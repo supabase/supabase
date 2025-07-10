@@ -113,15 +113,19 @@ export const CreateIcebergWrapperSheet = ({
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
-    const { wrapper_name } = values
-    if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
+    if (values.source_schema.length === 0) {
+      errors.source_schema = 'Please provide a source schema'
+    }
+    if (values.wrapper_name.length === 0) {
+      errors.wrapper_name = 'Please provide a name for your wrapper'
+    }
     if (!isEmpty(errors)) return setFormErrors(errors)
 
     createFDW({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapperMeta,
-      formState: { ...values, server_name: `${wrapper_name}_server` },
+      formState: { ...values, server_name: `${values.wrapper_name}_server` },
       mode: 'schema',
       tables: [],
       sourceSchema: values.source_schema,
