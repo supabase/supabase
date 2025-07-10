@@ -1218,7 +1218,38 @@ functions:
       - In order to use the `update_user()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
-
+    params:
+      - name: attributes
+        isOptional: false
+        type: UserAttributes
+        subContent: 
+          - name: data
+            isOptional: true
+            type: object
+            description: A custom data object to store the user's metadata. This maps to the `auth.users.raw_user_meta_data` column.
+          - name: email
+            isOptional: true
+            type: string
+            description: The user's email.
+          - name: nonce
+            isOptional: true
+            type: string
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: password
+            isOptional: true
+            type: string
+            description: The user's password.
+          - name: phone
+            isOptional: true
+            type: string
+            description: The user's phone.
+      - name: options
+        isOptional: true
+        type: object
+        subContent:
+          - name: email_redirect_to
+            isOptional: true
+            type: string
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
