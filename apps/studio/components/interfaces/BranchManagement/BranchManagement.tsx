@@ -27,6 +27,7 @@ import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
+import { BranchSelector } from './BranchSelector'
 import { PreviewBranchesEmptyState, PullRequestsEmptyState } from './EmptyStates'
 import { Overview } from './Overview'
 import { ReviewRow } from './ReviewRow'
@@ -268,7 +269,22 @@ const BranchManagement = () => {
                         <div className="space-y-4">
                           {gitlessBranching && (
                             <BranchManagementSection
-                              header={`${branchesReadyForReview.length} branches ready for review`}
+                              header={
+                                <div className="flex items-center justify-between w-full">
+                                  <span>
+                                    {branchesReadyForReview.length} branches ready for review
+                                  </span>
+                                  <BranchSelector
+                                    branches={previewBranches}
+                                    projectRef={projectRef ?? ''}
+                                    onBranchSelected={(branch) => {
+                                      // Optionally handle branch selection here
+                                      console.log('Branch selected for review:', branch.name)
+                                    }}
+                                    disabled={!projectRef}
+                                  />
+                                </div>
+                              }
                             >
                               {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
                                 <div className="bg-background px-6 py-4">
