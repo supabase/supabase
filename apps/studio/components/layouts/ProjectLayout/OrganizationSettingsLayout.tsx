@@ -3,7 +3,6 @@ import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
-import { useFlag } from 'hooks/ui/useFlag'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
@@ -12,9 +11,6 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   // Get the path without any hash values
   const fullCurrentPath = useCurrentPath()
   const [currentPath] = fullCurrentPath.split('#')
-
-  // [Joshen] RE Organization Settings - need to figure out how to enforce MFA across users before this goes live
-  const newSecurityPage = useFlag('showOrganizationSecuritySettings')
 
   // Hide these settings in the new layout on the following paths
   const isHidden = (path: string) => {
@@ -35,7 +31,7 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    newSecurityPage && {
+    {
       label: 'Security',
       href: `/org/${slug}/security`,
     },
