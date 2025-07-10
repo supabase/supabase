@@ -12,7 +12,7 @@
     "codegen:examples": "cp -r ../../examples ./examples",
     "codegen:graphql": "tsx --conditions=react-server ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
-    "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
+    "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --cache --write \"content/**/*.mdx\"",
     "dev": "concurrently --kill-others \"next dev --port 3001\" \"pnpm run dev:watch:troubleshooting\"",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
     "dev:watch:troubleshooting": "node ./scripts/troubleshooting/watch.mjs",
