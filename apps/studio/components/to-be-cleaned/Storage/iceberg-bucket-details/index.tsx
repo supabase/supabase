@@ -35,6 +35,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DecryptedReadOnlyInput } from './decrypted-read-only-input'
 import { DownloadEnvButton } from './download-env-button'
+import { useIcebergWrapperExtension } from './use-iceberg-wrapper'
 
 const DESCRIPTIONS: Record<string, string> = {
   vault_aws_access_key_id: 'Matches the AWS access key ID from a S3 Access Key.',
@@ -59,7 +60,8 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
     connectionString: project?.connectionString,
   })
 
-  const wrapper = useMemo(() => {
+  /** The wrapper instance is the wrapper that is installed for this iceberg bucket. */
+  const wrapperInstance = useMemo(() => {
     return data
       ?.filter((wrapper) =>
         wrapperMetaComparator(
@@ -82,26 +84,22 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
     return <p className="text-sm text-foreground-light">Unsupported integration type</p>
   }
 
-  const values = convertKVStringArrayToJson(wrapper?.server_options ?? [])
+  const values = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const wrapperMeta = integration.meta
 
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
-  const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
-  const hasRequiredVersion =
-    (wrappersExtension?.installed_version ?? '') >= (wrapperMeta?.minimumExtensionVersion ?? '')
 
-  const state =
-    isExtensionsLoading || isFDWsLoading
-      ? 'loading'
-      : isWrappersExtensionInstalled
-        ? hasRequiredVersion
-          ? wrapper
-            ? 'installed'
-            : 'missing'
-          : 'needs-upgrade'
-        : ('not-installed' as const)
+  const extensionState = useIcebergWrapperExtension()
 
-  const isWrapperSchemaInstalled = (wrapper?.tables || []).length > 0
+  const state = isFDWsLoading
+    ? 'loading'
+    : extensionState === 'installed'
+      ? wrapperInstance
+        ? 'added'
+        : 'missing'
+      : extensionState
+
+  const isWrapperSchemaInstalled = (wrapperInstance?.tables || []).length > 0
 
   return (
     <div className="flex flex-col w-full">
@@ -128,7 +126,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             wrappersExtension={wrappersExtension!}
           />
         )}
-        {state === 'installed' && wrapper && (
+        {state === 'added' && wrapperInstance && (
           <>
             <Alert_Shadcn_ className="p-10">
               {isWrapperSchemaInstalled ? (
@@ -196,7 +194,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                       <DecryptedReadOnlyInput
                         key={option.name}
                         label={option.label}
-                        secretName={`${wrapper.name}_${option.name}`}
+                        secretName={`${wrapperInstance.name}_${option.name}`}
                         value={values[option.name]}
                         secureEntry={option.secureEntry}
                         descriptionText={DESCRIPTIONS[option.name]}

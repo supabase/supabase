@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import { useIcebergWrapperExtension } from 'components/to-be-cleaned/Storage/iceberg-bucket-details/use-iceberg-wrapper'
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -19,6 +20,9 @@ import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   cn,
   Collapsible,
@@ -100,6 +104,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const isStandardBucket = form.watch('type') === 'STANDARD'
   const hasFileSizeLimit = form.watch('has_file_size_limit')
   const formattedSizeLimit = form.watch('formatted_size_limit')
+  const icebergWrapperExtensionState = useIcebergWrapperExtension()
 
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -130,7 +135,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         allowed_mime_types: allowedMimeTypes,
       })
 
-      if (values.type === 'ICEBERG') {
+      if (values.type === 'ICEBERG' && icebergWrapperExtensionState === 'installed') {
         await createIcebergWrapper({ bucketName: values.name })
       }
       toast.success(`Successfully created bucket ${values.name}`)
@@ -400,8 +405,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               </Collapsible>
             </>
           ) : (
-            <Modal.Content className="flex flex-col gap-y-4">
-              <div>
+            <Modal.Content>
+              {icebergWrapperExtensionState === 'installed' ? (
                 <Label_Shadcn_ className="text-foreground-lighter leading-1 flex flex-col gap-y-2">
                   <p>
                     <span>Supabase will setup a </span>
@@ -453,7 +458,22 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                     connect the Iceberg data to your database.
                   </p>
                 </Label_Shadcn_>
-              </div>
+              ) : (
+                <Alert_Shadcn_ variant="warning">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>
+                    You need to install the Iceberg wrapper extension to connect your Iceberg bucket
+                    to your database.
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+                    <p>
+                      You need to install the <span className="text-brand">wrappers</span> extension
+                      (with the minimum version of <span>0.5.3</span>) if you want to connect your
+                      Iceberg bucket to your database.
+                    </p>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
             </Modal.Content>
           )}
           <Modal.Separator />
