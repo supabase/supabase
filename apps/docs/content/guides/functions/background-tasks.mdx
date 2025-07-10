@@ -56,8 +56,9 @@ Deno.serve(async (req) => {
 ```
 
 <Admonition type="note">
-  The maximum duration is capped based on the wall-clock, CPU, and memory limits. The function will
-  shut down when it reaches one of these [limits](/docs/guides/functions/limits).
+
+The maximum duration is capped based on the wall-clock, CPU, and memory limits. The function will shut down when it reaches one of these [limits](/docs/guides/functions/limits).
+
 </Admonition>
 
 ---
@@ -74,6 +75,7 @@ policy = "per_worker"
 ```
 
 <Admonition type="caution">
-  When running with `per_worker` policy, Function won't auto-reload on edits. You will need to
-  manually restart it by running `supabase functions serve`.
+
+When running with `per_worker` policy, Function won't auto-reload on edits. You will need to manually restart it by running `supabase functions serve`.
+
 </Admonition>

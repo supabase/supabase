@@ -27,6 +27,7 @@ const model = new Supabase.ai.Session('model-name')
 ```
 
 <Admonition type="tip">
+
 To get type hints and checks for the API, import types from `functions-js`:
 
 ```ts
@@ -257,7 +258,9 @@ Since Llamafile provides an OpenAI API compatible server, you can either use it 
   <StepHikeCompact.Step step={3} fullWidth>
     <StepHikeCompact.Details title="Add the function code" fullWidth>
       <Admonition type="note">
+
         Note that the model parameter doesn't have any effect here. The model depends on which Llamafile is currently running.
+
       </Admonition>
 
       ```ts supabase/functions/llamafile-test/index.ts
@@ -341,7 +344,9 @@ Since Llamafile provides an OpenAI API compatible server, you can either use it 
   <StepHikeCompact.Step step={3} fullWidth>
     <StepHikeCompact.Details title="Add the function code" fullWidth>
       <Admonition type="note">
+
         Note that the model parameter doesn't have any effect here. The model depends on which Llamafile is currently running.
+
       </Admonition>
 
       ```ts
@@ -466,6 +471,7 @@ Once the function is working locally, it's time to deploy to production.
 </StepHikeCompact>
 
 <Admonition type="note">
+
 As demonstrated in the video above, running Ollama locally is typically slower than running it in on a server with dedicated GPUs. We are collaborating with the Ollama team to improve local performance.
 
 In the future, a hosted LLM API, will be provided as part of the Supabase platform. Supabase will scale and manage the API and GPUs for you. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).

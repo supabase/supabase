@@ -17,6 +17,7 @@ When developing Edge Functions, you can run into various issues during developme
 This guide will cover most of the common issues.
 
 <Admonition type="note">
+
 Before troubleshooting, make sure you're using the latest version of the Supabase CLI:
 
 ```bash
@@ -45,8 +46,10 @@ supabase functions deploy your-function --debug
 ```
 
 <Admonition type="note">
-  If these steps don't resolve the issue, open a support ticket via the Supabase Dashboard and
-  include all output from the diagnostic commands.
+
+If these steps don't resolve the issue, open a support ticket via the Supabase Dashboard and
+include all output from the diagnostic commands.
+
 </Admonition>
 
 ### Bundle size issues
@@ -152,11 +155,12 @@ lsof -i :54321
 If the problem persists, search the [Edge Runtime](https://github.com/supabase/edge-runtime) and [CLI](https://github.com/supabase/cli) repositories for similar error messages.
 
 <Admonition type="note">
-  If the output from the commands above does not help you to resolve the issue, open a support
-  ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all
-  output and details about your commands.
-</Admonition>
----
+
+If the output from the commands above does not help you to resolve the issue, open a support
+ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all
+output and details about your commands.
+
+## </Admonition>
 
 ## Performance optimization
 
@@ -169,7 +173,8 @@ Track your function's performance through the dashboard:
 3. Identify potential problems in resource consumption
 
 <Admonition type="note">
- Edge Functions have limited resources compared to traditional servers. Optimize for:
+
+Edge Functions have limited resources compared to traditional servers. Optimize for:
 
 - **Memory efficiency:** Avoid loading large datasets into memory
 - **CPU optimization:** Minimize complex computations

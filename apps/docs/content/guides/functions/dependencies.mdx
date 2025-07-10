@@ -53,9 +53,9 @@ You can add this file directly to the function’s own directory:
 ```
 
 <Admonition type="caution">
-  It's possible to use a global `deno.json` in the `/supabase/functions` directory for local
-  development, but this approach is not recommended for deployment. Each function should maintain
-  its own configuration to ensure proper isolation and dependency management.
+
+It's possible to use a global `deno.json` in the `/supabase/functions` directory for local development, but this approach is not recommended for deployment. Each function should maintain its own configuration to ensure proper isolation and dependency management.
+
 </Admonition>
 
 ### Using import maps (legacy)
@@ -73,7 +73,7 @@ Each function should have its own `import_map.json` file for proper isolation:
 }
 ```
 
-This json file should be located within the function’s own directory:
+This JSON file should be located within the function’s own directory:
 
 ```bash
 └── supabase
@@ -84,9 +84,9 @@ This json file should be located within the function’s own directory:
 ```
 
 <Admonition type="caution">
-  It's possible to use a global `import_map.json` in the `/supabase/functions` directory for local
-  development, but this approach is not recommended for deployment. Each function should maintain
-  its own configuration to ensure proper isolation and dependency management.
+
+It's possible to use a global `import_map.json` in the `/supabase/functions` directory for local development, but this approach is not recommended for deployment. Each function should maintain its own configuration to ensure proper isolation and dependency management.
+
 </Admonition>
 
 If you’re using import maps with VSCode, update your `.vscode/settings.json` to point to your function-specific import map:
@@ -124,9 +124,9 @@ To use private npm packages, create a `.npmrc` file within your function’s own
 ```
 
 <Admonition type="caution">
-  It's possible to use a global `.npmrc` in the `/supabase/functions` directory for local
-  development, but this approach is not recommended for deployment. Each function should maintain
-  its own configuration to ensure proper isolation and dependency management.
+
+It's possible to use a global `.npmrc` in the `/supabase/functions` directory for local development, but this approach is not recommended for deployment. Each function should maintain its own configuration to ensure proper isolation and dependency management.
+
 </Admonition>
 
 Add your registry details in the `.npmrc` file. Follow [this guide](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc) to learn more about the syntax of npmrc files.

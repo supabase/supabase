@@ -40,6 +40,7 @@ Deno.serve(async (req: Request) => {
 ```
 
 <Admonition type="note">
+
 Importantly, this is done _inside_ the `Deno.serve()` callback argument, so that the `Authorization` header is set for each individual request!
 
 </Admonition>

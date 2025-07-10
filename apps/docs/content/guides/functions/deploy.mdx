@@ -9,8 +9,9 @@ tocVideo: '5OWH9c4u68M'
 Once you have developed your Edge Functions locally, you can deploy them to your Supabase project.
 
 <Admonition type="note">
-  Before getting started, make sure you have the Supabase CLI installed. Check out the CLI
-  installation guide for installation methods and troubleshooting.
+
+Before getting started, make sure you have the Supabase CLI installed. Check out the CLI installation guide for installation methods and troubleshooting.
+
 </Admonition>
 
 ---
@@ -34,8 +35,9 @@ supabase projects list
 ```
 
 <Admonition type="tip" label="Need a new project?">
-  If you haven't yet created a Supabase project, you can do so by visiting
-  [database.new](https://database.new).
+
+If you haven't yet created a Supabase project, you can do so by visiting [database.new](https://database.new).
+
 </Admonition>
 
 [Link](/docs/reference/cli/usage#supabase-link) your local project to your remote Supabase project using the ID you just retrieved:
@@ -71,10 +73,10 @@ supabase functions deploy hello-world --no-verify-jwt
 ```
 
 <Admonition type="caution">
-  Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a
-  valid JWT. The Supabase client libraries automatically handle authorization.
+
+Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a valid JWT. The Supabase client libraries automatically handle authorization.
+
 </Admonition>
----
 
 ## Step 4: Verify successful deployment
 
@@ -111,8 +113,9 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 </$CodeTabs>
 
 <Admonition type="note">
-  Note that the `SUPABASE_ANON_KEY` is different in development and production. To get your
-  production anon key, you can find it in your Supabase dashboard under Settings > API.
+
+Note that the `SUPABASE_ANON_KEY` is different in development and production. To get your production anon key, you can find it in your Supabase dashboard under Settings > API.
+
 </Admonition>
 
 You should now see the expected response:
@@ -122,13 +125,14 @@ You should now see the expected response:
 ```
 
 <Admonition type="note">
-  You can also test the function through the Dashboard. To see how that works, check out the
-  [Dashboard Quickstart guide](/docs/guides/dashboard/quickstart).
+
+You can also test the function through the Dashboard. To see how that works, check out the [Dashboard Quickstart guide](/docs/guides/dashboard/quickstart).
+
 </Admonition>
 
 ---
 
-## CI/CD Deployment
+## CI/CD deployment
 
 You can use popular CI / CD tools like GitHub Actions, Bitbucket, and GitLab CI to automate Edge Function deployments.
 
