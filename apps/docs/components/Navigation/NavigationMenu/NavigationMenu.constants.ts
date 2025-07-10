@@ -1375,7 +1375,6 @@ export const functions: NavMenuConstant = {
       items: [
         { name: 'Error Handling', url: '/guides/functions/error-handling' },
         { name: 'HTTP Methods', url: '/guides/functions/http-methods' },
-        { name: 'Using Deno 2', url: '/guides/functions/deno2' },
       ],
     },
     {
