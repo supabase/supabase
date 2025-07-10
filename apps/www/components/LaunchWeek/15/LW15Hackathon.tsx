@@ -5,19 +5,36 @@ import { Button, cn } from 'ui'
 
 import SectionContainer from 'components/Layouts/SectionContainer'
 import Image from 'next/image'
+import { DEFAULT_EASE } from '../../../lib/animations'
+
+const MotionImage = motion(Image)
 
 const LW15Hackathon: FC = () => {
   const ref = React.useRef(null)
   const isInView = useInView(ref, { margin: '-25%', once: true })
 
   const variants = {
+    initial: {},
     reveal: {
       transition: {
         type: 'spring',
         damping: 10,
         mass: 0.75,
         stiffness: 100,
-        staggerChildren: 0.08,
+        staggerChildren: 0.15,
+      },
+    },
+  }
+
+  const imageVariants = {
+    initial: {
+      y: '100%',
+    },
+    reveal: {
+      y: 0,
+      transition: {
+        ease: DEFAULT_EASE,
+        duration: 0.5,
       },
     },
   }
@@ -28,9 +45,15 @@ const LW15Hackathon: FC = () => {
         className="!max-w-none lg:!container lw-nav-anchor lg:grid lg:grid-cols-5 gap-4 lg:gap-2"
         id="build-stage"
       >
-        <div className="flex flex-col md:gap-4 h-full justify-between col-span-2 lg:min-h-[500px]">
-          <div className="relative flex-grow-[1]">
-            <Image
+        <motion.div
+          ref={ref}
+          variants={variants}
+          animate={isInView ? 'reveal' : 'initial'}
+          className="flex flex-col md:gap-4 h-full justify-between col-span-2 lg:min-h-[500px]"
+        >
+          <div className="relative flex-grow-[1] overflow-hidden">
+            <MotionImage
+              variants={imageVariants}
               src="/images/launchweek/15/lw15-galaxy-hackathon.png"
               alt="Hackathon"
               width={1000}
@@ -39,8 +62,9 @@ const LW15Hackathon: FC = () => {
               className="absolute w-full inset-0 h-full object-cover object-top"
             />
           </div>
-          <div className="relative flex-grow-[2]">
-            <Image
+          <div className="relative flex-grow-[2] overflow-hidden">
+            <MotionImage
+              variants={imageVariants}
               src="/images/launchweek/15/lw15-galaxy-hackathon.png"
               alt="Hackathon"
               width={1000}
@@ -49,8 +73,9 @@ const LW15Hackathon: FC = () => {
               className="absolute w-full inset-0 h-full object-cover object-top"
             />
           </div>
-          <div className="relative flex-grow-[3]">
-            <Image
+          <div className="relative flex-grow-[3] overflow-hidden">
+            <MotionImage
+              variants={imageVariants}
               src="/images/launchweek/15/lw15-galaxy-hackathon.png"
               alt="Hackathon"
               width={1000}
@@ -59,7 +84,7 @@ const LW15Hackathon: FC = () => {
               className="absolute w-full inset-0 h-full object-cover object-top"
             />
           </div>
-        </div>
+        </motion.div>
         <div className="w-full h-full flex flex-col justify-between gap-4 lg:col-span-3">
           <div className="flex flex-col h-full gap-4">
             <div className="flex flex-col sm:flex-row justify-between text-xs gap-4">
