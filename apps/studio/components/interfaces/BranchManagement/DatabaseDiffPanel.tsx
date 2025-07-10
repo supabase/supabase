@@ -49,9 +49,9 @@ const DatabaseDiffPanel = ({
         <CardTitle>
           <Link
             href={`/project/${currentBranchRef}/database/schema`}
-            className="text-foreground-light flex items-center gap-2"
+            className="flex items-center gap-2"
           >
-            <Database strokeWidth={1.5} size={16} />
+            <Database strokeWidth={1.5} size={16} className="text-foreground-muted" />
             Schema Changes
           </Link>
         </CardTitle>

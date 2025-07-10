@@ -15,6 +15,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -35,6 +36,7 @@ import {
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
 import { useFlag } from 'hooks/ui/useFlag'
+import { toast } from 'sonner'
 
 const BranchLink = ({
   branch,
@@ -81,6 +83,16 @@ export const BranchDropdown = () => {
   const snap = useAppStateSnapshot()
 
   const projectRef = projectDetails?.parent_project_ref || ref
+
+  const { mutate: updateBranch, isLoading: isUpdatingBranch } = useBranchUpdateMutation({
+    onSuccess: (_, variables) => {
+      if (variables.requestReview) {
+        router.push(`/project/${ref}/merge`)
+      }
+      setOpen(false)
+      toast.success('Branch marked as ready for review')
+    },
+  })
 
   const {
     data: branches,
@@ -166,16 +178,30 @@ export const BranchDropdown = () => {
               <>
                 <CommandItem_Shadcn_
                   className="cursor-pointer w-full"
+                  disabled={isUpdatingBranch}
                   onSelect={() => {
-                    setOpen(false)
-                    router.push(`/project/${ref}/merge`)
+                    if (selectedBranch?.review_requested_at) {
+                      router.push(`/project/${ref}/merge`)
+                    } else {
+                      if (selectedBranch?.id && projectRef) {
+                        updateBranch({
+                          id: selectedBranch.id,
+                          projectRef,
+                          requestReview: true,
+                        })
+                      }
+                    }
                   }}
                   onClick={() => setOpen(false)}
                 >
-                  <Link href={`/project/${ref}/merge`} className="w-full flex items-center gap-2">
+                  <div className="w-full flex items-center gap-2">
                     <GitMerge size={14} strokeWidth={1.5} />
-                    Review changes
-                  </Link>
+                    {isUpdatingBranch
+                      ? 'Updating...'
+                      : selectedBranch?.review_requested_at
+                        ? 'Review changes'
+                        : 'Ready for review'}
+                  </div>
                 </CommandItem_Shadcn_>
               </>
             )}

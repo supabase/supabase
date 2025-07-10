@@ -4607,6 +4607,8 @@ export interface components {
       created_by: string
       /** Format: uuid */
       id: string
+      /** Format: date-time */
+      last_used_at: string | null
       /** Format: uuid */
       oauth_app_id: string
     }
@@ -6129,6 +6131,8 @@ export interface components {
         created_by: string
         /** Format: uuid */
         id: string
+        /** Format: date-time */
+        last_used_at: string | null
         /** Format: uuid */
         oauth_app_id: string
       }[]
@@ -7632,6 +7636,9 @@ export interface components {
     }
     StorageConfigResponse: {
       features: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -8515,6 +8522,9 @@ export interface components {
     }
     UpdateStorageConfigBody: {
       features?: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
