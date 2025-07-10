@@ -1,10 +1,7 @@
-import { Check, ChevronsUpDown, GitMerge, Shield } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { Check, Plus, Shield } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
 
 import { Branch } from 'data/branches/branches-query'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -17,42 +14,23 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
-  cn,
 } from 'ui'
 
 interface BranchSelectorProps {
   branches: Branch[]
-  projectRef: string
   onBranchSelected?: (branch: Branch) => void
   disabled?: boolean
+  isUpdating?: boolean
 }
 
 export const BranchSelector = ({
   branches,
-  projectRef,
   onBranchSelected,
   disabled = false,
+  isUpdating = false,
 }: BranchSelectorProps) => {
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
-
-  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
-    onSuccess: (_, variables) => {
-      toast.success('Branch marked as ready for review')
-      setOpen(false)
-      if (variables.requestReview && selectedBranch) {
-        // Redirect to merge page for the selected branch
-        router.push(`/project/${selectedBranch.project_ref}/merge`)
-        onBranchSelected?.(selectedBranch)
-      }
-      setSelectedBranch(null)
-    },
-    onError: (error) => {
-      toast.error(`Failed to mark branch for review: ${error.message}`)
-      setSelectedBranch(null)
-    },
-  })
 
   // Filter out branches that are already ready for review and the main branch
   const availableBranches = branches.filter(
@@ -61,35 +39,28 @@ export const BranchSelector = ({
 
   const handleBranchSelect = (branch: Branch) => {
     setSelectedBranch(branch)
-    if (branch.id && projectRef) {
-      updateBranch({
-        id: branch.id,
-        projectRef,
-        requestReview: true,
-      })
-    }
+    setOpen(false)
+    onBranchSelected?.(branch)
   }
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          type="primary"
+          type="outline"
           size="tiny"
           disabled={disabled || availableBranches.length === 0 || isUpdating}
-          icon={<GitMerge size={14} strokeWidth={1.5} />}
-          iconRight={<ChevronsUpDown strokeWidth={1.5} size={14} />}
-          className="gap-2"
+          icon={<Plus size={14} strokeWidth={1.5} />}
         >
-          {isUpdating ? 'Creating...' : 'Create new review'}
+          {isUpdating ? 'Creating...' : 'Create review'}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
+      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find branch to review..." />
           <CommandList_Shadcn_>
             <CommandEmpty_Shadcn_>No available branches found</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_ heading="Select branch for review">
+            <CommandGroup_Shadcn_>
               <ScrollArea className="max-h-[210px] overflow-y-auto">
                 {availableBranches.map((branch) => (
                   <CommandItem_Shadcn_
