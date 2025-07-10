@@ -5,6 +5,7 @@
 - [Bangla / বাংলা](/i18n/README.bn.md)
 - [Bulgarian / Български](/i18n/README.bg.md)
 - [Catalan / Català](/i18n/README.ca.md)
+- [Croatian / hrvatski](/i18n/README.hr.md)
 - [Czech / čeština](/i18n/README.cs.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)
