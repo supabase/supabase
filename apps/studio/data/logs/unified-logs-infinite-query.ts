@@ -30,8 +30,9 @@ export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
   let isoTimestampEnd: string
 
   if (search.date && search.date.length === 2) {
-    isoTimestampStart = new Date(search.date[0]).toISOString()
-    isoTimestampEnd = new Date(search.date[1]).toISOString()
+    const parseDate = (d: string | Date) => (d instanceof Date ? d : new Date(d))
+    isoTimestampStart = parseDate(search.date[0]).toISOString()
+    isoTimestampEnd = parseDate(search.date[1]).toISOString()
   } else {
     const now = new Date()
     isoTimestampEnd = now.toISOString()
@@ -42,9 +43,10 @@ export const getUnifiedLogsISOStartEnd = (search: QuerySearchParamsType) => {
   return { isoTimestampStart, isoTimestampEnd }
 }
 
-async function getUnifiedLogs(
-  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam: PageParam },
-  signal?: AbortSignal
+export async function getUnifiedLogs(
+  { projectRef, search, pageParam }: UnifiedLogsVariables & { pageParam?: PageParam },
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined')
     throw new Error('projectRef is required for getUnifiedLogs')
@@ -94,10 +96,13 @@ async function getUnifiedLogs(
     timestampEnd = isoTimestampEnd
   }
 
+  let headers = new Headers(headersInit)
+
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: timestampEnd, sql },
     signal,
+    headers,
   })
 
   if (error) handleError(error)
@@ -162,12 +167,12 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
       enabled: enabled && typeof projectRef !== 'undefined',
       getPreviousPageParam: (firstPage) => {
         if (!firstPage.prevCursor) return null
-        const result = { cursor: firstPage.prevCursor, direction: 'prev' } as PageParam
+        const result = { cursor: firstPage.prevCursor, direction: 'prev' }
         return result
       },
       getNextPageParam(lastPage) {
         if (!lastPage.nextCursor || lastPage.data.length === 0) return null
-        return { cursor: lastPage.nextCursor, direction: 'next' } as PageParam
+        return { cursor: lastPage.nextCursor, direction: 'next' }
       },
       ...UNIFIED_LOGS_QUERY_OPTIONS,
       ...options,
