@@ -31,13 +31,16 @@ await supabase.auth.signInWithOAuth({
 
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
-```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
-const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+  queryGroup="framework"
+>
+<TabPanel id="nextjs" label="Next.js">
 
-// ---cut---
+```js
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -46,9 +49,80 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 
 if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+  redirect(data.url)
 }
 ```
+
+</TabPanel>
+
+<TabPanel id="sveltekit" label="SvelteKit">
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  redirect(303, data.url)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="astro" label="Astro">
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  redirect(data.url)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix" label="Remix">
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  redirect(data.url, { headers })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="express" label="Express">
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  res.redirect(303, data.url)
+}
+```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 
