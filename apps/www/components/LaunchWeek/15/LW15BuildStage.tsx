@@ -25,7 +25,7 @@ const LW15BuildStage: FC = () => {
   return (
     <>
       <SectionContainer
-        className="!max-w-none lg:!container lw-nav-anchor flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-2"
+        className="!max-w-none lg:!container py-8 md:py-8 lw-nav-anchor flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-2"
         id="build-stage"
       >
         <div className="flex flex-col md:gap-2 h-full justify-between col-span-2">

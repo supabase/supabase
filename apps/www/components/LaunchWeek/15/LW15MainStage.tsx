@@ -17,10 +17,10 @@ const LW15MainStage = ({ className }: { className?: string }) => {
   const days = mainDays(isDark!)
 
   return (
-    <div className="relative pb-16 md:pb-24 lg:pb-24">
+    <div className="relative pb-8 lg:pb-24 overflow-hidden">
       <SectionContainer
         className={cn(
-          'relative !max-w-none !pb-4 md:pb-4 !pt-8 xl:!pt-10 xl:!container flex flex-col gap-4',
+          'relative !max-w-none !pb-4 md:pb-4 !pt-8 xl:!pt-10 lg:!container flex flex-col gap-4',
           className
         )}
         id="main-stage"
@@ -73,8 +73,7 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
   }, [hiddenRef, width])
 
   return (
-    <Link
-      href={day.blog!}
+    <div
       className={cn(
         'group/main block w-full h-full xl:flex-1 xl:h-auto xl:aspect-[217/275] relative overflow-hidden rounded border hover:border-black dark:hover:border-stronger text-white'
       )}
@@ -90,14 +89,14 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
         >
           <span className="text-xs opacity-40">{day.date}</span>
           <h4 className="text-lg leading-snug">{day.title}</h4>
-          <div className="block mt-2 opacity-0 group-hover/main:lg:opacity-100" ref={hiddenRef}>
+          <div className="block mt-2 lg:opacity-0 group-hover/main:lg:opacity-100" ref={hiddenRef}>
             <Button type="outline" size="small" className="text-current rounded-sm border-dashed">
               <Link href={day.blog!}>Read more</Link>
             </Button>
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 
@@ -142,7 +141,7 @@ interface Props {
 }
 
 const CardsSlider: React.FC<Props> = ({ slides, className }) => (
-  <div className={cn('relative px-6 lg:px-16', className)}>
+  <div className={cn('relative lg:container mx-auto px-6 lg:px-16', className)}>
     <Swiper
       initialSlide={0}
       spaceBetween={12}
