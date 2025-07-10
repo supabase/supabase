@@ -227,7 +227,7 @@ supabase db diff --linked --schema auth,storage > changes.sql
 The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
 
 ```js
-// npm install @supabase/supabase-js@1
+// npm install @supabase/supabase-js@2
 const { createClient } = require('@supabase/supabase-js')
 
 const OLD_PROJECT_URL = 'https://xxx.supabase.co'
@@ -238,7 +238,9 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 
 ;(async () => {
   const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-    schema: 'storage',
+    db: {
+      schema: 'storage',
+    },
   })
   const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
   const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
