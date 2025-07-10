@@ -264,7 +264,7 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full scroll-mt-16', className)}
+      className={cn('relative w-full scroll-mt-16', className)}
       wrapWithLoading={false}
       id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
