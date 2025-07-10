@@ -1,10 +1,16 @@
+import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
 import { useRouter } from 'next/router'
 
 import { Lw15ConfDataProvider } from 'components/LaunchWeek/15/hooks/use-conf-data'
 import DefaultLayout from 'components/Layouts/Default'
-import LW15LandingPage from 'components/LaunchWeek/15/Ticketing/LW15LandingPage'
+import LW15Heading from 'components/LaunchWeek/15/LW15Heading'
+import LW15MainStage from 'components/LaunchWeek/15/LW15MainStage'
+
+const LW15BuildStage = dynamic(() => import('components/LaunchWeek/15/LW15BuildStage'))
+const LW15Hackathon = dynamic(() => import('components/LaunchWeek/15/LW15Hackathon'))
+const LW15Meetups = dynamic(() => import('components/LaunchWeek/15/LW15Meetups'))
 
 const Lw15Page = () => {
   const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
@@ -39,17 +45,20 @@ const Lw15Page = () => {
       />
 
       <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
-        <DefaultLayout className="!min-h-[calc(100dvh-66px)] h-[calc(100dvh-66px)] dark:bg-black">
-          <div
-            style={{
-              fontFamily:
-                "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-            }}
-            className="h-full"
-          >
-            <LW15LandingPage />
-          </div>
-        </DefaultLayout>
+        <div
+          style={{
+            fontFamily:
+              "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+          }}
+        >
+          <DefaultLayout className="dark:bg-black">
+            <LW15Heading />
+            <LW15MainStage />
+            <LW15BuildStage />
+            <LW15Hackathon />
+            <LW15Meetups />
+          </DefaultLayout>
+        </div>
       </Lw15ConfDataProvider>
     </>
   )
