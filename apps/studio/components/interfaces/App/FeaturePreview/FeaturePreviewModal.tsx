@@ -1,6 +1,6 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -62,15 +62,6 @@ const FeaturePreviewModal = () => {
   function handleCloseFeaturePreviewModal() {
     snap.setShowFeaturePreviewModal(false)
   }
-
-  useEffect(() => {
-    if (snap.showFeaturePreviewModal) {
-      sendEvent({
-        action: 'feature_previews_clicked',
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
-    }
-  }, [snap.showFeaturePreviewModal])
 
   return (
     <Modal
