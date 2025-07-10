@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { SupabaseService } from '../supabase.service';
 
 @Component({
   selector: 'app-auth',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
 })

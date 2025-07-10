@@ -1,10 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AuthSession } from '@supabase/supabase-js';
 import { Profile, SupabaseService } from '../supabase.service';
+import { AvatarComponent } from '../avatar/avatar.component';
 
 @Component({
   selector: 'app-account',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, AvatarComponent],
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.css'],
 })
