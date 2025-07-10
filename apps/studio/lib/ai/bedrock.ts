@@ -37,6 +37,7 @@ async function vercelOidcProvider() {
 export const bedrockRegionMap = {
   us1: 'us-east-1',
   us2: 'us-east-2',
+  us3: 'us-west-2',
   eu: 'eu-central-1',
 } as const
 
