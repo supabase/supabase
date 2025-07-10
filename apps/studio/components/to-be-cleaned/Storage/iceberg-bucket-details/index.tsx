@@ -35,7 +35,16 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DecryptedReadOnlyInput } from './decrypted-read-only-input'
 
-export const IcebergExplorer = ({ bucket }: { bucket: Bucket }) => {
+const DESCRIPTIONS: Record<string, string> = {
+  vault_aws_access_key_id: 'Matches the AWS access key ID from a S3 Access Key.',
+  vault_aws_secret_access_key: 'Matches the AWS secret access from a S3 Access Key.',
+  vault_token: 'Corresponds to the service role key.',
+  warehouse: 'Matches the name of the bucket.',
+  's3.endpoint': '',
+  catalog_uri: '',
+}
+
+export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   const { project } = useProjectContext()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
 
@@ -163,10 +172,15 @@ export const IcebergExplorer = ({ bucket }: { bucket: Bucket }) => {
             </Alert_Shadcn_>
 
             <div>
-              <ScaffoldSectionTitle>Connection Details for 3rd Party Clients</ScaffoldSectionTitle>
-              <ScaffoldSectionDescription className="mb-4">
-                Authenticate your users through a suite of providers and login methods
-              </ScaffoldSectionDescription>
+              <div className="flex flex-row justify-between items-center">
+                <div>
+                  <ScaffoldSectionTitle>Configuration Details</ScaffoldSectionTitle>
+                  <ScaffoldSectionDescription className="mb-4">
+                    You can use the following configuration details to connect to the bucket from
+                    your code.
+                  </ScaffoldSectionDescription>
+                </div>
+              </div>
               <Card className="flex flex-col gap-6 p-6">
                 {wrapperMeta.server.options
                   .filter((option) => !option.hidden && values[option.name])
@@ -178,7 +192,7 @@ export const IcebergExplorer = ({ bucket }: { bucket: Bucket }) => {
                         secretName={`${wrapper.name}_${option.name}`}
                         value={values[option.name]}
                         secureEntry={option.secureEntry}
-                        descriptionText="Used to decode your JWTs. You can also use this to mint your own JWTs."
+                        descriptionText={DESCRIPTIONS[option.name]}
                       />
                     )
                   })}

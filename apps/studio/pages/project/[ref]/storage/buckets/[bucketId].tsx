@@ -5,7 +5,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
-import { IcebergExplorer } from 'components/to-be-cleaned/Storage/iceberg-explorer'
+import { IcebergBucketDetails } from 'components/to-be-cleaned/Storage/iceberg-bucket-details'
 import { useSelectedBucket } from 'components/to-be-cleaned/Storage/StorageExplorer/useSelectedBucket'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
@@ -28,11 +28,9 @@ const PageLayout: NextPageWithLayout = () => {
             <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
         ) : bucket.type === 'ICEBERG' ? (
-          <IcebergExplorer bucket={bucket} />
+          <IcebergBucketDetails bucket={bucket} />
         ) : (
-          <div className="p-4">
-            <StorageExplorer bucket={bucket} />
-          </div>
+          <StorageExplorer bucket={bucket} />
         )
       ) : (
         <div />
