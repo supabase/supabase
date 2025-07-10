@@ -69,7 +69,7 @@ const LW15Ticket = ({
           className="relative z-10 flex flex-col p-4 gap-4 w-full h-full"
           style={{ backgroundColor: `${bg}30` }}
         >
-          <div className="absolute top-5 bg-background dark:bg-black mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg z-30 overflow-hidden">
+          <div className="absolute top-5 border bg-background dark:bg-black mx-auto inset-x-0 h-[15px] w-[50px] rounded-lg z-30 overflow-hidden">
             <span className="absolute inset-0 w-full h-full" style={{ background: `${fg}07` }} />
           </div>
           <div className="w-full h-[50px] flex items-center justify-between">

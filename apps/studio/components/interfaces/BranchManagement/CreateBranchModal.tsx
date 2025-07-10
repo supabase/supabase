@@ -87,6 +87,7 @@ export const CreateBranchModal = () => {
         await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
       }
       setShowCreateBranchModal(false)
+      router.push(`/project/${data.project_ref}`)
     },
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)

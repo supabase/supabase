@@ -4,11 +4,12 @@ import { useRef } from 'react'
 
 import { Button, cn } from 'ui'
 import { AssistantChatForm } from './AssistantChatForm'
+import { type SqlSnippet } from './AIAssistant.types'
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
 
 interface AIOnboardingProps {
   onMessageSend: (message: string) => void
-  sqlSnippets?: string[]
+  sqlSnippets?: SqlSnippet[]
   onRemoveSnippet?: (index: number) => void
   suggestions?: {
     title?: string

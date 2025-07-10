@@ -2,9 +2,24 @@ import React from 'react'
 import { Button, CodeBlock } from 'ui'
 import { HoverCard_Shadcn_, HoverCardTrigger_Shadcn_, HoverCardContent_Shadcn_ } from 'ui'
 import { X } from 'lucide-react'
+import { type SqlSnippet } from './AIAssistant.types'
+
+export const getSnippetLabel = (snippet: SqlSnippet, index: number): string => {
+  if (typeof snippet === 'string') {
+    return `Snippet ${index + 1}`
+  }
+  return snippet.label
+}
+
+export const getSnippetContent = (snippet: SqlSnippet): string => {
+  if (typeof snippet === 'string') {
+    return snippet
+  }
+  return snippet.content
+}
 
 interface SnippetRowProps {
-  snippets: string[]
+  snippets: SqlSnippet[]
   onRemoveSnippet?: (index: number) => void
   className?: string
 }
@@ -17,15 +32,15 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
   if (!snippets || snippets.length === 0) return null
 
   return (
-    <div className={`w-full overflow-x-auto flex gap-2 ${className}`}>
+    <div className={`w-full overflow-x-auto flex ${className}`}>
       {snippets.map((snippet, idx) => (
         <HoverCard_Shadcn_ key={idx}>
           <HoverCardTrigger_Shadcn_ asChild>
             <div
               tabIndex={0}
-              className="border inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
+              className="border bg inline-flex gap-1 items-center shrink-0 py-1 pl-2 rounded-full pr-1 text-xs cursor-pointer"
             >
-              Snippet {idx + 1}
+              {getSnippetLabel(snippet, idx)}
               {onRemoveSnippet && (
                 <Button
                   size="tiny"
@@ -47,7 +62,7 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
               className="text-xs font-mono whitespace-pre-wrap break-words p-2 border-0"
               language="sql"
             >
-              {snippet}
+              {getSnippetContent(snippet)}
             </CodeBlock>
           </HoverCardContent_Shadcn_>
         </HoverCard_Shadcn_>
