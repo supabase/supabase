@@ -204,6 +204,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       </ScaffoldContainer>
       <ImportForeignSchemaDialog
         bucketName={bucket.name}
+        wrapperValues={values}
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />

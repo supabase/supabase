@@ -9,6 +9,8 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
+import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
+import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import {
   Button,
   Form_Shadcn_,
@@ -21,6 +23,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
+  wrapperValues: Record<string, string>
   visible: boolean
   onClose: () => void
 }
@@ -35,19 +38,20 @@ export type ImportForeignSchemaForm = z.infer<typeof FormSchema>
 
 export const ImportForeignSchemaDialog = ({
   bucketName,
+  wrapperValues,
   visible,
   onClose,
 }: ImportForeignSchemaDialogProps) => {
   const { project } = useProjectContext()
   const { ref } = useParams()
 
-  const { mutate, isLoading } = useFDWImportForeignSchemaMutation({
+  const { mutateAsync: createIcebergNamespace, isLoading: isCreatingIcebergNamespace } =
+    useIcebergNamespaceCreateMutation()
+
+  const { mutateAsync: importForeignSchema, isLoading } = useFDWImportForeignSchemaMutation({
     onSuccess: () => {
       toast.success(`Successfully connected ${bucketName} to the database.`)
       onClose()
-    },
-    onError: (error) => {
-      toast.error(`Failed to connect bucket to the database: ${error.message}`)
     },
   })
 
@@ -63,13 +67,29 @@ export const ImportForeignSchemaDialog = ({
   const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
 
-    mutate({
-      projectRef: ref,
+    const token = await getDecryptedValue({
+      projectRef: project?.ref,
       connectionString: project?.connectionString,
-      serverName: `${snakeCase(values.bucketName)}_fdw_server`,
-      sourceSchema: values.source_namespace,
-      targetSchema: values.target_schema,
+      id: wrapperValues['vault_token'],
     })
+    try {
+      await createIcebergNamespace({
+        catalogUri: wrapperValues['catalog_uri'],
+        warehouse: wrapperValues['warehouse'],
+        token: token[0].decrypted_secret,
+        namespace: values.source_namespace,
+      })
+
+      await importForeignSchema({
+        projectRef: ref,
+        connectionString: project?.connectionString,
+        serverName: `${snakeCase(values.bucketName)}_fdw_server`,
+        sourceSchema: values.source_namespace,
+        targetSchema: values.target_schema,
+      })
+    } catch (error: any) {
+      // error will be handled by the mutation onError callback
+    }
   }
 
   useEffect(() => {
