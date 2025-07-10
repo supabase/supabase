@@ -32,7 +32,7 @@ on storage.objects
 for delete
 to authenticated
 using (
-    owner_id = (select auth.uid())
+    owner_id = (select auth.uid())::text
 );
 ```
 
