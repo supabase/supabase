@@ -259,6 +259,10 @@ const DatabaseUsage = () => {
           <div className="grid grid-cols-1 gap-4">
             {dateRange &&
               REPORT_ATTRIBUTES_V2.map((chart) => {
+                if (chart.hide) {
+                  return null
+                }
+
                 const isAvailable =
                   chart.availableIn === undefined ||
                   (orgPlan?.id && chart.availableIn.includes(orgPlan?.id))
