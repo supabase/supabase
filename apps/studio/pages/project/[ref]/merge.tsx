@@ -142,7 +142,14 @@ const MergePage: NextPageWithLayout = () => {
         })
       }
     },
-    [refetchDiff, clearDiffsOptimistically, parentProjectRef, currentBranch?.id, updateBranch]
+    [
+      refetchDiff,
+      clearDiffsOptimistically,
+      parentProjectRef,
+      currentBranch?.id,
+      updateBranch,
+      currentBranch?.review_requested_at,
+    ]
   )
 
   const { currentWorkflowRun: currentBranchWorkflow, workflowRunLogs: currentBranchLogs } =
