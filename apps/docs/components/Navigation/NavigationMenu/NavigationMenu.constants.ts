@@ -1126,8 +1126,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/clickhouse',
         },
         {
+          name: 'Connecting to DuckDB',
+          url: '/guides/database/extensions/wrappers/duckdb',
+        },
+        {
           name: 'Connecting to Firebase',
           url: '/guides/database/extensions/wrappers/firebase',
+        },
+        {
+          name: 'Connecting to Iceberg',
+          url: '/guides/database/extensions/wrappers/iceberg',
         },
         {
           name: 'Connecting to Logflare',
