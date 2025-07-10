@@ -83,6 +83,7 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
             <DropdownMenuTrigger asChild>
               <Button
                 type="primary"
+                title="Choose token scope"
                 className="rounded-l-none px-[4px] py-[5px]"
                 icon={<ChevronDown />}
               />
@@ -147,9 +148,13 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
                 name="tokenName"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout label="Name">
+                  <FormItemLayout name="tokenName" label="Name">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="Provide a name for your token" />
+                      <Input_Shadcn_
+                        id="tokenName"
+                        {...field}
+                        placeholder="Provide a name for your token"
+                      />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
