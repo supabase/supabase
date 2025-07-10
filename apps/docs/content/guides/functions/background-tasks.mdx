@@ -19,7 +19,9 @@ You can listen to the `beforeunload` event handler to be notified when Function 
 
 Here's an example of using `EdgeRuntime.waitUntil` to run a background task and using `beforeunload` event to be notified when the instance is about to be shut down.
 
-```ts
+```ts 
+/// <reference types="jsr:@supabase/functions-js/edge-runtime.d.ts" />
+
 async function longRunningTask() {
   // do work here
 }
@@ -42,11 +44,18 @@ Deno.serve(async (req) => {
 })
 ```
 
+**Note:**
+To prevent linting errors, make sure add the following line at the top of your Edge Function file:
+
+`/// <reference types="jsr:@supabase/functions-js/edge-runtime.d.ts" />`
+
 ### Starting a background task in the request handler
 
 You can call `EdgeRuntime.waitUntil` in the request handler too. This will not block the request.
 
 ```ts
+/// <reference types="jsr:@supabase/functions-js/edge-runtime.d.ts" />
+
 async function fetchAndLog(url: string) {
   const response = await fetch(url)
   console.log(response)
