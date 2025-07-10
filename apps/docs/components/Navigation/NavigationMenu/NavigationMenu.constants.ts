@@ -1374,20 +1374,10 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Error Handling', url: '/guides/functions/error-handling' },
-        { name: 'HTTP Methods', url: '/guides/functions/http-methods' },
-      ],
-    },
-    {
-      name: 'Deployment',
-      url: undefined,
-      items: [
+        { name: 'Routing', url: '/guides/functions/routing' },
         {
           name: 'Deploy to Production',
           url: '/guides/functions/deploy',
-        },
-        {
-          name: 'Deploying with CI/CD pipelines',
-          url: '/guides/functions/cicd-workflow',
         },
       ],
     },
