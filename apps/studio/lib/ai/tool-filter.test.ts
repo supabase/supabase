@@ -9,6 +9,8 @@ import {
   createPrivacyMessageTool,
   toolSetValidationSchema,
   transformToolResult,
+  checkNetworkExtensionsAndAdjustOptInLevel,
+  DatabaseExtension,
 } from './tool-filter'
 
 describe('TOOL_CATEGORY_MAP', () => {
@@ -356,5 +358,133 @@ describe('toolSetValidationSchema', () => {
 
     const incompleteValidationResult = toolSetValidationSchema.safeParse(incompleteTools)
     expect(incompleteValidationResult.success).toBe(true) // Should still pass as we allow subsets
+  })
+})
+
+describe('checkNetworkExtensionsAndAdjustOptInLevel', () => {
+  const createMockExtension = (name: string, installedVersion?: string): DatabaseExtension => ({
+    comment: null,
+    default_version: '1.0',
+    installed_version: installedVersion || null,
+    name,
+    schema: 'public',
+  })
+
+  it('should return the same opt-in level when no extensions are provided', () => {
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(null, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log_and_data')
+  })
+
+  it('should return the same opt-in level when extensions array is empty', () => {
+    const result = checkNetworkExtensionsAndAdjustOptInLevel([], 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log_and_data')
+  })
+
+  it('should return the same opt-in level when extensions array is undefined', () => {
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(undefined, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log_and_data')
+  })
+
+  it('should not downgrade when no dangerous network extensions are installed', () => {
+    const extensions = [
+      createMockExtension('postgis', '3.2.0'),
+      createMockExtension('uuid-ossp', '1.1'),
+      createMockExtension('pg_trgm', '1.6'),
+    ]
+
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log_and_data')
+  })
+
+  it('should downgrade from schema_and_log_and_data to schema_and_log when pg_net is installed', () => {
+    const extensions = [
+      createMockExtension('postgis', '3.2.0'),
+      createMockExtension('pg_net', '0.7.1'), // installed
+      createMockExtension('uuid-ossp', '1.1'),
+    ]
+
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log')
+  })
+
+  it('should downgrade from schema_and_log_and_data to schema_and_log when http extension is installed', () => {
+    const extensions = [
+      createMockExtension('postgis', '3.2.0'),
+      createMockExtension('http', '1.5.0'), // installed
+      createMockExtension('uuid-ossp', '1.1'),
+    ]
+
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log')
+  })
+
+  it('should downgrade when both pg_net and http extensions are installed', () => {
+    const extensions = [
+      createMockExtension('pg_net', '0.7.1'), // installed
+      createMockExtension('http', '1.5.0'), // installed
+      createMockExtension('uuid-ossp', '1.1'),
+    ]
+
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log')
+  })
+
+  it('should not downgrade when dangerous extensions are available but not installed', () => {
+    const extensions = [
+      createMockExtension('pg_net'), // not installed (no installed_version)
+      createMockExtension('http'), // not installed (no installed_version)
+      createMockExtension('postgis', '3.2.0'), // installed
+    ]
+
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log_and_data')
+  })
+
+  it('should not downgrade when opt-in level is already at or below schema_and_log', () => {
+    const extensions = [
+      createMockExtension('pg_net', '0.7.1'), // installed
+    ]
+
+    // Test with schema_and_log - should remain unchanged
+    const result1 = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log')
+    expect(result1).toBe('schema_and_log')
+
+    // Test with schema - should remain unchanged
+    const result2 = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema')
+    expect(result2).toBe('schema')
+
+    // Test with disabled - should remain unchanged
+    const result3 = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'disabled')
+    expect(result3).toBe('disabled')
+  })
+
+  it('should handle extensions with empty string installed_version as not installed', () => {
+    const extensions = [
+      {
+        comment: null,
+        default_version: '1.0',
+        installed_version: '', // empty string should be treated as not installed
+        name: 'pg_net',
+        schema: 'public',
+      },
+    ]
+
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log_and_data')
+  })
+
+  it('should handle extensions with null installed_version as not installed', () => {
+    const extensions = [
+      {
+        comment: null,
+        default_version: '1.0',
+        installed_version: null, // explicitly null
+        name: 'pg_net',
+        schema: 'public',
+      },
+    ]
+
+    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
+    expect(result).toBe('schema_and_log_and_data')
   })
 })

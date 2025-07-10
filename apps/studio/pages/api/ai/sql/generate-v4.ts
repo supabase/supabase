@@ -15,12 +15,14 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getUnifiedLogsChart } from 'data/logs/unified-logs-chart-query'
 import { getUnifiedLogs } from 'data/logs/unified-logs-infinite-query'
+import { getDatabaseExtensions } from 'data/database-extensions/database-extensions-query'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
 import {
   filterToolsByOptInLevel,
   toolSetValidationSchema,
   transformToolResult,
+  checkNetworkExtensionsAndAdjustOptInLevel,
 } from 'lib/ai/tool-filter'
 import { getTools } from './tools'
 
@@ -101,6 +103,28 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+
+  // Check enabled database extensions to potentially restrict data access
+  let effectiveAiOptInLevel = aiOptInLevel
+
+  try {
+    let headers = new Headers()
+    if (authorization) headers.set('Authorization', authorization)
+
+    const dbExtensions = await getDatabaseExtensions(
+      { projectRef, connectionString },
+      undefined,
+      headers
+    )
+
+    effectiveAiOptInLevel = checkNetworkExtensionsAndAdjustOptInLevel(
+      dbExtensions,
+      effectiveAiOptInLevel
+    )
+  } catch (error) {
+    console.error('Failed to fetch database extensions:', error)
+    effectiveAiOptInLevel = 'disabled'
+  }
 
   const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
 
@@ -399,8 +423,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
 
       const availableMcpTools = await mcpClient.tools()
-      // Filter tools based on the AI opt-in level
-      const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
+      // Filter tools based on the (potentially modified) AI opt-in level
+      const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, effectiveAiOptInLevel)
 
       // Validate that only known tools are provided
       const { data: validatedTools, error: validationError } =
@@ -435,8 +459,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    // Filter local tools based on the AI opt-in level
-    const filteredLocalTools = filterToolsByOptInLevel(localTools, aiOptInLevel)
+    // Filter local tools based on the (potentially modified) AI opt-in level
+    const filteredLocalTools = filterToolsByOptInLevel(localTools, effectiveAiOptInLevel)
 
     // Combine MCP tools with filtered local tools
     const tools: ToolSet = {
