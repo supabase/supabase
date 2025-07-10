@@ -49,6 +49,8 @@ export const WrapperOverviewTab = () => {
   const databaseNeedsUpgrading =
     wrappersExtension?.installed_version === wrappersExtension?.default_version
 
+  const CreateWrapperSheetComponent = wrapperMeta.createComponent || CreateWrapperSheet
+
   return (
     <IntegrationOverviewTab
       actions={
@@ -113,9 +115,10 @@ export const WrapperOverviewTab = () => {
         <WrapperTable />
       </div>
       <Separator />
+
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="lg" tabIndex={undefined}>
-          <CreateWrapperSheet
+          <CreateWrapperSheetComponent
             wrapperMeta={wrapperMeta}
             onClose={() => {
               setCreateWrapperShown(false)
