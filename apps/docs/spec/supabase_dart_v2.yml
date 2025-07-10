@@ -3167,7 +3167,7 @@ functions:
       - name: values
         isOptional: false
         type: Map<String, dynamic> or List<Map<String, dynamic>>
-        description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
+        description: The values to upsert with. Pass a Map to upsert a single row or an array to upsert multiple rows.
       - name: onConflict
         isOptional: true
         type: String

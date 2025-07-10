@@ -1,10 +1,10 @@
 import { Announcement } from 'ui/src/layout/banners'
-import SOSBanner from './SOSBanner'
+import LW15Banner from './LW15Banner'
 
 export const AnnouncementBanner = () => {
   return (
     <Announcement show={true} announcementKey="announcement_sos25">
-      <SOSBanner />
+      <LW15Banner />
     </Announcement>
   )
 }

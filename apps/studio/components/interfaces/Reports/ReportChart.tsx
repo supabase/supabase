@@ -7,7 +7,7 @@
  * This component acts as a bridge between the data-fetching logic and the
  * presentational chart component.
  */
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import LogChartHandler from 'components/ui/Charts/LogChartHandler'
 import { useChartData } from 'hooks/useChartData'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -18,12 +18,14 @@ const ReportChart = ({
   endDate,
   interval,
   updateDateRange,
+  functionIds,
 }: {
   chart: any
   startDate: string
   endDate: string
   interval: string
   updateDateRange: UpdateDateRange
+  functionIds?: string[]
 }) => {
   const {
     data,
@@ -35,6 +37,7 @@ const ReportChart = ({
     startDate,
     endDate,
     interval,
+    functionIds,
     data: undefined,
     highlightedValue:
       chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
@@ -43,7 +46,7 @@ const ReportChart = ({
   })
 
   return (
-    <ComposedChartHandler
+    <LogChartHandler
       {...chart}
       attributes={
         (chartAttributes.length > 0 ? chartAttributes : chart.attributes) as MultiAttribute[]
