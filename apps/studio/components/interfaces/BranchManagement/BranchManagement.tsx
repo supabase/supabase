@@ -27,6 +27,7 @@ import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
+import { BranchSelector } from './BranchSelector'
 import { PreviewBranchesEmptyState, PullRequestsEmptyState } from './EmptyStates'
 import { Overview } from './Overview'
 import { ReviewRow } from './ReviewRow'
@@ -118,14 +119,29 @@ const BranchManagement = () => {
     },
   })
 
-  const { mutate: updateBranch } = useBranchUpdateMutation({
-    onSuccess: () => {
-      toast.success('Branch updated successfully')
-    },
-    onError: (error) => {
-      toast.error(`Failed to update branch: ${error.message}`)
+  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+    onError: () => {
+      toast.error(`Failed to update the branch`)
     },
   })
+
+  const handleMarkBranchForReview = (branch: Branch) => {
+    if (branch.id && projectRef) {
+      updateBranch(
+        {
+          id: branch.id,
+          projectRef,
+          requestReview: true,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Branch marked as ready for review')
+            router.push(`/project/${branch.project_ref}/merge`)
+          },
+        }
+      )
+    }
+  }
 
   const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
@@ -145,16 +161,6 @@ const BranchManagement = () => {
     if (projectRef == undefined) return console.error('Project ref is required')
     if (!previewBranches) return console.error('No branches available')
     disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
-  }
-
-  const handleReadyForReview = () => {
-    if (!currentBranch?.id || !projectRef) return
-    updateBranch({
-      id: currentBranch.id,
-      projectRef,
-      requestReview: true,
-    })
-    router.push(`/project/${currentBranch.project_ref}/merge`)
   }
 
   return (
@@ -268,7 +274,19 @@ const BranchManagement = () => {
                         <div className="space-y-4">
                           {gitlessBranching && (
                             <BranchManagementSection
-                              header={`${branchesReadyForReview.length} branches ready for review`}
+                              header={
+                                <div className="flex items-center justify-between w-full">
+                                  <span>
+                                    {branchesReadyForReview.length} branches ready for review
+                                  </span>
+                                  <BranchSelector
+                                    branches={previewBranches}
+                                    onBranchSelected={handleMarkBranchForReview}
+                                    disabled={!projectRef}
+                                    isUpdating={isUpdating}
+                                  />
+                                </div>
+                              }
                             >
                               {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
                                 <div className="bg-background px-6 py-4">
@@ -286,7 +304,9 @@ const BranchManagement = () => {
                                     <Button
                                       type="primary"
                                       size="tiny"
-                                      onClick={handleReadyForReview}
+                                      onClick={() =>
+                                        currentBranch && handleMarkBranchForReview(currentBranch)
+                                      }
                                     >
                                       Ready for review
                                     </Button>
