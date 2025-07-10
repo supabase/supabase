@@ -73,6 +73,15 @@ functions:
             isOptional: true
             type: AuthFlowType
             description: flow type to use for authentication.
+          - name: httpx_options
+            isOptional: true
+            type: HttpxOptions
+            description: Options passed to the httpx instance.
+            subContent:
+              - name: verify
+                isOptional: true
+                type: boolean
+                description: Either `True` to use an SSL context with the default CA bundle, `False` to disable verification.
 
     examples:
       - id: create-client
