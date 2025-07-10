@@ -26,6 +26,7 @@ import {
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { Bucket } from 'data/storage/buckets-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
+import { BASE_PATH } from 'lib/constants'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -98,12 +99,34 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
 
   return (
     <div className="flex flex-col w-full">
-      <ScaffoldContainer>
+      <ScaffoldContainer className="flex flex-row justify-between items-center gap-10">
         <ScaffoldHeader>
           <ScaffoldTitle>
             Iceberg Bucket <span className="text-brand">{bucket.name}</span>
           </ScaffoldTitle>
         </ScaffoldHeader>
+        {wrapperInstance && wrapperInstance?.tables?.length > 0 && (
+          <div className="flex items-end justify-end gap-2">
+            <a
+              href={`${BASE_PATH}/project/${project?.ref}/editor?schema=${wrapperInstance?.tables[0]?.schema}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button type="default" icon={<SquareArrowOutUpRight />}>
+                Table Editor
+              </Button>
+            </a>
+            <a
+              href={`${BASE_PATH}/project/${project?.ref}/sql/new?${encodeURIComponent(`select * from ${wrapperInstance?.tables[0]?.schema}.${wrapperInstance?.tables[0]?.name}`)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Button type="default" icon={<SquareArrowOutUpRight />}>
+                SQL Editor
+              </Button>
+            </a>
+          </div>
+        )}
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-4" bottomPadding>
         {state === 'loading' && <GenericSkeletonLoader />}
@@ -125,46 +148,22 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         )}
         {state === 'added' && wrapperInstance && (
           <>
-            <Alert_Shadcn_ className="p-10">
-              {isWrapperSchemaInstalled ? (
-                <AlertTitle_Shadcn_ className="flex flex-col">
-                  <div className="flex flex-row justify-between items-center">
-                    <div className="col-span-2 space-y-1">
-                      <p className="block">You're all set!</p>
-                      <p className="text-sm opacity-50">
-                        A wrapper has been setup for this bucket. You can use the Table Editor or
-                        SQL Editor to view the tables.
-                      </p>
-                    </div>
-                    <div className="flex items-end justify-end gap-2">
-                      <Button type="default" icon={<SquareArrowOutUpRight />}>
-                        Table Editor
-                      </Button>
-                      <Button type="default" icon={<SquareArrowOutUpRight />}>
-                        SQL Editor
-                      </Button>
-                    </div>
+            <Alert_Shadcn_ className="px-6 py-4">
+              <AlertTitle_Shadcn_ className="flex flex-col">
+                <div className="flex flex-row justify-between items-center gap-10">
+                  <div className="col-span-2 space-y-1">
+                    <p className="block">Connect a namespace</p>
+                    <p className="text-sm text-foreground-light">
+                      When you connect a namespace, you can view its tables in the Table Editor or
+                      SQL Editor. If you add new tables to the namespace, you need to reconnect it
+                      to get the new tables. You can multiple namespaces.
+                    </p>
                   </div>
-                </AlertTitle_Shadcn_>
-              ) : (
-                <AlertTitle_Shadcn_ className="flex flex-col">
-                  <div className="flex flex-row justify-between items-center space-x-10">
-                    <div className="col-span-2 space-y-1">
-                      <p className="block">You need to set the namespace</p>
-                      <p className="text-sm opacity-50">
-                        The foreign data wrapper which connects the Iceberg data to the database is
-                        not fully setup. Once you've created the namespace in the Iceberg catalog,
-                        you'll need to set the namespace in the wrapper.
-                      </p>
-                    </div>
-                    <div className="flex items-end justify-end gap-2">
-                      <Button type="default" onClick={() => setImportForeignSchemaShown(true)}>
-                        Set namespace
-                      </Button>
-                    </div>
-                  </div>
-                </AlertTitle_Shadcn_>
-              )}
+                  <Button type="primary" onClick={() => setImportForeignSchemaShown(true)}>
+                    Connect namespace
+                  </Button>
+                </div>
+              </AlertTitle_Shadcn_>
             </Alert_Shadcn_>
 
             <div>

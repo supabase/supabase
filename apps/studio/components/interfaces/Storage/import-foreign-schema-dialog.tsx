@@ -109,7 +109,7 @@ export const ImportForeignSchemaDialog = ({
       size="medium"
       header={
         <span>
-          Set namespace for <span className="text-brand">{bucketName}</span> bucket
+          Connect namespace for <span className="text-brand">{bucketName}</span> bucket
         </span>
       }
       onCancel={() => onClose()}
