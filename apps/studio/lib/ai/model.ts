@@ -11,6 +11,7 @@ export const modelsByProvider = {
   bedrock: {
     us1: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
     us2: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+    us3: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
     eu: 'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
   },
   openai: 'gpt-4.1-2025-04-14',
