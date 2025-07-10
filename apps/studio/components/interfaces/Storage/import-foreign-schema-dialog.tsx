@@ -66,7 +66,7 @@ export const ImportForeignSchemaDialog = ({
     mutate({
       projectRef: ref,
       connectionString: project?.connectionString,
-      serverName: `${snakeCase(values.bucketName)}_fdw`,
+      serverName: `${snakeCase(values.bucketName)}_fdw_server`,
       sourceSchema: values.source_namespace,
       targetSchema: values.target_schema,
     })
