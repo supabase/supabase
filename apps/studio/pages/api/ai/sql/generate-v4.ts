@@ -123,6 +123,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     )
   } catch (error) {
     console.error('Failed to fetch database extensions:', error)
+    effectiveAiOptInLevel = 'disabled'
   }
 
   const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
