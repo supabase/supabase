@@ -71,6 +71,8 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       .find((w) => w.name === snakeCase(`${bucket.name}_fdw`))
   }, [data])
 
+  const extensionState = useIcebergWrapperExtension()
+
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper')!
 
   if (integration.type !== 'wrapper') {
@@ -82,8 +84,6 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   const wrapperMeta = integration.meta
 
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
-
-  const extensionState = useIcebergWrapperExtension()
 
   const state = isFDWsLoading
     ? 'loading'
