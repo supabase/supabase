@@ -2,9 +2,14 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { cn } from 'ui'
 import { ResponseError } from 'types'
-import { Loader2, Play, Square, AlertTriangle, HelpCircle } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
-import { useEffect } from 'react'
+
+export enum PipelineStatusRequestStatus {
+  None = 'None',
+  EnableRequested = 'EnableRequested',
+  DisableRequested = 'DisableRequested'
+}
 
 interface PipelineStatusProps {
   pipelineStatus: string | undefined
@@ -12,8 +17,7 @@ interface PipelineStatusProps {
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
-  requestStatus: 'None' | 'EnableRequested' | 'DisableRequested'
-  refetch?: () => void
+  requestStatus: PipelineStatusRequestStatus
 }
 
 const PipelineStatus = ({
@@ -23,25 +27,10 @@ const PipelineStatus = ({
   isError,
   isSuccess,
   requestStatus,
-  refetch,
 }: PipelineStatusProps) => {
-  const requestInFlight = requestStatus !== 'None'
-
-  // Auto-refresh status every 10 seconds for general updates
-  // Note: DestinationRow handles intensive polling during state transitions
-  useEffect(() => {
-    if (!refetch || requestInFlight) return
-    
-    const interval = setInterval(() => {
-      refetch()
-    }, 10000)
-    
-    return () => clearInterval(interval)
-  }, [refetch, requestInFlight])
-  
   // Map backend statuses to UX-friendly display
   const getStatusConfig = () => {
-    if (requestStatus === 'EnableRequested') {
+    if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
       return {
         label: 'Enabling...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-blue-500" />,
@@ -50,7 +39,7 @@ const PipelineStatus = ({
       }
     }
     
-    if (requestStatus === 'DisableRequested') {
+    if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
       return {
         label: 'Disabling...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-orange-500" />,
