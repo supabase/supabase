@@ -41,9 +41,9 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
     // Select the Bedrock region based on the routing key and the model
     const bedrockRegion: BedrockRegion = routingKey
       ? await selectBedrockRegion(routingKey, model)
-      // There's a few places where getModel is called without a routing key
-      // Will cause disproportionate load on use1 region
-      : 'use1'
+      : // There's a few places where getModel is called without a routing key
+        // Will cause disproportionate load on use1 region
+        'use1'
     const bedrock = bedrockForRegion(bedrockRegion)
     const modelName = `${regionPrefixMap[bedrockRegion]}.${model}`
 
