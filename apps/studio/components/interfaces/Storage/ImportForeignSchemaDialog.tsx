@@ -7,10 +7,12 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDebounce } from 'components/ui/DataTable/hooks/useDebounce'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
-import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
+import { useIcebergNamespaceExistsQuery } from 'data/storage/iceberg-namespace-exists-query'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import {
   Button,
   Form_Shadcn_,
@@ -18,7 +20,6 @@ import {
   FormField_Shadcn_,
   Input_Shadcn_,
   Modal,
-  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -31,7 +32,6 @@ export interface ImportForeignSchemaDialogProps {
 
 const FormSchema = z.object({
   bucketName: z.string().trim(),
-  createNamespace: z.boolean(),
   sourceNamespace: z.string().trim(),
   targetSchema: z.string().trim(),
 })
@@ -48,6 +48,12 @@ export const ImportForeignSchemaDialog = ({
   const { ref } = useParams()
   const [loading, setLoading] = useState(false)
 
+  const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: wrapperValues['vault_token'],
+  })
+
   const { mutateAsync: createIcebergNamespace } = useIcebergNamespaceCreateMutation()
 
   const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({
@@ -61,27 +67,35 @@ export const ImportForeignSchemaDialog = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       bucketName,
-      createNamespace: false,
       sourceNamespace: 'default',
       targetSchema: 'public',
     },
   })
 
+  const debouncedSourceNamespace = useDebounce(form.getValues('sourceNamespace'), 2000)
+  const { data: namespaceExists } = useIcebergNamespaceExistsQuery(
+    {
+      catalogUri: wrapperValues['catalog_uri'],
+      warehouse: wrapperValues['warehouse'],
+      namespace: debouncedSourceNamespace,
+      token: token ?? '',
+    },
+    {
+      enabled: isSuccessToken && debouncedSourceNamespace.length > 0,
+    }
+  )
+
   const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
+    if (!token) return console.error('Token is required')
     setLoading(true)
 
-    const token = await getDecryptedValue({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: wrapperValues['vault_token'],
-    })
     try {
-      if (values.createNamespace) {
+      if (!namespaceExists) {
         await createIcebergNamespace({
           catalogUri: wrapperValues['catalog_uri'],
           warehouse: wrapperValues['warehouse'],
-          token: token[0].decrypted_secret,
+          token: token,
           namespace: values.sourceNamespace,
         })
       }
@@ -104,7 +118,6 @@ export const ImportForeignSchemaDialog = ({
     if (visible) {
       form.reset({
         bucketName,
-        createNamespace: false,
         sourceNamespace: 'default',
         targetSchema: 'public',
       })
@@ -132,7 +145,7 @@ export const ImportForeignSchemaDialog = ({
               render={({ field }) => (
                 <FormItemLayout
                   label="Namespace"
-                  description="Should match the namespace name when uploading data."
+                  description="Should match the namespace name when uploading data. If the namespace does not exist, it will be created."
                   layout="vertical"
                 >
                   <FormControl_Shadcn_>
@@ -141,25 +154,7 @@ export const ImportForeignSchemaDialog = ({
                 </FormItemLayout>
               )}
             />
-            <FormField_Shadcn_
-              control={form.control}
-              name="createNamespace"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Create a new namespace"
-                  description="Create the namespace if it doesn't exist. If it exists, it will show an error."
-                  layout="flex"
-                >
-                  <FormControl_Shadcn_>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={field.disabled}
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
+
             <FormField_Shadcn_
               control={form.control}
               name="targetSchema"

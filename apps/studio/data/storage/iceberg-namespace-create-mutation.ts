@@ -21,7 +21,6 @@ async function createIcebergNamespace({
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   })
-  console.log(headers)
 
   const url = `${catalogUri}/v1/${warehouse}/namespaces`.replaceAll(/(?<!:)\/\//g, '/')
 
