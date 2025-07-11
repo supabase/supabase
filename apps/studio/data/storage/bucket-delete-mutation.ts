@@ -18,8 +18,8 @@ export async function deleteBucket({ projectRef, id, type }: BucketDeleteVariabl
 
   if (type !== 'ANALYTICS') {
     const { error: emptyBucketError } = await post('/platform/storage/{ref}/buckets/{id}/empty', {
-      params: { path: { ref: projectRef, id }, query: { type } },
-    } as any)
+      params: { path: { ref: projectRef, id } },
+    })
     if (emptyBucketError) handleError(emptyBucketError)
   }
 
