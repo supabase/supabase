@@ -1,13 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { useDebounce } from 'use-debounce'
 import z from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDebounce } from 'components/ui/DataTable/hooks/useDebounce'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
@@ -72,18 +73,20 @@ export const ImportForeignSchemaDialog = ({
     },
   })
 
-  const debouncedSourceNamespace = useDebounce(form.getValues('sourceNamespace'), 2000)
-  const { data: namespaceExists } = useIcebergNamespaceExistsQuery(
-    {
-      catalogUri: wrapperValues['catalog_uri'],
-      warehouse: wrapperValues['warehouse'],
-      namespace: debouncedSourceNamespace,
-      token: token ?? '',
-    },
-    {
-      enabled: isSuccessToken && debouncedSourceNamespace.length > 0,
-    }
-  )
+  const sourceNamespace = form.watch('sourceNamespace')
+  const [debouncedSourceNamespace] = useDebounce(sourceNamespace, 1000)
+  const { data: namespaceExists, isLoading: isLoadingNamespaceExists } =
+    useIcebergNamespaceExistsQuery(
+      {
+        catalogUri: wrapperValues['catalog_uri'],
+        warehouse: wrapperValues['warehouse'],
+        namespace: debouncedSourceNamespace,
+        token: token ?? '',
+      },
+      {
+        enabled: isSuccessToken && debouncedSourceNamespace.length > 0,
+      }
+    )
 
   const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -147,6 +150,16 @@ export const ImportForeignSchemaDialog = ({
                   label="Namespace"
                   description="Should match the namespace name when uploading data. If the namespace does not exist, it will be created."
                   layout="vertical"
+                  labelOptional={
+                    <div className="flex items-center gap-x-2">
+                      {isLoadingNamespaceExists && <Loader2 size={16} className="animate-spin" />}
+                      {namespaceExists ? (
+                        <span>Namespace exists, will be connected</span>
+                      ) : (
+                        <span>Namespace will be created and connected</span>
+                      )}
+                    </div>
+                  }
                 >
                   <FormControl_Shadcn_>
                     <Input_Shadcn_ {...field} placeholder="Enter namespace name" />
