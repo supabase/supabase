@@ -77,12 +77,14 @@ export const ImportForeignSchemaDialog = ({
       id: wrapperValues['vault_token'],
     })
     try {
-      await createIcebergNamespace({
-        catalogUri: wrapperValues['catalog_uri'],
-        warehouse: wrapperValues['warehouse'],
-        token: token[0].decrypted_secret,
-        namespace: values.sourceNamespace,
-      })
+      if (values.createNamespace) {
+        await createIcebergNamespace({
+          catalogUri: wrapperValues['catalog_uri'],
+          warehouse: wrapperValues['warehouse'],
+          token: token[0].decrypted_secret,
+          namespace: values.sourceNamespace,
+        })
+      }
 
       await importForeignSchema({
         projectRef: ref,
