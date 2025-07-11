@@ -24,7 +24,6 @@ export const toolSetValidationSchema = z.record(
     'list_edge_functions',
     'list_branches',
     'get_logs',
-    'execute_sql',
     'search_docs',
     'get_advisors',
 
@@ -102,9 +101,6 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   get_logs: TOOL_CATEGORIES.LOG,
   get_advisors: TOOL_CATEGORIES.LOG,
   get_log_counts: TOOL_CATEGORIES.LOG,
-
-  // Data tools - MCP only
-  execute_sql: TOOL_CATEGORIES.DATA,
 }
 
 /**
@@ -188,33 +184,4 @@ export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLev
         return [toolName, createPrivacyMessageTool(toolInstance)]
       })
   )
-}
-
-/**
- * If either `pg_net` or `http` extension is enabled, we cap the opt-in level to a maximum
- * of `schema_and_log`, effectively disabling the `execute_sql` tool (which requires data-level access).
- */
-export function checkNetworkExtensionsAndAdjustOptInLevel(
-  dbExtensions: DatabaseExtension[] | null | undefined,
-  currentOptInLevel: AiOptInLevel
-): AiOptInLevel {
-  if (!dbExtensions || dbExtensions.length === 0) {
-    return currentOptInLevel
-  }
-
-  // List of dangerous network extensions that can make external connections
-  const dangerousNetworkExtensions = ['pg_net', 'http']
-
-  // Check if any dangerous network extensions are installed (have installed_version)
-  const hasNetworkExtensions = dbExtensions
-    .filter((ext) => !!ext.installed_version)
-    .some((ext) => dangerousNetworkExtensions.includes(ext.name))
-
-  // If network extensions are installed and current opt-in level is full data access,
-  // downgrade to schema_and_log to disable execute_sql tool
-  if (hasNetworkExtensions && currentOptInLevel === 'schema_and_log_and_data') {
-    return 'schema_and_log'
-  }
-
-  return currentOptInLevel
 }

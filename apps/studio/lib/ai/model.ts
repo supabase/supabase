@@ -7,15 +7,16 @@ import {
   selectBedrockRegion,
 } from './bedrock'
 
-export const modelsByProvider = {
-  bedrock: {
-    us1: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
-    us2: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
-    us3: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
-    eu: 'eu.anthropic.claude-3-7-sonnet-20250219-v1:0',
-  },
-  openai: 'gpt-4.1-2025-04-14',
+export const regionMap = {
+  us1: 'us',
+  us2: 'us',
+  us3: 'us',
+  eu: 'eu',
 }
+
+const SONNET_MODEL = 'anthropic.claude-3-7-sonnet-20250219-v1:0'
+const HAIKU_MODEL = 'anthropic.claude-3-5-haiku-20241022-v1:0'
+const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {
   model: LanguageModel
@@ -38,7 +39,7 @@ export const ModelErrorMessage =
  * An optional routing key can be provided to distribute requests across
  * different Bedrock regions.
  */
-export async function getModel(routingKey?: string): Promise<ModelResponse> {
+export async function getModel(routingKey?: string, isLimited?: boolean): Promise<ModelResponse> {
   const hasAwsCredentials = await checkAwsCredentials()
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
 
@@ -46,7 +47,8 @@ export async function getModel(routingKey?: string): Promise<ModelResponse> {
     // Select the Bedrock region based on the routing key
     const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
     const bedrock = bedrockForRegion(bedrockRegion)
-    const modelName = modelsByProvider.bedrock[bedrockRegion]
+    const model = isLimited ? HAIKU_MODEL : SONNET_MODEL
+    const modelName = `${regionMap[bedrockRegion]}.${model}`
 
     return {
       model: bedrock(modelName),
@@ -55,7 +57,7 @@ export async function getModel(routingKey?: string): Promise<ModelResponse> {
 
   if (hasOpenAIKey) {
     return {
-      model: openai(modelsByProvider.openai),
+      model: openai(OPENAI_MODEL),
     }
   }
 
