@@ -123,7 +123,7 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const { data: meetups, error } = await supabase
     .from('meetups')
     .select('id, city, country, link, start_at, timezone, launch_week')
