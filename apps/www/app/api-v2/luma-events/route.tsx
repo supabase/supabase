@@ -26,7 +26,7 @@ export interface LumaPayloadEvent {
   geo_address_json: LumaGeoAddressJson
 }
 export interface LumaEvent {
-  api_id: string
+  id: string
   calendar_api_id: string
   name: string
   description: string
@@ -94,6 +94,7 @@ export async function GET(request: NextRequest) {
     const launchWeekEvents = data.entries
       .filter(({ event }: { event: LumaPayloadEvent }) => event.visibility === 'public')
       .map(({ event }: { event: LumaPayloadEvent }) => ({
+        id: event.api_id,
         start_at: event.start_at,
         end_at: event.end_at,
         name: event.name,

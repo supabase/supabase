@@ -147,7 +147,7 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
                 <>
                   <MotionLink
                     variants={meetupVariants}
-                    key={`meetup-link-${meetup.api_id}`}
+                    key={`meetup-link-${meetup.id}`}
                     href={meetup.url ?? ''}
                     target="_blank"
                     onClick={() => handleSelectMeetup(meetup)}
@@ -156,10 +156,9 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
                     className={cn(
                       'h-10 group inline-flex items-center flex-wrap',
                       '!leading-none transition-colors',
-                      meetup.api_id === activeMeetup?.api_id && 'text-foreground'
+                      meetup.id === activeMeetup?.id && 'text-foreground'
                       // liveNow && 'text-foreground-light'
                     )}
-                    data-delay={i}
                   >
                     {liveNow && (
                       <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
