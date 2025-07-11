@@ -88,7 +88,7 @@ export const CreateWrapperSheet = ({
     wrapper_name: '',
     server_name: '',
     source_schema: wrapperMeta.sourceSchemaOption?.defaultValue ?? '',
-    target_schema: 'public',
+    target_schema: '',
     ...Object.fromEntries(
       wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
     ),
@@ -114,10 +114,14 @@ export const CreateWrapperSheet = ({
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
-    const { wrapper_name } = values
-    if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
+    if (values.wrapper_name.length === 0) {
+      errors.wrapper_name = 'Please provide a name for your wrapper'
+    }
     if (selectedMode === 'tables' && newTables.length === 0) {
       errors.tables = 'Please add at least one table'
+    }
+    if (selectedMode === 'schema' && values.source_schema.length === 0) {
+      errors.source_schema = 'Please provide a source schema'
     }
     if (!isEmpty(errors)) return setFormErrors(errors)
 
@@ -125,7 +129,7 @@ export const CreateWrapperSheet = ({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapperMeta,
-      formState: { ...values, server_name: `${wrapper_name}_server` },
+      formState: { ...values, server_name: `${values.wrapper_name}_server` },
       mode: selectedMode,
       tables: newTables,
       sourceSchema: values.source_schema,
@@ -377,6 +381,9 @@ export const CreateWrapperSheet = ({
                             onSelectSchema={(schema) => setFieldValue('target_schema', schema)}
                             onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
                           />
+                          <p className="text-foreground-lighter text-sm">
+                            Be careful not to use an API exposed schema.
+                          </p>
                         </div>
                       </FormSectionContent>
                     </FormSection>

@@ -1,8 +1,9 @@
+import Link from 'next/link'
+import { ExternalLinkIcon } from 'lucide-react'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
@@ -16,13 +17,14 @@ import {
   TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import ShimmerLine from 'components/ui/ShimmerLine'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useStorageReport } from 'data/reports/storage-report-query'
 
 import type { NextPageWithLayout } from 'types'
-import Link from 'next/link'
-import { ExternalLinkIcon } from 'lucide-react'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -40,9 +42,14 @@ export const StorageReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const plan = organization?.plan
+  const { datePickerHelpers, datePickerValue, handleDatePickerChange } = useReportDateRange(
+    REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
+  )
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
+    // Update localStorage and hook state
+    handleDatePickerChange(vals)
+    // Update query params for the report
     mergeParams({
       iso_timestamp_start: vals.from || '',
       iso_timestamp_end: vals.to || '',
@@ -52,9 +59,9 @@ export const StorageReport: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <ReportHeader title="Storage" showDatabaseSelector={false} />
-      <section className="relative pt-20 -mt-2 flex flex-col gap-3">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg dark:bg-200 pt-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
+      <ReportStickyNav
+        content={
+          <>
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}
@@ -65,16 +72,14 @@ export const StorageReport: NextPageWithLayout = () => {
               isLoading={isLoading}
               filters={filters}
               selectedProduct="storage"
-              datepickerHelpers={createFilteredDatePickerHelpers(plan?.id || 'free')}
+              datepickerHelpers={datePickerHelpers}
+              initialDatePickerValue={datePickerValue}
               className="w-full"
               showDatabaseSelector={false}
             />
-            <div className="h-px w-full">
-              <ShimmerLine active={report.isLoading} />
-            </div>
-          </div>
-        </div>
-
+          </>
+        }
+      >
         <ReportWidget
           isLoading={isLoading}
           params={params.totalRequests}
@@ -130,7 +135,7 @@ export const StorageReport: NextPageWithLayout = () => {
           append={TopCacheMissesRenderer}
           appendProps={{ data: data.topCacheMisses || [] }}
         />
-      </section>
+      </ReportStickyNav>
     </ReportPadding>
   )
 }

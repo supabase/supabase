@@ -42,6 +42,7 @@ import {
 } from 'ui'
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
+import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsListPanel } from './components/LogsListPanel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { CHART_CONFIG, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -314,6 +315,7 @@ export const UnifiedLogs = () => {
               />
               <DataTableToolbar
                 renderActions={() => [
+                  <DownloadLogsButton searchParameters={searchParameters} />,
                   <RefreshButton isLoading={isRefetchingData} onRefresh={refetchAllData} />,
                   fetchPreviousPage ? (
                     <LiveButton
