@@ -46,7 +46,7 @@ const LW15Hackathon: FC = () => {
             </div>
             <div className="flex flex-col sm:flex-row justify-between text-xs gap-4">
               <Button className="h-auto py-1 px-2" type="secondary" size="medium" asChild>
-                <Link href="/launch-week/ticket">Join the Hackathon</Link>
+                <Link href="#">Join the Hackathon</Link>
               </Button>
               <div className="hidden sm:block text-right">
                 Launch your next <br className="hidden sm:block" />

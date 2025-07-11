@@ -1,12 +1,12 @@
 import React, { PropsWithChildren, useState, useRef, useCallback, useEffect } from 'react'
 import { cn } from 'ui'
-import SectionContainer from 'components/Layouts/SectionContainer'
-import { FifteenSVG, LWSVG } from './lw15.components'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
-import type { LumaEvent } from 'app/api-v2/lw-meetups/route'
-import { DEFAULT_EASE } from '../../../lib/animations'
+import { FifteenSVG, LWSVG } from './lw15.components'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import { DEFAULT_EASE } from 'lib/animations'
+import { LumaEvent } from 'app/api-v2/luma-events/route'
 
 interface Props {
   className?: string
@@ -59,7 +59,12 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
   }
 
   const getMeetupCity = (meetup: LumaEvent) => {
-    return meetup.geo_address_json?.city ?? meetup.name.split(',')[0].split('-')[1]
+    return (
+      meetup.city ??
+      meetup.name.split(',')[0].split('-')[1] ??
+      meetup.name.split(',')[0].split(' ')[1] ??
+      meetup.name
+    )
   }
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -231,6 +236,7 @@ const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCard
     if (country === 'United States') return 'USA'
     if (country === 'United Kingdom') return 'UK'
     if (country === 'United Arab Emirates') return 'UAE'
+    if (country === 'Democratic Republic of the Congo') return 'DR. of Congo'
     return country
   }
 
@@ -267,9 +273,8 @@ const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCard
         </div>
         <div className="w-full flex justify-between gap-1 text-lg !leading-none">
           <div className="">Meetup</div>
-          <div className="">
-            {meetup?.geo_address_json.city},{' '}
-            {handleCountry(meetup?.geo_address_json?.country ?? '')}
+          <div className="text-right">
+            {meetup?.city}, {handleCountry(meetup?.country ?? '')}
           </div>
         </div>
       </div>

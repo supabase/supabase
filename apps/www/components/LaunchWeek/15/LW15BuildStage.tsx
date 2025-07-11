@@ -47,16 +47,28 @@ const LW15BuildStage: FC = () => {
               data-delay={i}
               className="first:border-t border-b border-strong"
             >
-              <Link
-                href={day.links[0].url}
-                className={cn(
-                  'relative flex text-lg items-center gap-4 w-full dark:border-background-surface-300 p-4',
-                  day.className
-                )}
-              >
-                <span className="w-1.5 h-1.5 bg-current" />
-                <span>{day.title}</span>
-              </Link>
+              {day.is_shipped ? (
+                <Link
+                  href={day.links[0].url}
+                  className={cn(
+                    'relative flex text-lg items-center gap-4 w-full dark:border-background-surface-300 p-4',
+                    day.className
+                  )}
+                >
+                  <span className="w-1.5 h-1.5 bg-current" />
+                  <span>{day.title}</span>
+                </Link>
+              ) : (
+                <div
+                  className={cn(
+                    'relative flex text-lg text-foreground-lighter items-center gap-4 w-full dark:border-background-surface-300 p-4 pointer-events-none',
+                    day.className
+                  )}
+                >
+                  <span className="w-1.5 h-1.5 bg-current" />
+                  <span className="text-lg leading-snug">&#91; Access locked &#93;</span>
+                </div>
+              )}
             </li>
           ))}
         </motion.ul>

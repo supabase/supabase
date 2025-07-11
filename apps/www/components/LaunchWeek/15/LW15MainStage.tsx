@@ -51,9 +51,9 @@ const DayCard = ({ day }: { day: WeekDayProps }) =>
         <div></div>
         <div className="flex flex-col gap-2 p-4">
           <span className="text-xs text-foreground-lighter">{day.date}</span>
-          <h4 className="text-lg leading-snug text-foreground-lighter">
+          <span className="text-lg leading-snug text-foreground-lighter">
             &#91; Access locked &#93;
-          </h4>
+          </span>
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import LW15Heading from 'components/LaunchWeek/15/LW15Heading'
 import LW15MainStage from 'components/LaunchWeek/15/LW15MainStage'
 
 import type { GetServerSideProps } from 'next'
-import type { LumaEvent } from 'app/api-v2/lw-meetups/route'
+import type { LumaEvent } from 'app/api-v2/luma-events/route'
 
 const LW15BuildStage = dynamic(() => import('components/LaunchWeek/15/LW15BuildStage'))
 const LW15Hackathon = dynamic(() => import('components/LaunchWeek/15/LW15Hackathon'))
@@ -74,7 +74,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     const afterDate = '2025-07-14T00:00:00.000Z'
     const beforeDate = '2025-09-01T23:59:59.999Z'
 
-    const url = new URL(`${SITE_ORIGIN}/api-v2/lw-meetups`)
+    const url = new URL(`${SITE_ORIGIN}/api-v2/luma-events`)
     url.searchParams.append('after', afterDate)
     url.searchParams.append('before', beforeDate)
 
@@ -82,7 +82,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
     const data = await res.json()
 
     if (data.success) {
-      return { props: { meetups: data.events || [] } }
+      return {
+        props: {
+          meetups: data.events.filter((event: LumaEvent) =>
+            event.name?.toLowerCase().includes('lw15')
+          ),
+        },
+      }
     } else {
       console.error('Failed to fetch meetups:', data.error)
       return { props: { meetups: [] } }

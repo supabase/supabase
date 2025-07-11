@@ -1,5 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export interface LumaGeoAddressJson {
+  city: string
+  type: string
+  region: string
+  address: string
+  country: string
+  latitude: string
+  place_id: string
+  longitude: string
+  city_state: string
+  description: string
+  full_address: string
+}
+export interface LumaPayloadEvent {
+  api_id: string
+  calendar_api_id: string
+  name: string
+  description: string
+  start_at: string
+  end_at: string
+  timezone: string
+  url: string
+  visibility: string
+  geo_address_json: LumaGeoAddressJson
+}
 export interface LumaEvent {
   api_id: string
   calendar_api_id: string
@@ -15,7 +40,7 @@ export interface LumaEvent {
 }
 
 interface LumaResponse {
-  entries: { event: LumaEvent }[]
+  entries: { event: LumaPayloadEvent }[]
   has_more: boolean
   next_cursor?: string
 }
@@ -67,13 +92,13 @@ export async function GET(request: NextRequest) {
     const data: LumaResponse = await response.json()
 
     const launchWeekEvents = data.entries
-      .filter(({ event }: { event: LumaEvent }) => event.visibility === 'public')
-      .map(({ event }: { event: LumaEvent }) => ({
+      .filter(({ event }: { event: LumaPayloadEvent }) => event.visibility === 'public')
+      .map(({ event }: { event: LumaPayloadEvent }) => ({
         start_at: event.start_at,
         end_at: event.end_at,
         name: event.name,
-        city: event.city,
-        country: event.country,
+        city: event.geo_address_json?.city,
+        country: event.geo_address_json?.country,
         url: event.url,
         timezone: event.timezone,
       }))
