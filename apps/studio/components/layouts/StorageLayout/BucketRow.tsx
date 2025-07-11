@@ -79,23 +79,27 @@ const BucketRow = ({
             <Button type="text" icon={<ChevronDown />} className="mr-1 p-1.5 w-7" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuItem
-              key="toggle-private"
-              className="space-x-2"
-              onClick={() => onSelectEditBucket()}
-            >
-              <Edit2 size={14} />
-              <p>Edit bucket</p>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              key="empty-bucket"
-              className="space-x-2"
-              onClick={() => onSelectEmptyBucket()}
-            >
-              <XCircle size={14} />
-              <p>Empty bucket</p>
-            </DropdownMenuItem>
+            {bucket.type === 'ANALYTICS' && (
+              <>
+                <DropdownMenuItem
+                  key="toggle-private"
+                  className="space-x-2"
+                  onClick={() => onSelectEditBucket()}
+                >
+                  <Edit2 size={14} />
+                  <p>Edit bucket</p>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  key="empty-bucket"
+                  className="space-x-2"
+                  onClick={() => onSelectEmptyBucket()}
+                >
+                  <XCircle size={14} />
+                  <p>Empty bucket</p>
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuItem
               key="delete-bucket"
               className="space-x-2"
