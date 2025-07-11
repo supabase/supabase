@@ -123,7 +123,7 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
   )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const { data: meetups, error } = await supabase
     .from('meetups')
     .select('id, city, country, link, start_at, timezone, launch_week')
@@ -157,48 +157,63 @@ export async function getServerSideProps() {
   }) as BlogPost[]
 
   let lumaEvents = []
-
   // LUMA EVENTS
   try {
+    // Check if API key is available at build time
+    console.log('LUMA_API_KEY available:', !!process.env.LUMA_API_KEY)
+    console.log('SITE_ORIGIN:', SITE_ORIGIN)
+
     const afterDate = new Date().toISOString()
+    console.log('Fetching Luma events after:', afterDate)
 
     const url = new URL(`${SITE_ORIGIN}/api-v2/luma-events`)
     url.searchParams.append('after', afterDate)
 
+    console.log('Fetching from URL:', url.toString())
     const res = await fetch(url.toString())
-    const data = await res.json()
 
-    if (data.success) {
-      lumaEvents =
-        data.events.map((event: LumaEvent) => {
-          let categories = []
-
-          if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
-
-          return {
-            slug: '',
-            type: 'event',
-            title: event?.name,
-            date: event?.start_at,
-            description: '',
-            thumb: '',
-            path: '',
-            url: event?.url ?? '',
-            tags: categories,
-            categories,
-            timezone: event?.timezone ?? 'America/Los_Angeles',
-            disable_page_build: true,
-            link: {
-              href: event?.url ?? '#',
-              target: '_blank',
-            },
-          }
-        }) || []
+    if (!res.ok) {
+      console.error('Luma API response not ok:', res.status, res.statusText)
+      const errorText = await res.text()
+      console.error('Error response:', errorText)
     } else {
-      console.error('Failed to fetch meetups:', data.error)
+      const data = await res.json()
+      console.log('Luma API response:', data)
+
+      if (data.success) {
+        lumaEvents =
+          data.events.map((event: LumaEvent) => {
+            let categories = []
+
+            if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
+
+            return {
+              slug: '',
+              type: 'event',
+              title: event?.name,
+              date: event?.start_at,
+              description: '',
+              thumb: '',
+              path: '',
+              url: event?.url ?? '',
+              tags: categories,
+              categories,
+              timezone: event?.timezone ?? 'America/Los_Angeles',
+              disable_page_build: true,
+              link: {
+                href: event?.url ?? '#',
+                target: '_blank',
+              },
+            }
+          }) || []
+        console.log('Processed Luma events:', lumaEvents.length)
+      } else {
+        console.error('Failed to fetch meetups:', data.error)
+      }
     }
   } catch (error) {
-    console.error('Error fetching meetups:', error)
+    console.error('Error fetching meetups from Luma:', error)
+    // Continue without Luma events rather than failing the entire build
   }
 
   const allEvents = [...staticEvents, ...meetupEvents, ...lumaEvents]
@@ -230,6 +245,8 @@ export async function getServerSideProps() {
       onDemandEvents,
       categories,
     },
+    // Revalidate every 1 hour (3600 seconds)
+    revalidate: 3600,
   }
 }
 
