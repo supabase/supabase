@@ -141,6 +141,7 @@ export default function Events({
         <SectionContainer className="!py-0">
           <EventsFilters
             allEvents={allEvents}
+            onDemandEvents={onDemandEvents}
             events={filteredEvents}
             setEvents={setFilteredEvents}
             categories={categories}
@@ -175,7 +176,7 @@ export default function Events({
             )}
           </div>
         </SectionContainer>
-        <SectionContainer>
+        <SectionContainer id="on-demand">
           <div className="pt-8 border-t">
             <h2 className="h3">On Demand</h2>
             <p className="text-foreground-light">Replay selected events on your schedule</p>
