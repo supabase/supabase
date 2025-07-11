@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { BucketType } from './buckets-query'
 import { storageKeys } from './keys'
 
 export type BucketCreateVariables = Omit<CreateStorageBucketBody, 'public'> & {
@@ -11,7 +12,9 @@ export type BucketCreateVariables = Omit<CreateStorageBucketBody, 'public'> & {
   isPublic: boolean
 }
 
-type CreateStorageBucketBody = components['schemas']['CreateStorageBucketBody']
+type CreateStorageBucketBody = Omit<components['schemas']['CreateStorageBucketBody'], 'type'> & {
+  type: BucketType
+}
 
 export async function createBucket({
   projectRef,
@@ -32,7 +35,7 @@ export async function createBucket({
 
   const { data, error } = await post('/platform/storage/{ref}/buckets', {
     params: { path: { ref: projectRef } },
-    body: payload,
+    body: payload as any,
   })
 
   if (error) handleError(error)

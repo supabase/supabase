@@ -60,7 +60,7 @@ const FormSchema = z.object({
       (value) => value !== 'public',
       '"public" is a reserved name. Please choose another name'
     ),
-  type: z.enum(['STANDARD', 'ICEBERG']).default('STANDARD'),
+  type: z.enum(['STANDARD', 'ANALYTICS']).default('STANDARD'),
   public: z.boolean().default(false),
   has_file_size_limit: z.boolean().default(false),
   formatted_size_limit: z.coerce
@@ -109,7 +109,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
 
-    if (values.type === 'ICEBERG' && !icebergCatalogEnabled) {
+    if (values.type === 'ANALYTICS' && !icebergCatalogEnabled) {
       toast.error(
         'The Iceberg catalog feature is not enabled for your project. Please contact support to enable it.'
       )
@@ -135,7 +135,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         allowed_mime_types: allowedMimeTypes,
       })
 
-      if (values.type === 'ICEBERG' && icebergWrapperExtensionState === 'installed') {
+      if (values.type === 'ANALYTICS' && icebergWrapperExtensionState === 'installed') {
         await createIcebergWrapper({ bucketName: values.name })
       }
       toast.success(`Successfully created bucket ${values.name}`)
@@ -212,8 +212,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                           </div>
                         </RadioGroupStackedItem>
                         <RadioGroupStackedItem
-                          value="ICEBERG"
-                          id="ICEBERG"
+                          value="ANALYTICS"
+                          id="ANALYTICS"
                           label="Analytic bucket"
                           showIndicator={false}
                           disabled={!icebergCatalogEnabled}
