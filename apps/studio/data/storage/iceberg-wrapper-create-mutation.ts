@@ -56,8 +56,8 @@ export const useIcebergWrapperCreateMutation = () => {
       formState: {
         wrapper_name: wrapperName,
         server_name: `${wrapperName}_server`,
-        vault_aws_access_key_id: createS3KeyData?.secret_key,
-        vault_aws_secret_access_key: createS3KeyData?.access_key,
+        vault_aws_access_key_id: createS3KeyData?.access_key,
+        vault_aws_secret_access_key: createS3KeyData?.secret_key,
         vault_token: serviceApiKey,
         warehouse: bucketName,
         's3.endpoint': getConnectionURL(project?.ref ?? '', protocol, endpoint),
