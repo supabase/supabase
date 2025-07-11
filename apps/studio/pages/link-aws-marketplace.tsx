@@ -107,7 +107,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    linkOrg({ orgSlug: values.orgSlug, buyerId: buyerId as string })
+    linkOrg({ slug: values.orgSlug, buyerId: buyerId as string })
   }
 
   return (

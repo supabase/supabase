@@ -5,18 +5,15 @@ import { handleError, put } from '../fetchers'
 import type { ResponseError } from '../../types'
 
 export type OrganizationLinkAwsMarketplaceVariables = {
-  orgSlug: string
   buyerId: string
+  slug: string
 }
 
-export async function linkOrganization({
-  orgSlug,
-  buyerId,
-}: OrganizationLinkAwsMarketplaceVariables) {
-  const { data, error } = await put('/platform/clazar/connect', {
+export async function linkOrganization({ buyerId, slug }: OrganizationLinkAwsMarketplaceVariables) {
+  const { data, error } = await put(`/platform/organizations/{slug}/cloud-marketplace/link`, {
+    params: { path: { slug } },
     body: {
-      org_slug: orgSlug,
-      clazar_buyer_id: buyerId,
+      buyer_id: buyerId,
     },
   })
 
