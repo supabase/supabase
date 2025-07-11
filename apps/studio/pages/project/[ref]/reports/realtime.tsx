@@ -10,7 +10,10 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  LogsDatePicker,
+  DatePickerValue,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
@@ -26,6 +29,7 @@ import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -68,9 +72,11 @@ const RealtimeUsage = () => {
   const {
     selectedDateRange,
     updateDateRange: updateDateRangeFromHook,
-    handleDatePickerChange,
     datePickerValue,
     datePickerHelpers,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
     isOrgPlanLoading,
     orgPlan,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
@@ -123,6 +129,16 @@ const RealtimeUsage = () => {
     }
   }, [])
 
+  const handleDatePickerChange = (values: DatePickerValue) => {
+    const promptShown = handleDatePickerChangeFromHook(values)
+    if (!promptShown) {
+      report.mergeParams({
+        iso_timestamp_start: values.from,
+        iso_timestamp_end: values.to,
+      })
+    }
+  }
+
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     updateDateRangeFromHook(from, to)
     report.mergeParams({
@@ -150,6 +166,13 @@ const RealtimeUsage = () => {
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="realtimeReportDateRange"
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">

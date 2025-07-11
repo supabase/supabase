@@ -27,8 +27,8 @@ export type DatePickerValue = {
 
 interface Props {
   value: DatePickerValue
-  onSubmit: (args: DatePickerValue) => void
   helpers: DatetimeHelper[]
+  onSubmit: (value: DatePickerValue) => void
 }
 
 export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {

@@ -21,7 +21,10 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  LogsDatePicker,
+  DatePickerValue,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
@@ -36,6 +39,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { formatBytes } from 'lib/helpers'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -65,12 +69,14 @@ const DatabaseUsage = () => {
 
   const {
     selectedDateRange,
-    updateDateRange: updateDateRangeFromHook,
-    handleDatePickerChange,
+    updateDateRange,
     datePickerValue,
     datePickerHelpers,
     isOrgPlanLoading,
     orgPlan,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
@@ -82,6 +88,7 @@ const DatabaseUsage = () => {
   const queryClient = useQueryClient()
 
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
@@ -95,7 +102,6 @@ const DatabaseUsage = () => {
   const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
-  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
   const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
@@ -178,10 +184,6 @@ const DatabaseUsage = () => {
     }
   }, [db, chart])
 
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    updateDateRangeFromHook(from, to)
-  }
-
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
@@ -202,6 +204,13 @@ const DatabaseUsage = () => {
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="databaseReportDateRange"
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">

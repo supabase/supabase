@@ -41,6 +41,7 @@ export interface ComposedChartHandlerProps {
   valuePrecision?: number
   isVisible?: boolean
   docsUrl?: string
+  hide?: boolean
 }
 
 /**
@@ -355,6 +356,8 @@ const useAttributeQueries = (
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+  if (props.hide) return null
+
   return (
     <LazyChartWrapper>
       <ComposedChartHandler {...props} />
