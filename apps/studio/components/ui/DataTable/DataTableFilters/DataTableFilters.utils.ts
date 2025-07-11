@@ -218,13 +218,10 @@ export function columnFiltersParser<TData>({
       const regex = /(\w+):([^]*?)(?=\s+\w+:|$)/g
       let match
 
-      console.log('DataTableFilterCommand parsing input:', inputValue)
-
       while ((match = regex.exec(inputValue)) !== null) {
         const [_, fieldName, fieldValue] = match
         if (fieldName && fieldValue) {
           filterPairs[fieldName] = fieldValue.trim()
-          console.log(`Parsed filter pair: ${fieldName} = ${fieldValue.trim()}`)
         }
       }
 
