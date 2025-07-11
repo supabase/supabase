@@ -20,7 +20,8 @@ export type FDWCreateVariables = {
   formState: {
     [k: string]: string
   }
-  mode: 'tables' | 'schema'
+  // If mode is skip, the wrapper will skip the last step, binding the schema/tables to foreign data. This could be done later.
+  mode: 'tables' | 'schema' | 'skip'
   tables: any[]
   sourceSchema: string
   targetSchema: string
@@ -43,9 +44,9 @@ export function getCreateFDWSql({
     .join('\n')
 
   const createWrapperSql = /* SQL */ `
-    create foreign data wrapper ${formState.wrapper_name}
-    handler ${wrapperMeta.handlerName}
-    validator ${wrapperMeta.validatorName};
+    create foreign data wrapper "${formState.wrapper_name}"
+    handler "${wrapperMeta.handlerName}"
+    validator "${wrapperMeta.validatorName}";
   `
 
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
@@ -170,7 +171,7 @@ export function getCreateFDWSql({
         .join('\n')}
     
       execute format(
-        E'create server ${formState.server_name} foreign data wrapper ${formState.wrapper_name} options (${optionsSqlArray});',
+        E'create server "${formState.server_name}" foreign data wrapper "${formState.wrapper_name}" options (${optionsSqlArray});',
         ${encryptedOptions
           .filter((option) => formState[option.name])
           .map((option) => `v_${option.name}`)
@@ -233,7 +234,7 @@ export async function createFDW({ projectRef, connectionString, ...rest }: FDWCr
   return result
 }
 
-type FDWCreateData = Awaited<ReturnType<typeof createFDW>>
+export type FDWCreateData = Awaited<ReturnType<typeof createFDW>>
 
 export const useFDWCreateMutation = ({
   onSuccess,

@@ -8,12 +8,11 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import type { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
 import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useBucketsQuery } from 'data/storage/buckets-query'
+import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Menu } from 'ui'
@@ -34,9 +33,9 @@ const StorageMenu = () => {
 
   const [searchText, setSearchText] = useState<string>('')
   const [showCreateBucketModal, setShowCreateBucketModal] = useState(false)
-  const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<StorageBucket>()
-  const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<StorageBucket>()
-  const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<StorageBucket>()
+  const [selectedBucketToEdit, setSelectedBucketToEdit] = useState<Bucket>()
+  const [selectedBucketToEmpty, setSelectedBucketToEmpty] = useState<Bucket>()
+  const [selectedBucketToDelete, setSelectedBucketToDelete] = useState<Bucket>()
   const canCreateBuckets = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'created-at'>(

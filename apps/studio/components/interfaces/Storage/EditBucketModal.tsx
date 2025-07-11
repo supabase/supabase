@@ -15,11 +15,11 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
-import type { StorageBucket } from './Storage.types'
+import { Bucket } from 'data/storage/buckets-query'
 
 export interface EditBucketModalProps {
   visible: boolean
-  bucket?: StorageBucket
+  bucket?: Bucket
   onClose: () => void
 }
 
