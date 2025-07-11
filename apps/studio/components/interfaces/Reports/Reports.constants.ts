@@ -73,13 +73,6 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
   },
 ]
 
-export const createFilteredDatePickerHelpers = (planId: PlanId) => {
-  return REPORTS_DATEPICKER_HELPERS.map((helper) => ({
-    ...helper,
-    disabled: !helper.availableIn?.includes(planId),
-  }))
-}
-
 export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),
   iso_timestamp_end: REPORTS_DATEPICKER_HELPERS[0].calcTo(),

@@ -1,14 +1,21 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { createParser, useQueryState } from 'nuqs'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
-  createFilteredDatePickerHelpers,
   REPORTS_DATEPICKER_HELPERS,
   ReportsDatetimeHelper,
   REPORT_DATERANGE_HELPER_LABELS,
 } from 'components/interfaces/Reports/Reports.constants'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
+
+export const DATERANGE_LIMITS: { [key: string]: number } = {
+  free: 1,
+  pro: 7,
+  team: 28,
+  enterprise: 90,
+}
 
 export interface ReportDateRange {
   period_start: { date: string; time_period: string }
@@ -40,9 +47,17 @@ export const useReportDateRange = (
     | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
 ) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
   // Get filtered date picker helpers based on organization plan
-  const datePickerHelpers = createFilteredDatePickerHelpers(orgPlan?.id || 'free')
+  const datePickerHelpers: ReportsDatetimeHelper[] = useMemo(
+    () =>
+      REPORTS_DATEPICKER_HELPERS.map((helper) => ({
+        ...helper,
+        disabled: false,
+      })),
+    []
+  )
 
   // Use nuqs for URL state management with individual parameters (empty defaults)
   const [timestampStartValue, setTimestampStart] = useQueryState('its', stringWithDefault(''))
@@ -199,18 +214,6 @@ export const useReportDateRange = (
     [setTimestampStart, setTimestampEnd, setIsHelper, setHelperText]
   )
 
-  const handleDatePickerChange = useCallback(
-    (values: DatePickerValue) => {
-      if (values.from && values.to) {
-        setTimestampStart(values.from)
-        setTimestampEnd(values.to)
-        setIsHelper(values.isHelper || false)
-        setHelperText(values.text || '')
-      }
-    },
-    [setTimestampStart, setTimestampEnd, setIsHelper, setHelperText]
-  )
-
   // For backward compatibility, provide a setter that updates the derived state
   const setSelectedDateRange = useCallback(
     (newRange: ReportDateRange) => {
@@ -234,14 +237,27 @@ export const useReportDateRange = (
     [timestampStart, timestampEnd, isHelper, helperText]
   )
 
+  const handleDatePickerChange = (values: DatePickerValue) => {
+    const shouldShowUpgradePrompt = maybeShowUpgradePrompt(values.from, orgPlan?.id)
+    if (shouldShowUpgradePrompt) {
+      setShowUpgradePrompt(true)
+      return true
+    } else {
+      updateDateRange(values.from, values.to)
+      return false
+    }
+  }
+
   return {
     selectedDateRange,
     setSelectedDateRange,
     updateDateRange,
-    handleDatePickerChange,
     datePickerValue,
     datePickerHelpers,
     isOrgPlanLoading,
     orgPlan,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
   }
 }
