@@ -34,21 +34,16 @@ const SignInMfaPage: NextPageWithLayout = () => {
     auth
       .initialize()
       .then(async ({ error }) => {
-        console.log('step 1')
         if (error) {
           // if there was a problem signing in via the url, don't redirect
           setLoading(false)
           return
         }
-        console.log('step 2')
 
         const token = await getAccessToken()
 
-        console.log('step 3', token)
-
         if (token) {
           const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
-          console.log('step 4', data, error)
           if (error) {
             // if there was a problem signing in via the url, don't redirect
             toast.error(
@@ -57,8 +52,6 @@ const SignInMfaPage: NextPageWithLayout = () => {
             setLoading(false)
             return router.push({ pathname: '/sign-in', query: router.query })
           }
-
-          console.log('step 5')
 
           if (data.currentLevel === data.nextLevel) {
             sendEvent({
@@ -69,22 +62,16 @@ const SignInMfaPage: NextPageWithLayout = () => {
               },
             })
             addLoginEvent({})
-            console.log('step 6')
+
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return
-          }
-
-          console.log('step 7')
-
-          if (data.currentLevel !== data.nextLevel) {
+          } else {
+            // Show the MFA form
             setLoading(false)
             return
           }
-
-          console.log('step 8')
         } else {
-          console.log('step 9 maybe')
           // if the user doesn't have a token, he needs to go back to the sign-in page
           const redirectTo = buildPathWithParams('/sign-in')
           router.replace(redirectTo)
