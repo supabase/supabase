@@ -19,15 +19,7 @@ const Hero = () => {
                   url="/launch-week"
                   badge="LW15"
                   announcement="Claim your ticket"
-                  className="-mt-8
-                  [&_.announcement-overlay]:bg-[url(/images/launchweek/15/lw15-galaxy.png)]
-                  [&_.announcement-overlay]:bg-cover
-                  [&_.announcement-overlay]:bg-center
-                  [&_.announcement-overlay]:bg-no-repeat
-                  [&_.announcement-overlay]:mix-blend-screen
-                  [&_.announcement-overlay]:!opacity-5
-                  [&_.announcement-overlay]:dark:!opacity-10
-                  [&_.announcement-overlay]:group-hover/announcement:!opacity-20"
+                  className="-mt-8"
                   hasArrow
                 />
                 <div className="flex flex-col items-center">
