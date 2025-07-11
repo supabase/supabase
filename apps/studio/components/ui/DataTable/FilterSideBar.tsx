@@ -6,8 +6,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { useUnifiedLogsControl } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
-import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
-import { ArrowLeft } from 'lucide-react'
+import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 
 export function FilterSideBar() {
   const { table } = useDataTable()
@@ -48,15 +47,10 @@ export function FilterSideBar() {
       </div>
 
       {showGoBackBox && (
-        <InnerSideBarEmptyPanel
+        <FeaturePreviewSidebarPanel
           className="mx-4 mt-4 mb-4"
           title="Go back to old logs"
           description="Use the traditional interface."
-          illustration={
-            <div className="w-6 h-6 bg-foreground-muted rounded-full flex items-center justify-center mb-2">
-              <ArrowLeft className="w-3 h-3 text-background" />
-            </div>
-          }
           actions={
             <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
               Switch back

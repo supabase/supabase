@@ -19,6 +19,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useUnifiedLogsControl } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
+  Badge,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -38,6 +39,7 @@ import {
   InnerSideBarFilterSearchInput,
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
+import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const SupaIcon = ({ className }: { className?: string }) => {
@@ -219,25 +221,21 @@ export function LogsSidebarMenuV2() {
   return (
     <div className="pb-12 relative">
       {unifiedLogsPreviewAvailable && !unifiedLogsPreview && (
-        <InnerSideBarEmptyPanel
-          className="mx-4 mt-4 mb-4"
-          title="Try new logs"
-          description="Better filtering and real-time updates."
-          illustration={
-            <div className="w-6 h-6 bg-brand-500 rounded-full flex items-center justify-center mb-2">
-              <Sparkles className="w-3 h-3 text-white" />
-            </div>
-          }
+        <FeaturePreviewSidebarPanel
+          className="mx-4 mt-4"
+          title="Logs feature preview"
+          description="Try the combined logs view"
+          illustration={<Badge variant="brand">New</Badge>}
           actions={
             <Button
-              type="default"
               size="tiny"
+              type="default"
               onClick={() => {
                 enableUnifiedLogs()
                 router.push(`/project/${ref}/logs`)
               }}
             >
-              Enable preview
+              Enable New Logs
             </Button>
           }
         />
