@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { useIsRealtimeSettingsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useIsRealtimeSettingsEnabled } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 

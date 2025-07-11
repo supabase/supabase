@@ -80,7 +80,7 @@ export const useIsInlineEditorEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }
 
-export const useRealtimeAllowPrivateChannelsEnabled = () => {
+export const useIsRealtimeSettingsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.REALTIME_PRIVATE_ONLY_MODE]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]
 }

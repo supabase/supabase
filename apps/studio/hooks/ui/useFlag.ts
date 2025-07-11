@@ -57,7 +57,7 @@ export function usePHFlag<T = string | boolean>(name: string) {
   return flagValue as T
 }
 
-export const useIsRealtimeSettingsEnabled = () => {
+export const useIsRealtimeSettingsFFEnabled = () => {
   const project = useSelectedProject()
 
   // This flag is used to enable/disable the realtime settings for specific projects.

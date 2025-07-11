@@ -2,8 +2,8 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
-    key: LOCAL_STORAGE_KEYS.REALTIME_PRIVATE_ONLY_MODE,
-    name: 'Enable Realtime private only mode',
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
+    name: 'Realtime settings',
     discussionsUrl: undefined,
     isNew: true,
     isPlatformOnly: true,
@@ -12,7 +12,7 @@ export const FEATURE_PREVIEWS = [
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
     name: 'Directly edit database entities',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: true,
+    isNew: false,
     isPlatformOnly: false,
   },
   {
