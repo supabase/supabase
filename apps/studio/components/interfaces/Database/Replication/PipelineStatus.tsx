@@ -4,6 +4,7 @@ import { cn } from 'ui'
 import { ResponseError } from 'types'
 import { Loader2, Play, Square, AlertTriangle, HelpCircle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+import { useEffect } from 'react'
 
 interface PipelineStatusProps {
   pipelineStatus: string | undefined
@@ -12,6 +13,7 @@ interface PipelineStatusProps {
   isError: boolean
   isSuccess: boolean
   requestStatus: 'None' | 'EnableRequested' | 'DisableRequested'
+  refetch?: () => void
 }
 
 const PipelineStatus = ({
@@ -21,27 +23,38 @@ const PipelineStatus = ({
   isError,
   isSuccess,
   requestStatus,
+  refetch,
 }: PipelineStatusProps) => {
   const requestInFlight = requestStatus !== 'None'
+
+  // Auto-refresh status every 10 seconds for general updates
+  // Note: DestinationRow handles intensive polling during state transitions
+  useEffect(() => {
+    if (!refetch || requestInFlight) return
+    
+    const interval = setInterval(() => {
+      refetch()
+    }, 10000)
+    
+    return () => clearInterval(interval)
+  }, [refetch, requestInFlight])
   
   // Map backend statuses to UX-friendly display
   const getStatusConfig = () => {
     if (requestStatus === 'EnableRequested') {
       return {
-        label: 'Starting...',
-        icon: <Loader2 className="animate-spin w-4 h-4" />,
-        color: 'text-foreground-light',
-        bgColor: 'bg-surface-200',
+        label: 'Enabling...',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-blue-500" />,
+        color: 'text-foreground',
         tooltip: 'Pipeline is being enabled and will start shortly'
       }
     }
     
     if (requestStatus === 'DisableRequested') {
       return {
-        label: 'Stopping...',
-        icon: <Loader2 className="animate-spin w-4 h-4" />,
-        color: 'text-foreground-light',
-        bgColor: 'bg-surface-200',
+        label: 'Disabling...',
+        dot: <Loader2 className="animate-spin w-3 h-3 text-orange-500" />,
+        color: 'text-foreground',
         tooltip: 'Pipeline is being disabled and will stop shortly'
       }
     }
@@ -50,41 +63,36 @@ const PipelineStatus = ({
       case 'Starting':
         return {
           label: 'Starting',
-          icon: <Loader2 className="animate-spin w-4 h-4 text-amber-500" />,
-          color: 'text-amber-700',
-          bgColor: 'bg-amber-100',
+          dot: <Loader2 className="animate-spin w-3 h-3 text-amber-500" />,
+          color: 'text-foreground',
           tooltip: 'Pipeline is initializing and will be ready soon'
         }
       case 'Started':
         return {
           label: 'Running',
-          icon: <Play className="w-4 h-4 text-green-600" />,
-          color: 'text-green-700',
-          bgColor: 'bg-green-100',
+          dot: <div className="w-2 h-2 bg-green-500 rounded-full" />,
+          color: 'text-foreground',
           tooltip: 'Pipeline is active and processing data'
         }
       case 'Stopped':
         return {
           label: 'Stopped',
-          icon: <Square className="w-4 h-4 text-gray-500" />,
-          color: 'text-gray-700',
-          bgColor: 'bg-gray-100',
+          dot: <div className="w-2 h-2 bg-gray-400 rounded-full" />,
+          color: 'text-foreground-light',
           tooltip: 'Pipeline is not running - enable to start processing'
         }
       case 'Unknown':
         return {
           label: 'Unknown',
-          icon: <HelpCircle className="w-4 h-4 text-orange-500" />,
-          color: 'text-orange-700',
-          bgColor: 'bg-orange-100',
+          dot: <div className="w-2 h-2 bg-orange-500 rounded-full" />,
+          color: 'text-foreground-light',
           tooltip: 'Pipeline status could not be determined'
         }
       default:
         return {
           label: 'Unknown',
-          icon: <AlertTriangle className="w-4 h-4 text-red-500" />,
-          color: 'text-red-700',
-          bgColor: 'bg-red-100',
+          dot: <div className="w-2 h-2 bg-red-500 rounded-full" />,
+          color: 'text-foreground-light',
           tooltip: 'Pipeline status is unclear - check logs for details'
         }
     }
@@ -101,11 +109,10 @@ const PipelineStatus = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <div className={cn(
-                'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
-                statusConfig.bgColor,
+                'flex items-center gap-2 text-sm',
                 statusConfig.color
               )}>
-                {statusConfig.icon}
+                {statusConfig.dot}
                 <span>{statusConfig.label}</span>
               </div>
             </TooltipTrigger>

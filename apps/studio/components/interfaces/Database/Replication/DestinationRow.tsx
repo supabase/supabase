@@ -51,6 +51,7 @@ const DestinationRow = ({
     isLoading: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
+    refetch: refetchPipelineStatus,
   } = useReplicationPipelineStatusQuery(
     {
       projectRef,
@@ -152,6 +153,7 @@ const DestinationRow = ({
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
                 requestStatus={requestStatus}
+                refetch={refetchPipelineStatus}
               ></PipelineStatus>
             )}
           </Table.td>
