@@ -5,6 +5,7 @@ import { ReactNode, useEffect } from 'react'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -13,12 +14,12 @@ import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import { InlineEditorPreview } from './InlineEditorPreview'
-import { RealtimePrivateOnlyModePreview } from './RealtimePrivateOnlyModePreview'
+import { RealtimeSettingsPreview } from './RealtimeSettingsPreview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
 } = {
-  [LOCAL_STORAGE_KEYS.REALTIME_PRIVATE_ONLY_MODE]: <RealtimePrivateOnlyModePreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]: <RealtimeSettingsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
@@ -31,9 +32,13 @@ const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
+
   // [Joshen] Use this if we want to feature flag previews
   function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
     switch (feature.key) {
+      case 'supabase-ui-realtime-settings':
+        return isRealtimeSettingsEnabled
       default:
         return true
     }
