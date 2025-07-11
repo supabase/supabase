@@ -11,12 +11,12 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
+  UI_PREVIEW_REALTIME_SETTINGS: 'supabase-ui-realtime-settings',
+
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
   TERMS_OF_SERVICE_ACKNOWLEDGED: 'terms-of-service-acknowledged',
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
-
-  REALTIME_PRIVATE_ONLY_MODE: 'supabase-realtime-private-only-mode',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
