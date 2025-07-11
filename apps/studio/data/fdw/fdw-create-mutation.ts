@@ -44,9 +44,9 @@ export function getCreateFDWSql({
     .join('\n')
 
   const createWrapperSql = /* SQL */ `
-    create foreign data wrapper ${formState.wrapper_name}
-    handler ${wrapperMeta.handlerName}
-    validator ${wrapperMeta.validatorName};
+    create foreign data wrapper "${formState.wrapper_name}"
+    handler "${wrapperMeta.handlerName}"
+    validator "${wrapperMeta.validatorName}";
   `
 
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
@@ -171,7 +171,7 @@ export function getCreateFDWSql({
         .join('\n')}
     
       execute format(
-        E'create server ${formState.server_name} foreign data wrapper ${formState.wrapper_name} options (${optionsSqlArray});',
+        E'create server "${formState.server_name}" foreign data wrapper "${formState.wrapper_name}" options (${optionsSqlArray});',
         ${encryptedOptions
           .filter((option) => formState[option.name])
           .map((option) => `v_${option.name}`)
