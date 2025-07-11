@@ -10,7 +10,7 @@ import {
   convertKVStringArrayToJson,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/import-foreign-schema-dialog'
+import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -37,10 +37,10 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DESCRIPTIONS } from './constants'
-import { DecryptedReadOnlyInput } from './decrypted-read-only-input'
-import { DownloadEnvButton } from './download-env-button'
-import { SimpleConfigurationDetails } from './simple-configuration-details'
-import { useIcebergWrapperExtension } from './use-iceberg-wrapper'
+import { CopyEnvButton } from './CopyEnvButton'
+import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
+import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
+import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   const { project } = useProjectContext()
@@ -175,7 +175,7 @@ export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                     your code.
                   </ScaffoldSectionDescription>
                 </div>
-                <DownloadEnvButton
+                <CopyEnvButton
                   serverOptions={wrapperMeta.server.options.filter(
                     (option) => !option.hidden && values[option.name]
                   )}

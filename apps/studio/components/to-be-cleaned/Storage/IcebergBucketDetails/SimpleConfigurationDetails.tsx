@@ -5,8 +5,8 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { Card } from 'ui'
 import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSettings.utils'
 import { DESCRIPTIONS } from './constants'
-import { DecryptedReadOnlyInput } from './decrypted-read-only-input'
-import { DownloadEnvButton } from './download-env-button'
+import { CopyEnvButton } from './CopyEnvButton'
+import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 
 const wrapperMeta = {
   options: [
@@ -42,7 +42,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
             You can use the following configuration details to connect to the bucket from your code.
           </ScaffoldSectionDescription>
         </div>
-        <DownloadEnvButton serverOptions={wrapperMeta.options} values={values} />
+        <CopyEnvButton serverOptions={wrapperMeta.options} values={values} />
       </div>
       <Card className="flex flex-col gap-6 p-6 pb-0">
         <p className="text-sm text-foreground-light mb-4">

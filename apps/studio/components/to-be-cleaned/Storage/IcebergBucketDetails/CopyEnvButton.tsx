@@ -7,7 +7,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { copyToClipboard } from 'ui'
 
-export const DownloadEnvButton = ({
+export const CopyEnvButton = ({
   serverOptions,
   values,
 }: {
@@ -49,8 +49,8 @@ export const DownloadEnvButton = ({
         content: {
           text: (
             <span>
-              Downloads an <span className="text-brand">.env file</span> with the configuration
-              details.
+              Copies an <span className="text-brand">.env file</span> with the configuration details
+              to your clipboard.
             </span>
           ),
         },

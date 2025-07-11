@@ -15,9 +15,11 @@ import {
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
+  FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
   Modal,
+  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -30,8 +32,9 @@ export interface ImportForeignSchemaDialogProps {
 
 const FormSchema = z.object({
   bucketName: z.string().trim(),
-  source_namespace: z.string().trim(),
-  target_schema: z.string().trim(),
+  createNamespace: z.boolean(),
+  sourceNamespace: z.string().trim(),
+  targetSchema: z.string().trim(),
 })
 
 export type ImportForeignSchemaForm = z.infer<typeof FormSchema>
@@ -59,8 +62,9 @@ export const ImportForeignSchemaDialog = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       bucketName,
-      source_namespace: 'default',
-      target_schema: 'public',
+      createNamespace: false,
+      sourceNamespace: 'default',
+      targetSchema: 'public',
     },
   })
 
@@ -77,15 +81,15 @@ export const ImportForeignSchemaDialog = ({
         catalogUri: wrapperValues['catalog_uri'],
         warehouse: wrapperValues['warehouse'],
         token: token[0].decrypted_secret,
-        namespace: values.source_namespace,
+        namespace: values.sourceNamespace,
       })
 
       await importForeignSchema({
         projectRef: ref,
         connectionString: project?.connectionString,
         serverName: `${snakeCase(values.bucketName)}_fdw_server`,
-        sourceSchema: values.source_namespace,
-        targetSchema: values.target_schema,
+        sourceSchema: values.sourceNamespace,
+        targetSchema: values.targetSchema,
       })
     } catch (error: any) {
       // error will be handled by the mutation onError callback
@@ -96,11 +100,12 @@ export const ImportForeignSchemaDialog = ({
     if (visible) {
       form.reset({
         bucketName,
-        source_namespace: 'default',
-        target_schema: 'public',
+        createNamespace: false,
+        sourceNamespace: 'default',
+        targetSchema: 'public',
       })
     }
-  }, [visible, form])
+  }, [visible, form, bucketName])
 
   return (
     <Modal
@@ -119,7 +124,7 @@ export const ImportForeignSchemaDialog = ({
           <Modal.Content className="flex flex-col gap-y-4">
             <FormField_Shadcn_
               control={form.control}
-              name="source_namespace"
+              name="sourceNamespace"
               render={({ field }) => (
                 <FormItemLayout
                   label="Namespace"
@@ -134,7 +139,26 @@ export const ImportForeignSchemaDialog = ({
             />
             <FormField_Shadcn_
               control={form.control}
-              name="target_schema"
+              name="createNamespace"
+              render={({ field }) => (
+                <FormItemLayout
+                  label="Namespace"
+                  description="Should match the namespace name when uploading data."
+                  layout="vertical"
+                >
+                  <FormControl_Shadcn_>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={field.disabled}
+                    />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+            <FormField_Shadcn_
+              control={form.control}
+              name="targetSchema"
               render={({ field }) => (
                 <FormItemLayout
                   label="Target Schema"
@@ -153,10 +177,19 @@ export const ImportForeignSchemaDialog = ({
           </Modal.Content>
           <Modal.Separator />
           <Modal.Content className="flex items-center space-x-2 justify-end">
-            <Button type="default" htmlType="button" disabled={isLoading} onClick={() => onClose()}>
+            <Button
+              type="default"
+              htmlType="button"
+              disabled={isLoading || isCreatingIcebergNamespace}
+              onClick={() => onClose()}
+            >
               Cancel
             </Button>
-            <Button type="primary" htmlType="submit" loading={isLoading}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isLoading || isCreatingIcebergNamespace}
+            >
               Save
             </Button>
           </Modal.Content>

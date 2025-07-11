@@ -9,7 +9,7 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useIcebergWrapperExtension } from 'components/to-be-cleaned/Storage/iceberg-bucket-details/use-iceberg-wrapper'
+import { useIcebergWrapperExtension } from 'components/to-be-cleaned/Storage/IcebergBucketDetails/useIcebergWrapper'
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
