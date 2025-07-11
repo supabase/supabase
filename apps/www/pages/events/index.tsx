@@ -95,10 +95,8 @@ export default function Events({
     const updatedCategories = { ...staticCategories }
 
     lumaEvents.forEach((event) => {
-      // Update 'all' counter
       updatedCategories.all = (updatedCategories.all || 0) + 1
 
-      // Update category counters
       event.categories?.forEach((category) => {
         updatedCategories[category] = (updatedCategories[category] || 0) + 1
       })
@@ -243,7 +241,6 @@ export async function getStaticProps() {
     runner: '** EVENTS PAGE **',
   }) as BlogPost[]
 
-  // Remove Luma API call from build time - will fetch client-side instead
   const allEvents = [...staticEvents, ...meetupEvents]
   const upcomingEvents = allEvents.filter((event: BlogPost) =>
     event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
@@ -254,10 +251,8 @@ export async function getStaticProps() {
 
   const categories = upcomingEvents.reduce(
     (acc: { [key: string]: number }, event: BlogPost) => {
-      // Increment the 'all' counter
       acc.all = (acc.all || 0) + 1
 
-      // Increment the counter for each category
       event.categories?.forEach((category) => {
         acc[category] = (acc[category] || 0) + 1
       })
@@ -273,7 +268,5 @@ export async function getStaticProps() {
       onDemandEvents,
       categories,
     },
-    // Revalidate every 1 hour (3600 seconds)
-    revalidate: 3600,
   }
 }
