@@ -19,10 +19,10 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
 import { analyticsKeys } from 'data/analytics/keys'
@@ -31,10 +31,10 @@ import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { formatBytes } from 'lib/helpers'
 
 import type { NextPageWithLayout } from 'types'
@@ -62,21 +62,23 @@ const DatabaseUsage = () => {
   const { project } = useProjectContext()
   const isReportsV2 = useFlag('reportsDatabaseV2')
   const org = useSelectedOrganization()
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+
+  const {
+    selectedDateRange,
+    updateDateRange: updateDateRangeFromHook,
+    handleDatePickerChange,
+    datePickerValue,
+    datePickerHelpers,
+    isOrgPlanLoading,
+    orgPlan,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
   const isTeamsOrEnterprisePlan =
     !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
   const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
-  const defaultStart = dayjs().subtract(1, 'day').toISOString()
-  const defaultEnd = dayjs().toISOString()
-  const [dateRange, setDateRange] = useState<any>({
-    period_start: { date: defaultStart, time_period: '1d' },
-    period_end: { date: defaultEnd, time_period: 'today' },
-    interval: '1h',
-  })
-
   const queryClient = useQueryClient()
 
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -111,19 +113,19 @@ const DatabaseUsage = () => {
   })
 
   const onRefreshReport = async () => {
-    if (!dateRange) return
+    if (!selectedDateRange) return
 
     // [Joshen] Since we can't track individual loading states for each chart
     // so for now we mock a loading state that only lasts for a second
     setIsRefreshing(true)
     refresh()
-    const { period_start, interval } = dateRange
+    const { period_start, period_end, interval } = selectedDateRange
     REPORT_ATTRIBUTES.forEach((attr) => {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {
           attribute: attr?.id,
           startDate: period_start.date,
-          endDate: period_start.end,
+          endDate: period_end.date,
           interval,
           databaseIdentifier: state.selectedDatabaseId,
         })
@@ -136,7 +138,7 @@ const DatabaseUsage = () => {
             analyticsKeys.infraMonitoring(ref, {
               attribute: attr.attribute,
               startDate: period_start.date,
-              endDate: period_start.end,
+              endDate: period_end.date,
               interval,
               databaseIdentifier: state.selectedDatabaseId,
             })
@@ -149,7 +151,7 @@ const DatabaseUsage = () => {
         analyticsKeys.infraMonitoring(ref, {
           attribute: 'physical_replication_lag_physical_replica_lag_seconds',
           startDate: period_start.date,
-          endDate: period_start.end,
+          endDate: period_end.date,
           interval,
           databaseIdentifier: state.selectedDatabaseId,
         })
@@ -176,47 +178,17 @@ const DatabaseUsage = () => {
     }
   }, [db, chart])
 
-  const handleIntervalGranularity = (from: string, to: string) => {
-    const conditions = {
-      '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
-      '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
-      '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
-      '1h': dayjs(to).diff(from, 'day') < 10, // less than 10 days
-      '1d': dayjs(to).diff(from, 'day') >= 10, // more than 10 days
-    }
-
-    switch (true) {
-      case conditions['1m']:
-        return '1m'
-      case conditions['10m']:
-        return '10m'
-      case conditions['30m']:
-        return '30m'
-      default:
-        return '1h'
-    }
-  }
-
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    setDateRange({
-      period_start: { date: from, time_period: '1d' },
-      period_end: { date: to, time_period: 'today' },
-      interval: handleIntervalGranularity(from, to),
-    })
+    updateDateRangeFromHook(from, to)
   }
 
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <div className="w-full flex flex-col gap-1">
-        <div className="h-2 w-full">
-          <ShimmerLine active={report.isLoading} />
-        </div>
-      </div>
       <GrafanaPromoBanner />
-      <section className="relative pt-16 -mt-2">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+      <ReportStickyNav
+        content={
+          <>
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -226,60 +198,51 @@ const DatabaseUsage = () => {
               onClick={onRefreshReport}
             />
             <div className="flex items-center gap-3">
-              <DateRangePicker
-                loading={false}
-                value={'1d'}
-                options={TIME_PERIODS_INFRA}
-                currentBillingPeriodStart={undefined}
-                onChange={(values) => {
-                  if (values.interval === '1d') {
-                    setDateRange({ ...values, interval: '1h' })
-                  } else {
-                    setDateRange(values)
-                  }
-                }}
+              <LogsDatePicker
+                onSubmit={handleDatePickerChange}
+                value={datePickerValue}
+                helpers={datePickerHelpers}
               />
-              {dateRange && (
+              {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRight size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
                   </p>
                 </div>
               )}
             </div>
-          </div>
-        </div>
+          </>
+        }
+      >
         {showChartsV2 ? (
-          <div className="grid grid-cols-1 gap-4">
-            {dateRange &&
-              REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
-                  key={chart.id}
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                  updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  showMaxValue={
-                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
-                />
-              ))}
-          </div>
+          selectedDateRange &&
+          REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
+            <ComposedChartHandler
+              key={chart.id}
+              {...chart}
+              attributes={chart.attributes as MultiAttribute[]}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+              defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+              showMaxValue={
+                chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                  ? true
+                  : chart.showMaxValue
+              }
+            />
+          ))
         ) : (
           <Panel title={<h2>Database health</h2>}>
             <Panel.Content className="grid grid-cols-1 gap-4">
-              {dateRange &&
+              {selectedDateRange &&
                 REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
                   <ChartHandler
                     key={attr.id}
@@ -287,31 +250,31 @@ const DatabaseUsage = () => {
                     provider="infra-monitoring"
                     attribute={attr.id}
                     label={attr.label}
-                    interval={dateRange.interval}
-                    startDate={dateRange?.period_start?.date}
-                    endDate={dateRange?.period_end?.date}
+                    interval={selectedDateRange.interval}
+                    startDate={selectedDateRange?.period_start?.date}
+                    endDate={selectedDateRange?.period_end?.date}
                   />
                 ))}
             </Panel.Content>
           </Panel>
         )}
-        {dateRange && isReplicaSelected && (
+        {selectedDateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
               <div id="replication-lag">
                 <ChartHandler
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
                   attribute="physical_replication_lag_physical_replica_lag_seconds"
                   label="Replication lag"
-                  interval={dateRange.interval}
+                  interval={selectedDateRange.interval}
                   provider="infra-monitoring"
                 />
               </div>
             </Panel.Content>
           </Panel>
         )}
-      </section>
+      </ReportStickyNav>
       <section id="database-size-report">
         <ReportWidget
           isLoading={isLoading}

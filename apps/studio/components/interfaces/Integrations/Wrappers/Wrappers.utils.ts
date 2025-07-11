@@ -50,7 +50,7 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   }
 }
 
-interface FormattedWrapperTable {
+export interface FormattedWrapperTable {
   index: number
   columns: { name: string }[]
   is_new_schema: boolean

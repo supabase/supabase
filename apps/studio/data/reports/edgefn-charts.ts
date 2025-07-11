@@ -1,4 +1,6 @@
-export const getEdgeFunctionReportAttributes = () => [
+import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
+
+export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
   {
     id: 'invocations',
     label: 'Edge Function Invocations',
@@ -60,7 +62,7 @@ export const getEdgeFunctionReportAttributes = () => [
   {
     id: 'execution-time',
     label: 'Edge Function Execution Time',
-    valuePrecision: 2,
+    valuePrecision: 0,
     hide: false,
     showTooltip: true,
     showLegend: true,
@@ -68,6 +70,11 @@ export const getEdgeFunctionReportAttributes = () => [
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
+    format: 'ms',
+    YAxisProps: {
+      width: 50,
+      tickFormatter: (value: number) => `${value}ms`,
+    },
     attributes: [
       {
         attribute: 'ExecutionTime',

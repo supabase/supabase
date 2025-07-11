@@ -66,6 +66,7 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
             )}
           </div>
         }
+        labelOptional={option.required ? undefined : 'Optional'}
         defaultValue={option.defaultValue ?? ''}
         error={error}
         value={loading ? 'Fetching value from Vault...' : undefined}
