@@ -61,7 +61,7 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
   const isTablet = useBreakpoint(1024)
   const [hiddenHeight, setHiddenHeight] = useState(0)
   const { width } = useWindowSize()
-  const padding = 16
+  const padding = 8
 
   useEffect(() => {
     if (hiddenRef?.current) {
@@ -87,9 +87,12 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
             bottom: isTablet ? 0 : -hiddenHeight + 'px',
           }}
         >
-          <span className="text-xs opacity-40">{day.date}</span>
+          <span className="text-xs opacity-60">{day.date}</span>
           <h4 className="text-lg leading-snug">{day.title}</h4>
-          <div className="block mt-2 lg:opacity-0 group-hover/main:lg:opacity-100" ref={hiddenRef}>
+          <div
+            className="block lg:opacity-0 blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100"
+            ref={hiddenRef}
+          >
             <Button type="outline" size="small" className="text-current rounded-sm border-dashed">
               <Link href={day.blog!}>Read more</Link>
             </Button>
