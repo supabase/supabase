@@ -718,8 +718,12 @@ export const auth = {
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
         { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
-        { name: 'JWTs', url: '/guides/auth/jwts' },
-        { name: 'JWT Fields Reference', url: '/guides/auth/jwt-fields' },
+        {
+          name: 'JSON Web Tokens (JWT)',
+          url: '/guides/auth/jwts',
+          items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
+        },
+        { name: 'JWT Signing Keys', url: '/guides/auth/signing-keys' },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
           name: 'Column Level Security',
