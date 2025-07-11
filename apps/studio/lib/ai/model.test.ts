@@ -1,7 +1,7 @@
 import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as bedrockModule from './bedrock'
-import { getModel, ModelErrorMessage, modelsByProvider } from './model'
+import { getModel, ModelErrorMessage } from './model'
 
 vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
@@ -43,7 +43,7 @@ describe('getModel', () => {
     const { model } = await getModel('test-key')
 
     expect(model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith(modelsByProvider.openai)
+    expect(openai).toHaveBeenCalledWith('gpt-4.1-2025-04-14')
   })
 
   it('should return error when neither AWS credentials nor OPENAI_API_KEY is available', async () => {

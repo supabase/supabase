@@ -9,7 +9,6 @@ import {
   createPrivacyMessageTool,
   toolSetValidationSchema,
   transformToolResult,
-  checkNetworkExtensionsAndAdjustOptInLevel,
   DatabaseExtension,
 } from './tool-filter'
 
@@ -18,7 +17,6 @@ describe('TOOL_CATEGORY_MAP', () => {
     expect(TOOL_CATEGORY_MAP['display_query']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
     expect(TOOL_CATEGORY_MAP['get_logs']).toBe(TOOL_CATEGORIES.LOG)
-    expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.DATA)
   })
 })
 
@@ -40,8 +38,6 @@ describe('tool allowance by opt-in level', () => {
       get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       get_log_counts: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-      // Data tools
-      execute_sql: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
     const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
@@ -104,7 +100,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('execute_sql')
   })
 
-  it('should return all tools for schema_and_log_and_data opt-in level', () => {
+  it('should return all tools for schema_and_log_and_data opt-in level (excluding execute_sql)', () => {
     const tools = getAllowedTools('schema_and_log_and_data')
     expect(tools).toContain('display_query')
     expect(tools).toContain('display_edge_function')
@@ -117,7 +113,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('get_logs')
     expect(tools).toContain('get_advisors')
     expect(tools).toContain('get_log_counts')
-    expect(tools).toContain('execute_sql')
+    expect(tools).not.toContain('execute_sql')
   })
 })
 
@@ -137,8 +133,6 @@ describe('filterToolsByOptInLevel', () => {
     get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     get_log_counts: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-    // Data tools
-    execute_sql: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Unknown tool - should be filtered out entirely
     some_other_tool: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
   } as unknown as ToolSet
@@ -195,7 +189,6 @@ describe('filterToolsByOptInLevel', () => {
       'get_logs',
       'get_advisors',
       'get_log_counts',
-      'execute_sql',
     ])
   })
 
@@ -210,21 +203,16 @@ describe('filterToolsByOptInLevel', () => {
       'get_logs',
       'get_advisors',
       'get_log_counts',
-      'execute_sql',
     ])
   })
 
-  it('should stub log and execute tools for schema opt-in level', async () => {
+  it('should stub log tools for schema opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
-    await expectStubsFor(tools, ['get_logs', 'get_advisors', 'get_log_counts', 'execute_sql'])
+    await expectStubsFor(tools, ['get_logs', 'get_advisors', 'get_log_counts'])
   })
 
-  it('should stub execute tool for schema_and_log opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log')
-
-    await expectStubsFor(tools, ['execute_sql'])
-  })
+  // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
 
   it('should not stub any tools for schema_and_log_and_data opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data')
@@ -340,7 +328,6 @@ describe('toolSetValidationSchema', () => {
       list_edge_functions: { parameters: z.object({}), execute: vitest.fn() },
       list_branches: { parameters: z.object({}), execute: vitest.fn() },
       get_logs: { parameters: z.object({}), execute: vitest.fn() },
-      execute_sql: { parameters: z.object({}), execute: vitest.fn() },
       search_docs: { parameters: z.object({}), execute: vitest.fn() },
       get_advisors: { parameters: z.object({}), execute: vitest.fn() },
       display_query: { parameters: z.object({}), execute: vitest.fn() },
@@ -354,137 +341,9 @@ describe('toolSetValidationSchema', () => {
 
     // Test with missing tool
     const incompleteTools = { ...allExpectedTools }
-    delete (incompleteTools as any).execute_sql
+    delete (incompleteTools as any).search_docs
 
     const incompleteValidationResult = toolSetValidationSchema.safeParse(incompleteTools)
     expect(incompleteValidationResult.success).toBe(true) // Should still pass as we allow subsets
-  })
-})
-
-describe('checkNetworkExtensionsAndAdjustOptInLevel', () => {
-  const createMockExtension = (name: string, installedVersion?: string): DatabaseExtension => ({
-    comment: null,
-    default_version: '1.0',
-    installed_version: installedVersion || null,
-    name,
-    schema: 'public',
-  })
-
-  it('should return the same opt-in level when no extensions are provided', () => {
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(null, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log_and_data')
-  })
-
-  it('should return the same opt-in level when extensions array is empty', () => {
-    const result = checkNetworkExtensionsAndAdjustOptInLevel([], 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log_and_data')
-  })
-
-  it('should return the same opt-in level when extensions array is undefined', () => {
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(undefined, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log_and_data')
-  })
-
-  it('should not downgrade when no dangerous network extensions are installed', () => {
-    const extensions = [
-      createMockExtension('postgis', '3.2.0'),
-      createMockExtension('uuid-ossp', '1.1'),
-      createMockExtension('pg_trgm', '1.6'),
-    ]
-
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log_and_data')
-  })
-
-  it('should downgrade from schema_and_log_and_data to schema_and_log when pg_net is installed', () => {
-    const extensions = [
-      createMockExtension('postgis', '3.2.0'),
-      createMockExtension('pg_net', '0.7.1'), // installed
-      createMockExtension('uuid-ossp', '1.1'),
-    ]
-
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log')
-  })
-
-  it('should downgrade from schema_and_log_and_data to schema_and_log when http extension is installed', () => {
-    const extensions = [
-      createMockExtension('postgis', '3.2.0'),
-      createMockExtension('http', '1.5.0'), // installed
-      createMockExtension('uuid-ossp', '1.1'),
-    ]
-
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log')
-  })
-
-  it('should downgrade when both pg_net and http extensions are installed', () => {
-    const extensions = [
-      createMockExtension('pg_net', '0.7.1'), // installed
-      createMockExtension('http', '1.5.0'), // installed
-      createMockExtension('uuid-ossp', '1.1'),
-    ]
-
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log')
-  })
-
-  it('should not downgrade when dangerous extensions are available but not installed', () => {
-    const extensions = [
-      createMockExtension('pg_net'), // not installed (no installed_version)
-      createMockExtension('http'), // not installed (no installed_version)
-      createMockExtension('postgis', '3.2.0'), // installed
-    ]
-
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log_and_data')
-  })
-
-  it('should not downgrade when opt-in level is already at or below schema_and_log', () => {
-    const extensions = [
-      createMockExtension('pg_net', '0.7.1'), // installed
-    ]
-
-    // Test with schema_and_log - should remain unchanged
-    const result1 = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log')
-    expect(result1).toBe('schema_and_log')
-
-    // Test with schema - should remain unchanged
-    const result2 = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema')
-    expect(result2).toBe('schema')
-
-    // Test with disabled - should remain unchanged
-    const result3 = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'disabled')
-    expect(result3).toBe('disabled')
-  })
-
-  it('should handle extensions with empty string installed_version as not installed', () => {
-    const extensions = [
-      {
-        comment: null,
-        default_version: '1.0',
-        installed_version: '', // empty string should be treated as not installed
-        name: 'pg_net',
-        schema: 'public',
-      },
-    ]
-
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log_and_data')
-  })
-
-  it('should handle extensions with null installed_version as not installed', () => {
-    const extensions = [
-      {
-        comment: null,
-        default_version: '1.0',
-        installed_version: null, // explicitly null
-        name: 'pg_net',
-        schema: 'public',
-      },
-    ]
-
-    const result = checkNetworkExtensionsAndAdjustOptInLevel(extensions, 'schema_and_log_and_data')
-    expect(result).toBe('schema_and_log_and_data')
   })
 })
