@@ -7,6 +7,7 @@ import { useUnifiedLogsControl } from 'components/interfaces/App/FeaturePreview/
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
+import { ArrowLeft } from 'lucide-react'
 
 export function FilterSideBar() {
   const { table } = useDataTable()
@@ -53,13 +54,7 @@ export function FilterSideBar() {
           description="Use the traditional interface."
           illustration={
             <div className="w-6 h-6 bg-foreground-muted rounded-full flex items-center justify-center mb-2">
-              <svg className="w-3 h-3 text-background" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <ArrowLeft className="w-3 h-3 text-background" />
             </div>
           }
           actions={
