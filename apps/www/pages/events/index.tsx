@@ -2,16 +2,18 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
-import { getSortedPosts } from '~/lib/posts'
-import supabase from '~/lib/supabase'
+import { getSortedPosts } from 'lib/posts'
+import supabase from 'lib/supabase'
+import { SITE_ORIGIN } from 'lib/constants'
 
 import { cn } from 'ui'
-import DefaultLayout from '~/components/Layouts/Default'
-import EventListItem from '~/components/Events/EventListItem'
-import EventsFilters from '~/components/Events/EventsFilters'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import DefaultLayout from 'components/Layouts/Default'
+import EventListItem from 'components/Events/EventListItem'
+import EventsFilters from 'components/Events/EventsFilters'
+import SectionContainer from 'components/Layouts/SectionContainer'
 
-import type BlogPost from '~/types/post'
+import type BlogPost from 'types/post'
+import type { LumaEvent } from 'app/api-v2/luma-events/route'
 
 interface Props {
   events: BlogPost[]
@@ -121,7 +123,7 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const { data: meetups, error } = await supabase
     .from('meetups')
     .select('id, city, country, link, start_at, timezone, launch_week')
@@ -154,7 +156,52 @@ export async function getStaticProps() {
     runner: '** EVENTS PAGE **',
   }) as BlogPost[]
 
-  const allEvents = [...staticEvents, ...meetupEvents]
+  let lumaEvents = []
+
+  // LUMA EVENTS
+  try {
+    const afterDate = new Date().toISOString()
+
+    const url = new URL(`${SITE_ORIGIN}/api-v2/luma-events`)
+    url.searchParams.append('after', afterDate)
+
+    const res = await fetch(url.toString())
+    const data = await res.json()
+
+    if (data.success) {
+      lumaEvents =
+        data.events.map((event: LumaEvent) => {
+          let categories = []
+
+          if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
+
+          return {
+            slug: '',
+            type: 'event',
+            title: event?.name,
+            date: event?.start_at,
+            description: '',
+            thumb: '',
+            path: '',
+            url: event?.url ?? '',
+            tags: categories,
+            categories,
+            timezone: event?.timezone ?? 'America/Los_Angeles',
+            disable_page_build: true,
+            link: {
+              href: event?.url ?? '#',
+              target: '_blank',
+            },
+          }
+        }) || []
+    } else {
+      console.error('Failed to fetch meetups:', data.error)
+    }
+  } catch (error) {
+    console.error('Error fetching meetups:', error)
+  }
+
+  const allEvents = [...staticEvents, ...meetupEvents, ...lumaEvents]
   const upcomingEvents = allEvents.filter((event: BlogPost) =>
     event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
   )

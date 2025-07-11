@@ -89,19 +89,7 @@ export async function GET(request: NextRequest) {
 
     // Filter and transform the events for launch week
     const launchWeekEvents = data.entries
-      // .filter(({ event }) => {
-      //   // Filter for events related to launch week or Supabase meetups
-      //   const name = event.name.toLowerCase()
-      //   const description = event.description?.toLowerCase() || ''
-
-      //   return (
-      //     name.includes('launch week') ||
-      //     name.includes('supabase') ||
-      //     name.includes('lw15') ||
-      //     description.includes('launch week') ||
-      //     description.includes('supabase')
-      //   )
-      // })
+      .filter(({ event }: { event: LumaEvent }) => event.visibility === 'public')
       .map(({ event }: { event: LumaEvent }) => event)
       .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
 
