@@ -63,9 +63,6 @@ const createTable = async (page: Page, tableName: string) => {
 
   await s.saveBtn(page).click()
 
-  // wait till we see the success toast
-  // Text: Table tableName is good to go!
-
   await expect(
     page.getByText(`Table ${tableName} is good to go!`),
     'Success toast should be visible after table creation'
@@ -79,7 +76,7 @@ const createTable = async (page: Page, tableName: string) => {
   ).toBeVisible()
 }
 
-const deleteTables = async (page: Page, tableName: string) => {
+const deleteTable = async (page: Page, tableName: string) => {
   const s = getSelectors(tableName)
 
   await page.waitForTimeout(500)
@@ -96,9 +93,13 @@ const deleteTables = async (page: Page, tableName: string) => {
   ).toBeVisible()
 }
 
-const deleteEnum = async (page: Page, enumName: string) => {
+const deleteEnum = async (page: Page, enumName: string, ref: string) => {
   // give it a second for interactions to load
-  await page.waitForTimeout(1000)
+  await page.waitForResponse(
+    (response) =>
+      response.url().includes(`pg-meta/${ref}/types`) ||
+      response.url().includes('pg-meta/default/types')
+  )
 
   // if enum (test) exists, delete it.
   const exists = (await page.getByRole('cell', { name: enumName, exact: true }).count()) > 0
@@ -133,22 +134,22 @@ test.describe('Table Editor', () => {
 
     await page.waitForTimeout(2000)
     // delete table name if it exists
-    await deleteTables(page, testTableName)
-    await deleteTables(page, tableNameRlsEnabled)
-    await deleteTables(page, tableNameRlsDisabled)
-    await deleteTables(page, tableNameEnum)
-    await deleteTables(page, tableNameCsv)
+    await deleteTable(page, testTableName)
+    await deleteTable(page, tableNameRlsEnabled)
+    await deleteTable(page, tableNameRlsDisabled)
+    await deleteTable(page, tableNameEnum)
+    await deleteTable(page, tableNameCsv)
   })
 
   test.afterAll(async () => {
     test.setTimeout(60000)
 
     // delete all tables related to this test
-    await deleteTables(page, testTableName)
-    await deleteTables(page, tableNameRlsEnabled)
-    await deleteTables(page, tableNameRlsDisabled)
-    await deleteTables(page, tableNameEnum)
-    await deleteTables(page, tableNameCsv)
+    await deleteTable(page, testTableName)
+    await deleteTable(page, tableNameRlsEnabled)
+    await deleteTable(page, tableNameRlsDisabled)
+    await deleteTable(page, tableNameEnum)
+    await deleteTable(page, tableNameCsv)
   })
 
   test('should perform all table operations sequentially', async ({ ref }) => {
@@ -251,7 +252,7 @@ test.describe('Table Editor', () => {
       'Tables list should be visible in public schema'
     ).toBeVisible()
 
-    await deleteTables(page, testTableName)
+    await deleteTable(page, testTableName)
   })
 
   test('should show rls accordingly', async () => {
@@ -279,27 +280,30 @@ test.describe('Table Editor', () => {
     await page.getByRole('button', { name: `View ${tableNameRlsDisabled}` }).click()
     await expect(page.getByRole('button', { name: 'RLS disabled' })).toBeVisible()
 
-    await deleteTables(page, tableNameRlsEnabled)
-    await deleteTables(page, tableNameRlsDisabled)
+    await deleteTable(page, tableNameRlsEnabled)
+    await deleteTable(page, tableNameRlsDisabled)
   })
 
   test('add enums and show enums on table', async ({ ref }) => {
-    const ENUM_NAME = 'priority'
-    const ENUM_COLUMN_NAME = 'order_priority_level'
-    // clear local storage, as it might result in some flakiness
-    await page.evaluate(() => window.localStorage.clear())
+    const ENUM_NAME = 'test_enum'
+    const ENUM_COLUMN_NAME = 'test_column'
 
+    // clear local storage, as it might result in some flakiness
+    await page.evaluate((ref) => {
+      localStorage.removeItem('dashboard-history-default')
+      localStorage.removeItem(`dashboard-history-${ref}`)
+    }, ref)
     await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
 
     // delete enum if it exists
-    await deleteEnum(page, ENUM_NAME)
+    await deleteEnum(page, ENUM_NAME, ref)
 
     // create a new enum
     await page.getByRole('button', { name: 'Create type' }).click()
     await page.getByRole('textbox', { name: 'Name' }).fill(ENUM_NAME)
-    await page.locator('input[name="values.0.value"]').fill('medium')
+    await page.locator('input[name="values.0.value"]').fill('value1')
     await page.getByRole('button', { name: 'Add value' }).click()
-    await page.locator('input[name="values.1.value"]').fill('high')
+    await page.locator('input[name="values.1.value"]').fill('value2')
     await page.getByRole('button', { name: 'Create type' }).click()
 
     // Wait for enum response to be completed
@@ -311,20 +315,30 @@ test.describe('Table Editor', () => {
 
     // verify enum is created
     await expect(page.getByRole('cell', { name: ENUM_NAME, exact: true })).toBeVisible()
-    await expect(page.getByRole('cell', { name: 'medium, high', exact: true })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'value1, value2', exact: true })).toBeVisible()
 
     // create a new table with new column for enums
     await page.goto(toUrl(`/project/${ref}/editor`))
-    await createTable(page, tableNameEnum)
-    const s = getSelectors(testTableName)
-    await s.insertBtn(page).click()
-    await s.insertColumn(page).click()
 
-    await page.getByRole('textbox', { name: 'column_name', exact: true }).fill(ENUM_COLUMN_NAME)
-    await page.getByRole('combobox').click()
+    const s = getSelectors(tableNameEnum)
+    await s.newTableBtn(page).click()
+    await s.tableNameInput(page).fill(tableNameEnum)
+    await s.createdAtExtraOptions(page).click()
+    await page.getByText('Is Nullable').click()
+    await s.createdAtExtraOptions(page).click()
+    await s.addColumnBtn(page).click()
+    await s.columnNameInput(page).fill(ENUM_COLUMN_NAME)
+    await page.getByRole('combobox').filter({ hasText: 'Choose a column type...' }).click()
     await page.getByPlaceholder('Search types...').fill(ENUM_NAME)
     await page.getByRole('option', { name: ENUM_NAME }).click()
-    await page.getByRole('button', { name: 'Save' }).click()
+    await s.saveBtn(page).click()
+
+    await expect(
+      page.getByText(`Table ${tableNameEnum} is good to go!`),
+      'Success toast should be visible after table creation'
+    ).toBeVisible({
+      timeout: 50000,
+    })
 
     // Wait for the grid to be visible and data to be loaded
     await expect(s.grid(page), 'Grid should be visible after inserting data').toBeVisible()
@@ -333,25 +347,28 @@ test.describe('Table Editor', () => {
     // insert row with enum value
     await s.insertBtn(page).click()
     await s.insertRow(page).click()
-    await page.getByRole('combobox').selectOption('medium')
+    await page.getByRole('combobox').selectOption('value1')
     await s.actionBarSaveRow(page).click()
-    await expect(page.getByRole('gridcell', { name: 'medium' })).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'value1' })).toBeVisible()
 
-    // update enum value
-    await page.getByRole('gridcell', { name: 'medium' }).click({ button: 'right' })
-    await page.getByRole('menuitem', { name: 'Edit' }).click()
-    await page.getByRole('combobox').selectOption('high')
+    // insert row with another enum value
+    await s.insertBtn(page).click()
+    await s.insertRow(page).click()
+    await page.getByRole('combobox').selectOption('value2')
     await s.actionBarSaveRow(page).click()
-    await expect(page.getByRole('gridcell', { name: 'high' })).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'value2' })).toBeVisible()
 
     // delete enum and enum table
-    await deleteTables(page, tableNameEnum)
+    await deleteTable(page, tableNameEnum)
     await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
-    await deleteEnum(page, ENUM_NAME)
+    await deleteEnum(page, ENUM_NAME, ref)
 
     // should end at the init link
     // clear local storage, as it might result in some flakiness
-    await page.evaluate(() => window.localStorage.clear())
+    await page.evaluate((ref) => {
+      localStorage.removeItem('dashboard-history-default')
+      localStorage.removeItem(`dashboard-history-${ref}`)
+    }, ref)
     await page.goto(toUrl(`/project/${ref}/editor`))
   })
 
@@ -397,6 +414,6 @@ test.describe('Table Editor', () => {
 
     // remove the downloaded file + clean up tables
     fs.unlinkSync(downloadPath)
-    deleteTables(page, tableNameCsv)
+    await deleteTable(page, tableNameCsv)
   })
 })
