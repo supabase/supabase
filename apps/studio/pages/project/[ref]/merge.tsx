@@ -290,8 +290,8 @@ const MergePage: NextPageWithLayout = () => {
   const breadcrumbs = useMemo(
     () => [
       {
-        label: 'Branches',
-        href: `/project/${project?.ref}/branches?tab=prs`,
+        label: 'Merge requests',
+        href: `/project/${project?.ref}/branches/merge-requests`,
       },
     ],
     [parentProjectRef]

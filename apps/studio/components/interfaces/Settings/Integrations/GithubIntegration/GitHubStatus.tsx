@@ -37,60 +37,54 @@ export const GitHubStatus = () => {
   const hasAutomaticBranching = Boolean(githubConnection?.new_branch_per_pr)
 
   return (
-    <Card>
-      <CardContent className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <Card className="bg-background-transparent">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2">
           <Image
             className="dark:invert"
             src={`${BASE_PATH}/img/icons/github-icon.svg`}
-            width={20}
-            height={20}
+            width={16}
+            height={16}
             alt="GitHub"
           />
-
-          <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-foreground">
-              {isConnected
-                ? `Connected to ${githubConnection?.repository.name}`
-                : 'GitHub Integration'}
-            </h3>
-
-            <div className="flex items-center gap-4 text-xs text-foreground-light">
-              {isConnected ? (
-                <>
-                  <div className="flex items-center gap-1">
-                    {hasGitBranchSync ? (
-                      <CheckCircle2 size={12} className="text-brand-600" />
-                    ) : (
-                      <AlertCircle size={12} className="text-warning-600" />
-                    )}
-                    <span>
-                      {hasGitBranchSync
-                        ? `Syncing production (${mainBranch?.git_branch})`
-                        : 'Production sync disabled'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {hasAutomaticBranching ? (
-                      <CheckCircle2 size={12} className="text-brand-600" />
-                    ) : (
-                      <AlertCircle size={12} className="text-warning-600" />
-                    )}
-                    <span>
-                      {hasAutomaticBranching
-                        ? 'Automatically creating branches'
-                        : 'Automatic branching disabled'}
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <span>Not connected to any repository</span>
-              )}
-            </div>
-          </div>
+          <h3 className="text-sm text-foreground">
+            {isConnected ? `${githubConnection?.repository.name}` : 'GitHub Integration'}
+          </h3>
+        </div>
+        <div className="text-xs text-foreground-light mt-3 space-y-2">
+          {isConnected ? (
+            <>
+              <div className="flex items-center gap-1">
+                {hasGitBranchSync ? (
+                  <CheckCircle2 size={12} className="text-brand-600" />
+                ) : (
+                  <AlertCircle size={12} className="text-warning-600" />
+                )}
+                <span>
+                  {hasGitBranchSync
+                    ? `Syncing production (${mainBranch?.git_branch})`
+                    : 'Production sync disabled'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                {hasAutomaticBranching ? (
+                  <CheckCircle2 size={12} className="text-brand-600" />
+                ) : (
+                  <AlertCircle size={12} className="text-warning-600" />
+                )}
+                <span>
+                  {hasAutomaticBranching
+                    ? 'Automatically creating branches'
+                    : 'Automatic branching disabled'}
+                </span>
+              </div>
+            </>
+          ) : (
+            <span>Not connected to any repository</span>
+          )}
         </div>
 
-        <Button asChild type="default" icon={<Settings size={14} />}>
+        <Button asChild type="default" icon={<Settings size={14} />} className="w-full mt-4">
           <Link href={`/project/${projectRef}/settings/integrations`}>Configure</Link>
         </Button>
       </CardContent>

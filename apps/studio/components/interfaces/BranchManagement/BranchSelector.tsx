@@ -46,16 +46,11 @@ export const BranchSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type="outline"
-          size="tiny"
-          disabled={disabled || availableBranches.length === 0 || isUpdating}
-          icon={<Plus size={14} strokeWidth={1.5} />}
-        >
-          {isUpdating ? 'Creating...' : 'Create review'}
+        <Button type="primary" disabled={disabled || availableBranches.length === 0 || isUpdating}>
+          {isUpdating ? 'Creating...' : 'Create merge request'}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom">
+      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find branch to review..." />
           <CommandList_Shadcn_>
