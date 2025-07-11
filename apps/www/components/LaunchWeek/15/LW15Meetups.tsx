@@ -58,15 +58,6 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
     },
   }
 
-  const getMeetupCity = (meetup: LumaEvent) => {
-    return (
-      meetup.city ??
-      meetup.name.split(',')[0].split('-')[1] ??
-      meetup.name.split(',')[0].split(' ')[1] ??
-      meetup.name
-    )
-  }
-
   const handleMouseMove = useCallback((e: MouseEvent) => {
     // Global mouse position for overlay
     setGlobalMousePosition({
@@ -99,6 +90,11 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
     setActiveMeetup(null)
     setShowOverlay(false)
   }
+
+  // Keep this for OG image generation
+  const meetupsFilteredByUniqueCountries = meetups
+    .filter((meetup, index, self) => index === self.findIndex((t) => t.country === meetup.country))
+    .sort((a, b) => a.country.localeCompare(b.country))
 
   return (
     <>
@@ -229,19 +225,19 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
   )
 }
 
+const handleCountry = (country: string) => {
+  if (country === 'United States') return 'USA'
+  if (country === 'United Kingdom') return 'UK'
+  if (country === 'United Arab Emirates') return 'UAE'
+  if (country === 'Democratic Republic of the Congo') return 'Congo'
+  return country
+}
+
 const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCardProps) => {
   const show = !(!meetup || !visible)
 
-  const handleCountry = (country: string) => {
-    if (country === 'United States') return 'USA'
-    if (country === 'United Kingdom') return 'UK'
-    if (country === 'United Arab Emirates') return 'UAE'
-    if (country === 'Democratic Republic of the Congo') return 'DR. of Congo'
-    return country
-  }
-
   // Calculate if overlay should appear to the left of cursor
-  const overlayWidth = 320 // max-w-xs is approximately 320px
+  const overlayWidth = 320
   const distanceToRightEdge =
     typeof window !== 'undefined' ? window.innerWidth - mousePosition.x : 1000
   const shouldPositionLeft = distanceToRightEdge < overlayWidth
@@ -274,7 +270,7 @@ const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCard
         <div className="w-full flex justify-between gap-1 text-lg !leading-none">
           <div className="">Meetup</div>
           <div className="text-right">
-            {meetup?.city}, {handleCountry(meetup?.country ?? '')}
+            {getMeetupCity(meetup!)}, {getMeetupCountry(meetup!)}
           </div>
         </div>
       </div>
@@ -288,5 +284,16 @@ function addHours(start_at: Date, hours: number) {
 
   return dateCopy
 }
+
+const getMeetupCity = (meetup: LumaEvent) => {
+  if (!meetup) return ''
+  return (
+    meetup.city ??
+    meetup.name.split(',')[0].split('-')[1] ??
+    meetup.name.split(',')[0].split(' ')[1] ??
+    meetup.name
+  )
+}
+const getMeetupCountry = (meetup: LumaEvent) => handleCountry(meetup?.country ?? '')
 
 export default LW15Meetups
