@@ -74,7 +74,6 @@ export async function GET(request: NextRequest) {
         name: event.name,
         city: event.city,
         country: event.country,
-        description: event.description,
         url: event.url,
         timezone: event.timezone,
       }))
