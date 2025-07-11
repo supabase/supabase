@@ -1,10 +1,30 @@
-import { cn, ResizablePanel } from 'ui'
+import { cn, ResizablePanel, Button } from 'ui'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useUnifiedLogsControl } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useRouter } from 'next/router'
+import { useParams } from 'common'
+import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 
 export function FilterSideBar() {
   const { table } = useDataTable()
+  const router = useRouter()
+  const { ref } = useParams()
+  const unifiedLogsPreviewAvailable = useFlag('unifiedLogsPreviewAvailable')
+  const { isEnabled: unifiedLogsPreview, disable: disableUnifiedLogs } = useUnifiedLogsControl()
+
+  // Only show the box if the feature preview is available and currently enabled
+  const showGoBackBox = unifiedLogsPreviewAvailable && unifiedLogsPreview
+
+  const handleGoBackToOldLogs = () => {
+    // Disable the unified logs preview using the helper
+    disableUnifiedLogs()
+
+    // Redirect to old logs
+    router.push(`/project/${ref}/logs/explorer`)
+  }
 
   return (
     <ResizablePanel
@@ -25,6 +45,30 @@ export function FilterSideBar() {
           <div>{table.getState().columnFilters.length ? <DataTableResetButton /> : null}</div>
         </div>
       </div>
+
+      {showGoBackBox && (
+        <InnerSideBarEmptyPanel
+          className="mx-4 mt-4 mb-4"
+          title="Go back to old logs"
+          description="Use the traditional interface."
+          illustration={
+            <div className="w-6 h-6 bg-foreground-muted rounded-full flex items-center justify-center mb-2">
+              <svg className="w-3 h-3 text-background" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          }
+          actions={
+            <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
+              Switch back
+            </Button>
+          }
+        />
+      )}
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls />
       </div>

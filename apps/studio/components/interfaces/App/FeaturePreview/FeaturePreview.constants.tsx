@@ -22,4 +22,11 @@ export const FEATURE_PREVIEWS = [
     isNew: false,
     isPlatformOnly: false,
   },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
+    name: 'New Logs',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
+    isNew: true,
+    isPlatformOnly: false,
+  },
 ] as const

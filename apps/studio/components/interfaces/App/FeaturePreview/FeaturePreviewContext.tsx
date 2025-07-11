@@ -79,3 +79,19 @@ export const useIsInlineEditorEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }
+
+export const useIsUnifiedLogsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+}
+
+export const useUnifiedLogsControl = () => {
+  const { flags, onUpdateFlag } = useFeaturePreviewContext()
+
+  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+
+  const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
+  const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
+
+  return { isEnabled, enable, disable }
+}

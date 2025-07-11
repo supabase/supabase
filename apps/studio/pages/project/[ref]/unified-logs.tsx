@@ -10,14 +10,11 @@ import type { NextPageWithLayout } from 'types'
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  // Redirect if flag is disabled
-  if (unifiedLogsEnabled === false) {
-    router.push(`/project/${ref}/logs`)
-  }
+  // Always redirect to main logs page - unified logs are now shown there when flag is enabled
+  router.push(`/project/${ref}/logs`)
 
-  return <UnifiedLogs />
+  return null
 }
 
 LogPage.getLayout = (page) => (
