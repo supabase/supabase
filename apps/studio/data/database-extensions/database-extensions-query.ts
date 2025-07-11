@@ -5,6 +5,7 @@ import { databaseExtensionsKeys } from './keys'
 import { components } from 'api-types'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension']
 
@@ -27,6 +28,7 @@ export async function getDatabaseExtensions(
     params: {
       header: {
         'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
       },
       path: {
         ref: projectRef,
