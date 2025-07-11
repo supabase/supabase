@@ -39,7 +39,7 @@ async function createIcebergNamespace({
       if (result.error.message) {
         throw new Error(result.error.message)
       }
-      throw new Error('Failed to create iceberg namespace')
+      throw new Error('Failed to create Iceberg namespace')
     }
     return result
   } catch (error) {
@@ -64,8 +64,12 @@ export const useIcebergNamespaceCreateMutation = ({
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
+        if ((data.message = 'Request failed with status code 409')) {
+          toast.error(`A namespace named ${variables.namespace} already exists in the catalog.`)
+          return
+        }
         if (onError === undefined) {
-          toast.error(`Failed to create iceberg namespace: ${data.message}`)
+          toast.error(`Failed to create Iceberg namespace: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

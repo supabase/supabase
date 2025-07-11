@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -14,7 +14,6 @@ import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query
 import {
   Button,
   Form_Shadcn_,
-  FormControl_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
@@ -47,11 +46,11 @@ export const ImportForeignSchemaDialog = ({
 }: ImportForeignSchemaDialogProps) => {
   const { project } = useProjectContext()
   const { ref } = useParams()
+  const [loading, setLoading] = useState(false)
 
-  const { mutateAsync: createIcebergNamespace, isLoading: isCreatingIcebergNamespace } =
-    useIcebergNamespaceCreateMutation()
+  const { mutateAsync: createIcebergNamespace } = useIcebergNamespaceCreateMutation()
 
-  const { mutateAsync: importForeignSchema, isLoading } = useFDWImportForeignSchemaMutation({
+  const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({
     onSuccess: () => {
       toast.success(`Successfully connected ${bucketName} to the database.`)
       onClose()
@@ -70,6 +69,7 @@ export const ImportForeignSchemaDialog = ({
 
   const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
+    setLoading(true)
 
     const token = await getDecryptedValue({
       projectRef: project?.ref,
@@ -93,6 +93,8 @@ export const ImportForeignSchemaDialog = ({
       })
     } catch (error: any) {
       // error will be handled by the mutation onError callback
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -142,9 +144,9 @@ export const ImportForeignSchemaDialog = ({
               name="createNamespace"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Namespace"
-                  description="Should match the namespace name when uploading data."
-                  layout="vertical"
+                  label="Create a new namespace"
+                  description="Create the namespace if it doesn't exist. If it exists, it will show an error."
+                  layout="flex"
                 >
                   <FormControl_Shadcn_>
                     <Switch
@@ -177,19 +179,10 @@ export const ImportForeignSchemaDialog = ({
           </Modal.Content>
           <Modal.Separator />
           <Modal.Content className="flex items-center space-x-2 justify-end">
-            <Button
-              type="default"
-              htmlType="button"
-              disabled={isLoading || isCreatingIcebergNamespace}
-              onClick={() => onClose()}
-            >
+            <Button type="default" htmlType="button" disabled={loading} onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={isLoading || isCreatingIcebergNamespace}
-            >
+            <Button type="primary" htmlType="submit" loading={loading}>
               Save
             </Button>
           </Modal.Content>
