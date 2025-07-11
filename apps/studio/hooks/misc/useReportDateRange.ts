@@ -239,7 +239,6 @@ export const useReportDateRange = (
   )
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    console.log('values', values)
     const shouldShowUpgradePrompt = maybeShowUpgradePrompt(values.from, orgPlan?.id)
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)
