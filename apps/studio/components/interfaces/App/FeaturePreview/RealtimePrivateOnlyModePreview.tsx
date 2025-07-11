@@ -6,14 +6,13 @@ export const RealtimePrivateOnlyModePreview = () => {
   return (
     <div>
       <Image
-        src={}
+        src={`${BASE_PATH}/img/previews/inline-editor-preview.png`}
         width={1296}
         height={900}
         alt="api-docs-side-panel-preview"
         className="rounded border mb-4"
       />
-      <p className="text-sm text-foreground-light mb-4">
-      </p>
+      <p className="text-sm text-foreground-light mb-4"></p>
     </div>
   )
 }

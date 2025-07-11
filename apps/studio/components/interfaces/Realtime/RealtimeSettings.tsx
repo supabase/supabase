@@ -33,6 +33,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useRealtimeAllowPrivateChannelsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 
 const formId = 'realtime-configuration-form'
 
@@ -41,6 +42,8 @@ export const RealtimeSettings = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const canUpdateConfig = useCheckPermissions(PermissionAction.REALTIME_ADMIN_READ, '*')
+
+  const allowPrivateChannels = useRealtimeAllowPrivateChannelsEnabled()
 
   const { data: maxConn } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -109,34 +112,36 @@ export const RealtimeSettings = () => {
             <AlertError error={error} subject="Failed to retrieve realtime settings" />
           ) : (
             <Card>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="allow_public"
-                  render={({ field }) => (
-                    <FormSection
-                      className="!p-0 !pt-2"
-                      header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
-                    >
-                      <FormSectionContent loading={isLoading} className="!gap-y-2">
-                        <FormItemLayout
-                          layout="flex"
-                          label="Allow public access"
-                          description="If disabled, only private channels will be allowed"
-                        >
-                          <FormControl_Shadcn_>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={!canUpdateConfig}
-                            />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      </FormSectionContent>
-                    </FormSection>
-                  )}
-                />
-              </CardContent>
+              {allowPrivateChannels && (
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="allow_public"
+                    render={({ field }) => (
+                      <FormSection
+                        className="!p-0 !pt-2"
+                        header={<FormSectionLabel>Channel restrictions</FormSectionLabel>}
+                      >
+                        <FormSectionContent loading={isLoading} className="!gap-y-2">
+                          <FormItemLayout
+                            layout="flex"
+                            label="Allow public access"
+                            description="If disabled, only private channels will be allowed"
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!canUpdateConfig}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        </FormSectionContent>
+                      </FormSection>
+                    )}
+                  />
+                </CardContent>
+              )}
               <CardContent>
                 <FormField_Shadcn_
                   control={form.control}

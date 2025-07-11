@@ -4,9 +4,9 @@ export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.REALTIME_PRIVATE_ONLY_MODE,
     name: 'Enable Realtime private only mode',
-    discussionsUrl: '',
+    discussionsUrl: undefined,
     isNew: true,
-    isPlatformOnly: false,
+    isPlatformOnly: true,
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,

@@ -5,6 +5,7 @@ import { ReactNode, useEffect } from 'react'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsRealtimeSettingsEnabled } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -31,9 +32,13 @@ const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
+  const isRealtimeSettingsEnabled = useIsRealtimeSettingsEnabled()
+
   // [Joshen] Use this if we want to feature flag previews
   function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
     switch (feature.key) {
+      case 'supabase-realtime-private-only-mode':
+        return isRealtimeSettingsEnabled
       default:
         return true
     }
