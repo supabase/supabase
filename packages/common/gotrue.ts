@@ -119,7 +119,7 @@ export const gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: shouldDetectSessionInUrl,
-  debug: true, //debug ? (persistedDebug ? logIndexedDB : true) : false,
+  debug: debug ? (persistedDebug ? logIndexedDB : true) : false,
   lock: navigatorLockEnabled ? navigatorLock : undefined,
 
   ...('localStorage' in globalThis
