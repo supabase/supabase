@@ -4,7 +4,9 @@ import SectionContainer from 'components/Layouts/SectionContainer'
 import { FifteenSVG, LWSVG } from './lw15.components'
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion, useInView } from 'framer-motion'
 import type { LumaEvent } from 'app/api-v2/lw-meetups/route'
+import { DEFAULT_EASE } from '../../../lib/animations'
 
 interface Props {
   className?: string
@@ -17,59 +19,7 @@ interface MeetupOverlayCardProps {
   visible: boolean
 }
 
-const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCardProps) => {
-  const show = !(!meetup || !visible)
-
-  const handleCountry = (country: string) => {
-    if (country === 'United States') return 'USA'
-    if (country === 'United Kingdom') return 'UK'
-    if (country === 'United Arab Emirates') return 'UAE'
-    return country
-  }
-
-  return (
-    <div
-      className={cn(
-        'fixed z-50 pointer-events-none opacity-0 transition-opacity',
-        show && 'opacity-100'
-      )}
-      style={{
-        left: mousePosition.x + 15,
-        top: mousePosition.y + 15,
-      }}
-    >
-      <div className="bg-black dark:bg-foreground text-white dark:text-background p-2 rounded-sm shadow-lg border w-screen max-w-xs flex flex-col gap-2">
-        <div className="w-full flex justify-between items-start gap-1 h-8">
-          <LWSVG className="h-full w-auto" />
-          <div className="relative h-full flex-1 overflow-hidden">
-            <Image
-              src="/images/launchweek/15/lw15-galaxy.png"
-              alt="Meetups Galaxy"
-              width={1000}
-              height={1000}
-              className="h-full w-full object-cover object-[0%_30%]"
-            />
-          </div>
-          <FifteenSVG className="h-full w-auto mr-0.5" />
-        </div>
-        <div className="w-full flex justify-between gap-1 text-lg !leading-none">
-          <div className="">Meetup</div>
-          <div className="">
-            {meetup?.geo_address_json.city},{' '}
-            {handleCountry(meetup?.geo_address_json?.country ?? '')}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function addHours(start_at: Date, hours: number) {
-  const dateCopy = new Date(start_at)
-  dateCopy.setHours(dateCopy.getHours() + hours)
-
-  return dateCopy
-}
+const MotionLink = motion(Link)
 
 const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -78,6 +28,39 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
   const now = new Date(Date.now())
   const [activeMeetup, setActiveMeetup] = useState<LumaEvent | null>(null)
   const [showOverlay, setShowOverlay] = useState(false)
+  const ref = React.useRef(null)
+  const isInView = useInView(ref, { margin: '-25%', once: true })
+
+  const variants = {
+    reveal: {
+      transition: {
+        type: 'spring',
+        damping: 10,
+        mass: 0.75,
+        stiffness: 100,
+        staggerChildren: 0.018,
+      },
+    },
+  }
+
+  const meetupVariants = {
+    initial: {
+      y: '100%',
+      opacity: 0,
+    },
+    reveal: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        ease: DEFAULT_EASE,
+        duration: 0.5,
+      },
+    },
+  }
+
+  const getMeetupCity = (meetup: LumaEvent) => {
+    return meetup.geo_address_json?.city ?? meetup.name.split(',')[0].split('-')[1]
+  }
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     // Global mouse position for overlay
@@ -141,7 +124,10 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
             <FifteenSVG className="h-8 w-auto" />
           </div>
         </div>
-        <div
+        <motion.div
+          ref={ref}
+          variants={variants}
+          animate={isInView ? 'reveal' : 'initial'}
           onMouseLeave={handleMouseLeave}
           className={cn(
             'relative w-full z-10 text-3xl lg:text-4xl xl:text-5xl mt-24 flex flex-wrap gap-x-2 md:gap-x-3 gap-y-1',
@@ -158,7 +144,8 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
 
               return (
                 <>
-                  <Link
+                  <MotionLink
+                    variants={meetupVariants}
                     key={`meetup-link-${meetup.api_id}`}
                     href={meetup.url ?? ''}
                     target="_blank"
@@ -171,17 +158,22 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
                       meetup.api_id === activeMeetup?.api_id && 'text-foreground'
                       // liveNow && 'text-foreground-light'
                     )}
+                    data-delay={i}
                   >
                     {liveNow && (
                       <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
                     )}
-                    <span>{meetup.geo_address_json?.city}</span>
-                  </Link>
-                  {i !== meetups.length - 1 && <span className="ml-0 mb-0 my-auto flex">/</span>}
+                    <span>{getMeetupCity(meetup)}</span>
+                  </MotionLink>
+                  {i !== meetups.length - 1 && (
+                    <motion.span variants={meetupVariants} className="ml-0 mb-0 my-auto flex">
+                      /
+                    </motion.span>
+                  )}
                 </>
               )
             })}
-        </div>
+        </motion.div>
         <div
           ref={imageRef}
           className="mx-auto h-[400px] -mt-32 -mb-20 lg:mt-0 lg:mb-0 aspect-square lg:aspect-[2/1] overflow-hidden relative"
@@ -230,6 +222,66 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
       </SectionContainer>
     </>
   )
+}
+
+const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCardProps) => {
+  const show = !(!meetup || !visible)
+
+  const handleCountry = (country: string) => {
+    if (country === 'United States') return 'USA'
+    if (country === 'United Kingdom') return 'UK'
+    if (country === 'United Arab Emirates') return 'UAE'
+    return country
+  }
+
+  // Calculate if overlay should appear to the left of cursor
+  const overlayWidth = 320 // max-w-xs is approximately 320px
+  const distanceToRightEdge =
+    typeof window !== 'undefined' ? window.innerWidth - mousePosition.x : 1000
+  const shouldPositionLeft = distanceToRightEdge < overlayWidth
+
+  return (
+    <div
+      className={cn(
+        'fixed z-50 pointer-events-none opacity-0 transition-opacity',
+        show && 'opacity-100'
+      )}
+      style={{
+        left: shouldPositionLeft ? mousePosition.x - overlayWidth - 15 : mousePosition.x + 15,
+        top: mousePosition.y + 15,
+      }}
+    >
+      <div className="bg-black dark:bg-foreground text-white dark:text-background p-2 rounded-sm shadow-lg border w-screen max-w-xs flex flex-col gap-2">
+        <div className="w-full flex justify-between items-start gap-1 h-8">
+          <LWSVG className="h-full w-auto" />
+          <div className="relative h-full flex-1 overflow-hidden">
+            <Image
+              src="/images/launchweek/15/lw15-galaxy.png"
+              alt="Meetups Galaxy"
+              width={1000}
+              height={1000}
+              className="h-full w-full object-cover object-[0%_30%]"
+            />
+          </div>
+          <FifteenSVG className="h-full w-auto mr-0.5" />
+        </div>
+        <div className="w-full flex justify-between gap-1 text-lg !leading-none">
+          <div className="">Meetup</div>
+          <div className="">
+            {meetup?.geo_address_json.city},{' '}
+            {handleCountry(meetup?.geo_address_json?.country ?? '')}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function addHours(start_at: Date, hours: number) {
+  const dateCopy = new Date(start_at)
+  dateCopy.setHours(dateCopy.getHours() + hours)
+
+  return dateCopy
 }
 
 export default LW15Meetups

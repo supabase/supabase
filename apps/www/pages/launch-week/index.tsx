@@ -70,7 +70,15 @@ const Lw15Page = ({ meetups }: Props) => {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    const res = await fetch(`${SITE_ORIGIN}/api-v2/lw-meetups`)
+    // Date range for Launch Week 15: July 14th, 2025 to September 1st, 2025
+    const afterDate = '2025-07-14T00:00:00.000Z'
+    const beforeDate = '2025-09-01T23:59:59.999Z'
+
+    const url = new URL(`${SITE_ORIGIN}/api-v2/lw-meetups`)
+    url.searchParams.append('after', afterDate)
+    url.searchParams.append('before', beforeDate)
+
+    const res = await fetch(url.toString())
     const data = await res.json()
 
     if (data.success) {

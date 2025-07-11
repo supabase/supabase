@@ -50,8 +50,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'API configuration error' }, { status: 500 })
     }
 
+    // Extract query parameters from the request
+    const { searchParams } = new URL(request.url)
+    const after = searchParams.get('after')
+    const before = searchParams.get('before')
+
+    // Build the Luma API URL with query parameters
+    const lumaUrl = new URL('https://public-api.lu.ma/public/v1/calendar/list-events')
+
+    if (after) {
+      lumaUrl.searchParams.append('after', after)
+    }
+    if (before) {
+      lumaUrl.searchParams.append('before', before)
+    }
+
     // Fetch events from Luma API
-    const response = await fetch('https://public-api.lu.ma/public/v1/calendar/list-events', {
+    const response = await fetch(lumaUrl.toString(), {
       method: 'GET',
       headers: {
         accept: 'application/json',
@@ -74,18 +89,19 @@ export async function GET(request: NextRequest) {
 
     // Filter and transform the events for launch week
     const launchWeekEvents = data.entries
-      .filter(({ event }) => {
-        // Filter for events related to launch week or Supabase meetups
-        const name = event.name.toLowerCase()
-        const description = event.description?.toLowerCase() || ''
+      // .filter(({ event }) => {
+      //   // Filter for events related to launch week or Supabase meetups
+      //   const name = event.name.toLowerCase()
+      //   const description = event.description?.toLowerCase() || ''
 
-        return (
-          name.includes('launch week') ||
-          name.includes('supabase') ||
-          description.includes('launch week') ||
-          description.includes('supabase')
-        )
-      })
+      //   return (
+      //     name.includes('launch week') ||
+      //     name.includes('supabase') ||
+      //     name.includes('lw15') ||
+      //     description.includes('launch week') ||
+      //     description.includes('supabase')
+      //   )
+      // })
       .map(({ event }: { event: LumaEvent }) => event)
       .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
 
@@ -93,6 +109,10 @@ export async function GET(request: NextRequest) {
       success: true,
       events: launchWeekEvents,
       total: launchWeekEvents.length,
+      filters: {
+        after,
+        before,
+      },
     })
   } catch (error) {
     console.error('Error fetching meetups from Luma:', error)
