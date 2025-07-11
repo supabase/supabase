@@ -69,7 +69,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  // Server-side safety: limit to last 5 messages and remove `results` property to prevent accidental leakage
+  // Server-side safety: limit to last 5 messages and remove `results` property to prevent accidental leakage.
+  // Results property is used to cache results client-side after queries are run
+  // Tool results will still be included in history sent to model
   const messages = (rawMessages || []).slice(-5).map((msg: any) => {
     if (msg && msg.role === 'assistant' && 'results' in msg) {
       const cleanedMsg = { ...msg }
