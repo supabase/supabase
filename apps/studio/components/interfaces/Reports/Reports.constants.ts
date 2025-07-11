@@ -56,19 +56,19 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_7_DAYS,
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['pro', 'team', 'enterprise'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_14_DAYS,
     calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_28_DAYS,
     calcFrom: () => dayjs().subtract(28, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
 ]

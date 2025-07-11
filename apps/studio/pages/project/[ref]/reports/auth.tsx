@@ -130,6 +130,7 @@ const AuthUsage = () => {
               startDate={selectedDateRange?.period_start?.date}
               endDate={selectedDateRange?.period_end?.date}
               updateDateRange={updateDateRange}
+              orgPlanId={orgPlan?.id}
             />
           ))}
       </ReportStickyNav>

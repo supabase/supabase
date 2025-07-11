@@ -174,12 +174,13 @@ export const useReportDateRange = (
   }, [timestampStartValue, timestampEndValue, helperTextValue, getDefaultHelper])
 
   const handleIntervalGranularity = useCallback((from: string, to: string) => {
+    const diffInDays = dayjs(to).diff(from, 'day', true)
     const conditions = {
       '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
       '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
       '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
-      '1h': dayjs(to).diff(from, 'day') < 10, // less than 10 days
-      '1d': dayjs(to).diff(from, 'day') >= 10, // more than 10 days
+      '1h': diffInDays < 10, // less than 10 days
+      '1d': diffInDays >= 10, // more than 10 days
     }
 
     switch (true) {
@@ -238,12 +239,18 @@ export const useReportDateRange = (
   )
 
   const handleDatePickerChange = (values: DatePickerValue) => {
+    console.log('values', values)
     const shouldShowUpgradePrompt = maybeShowUpgradePrompt(values.from, orgPlan?.id)
     if (shouldShowUpgradePrompt) {
       setShowUpgradePrompt(true)
       return true
     } else {
-      updateDateRange(values.from, values.to)
+      if (values.from && values.to) {
+        setTimestampStart(values.from)
+        setTimestampEnd(values.to)
+        setIsHelper(values.isHelper || false)
+        setHelperText(values.text || '')
+      }
       return false
     }
   }

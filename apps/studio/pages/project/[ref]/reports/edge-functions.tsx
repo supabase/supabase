@@ -224,6 +224,7 @@ const EdgeFunctionsUsage = () => {
               endDate={selectedDateRange?.period_end?.date}
               updateDateRange={updateDateRange}
               functionIds={functionIds}
+              orgPlanId={orgPlan?.id}
             />
           ))}
       </ReportStickyNav>
