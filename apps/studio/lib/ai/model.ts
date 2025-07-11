@@ -45,11 +45,12 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
 
   if (hasAwsCredentials) {
     // Select the Bedrock region based on the routing key
-    const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
-    const bedrock = bedrockForRegion(bedrockRegion)
-    const model =
-      bedrockRegion === 'us1' || bedrockRegion === 'us3' || isLimited ? HAIKU_MODEL : SONNET_MODEL
-    const modelName = `${regionMap[bedrockRegion]}.${model}`
+    // const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
+    // Temporarily randomly pick between 'us1' and 'us3' until we figure out rate limits
+    const temporaryRegion = Math.random() < 0.5 ? 'us1' : 'us3'
+    const bedrock = bedrockForRegion(temporaryRegion)
+    const model = HAIKU_MODEL
+    const modelName = `${regionMap[temporaryRegion]}.${model}`
 
     return {
       model: bedrock(modelName),
