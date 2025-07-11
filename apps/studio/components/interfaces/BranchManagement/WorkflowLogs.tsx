@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { StatusIcon } from 'ui'
+import type { Branch } from 'data/branches/branches-query'
 import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
@@ -22,9 +24,20 @@ import BranchStatusBadge from './BranchStatusBadge'
 
 interface WorkflowLogsProps {
   projectRef: string
+  status?: Branch['status'] | string
 }
 
-const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
+type StatusType = Branch['status'] | string
+
+const UNHEALTHY_STATUSES: StatusType[] = [
+  'ACTIVE_UNHEALTHY',
+  'INIT_FAILED',
+  'UNKNOWN',
+  'MIGRATIONS_FAILED',
+  'FUNCTIONS_FAILED',
+]
+
+const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const {
@@ -62,7 +75,28 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="default">View Logs</Button>
+        {(() => {
+          const showStatusIcon =
+            status !== undefined && status !== 'ACTIVE_HEALTHY' && status !== 'MIGRATIONS_PASSED'
+
+          const isUnhealthy = status !== undefined && UNHEALTHY_STATUSES.includes(status)
+
+          return (
+            <Button
+              type="default"
+              icon={
+                showStatusIcon ? (
+                  <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
+                ) : undefined
+              }
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              View Logs
+            </Button>
+          )
+        })()}
       </DialogTrigger>
 
       <DialogContent size="xlarge">

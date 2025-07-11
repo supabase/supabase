@@ -1,4 +1,4 @@
-import { Check, Plus, Shield } from 'lucide-react'
+import { Check, GitMerge, Merge, Plus, Shield } from 'lucide-react'
 import { useState } from 'react'
 
 import { Branch } from 'data/branches/branches-query'
@@ -21,6 +21,7 @@ interface BranchSelectorProps {
   onBranchSelected?: (branch: Branch) => void
   disabled?: boolean
   isUpdating?: boolean
+  type?: 'primary' | 'outline'
 }
 
 export const BranchSelector = ({
@@ -28,6 +29,7 @@ export const BranchSelector = ({
   onBranchSelected,
   disabled = false,
   isUpdating = false,
+  type = 'primary',
 }: BranchSelectorProps) => {
   const [open, setOpen] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
@@ -46,7 +48,11 @@ export const BranchSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="primary" disabled={disabled || availableBranches.length === 0 || isUpdating}>
+        <Button
+          icon={<GitMerge size={14} strokeWidth={1.5} />}
+          type={type}
+          disabled={disabled || availableBranches.length === 0 || isUpdating}
+        >
           {isUpdating ? 'Creating...' : 'Create merge request'}
         </Button>
       </PopoverTrigger_Shadcn_>

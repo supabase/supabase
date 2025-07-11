@@ -436,7 +436,7 @@ const MergePage: NextPageWithLayout = () => {
               router.push(`/project/${project?.ref}/branches?tab=prs`)
             }}
           >
-            Not ready for review
+            Close this merge request
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

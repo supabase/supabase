@@ -171,40 +171,6 @@ export const BranchDropdown = () => {
               <p>Create branch</p>
             </div>
           </CommandItem_Shadcn_>
-          {gitlessBranching &&
-            isBranchingEnabled &&
-            selectedBranch &&
-            !selectedBranch.is_default && (
-              <>
-                <CommandItem_Shadcn_
-                  className="cursor-pointer w-full"
-                  disabled={isUpdatingBranch}
-                  onSelect={() => {
-                    if (selectedBranch?.review_requested_at) {
-                      router.push(`/project/${ref}/merge`)
-                    } else {
-                      if (selectedBranch?.id && projectRef) {
-                        updateBranch({
-                          id: selectedBranch.id,
-                          projectRef,
-                          requestReview: true,
-                        })
-                      }
-                    }
-                  }}
-                  onClick={() => setOpen(false)}
-                >
-                  <div className="w-full flex items-center gap-2">
-                    <GitMerge size={14} strokeWidth={1.5} />
-                    {isUpdatingBranch
-                      ? 'Updating...'
-                      : selectedBranch?.review_requested_at
-                        ? 'Review changes'
-                        : 'Ready for review'}
-                  </div>
-                </CommandItem_Shadcn_>
-              </>
-            )}
           <CommandItem_Shadcn_
             className="cursor-pointer w-full"
             onSelect={() => {

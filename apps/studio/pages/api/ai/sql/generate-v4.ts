@@ -240,6 +240,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             const totalWarning = chartData.reduce((sum: number, point) => sum + point.warning, 0)
             const totalError = chartData.reduce((sum: number, point) => sum + point.error, 0)
 
+            console.log('chartData', chartData)
+
             return {
               status: 'success',
               data: chartData,
@@ -290,8 +292,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           limit: z
             .number()
             .min(1)
-            .max(20)
-            .default(10)
+            .max(100)
+            .default(20)
             .describe('Maximum number of logs to return (1-100, defaults to 20)'),
         }),
         execute: async (args) => {
@@ -589,6 +591,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const result = streamText({
       model,
       maxSteps: 5,
+      onFinish: ({ usage }) => {
+        console.log('usage', usage)
+      },
       system,
       messages,
       tools,

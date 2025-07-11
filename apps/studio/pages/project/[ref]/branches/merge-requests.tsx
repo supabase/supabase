@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { GitMerge, MessageCircle } from 'lucide-react'
+import { GitMerge, MessageCircle, X, MoreVertical } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -11,7 +11,6 @@ import BranchLayout from 'components/layouts/BranchLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
@@ -23,7 +22,14 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  Tooltip,
+} from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import {
   BranchManagementSection,
@@ -31,7 +37,6 @@ import {
 } from 'components/interfaces/BranchManagement/BranchPanels'
 import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSelector'
 import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
-import { ReviewRow } from 'components/interfaces/BranchManagement/ReviewRow'
 import type { NextPageWithLayout } from 'types'
 
 const MergeRequestsPage: NextPageWithLayout = () => {
@@ -52,9 +57,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
   const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
-  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-    resource: { is_default: false },
-  })
 
   const {
     data: connections,
@@ -78,9 +80,17 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
-  const branchesReadyForReview = previewBranches.filter(
-    (branch) => branch.review_requested_at !== undefined && branch.review_requested_at !== null
-  )
+
+  // Combined list of branches that are either ready for review or have an open pull request
+  // If the gitlessBranching feature flag is disabled we only surface pull-request branches (the
+  // previous behaviour). When the flag is enabled we also include review-ready branches.
+  const mergeRequestBranches = gitlessBranching
+    ? previewBranches.filter(
+        (branch) =>
+          branch.pr_number !== undefined ||
+          (branch.review_requested_at !== undefined && branch.review_requested_at !== null)
+      )
+    : branchesWithPRs
 
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const isCurrentBranchReadyForReview =
@@ -118,6 +128,23 @@ const MergeRequestsPage: NextPageWithLayout = () => {
           onSuccess: () => {
             toast.success('Branch marked as ready for review')
             router.push(`/project/${branch.project_ref}/merge`)
+          },
+        }
+      )
+    }
+  }
+
+  const handleCloseMergeRequest = (branch: Branch) => {
+    if (branch.id && projectRef) {
+      updateBranch(
+        {
+          id: branch.id,
+          projectRef,
+          requestReview: false,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Branch marked as not ready for review')
           },
         }
       )
@@ -165,22 +192,14 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                   {!isError && (
                     <div className="space-y-4">
                       {gitlessBranching && (
-                        <BranchManagementSection
-                          header={
-                            <div className="flex items-center justify-between w-full">
-                              <span>{branchesReadyForReview.length} branches ready for review</span>
-                            </div>
-                          }
-                        >
+                        <>
                           {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
-                            <div className="bg-background px-6 py-4">
+                            <div className="rounded border rounded-lg bg-background px-6 py-4">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-sm text-foreground-light">
                                   <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
-                                  Mark <span className="text-foreground">
-                                    {currentBranch.name}
-                                  </span>{' '}
-                                  ready for review
+                                  <span className="text-foreground">{currentBranch.name}</span>
+                                  last viewed
                                 </div>
                                 <Button
                                   type="primary"
@@ -189,27 +208,23 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                     currentBranch && handleMarkBranchForReview(currentBranch)
                                   }
                                 >
-                                  Ready for review
+                                  Merge request
                                 </Button>
                               </div>
                             </div>
                           )}
-                          {branchesReadyForReview.length > 0 ? (
-                            branchesReadyForReview.map((branch) => {
-                              return <ReviewRow key={branch.id} branch={branch} />
-                            })
-                          ) : (
-                            <div className="px-6 py-4 text-sm text-foreground-light">
-                              No branches are currently ready for review
-                            </div>
-                          )}
-                        </BranchManagementSection>
+                          {/* Combined list of review-ready branches and branches with PRs */}
+                        </>
                       )}
                       <BranchManagementSection
-                        header={`${branchesWithPRs.length} branches with pull requests`}
+                        header={`${mergeRequestBranches.length} merge requests`}
                       >
-                        {branchesWithPRs.length > 0 ? (
-                          branchesWithPRs.map((branch) => {
+                        {mergeRequestBranches.length > 0 ? (
+                          mergeRequestBranches.map((branch) => {
+                            const isPR = branch.pr_number !== undefined
+                            const rowLink = isPR
+                              ? `https://github.com/${repo}/pull/${branch.pr_number}`
+                              : `/project/${branch.project_ref}/merge`
                             return (
                               <BranchRow
                                 key={branch.id}
@@ -217,6 +232,38 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                 branch={branch}
                                 generateCreatePullRequestURL={generateCreatePullRequestURL}
                                 onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                                rowLink={rowLink}
+                                external={isPR}
+                                rowActions={
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        type="text"
+                                        icon={<MoreVertical />}
+                                        className="px-1"
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-56" side="bottom" align="end">
+                                      <Tooltip>
+                                        <DropdownMenuItem
+                                          className="gap-x-2"
+                                          disabled={isUpdating}
+                                          onSelect={(e) => {
+                                            e.stopPropagation()
+                                            handleCloseMergeRequest(branch)
+                                          }}
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleCloseMergeRequest(branch)
+                                          }}
+                                        >
+                                          <X size={14} /> Close this merge request
+                                        </DropdownMenuItem>
+                                      </Tooltip>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                }
                               />
                             )
                           })
@@ -224,9 +271,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                           <PullRequestsEmptyState
                             url={generateCreatePullRequestURL()}
                             projectRef={projectRef ?? '_'}
-                            hasBranches={previewBranches.length > 0}
+                            branches={previewBranches}
+                            onBranchSelected={handleMarkBranchForReview}
+                            isUpdating={isUpdating}
                             githubConnection={githubConnection}
-                            gitlessBranching={gitlessBranching}
                           />
                         )}
                       </BranchManagementSection>

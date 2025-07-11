@@ -1,6 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink, GitBranch, GitPullRequest, Github } from 'lucide-react'
+import { ExternalLink, GitBranch, Github } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { BranchSelector } from './BranchSelector'
+import type { Branch } from 'data/branches/branches-query'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -56,70 +59,47 @@ export const BranchingEmptyState = () => {
 export const PullRequestsEmptyState = ({
   url,
   projectRef,
-  hasBranches,
+  branches,
+  onBranchSelected,
+  isUpdating,
   githubConnection,
-  gitlessBranching,
 }: {
   url: string
   projectRef: string
-  hasBranches: boolean
+  branches: Branch[]
+  onBranchSelected: (branch: Branch) => void
+  isUpdating: boolean
   githubConnection?: any
-  gitlessBranching?: boolean
 }) => {
-  // Show GitHub connection message if GitHub is not connected and gitless branching is enabled
-  if (!githubConnection && gitlessBranching) {
-    return (
-      <div className="p-16 text-center">
-        <div>
-          <h3 className="mb-1">Connect to GitHub for seamless branching</h3>
-          <p className="text-sm text-foreground-light mb-4">
-            Sync GitHub repos to Supabase projects for automatic branch creation and merging
-          </p>
-        </div>
-
-        <Button type="default" icon={<Github />} asChild>
-          <Link href={`/project/${projectRef}/settings/integrations`}>Connect to GitHub</Link>
-        </Button>
-      </div>
-    )
-  }
-
+  const router = useRouter()
   return (
     <div className="flex items-center flex-col justify-center w-full py-10">
-      <p>No pull requests made yet for this repository</p>
+      <p>No merge requests</p>
       <p className="text-foreground-light">
-        Only pull requests with the ./migration directory changes will show here.
+        Create your first merge request to merge changes back to the main branch
       </p>
-      {hasBranches && (
-        <div className="w-96 border rounded-md mt-4">
-          <div className="px-5 py-3 bg-surface-100 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <GitPullRequest size={18} strokeWidth={2} className="text-foreground-light" />
-              <p>Create a pull request</p>
-            </div>
-            <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-              <Link passHref target="_blank" rel="noreferrer" href={url}>
-                Github
-              </Link>
-            </Button>
-          </div>
-          <div className="px-5 py-3 border-t flex items-center justify-between">
-            <div>
-              <p>Not sure what to do?</p>
-              <p className="text-foreground-light">Browse our documentation</p>
-            </div>
-            <Button type="default" iconRight={<ExternalLink size={14} />}>
-              <Link
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/guides/platform/branching"
-              >
-                Docs
-              </Link>
-            </Button>
-          </div>
-        </div>
-      )}
+      <div className="flex items-center space-x-2 mt-4">
+        {githubConnection ? (
+          <Button type="outline" asChild icon={<Github />}>
+            <Link passHref href={url} target="_blank" rel="noreferrer">
+              Create pull request
+            </Link>
+          </Button>
+        ) : (
+          <Button
+            type="outline"
+            onClick={() => router.push(`/project/${projectRef}/settings/integrations`)}
+          >
+            Connect to GitHub
+          </Button>
+        )}
+        <BranchSelector
+          type="outline"
+          branches={branches}
+          onBranchSelected={onBranchSelected}
+          isUpdating={isUpdating}
+        />
+      </div>
     </div>
   )
 }
