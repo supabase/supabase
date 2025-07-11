@@ -1,7 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import { streamText, tool, ToolSet } from 'ai'
 import { source } from 'common-tags'
-import crypto from 'crypto'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
@@ -15,15 +14,9 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getUnifiedLogsChart } from 'data/logs/unified-logs-chart-query'
 import { getUnifiedLogs } from 'data/logs/unified-logs-infinite-query'
-import { getDatabaseExtensions } from 'data/database-extensions/database-extensions-query'
 import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
-import {
-  filterToolsByOptInLevel,
-  toolSetValidationSchema,
-  transformToolResult,
-  checkNetworkExtensionsAndAdjustOptInLevel,
-} from 'lib/ai/tool-filter'
+import { filterToolsByOptInLevel, toolSetValidationSchema } from 'lib/ai/tool-filter'
 import { getTools } from './tools'
 
 export const maxDuration = 120
@@ -74,7 +67,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, orgSlug, chatName } = data
+  const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
+
+  // Server-side safety: limit to last 5 messages and remove `results` property to prevent accidental leakage.
+  // Results property is used to cache results client-side after queries are run
+  // Tool results will still be included in history sent to model
+  const messages = (rawMessages || []).slice(-5).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    return msg
+  })
 
   // Get organizations and compute opt in level server-side
   const [organizations, projects] = await Promise.all([
@@ -104,29 +109,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
 
-  // Check enabled database extensions to potentially restrict data access
-  let effectiveAiOptInLevel = aiOptInLevel
+  const isLimited = messages.length > 4
 
-  try {
-    let headers = new Headers()
-    if (authorization) headers.set('Authorization', authorization)
-
-    const dbExtensions = await getDatabaseExtensions(
-      { projectRef, connectionString },
-      undefined,
-      headers
-    )
-
-    effectiveAiOptInLevel = checkNetworkExtensionsAndAdjustOptInLevel(
-      dbExtensions,
-      effectiveAiOptInLevel
-    )
-  } catch (error) {
-    console.error('Failed to fetch database extensions:', error)
-    effectiveAiOptInLevel = 'disabled'
-  }
-
-  const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
+  const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -305,8 +290,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           limit: z
             .number()
             .min(1)
-            .max(100)
-            .default(20)
+            .max(20)
+            .default(10)
             .describe('Maximum number of logs to return (1-100, defaults to 20)'),
         }),
         execute: async (args) => {
@@ -424,7 +409,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       const availableMcpTools = await mcpClient.tools()
       // Filter tools based on the (potentially modified) AI opt-in level
-      const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, effectiveAiOptInLevel)
+      const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
 
       // Validate that only known tools are provided
       const { data: validatedTools, error: validationError } =
@@ -438,29 +423,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         })
       }
 
-      // Modify the execute_sql tool to add manualToolCallId (if it exists)
-      mcpTools = {
-        ...validatedTools,
-        ...(validatedTools.execute_sql && {
-          execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
-            const manualToolCallId = `manual_${crypto.randomUUID()}`
-
-            if (typeof result === 'object') {
-              return { ...result, manualToolCallId }
-            } else {
-              console.warn('execute_sql result is not an object, cannot add manualToolCallId')
-              return {
-                error: 'Internal error: Unexpected tool result format',
-                manualToolCallId,
-              }
-            }
-          }),
-        }),
-      }
+      mcpTools = { ...validatedTools }
     }
 
     // Filter local tools based on the (potentially modified) AI opt-in level
-    const filteredLocalTools = filterToolsByOptInLevel(localTools, effectiveAiOptInLevel)
+    const filteredLocalTools = filterToolsByOptInLevel(localTools, aiOptInLevel)
 
     // Combine MCP tools with filtered local tools
     const tools: ToolSet = {
