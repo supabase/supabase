@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { storageKeys } from './keys'
 
 type CreateIcebergNamespaceVariables = {
   catalogUri: string
@@ -56,10 +57,19 @@ export const useIcebergNamespaceCreateMutation = ({
   UseMutationOptions<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
+
   return useMutation<IcebergNamespaceCreateData, ResponseError, CreateIcebergNamespaceVariables>(
     (vars) => createIcebergNamespace(vars),
     {
       async onSuccess(data, variables, context) {
+        await queryClient.invalidateQueries(
+          storageKeys.icebergNamespace(
+            variables.catalogUri,
+            variables.warehouse,
+            variables.namespace
+          )
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
