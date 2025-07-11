@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
 import { getSortedPosts } from 'lib/posts'
 import supabase from 'lib/supabase'
-import { SITE_ORIGIN } from 'lib/constants'
 
 import { cn } from 'ui'
 import DefaultLayout from 'components/Layouts/Default'
@@ -21,9 +20,92 @@ interface Props {
   categories: { [key: string]: number }
 }
 
-function Events({ events: allEvents, onDemandEvents, categories }: Props) {
-  const [events, setEvents] = useState(allEvents)
+export default function Events({
+  events: staticEvents,
+  onDemandEvents,
+  categories: staticCategories,
+}: Props) {
+  const [lumaEvents, setLumaEvents] = useState<BlogPost[]>([])
+  const [isLoadingLuma, setIsLoadingLuma] = useState(true)
+  const [filteredEvents, setFilteredEvents] = useState<BlogPost[]>([])
   const router = useRouter()
+
+  // Fetch Luma events on client-side to avoid serverless maximum size limit error: https://vercel.com/guides/troubleshooting-function-250mb-limit
+  useEffect(() => {
+    const fetchLumaEvents = async () => {
+      try {
+        const afterDate = new Date().toISOString()
+        const url = new URL('/api-v2/luma-events', window.location.origin)
+        url.searchParams.append('after', afterDate)
+
+        const res = await fetch(url.toString())
+        const data = await res.json()
+
+        if (data.success) {
+          const transformedEvents = data.events.map((event: LumaEvent) => {
+            let categories = []
+            if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
+
+            return {
+              slug: '',
+              type: 'event',
+              title: event?.name,
+              date: event?.start_at,
+              description: '',
+              thumb: '',
+              path: '',
+              url: event?.url ?? '',
+              tags: categories,
+              categories,
+              timezone: event?.timezone ?? 'America/Los_Angeles',
+              disable_page_build: true,
+              link: {
+                href: event?.url ?? '#',
+                target: '_blank',
+              },
+            } as BlogPost
+          })
+          setLumaEvents(transformedEvents)
+        }
+      } catch (error) {
+        console.error('Error fetching Luma events:', error)
+      } finally {
+        setIsLoadingLuma(false)
+      }
+    }
+
+    fetchLumaEvents()
+  }, [])
+
+  // Combine static and Luma events
+  const allEvents = useMemo(() => {
+    const combined = [...staticEvents, ...lumaEvents]
+    return combined.filter((event: BlogPost) =>
+      event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
+    )
+  }, [staticEvents, lumaEvents])
+
+  // Initialize filtered events when allEvents changes
+  useEffect(() => {
+    setFilteredEvents(allEvents)
+  }, [allEvents])
+
+  // Recalculate categories with Luma events included
+  const categories = useMemo(() => {
+    const updatedCategories = { ...staticCategories }
+
+    lumaEvents.forEach((event) => {
+      // Update 'all' counter
+      updatedCategories.all = (updatedCategories.all || 0) + 1
+
+      // Update category counters
+      event.categories?.forEach((category) => {
+        updatedCategories[category] = (updatedCategories[category] || 0) + 1
+      })
+    })
+
+    return updatedCategories
+  }, [staticCategories, lumaEvents])
 
   const meta_title = 'Supabase Events: webinars, talks, hackathons, and meetups'
   const meta_description = 'Join Supabase and the open-source community at the upcoming events.'
@@ -61,19 +143,18 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
         <SectionContainer className="!py-0">
           <EventsFilters
             allEvents={allEvents}
-            events={events}
-            setEvents={setEvents}
+            events={filteredEvents}
+            setEvents={setFilteredEvents}
             categories={categories}
           />
-
-          <ol
+          <div
             className={cn(
               'grid -mx-2 sm:-mx-4 py-6 lg:py-6 grid-cols-1',
-              !events?.length && 'mx-0 sm:mx-0'
+              !filteredEvents?.length && 'mx-0 sm:mx-0'
             )}
           >
-            {events?.length ? (
-              events
+            {filteredEvents?.length ? (
+              filteredEvents
                 ?.sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())
                 .map((event: BlogPost, idx: number) => (
                   <div
@@ -84,11 +165,17 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
                   </div>
                 ))
             ) : (
-              <p className="text-sm py-2 sm:py-4 text-lighter col-span-full italic opacity-0 !scale-100 animate-fade-in">
-                No results found
-              </p>
+              <div className="flex flex-col items-center justify-center py-12">
+                {isLoadingLuma ? (
+                  <div className="text-center">
+                    <p className="text-foreground-muted">Loading events...</p>
+                  </div>
+                ) : (
+                  <p className="text-foreground-muted">No results found.</p>
+                )}
+              </div>
             )}
-          </ol>
+          </div>
         </SectionContainer>
         <SectionContainer>
           <div className="pt-8 border-t">
@@ -156,67 +243,8 @@ export async function getStaticProps() {
     runner: '** EVENTS PAGE **',
   }) as BlogPost[]
 
-  let lumaEvents = []
-  // LUMA EVENTS
-  try {
-    // Check if API key is available at build time
-    console.log('LUMA_API_KEY available:', !!process.env.LUMA_API_KEY)
-    console.log('SITE_ORIGIN:', SITE_ORIGIN)
-
-    const afterDate = new Date().toISOString()
-    console.log('Fetching Luma events after:', afterDate)
-
-    const url = new URL(`${SITE_ORIGIN}/api-v2/luma-events`)
-    url.searchParams.append('after', afterDate)
-
-    console.log('Fetching from URL:', url.toString())
-    const res = await fetch(url.toString())
-
-    if (!res.ok) {
-      console.error('Luma API response not ok:', res.status, res.statusText)
-      const errorText = await res.text()
-      console.error('Error response:', errorText)
-    } else {
-      const data = await res.json()
-      console.log('Luma API response:', data)
-
-      if (data.success) {
-        lumaEvents =
-          data.events.map((event: LumaEvent) => {
-            let categories = []
-
-            if (event.name.toLowerCase().includes('meetup')) categories.push('meetup')
-
-            return {
-              slug: '',
-              type: 'event',
-              title: event?.name,
-              date: event?.start_at,
-              description: '',
-              thumb: '',
-              path: '',
-              url: event?.url ?? '',
-              tags: categories,
-              categories,
-              timezone: event?.timezone ?? 'America/Los_Angeles',
-              disable_page_build: true,
-              link: {
-                href: event?.url ?? '#',
-                target: '_blank',
-              },
-            }
-          }) || []
-        console.log('Processed Luma events:', lumaEvents.length)
-      } else {
-        console.error('Failed to fetch meetups:', data.error)
-      }
-    }
-  } catch (error) {
-    console.error('Error fetching meetups from Luma:', error)
-    // Continue without Luma events rather than failing the entire build
-  }
-
-  const allEvents = [...staticEvents, ...meetupEvents, ...lumaEvents]
+  // Remove Luma API call from build time - will fetch client-side instead
+  const allEvents = [...staticEvents, ...meetupEvents]
   const upcomingEvents = allEvents.filter((event: BlogPost) =>
     event.end_date ? new Date(event.end_date!) >= new Date() : new Date(event.date!) >= new Date()
   )
@@ -249,5 +277,3 @@ export async function getStaticProps() {
     revalidate: 3600,
   }
 }
-
-export default Events
