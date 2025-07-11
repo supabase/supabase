@@ -18,7 +18,6 @@ describe('TOOL_CATEGORY_MAP', () => {
     expect(TOOL_CATEGORY_MAP['display_query']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
     expect(TOOL_CATEGORY_MAP['get_logs']).toBe(TOOL_CATEGORIES.LOG)
-    expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.DATA)
   })
 })
 
@@ -40,8 +39,6 @@ describe('tool allowance by opt-in level', () => {
       get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       get_log_counts: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-      // Data tools
-      execute_sql: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
     const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
@@ -104,7 +101,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('execute_sql')
   })
 
-  it('should return all tools for schema_and_log_and_data opt-in level', () => {
+  it('should return all tools for schema_and_log_and_data opt-in level (excluding execute_sql)', () => {
     const tools = getAllowedTools('schema_and_log_and_data')
     expect(tools).toContain('display_query')
     expect(tools).toContain('display_edge_function')
@@ -117,7 +114,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('get_logs')
     expect(tools).toContain('get_advisors')
     expect(tools).toContain('get_log_counts')
-    expect(tools).toContain('execute_sql')
+    expect(tools).not.toContain('execute_sql')
   })
 })
 
@@ -137,8 +134,6 @@ describe('filterToolsByOptInLevel', () => {
     get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     get_log_counts: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-    // Data tools
-    execute_sql: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Unknown tool - should be filtered out entirely
     some_other_tool: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
   } as unknown as ToolSet
@@ -195,7 +190,6 @@ describe('filterToolsByOptInLevel', () => {
       'get_logs',
       'get_advisors',
       'get_log_counts',
-      'execute_sql',
     ])
   })
 
@@ -210,21 +204,16 @@ describe('filterToolsByOptInLevel', () => {
       'get_logs',
       'get_advisors',
       'get_log_counts',
-      'execute_sql',
     ])
   })
 
-  it('should stub log and execute tools for schema opt-in level', async () => {
+  it('should stub log tools for schema opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
-    await expectStubsFor(tools, ['get_logs', 'get_advisors', 'get_log_counts', 'execute_sql'])
+    await expectStubsFor(tools, ['get_logs', 'get_advisors', 'get_log_counts'])
   })
 
-  it('should stub execute tool for schema_and_log opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log')
-
-    await expectStubsFor(tools, ['execute_sql'])
-  })
+  // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
 
   it('should not stub any tools for schema_and_log_and_data opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data')
@@ -340,7 +329,6 @@ describe('toolSetValidationSchema', () => {
       list_edge_functions: { parameters: z.object({}), execute: vitest.fn() },
       list_branches: { parameters: z.object({}), execute: vitest.fn() },
       get_logs: { parameters: z.object({}), execute: vitest.fn() },
-      execute_sql: { parameters: z.object({}), execute: vitest.fn() },
       search_docs: { parameters: z.object({}), execute: vitest.fn() },
       get_advisors: { parameters: z.object({}), execute: vitest.fn() },
       display_query: { parameters: z.object({}), execute: vitest.fn() },
@@ -354,7 +342,7 @@ describe('toolSetValidationSchema', () => {
 
     // Test with missing tool
     const incompleteTools = { ...allExpectedTools }
-    delete (incompleteTools as any).execute_sql
+    delete (incompleteTools as any).search_docs
 
     const incompleteValidationResult = toolSetValidationSchema.safeParse(incompleteTools)
     expect(incompleteValidationResult.success).toBe(true) // Should still pass as we allow subsets
