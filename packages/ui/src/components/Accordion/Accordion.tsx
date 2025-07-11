@@ -39,7 +39,7 @@ export interface AccordionProps {
 }
 
 /**
- * @deprecated Use ./Accordion_Shadcn_ instead
+ * @deprecated Use `import { Accordion_Shadcn_ } from "ui"` instead
  */
 function Accordion({
   children,

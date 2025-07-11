@@ -32,7 +32,7 @@ function errorReducer(state: any, action: any) {
 }
 
 /**
- * @deprecated Use ./Form_shadcn_ instead
+ * @deprecated Use `import { Form_shadcn_ } from "ui"` instead
  */
 export default function Form({ validate, ...props }: Props) {
   const [fieldLevelErrors, dispatchErrors] = useReducer(errorReducer, null)
