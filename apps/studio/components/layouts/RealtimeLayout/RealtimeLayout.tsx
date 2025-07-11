@@ -5,6 +5,7 @@ import { useIsRealtimeSettingsEnabled } from 'components/interfaces/App/FeatureP
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 
@@ -14,7 +15,10 @@ export interface RealtimeLayoutProps {
 
 const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLayoutProps>) => {
   const project = useSelectedProject()
-  const enableRealtimeSettings = useIsRealtimeSettingsEnabled()
+  const enableRealtimeSettingsFF = useIsRealtimeSettingsFFEnabled()
+  const enableRealtimeSettingsFP = useIsRealtimeSettingsEnabled()
+
+  const enableRealtimeSettings = enableRealtimeSettingsFF && enableRealtimeSettingsFP
 
   const router = useRouter()
   const page = router.pathname.split('/')[4]
