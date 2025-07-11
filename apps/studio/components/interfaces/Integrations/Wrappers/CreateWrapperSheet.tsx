@@ -88,7 +88,7 @@ export const CreateWrapperSheet = ({
     wrapper_name: '',
     server_name: '',
     source_schema: wrapperMeta.sourceSchemaOption?.defaultValue ?? '',
-    target_schema: 'public',
+    target_schema: '',
     ...Object.fromEntries(
       wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
     ),
@@ -381,6 +381,9 @@ export const CreateWrapperSheet = ({
                             onSelectSchema={(schema) => setFieldValue('target_schema', schema)}
                             onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
                           />
+                          <p className="text-foreground-lighter text-sm">
+                            Be careful not to use an API exposed schema.
+                          </p>
                         </div>
                       </FormSectionContent>
                     </FormSection>
