@@ -9,7 +9,11 @@ import { storageKeys } from './keys'
 
 export type BucketsVariables = { projectRef?: string }
 
-export type Bucket = components['schemas']['StorageBucketResponse']
+export type Bucket = Omit<components['schemas']['StorageBucketResponse'], 'type'> & {
+  type: BucketType
+}
+
+export type BucketType = 'STANDARD' | 'ANALYTICS'
 
 export async function getBuckets({ projectRef }: BucketsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -20,7 +24,7 @@ export async function getBuckets({ projectRef }: BucketsVariables, signal?: Abor
   })
 
   if (error) handleError(error)
-  return data
+  return data as Bucket[]
 }
 
 export type BucketsData = Awaited<ReturnType<typeof getBuckets>>

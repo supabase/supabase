@@ -27,8 +27,8 @@ const PageLayout: NextPageWithLayout = () => {
           <div className="flex h-full w-full items-center justify-center">
             <p className="text-sm text-foreground-light">Bucket {bucketId} cannot be found</p>
           </div>
-        ) : bucket.type === 'ICEBERG' ? (
-          <IcebergBucketDetails bucket={bucket} />
+        ) : bucket.type === 'ANALYTICS' ? (
+          <AnalyticBucketDetails bucket={bucket} />
         ) : (
           <StorageExplorer bucket={bucket} />
         )

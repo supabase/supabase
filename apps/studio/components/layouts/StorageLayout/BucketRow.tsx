@@ -61,13 +61,13 @@ const BucketRow = ({
             {bucket.name}
           </p>
           {bucket.public && <Badge variant="warning">Public</Badge>}
-          {bucket.type === 'ICEBERG' && (
+          {bucket.type === 'ANALYTICS' && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Columns3 className="text-foreground-lighter" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>The bucket is Iceberg-enabled.</p>
+                <p>Analytic bucket</p>
               </TooltipContent>
             </Tooltip>
           )}

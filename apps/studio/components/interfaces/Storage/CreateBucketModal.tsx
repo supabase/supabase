@@ -214,7 +214,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                         <RadioGroupStackedItem
                           value="ICEBERG"
                           id="ICEBERG"
-                          label="Iceberg bucket"
+                          label="Analytic bucket"
                           showIndicator={false}
                           disabled={!icebergCatalogEnabled}
                         >
@@ -229,8 +229,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                             <div className="w-full flex gap-x-2 py-2 items-center">
                               <WarningIcon />
                               <span className="text-xs text-left">
-                                The Iceberg catalog feature is not enabled for your project. Please
-                                contact support to enable it.
+                                The feature is not enabled for your project. Please contact support
+                                to enable it.
                               </span>
                             </div>
                           )}
@@ -461,14 +461,14 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                 <Alert_Shadcn_ variant="warning">
                   <WarningIcon />
                   <AlertTitle_Shadcn_>
-                    You need to install the Iceberg wrapper extension to connect your Iceberg bucket
-                    to your database.
+                    You need to install the Iceberg wrapper extension to connect your Analytic
+                    bucket to your database.
                   </AlertTitle_Shadcn_>
                   <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
                     <p>
                       You need to install the <span className="text-brand">wrappers</span> extension
                       (with the minimum version of <span>0.5.3</span>) if you want to connect your
-                      Iceberg bucket to your database.
+                      Analytic bucket to your database.
                     </p>
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
