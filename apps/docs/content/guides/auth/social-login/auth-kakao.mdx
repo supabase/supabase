@@ -64,6 +64,26 @@ This will serve as the `client_id` when you make API calls to authenticate the u
 
 ![Consent items needs to be set.](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
+### For Individual Developers
+
+If you're an individual developer (not business-verified), you may encounter error `KOE205` when using the `account_email` scope. This error occurs because the `account_email` scope is restricted to business-verified applications by default.
+
+To resolve this issue:
+
+1. Go to **App Settings** > **Business** in your Kakao Developer Console
+2. Click **"Register business information"**
+3. Select **"Register as Individual"** option
+4. Agree to the terms of use (this may redirect you to your KakaoTalk mobile app)
+5. Reload the developer portal page in your browser
+
+After completing these steps, you'll have access to the `account_email` scope without requiring full business verification. This allows individual developers to use Kakao OAuth with email access in their applications.
+
+<Admonition type="note">
+
+You may also need to upload an app icon if you haven't already done so, as this can be a requirement for enabling certain features.
+
+</Admonition>
+
 ## Add your OAuth credentials to Supabase
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Kakao" }} />
