@@ -59,12 +59,15 @@ const DestinationRow = ({
     },
     { refetchInterval: refreshFrequencyMs }
   )
-  const [requestStatus, setRequestStatus] = useState<PipelineStatusRequestStatus>(PipelineStatusRequestStatus.None)
+  const [requestStatus, setRequestStatus] = useState<PipelineStatusRequestStatus>(
+    PipelineStatusRequestStatus.None
+  )
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
   if (
-    (requestStatus === PipelineStatusRequestStatus.EnableRequested && pipelineStatus === 'Started') ||
+    (requestStatus === PipelineStatusRequestStatus.EnableRequested &&
+      pipelineStatus === 'Started') ||
     (requestStatus === PipelineStatusRequestStatus.DisableRequested && pipelineStatus === 'Stopped')
   ) {
     setRequestStatus(PipelineStatusRequestStatus.None)
