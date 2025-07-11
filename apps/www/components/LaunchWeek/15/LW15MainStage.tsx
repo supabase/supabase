@@ -10,6 +10,7 @@ import SectionContainer from 'components/Layouts/SectionContainer'
 import { mainDays, WeekDayProps } from './data'
 import { useWindowSize } from 'react-use'
 import { useBreakpoint } from 'common'
+import { DayLink } from './lw15.components'
 
 const LW15MainStage = ({ className }: { className?: string }) => {
   const { resolvedTheme } = useTheme()
@@ -50,7 +51,9 @@ const DayCard = ({ day }: { day: WeekDayProps }) =>
         <div></div>
         <div className="flex flex-col gap-2 p-4">
           <span className="text-xs text-foreground-lighter">{day.date}</span>
-          <h4 className="text-lg leading-snug text-foreground-light">&#91; Access locked &#93;</h4>
+          <h4 className="text-lg leading-snug text-foreground-lighter">
+            &#91; Access locked &#93;
+          </h4>
         </div>
       </div>
     </div>
@@ -68,19 +71,27 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
       const { height } = hiddenRef.current.getBoundingClientRect()
       setHiddenHeight(height + padding)
     }
-
-    console.log(hiddenHeight)
   }, [hiddenRef, width])
 
   return (
     <div
       className={cn(
-        'group/main block w-full h-full xl:flex-1 xl:h-auto xl:aspect-[217/275] relative overflow-hidden rounded border hover:border-black dark:hover:border-stronger text-white'
+        'group/main block w-full h-full xl:flex-1 xl:h-auto xl:aspect-[217/275] relative overflow-hidden rounded border border-strong text-white',
+        day.isToday && 'ring-1 ring-foreground-lighter ring-offset-2 ring-offset-background'
       )}
     >
       <CardBG day={day} />
       <div className="w-full h-full relative z-10 flex flex-col justify-between gap-4 overflow-hidden">
-        <div></div>
+        <ul className="flex flex-col gap-1 p-4">
+          {day.links?.map((link) => (
+            <li key={link.href}>
+              <DayLink
+                {...link}
+                className="transition-all duration-300 !ease-[.25,.25,0,1] lg:-translate-y-full lg:opacity-0 group-hover/main:translate-y-0 group-hover/main:opacity-100"
+              />
+            </li>
+          ))}
+        </ul>
         <div
           className="flex flex-col p-4 gap-2 relative group-hover/main:!bottom-0 !ease-[.25,.25,0,1] duration-300"
           style={{
@@ -90,7 +101,7 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
           <span className="text-xs opacity-60">{day.date}</span>
           <h4 className="text-lg leading-snug">{day.title}</h4>
           <div
-            className="block lg:opacity-0 blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100"
+            className="block lg:opacity-0 lg:blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100"
             ref={hiddenRef}
           >
             <Button type="outline" size="small" className="text-current rounded-sm border-dashed">
@@ -114,7 +125,7 @@ const CardBG = ({ day }: { day: WeekDayProps }) => (
               className={cn(
                 'absolute inset-0 w-full h-full -z-10',
                 'transition-all duration-300 !ease-[.24,0,.22,.99]',
-                'dark:opacity-40 scale-100',
+                'dark:opacity-50 scale-100',
                 'group-hover/main:dark:opacity-100'
               )}
             >
@@ -134,7 +145,7 @@ const CardBG = ({ day }: { day: WeekDayProps }) => (
           )}
         </>
       ))}
-    <div className="absolute inset-0 z-0 w-full h-full bg-gradient-to-b from-black/30 to-black/90" />
+    <div className="absolute inset-0 z-0 w-full h-full bg-gradient-to-b from-black/80 via-black/30 to-black/90" />
   </div>
 )
 
