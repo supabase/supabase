@@ -5,7 +5,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
-import { IcebergBucketDetails } from 'components/to-be-cleaned/Storage/IcebergBucketDetails'
+import { AnalyticBucketDetails } from 'components/to-be-cleaned/Storage/AnalyticBucketDetails'
 import { useSelectedBucket } from 'components/to-be-cleaned/Storage/StorageExplorer/useSelectedBucket'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'

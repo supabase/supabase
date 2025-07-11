@@ -42,7 +42,7 @@ import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
-export const IcebergBucketDetails = ({ bucket }: { bucket: Bucket }) => {
+export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   const { project } = useProjectContext()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
 
