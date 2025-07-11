@@ -48,7 +48,7 @@ export const TimezoneSelection = ({
               : 'Select timezone...'}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[350px] p-0">
+        <PopoverContent_Shadcn_ portal className="w-[350px] p-0">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
             <CommandList_Shadcn_>
