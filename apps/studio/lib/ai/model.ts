@@ -5,17 +5,10 @@ import {
   BedrockRegion,
   checkAwsCredentials,
   selectBedrockRegion,
+  BedrockModel,
+  regionPrefixMap,
 } from './bedrock'
 
-export const regionMap = {
-  us1: 'us',
-  us2: 'us',
-  us3: 'us',
-  eu: 'eu',
-}
-
-const SONNET_MODEL = 'anthropic.claude-3-7-sonnet-20250219-v1:0'
-const HAIKU_MODEL = 'anthropic.claude-3-haiku-20240307-v1:0'
 const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {
@@ -44,11 +37,15 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
 
   if (hasAwsCredentials) {
-    // Select the Bedrock region based on the routing key
-    const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
+    const model = isLimited ? BedrockModel.HAIKU : BedrockModel.SONNET
+    // Select the Bedrock region based on the routing key and the model
+    const bedrockRegion: BedrockRegion = routingKey
+      ? await selectBedrockRegion(routingKey, model)
+      // There's a few places where getModel is called without a routing key
+      // Will cause disproportionate load on use1 region
+      : 'use1'
     const bedrock = bedrockForRegion(bedrockRegion)
-    const model = isLimited ? HAIKU_MODEL : SONNET_MODEL
-    const modelName = `${regionMap[bedrockRegion]}.${model}`
+    const modelName = `${regionPrefixMap[bedrockRegion]}.${model}`
 
     return {
       model: bedrock(modelName),

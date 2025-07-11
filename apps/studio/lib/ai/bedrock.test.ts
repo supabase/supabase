@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { selectBedrockRegion, bedrockRegionMap } from './bedrock'
+import { selectBedrockRegion, bedrockRegionMap, BedrockModel } from './bedrock'
 
 describe('selectBedrockRegion', () => {
   it('should return a valid region for a given routing key', async () => {
-    const region = await selectBedrockRegion('test-key')
+    const region = await selectBedrockRegion('test-key', BedrockModel.SONNET)
     const validRegions = Object.keys(bedrockRegionMap)
 
     expect(validRegions).toContain(region)
@@ -11,15 +11,17 @@ describe('selectBedrockRegion', () => {
 
   it('should return the same region for the same routing key', async () => {
     const routingKey = 'consistent-key'
-    const region1 = await selectBedrockRegion(routingKey)
-    const region2 = await selectBedrockRegion(routingKey)
+    const region1 = await selectBedrockRegion(routingKey, BedrockModel.SONNET)
+    const region2 = await selectBedrockRegion(routingKey, BedrockModel.SONNET)
 
     expect(region1).toBe(region2)
   })
 
   it('should distribute different keys across regions', async () => {
     const keys = Array.from({ length: 100 }, (_, i) => `key-${i}`)
-    const regions = await Promise.all(keys.map((key) => selectBedrockRegion(key)))
+    const regions = await Promise.all(
+      keys.map((key) => selectBedrockRegion(key, BedrockModel.SONNET))
+    )
     const uniqueRegions = new Set(regions)
     const validRegions = Object.keys(bedrockRegionMap)
 
@@ -30,7 +32,9 @@ describe('selectBedrockRegion', () => {
   it('should distribute keys evenly across regions', async () => {
     const numKeys = 3000
     const keys = Array.from({ length: numKeys }, (_, i) => `key-${i}`)
-    const regions = await Promise.all(keys.map((key) => selectBedrockRegion(key)))
+    const regions = await Promise.all(
+      keys.map((key) => selectBedrockRegion(key, BedrockModel.SONNET))
+    )
     const validRegions = Object.keys(bedrockRegionMap)
 
     // Count occurrences of each region
@@ -50,14 +54,14 @@ describe('selectBedrockRegion', () => {
   })
 
   it('should handle empty string', async () => {
-    const region = await selectBedrockRegion('')
+    const region = await selectBedrockRegion('', BedrockModel.SONNET)
     const validRegions = Object.keys(bedrockRegionMap)
 
     expect(validRegions).toContain(region)
   })
 
   it('should handle special characters in routing key', async () => {
-    const region = await selectBedrockRegion('key-with-special-chars!@#$%')
+    const region = await selectBedrockRegion('key-with-special-chars!@#$%', BedrockModel.SONNET)
     const validRegions = Object.keys(bedrockRegionMap)
 
     expect(validRegions).toContain(region)
@@ -65,8 +69,8 @@ describe('selectBedrockRegion', () => {
 
   it('should return consistent results for unicode characters', async () => {
     const routingKey = '🔑-unicode-key-测试'
-    const region1 = await selectBedrockRegion(routingKey)
-    const region2 = await selectBedrockRegion(routingKey)
+    const region1 = await selectBedrockRegion(routingKey, BedrockModel.SONNET)
+    const region2 = await selectBedrockRegion(routingKey, BedrockModel.SONNET)
 
     expect(region1).toBe(region2)
   })
