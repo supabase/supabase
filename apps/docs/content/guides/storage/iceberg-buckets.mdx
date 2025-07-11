@@ -1,0 +1,40 @@
+---
+title: 'Iceberg Buckets'
+subtitle: ''
+---
+
+<Admonition type="note">
+    This feature is currently in Private Beta and subject to change as the API evolves.
+</Admonition>
+
+Iceberg Buckets are specialized Supabase Storage buckets powered by Apache Iceberg, an open-table format for efficiently managing analytical datasets.
+
+Iceberg ensures scalable, robust, and performant management of massive analytical datasets, supporting advanced features such as schema evolution, snapshot isolation, efficient partitioning, incremental data updates, and transactional guarantees.
+
+You interact with Iceberg Buckets through clients such as PyIceberg or Apache Spark, which communicate with Supabase via a REST Catalog interface. Iceberg buckets enable analytical queries over large datasets stored in Parquet files optimized for analytics.
+
+
+## Create your first ICEBERG Bucket
+
+To create an Iceberg Bucket, you can use the Supabase SDK or the Supabase Dashboard.
+
+### Using the Supabase SDK
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+supabase.storage.createBucket('analytics', {
+  type: 'ICEBERG',
+})
+```
+
+### Using the Supabase Dashboard
+
+1. Navigate to the Storage section in the Supabase Dashboard.
+2. Click on "Create Bucket".
+3. Enter a name for your bucket (e.g., `analytics`).
+4. Select "Iceberg" as the bucket type.
+
+<img alt="Storage schema design" src="/docs/img/storage/iceberg-bucket.png" />

@@ -1,0 +1,62 @@
+---
+title: 'Using Apache Spark with Supabase Iceberg'
+---
+
+<Admonition type="note">
+    This feature is currently in Private Beta and subject to change as the API evolves.
+</Admonition>
+
+Apache Spark allows distributed analytical queries against Iceberg Buckets.
+
+**Example Spark Usage**
+
+```python
+from pyspark.sql import SparkSession
+
+WAREHOUSE = "analytics"
+TOKEN = "SERVICE_KEY"
+CATALOG_URI = "https://<your-supabase-instance>/storage/v1/iceberg"
+S3_ENDPOINT = "https://<your-supabase-instance>/storage/v1/s3"
+S3_ACCESS_KEY = "KEY"
+S3_SECRET_KEY = "SECRET"
+
+# Initialize Spark session with Iceberg configuration
+spark = SparkSession.builder \
+    .master("local[*]") \
+    .appName("SupabaseIceberg") \
+    .config("spark.driver.host", "127.0.0.1") \
+    .config("spark.driver.bindAddress", "127.0.0.1") \
+    .config('spark.jars.packages', 'org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.6.1,org.apache.iceberg:iceberg-aws-bundle:1.6.1') \
+    .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
+    .config("spark.sql.catalog.my_catalog", "org.apache.iceberg.spark.SparkCatalog") \
+    .config("spark.sql.catalog.my_catalog.type", "rest") \
+    .config("spark.sql.catalog.my_catalog.uri", CATALOG_URI) \
+    .config("spark.sql.catalog.my_catalog.warehouse", WAREHOUSE) \
+    .config("spark.sql.catalog.my_catalog.token", TOKEN) \
+    .config("spark.sql.catalog.my_catalog.s3.endpoint", S3_ENDPOINT) \
+    .config("spark.sql.catalog.my_catalog.s3.path-style-access", "true") \
+    .config("spark.sql.catalog.my_catalog.s3.access-key-id", S3_ACCESS_KEY) \
+    .config("spark.sql.catalog.my_catalog.s3.secret-access-key", S3_SECRET_KEY) \
+    .config("spark.sql.catalog.my_catalog.s3.remote-signing-enabled", "false") \
+    .config("spark.sql.defaultCatalog", "my_catalog") \
+    .getOrCreate()
+
+# SQL Operations
+spark.sql("CREATE NAMESPACE IF NOT EXISTS analytics")
+
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS analytics.users (
+        user_id BIGINT,
+        username STRING
+    )
+    USING iceberg
+""")
+
+spark.sql("""
+    INSERT INTO analytics.users (user_id, username)
+    VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie')
+""")
+
+result_df = spark.sql("SELECT * FROM analytics.users")
+result_df.show()
+```

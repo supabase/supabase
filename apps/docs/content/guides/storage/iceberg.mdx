@@ -1,0 +1,18 @@
+---
+title: 'Analytical Buckets'
+subtitle: ''
+---
+<Admonition type="note">
+    This feature is currently in Private Beta and subject to change as the API evolves.
+</Admonition>
+
+Supabase Storage now supports Analytical Buckets, enabling advanced analytical workflows using Apache Iceberg tables directly within Supabase.
+
+Analytical Buckets are specifically designed for Online Analytical Processing (OLAP) workloads, involving complex queries, aggregations, historical data analysis, and data warehousing. This is distinct from Online Transactional Processing (OLTP) workloads, which primarily involve real-time, transactional data operations, typically characterized by high-frequency, low-latency updates.
+
+**Analytical Buckets are ideally suited for workloads including:**
+
+- Data warehousing and business intelligence
+- Real-time analytics (with periodic refreshes)
+- Complex analytical queries and aggregations
+- Historical data archiving and analysis
