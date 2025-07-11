@@ -64,7 +64,7 @@ const BucketRow = ({
           {bucket.type === 'ANALYTICS' && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Columns3 className="text-foreground-lighter" />
+                <Columns3 className="text-foreground-lighter" size="20" />
               </TooltipTrigger>
               <TooltipContent>
                 <p>Analytic bucket</p>
