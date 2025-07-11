@@ -7,7 +7,8 @@ vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
 }))
 
-vi.mock('./bedrock', () => ({
+vi.mock('./bedrock', async () => ({
+  ...(await vi.importActual('./bedrock')),
   bedrockForRegion: vi.fn(() => () => 'bedrock-model'),
   checkAwsCredentials: vi.fn(),
   selectBedrockRegion: vi.fn(() => 'us'),
@@ -32,7 +33,7 @@ describe('getModel', () => {
     console.log('Model:', model)
 
     expect(model).toEqual('bedrock-model')
-    expect(bedrockModule.bedrockForRegion).toHaveBeenCalledWith('us1')
+    expect(bedrockModule.bedrockForRegion).toHaveBeenCalledWith('use1')
     expect(error).toBeUndefined()
   })
 

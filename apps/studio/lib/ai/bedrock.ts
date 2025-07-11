@@ -35,13 +35,44 @@ async function vercelOidcProvider() {
 }
 
 export const bedrockRegionMap = {
-  us1: 'us-east-1',
-  us2: 'us-east-2',
-  us3: 'us-west-2',
-  eu: 'eu-central-1',
+  use1: 'us-east-1',
+  use2: 'us-east-2',
+  usw2: 'us-west-2',
+  euc1: 'eu-central-1',
 } as const
 
 export type BedrockRegion = keyof typeof bedrockRegionMap
+
+export const regionPrefixMap: Record<BedrockRegion, string> = {
+  use1: 'us',
+  use2: 'us',
+  usw2: 'us',
+  euc1: 'eu',
+}
+
+export enum BedrockModel {
+  SONNET = 'anthropic.claude-3-7-sonnet-20250219-v1:0',
+  HAIKU = 'anthropic.claude-3-haiku-20240307-v1:0',
+}
+
+/**
+ * Weights for distributing requests across Bedrock regions.
+ * Weights are proportional to our rate limits per model per region.
+ */
+const modelPerRegionRequestWeights: Record<BedrockModel, Record<BedrockRegion, number>> = {
+  [BedrockModel.SONNET]: {
+    use1: 20,
+    use2: 10,
+    usw2: 10,
+    euc1: 10,
+  },
+  [BedrockModel.HAIKU]: {
+    use1: 40,
+    use2: 6,
+    usw2: 40,
+    euc1: 6,
+  },
+}
 
 export const bedrockForRegion = (region: BedrockRegion) =>
   createAmazonBedrock({
@@ -53,9 +84,9 @@ export const bedrockForRegion = (region: BedrockRegion) =>
  * Selects a region based on a routing key using a consistent hashing algorithm.
  *
  * Ensures that the same key always maps to the same region
- * while distributing keys evenly across available regions.
+ * while distributing keys according to the weights per region.
  */
-export async function selectBedrockRegion(routingKey: string) {
+export async function selectBedrockRegion(routingKey: string, model: BedrockModel) {
   const regions = Object.keys(bedrockRegionMap) as BedrockRegion[]
   const encoder = new TextEncoder()
   const data = encoder.encode(routingKey)
@@ -64,10 +95,19 @@ export async function selectBedrockRegion(routingKey: string) {
   // Use first 4 bytes (32 bit integer)
   const hashInt = new DataView(hashBuffer).getUint32(0)
 
-  // Use modulo to map to available regions
-  const regionIndex = hashInt % regions.length
-
-  return regions[regionIndex]
+  const totalWeight = regions.reduce(
+    (sum, region) => sum + modelPerRegionRequestWeights[model][region],
+    0
+  )
+  let cumulativeWeight = 0
+  const targetWeight = hashInt % totalWeight
+  for (const region of regions) {
+    cumulativeWeight += modelPerRegionRequestWeights[model][region]
+    if (cumulativeWeight > targetWeight) {
+      return region
+    }
+  }
+  return regions[0]
 }
 
 export async function checkAwsCredentials() {
