@@ -5,8 +5,6 @@ import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { routerMock } from './lib/route-mock'
 import { mswServer } from './lib/msw'
 
-mswServer.listen({ onUnhandledRequest: 'error' })
-
 // Warning: `restoreMocks: true` in vitest.config.ts will
 // cause this global mockImplementation to be **reset**
 // before any tests are run!
@@ -35,6 +33,7 @@ Object.defineProperty(window, 'matchMedia', {
 // })
 
 beforeAll(() => {
+  mswServer.listen({ onUnhandledRequest: 'error' })
   vi.mock('next/router', () => require('next-router-mock'))
   vi.mock('next/navigation', async () => {
     const actual = await vi.importActual('next/navigation')
@@ -58,10 +57,11 @@ beforeAll(() => {
   routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
 })
 
-afterAll(() => mswServer.close())
-
-afterEach(() => mswServer.resetHandlers())
-
 afterEach(() => {
+  mswServer.resetHandlers()
   cleanup()
+})
+
+afterAll(() => {
+  mswServer.close()
 })
