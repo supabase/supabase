@@ -59,15 +59,20 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
           onCreateToken(data)
           setVisible(false)
         },
-        onError: () => {
-          toast.error(`Failed to create access token.`)
-        },
       }
     )
   }
 
   return (
-    <Dialog open={visible} onOpenChange={setVisible}>
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) {
+          form.reset()
+        }
+        setVisible(open)
+      }}
+    >
       <DialogTrigger asChild>
         <>
           <Button
@@ -112,37 +117,33 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-4">
+          {tokenScope === 'V0' && (
+            <Admonition
+              type="warning"
+              title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
+              description={
+                <>
+                  <p>
+                    These include deleting organizations and projects which cannot be undone. As
+                    such, be very careful when using this API.
+                  </p>
+                  <div className="mt-4">
+                    <Button asChild type="default" icon={<ExternalLink />}>
+                      <Link href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
+                        Experimental API documentation
+                      </Link>
+                    </Button>
+                  </div>
+                </>
+              }
+            />
+          )}
           <Form_Shadcn_ {...form}>
             <form
-              className="flex flex-col gap-4"
               id={formId}
+              className="flex flex-col gap-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              {tokenScope === 'V0' && (
-                <Admonition
-                  type="warning"
-                  title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
-                  description={
-                    <>
-                      <p>
-                        These include deleting organizations and projects which cannot be undone. As
-                        such, be very careful when using this API.
-                      </p>
-                      <div className="mt-4">
-                        <Button asChild type="default" icon={<ExternalLink />}>
-                          <Link
-                            href="https://api.supabase.com/api/v0"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Experimental API documentation
-                          </Link>
-                        </Button>
-                      </div>
-                    </>
-                  }
-                />
-              )}
               <FormField_Shadcn_
                 key="tokenName"
                 name="tokenName"
@@ -163,10 +164,17 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={() => setVisible(false)}>
+          <Button
+            type="default"
+            disabled={isLoading}
+            onClick={() => {
+              form.reset()
+              setVisible(false)
+            }}
+          >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isLoading} disabled={isLoading}>
+          <Button form={formId} htmlType="submit" loading={isLoading}>
             Generate token
           </Button>
         </DialogFooter>
