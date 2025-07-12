@@ -150,7 +150,8 @@
         "AWS_SECRET_ACCESS_KEY",
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
-        "SITE_NAME"
+        "SITE_NAME",
+        "LUMA_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

@@ -34,6 +34,7 @@ interface ReportFilterBarProps {
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
+  initialDatePickerValue?: DatePickerValue
   className?: string
   selectedProduct?: string
   showDatabaseSelector?: boolean
@@ -92,6 +93,7 @@ const ReportFilterBar = ({
   onRemoveFilters,
   onRefresh,
   datepickerHelpers,
+  initialDatePickerValue,
   className,
   selectedProduct,
   showDatabaseSelector = true,
@@ -158,13 +160,20 @@ const ReportFilterBar = ({
     }
   }, [])
 
-  const defaultHelper = datepickerHelpers[0]
-  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
-    to: defaultHelper.calcTo(),
-    from: defaultHelper.calcFrom(),
-    isHelper: true,
-    text: defaultHelper.text,
-  })
+  const getInitialDatePickerValue = () => {
+    if (initialDatePickerValue) {
+      return initialDatePickerValue
+    }
+    const defaultHelper = datepickerHelpers.find((h) => h.default) || datepickerHelpers[0]
+    return {
+      to: defaultHelper.calcTo(),
+      from: defaultHelper.calcFrom(),
+      isHelper: true,
+      text: defaultHelper.text,
+    }
+  }
+
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>(getInitialDatePickerValue())
 
   return (
     <div className={cn('flex items-center justify-between', className)}>

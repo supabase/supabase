@@ -246,12 +246,16 @@ export async function updateTicketColors({
   background: string
   foreground: string
 }) {
-  console.log('previous userMetadata', userMetadata)
+  const githubUserData = await fetchGitHubUser(username)
   const { error } = await supabase
     .from('tickets')
     .update({
       metadata: {
         ...userMetadata,
+        ...(githubUserData && {
+          company: githubUserData.company,
+          location: githubUserData.location,
+        }),
         colors: {
           background,
           foreground,

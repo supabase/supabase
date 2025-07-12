@@ -6,56 +6,67 @@ import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
-interface ReportsDatetimeHelper extends DatetimeHelper {
+export interface ReportsDatetimeHelper extends DatetimeHelper {
   availableIn: PlanId[]
+}
+
+export enum REPORT_DATERANGE_HELPER_LABELS {
+  LAST_10_MINUTES = 'Last 10 minutes',
+  LAST_30_MINUTES = 'Last 30 minutes',
+  LAST_60_MINUTES = 'Last 60 minutes',
+  LAST_3_HOURS = 'Last 3 hours',
+  LAST_24_HOURS = 'Last 24 hours',
+  LAST_7_DAYS = 'Last 7 days',
+  LAST_14_DAYS = 'Last 14 days',
+  LAST_28_DAYS = 'Last 28 days',
 }
 
 export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
   {
-    text: 'Last 10 minutes',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_10_MINUTES,
     calcFrom: () => dayjs().subtract(10, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 30 minutes',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_30_MINUTES,
     calcFrom: () => dayjs().subtract(30, 'minute').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 60 minutes',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
     calcFrom: () => dayjs().subtract(1, 'hour').startOf('day').toISOString(),
     calcTo: () => dayjs().toISOString(),
     default: true,
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 3 hours',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_3_HOURS,
     calcFrom: () => dayjs().subtract(3, 'hour').startOf('day').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 24 hours',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS,
     calcFrom: () => dayjs().subtract(1, 'day').startOf('day').toISOString(),
     calcTo: () => dayjs().toISOString(),
     availableIn: ['free', 'pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 7 days',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_7_DAYS,
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     availableIn: ['pro', 'team', 'enterprise'],
   },
   {
-    text: 'Last 14 days',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_14_DAYS,
     calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     availableIn: ['team', 'enterprise'],
   },
   {
-    text: 'Last 28 days',
+    text: REPORT_DATERANGE_HELPER_LABELS.LAST_28_DAYS,
     calcFrom: () => dayjs().subtract(28, 'day').startOf('day').toISOString(),
     calcTo: () => '',
     availableIn: ['team', 'enterprise'],
@@ -334,7 +345,7 @@ from edge_logs f
 where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
-  ${generateRegexpWhere(filters, false)} 
+  ${generateRegexpWhere(filters, false)}
 group by path, search
 order by count desc
 limit 12
@@ -368,7 +379,7 @@ select
     statements.rows / statements.calls as avg_rows${
       runIndexAdvisor
         ? `,
-    case 
+    case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
         select json_build_object(
@@ -405,7 +416,7 @@ select
     to_char(((statements.total_exec_time + statements.total_plan_time)/sum(statements.total_exec_time + statements.total_plan_time) OVER()) * 100, 'FM90D0') || '%'  AS prop_total_time${
       runIndexAdvisor
         ? `,
-    case 
+    case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
         select json_build_object(
@@ -451,7 +462,7 @@ select
     statements.rows / statements.calls as avg_rows${
       runIndexAdvisor
         ? `,
-    case 
+    case
       when (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
       then (
         select json_build_object(
@@ -495,12 +506,12 @@ select
       largeObjects: {
         queryType: 'db',
         sql: (_) => `-- reports-database-large-objects
-SELECT 
+SELECT
         SCHEMA_NAME,
         relname,
         table_size
       FROM
-        (SELECT 
+        (SELECT
           pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
           relname,
           pg_total_relation_size(pg_catalog.pg_class.oid) AS table_size

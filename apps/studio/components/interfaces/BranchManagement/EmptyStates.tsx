@@ -55,11 +55,13 @@ export const BranchingEmptyState = () => {
 
 export const PullRequestsEmptyState = ({
   url,
+  projectRef,
   hasBranches,
   githubConnection,
   gitlessBranching,
 }: {
   url: string
+  projectRef: string
   hasBranches: boolean
   githubConnection?: any
   gitlessBranching?: boolean
@@ -74,12 +76,9 @@ export const PullRequestsEmptyState = ({
             Sync GitHub repos to Supabase projects for automatic branch creation and merging
           </p>
         </div>
-        <Button
-          type="default"
-          icon={<Github />}
-          onClick={() => sidePanelsState.setGithubConnectionsOpen(true)}
-        >
-          Connect to GitHub
+
+        <Button type="default" icon={<Github />} asChild>
+          <Link href={`/project/${projectRef}/settings/integrations`}>Connect to GitHub</Link>
         </Button>
       </div>
     )
