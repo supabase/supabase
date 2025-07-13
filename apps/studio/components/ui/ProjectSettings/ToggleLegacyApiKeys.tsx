@@ -3,17 +3,33 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
+  const slug = org?.slug as string
+
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
 
   const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
     useLegacyAPIKeysStatusQuery({ projectRef })
@@ -23,9 +39,13 @@ export const ToggleLegacyApiKeysPanel = () => {
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
     useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
 
+  const { data: authorizedApps, isLoading: isLoadingAuthorizedApps } = useAuthorizedAppsQuery({
+    slug: slug!,
+  })
+
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
-  if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess)) {
+  if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess && isLoadingAuthorizedApps)) {
     return null
   }
 
@@ -47,7 +67,11 @@ export const ToggleLegacyApiKeysPanel = () => {
             <div className="flex items-center">
               <ButtonTooltip
                 type="default"
-                onClick={() => setIsConfirmOpen(true)}
+                onClick={
+                  authorizedApps?.length
+                    ? () => setIsAppsWarningOpen(true)
+                    : () => setIsConfirmOpen(true)
+                }
                 disabled={
                   !canUpdateAPIKeys ||
                   (!isLegacyKeysEnabled && legacyJWTSecret?.status === 'revoked')
@@ -77,6 +101,25 @@ export const ToggleLegacyApiKeysPanel = () => {
         onClose={() => setIsConfirmOpen(false)}
         legacyAPIKeysStatusData={legacyAPIKeysStatusData}
       />
+
+      <AlertDialog open={isAppsWarningOpen} onOpenChange={(value) => setIsAppsWarningOpen(value)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apps using Supabase may break</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your project uses apps that integrate with Supabase. Disabling the legacy API keys is
+              a brand new feature and the apps you're using may not have added support for this yet.
+              It can cause them to stop functioning. Check before continuing.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => setIsConfirmOpen(true)}>
+              Proceed to disable API keys
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   )
 }
@@ -90,7 +133,7 @@ const ToggleApiKeysModal = ({
   onClose: () => void
   legacyAPIKeysStatusData: { enabled: boolean }
 }) => {
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, slug } = useParams()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
   const { mutate: toggleLegacyAPIKey, isLoading: isTogglingLegacyAPIKey } =
@@ -136,6 +179,12 @@ const ToggleApiKeysModal = ({
                   use will cause downtime for your application. Ensure they are no longer in use
                   before proceeding. If you have not created a publishable and at least one secret
                   API key, some dashboard functionality may become unavailable.
+                  <br />
+                  <br />
+                  <span className="text-danger">
+                    This disables API keys when used in the <code>apikey</code> header. They remain
+                    valid as a JWT.
+                  </span>
                 </span>
               ),
             }
