@@ -15,7 +15,7 @@ export const regionMap = {
 }
 
 const SONNET_MODEL = 'anthropic.claude-3-7-sonnet-20250219-v1:0'
-const HAIKU_MODEL = 'anthropic.claude-3-5-haiku-20241022-v1:0'
+const HAIKU_MODEL = 'anthropic.claude-3-haiku-20240307-v1:0'
 const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {
@@ -47,7 +47,7 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
     // Select the Bedrock region based on the routing key
     const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
     const bedrock = bedrockForRegion(bedrockRegion)
-    const model = isLimited ? HAIKU_MODEL : SONNET_MODEL
+    const model = HAIKU_MODEL
     const modelName = `${regionMap[bedrockRegion]}.${model}`
 
     return {
