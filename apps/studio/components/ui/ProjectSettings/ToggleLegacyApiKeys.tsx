@@ -3,6 +3,13 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
+import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,20 +20,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import Panel from '../Panel'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
   const org = useSelectedOrganization()
-  const slug = org?.slug as string
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
@@ -39,8 +38,8 @@ export const ToggleLegacyApiKeysPanel = () => {
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
     useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
 
-  const { data: authorizedApps, isLoading: isLoadingAuthorizedApps } = useAuthorizedAppsQuery({
-    slug: slug!,
+  const { data: authorizedApps = [], isLoading: isLoadingAuthorizedApps } = useAuthorizedAppsQuery({
+    slug: org?.slug,
   })
 
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
@@ -133,7 +132,7 @@ const ToggleApiKeysModal = ({
   onClose: () => void
   legacyAPIKeysStatusData: { enabled: boolean }
 }) => {
-  const { ref: projectRef, slug } = useParams()
+  const { ref: projectRef } = useParams()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
   const { mutate: toggleLegacyAPIKey, isLoading: isTogglingLegacyAPIKey } =
