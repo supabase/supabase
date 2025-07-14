@@ -1,39 +1,41 @@
+import { useParams } from 'common'
+import { useBranchQuery } from 'data/branches/branch-query'
+import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
+import {
+  Clock,
+  ExternalLink,
+  Infinity,
+  MoreVertical,
+  Pencil,
+  RefreshCw,
+  Shield,
+  Trash2,
+} from 'lucide-react'
+import Link from 'next/link'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuItem,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import {
-  MoreVertical,
-  Trash2,
-  ExternalLink,
-  RefreshCw,
-  Clock,
-  Infinity,
-  Pencil,
-  Shield,
-} from 'lucide-react'
-import { useParams } from 'common'
-import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchQuery } from 'data/branches/branch-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { EditBranchModal } from './EditBranchModal'
-import { Tooltip, TooltipTrigger, TooltipContent } from 'ui'
-import { toast } from 'sonner'
-import Link from 'next/link'
 
-import type { Branch } from 'data/branches/branches-query'
-import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
-import { PreviewBranchesEmptyState } from './EmptyStates'
-import { useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
+import { useState } from 'react'
+import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
+import { PreviewBranchesEmptyState } from './EmptyStates'
 
 interface OverviewProps {
   isLoading: boolean
@@ -356,7 +358,7 @@ const PreviewBranchActions = ({
       <ConfirmationModal
         variant="default"
         visible={showBranchModeSwitch}
-        confirmLabel={branch.persistent ? 'Switch to ephemeral' : 'Switch to persistent'}
+        confirmLabel={branch.persistent ? 'Switch to preview' : 'Switch to persistent'}
         title="Confirm branch mode switch"
         loading={isUpdatingBranch}
         onCancel={() => setShowBranchModeSwitch(false)}
@@ -364,7 +366,7 @@ const PreviewBranchActions = ({
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to switch the branch "{branch.name}" to{' '}
-          {branch.persistent ? 'ephemeral' : 'persistent'} mode?
+          {branch.persistent ? 'preview' : 'persistent'}?
         </p>
       </ConfirmationModal>
 
