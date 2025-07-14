@@ -4,11 +4,8 @@ import { Button } from 'ui'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
-import { useInView } from 'react-intersection-observer'
 
-import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useBranchQuery } from 'data/branches/branch-query'
 import type { Branch } from 'data/branches/branches-query'
 import WorkflowLogs from './WorkflowLogs'
 
@@ -77,27 +74,11 @@ export const BranchRow = ({
   external = false,
   rowActions,
 }: BranchRowProps) => {
-  const { ref: projectRef } = useParams()
   const router = useRouter()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
-
-  const { ref, inView } = useInView()
-  const { data } = useBranchQuery(
-    { projectRef, id: branch.id },
-    {
-      enabled: inView,
-      refetchInterval(data) {
-        if (data?.status !== 'ACTIVE_HEALTHY') {
-          return 1000 * 3 // 3 seconds
-        }
-
-        return false
-      },
-    }
-  )
 
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
   const handleRowClick = () => {
@@ -109,10 +90,7 @@ export const BranchRow = ({
   }
 
   return (
-    <div
-      className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100"
-      ref={ref}
-    >
+    <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
       <div className="flex items-center gap-x-3 cursor-pointer" onClick={handleRowClick}>
         {branch.git_branch && (
           <Button asChild type="default">
