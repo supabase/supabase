@@ -111,11 +111,19 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
         )}
         id="meetups"
       >
-        <div className="w-full leading-none">
-          <h3 className="text-2xl lg:text-3xl">LW15 Worldwide Meetups</h3>
-          <p className="text-left text-sm text-foreground-light mt-2">
-            Join us for community-driven meetups around the world to celebrate Launch Week 15.
-          </p>
+        <div className="w-full grid grid-cols-5 gap-4 leading-none">
+          <div className="col-span-2 flex flex-col items-start">
+            <LWSVG className="h-8 w-auto" />
+            <span>Supabase</span>
+            <span>Meetups.</span>
+          </div>
+          <div className="col-span-2 flex flex-col items-start">
+            <span>Worldwide</span>
+            <span>Meetups</span>
+          </div>
+          <div className="col-span-1 flex flex-col items-end">
+            <FifteenSVG className="h-8 w-auto" />
+          </div>
         </div>
         <motion.div
           ref={ref}
