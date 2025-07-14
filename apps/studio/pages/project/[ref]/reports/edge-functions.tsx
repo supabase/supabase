@@ -259,9 +259,6 @@ const EdgeFunctionsUsage = () => {
               />
             ))}
         </div>
-        {/* <div className="mt-8 border-t pt-8">
-          <SharedAPIReport filterBy="functions" />
-        </div> */}
       </section>
     </>
   )
