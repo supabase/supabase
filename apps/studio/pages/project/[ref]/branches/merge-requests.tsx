@@ -188,6 +188,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                 <Button
                                   type="primary"
                                   size="tiny"
+                                  loading={isUpdating}
                                   onClick={() =>
                                     currentBranch && handleMarkBranchForReview(currentBranch)
                                   }
