@@ -1,16 +1,15 @@
-import { snakeCase } from 'lodash'
-import { SquareArrowOutUpRight } from 'lucide-react'
+import { snakeCase, uniq } from 'lodash'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   convertKVStringArrayToJson,
+  formatWrapperTables,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -26,8 +25,9 @@ import {
 } from 'data/database-extensions/database-extensions-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { Bucket } from 'data/storage/buckets-query'
+import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
-import { BASE_PATH } from 'lib/constants'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -40,12 +40,12 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DESCRIPTIONS } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
+import { NamespaceCard } from './NamespaceCard'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
 export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
   const { project } = useProjectContext()
-  const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
 
   const { data: extensionsData } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -76,15 +76,48 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
 
   const extensionState = useIcebergWrapperExtension()
 
-  const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper')!
+  const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
 
-  if (integration.type !== 'wrapper') {
-    // This should never happen
-    return <p className="text-sm text-foreground-light">Unsupported integration type</p>
-  }
+  const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
+  const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
 
-  const values = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
-  const wrapperMeta = integration.meta
+  const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: wrapperValues.vault_token,
+    },
+    {
+      enabled: wrapperValues.vault_token !== undefined,
+    }
+  )
+
+  const { data: namespacesData, isLoading: isLoadingNamespaces } = useIcebergNamespacesQuery(
+    {
+      catalogUri: wrapperValues.catalog_uri,
+      warehouse: wrapperValues.warehouse,
+      token: token!,
+    },
+    { enabled: isSuccessToken }
+  )
+
+  const wrapperTables = useMemo(() => {
+    if (!wrapperInstance) return []
+
+    return formatWrapperTables(wrapperInstance, wrapperMeta!)
+  }, [wrapperInstance, wrapperMeta])
+
+  const namespaces = useMemo(() => {
+    const fdwNamespaces = wrapperTables.map((t) => t.table.split('.')[0]) as string[]
+    const namespaces = uniq([...fdwNamespaces, ...(namespacesData ?? [])])
+
+    return namespaces.map((namespace) => {
+      return {
+        namespace,
+        tables: wrapperTables.filter((t) => t.table.split('.')[0] === namespace),
+      }
+    })
+  }, [wrapperTables, namespacesData])
 
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
@@ -96,8 +129,6 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         : 'missing'
       : extensionState
 
-  const isWrapperSchemaInstalled = (wrapperInstance?.tables || []).length > 0
-
   return (
     <div className="flex flex-col w-full">
       <ScaffoldContainer className="flex flex-row justify-between items-center gap-10">
@@ -105,30 +136,14 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
           <ScaffoldTitle>
             Iceberg Bucket <span className="text-brand">{bucket.name}</span>
           </ScaffoldTitle>
+          <ScaffoldSectionDescription>
+            Tables and objects connected to this Iceberg bucket
+          </ScaffoldSectionDescription>
         </ScaffoldHeader>
-        {wrapperInstance && wrapperInstance?.tables?.length > 0 && (
-          <div className="flex items-end justify-end gap-2">
-            <a
-              href={`${BASE_PATH}/project/${project?.ref}/editor?schema=${wrapperInstance?.tables[0]?.schema}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button type="default" icon={<SquareArrowOutUpRight />}>
-                Table Editor
-              </Button>
-            </a>
-            <a
-              href={`${BASE_PATH}/project/${project?.ref}/sql/new?${encodeURIComponent(`select * from ${wrapperInstance?.tables[0]?.schema}.${wrapperInstance?.tables[0]?.name}`)}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button type="default" icon={<SquareArrowOutUpRight />}>
-                SQL Editor
-              </Button>
-            </a>
-          </div>
-        )}
         <DocsButton href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket" />
+        {/* <Button type="primary" onClick={() => setImportForeignSchemaShown(true)}>
+          {wrapperTables.length === 0 ? 'Connect a namespace' : 'Connect another namespace'}
+        </Button> */}
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-4" bottomPadding>
         {state === 'loading' && <GenericSkeletonLoader />}
@@ -150,23 +165,28 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         )}
         {state === 'added' && wrapperInstance && (
           <>
-            <Alert_Shadcn_ className="px-6 py-4">
-              <AlertTitle_Shadcn_ className="flex flex-col">
-                <div className="flex flex-row justify-between items-center gap-10">
-                  <div className="col-span-2 space-y-1">
-                    <p className="block">Connect a namespace</p>
-                    <p className="text-sm text-foreground-light">
-                      When you connect a namespace, you can view its tables in the Table Editor or
-                      SQL Editor. If you add new tables to the namespace, you need to reconnect it
-                      to get the new tables. You can multiple namespaces.
-                    </p>
-                  </div>
-                  <Button type="primary" onClick={() => setImportForeignSchemaShown(true)}>
-                    Connect namespace
-                  </Button>
-                </div>
-              </AlertTitle_Shadcn_>
-            </Alert_Shadcn_>
+            <div className="flex flex-col gap-4">
+              {isLoadingNamespaces || isFDWsLoading ? (
+                <GenericSkeletonLoader />
+              ) : namespaces.length === 0 ? (
+                <Card className="flex flex-col px-20 py-16 items-center justify-center space-y-3">
+                  <p className="text-sm text-foreground-light">No namespaces on the bucket yet</p>
+                </Card>
+              ) : (
+                namespaces.map(({ namespace, tables }) => (
+                  <NamespaceCard
+                    key={namespace}
+                    bucketName={bucket.name}
+                    namespace={namespace}
+                    token={token!}
+                    wrapperInstance={wrapperInstance}
+                    wrapperValues={wrapperValues}
+                    tables={tables as any}
+                    integration={integration!}
+                  />
+                ))
+              )}
+            </div>
 
             <div>
               <div className="flex flex-row justify-between items-center">
@@ -179,20 +199,20 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                 </div>
                 <CopyEnvButton
                   serverOptions={wrapperMeta.server.options.filter(
-                    (option) => !option.hidden && values[option.name]
+                    (option) => !option.hidden && wrapperValues[option.name]
                   )}
-                  values={values}
+                  values={wrapperValues}
                 />
               </div>
               <Card className="flex flex-col gap-6 p-6 pb-0">
                 {wrapperMeta.server.options
-                  .filter((option) => !option.hidden && values[option.name])
+                  .filter((option) => !option.hidden && wrapperValues[option.name])
                   .map((option) => {
                     return (
                       <DecryptedReadOnlyInput
                         key={option.name}
                         label={option.label}
-                        value={values[option.name]}
+                        value={wrapperValues[option.name]}
                         secureEntry={option.secureEntry}
                         descriptionText={DESCRIPTIONS[option.name]}
                       />
@@ -204,12 +224,6 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
         )}
         {state === 'missing' && <WrapperMissing bucketName={bucket.name} />}
       </ScaffoldContainer>
-      <ImportForeignSchemaDialog
-        bucketName={bucket.name}
-        wrapperValues={values}
-        visible={importForeignSchemaShown}
-        onClose={() => setImportForeignSchemaShown(false)}
-      />
     </div>
   )
 }

@@ -1,10 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { snakeCase } from 'lodash'
-import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useDebounce } from 'use-debounce'
 import z from 'zod'
 
 import { useParams } from 'common'
@@ -12,7 +10,6 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
-import { useIcebergNamespaceExistsQuery } from 'data/storage/iceberg-namespace-exists-query'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import {
   Button,
@@ -42,6 +39,7 @@ export type ImportForeignSchemaForm = z.infer<typeof FormSchema>
 
 export const ImportForeignSchemaDialog = ({
   bucketName,
+  namespace,
   wrapperValues,
   visible,
   onClose,
@@ -51,11 +49,16 @@ export const ImportForeignSchemaDialog = ({
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
-  const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    id: wrapperValues['vault_token'],
-  })
+  const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: wrapperValues['vault_token'],
+    },
+    {
+      enabled: wrapperValues['vault_token'] !== undefined,
+    }
+  )
 
   const { mutateAsync: createIcebergNamespace } = useIcebergNamespaceCreateMutation()
 
@@ -70,25 +73,10 @@ export const ImportForeignSchemaDialog = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       bucketName,
-      sourceNamespace: 'default',
+      sourceNamespace: namespace,
       targetSchema: '',
     },
   })
-
-  const sourceNamespace = form.watch('sourceNamespace')
-  const [debouncedSourceNamespace] = useDebounce(sourceNamespace, 1000)
-  const { data: namespaceExists, isLoading: isLoadingNamespaceExists } =
-    useIcebergNamespaceExistsQuery(
-      {
-        catalogUri: wrapperValues['catalog_uri'],
-        warehouse: wrapperValues['warehouse'],
-        namespace: debouncedSourceNamespace,
-        token: token ?? '',
-      },
-      {
-        enabled: isSuccessToken && debouncedSourceNamespace.length > 0,
-      }
-    )
 
   const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
@@ -96,15 +84,6 @@ export const ImportForeignSchemaDialog = ({
     setLoading(true)
 
     try {
-      if (!namespaceExists) {
-        await createIcebergNamespace({
-          catalogUri: wrapperValues['catalog_uri'],
-          warehouse: wrapperValues['warehouse'],
-          token: token,
-          namespace: values.sourceNamespace,
-        })
-      }
-
       await importForeignSchema({
         projectRef: ref,
         connectionString: project?.connectionString,
@@ -123,11 +102,11 @@ export const ImportForeignSchemaDialog = ({
     if (visible) {
       form.reset({
         bucketName,
-        sourceNamespace: 'default',
+        sourceNamespace: namespace,
         targetSchema: '',
       })
     }
-  }, [visible, form, bucketName])
+  }, [visible, form, bucketName, namespace])
 
   return (
     <Modal
@@ -136,7 +115,7 @@ export const ImportForeignSchemaDialog = ({
       size="medium"
       header={
         <span>
-          Connect namespace for <span className="text-brand">{bucketName}</span> bucket
+          Connect namespace <span className="text-brand">{namespace}</span>
         </span>
       }
       onCancel={() => onClose()}
@@ -148,23 +127,9 @@ export const ImportForeignSchemaDialog = ({
               control={form.control}
               name="sourceNamespace"
               render={({ field }) => (
-                <FormItemLayout
-                  label="Namespace"
-                  description="Should match the namespace name when uploading data. If the namespace does not exist, it will be created."
-                  layout="vertical"
-                  labelOptional={
-                    <div className="flex items-center gap-x-2">
-                      {isLoadingNamespaceExists && <Loader2 size={16} className="animate-spin" />}
-                      {namespaceExists ? (
-                        <span>Namespace exists, will be connected</span>
-                      ) : (
-                        <span>Namespace will be created and connected</span>
-                      )}
-                    </div>
-                  }
-                >
+                <FormItemLayout label="Namespace" layout="vertical">
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} placeholder="Enter namespace name" />
+                    <Input_Shadcn_ {...field} placeholder="Enter namespace name" disabled />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
