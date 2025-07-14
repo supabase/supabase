@@ -1739,10 +1739,14 @@ export const storage: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
-        { name: 'Getting Started', url: '/guides/storage/analytics/get-started' },
-        { name: 'Iceberg REST Catalog', url: '/guides/storage/analytics/iceberg-rest-catalog' },
-        { name: 'PyIceberg', url: '/guides/storage/analytics/pyiceberg' },
-        { name: 'Spark', url: '/guides/storage/analytics/spark' },
+        {
+          name: 'Creating Analytics Buckets',
+          url: '/guides/storage/analytics/creating-analytics-buckets',
+        },
+        {
+          name: 'Connecting to Analytics Buckets',
+          url: '/guides/storage/analytics/connecting-to-analytics-bucket',
+        },
       ],
     },
     {
