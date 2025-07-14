@@ -248,9 +248,6 @@ export default function JWTSecretKeysTable() {
                       <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
                         Status
                       </TableHead>
-                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
-                        Key ID
-                      </TableHead>
                       <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Type
                       </TableHead>
@@ -315,6 +312,9 @@ export default function JWTSecretKeysTable() {
                         </TableHead>
                         <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Type
+                        </TableHead>
+                        <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                          Last rotated at
                         </TableHead>
                         <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Actions

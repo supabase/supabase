@@ -9,6 +9,7 @@ import {
   ShieldOff,
   Timer,
 } from 'lucide-react'
+import dayjs from 'dayjs'
 
 import { components } from 'api-types'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
@@ -100,6 +101,11 @@ export const SigningKeyRow = ({
         legacy={signingKey.id === legacyKey?.id}
       />
     </TableCell>
+    {signingKey.status === 'previously_used' && (
+      <TableCell className="text-left py-2 text-sm text-foreground-light whitespace-nowrap">
+        {dayjs(signingKey.updated_at).fromNow()}
+      </TableCell>
+    )}
     <TableCell className="text-right py-2">
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
         <DropdownMenu>
