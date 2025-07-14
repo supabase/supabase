@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { GitMerge, MessageCircle, X, MoreVertical } from 'lucide-react'
+import { GitMerge, MessageCircle, X, MoreVertical, ArrowRight, Shield } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -21,7 +21,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -46,13 +45,9 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const selectedOrg = useSelectedOrganization()
   const gitlessBranching = useFlag('gitlessBranching')
 
-  const hasBranchEnabled = project?.is_branch_enabled
-
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
-
-  const snap = useAppStateSnapshot()
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
@@ -79,29 +74,20 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
-  const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
 
-  // Combined list of branches that are either ready for review or have an open pull request
-  // If the gitlessBranching feature flag is disabled we only surface pull-request branches (the
-  // previous behaviour). When the flag is enabled we also include review-ready branches.
-  const mergeRequestBranches = gitlessBranching
-    ? previewBranches.filter(
-        (branch) =>
-          branch.pr_number !== undefined ||
-          (branch.review_requested_at !== undefined && branch.review_requested_at !== null)
-      )
-    : branchesWithPRs
+  const mergeRequestBranches = previewBranches.filter(
+    (branch) =>
+      branch.pr_number !== undefined ||
+      (branch.review_requested_at !== undefined && branch.review_requested_at !== null)
+  )
 
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
-  const isCurrentBranchReadyForReview =
-    currentBranch?.review_requested_at !== undefined && currentBranch?.review_requested_at !== null
+  const isCurrentBranchReadyForReview = !!currentBranch?.review_requested_at
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
 
   const isError = isErrorConnections || isErrorBranches
-  const isLoading = isLoadingConnections || isLoadingBranches
-  const isSuccess = isSuccessConnections && isSuccessBranches
 
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
@@ -126,7 +112,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         },
         {
           onSuccess: () => {
-            toast.success('Branch marked as ready for review')
+            toast.success('Merge request created')
             router.push(`/project/${branch.project_ref}/merge`)
           },
         }
@@ -144,7 +130,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
         },
         {
           onSuccess: () => {
-            toast.success('Branch marked as not ready for review')
+            toast.success('Merge request closed')
           },
         }
       )
@@ -213,7 +199,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                               </div>
                             </div>
                           )}
-                          {/* Combined list of review-ready branches and branches with PRs */}
                         </>
                       )}
                       <BranchManagementSection
@@ -228,41 +213,69 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                             return (
                               <BranchRow
                                 key={branch.id}
+                                label={
+                                  <div className="flex items-center gap-x-4">
+                                    {branch.name}
+                                    <ArrowRight
+                                      size={14}
+                                      strokeWidth={1.5}
+                                      className="text-foreground-lighter"
+                                    />
+                                    <div className="flex items-center gap-x-2">
+                                      {branch.pr_number ? (
+                                        <p className="text-foreground-lighter">
+                                          #{branch.pr_number}
+                                        </p>
+                                      ) : (
+                                        <>
+                                          <Shield
+                                            size={14}
+                                            strokeWidth={1.5}
+                                            className="text-warning"
+                                          />
+                                          <p className="text-foreground-lighter">
+                                            {mainBranch.name}
+                                          </p>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+                                }
                                 repo={repo}
                                 branch={branch}
-                                generateCreatePullRequestURL={generateCreatePullRequestURL}
-                                onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                                 rowLink={rowLink}
                                 external={isPR}
                                 rowActions={
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button
-                                        type="text"
-                                        icon={<MoreVertical />}
-                                        className="px-1"
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56" side="bottom" align="end">
-                                      <Tooltip>
-                                        <DropdownMenuItem
-                                          className="gap-x-2"
-                                          disabled={isUpdating}
-                                          onSelect={(e) => {
-                                            e.stopPropagation()
-                                            handleCloseMergeRequest(branch)
-                                          }}
-                                          onClick={(e) => {
-                                            e.stopPropagation()
-                                            handleCloseMergeRequest(branch)
-                                          }}
-                                        >
-                                          <X size={14} /> Close this merge request
-                                        </DropdownMenuItem>
-                                      </Tooltip>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
+                                  !isPR && (
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          type="text"
+                                          icon={<MoreVertical />}
+                                          className="px-1"
+                                          onClick={(e) => e.stopPropagation()}
+                                        />
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent
+                                        className="w-56"
+                                        side="bottom"
+                                        align="end"
+                                      >
+                                        <Tooltip>
+                                          <DropdownMenuItem
+                                            className="gap-x-2"
+                                            disabled={isUpdating}
+                                            onSelect={(e) => {
+                                              e.stopPropagation()
+                                              handleCloseMergeRequest(branch)
+                                            }}
+                                          >
+                                            <X size={14} /> Close this merge request
+                                          </DropdownMenuItem>
+                                        </Tooltip>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  )
                                 }
                               />
                             )
@@ -341,9 +354,7 @@ MergeRequestsPage.getLayout = (page) => {
         )
       }
     }
-    const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-      resource: { is_default: false },
-    })
+
     const primaryActions = (
       <BranchSelector
         branches={previewBranches}
@@ -369,7 +380,7 @@ MergeRequestsPage.getLayout = (page) => {
     return (
       <PageLayout
         title="Merge requests"
-        subtitle="Manage branch merge requests and reviews"
+        subtitle="Review and merge changes from one branch into another"
         primaryActions={primaryActions}
         secondaryActions={secondaryActions}
       >

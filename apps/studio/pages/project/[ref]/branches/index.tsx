@@ -126,7 +126,6 @@ const BranchesPage: NextPageWithLayout = () => {
                       repo={repo}
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
-                      onViewAllBranches={() => {}}
                       onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
                       generateCreatePullRequestURL={generateCreatePullRequestURL}

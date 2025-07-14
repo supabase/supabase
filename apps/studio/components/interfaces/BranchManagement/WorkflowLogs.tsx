@@ -72,31 +72,29 @@ const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     }
   )
 
+  const showStatusIcon =
+    status !== undefined &&
+    status !== 'ACTIVE_HEALTHY' &&
+    status !== 'FUNCTIONS_DEPLOYED' &&
+    status !== 'MIGRATIONS_PASSED'
+  const isUnhealthy = status !== undefined && UNHEALTHY_STATUSES.includes(status)
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {(() => {
-          const showStatusIcon =
-            status !== undefined && status !== 'ACTIVE_HEALTHY' && status !== 'MIGRATIONS_PASSED'
-
-          const isUnhealthy = status !== undefined && UNHEALTHY_STATUSES.includes(status)
-
-          return (
-            <Button
-              type="default"
-              icon={
-                showStatusIcon ? (
-                  <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
-                ) : undefined
-              }
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            >
-              View Logs
-            </Button>
-          )
-        })()}
+        <Button
+          type="default"
+          icon={
+            showStatusIcon ? (
+              <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
+            ) : undefined
+          }
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        >
+          View Logs
+        </Button>
       </DialogTrigger>
 
       <DialogContent size="xlarge">

@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import {
   Button,
   DropdownMenu,
@@ -14,6 +13,7 @@ import {
   Clock,
   Infinity,
   Pencil,
+  Shield,
 } from 'lucide-react'
 import { useParams } from 'common'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
@@ -28,11 +28,12 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 
 import type { Branch } from 'data/branches/branches-query'
-import { ChevronRight } from 'lucide-react'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 import { useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { branchKeys } from 'data/branches/keys'
 
 interface OverviewProps {
   isLoading: boolean
@@ -40,7 +41,6 @@ interface OverviewProps {
   repo: string
   mainBranch: Branch
   previewBranches: Branch[]
-  onViewAllBranches: () => void
   onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
   generateCreatePullRequestURL: (branchName?: string) => string
@@ -53,12 +53,14 @@ export const Overview = ({
   repo,
   mainBranch,
   previewBranches,
-  onViewAllBranches,
   onSelectCreateBranch,
   onSelectDeleteBranch,
   generateCreatePullRequestURL,
   showProductionBranch = true,
 }: OverviewProps) => {
+  const persistentBranches = previewBranches.filter((branch) => branch.persistent)
+  const ephemeralBranches = previewBranches.filter((branch) => !branch.persistent)
+
   return (
     <>
       {showProductionBranch && (
@@ -66,41 +68,64 @@ export const Overview = ({
           {isLoading && <BranchRowLoader />}
           {isSuccess && mainBranch !== undefined && (
             <BranchRow
-              isMain
               branch={mainBranch}
+              label={
+                <div className="flex items-center gap-x-2">
+                  <Shield size={14} strokeWidth={1.5} className="text-warning" />
+                  {mainBranch.name}
+                </div>
+              }
               repo={repo}
-              onSelectDeleteBranch={noop}
               rowActions={<MainBranchActions branch={mainBranch} repo={repo} />}
             />
           )}
         </BranchManagementSection>
       )}
 
-      <BranchManagementSection
-        header="Preview branches"
-        footer={
-          isSuccess && (
-            <div className="flex items-center justify-center">
-              <Button type="text" iconRight={<ChevronRight />} onClick={() => onViewAllBranches()}>
-                View all branches
-              </Button>
-            </div>
-          )
-        }
-      >
+      {/* Persistent Branches Section */}
+      <BranchManagementSection header="Persistent branches">
         {isLoading && <BranchLoader />}
-        {isSuccess && previewBranches.length === 0 && (
-          <PreviewBranchesEmptyState onSelectCreateBranch={onSelectCreateBranch} />
+        {isSuccess && persistentBranches.length === 0 && (
+          <div className="flex items-center flex-col justify-center w-full py-10">
+            <p>No persistent branches</p>
+            <p className="text-foreground-light">
+              Persistent branches are long-lived and not automatically deleted.
+            </p>
+          </div>
         )}
         {isSuccess &&
-          previewBranches.map((branch) => {
+          persistentBranches.map((branch) => {
             return (
               <BranchRow
                 key={branch.id}
                 repo={repo}
                 branch={branch}
-                generateCreatePullRequestURL={generateCreatePullRequestURL}
-                onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                rowActions={
+                  <PreviewBranchActions
+                    branch={branch}
+                    repo={repo}
+                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                  />
+                }
+              />
+            )
+          })}
+      </BranchManagementSection>
+
+      {/* Ephemeral/Preview Branches Section */}
+      <BranchManagementSection header="Preview branches">
+        {isLoading && <BranchLoader />}
+        {isSuccess && ephemeralBranches.length === 0 && (
+          <PreviewBranchesEmptyState onSelectCreateBranch={onSelectCreateBranch} />
+        )}
+        {isSuccess &&
+          ephemeralBranches.map((branch) => {
+            return (
+              <BranchRow
+                key={branch.id}
+                repo={repo}
+                branch={branch}
                 rowActions={
                   <PreviewBranchActions
                     branch={branch}
@@ -121,7 +146,6 @@ export const Overview = ({
 const PreviewBranchActions = ({
   branch,
   onSelectDeleteBranch,
-  repo,
   generateCreatePullRequestURL,
 }: {
   branch: Branch
@@ -129,13 +153,17 @@ const PreviewBranchActions = ({
   onSelectDeleteBranch: () => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }) => {
-  const { ref: projectRef } = useParams()
   const gitlessBranching = useFlag('gitlessBranching')
+  const queryClient = useQueryClient()
+  const projectRef = branch.parent_project_ref ?? branch.project_ref
 
   const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
   const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
 
-  const { data } = useBranchQuery({ projectRef, id: branch.id })
+  const { data } = useBranchQuery({
+    projectRef,
+    id: branch.id,
+  })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
@@ -153,6 +181,9 @@ const PreviewBranchActions = ({
     onSuccess() {
       toast.success('Successfully updated branch')
       setShowBranchModeSwitch(false)
+      if (projectRef) {
+        queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
+      }
     },
   })
 
@@ -220,7 +251,7 @@ const PreviewBranchActions = ({
               >
                 {branch.persistent ? (
                   <>
-                    <Clock size={14} /> Switch to ephemeral
+                    <Clock size={14} /> Switch to preview
                   </>
                 ) : (
                   <>
