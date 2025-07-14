@@ -51,7 +51,7 @@ const LW15BuildStage: FC = () => {
                 <Link
                   href={day.links[0].url}
                   className={cn(
-                    'relative flex text-lg items-center gap-4 w-full dark:border-background-surface-300 p-4',
+                    'relative flex text-lg items-center gap-4 w-full dark:border-background-surface-300 p-4 text-foreground-light hover:text-foreground',
                     day.className
                   )}
                 >
