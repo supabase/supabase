@@ -243,12 +243,8 @@ const PipelineStatus = ({
 
     // Handle Failed status object
     if (isFailedStatus(pipelineStatus)) {
-      const isLoadingLogs = isLogLoadingState(pipelineStatus)
       return {
-        isFailedStatus: true,
-        tooltip: isLoadingLogs
-          ? 'Pipeline failed - logs are being retrieved from container'
-          : 'Pipeline has failed - expand for error details',
+        isFailedStatus: true
       }
     }
 
