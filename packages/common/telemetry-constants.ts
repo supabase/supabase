@@ -1326,6 +1326,23 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
 }
 
 /**
+ * Triggered when the organization MFA enforcement setting is updated.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/security
+ */
+export interface OrganizationMfaEnforcementUpdated {
+  action: 'organization_mfa_enforcement_updated'
+  properties: {
+    mfaEnforced: boolean
+  }
+  groups: {
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1403,3 +1420,4 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
+  | OrganizationMfaEnforcementUpdated
