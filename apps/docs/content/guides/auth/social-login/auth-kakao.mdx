@@ -70,17 +70,17 @@ If you're an individual developer (not business-verified), you may encounter err
 
 To resolve this issue:
 
-1. Go to **App Settings** > **Business** in your Kakao Developer Console
-2. Click **"Register business information"**
-3. Select **"Register as Individual"** option
-4. Agree to the terms of use (this may redirect you to your KakaoTalk mobile app)
-5. Reload the developer portal page in your browser
+1. Go to **App Settings** > **App** > **General** in your Kakao Developer Console
+2. Upload an **App Icon** if you haven't already (required for business app conversion)
+3. In the **Business Information** section, click **"개인 개발자 비즈 앱 전환"** (Individual Developer Business App Conversion)
+4. Complete personal verification and agree to Kakao Business integrated service terms
+5. After conversion, your app will show "비즈 앱" status and you can set `account_email` as a required consent item under **제품 설정** (Product Settings) > **카카오 로그인** (Kakao Login) > **동의항목** (Consent Items)
 
-After completing these steps, you'll have access to the `account_email` scope without requiring full business verification. This allows individual developers to use Kakao OAuth with email access in their applications.
+This allows individual developers to use Kakao OAuth with email access without requiring a business license.
 
 <Admonition type="note">
 
-You may also need to upload an app icon if you haven't already done so, as this can be a requirement for enabling certain features.
+The app icon upload is a prerequisite for business app conversion. Without an app icon, the conversion option will not be available.
 
 </Admonition>
 
