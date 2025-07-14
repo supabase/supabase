@@ -81,23 +81,19 @@ const FunctionDiff = ({
 
   return (
     <Card>
-      <CardHeader className="space-y-0 px-4">
-        {/* Function title */}
+      <CardHeader>
         <CardTitle>
           <Link
             href={`/project/${currentBranchRef}/functions/${functionSlug}`}
             className="flex items-center gap-2"
           >
-            <Code strokeWidth={1.5} size={16} className="text-foreground-light" />
+            <Code strokeWidth={1.5} size={16} className="text-foreground-muted" />
             {functionSlug}
           </Link>
         </CardTitle>
-
-        {/* File list sidebar will be shown instead of top tabs */}
       </CardHeader>
       <CardContent className="p-0 h-96">
         <div className="flex h-full min-h-0">
-          {/* Sidebar file list */}
           <div className="w-48 border-r bg-surface-200 flex flex-col overflow-y-auto">
             <ul className="divide-y divide-border">
               {fileInfos.map((fileInfo) => (
@@ -124,8 +120,6 @@ const FunctionDiff = ({
               ))}
             </ul>
           </div>
-
-          {/* Diff viewer */}
           <div className="flex-1 min-h-0">
             <DiffViewer
               language={language}
@@ -148,7 +142,9 @@ const EdgeFunctionsDiffPanel = ({
     return <Skeleton className="h-64" />
   }
 
-  if (!diffResults.hasChanges) {
+  const noChanges = diffResults.addedSlugs.length === 0 && diffResults.modifiedSlugs.length === 0
+
+  if (noChanges) {
     return (
       <div className="p-6 text-center">
         <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
@@ -178,8 +174,8 @@ const EdgeFunctionsDiffPanel = ({
           </div>
         </div>
       )}
-
-      {diffResults.removedSlugs.length > 0 && (
+      {/* TODO: Removing functions is not supported yet */}
+      {/* {diffResults.removedSlugs.length > 0 && (
         <div>
           <div className="space-y-4">
             {diffResults.removedSlugs.map((slug) => (
@@ -194,7 +190,7 @@ const EdgeFunctionsDiffPanel = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {diffResults.modifiedSlugs.length > 0 && (
         <div className="space-y-4">

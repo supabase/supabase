@@ -1,3 +1,4 @@
+import CopyButton from 'components/ui/CopyButton'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 
@@ -27,9 +28,10 @@ export const LogsList = ({ logs = [] }: LogsListProps) => {
       <div className="text-sm font-mono">
         {logs.map((log) => {
           const date = new Date(Number(log.timestamp) / 1000)
+          const message = log.event_message.split('\n').filter((x) => x.length > 0)
 
           return (
-            <div key={log.id} className="py-1.5 px-4 border-b border-border last:border-0">
+            <div key={log.id} className="group py-1.5 px-4 border-b border-border last:border-0">
               <div className="flex items-start gap-5">
                 <div className="flex flex-row items-center gap-5 flex-shrink-0">
                   <HoverCardTimestamp date={date} className="flex-shrink-0" />
@@ -39,8 +41,18 @@ export const LogsList = ({ logs = [] }: LogsListProps) => {
                     className="min-w-20 flex-shrink-0"
                   />
                 </div>
-                <div className="mt-1 whitespace-pre-wrap break-all pl-2 text-[0.8rem] flex-shrink-0 overflow-x-auto">
-                  {log.event_message}
+                <div className="w-full grow relative mt-1 whitespace-pre-wrap break-all pl-2 text-[0.75rem] flex-shrink-0">
+                  {message.map((x, i) => (
+                    <pre key={`message-${i}`} className="font-mono w-full">
+                      {x}
+                    </pre>
+                  ))}
+                  <CopyButton
+                    iconOnly
+                    type="default"
+                    text={log.event_message}
+                    className="absolute top-[5px] right-2 z-10 opacity-0 group-hover:opacity-100 transition"
+                  />
                 </div>
               </div>
             </div>

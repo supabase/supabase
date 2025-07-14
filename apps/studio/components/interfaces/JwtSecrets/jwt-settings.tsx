@@ -4,43 +4,40 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
-import {
-  AlertCircle,
-  ChevronDown,
-  Eye,
-  EyeOff,
-  Hourglass,
-  Key,
-  CloudOff,
-  Loader2,
-  PenTool,
-  Power,
-  RefreshCw,
-  TriangleAlert,
-  ExternalLink,
-  Lightbulb,
-} from 'lucide-react'
-import { Dispatch, SetStateAction, useState } from 'react'
-import { toast } from 'sonner'
-import { number, object } from 'yup'
-import Link from 'next/link'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import Panel from 'components/ui/Panel'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import { uuidv4 } from 'lib/helpers'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  AlertCircle,
+  ChevronDown,
+  CloudOff,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Hourglass,
+  Key,
+  Lightbulb,
+  Loader2,
+  PenTool,
+  Power,
+  RefreshCw,
+  TriangleAlert,
+} from 'lucide-react'
+import Link from 'next/link'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { toast } from 'sonner'
+import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -51,12 +48,10 @@ import {
   Input,
   InputNumber,
   Modal,
-  WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { useFlag } from 'hooks/ui/useFlag'
+import { number, object } from 'yup'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
@@ -193,25 +188,29 @@ const JWTSettings = () => {
                 ) : (
                   <>
                     {legacyKey && legacyKey.status !== 'revoked' && (
-                      <Admonition type="warning">
-                        You've successfully migrated your legacy JWT secret to the new JWT Signing
-                        Keys feature. Changing the legacy JWT secret now can only be done by
-                        rotating to a standby key and finally revoking it. Now used to{' '}
-                        <em className="text-brand not-italic">
-                          {legacyKey.status === 'in_use' ? 'sign and verify' : 'only verify'}
-                        </em>{' '}
-                        JSON Web Tokens by Supabase products.{' '}
+                      <Admonition
+                        type="warning"
+                        title="Legacy JWT secret has been migrated to new JWT Signing Keys"
+                      >
+                        <p className="!leading-normal">
+                          Changing the legacy JWT secret can only be done by rotating to a standby
+                          key and then revoking it. It is used to{' '}
+                          <em className="text-foreground not-italic">
+                            {legacyKey.status === 'in_use' ? 'sign and verify' : 'only verify'}
+                          </em>{' '}
+                          JSON Web Tokens by Supabase products.
+                        </p>
+
                         {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
-                          <>
+                          <p className="!leading-normal">
                             <em className="text-warning not-italic">
                               This includes the <code>anon</code> and <code>service_role</code> JWT
                               based API keys.
                             </em>{' '}
                             Consider switching to publishable and secret API keys to disable them.
-                          </>
+                          </p>
                         )}
-                        <br />
-                        <br />
+
                         <Button type="default" asChild icon={<ExternalLink className="size-4" />}>
                           <Link href={`/project/${projectRef}/settings/api-keys`}>
                             Go to API keys
@@ -220,10 +219,11 @@ const JWTSettings = () => {
                       </Admonition>
                     )}
                     {legacyKey && legacyKey.status === 'revoked' && (
-                      <Admonition type="note">
-                        Your project has revoked the legacy JWT secret. No new JSON Web Tokens are
-                        issued nor verified with it by Supabase products.
-                      </Admonition>
+                      <Admonition
+                        type="note"
+                        title="Your project has revoked the legacy JWT secret"
+                        description="No new JSON Web Tokens are issued nor verified with it by Supabase products."
+                      />
                     )}
                     <Input
                       label={

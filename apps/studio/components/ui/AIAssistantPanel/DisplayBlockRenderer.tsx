@@ -117,7 +117,7 @@ export const DisplayBlockRenderer = ({
         showRunButtonIfNotReadOnly={true}
         isLoading={isLoading}
         draggable={isDraggableToReports}
-        runQuery={initialArgs.runQuery === true && !displayData && !manualId}
+        runQuery={false}
         tooltip={
           isDraggableToReports ? (
             <div className="flex items-center gap-x-2">
