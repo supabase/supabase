@@ -53,7 +53,7 @@ async function resolveSearchImpl(
 ): Promise<Result<Array<SearchResultModel>, ApiErrorGeneric>> {
   const fieldsInfo = graphQLFields(info)
   const requestedFields = Object.keys(fieldsInfo.nodes ?? fieldsInfo.edges?.node ?? {})
-  return await SearchResultModel.search(args, requestedFields)
+  return await SearchResultModel.searchHybrid(args, requestedFields)
 }
 
 export const searchRoot = {
