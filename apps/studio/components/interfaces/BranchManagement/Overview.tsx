@@ -1,9 +1,6 @@
-import { useParams } from 'common'
-import { useBranchQuery } from 'data/branches/branch-query'
-import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { partition } from 'lodash'
 import {
   Clock,
   ExternalLink,
@@ -15,26 +12,28 @@ import {
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 import { toast } from 'sonner'
+
+import { useParams } from 'common'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useBranchQuery } from 'data/branches/branch-query'
+import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
+import type { Branch } from 'data/branches/branches-query'
+import { branchKeys } from 'data/branches/keys'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { EditBranchModal } from './EditBranchModal'
-
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
-import type { Branch } from 'data/branches/branches-query'
-import { branchKeys } from 'data/branches/keys'
-import { useState } from 'react'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
+import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 
 interface OverviewProps {
@@ -60,8 +59,10 @@ export const Overview = ({
   generateCreatePullRequestURL,
   showProductionBranch = true,
 }: OverviewProps) => {
-  const persistentBranches = previewBranches.filter((branch) => branch.persistent)
-  const ephemeralBranches = previewBranches.filter((branch) => !branch.persistent)
+  const [persistentBranches, ephemeralBranches] = partition(
+    previewBranches,
+    (branch) => branch.persistent
+  )
 
   return (
     <>
@@ -162,10 +163,7 @@ const PreviewBranchActions = ({
   const canDeleteBranches = useCheckPermissions(PermissionAction.DELETE, 'preview_branches')
   const canUpdateBranches = useCheckPermissions(PermissionAction.UPDATE, 'preview_branches')
 
-  const { data } = useBranchQuery({
-    projectRef,
-    id: branch.id,
-  })
+  const { data } = useBranchQuery({ projectRef, id: branch.id })
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
 
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
@@ -211,118 +209,110 @@ const PreviewBranchActions = ({
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
-          {/* Reset Branch */}
-          <Tooltip>
-            <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
-              <DropdownMenuItem
-                className="gap-x-2"
-                disabled={isResetting || !isBranchActiveHealthy}
-                onSelect={(e) => {
-                  e.stopPropagation()
-                  setShowConfirmResetModal(true)
-                }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowConfirmResetModal(true)
-                }}
-              >
-                <RefreshCw size={14} /> Reset Branch
-              </DropdownMenuItem>
-            </TooltipTrigger>
-            {!isBranchActiveHealthy && (
-              <TooltipContent side="left">
-                Branch is still initializing. Please wait for it to become healthy before resetting
-              </TooltipContent>
-            )}
-          </Tooltip>
+          <DropdownMenuItemTooltip
+            className="gap-x-2"
+            disabled={isResetting || !isBranchActiveHealthy}
+            onSelect={(e) => {
+              e.stopPropagation()
+              setShowConfirmResetModal(true)
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowConfirmResetModal(true)
+            }}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: !isBranchActiveHealthy
+                  ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
+                  : undefined,
+              },
+            }}
+          >
+            <RefreshCw size={14} /> Reset branch
+          </DropdownMenuItemTooltip>
 
-          {/* Switch persistent/ephemeral */}
-          <Tooltip>
-            <TooltipTrigger asChild={isBranchActiveHealthy} className="w-full">
-              <DropdownMenuItem
-                className="gap-x-2"
-                disabled={!isBranchActiveHealthy}
-                onSelect={(e) => {
-                  e.stopPropagation()
-                  setShowBranchModeSwitch(true)
-                }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowBranchModeSwitch(true)
-                }}
-              >
-                {branch.persistent ? (
-                  <>
-                    <Clock size={14} /> Switch to preview
-                  </>
-                ) : (
-                  <>
-                    <Infinity size={14} className="scale-110" /> Switch to persistent
-                  </>
-                )}
-              </DropdownMenuItem>
-            </TooltipTrigger>
-            {!isBranchActiveHealthy && (
-              <TooltipContent side="left">
-                Branch is still initializing. Please wait for it to become healthy before switching
-              </TooltipContent>
+          <DropdownMenuItemTooltip
+            className="gap-x-2"
+            disabled={!isBranchActiveHealthy}
+            onSelect={(e) => {
+              e.stopPropagation()
+              setShowBranchModeSwitch(true)
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowBranchModeSwitch(true)
+            }}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: !isBranchActiveHealthy
+                  ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
+                  : undefined,
+              },
+            }}
+          >
+            {branch.persistent ? (
+              <>
+                <Clock size={14} /> Switch to preview
+              </>
+            ) : (
+              <>
+                <Infinity size={14} className="scale-110" /> Switch to persistent
+              </>
             )}
-          </Tooltip>
+          </DropdownMenuItemTooltip>
 
           {/* Edit Branch (gitless) */}
           {gitlessBranching && (
-            <Tooltip>
-              <TooltipTrigger
-                asChild={canUpdateBranches && isBranchActiveHealthy}
-                className="w-full"
-              >
-                <DropdownMenuItem
-                  className="gap-x-2"
-                  disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
-                  onSelect={(e) => {
-                    e.stopPropagation()
-                    setShowEditBranchModal(true)
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setShowEditBranchModal(true)
-                  }}
-                >
-                  <Pencil size={14} /> Edit Branch
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {(!canUpdateBranches || !isBranchActiveHealthy) && (
-                <TooltipContent side="left">
-                  {!canUpdateBranches
+            <DropdownMenuItemTooltip
+              className="gap-x-2"
+              disabled={!canUpdateBranches || !isBranchActiveHealthy || isUpdatingBranch}
+              onSelect={(e) => {
+                e.stopPropagation()
+                setShowEditBranchModal(true)
+              }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowEditBranchModal(true)
+              }}
+              tooltip={{
+                content: {
+                  side: 'left',
+                  text: !canUpdateBranches
                     ? 'You need additional permissions to edit branches'
-                    : 'Branch is still initializing. Wait until healthy.'}
-                </TooltipContent>
-              )}
-            </Tooltip>
+                    : !isBranchActiveHealthy
+                      ? 'Branch is still initializing. Please wait for it to become healthy before editing.'
+                      : undefined,
+                },
+              }}
+            >
+              <Pencil size={14} /> Edit branch
+            </DropdownMenuItemTooltip>
           )}
 
-          {/* Delete Branch */}
-          <Tooltip>
-            <TooltipTrigger asChild={canDeleteBranches} className="w-full">
-              <DropdownMenuItem
-                className="gap-x-2"
-                disabled={!canDeleteBranches}
-                onSelect={(e) => {
-                  e.stopPropagation()
-                  onSelectDeleteBranch()
-                }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onSelectDeleteBranch()
-                }}
-              >
-                <Trash2 size={14} /> Delete branch
-              </DropdownMenuItem>
-            </TooltipTrigger>
-            {!canDeleteBranches && (
-              <TooltipContent side="left">You need permissions to delete branches</TooltipContent>
-            )}
-          </Tooltip>
+          <DropdownMenuItemTooltip
+            className="gap-x-2"
+            disabled={!canDeleteBranches}
+            onSelect={(e) => {
+              e.stopPropagation()
+              onSelectDeleteBranch()
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onSelectDeleteBranch()
+            }}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: !canDeleteBranches
+                  ? 'You need additional permissions to delete branches'
+                  : undefined,
+              },
+            }}
+          >
+            <Trash2 size={14} /> Delete branch
+          </DropdownMenuItemTooltip>
 
           {/* Create PR if applicable */}
           {branch.git_branch && branch.pr_number === undefined && (
@@ -333,14 +323,13 @@ const PreviewBranchActions = ({
                 href={generateCreatePullRequestURL(branch.git_branch)}
                 onClick={(e) => e.stopPropagation()}
               >
-                <ExternalLink size={14} /> Create Pull Request
+                <ExternalLink size={14} /> Create pull request
               </a>
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Modals */}
       <ConfirmationModal
         variant="destructive"
         visible={showConfirmResetModal}
