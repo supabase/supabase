@@ -2,12 +2,12 @@ import { motion } from 'framer-motion'
 import {
   CircleArrowDown,
   CircleArrowUp,
-  Trash2,
   Eye,
   Key,
   MoreVertical,
   ShieldOff,
   Timer,
+  Trash2,
 } from 'lucide-react'
 
 import { components } from 'api-types'
@@ -28,8 +28,8 @@ import { statusColors, statusLabels } from '../jwt.constants'
 
 interface SigningKeyRowProps {
   signingKey: components['schemas']['SigningKeyResponse']
-  setSelectedKey: (key: JWTSigningKey | null) => void
-  setShownDialog: (dialog: 'key-details' | 'revoke' | 'delete' | null) => void
+  setSelectedKey: (key?: JWTSigningKey) => void
+  setShownDialog: (dialog?: 'key-details' | 'revoke' | 'delete') => void
   handlePreviouslyUsedKey: (keyId: string) => void
   handleStandbyKey: (keyId: string) => void
   legacyKey?: JWTSigningKey | null
