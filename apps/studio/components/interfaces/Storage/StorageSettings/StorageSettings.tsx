@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Clock } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -32,7 +32,11 @@ import {
   Select_Shadcn_,
   Switch,
 } from 'ui'
-import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
+import {
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES,
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
+  StorageSizeUnits,
+} from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 interface StorageSettingsState {
@@ -84,9 +88,15 @@ const StorageSettings = () => {
     }
   }, [isSuccess, config])
 
-  const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
-    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
-  )} bytes`
+  const maxBytes = useMemo(() => {
+    if (organization?.usage_billing_enabled) {
+      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+    } else {
+      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
+    }
+  }, [organization])
+
+  const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(maxBytes)} bytes`
 
   const FormSchema = z
     .object({
@@ -96,7 +106,7 @@ const StorageSettings = () => {
     })
     .superRefine((data, ctx) => {
       const { unit, fileSizeLimit } = data
-      const { value: formattedMaxLimit } = convertFromBytes(STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, unit)
+      const { value: formattedMaxLimit } = convertFromBytes(maxBytes, unit)
 
       if (fileSizeLimit > formattedMaxLimit) {
         ctx.addIssue({
@@ -222,7 +232,7 @@ const StorageSettings = () => {
                         limit,
                         storageUnit
                       ).toLocaleString()} bytes. `}
-                    Maximum size in bytes of a file that can be uploaded is 50 GB (
+                    Maximum size in bytes of a file that can be uploaded is 500 GB (
                     {formattedMaxSizeBytes}).
                   </p>
                 </div>
