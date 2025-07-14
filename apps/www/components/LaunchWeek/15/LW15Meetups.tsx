@@ -91,11 +91,6 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
     setShowOverlay(false)
   }
 
-  // Keep this for OG image generation
-  const meetupsFilteredByUniqueCountries = meetups
-    .filter((meetup, index, self) => index === self.findIndex((t) => t.country === meetup.country))
-    .sort((a, b) => a.country.localeCompare(b.country))
-
   const meetupsSortedByCity = meetups.sort((a, b) =>
     getMeetupCity(a).localeCompare(getMeetupCity(b))
   )
