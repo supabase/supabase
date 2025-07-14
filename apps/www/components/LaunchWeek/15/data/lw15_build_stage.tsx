@@ -26,13 +26,13 @@ export interface BuildDayLink {
 
 export const days: BuildDay[] = [
   {
-    title: '',
+    title: 'Supabase UI: Platform Kit',
     description: '',
-    id: '',
-    is_shipped: false,
+    id: 'platform-kit',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/supabase-ui-platform-kit',
         label: 'Blog post',
         target: '_blank',
       },
