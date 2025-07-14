@@ -44,14 +44,14 @@ Embed the manager dialog in your app and manage its state:
 
 ```tsx
 import { useState } from 'react'
-import { useMobile } from '@/hooks/use-mobile'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { Button } from '@/components/ui/button'
 import SupabaseManagerDialog from '@/components/supabase-manager'
 
 export default function Example() {
   const [open, setOpen] = useState(false)
   const projectRef = 'your-project-ref' // Replace with your actual project ref
-  const isMobile = useMobile()
+  const isMobile = useIsMobile()
 
   return (
     <>
