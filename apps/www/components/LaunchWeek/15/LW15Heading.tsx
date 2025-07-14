@@ -115,20 +115,9 @@ const LW15Heading = () => {
             data-animate-delay={300}
             className="hidden md:inline-block opacity-0 col-span-3 lg:col-span-2 text-xs overflow-hidden h-fit max-w-[400px]"
           >
-            Celebrate our launch week with exciting new features designed to take your development
-            skills to the next level.
+            Five days of launches to supercharge your development.
           </div>
-          <div className="flex flex-col justify-start lg:col-start-4 md:col-span-2 lg:col-span-1 gap-4">
-            <h2
-              data-animate
-              data-animate-delay={400}
-              data-animate-duration={800}
-              className="text-xs opacity-0 text-left md:text-right lg:text-left"
-            >
-              Five days of launches
-              <br /> to supercharge your development.
-            </h2>
-          </div>
+          <div className="flex flex-col justify-start lg:col-start-4 md:col-span-2 lg:col-span-1 gap-4"></div>
           <div className="col-span-1 text-right text-xs hidden lg:flex justify-end items-start h-fit overflow-hidden">
             <LW15ThemeSwitcher className="opacity-0 anim-last" />
           </div>
