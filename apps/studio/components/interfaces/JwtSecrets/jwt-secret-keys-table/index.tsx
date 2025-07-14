@@ -70,7 +70,7 @@ export default function JWTSecretKeysTable() {
     {
       onSuccess: () => {
         setShownDialog(undefined)
-        toast.success('Successfully migrate JWT secret!')
+        toast.success('Successfully migrated JWT secret!')
       },
     }
   )
