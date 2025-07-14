@@ -1,10 +1,4 @@
-export function LogoSupabase({
-  className,
-  size = 24,
-}: {
-  className?: string;
-  size?: number;
-}) {
+export function LogoSupabase({ className, size = 24 }: { className?: string; size?: number }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -51,5 +45,5 @@ export function LogoSupabase({
         </linearGradient>
       </defs>
     </svg>
-  );
+  )
 }
