@@ -132,14 +132,7 @@ export const BranchRow = ({
         <p className="text-xs text-foreground-lighter">
           {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
         </p>
-        <WorkflowLogs
-          projectRef={branch.project_ref}
-          status={
-            (branch.status === 'CREATING_PROJECT'
-              ? data?.status ?? branch.status
-              : branch.status) as any
-          }
-        />
+        <WorkflowLogs projectRef={branch.project_ref} status={branch.status} />
         {rowActions}
       </div>
     </div>
