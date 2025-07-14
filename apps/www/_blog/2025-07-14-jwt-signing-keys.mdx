@@ -20,6 +20,16 @@ Today we're announcing some long awaited changes in Supabase:
 - Support for [asymmetric JWTs with Supabase Auth](/docs/guides/auth/signing-keys).
 - [New API keys](/docs/guides/api/api-keys) to help you transition to asymmetric JWTs and improve the security of your apps.
 
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/..."
+    title="Introducing JWT Signing Keys"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
 ## JWT as Open Source Auth
 
 Over the last decade, [JSON Web Tokens](https://jwt.io/introduction) (JWTs) have surfaced as the [universal language](https://supabase.com/docs/guides/auth/sessions#what-are-the-benefits-of-using-access-and-refresh-tokens-instead-of-traditional-sessions) between your business logic and your Auth servers.
@@ -55,9 +65,16 @@ We’ve taken great care to ensure each step is safe and reversible, ensuring ze
 
 ### 1. Migrate to get started
 
-Use the Supabase dashboard to migrate your existing JWT secret to the new JWT signing keys system.
+Use the [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/jwt/signing-keys) to migrate your existing JWT secret to the new JWT signing keys system.
 
-_Screenshot of migration UI._
+<Img
+  alt="Geo-routing diagram"
+  src={{
+    dark: '/images/blog/launch-week-15/day-1-jwt-signing-keys/jwt-signing-keys-migration-dark.png',
+    light:
+      '/images/blog/launch-week-15/day-1-jwt-signing-keys/jwt-signing-keys-migration-light.png',
+  }}
+/>
 
 Your project continues using its existing symmetric JWT secret, but under the hood, Supabase has prepared your project for asymmetric JWTs.
 
