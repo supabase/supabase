@@ -47,6 +47,8 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
       const { projectRef } = variables
 
       await queryClient.invalidateQueries(jwtSigningKeysKeys.legacy(projectRef))
+      // invalidate the keys as well since migration creates 2 new keys and the UI needs to be refreshed
+      await queryClient.invalidateQueries(jwtSigningKeysKeys.list(projectRef))
 
       await onSuccess?.(data, variables, context)
     },
