@@ -170,7 +170,7 @@ export const NamespaceCard = ({
       <div className="flex flex-col gap-3 border-t bg-dash-sidebar p-4 rounded-b-lg">
         {tables.length === 0 && (
           <div className="flex flex-col gap-2 items-center justify-center">
-            <p className="text-foreground-light text-sm">No connectedtables</p>
+            <p className="text-foreground-light text-sm">No connected tables</p>
           </div>
         )}
         {tables?.map((table) => {

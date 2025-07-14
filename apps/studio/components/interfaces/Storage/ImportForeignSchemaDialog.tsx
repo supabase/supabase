@@ -8,9 +8,10 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import {
+  importForeignSchema,
+  useFDWImportForeignSchemaMutation,
+} from 'data/fdw/fdw-import-foreign-schema-mutation'
 import {
   Button,
   Form_Shadcn_,
@@ -24,6 +25,7 @@ import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
+  namespace: string
   wrapperValues: Record<string, string>
   visible: boolean
   onClose: () => void
@@ -49,19 +51,6 @@ export const ImportForeignSchemaDialog = ({
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
-  const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: wrapperValues['vault_token'],
-    },
-    {
-      enabled: wrapperValues['vault_token'] !== undefined,
-    }
-  )
-
-  const { mutateAsync: createIcebergNamespace } = useIcebergNamespaceCreateMutation()
-
   const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({
     onSuccess: () => {
       toast.success(`Successfully connected ${bucketName} to the database.`)
@@ -80,7 +69,6 @@ export const ImportForeignSchemaDialog = ({
 
   const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
     if (!ref) return console.error('Project ref is required')
-    if (!token) return console.error('Token is required')
     setLoading(true)
 
     try {
