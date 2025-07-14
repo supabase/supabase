@@ -165,11 +165,41 @@ export const DisplayApiSettings = ({
                 }
                 onChange={() => {}}
                 descriptionText={
-                  x.tags === 'service_role'
-                    ? 'This key has the ability to bypass Row Level Security. Never share it publicly. If leaked, generate a new JWT secret immediately. ' +
-                      (showLegacyText ? 'Prefer using Publishable API keys instead.' : '')
-                    : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies. ' +
-                      (showLegacyText ? 'Prefer using Secret API keys instead.' : '')
+                  x.tags === 'service_role' ? (
+                    <>
+                      This key has the ability to bypass Row Level Security. Never share it
+                      publicly. If leaked, generate a new JWT secret immediately.{' '}
+                      {showLegacyText && (
+                        <span>
+                          Prefer using{' '}
+                          <a
+                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            className="text-link underline"
+                          >
+                            Secret API keys
+                          </a>{' '}
+                          instead.
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      This key is safe to use in a browser if you have enabled Row Level Security
+                      for your tables and configured policies.{' '}
+                      {showLegacyText && (
+                        <span>
+                          Prefer using{' '}
+                          <a
+                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            className="text-link underline"
+                          >
+                            Publishable API keys
+                          </a>{' '}
+                          instead.
+                        </span>
+                      )}
+                    </>
+                  )
                 }
               />
 
