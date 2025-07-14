@@ -269,7 +269,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
                 <Badge
                   size="small"
                   variant="outline"
-                  className="ml-auto h-5 text-[10px] text-foreground-light"
+                  className="h-5 text-[10px] text-foreground-light capitalize"
                 >
                   {helper.availableIn[0]}
                 </Badge>
