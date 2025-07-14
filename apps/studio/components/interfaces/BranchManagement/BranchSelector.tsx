@@ -1,9 +1,9 @@
-import { Check, Plus, Shield } from 'lucide-react'
+import { Check, GitMerge, Shield } from 'lucide-react'
 import { useState } from 'react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Branch } from 'data/branches/branches-query'
 import {
-  Button,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -21,6 +21,7 @@ interface BranchSelectorProps {
   onBranchSelected?: (branch: Branch) => void
   disabled?: boolean
   isUpdating?: boolean
+  type?: 'primary' | 'outline'
 }
 
 export const BranchSelector = ({
@@ -28,6 +29,7 @@ export const BranchSelector = ({
   onBranchSelected,
   disabled = false,
   isUpdating = false,
+  type = 'primary',
 }: BranchSelectorProps) => {
   const [open, setOpen] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
@@ -46,16 +48,24 @@ export const BranchSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type="outline"
-          size="tiny"
+        <ButtonTooltip
+          icon={<GitMerge size={14} strokeWidth={1.5} />}
+          type={type}
           disabled={disabled || availableBranches.length === 0 || isUpdating}
-          icon={<Plus size={14} strokeWidth={1.5} />}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text:
+                availableBranches.length === 0
+                  ? 'All branches currently have merge requests'
+                  : undefined,
+            },
+          }}
         >
-          {isUpdating ? 'Creating...' : 'Create review'}
-        </Button>
+          {isUpdating ? 'Creating...' : 'New merge request'}
+        </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom">
+      <PopoverContent_Shadcn_ portal className="p-0 w-80" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find branch to review..." />
           <CommandList_Shadcn_>
