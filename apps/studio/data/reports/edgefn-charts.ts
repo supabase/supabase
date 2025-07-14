@@ -2,28 +2,8 @@ import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
   {
-    id: 'invocations',
-    label: 'Edge Function Invocations',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    titleTooltip: 'The total number of edge function invocations.',
-    attributes: [
-      {
-        attribute: 'TotalInvocations',
-        provider: 'logs',
-        label: 'Invocations',
-        enabled: true,
-      },
-    ],
-  },
-  {
     id: 'execution-status-codes',
-    label: 'Edge Function Execution Status Codes',
+    label: 'Edge Function Status Codes',
     valuePrecision: 0,
     hide: false,
     showTooltip: true,
@@ -32,30 +12,12 @@ export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
     hideChartType: false,
     defaultChartStyle: 'bar',
     titleTooltip: 'The total number of edge function executions by status code.',
+    availableIn: ['free', 'pro', 'team'],
     attributes: [
       {
         attribute: 'ExecutionStatusCodes',
         provider: 'logs',
         label: 'Execution Status Codes',
-      },
-    ],
-  },
-  {
-    id: 'invocations-by-region',
-    label: 'Edge Function Invocations by Region',
-    valuePrecision: 0,
-    hide: false,
-    showTooltip: true,
-    showLegend: true,
-    showMaxValue: false,
-    hideChartType: false,
-    defaultChartStyle: 'bar',
-    titleTooltip: 'The total number of edge function invocations by region.',
-    attributes: [
-      {
-        attribute: 'InvocationsByRegion',
-        provider: 'logs',
-        label: 'Invocations by Region',
       },
     ],
   },
@@ -70,6 +32,7 @@ export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
+    availableIn: ['free', 'pro', 'team'],
     format: 'ms',
     YAxisProps: {
       width: 50,
@@ -81,6 +44,26 @@ export const getEdgeFunctionReportAttributes = (): ReportAttributes[] => [
         label: 'Avg. Execution Time (ms)',
         provider: 'logs',
         enabled: true,
+      },
+    ],
+  },
+  {
+    id: 'invocations-by-region',
+    label: 'Edge Function Invocations by Region',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: true,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of edge function invocations by region.',
+    availableIn: ['pro', 'team'],
+    attributes: [
+      {
+        attribute: 'InvocationsByRegion',
+        provider: 'logs',
+        label: 'Invocations by Region',
       },
     ],
   },
