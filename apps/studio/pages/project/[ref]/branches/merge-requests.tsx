@@ -327,6 +327,7 @@ MergeRequestsPage.getLayout = (page) => {
     const router = useRouter()
     const { ref } = useParams()
     const project = useSelectedProject()
+    const gitlessBranching = useFlag('gitlessBranching')
     const isBranch = project?.parent_project_ref !== undefined
     const projectRef =
       project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
@@ -355,14 +356,14 @@ MergeRequestsPage.getLayout = (page) => {
       }
     }
 
-    const primaryActions = (
+    const primaryActions = gitlessBranching ? (
       <BranchSelector
         branches={previewBranches}
         onBranchSelected={handleMarkBranchForReview}
         disabled={!projectRef}
         isUpdating={isUpdating}
       />
-    )
+    ) : null
     const secondaryActions = (
       <div className="flex items-center gap-x-2">
         <Button asChild type="text" icon={<MessageCircle className="text-muted" strokeWidth={1} />}>
