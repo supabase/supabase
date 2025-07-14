@@ -257,6 +257,9 @@ export default function JWTSecretKeysTable() {
                         <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Type
                         </TableHead>
+                        <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
+                          Last rotated at
+                        </TableHead>
                         <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Actions
                         </TableHead>
@@ -280,8 +283,14 @@ export default function JWTSecretKeysTable() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <div className="flex items-center justify-center text-sm text-foreground-light p-6">
-                    No previously used keys
+                  <div className="flex flex-col items-center justify-center text-center text-foreground-light p-8 gap-2">
+                    <Timer className="size-6 text-foreground-lighter" />
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium">No previously used keys</p>
+                      <p className="text-xs text-foreground-lighter">
+                        Rotated keys will appear here for verification of existing tokens
+                      </p>
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -311,6 +320,9 @@ export default function JWTSecretKeysTable() {
                     </TableHead>
                     <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Type
+                    </TableHead>
+                    <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
+                      Last rotated at
                     </TableHead>
                     <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Actions
