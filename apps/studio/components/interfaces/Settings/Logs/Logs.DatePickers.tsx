@@ -271,7 +271,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
                   variant="outline"
                   className="h-5 text-[10px] text-foreground-light capitalize"
                 >
-                  {helper.availableIn[0]}
+                  {helper.availableIn?.[0] || ''}
                 </Badge>
               ) : null}
             </Label>
