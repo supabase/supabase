@@ -142,7 +142,9 @@ const EdgeFunctionsDiffPanel = ({
     return <Skeleton className="h-64" />
   }
 
-  if (!diffResults.hasChanges) {
+  const noChanges = diffResults.addedSlugs.length === 0 && diffResults.modifiedSlugs.length === 0
+
+  if (noChanges) {
     return (
       <div className="p-6 text-center">
         <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
