@@ -96,6 +96,10 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
     .filter((meetup, index, self) => index === self.findIndex((t) => t.country === meetup.country))
     .sort((a, b) => a.country.localeCompare(b.country))
 
+  const meetupsSortedByCity = meetups.sort((a, b) =>
+    getMeetupCity(a).localeCompare(getMeetupCity(b))
+  )
+
   return (
     <>
       <MeetupOverlayCard
@@ -127,8 +131,8 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
             activeMeetup && 'text-foreground-muted'
           )}
         >
-          {meetups &&
-            meetups?.map((meetup: LumaEvent, i: number) => {
+          {meetupsSortedByCity &&
+            meetupsSortedByCity?.map((meetup: LumaEvent, i: number) => {
               const startAt = new Date(meetup.start_at)
               const endAt = addHours(new Date(meetup.start_at), 3)
               const after = now > startAt
