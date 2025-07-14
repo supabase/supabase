@@ -11,7 +11,10 @@ import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  LogsDatePicker,
+  DatePickerValue,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import { Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import { Label } from '@ui/components/shadcn/ui/label'
 
@@ -19,6 +22,7 @@ import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 
@@ -56,10 +60,14 @@ const EdgeFunctionsUsage = () => {
 
   const {
     selectedDateRange,
-    updateDateRange: updateDateRangeFromHook,
-    handleDatePickerChange,
+    updateDateRange,
     datePickerValue,
     datePickerHelpers,
+    isOrgPlanLoading,
+    orgPlan,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const queryClient = useQueryClient()
@@ -73,10 +81,6 @@ const EdgeFunctionsUsage = () => {
     setIsRefreshing(true)
     queryClient.invalidateQueries(['edge-function-report', ref])
     setTimeout(() => setIsRefreshing(false), 1000)
-  }
-
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    updateDateRangeFromHook(from, to)
   }
 
   if (!ref) {
@@ -103,6 +107,13 @@ const EdgeFunctionsUsage = () => {
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="edgeFunctionsReportDateRange"
               />
               <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
@@ -213,6 +224,7 @@ const EdgeFunctionsUsage = () => {
               endDate={selectedDateRange?.period_end?.date}
               updateDateRange={updateDateRange}
               functionIds={functionIds}
+              orgPlanId={orgPlan?.id}
             />
           ))}
       </ReportStickyNav>

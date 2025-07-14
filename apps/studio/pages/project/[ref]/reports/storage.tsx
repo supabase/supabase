@@ -8,7 +8,10 @@ import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  DatePickerValue,
+  LogsDatePicker,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
   NetworkTrafficRenderer,
@@ -19,10 +22,12 @@ import {
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import { useState } from 'react'
 
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useStorageReport } from 'data/reports/storage-report-query'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 
@@ -42,18 +47,23 @@ export const StorageReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { datePickerHelpers, datePickerValue, handleDatePickerChange } = useReportDateRange(
-    REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
-  )
+  const {
+    datePickerHelpers,
+    datePickerValue,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
-    // Update localStorage and hook state
-    handleDatePickerChange(vals)
-    // Update query params for the report
-    mergeParams({
-      iso_timestamp_start: vals.from || '',
-      iso_timestamp_end: vals.to || '',
-    })
+    const promptShown = handleDatePickerChangeFromHook(vals)
+    if (!promptShown) {
+      // Update query params for the report
+      mergeParams({
+        iso_timestamp_start: vals.from || '',
+        iso_timestamp_end: vals.to || '',
+      })
+    }
   }
 
   return (
@@ -61,7 +71,7 @@ export const StorageReport: NextPageWithLayout = () => {
       <ReportHeader title="Storage" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <>
+          <div className="flex items-center gap-3">
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}
@@ -77,7 +87,14 @@ export const StorageReport: NextPageWithLayout = () => {
               className="w-full"
               showDatabaseSelector={false}
             />
-          </>
+            <UpgradePrompt
+              show={showUpgradePrompt}
+              setShowUpgradePrompt={setShowUpgradePrompt}
+              title="Report date range"
+              description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+              source="storageReportDateRange"
+            />
+          </div>
         }
       >
         <ReportWidget
