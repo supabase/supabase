@@ -182,7 +182,7 @@ Which responds with JWKS object containing one or more asymmetric [JWT signing k
 }
 ```
 
-This endpoint is served directly from the Auth server, but is also additionally cached by the Supabase Edge for 10 minutes, significanlty speeding up access to this data regardless of where you're performing the verification. It's important to be aware of the cache expiry time to prevent unintentionally rejecting valid user access tokens. We recommend waiting at least 20 minutes when creating a standby signing key, or revoking a previously used key.
+This endpoint is served directly from the Auth server, but is also additionally cached by the Supabase Edge for 10 minutes, significantly speeding up access to this data regardless of where you're performing the verification. It's important to be aware of the cache expiry time to prevent unintentionally rejecting valid user access tokens. We recommend waiting at least 20 minutes when creating a standby signing key, or revoking a previously used key.
 
 Make sure that you do not cache this data for longer in your application, as it might make revocation difficult. If you do, make sure to provide a way to purge this cache when rotating signing keys to avoid unintentionally rejecting valid user access tokens.
 
