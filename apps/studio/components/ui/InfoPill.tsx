@@ -1,11 +1,13 @@
+import { ExternalLink } from 'lucide-react'
 import React from 'react'
+
+import { cn } from 'ui'
+import { Badge } from 'ui/src/components/shadcn/ui/badge'
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from 'ui/src/components/shadcn/ui/hover-card'
-import { Badge } from 'ui/src/components/shadcn/ui/badge'
-import { ExternalLink } from 'lucide-react'
 
 interface Link {
   url: string
@@ -23,9 +25,11 @@ interface InfoPillProps {
 export const InfoPill: React.FC<InfoPillProps> = ({ label, icon, title, description, links }) => {
   return (
     <HoverCard closeDelay={50} openDelay={300}>
-      <HoverCardTrigger>
-        <Badge className="gap-2 py-0 hover:border-foreground">
-          {icon} {label}
+      <HoverCardTrigger className="min-w-0 flex">
+        <Badge className={cn('gap-2 py-2 h-6 min-w-0 overflow-hidden')}>
+          <span className="flex-1 flex items-center gap-2">
+            {icon} {label}
+          </span>
         </Badge>
       </HoverCardTrigger>
       <HoverCardContent className="w-80 flex items-start gap-3" side="right" align="center">
