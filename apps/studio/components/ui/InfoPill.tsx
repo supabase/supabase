@@ -1,7 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import React from 'react'
 
-import { cn } from 'ui'
 import { Badge } from 'ui/src/components/shadcn/ui/badge'
 import {
   HoverCard,
@@ -26,7 +25,7 @@ export const InfoPill: React.FC<InfoPillProps> = ({ label, icon, title, descript
   return (
     <HoverCard closeDelay={50} openDelay={300}>
       <HoverCardTrigger className="min-w-0 flex">
-        <Badge className={cn('gap-2 py-2 h-6 min-w-0 overflow-hidden')}>
+        <Badge className="gap-2 py-2 h-6 min-w-0 overflow-hidden">
           <span className="flex-1 flex items-center gap-2">
             {icon} {label}
           </span>
