@@ -167,7 +167,8 @@ export const DisplayApiSettings = ({
                 descriptionText={
                   x.tags === 'service_role' ? (
                     <>
-                      This key has the ability to bypass Row Level Security. Never share it publicly. If leaked, generate a new JWT secret immediately.{' '}
+                      This key has the ability to bypass Row Level Security. Never share it
+                      publicly. If leaked, generate a new JWT secret immediately.{' '}
                       {showLegacyText && (
                         <span>
                           Prefer using{' '}
@@ -183,7 +184,8 @@ export const DisplayApiSettings = ({
                     </>
                   ) : (
                     <>
-                      This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies.{' '}
+                      This key is safe to use in a browser if you have enabled Row Level Security
+                      for your tables and configured policies.{' '}
                       {showLegacyText && (
                         <span>
                           Prefer using{' '}
@@ -199,7 +201,6 @@ export const DisplayApiSettings = ({
                     </>
                   )
                 }
-
               />
 
               <div
