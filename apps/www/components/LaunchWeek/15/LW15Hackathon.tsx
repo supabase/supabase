@@ -25,7 +25,6 @@ const LW15Hackathon: FC = () => {
               </div>
               <div>Starts this Friday.</div>
             </div>
-            <div className="text-6xl sm:hidden">Step into a space where ideas expand.</div>
           </div>
           <LW15HackathonImage className="lg:hidden" />
           <div className="flex flex-col justify-between gap-4">
