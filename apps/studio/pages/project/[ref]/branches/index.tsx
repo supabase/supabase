@@ -5,10 +5,11 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { Overview } from 'components/interfaces/BranchManagement/Overview'
 import BranchLayout from 'components/layouts/BranchLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -20,15 +21,17 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
+import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { Overview } from 'components/interfaces/BranchManagement/Overview'
-import type { NextPageWithLayout } from 'types'
 
 const BranchesPage: NextPageWithLayout = () => {
   const { ref } = useParams()
+  const snap = useAppStateSnapshot()
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
+
+  const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
   const hasBranchEnabled = project?.is_branch_enabled
 
@@ -36,14 +39,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const snap = useAppStateSnapshot()
-
-  const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
-
   const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
-  const canCreateBranches = useCheckPermissions(PermissionAction.CREATE, 'preview_branches', {
-    resource: { is_default: false },
-  })
 
   const {
     data: connections,
@@ -140,7 +136,7 @@ const BranchesPage: NextPageWithLayout = () => {
       </ScaffoldContainer>
 
       <TextConfirmModal
-        variant={'warning'}
+        variant="warning"
         visible={selectedBranchToDelete !== undefined}
         onCancel={() => setSelectedBranchToDelete(undefined)}
         onConfirm={() => onConfirmDeleteBranch()}

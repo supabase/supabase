@@ -11,7 +11,7 @@ import { generateBranchMenu } from './BranchLayout.utils'
 const BranchProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
-  const page = router.pathname.split('/')[4]
+  const page = router.pathname.split('/')[4] ?? 'branches'
 
   return (
     <>

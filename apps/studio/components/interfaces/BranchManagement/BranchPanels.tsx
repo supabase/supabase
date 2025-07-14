@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 import { Github } from 'lucide-react'
-import { Button } from 'ui'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
@@ -81,6 +81,7 @@ export const BranchRow = ({
   const formattedUpdatedAt = dayjs(branch.updated_at).format('DD MMM YYYY, HH:mm:ss (ZZ)')
 
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
+
   const handleRowClick = () => {
     if (external) {
       window.open(navigateUrl, '_blank', 'noopener noreferrer')
@@ -90,21 +91,32 @@ export const BranchRow = ({
   }
 
   return (
-    <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
-      <div className="flex items-center gap-x-3 cursor-pointer" onClick={handleRowClick}>
+    <div className="w-full flex items-center justify-between px-4 py-2.5 transition hover:bg-surface-100">
+      <div className="flex items-center gap-x-3">
         {branch.git_branch && (
-          <Button asChild type="default">
-            <Link
+          <ButtonTooltip
+            asChild
+            type="default"
+            className="px-1.5"
+            tooltip={{ content: { side: 'bottom', text: 'View branch on GitHub' } }}
+          >
+            <a
               target="_blank"
-              rel="noreferrer"
-              passHref
+              rel="noreferrer noopener"
               href={`https://github.com/${repo}/tree/${branch.git_branch}`}
             >
               <Github size={14} className="text-foreground-light" />
-            </Link>
-          </Button>
+            </a>
+          </ButtonTooltip>
         )}
-        {label || branch.name}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center cursor-pointer" onClick={handleRowClick}>
+              {label || branch.name}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Switch to branch</TooltipContent>
+        </Tooltip>
       </div>
       <div className="flex items-center gap-x-4">
         <p className="text-xs text-foreground-lighter">

@@ -1,15 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { GitMerge, MessageCircle, X, MoreVertical, ArrowRight, Shield } from 'lucide-react'
+import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import {
+  BranchManagementSection,
+  BranchRow,
+} from 'components/interfaces/BranchManagement/BranchPanels'
+import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSelector'
+import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
 import BranchLayout from 'components/layouts/BranchLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
@@ -21,22 +27,16 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import type { NextPageWithLayout } from 'types'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuItem,
+  DropdownMenuTrigger,
   Tooltip,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import {
-  BranchManagementSection,
-  BranchRow,
-} from 'components/interfaces/BranchManagement/BranchPanels'
-import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSelector'
-import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
-import type { NextPageWithLayout } from 'types'
 
 const MergeRequestsPage: NextPageWithLayout = () => {
   const router = useRouter()

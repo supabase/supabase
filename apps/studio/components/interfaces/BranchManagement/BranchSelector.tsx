@@ -1,4 +1,4 @@
-import { Check, GitMerge, Merge, Plus, Shield } from 'lucide-react'
+import { Check, GitMerge, Shield } from 'lucide-react'
 import { useState } from 'react'
 
 import { Branch } from 'data/branches/branches-query'
@@ -56,7 +56,7 @@ export const BranchSelector = ({
           {isUpdating ? 'Creating...' : 'Create merge request'}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
+      <PopoverContent_Shadcn_ portal className="p-0 w-80" side="bottom" align="end">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Find branch to review..." />
           <CommandList_Shadcn_>

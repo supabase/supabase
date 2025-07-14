@@ -1,15 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import type { Branch } from 'data/branches/branches-query'
 import { ExternalLink, GitBranch, Github } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { BranchSelector } from './BranchSelector'
-import type { Branch } from 'data/branches/branches-query'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
-import { sidePanelsState } from 'state/side-panels'
 import { Button } from 'ui'
 
 export const BranchingEmptyState = () => {
