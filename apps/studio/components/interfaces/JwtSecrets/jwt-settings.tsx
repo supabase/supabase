@@ -193,8 +193,8 @@ const JWTSettings = () => {
                         title="Legacy JWT secret has been migrated to new JWT Signing Keys"
                       >
                         <p className="!leading-normal">
-                          Changing the legacy JWT secret now can only be done by rotating to a
-                          standby key and then revoking it. The JWT secret is now used to{' '}
+                          Changing the legacy JWT secret can only be done by rotating to a standby
+                          key and then revoking it. It is used to{' '}
                           <em className="text-foreground not-italic">
                             {legacyKey.status === 'in_use' ? 'sign and verify' : 'only verify'}
                           </em>{' '}
