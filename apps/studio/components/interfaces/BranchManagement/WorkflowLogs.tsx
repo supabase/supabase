@@ -37,7 +37,7 @@ const UNHEALTHY_STATUSES: StatusType[] = [
   'FUNCTIONS_FAILED',
 ]
 
-const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
+export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const {
@@ -46,14 +46,7 @@ const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     isLoading: isWorkflowRunsLoading,
     isError: isWorkflowRunsError,
     error: workflowRunsError,
-  } = useWorkflowRunsQuery(
-    {
-      projectRef,
-    },
-    {
-      enabled: isOpen,
-    }
-  )
+  } = useWorkflowRunsQuery({ projectRef }, { enabled: isOpen })
 
   const [selectedWorkflowRunId, setSelectedWorkflowRunId] = useState<string | undefined>(undefined)
 
@@ -64,12 +57,8 @@ const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     isError: isWorkflowRunLogsError,
     error: workflowRunLogsError,
   } = useWorkflowRunLogsQuery(
-    {
-      workflowRunId: selectedWorkflowRunId,
-    },
-    {
-      enabled: isOpen && selectedWorkflowRunId !== undefined,
-    }
+    { workflowRunId: selectedWorkflowRunId },
+    { enabled: isOpen && selectedWorkflowRunId !== undefined }
   )
 
   const showStatusIcon =
@@ -89,9 +78,7 @@ const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
               <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
             ) : undefined
           }
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
+          onClick={(e) => e.stopPropagation()}
         >
           View Logs
         </Button>
@@ -174,5 +161,3 @@ const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
     </Dialog>
   )
 }
-
-export default WorkflowLogs

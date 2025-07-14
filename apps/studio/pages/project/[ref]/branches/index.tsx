@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Overview } from 'components/interfaces/BranchManagement/Overview'
-import BranchLayout from 'components/layouts/BranchLayout'
+import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'

@@ -12,7 +12,7 @@ import {
 } from 'components/interfaces/BranchManagement/BranchPanels'
 import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSelector'
 import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
-import BranchLayout from 'components/layouts/BranchLayout'
+import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'

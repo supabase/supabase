@@ -7,7 +7,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import type { Branch } from 'data/branches/branches-query'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import WorkflowLogs from './WorkflowLogs'
+import { WorkflowLogs } from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode

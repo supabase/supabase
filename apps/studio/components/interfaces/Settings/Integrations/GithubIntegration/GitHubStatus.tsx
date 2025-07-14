@@ -1,5 +1,6 @@
-import { CheckCircle2, AlertCircle, ArrowUpRight } from 'lucide-react'
+import { AlertCircle, ArrowUpRight, CheckCircle2 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -7,8 +8,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { HoverCard, HoverCardTrigger, HoverCardContent } from 'ui'
-import Link from 'next/link'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 export const GitHubStatus = () => {
   const { ref: projectRef } = useParams()
