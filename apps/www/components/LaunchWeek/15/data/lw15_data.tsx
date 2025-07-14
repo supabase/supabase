@@ -72,12 +72,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     links: [
       {
         type: 'video',
-        href: '',
+        href: 'htzj9SkkhhA',
       },
-      // {
-      //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/',
-      // },
     ],
     steps: [
       {
