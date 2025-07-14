@@ -47,7 +47,7 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
     // Select the Bedrock region based on the routing key
     const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
     const bedrock = bedrockForRegion(bedrockRegion)
-    const model = isLimited ? HAIKU_MODEL : SONNET_MODEL
+    const model = HAIKU_MODEL
     const modelName = `${regionMap[bedrockRegion]}.${model}`
 
     return {

@@ -219,7 +219,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
-                  <FormItemLayout label="Preview Branch Name">
+                  <FormItemLayout label="Preview branch name">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
                         {...field}
