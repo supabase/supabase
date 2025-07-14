@@ -20,7 +20,7 @@ const Hero = () => {
                   url="/launch-week#main-stage"
                   badge="LW15"
                   announcement={announcement.launch}
-                  className="-mt-8"
+                  className="lg:-mt-8"
                   hasArrow
                 />
                 <div className="flex flex-col items-center">

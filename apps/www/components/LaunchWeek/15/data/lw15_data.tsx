@@ -64,10 +64,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/',
+    blog: '/blog/jwt-signing-keys',
     date: 'Monday, 14th',
     published_at: '2025-03-31T07:00:00.000-07:00',
-    title: 'Introducing ...',
+    title: 'Introducing JWT Signing Keys',
     description: '',
     links: [
       {

@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 25 Jun 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Mon, 14 Jul 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/jwt-signing-keys</guid>
+  <title>Introducing JWT Signing Keys</title>
+  <link>https://supabase.com/blog/jwt-signing-keys</link>
+  <description>A new JWT signing keys system based on public key cryptography to improve your project&apos;s security and performance.</description>
+  <pubDate>Mon, 14 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/natural-db</guid>
   <title>Build a Personalized AI Assistant with Postgres</title>
   <link>https://supabase.com/blog/natural-db</link>
