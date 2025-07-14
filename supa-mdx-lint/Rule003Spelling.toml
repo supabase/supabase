@@ -38,7 +38,7 @@ allow_list = [
     "[Cc]oroutines?",
     "[Cc]ron",
     "[Cc]rypto",
-    "[Cc]ryptosysem",
+    "[Cc]ryptosystem",
     "[Dd]atasets?",
     "[Dd]atasources?",
     "[Dd]e facto",
