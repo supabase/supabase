@@ -4,12 +4,12 @@ subtitle: ''
 ---
 
 <Admonition type="warning">
-    This feature is in **Private Beta** and may change as the API evolves.
-    Stability and backward compatibility are not guaranteed at this stage.
+  This feature is in **Private Alpha**. API stability and backward compatibility are not guaranteed
+  at this stage.
 </Admonition>
 
 Analytics Buckets use [Apache Iceberg](https://iceberg.apache.org/), an open-table format for managing large analytical datasets.
-You can interact with them using tools such as [PyIceberg](https://py.iceberg.apache.org/) or [Apache Spark](https://spark.apache.org/) via a REST Catalog interface.
+You can interact with them using tools such as [PyIceberg](https://py.iceberg.apache.org/), [Apache Spark](https://spark.apache.org/) or any client which supports the [standard Iceberg REST Catalog API](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/apache/iceberg/main/open-api/rest-catalog-open-api.yaml).
 
 In this guide we will create our specialized **Analytics Bucket** and perform some basic operations
 
@@ -24,7 +24,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
 
-supabase.storage.createBucket('analytics', {
+supabase.storage.createBucket('my-analytics-bucket', {
   type: 'ANALYTICS',
 })
 ```
@@ -33,21 +33,22 @@ supabase.storage.createBucket('analytics', {
 
 1. Navigate to the Storage section in the Supabase Dashboard.
 2. Click on "Create Bucket".
-3. Enter a name for your bucket (e.g., analytics).
-4. Select "Iceberg" as the bucket type.
+3. Enter a name for your bucket (e.g., my-analytics-bucket).
+4. Select "Analytics Bucket" as the bucket type.
 
 <img alt="Storage schema design" src="/docs/img/storage/iceberg-bucket.png" />
 
 ## Create S3 credentials
-The iceberg client will need to interact with the underlying S3 Bucket, at this point we only support static S3 credentials.
 
-To create S3 Credentials go to [**Project Settings > Storage**](https://supabase.com/dashboard/project/_/settings/storage), for more information, see the [S3 Authentication Guide](https://supabase.com/docs/guides/storage/s3/authentication).
+An Iceberg client will need to interact with the underlying S3 Bucket.
+
+To authenticate your client, create S3 Credentials go to [**Project Settings > Storage**](https://supabase.com/dashboard/project/_/settings/storage), for more information, see the [S3 Authentication Guide](https://supabase.com/docs/guides/storage/s3/authentication). We will support other authentication methods in the future.
 
 You will now have an **Access Key** and a **Secret Key** that you can use to authenticate your Iceberg client.
 
 ## Connecting to the Iceberg Catalog
 
-To connect to the Iceberg Catalog, you will need an Iceberg Client which supports the REST Catalog interface.
+To connect to the Iceberg Catalog, you will need an Iceberg client which supports the REST Catalog interface.
 
 You can use [PyIceberg](https://py.iceberg.apache.org/) or [Apache Spark](https://spark.apache.org/) to interact with it.
 The catalog url will look like this:
@@ -66,6 +67,7 @@ curl \
 ```
 
 ## Using PyIceberg
+
 Here's a comprehensive example using PyIceberg with clearly separated configuration:
 
 ```python

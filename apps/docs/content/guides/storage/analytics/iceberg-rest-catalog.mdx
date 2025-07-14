@@ -3,8 +3,8 @@ title: 'Iceberg REST Catalog'
 ---
 
 <Admonition type="warning">
-    This feature is in **Private Beta** and may change as the API evolves.
-    Stability and backward compatibility are not guaranteed at this stage.
+  This feature is in **Private Alpha**. API stability and backward compatibility are not guaranteed
+  at this stage.
 </Admonition>
 
 The **Iceberg REST Catalog** acts as the central management system for Iceberg tables. It allows Iceberg clients, such as PyIceberg and Apache Spark, to perform metadata operations including:
@@ -17,7 +17,6 @@ The **Iceberg REST Catalog** acts as the central management system for Iceberg t
 The REST Catalog itself does not store the actual data. Instead, it stores metadata describing the structure, schema, and partitioning strategy of Iceberg tables.
 
 Actual data storage and retrieval operations occur through the separate S3-compatible endpoint, optimized for reading and writing large analytical datasets stored in Parquet files.
-
 
 ## Authentication
 
