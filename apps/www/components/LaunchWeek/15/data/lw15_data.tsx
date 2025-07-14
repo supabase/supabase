@@ -67,17 +67,17 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '/blog/',
     date: 'Monday, 14th',
     published_at: '2025-03-31T07:00:00.000-07:00',
-    title: 'Lorem ipsum dolor sit amet',
+    title: 'Introducing ...',
     description: '',
     links: [
       {
         type: 'video',
         href: '',
       },
-      {
-        type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: 'https://twitter.com/i/spaces/',
+      // },
     ],
     steps: [
       {

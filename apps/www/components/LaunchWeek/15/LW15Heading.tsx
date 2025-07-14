@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react'
-import { cn } from 'ui'
 import { createTimeline } from 'animejs'
 
 import SectionContainer from 'components/Layouts/SectionContainer'
@@ -109,32 +108,32 @@ const LW15Heading = () => {
 
   return (
     <header className="border-b">
-      <SectionContainer className="flex flex-col justify-between gap-12 !py-10 h-full !max-w-none lg:!container">
+      <SectionContainer className="flex flex-col justify-between gap-12 !py-8 lg:!py-10 h-full !max-w-none lg:!container">
         <div className="grid md:grid-cols-5 gap-4 delay-100">
           <div
             data-animate
             data-animate-delay={300}
-            className="hidden md:inline-block opacity-0 col-span-2 text-xs overflow-hidden h-fit max-w-[400px]"
+            className="hidden md:inline-block opacity-0 col-span-3 lg:col-span-2 text-xs overflow-hidden h-fit max-w-[400px]"
           >
             Celebrate our launch week with exciting new features designed to take your development
             skills to the next level.
           </div>
-          <div className="flex flex-col justify-start md:col-start-4 gap-4">
+          <div className="flex flex-col justify-start lg:col-start-4 md:col-span-2 lg:col-span-1 gap-4">
             <h2
               data-animate
               data-animate-delay={400}
               data-animate-duration={800}
-              className="text-xs opacity-0"
+              className="text-xs opacity-0 text-left md:text-right lg:text-left"
             >
               Five days of launches
               <br /> to supercharge your development.
             </h2>
           </div>
-          <div className="col-span-1 text-right text-xs hidden md:flex justify-end items-start h-fit overflow-hidden">
+          <div className="col-span-1 text-right text-xs hidden lg:flex justify-end items-start h-fit overflow-hidden">
             <LW15ThemeSwitcher className="opacity-0 anim-last" />
           </div>
         </div>
-        <div className="flex flex-col gap-4 mt-8 lg:mt-24">
+        <div className="flex flex-col gap-4 xl:mt-24">
           <div className="w-full flex items-center justify-center h-[42px] md:h-[60px] lg:h-[92px] gap-4">
             <h1 className="sr-only">Supabase Launch Week 15</h1>
             <LWSVG className="opacity-0 lw15-logo lw15-logo-left h-full w-auto" />

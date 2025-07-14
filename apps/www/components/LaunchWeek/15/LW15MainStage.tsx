@@ -158,17 +158,17 @@ const CardsSlider: React.FC<Props> = ({ slides, className }) => (
   <div className={cn('relative lg:container mx-auto px-6 lg:px-16', className)}>
     <Swiper
       initialSlide={0}
-      spaceBetween={12}
+      spaceBetween={8}
       slidesPerView={1.5}
       breakpoints={{
         540: {
           slidesPerView: 2.5,
         },
         720: {
-          slidesPerView: 3.5,
+          slidesPerView: 2.8,
         },
         960: {
-          slidesPerView: 4.5,
+          slidesPerView: 3.2,
         },
       }}
       speed={400}

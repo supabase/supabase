@@ -1,5 +1,8 @@
 import { Announcement } from 'ui/src/layout/banners'
 import LW15Banner from './LW15Banner'
+import announcementJSON from './data.json'
+
+export const announcement = announcementJSON
 
 export const AnnouncementBanner = () => {
   return (
