@@ -969,7 +969,7 @@ functions:
           ```kotlin
           supabase.from("countries").select {
               filter {
-                  filterNot("name", FilterOperation.IS, "")
+                  filterNot("name", FilterOperator.IS, "")
               }
           }
           ```
