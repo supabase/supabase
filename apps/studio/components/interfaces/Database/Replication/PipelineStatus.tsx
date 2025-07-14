@@ -14,6 +14,7 @@ import {
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
 import { useState, useEffect, useRef } from 'react'
+import { copyToClipboard } from 'ui'
 import { toast } from 'sonner'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 
@@ -70,12 +71,12 @@ const PipelineStatus = ({
     }
   }, [isErrorDetailsOpen])
 
-  const copyToClipboard = async (text: string) => {
+  const handleCopyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text)
-      toast.success('Copied to clipboard')
+      await copyToClipboard(text)
+      toast.success('Error details copied to clipboard')
     } catch (error) {
-      toast.error('Failed to copy to clipboard')
+      toast.error('Failed to copy error details')
     }
   }
 
@@ -91,6 +92,9 @@ const PipelineStatus = ({
   }
 
   const isLogLoadingState = (failedStatus: FailedStatus): boolean => {
+    // Right now we hardcode the error message which is returned when k8s is not able to find logs, which seems
+    // to be a transient error. In case we find a way to properly handle this in the backend, this hack will not
+    // be needed anymore.
     return (
       failedStatus.message?.startsWith('unable to retrieve container logs for containerd://') ===
       true
@@ -104,14 +108,27 @@ const PipelineStatus = ({
 
     return (
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 text-sm text-destructive">
-          {isLoadingLogs ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
-          ) : (
-            <AlertTriangle className="w-3 h-3" />
-          )}
-          <span>Failed</span>
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2 text-sm text-destructive">
+                {isLoadingLogs ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <AlertTriangle className="w-3 h-3" />
+                )}
+                <span>Failed</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {isLoadingLogs
+                  ? 'Pipeline failed - logs are being retrieved from container'
+                  : 'Pipeline has failed - expand for error details'}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         {hasDetails && (
           <Collapsible open={isErrorDetailsOpen} onOpenChange={setIsErrorDetailsOpen}>
             <CollapsibleTrigger asChild>
@@ -147,8 +164,8 @@ const PipelineStatus = ({
                         <Button
                           type="text"
                           size="tiny"
-                          onClick={() =>
-                            copyToClipboard(
+                          onClick={async () => {
+                            await handleCopyToClipboard(
                               [
                                 failedStatus.exit_code !== undefined
                                   ? `Exit Code: ${failedStatus.exit_code}`
@@ -159,7 +176,7 @@ const PipelineStatus = ({
                                 .filter(Boolean)
                                 .join('\n')
                             )
-                          }
+                          }}
                         >
                           <Copy className="w-3 h-3" />
                         </Button>
@@ -293,18 +310,7 @@ const PipelineStatus = ({
       {isSuccess && (
         <>
           {statusConfig.isFailedStatus ? (
-            <div className="relative">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>{renderFailedStatus(pipelineStatus as FailedStatus)}</div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{statusConfig.tooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+            <div className="relative">{renderFailedStatus(pipelineStatus as FailedStatus)}</div>
           ) : (
             <TooltipProvider>
               <Tooltip>
