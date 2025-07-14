@@ -63,6 +63,7 @@ export const PullRequestsEmptyState = ({
   onBranchSelected,
   isUpdating,
   githubConnection,
+  gitlessBranching = false,
 }: {
   url: string
   projectRef: string
@@ -70,6 +71,7 @@ export const PullRequestsEmptyState = ({
   onBranchSelected: (branch: Branch) => void
   isUpdating: boolean
   githubConnection?: any
+  gitlessBranching: boolean
 }) => {
   const router = useRouter()
   return (
@@ -93,12 +95,14 @@ export const PullRequestsEmptyState = ({
             Connect to GitHub
           </Button>
         )}
-        <BranchSelector
-          type="outline"
-          branches={branches}
-          onBranchSelected={onBranchSelected}
-          isUpdating={isUpdating}
-        />
+        {gitlessBranching && (
+          <BranchSelector
+            type="outline"
+            branches={branches}
+            onBranchSelected={onBranchSelected}
+            isUpdating={isUpdating}
+          />
+        )}
       </div>
     </div>
   )

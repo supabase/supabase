@@ -37,9 +37,4 @@ const BranchLayout = ({ children }: PropsWithChildren<{}>) => {
   )
 }
 
-/**
- * Layout for all branch pages on the dashboard, wrapped with withAuth to verify logged in state
- *
- * Handles rendering the navigation for each section under the branch pages.
- */
 export default withAuth(BranchLayout)

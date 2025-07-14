@@ -283,6 +283,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                         ) : (
                           <PullRequestsEmptyState
                             url={generateCreatePullRequestURL()}
+                            gitlessBranching={gitlessBranching}
                             projectRef={projectRef ?? '_'}
                             branches={previewBranches}
                             onBranchSelected={handleMarkBranchForReview}
