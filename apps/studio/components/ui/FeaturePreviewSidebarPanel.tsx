@@ -20,17 +20,17 @@ export function FeaturePreviewSidebarPanel({
     <div
       className={cn(
         'rounded-lg border p-4 space-y-3',
-        'bg border-border/50',
+        'bg-muted/10 border-border/50',
         // Force left alignment and override any centering
-        'text-left [&_*]:text-left [&_div]:items-start [&_p]:text-left',
+        'text-left [&_*]:text-left [&_div]:items-start',
         className
       )}
     >
       {illustration && <div className="flex justify-start items-start">{illustration}</div>}
 
-      <div className="space-y-1 text-left">
-        <h3 className="font-medium text-sm text-foreground text-left">{title}</h3>
-        <p className="text-xs text-foreground-light text-left">{description}</p>
+      <div className="space-y-1">
+        <h3 className="font-medium text-sm text-foreground">{title}</h3>
+        <p className="text-xs text-foreground-light">{description}</p>
       </div>
 
       {actions && <div className="flex justify-start items-start">{actions}</div>}

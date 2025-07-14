@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight, FilePlus, Plus, Sparkles } from 'lucide-react'
+import { ChevronRight, FilePlus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
