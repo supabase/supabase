@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 
 import { components } from 'api-types'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import {
   Badge,
@@ -35,6 +36,7 @@ interface SigningKeyRowProps {
   handleStandbyKey: (keyId: string) => void
   legacyKey?: JWTSigningKey | null
   standbyKey?: JWTSigningKey | null
+  isLoading?: boolean
 }
 
 const MotionTableRow = motion(TableRow)
@@ -47,6 +49,7 @@ export const SigningKeyRow = ({
   handleStandbyKey,
   legacyKey,
   standbyKey,
+  isLoading = false,
 }: SigningKeyRowProps) => (
   <MotionTableRow
     key={signingKey.id}
@@ -112,9 +115,14 @@ export const SigningKeyRow = ({
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" className="px-2" icon={<MoreVertical className="size-4" />} />
+            <Button
+              type="text"
+              className="px-1.5"
+              loading={isLoading}
+              icon={<MoreVertical className="size-4" />}
+            />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-52">
             {signingKey.algorithm !== 'HS256' && (
               <DropdownMenuItem
                 onSelect={() => {
@@ -139,15 +147,21 @@ export const SigningKeyRow = ({
             )}
             {signingKey.status === 'previously_used' && (
               <>
-                <DropdownMenuItem
-                  onSelect={() => {
-                    handleStandbyKey(signingKey.id)
-                  }}
+                <DropdownMenuItemTooltip
                   disabled={!!standbyKey}
+                  onSelect={() => handleStandbyKey(signingKey.id)}
+                  tooltip={{
+                    content: {
+                      side: 'left',
+                      text: !!standbyKey
+                        ? 'You may only have one standby key at a time'
+                        : undefined,
+                    },
+                  }}
                 >
                   <CircleArrowUp className="mr-2 size-4" />
                   Move to standby key
-                </DropdownMenuItem>
+                </DropdownMenuItemTooltip>
                 <DropdownMenuItem
                   onSelect={() => {
                     setSelectedKey(signingKey)
@@ -162,15 +176,21 @@ export const SigningKeyRow = ({
             )}
             {signingKey.status === 'revoked' && (
               <>
-                <DropdownMenuItem
-                  onSelect={() => {
-                    handleStandbyKey(signingKey.id)
-                  }}
+                <DropdownMenuItemTooltip
                   disabled={!!standbyKey}
+                  onSelect={() => handleStandbyKey(signingKey.id)}
+                  tooltip={{
+                    content: {
+                      side: 'left',
+                      text: !!standbyKey
+                        ? 'You may only have one standby key at a time'
+                        : undefined,
+                    },
+                  }}
                 >
                   <CircleArrowUp className="mr-2 size-4" />
                   Move to standby key
-                </DropdownMenuItem>
+                </DropdownMenuItemTooltip>
                 <DropdownMenuItem
                   onSelect={() => {
                     setSelectedKey(signingKey)
