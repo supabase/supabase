@@ -77,7 +77,7 @@ export default function Example() {
    OPENAI_API_KEY=your-openai-api-key
    ```
 
-2. **Add project-level authentication checks** in your API proxy at `app/api/supabase-proxy/[...path]/route.ts` to ensure only authorized users can access their own project resources.
+2. **Add project-level authentication checks** in your API proxy at `app/api/supabase-proxy/[...path]/route.ts` as well as your ai/sql route at `app/api/ai/sql/route.ts` to ensure only authorized users can access their own project resources.
 
 3. **Add a Toaster for notifications:**  
    Place the following component at the root of your app (e.g., in your `layout.tsx` or `App.tsx`) to enable toast notifications:

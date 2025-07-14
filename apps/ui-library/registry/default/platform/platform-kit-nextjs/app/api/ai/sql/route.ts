@@ -65,28 +65,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'projectRef is required.' }, { status: 400 })
     }
 
+    // Implement your permission check here (e.g. check if the user is a member of the project)
+    // In this example, everyone can access all projects
+    const userHasPermissionForProject = Boolean(projectRef)
+
+    if (!userHasPermissionForProject) {
+      return NextResponse.json(
+        { message: 'You do not have permission to access this project.' },
+        { status: 403 }
+      )
+    }
+
     // 1. Get database schema
     const schema = await getDbSchema(projectRef)
     const formattedSchema = formatSchemaForPrompt(schema)
 
     // 2. Create a prompt for OpenAI
-    const systemPrompt = `You are an expert SQL assistant. Given the following database schema, write a SQL query that answers the user's question.
-Only output the SQL query. Do not include any explanations or markdown.
+    const systemPrompt = `You are an expert SQL assistant. Given the following database schema, write a SQL query that answers the user's question. Return only the SQL query, do not include any explanations or markdown.\n\nSchema:\n${formattedSchema}`
 
-Schema:
-${formattedSchema}`
-
-    // 3. Call OpenAI to generate SQL
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0,
+    // 3. Call OpenAI to generate SQL using responses.create (plain text output)
+    const response = await openai.responses.create({
+      model: 'gpt-4.1',
+      instructions: systemPrompt, // Use systemPrompt as instructions
+      input: prompt, // User's question
     })
 
-    const sql = completion.choices[0].message?.content
+    const sql = response.output_text
 
     if (!sql) {
       return NextResponse.json(
