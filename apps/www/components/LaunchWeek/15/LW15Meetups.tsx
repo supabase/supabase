@@ -164,7 +164,7 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
                   {i !== meetups.length - 1 && (
                     <motion.span
                       variants={meetupVariants}
-                      className="ml-0 mb-0 my-auto flex text-foreground-lighter"
+                      className="ml-0 mb-0 my-auto flex transition-colors"
                     >
                       /
                     </motion.span>
@@ -287,8 +287,8 @@ const getMeetupCity = (meetup: LumaEvent) => {
   if (!meetup) return ''
   return (
     meetup.city ??
-    meetup.name.split(',')[0].split('-')[1] ??
-    meetup.name.split(',')[0].split(' ')[1] ??
+    meetup.name.split(',')[0].split('-')[1].trim() ??
+    meetup.name.split(',')[0].split(' ')[1].trim() ??
     meetup.name
   )
 }
