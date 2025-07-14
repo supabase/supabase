@@ -229,34 +229,13 @@ const RealtimeUsage = () => {
               />
             ))}
         </div>
-        <div className="relative pt-16 mt-4 border-t">
-          <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-            <div className="sticky top-0 bg-200 py-4 mb-4 flex flex-col items-center pointer-events-auto gap-4">
-              <ReportFilterBar
-                onRemoveFilters={removeFilters}
-                hideDatepicker={true}
-                // onDatepickerChange={handleDatepickerChange}
-                datepickerFrom={dateRange.from}
-                datepickerTo={dateRange.to}
-                onAddFilter={addFilter}
-                // onRefresh={refresh}
-                isLoading={isLoading}
-                filters={filters}
-                selectedProduct="realtime"
-                datepickerHelpers={createFilteredDatePickerHelpers(orgPlan?.id || 'free')}
-                className="w-full"
-                showDatabaseSelector={false}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-4">
-            <SharedAPIReport
-              filterBy="realtime"
-              start={dateRange.period_start.date}
-              end={dateRange.period_end.date}
-              hiddenReports={['networkTraffic']}
-            />
-          </div>
+        <div className="relative pt-8 mt-8 border-t">
+          <SharedAPIReport
+            filterBy="realtime"
+            start={dateRange.period_start.date}
+            end={dateRange.period_end.date}
+            hiddenReports={['networkTraffic']}
+          />
         </div>
       </section>
     </>
