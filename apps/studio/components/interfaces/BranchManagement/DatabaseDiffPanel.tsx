@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { CircleAlert, Database, Wind } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
+import { CircleAlert, Database, Download, Wind } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, Skeleton, Button } from 'ui'
+import { toast } from 'sonner'
 
 import DiffViewer from 'components/ui/DiffViewer'
 
@@ -45,7 +46,7 @@ const DatabaseDiffPanel = ({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle>
           <Link
             href={`/project/${currentBranchRef}/database/schema`}
@@ -55,6 +56,37 @@ const DatabaseDiffPanel = ({
             Schema Changes
           </Link>
         </CardTitle>
+        <Button
+          type="default"
+          size="tiny"
+          icon={<Download strokeWidth={1.5} size={14} className="text-foreground-light" />}
+          className="mt-0"
+          onClick={() => {
+            if (!diffContent) return
+            const now = new Date()
+            const pad = (n: number) => n.toString().padStart(2, '0')
+            const timestamp =
+              now.getFullYear().toString() +
+              pad(now.getMonth() + 1) +
+              pad(now.getDate()) +
+              pad(now.getHours()) +
+              pad(now.getMinutes()) +
+              pad(now.getSeconds())
+            const filename = `${timestamp}_migration.sql`
+            const blob = new Blob([diffContent], { type: 'text/plain;charset=utf-8;' })
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.setAttribute('download', filename)
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            window.URL.revokeObjectURL(url)
+            toast.success('Migration file downloaded!')
+          }}
+        >
+          Download as migration
+        </Button>
       </CardHeader>
       <CardContent className="p-0 h-96">
         <DiffViewer language="sql" original="" modified={diffContent} />
