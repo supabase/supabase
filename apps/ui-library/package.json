@@ -26,7 +26,7 @@
     "@radix-ui/react-checkbox": "*",
     "@radix-ui/react-collapsible": "*",
     "@radix-ui/react-context-menu": "*",
-    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dialog": "*",
     "@radix-ui/react-dropdown-menu": "*",
     "@radix-ui/react-hover-card": "*",
     "@radix-ui/react-label": "*",
