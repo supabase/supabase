@@ -244,7 +244,7 @@ const PipelineStatus = ({
     // Handle Failed status object
     if (isFailedStatus(pipelineStatus)) {
       return {
-        isFailedStatus: true
+        isFailedStatus: true,
       }
     }
 
