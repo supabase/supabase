@@ -173,8 +173,6 @@ export const DisplayApiSettings = ({
                           Prefer using{' '}
                           <a
                             href={`/project/${projectRef}/settings/api-keys/new`}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className="text-link underline"
                           >
                             Secret API keys
@@ -191,8 +189,6 @@ export const DisplayApiSettings = ({
                           Prefer using{' '}
                           <a
                             href={`/project/${projectRef}/settings/api-keys/new`}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className="text-link underline"
                           >
                             Publishable API keys
