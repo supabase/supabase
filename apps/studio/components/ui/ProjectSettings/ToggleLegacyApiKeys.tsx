@@ -38,13 +38,13 @@ export const ToggleLegacyApiKeysPanel = () => {
   const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } =
     useAsyncCheckProjectPermissions(PermissionAction.SECRETS_WRITE, '*')
 
-  const { data: authorizedApps = [], isLoading: isLoadingAuthorizedApps } = useAuthorizedAppsQuery({
+  const { data: authorizedApps = [], isSuccess: isAuthorizedAppsSuccess } = useAuthorizedAppsQuery({
     slug: org?.slug,
   })
 
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
-  if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess && isLoadingAuthorizedApps)) {
+  if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess && isAuthorizedAppsSuccess)) {
     return null
   }
 
