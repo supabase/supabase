@@ -59,7 +59,7 @@ export const PublishableAPIKeys = () => {
             </div>
           ) : (
             <div className="text-xs bg-200 last:rounded-b-md border px-5 text-foreground-lighter py-1">
-              Publishable key can be safely shared in public
+              The publishable key can be safely shared publicly
             </div>
           )}
         </div>
