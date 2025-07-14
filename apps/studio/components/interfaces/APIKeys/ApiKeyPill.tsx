@@ -118,7 +118,7 @@ export function ApiKeyPill({
             isSecret ? 'overflow-hidden' : '',
             show ? 'ring-1 ring-foreground-lighter ring-opacity-50' : 'ring-0 ring-opacity-0',
             'transition-all',
-            'max-w-[120px] sm:max-w-[160px] md:max-w-[200px] lg:max-w-[340px]',
+            'max-w-[100px] sm:max-w-[140px] md:max-w-[180px] lg:max-w-[340px]',
             'cursor-text',
             'relative'
           )}

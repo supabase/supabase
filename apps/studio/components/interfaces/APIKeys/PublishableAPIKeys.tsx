@@ -38,7 +38,7 @@ export const PublishableAPIKeys = () => {
         description="This key is safe to use in a browser if you have enabled Row Level Security (RLS) for your tables and configured policies."
       />
       <div className="flex flex-col gap-8">
-        <div className="-space-y-px w-content w-fit">
+        <div className="-space-y-px w-full lg:w-content lg:w-fit">
           <div className="bg-surface-100 px-5 py-2 flex items-center gap-5 first:rounded-t-md border">
             <span className="text-sm">Publishable key</span>
             <div className="flex items-center gap-2">
@@ -91,7 +91,8 @@ function ApiKeyInput() {
   // The default publisahble key will always be the first one
   const apiKey = publishableApiKeys[0]
 
-  const baseClasses = 'flex-1 grow gap-1 rounded-full min-w-[32em]'
+  const baseClasses =
+    'flex-1 grow gap-1 rounded-full min-w-0 max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-none lg:min-w-[40rem]'
   const size = 'tiny'
 
   if (isApiKeysLoading || isPermissionsLoading) {
