@@ -158,7 +158,10 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
                     <span>{getMeetupCity(meetup)}</span>
                   </MotionLink>
                   {i !== meetups.length - 1 && (
-                    <motion.span variants={meetupVariants} className="ml-0 mb-0 my-auto flex">
+                    <motion.span
+                      variants={meetupVariants}
+                      className="ml-0 mb-0 my-auto flex text-foreground-lighter"
+                    >
                       /
                     </motion.span>
                   )}
