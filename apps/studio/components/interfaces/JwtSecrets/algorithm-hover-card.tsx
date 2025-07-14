@@ -1,5 +1,4 @@
 import { LockKeyholeOpen, RectangleEllipsis } from 'lucide-react'
-import React from 'react'
 
 import { InfoPill } from 'components/ui/InfoPill'
 import { AlgorithmDetail, algorithmDetails } from './algorithm-details'
@@ -9,7 +8,7 @@ interface AlgorithmHoverCardProps {
   legacy?: boolean
 }
 
-export const AlgorithmHoverCard: React.FC<AlgorithmHoverCardProps> = ({ algorithm, legacy }) => {
+export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProps) => {
   const details: AlgorithmDetail = algorithmDetails[algorithm]
 
   return (

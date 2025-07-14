@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useMemo } from 'react'
+
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { useMemo } from 'react'
 import { cn, EyeOffIcon, Input_Shadcn_, Skeleton, WarningIcon } from 'ui'
+
 // to add in later with follow up PR
 // import CreatePublishableAPIKeyDialog from './CreatePublishableAPIKeyDialog'
 // to add in later with follow up PR
