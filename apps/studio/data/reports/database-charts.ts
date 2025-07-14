@@ -216,7 +216,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     },
     {
       id: 'client-connections',
-      label: 'Database client connections',
+      label: 'Database connections',
       valuePrecision: 0,
       hide: false,
       showTooltip: true,
