@@ -8,10 +8,7 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import {
-  importForeignSchema,
-  useFDWImportForeignSchemaMutation,
-} from 'data/fdw/fdw-import-foreign-schema-mutation'
+import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import {
   Button,
   Form_Shadcn_,
@@ -26,6 +23,7 @@ import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
   namespace: string
+  excludedSchemas: string[]
   wrapperValues: Record<string, string>
   visible: boolean
   onClose: () => void
@@ -42,6 +40,7 @@ export type ImportForeignSchemaForm = z.infer<typeof FormSchema>
 export const ImportForeignSchemaDialog = ({
   bucketName,
   namespace,
+  excludedSchemas,
   wrapperValues,
   visible,
   onClose,
@@ -129,13 +128,14 @@ export const ImportForeignSchemaDialog = ({
               render={({ field }) => (
                 <FormItemLayout
                   label="Target Schema"
-                  description="Database schema in which the Iceberg data will be shown."
+                  description="Select the database schema where the Iceberg data will be accessible. Each schema can only be connected to one namespace."
                   layout="vertical"
                 >
                   <SchemaSelector
                     portal={false}
                     size="small"
                     selectedSchemaName={field.value}
+                    excludedSchemas={excludedSchemas}
                     onSelectSchema={(schema) => field.onChange(schema)}
                     onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
                   />

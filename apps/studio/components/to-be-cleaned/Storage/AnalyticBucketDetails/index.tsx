@@ -34,13 +34,18 @@ import {
   AlertTitle_Shadcn_,
   Button,
   Card,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
   WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
-import { NamespaceCard } from './NamespaceCard'
+import { NamespaceRow } from './NamespaceRow'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
 
@@ -112,12 +117,17 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
     const namespaces = uniq([...fdwNamespaces, ...(namespacesData ?? [])])
 
     return namespaces.map((namespace) => {
+      const tables = wrapperTables.filter((t) => t.table.split('.')[0] === namespace)
+      const schema = tables[0]?.schema
+
       return {
-        namespace,
-        tables: wrapperTables.filter((t) => t.table.split('.')[0] === namespace),
+        namespace: namespace,
+        schema: schema,
+        tables: tables,
       }
     })
   }, [wrapperTables, namespacesData])
+  const excludedSchemas = uniq(namespaces.map((n) => n.schema))
 
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
@@ -170,18 +180,33 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                   <p className="text-sm text-foreground-light">No namespaces on the bucket yet</p>
                 </Card>
               ) : (
-                namespaces.map(({ namespace, tables }) => (
-                  <NamespaceCard
-                    key={namespace}
-                    bucketName={bucket.name}
-                    namespace={namespace}
-                    token={token!}
-                    wrapperInstance={wrapperInstance}
-                    wrapperValues={wrapperValues}
-                    tables={tables as any}
-                    integration={integration!}
-                  />
-                ))
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Namespace</TableHead>
+                        <TableHead>Schema</TableHead>
+                        <TableHead>Tables</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {namespaces.map(({ namespace, schema, tables }) => (
+                        <NamespaceRow
+                          key={namespace}
+                          bucketName={bucket.name}
+                          namespace={namespace}
+                          schema={schema}
+                          excludedSchemas={excludedSchemas}
+                          tables={tables as any}
+                          token={token!}
+                          wrapperInstance={wrapperInstance}
+                          wrapperValues={wrapperValues}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
               )}
             </div>
 
