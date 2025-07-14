@@ -91,7 +91,9 @@ export const SigningKeyRow = ({
             'gap-2 py-2 h-6 min-w-0 overflow-hidden flex items-center flex-1'
           )}
         >
-          <span className="truncate flex-1">{signingKey.id}</span>
+          <span className="truncate flex-1" title={signingKey.id}>
+            {signingKey.id}
+          </span>
         </Badge>
       </div>
     </TableCell>
@@ -101,8 +103,8 @@ export const SigningKeyRow = ({
         legacy={signingKey.id === legacyKey?.id}
       />
     </TableCell>
-    {signingKey.status === 'previously_used' && (
-      <TableCell className="text-left py-2 text-sm text-foreground-light whitespace-nowrap">
+    {(signingKey.status === 'previously_used' || signingKey.status === 'revoked') && (
+      <TableCell className="text-right py-2 text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
         {dayjs(signingKey.updated_at).fromNow()}
       </TableCell>
     )}
