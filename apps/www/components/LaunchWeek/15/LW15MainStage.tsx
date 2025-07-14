@@ -82,7 +82,7 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
     >
       <CardBG day={day} />
       <div className="w-full h-full relative z-10 flex flex-col justify-between gap-4 overflow-hidden">
-        <ul className="flex flex-col gap-1 p-4">
+        <ul className="flex flex-col gap-1 p-4 lg:opacity-0 lg:blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100">
           {day.links?.map((link) => (
             <li key={link.href}>
               <DayLink
