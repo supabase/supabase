@@ -65,10 +65,18 @@ const DestinationRow = ({
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
+  const getStatusName = (status: any) => {
+    if (status && typeof status === 'object' && 'name' in status) {
+      return status.name
+    }
+    return status
+  }
+  
+  const statusName = getStatusName(pipelineStatus)
   if (
     (requestStatus === PipelineStatusRequestStatus.EnableRequested &&
-      pipelineStatus === 'Started') ||
-    (requestStatus === PipelineStatusRequestStatus.DisableRequested && pipelineStatus === 'Stopped')
+      statusName === 'started') ||
+    (requestStatus === PipelineStatusRequestStatus.DisableRequested && statusName === 'stopped')
   ) {
     setRequestStatus(PipelineStatusRequestStatus.None)
   }
@@ -190,7 +198,7 @@ const DestinationRow = ({
           sourceId,
           destinationId: destinationId,
           pipelineId: pipeline?.id,
-          enabled: pipelineStatusData?.status === 'Started',
+          enabled: statusName === 'started',
         }}
       />
     </>
