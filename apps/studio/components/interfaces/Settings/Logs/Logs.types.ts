@@ -142,6 +142,7 @@ export interface DatetimeHelper {
   calcFrom: () => string
   default?: boolean
   disabled?: boolean
+  availableIn?: PlanId[]
 }
 
 export interface WarehouseCollection {
