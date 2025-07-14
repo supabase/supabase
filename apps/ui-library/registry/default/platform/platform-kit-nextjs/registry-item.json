@@ -13,33 +13,31 @@
     "command",
     "dialog",
     "drawer",
+    "input",
     "form",
     "hover-card",
-    "input",
     "label",
     "popover",
     "select",
     "skeleton",
     "switch",
     "table",
-    "toggle",
     "toggle-group",
-    "tooltip"
+    "toggle",
+    "tooltip",
+    "use-mobile"
   ],
   "dependencies": [
-    "@hookform/resolvers",
     "@monaco-editor/react",
     "@tanstack/react-query",
     "@tanstack/react-table",
     "axios",
-    "cmdk",
     "common-tags",
     "openai",
     "openapi-fetch",
-    "react-hook-form",
     "react-markdown",
-    "recharts",
-    "sonner"
+    "zod@^3",
+    "@types/common-tags"
   ],
   "files": [
     {
