@@ -19,39 +19,23 @@ const LW15Hackathon: FC = () => {
         <LW15HackathonImage className="hidden lg:flex" />
         <div className="w-full h-full flex flex-col justify-between gap-4 lg:col-span-3">
           <div className="flex flex-col h-full gap-4">
-            <div className="flex justify-between text-xs gap-4">
-              <div>
-                Supabase <br className="hidden sm:block" />
-                Hackathon 15
-              </div>
-              <div className="text-right">
-                Starts <br className="hidden sm:block" />
-                Jan 14th
-              </div>
-            </div>
             <div className="hidden sm:flex flex-col text-6xl">
               <div className="flex justify-between">
-                <span>Step into</span>
-                <span>a space</span>
+                <span className="text-foreground-lighter">Hackathon</span>
               </div>
-              <div>where ideas expand.</div>
+              <div>Starts this Friday.</div>
             </div>
             <div className="text-6xl sm:hidden">Step into a space where ideas expand.</div>
           </div>
           <LW15HackathonImage className="lg:hidden" />
           <div className="flex flex-col justify-between gap-4">
-            <div className="text-2xl max-w-[440px]">
-              Build something amazing in 10 days using Supabase. Compete solo or in a team, submit a
-              quick demo and win.
-            </div>
-            <div className="flex flex-col sm:flex-row justify-between text-xs gap-4">
-              <Button className="h-auto py-1 px-2" type="secondary" size="medium" asChild>
-                <Link href="#">Join the Hackathon</Link>
-              </Button>
-              <div className="hidden sm:block text-right">
-                Launch your next <br className="hidden sm:block" />
-                big idea.
-              </div>
+            <div className="text-2xl max-w-[600px] text-foreground-lighter">
+              <p>Build something amazing in 10 days using Supabase.</p>
+              <p>
+                Compete solo or in a team,
+                <br />
+                submit a quick demo and win.
+              </p>
             </div>
           </div>
         </div>
