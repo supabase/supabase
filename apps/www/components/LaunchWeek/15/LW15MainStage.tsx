@@ -50,8 +50,8 @@ const DayCard = ({ day }: { day: WeekDayProps }) =>
       <div className="w-full h-full relative z-10 flex flex-col justify-between gap-4">
         <div></div>
         <div className="flex flex-col gap-2 p-4">
-          <span className="text-xs text-foreground-lighter">{day.date}</span>
-          <span className="text-lg leading-snug text-foreground-lighter">
+          <span className="text-xl text-foreground-lighter">{day.date}</span>
+          <span className="text-base leading-snug text-foreground-muted">
             &#91; Access locked &#93;
           </span>
         </div>
@@ -98,8 +98,8 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
             bottom: isTablet ? 0 : -hiddenHeight + 'px',
           }}
         >
-          <span className="text-xs opacity-60">{day.date}</span>
-          <h4 className="text-lg leading-snug">{day.title}</h4>
+          <span className="text-lg opacity-60">{day.date}</span>
+          <h4 className="text-xl leading-snug">{day.title}</h4>
           <div
             className="block lg:opacity-0 lg:blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100"
             ref={hiddenRef}
