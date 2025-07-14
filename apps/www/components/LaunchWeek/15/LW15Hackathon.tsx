@@ -19,7 +19,7 @@ const LW15Hackathon: FC = () => {
         <LW15HackathonImage className="hidden lg:flex" />
         <div className="w-full h-full flex flex-col justify-between gap-4 lg:col-span-3">
           <div className="flex flex-col h-full gap-4">
-            <div className="hidden sm:flex flex-col text-6xl">
+            <div className="flex flex-col text-6xl">
               <div className="flex justify-between">
                 <span className="text-foreground-lighter">Hackathon</span>
               </div>
