@@ -1,6 +1,8 @@
+import type { Branch } from 'data/branches/branches-query'
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
+import { StatusIcon } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import { useWorkflowRunLogsQuery } from 'data/workflow-runs/workflow-run-logs-query'
@@ -22,9 +24,20 @@ import BranchStatusBadge from './BranchStatusBadge'
 
 interface WorkflowLogsProps {
   projectRef: string
+  status?: Branch['status'] | string
 }
 
-const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
+type StatusType = Branch['status'] | string
+
+const UNHEALTHY_STATUSES: StatusType[] = [
+  'ACTIVE_UNHEALTHY',
+  'INIT_FAILED',
+  'UNKNOWN',
+  'MIGRATIONS_FAILED',
+  'FUNCTIONS_FAILED',
+]
+
+export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const {
@@ -33,14 +46,7 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
     isLoading: isWorkflowRunsLoading,
     isError: isWorkflowRunsError,
     error: workflowRunsError,
-  } = useWorkflowRunsQuery(
-    {
-      projectRef,
-    },
-    {
-      enabled: isOpen,
-    }
-  )
+  } = useWorkflowRunsQuery({ projectRef }, { enabled: isOpen })
 
   const [selectedWorkflowRunId, setSelectedWorkflowRunId] = useState<string | undefined>(undefined)
 
@@ -51,24 +57,36 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
     isError: isWorkflowRunLogsError,
     error: workflowRunLogsError,
   } = useWorkflowRunLogsQuery(
-    {
-      workflowRunId: selectedWorkflowRunId,
-    },
-    {
-      enabled: isOpen && selectedWorkflowRunId !== undefined,
-    }
+    { workflowRunId: selectedWorkflowRunId },
+    { enabled: isOpen && selectedWorkflowRunId !== undefined }
   )
+
+  const showStatusIcon =
+    status !== undefined &&
+    status !== 'ACTIVE_HEALTHY' &&
+    status !== 'FUNCTIONS_DEPLOYED' &&
+    status !== 'MIGRATIONS_PASSED'
+  const isUnhealthy = status !== undefined && UNHEALTHY_STATUSES.includes(status)
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="default">View Logs</Button>
+        <Button
+          type="default"
+          icon={
+            showStatusIcon ? (
+              <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
+            ) : undefined
+          }
+          onClick={(e) => e.stopPropagation()}
+        >
+          View Logs
+        </Button>
       </DialogTrigger>
 
       <DialogContent size="xlarge">
         <DialogHeader>
           <DialogTitle>Workflow Logs</DialogTitle>
-
           <DialogDescription>Select a workflow run to view logs</DialogDescription>
         </DialogHeader>
 
@@ -143,5 +161,3 @@ const WorkflowLogs = ({ projectRef }: WorkflowLogsProps) => {
     </Dialog>
   )
 }
-
-export default WorkflowLogs

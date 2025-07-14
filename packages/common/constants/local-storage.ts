@@ -11,6 +11,8 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
+  UI_PREVIEW_REALTIME_SETTINGS: 'supabase-ui-realtime-settings',
+
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
   TERMS_OF_SERVICE_ACKNOWLEDGED: 'terms-of-service-acknowledged',
@@ -104,6 +106,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
 ]
 
 export function clearLocalStorage() {

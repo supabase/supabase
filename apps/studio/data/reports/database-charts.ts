@@ -219,9 +219,8 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       ],
     },
     {
-      id: 'total-client-connections',
-      label: 'Total Direct Database Client Connections',
-      syncId: 'database-reports',
+      id: 'client-connections',
+      label: 'Database connections',
       valuePrecision: 0,
       availableIn: ['free', 'pro', 'team'],
       hide: !isFreePlan, // [Jordi] Paid plans can see grouped client connections instead, so this chart is not needed for them. See below.
