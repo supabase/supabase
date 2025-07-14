@@ -73,6 +73,7 @@ export const PullRequestsEmptyState = ({
   gitlessBranching: boolean
 }) => {
   const router = useRouter()
+
   return (
     <div className="flex items-center flex-col justify-center w-full py-10">
       <p>No merge requests</p>

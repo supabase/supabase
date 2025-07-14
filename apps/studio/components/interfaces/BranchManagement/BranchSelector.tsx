@@ -53,7 +53,7 @@ export const BranchSelector = ({
           type={type}
           disabled={disabled || availableBranches.length === 0 || isUpdating}
         >
-          {isUpdating ? 'Creating...' : 'Create merge request'}
+          {isUpdating ? 'Creating...' : 'New merge request'}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ portal className="p-0 w-80" side="bottom" align="end">
