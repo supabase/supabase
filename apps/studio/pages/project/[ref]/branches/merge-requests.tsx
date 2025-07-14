@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -19,7 +19,6 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
-import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
@@ -36,7 +35,6 @@ import {
   DropdownMenuTrigger,
   Tooltip,
 } from 'ui'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const MergeRequestsPage: NextPageWithLayout = () => {
@@ -49,8 +47,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
-
-  const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
   const canReadBranches = useCheckPermissions(PermissionAction.READ, 'preview_branches')
 
@@ -86,13 +82,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const repo = githubConnection?.repository.name ?? ''
 
   const isError = isErrorConnections || isErrorBranches
-
-  const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
-    onSuccess: () => {
-      toast.success('Successfully deleted branch')
-      setSelectedBranchToDelete(undefined)
-    },
-  })
 
   const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -143,187 +132,149 @@ const MergeRequestsPage: NextPageWithLayout = () => {
       : `https://github.com/${githubConnection.repository.name}/compare`
   }
 
-  const onConfirmDeleteBranch = () => {
-    if (selectedBranchToDelete == undefined) return console.error('No branch selected')
-    if (projectRef == undefined) return console.error('Project ref is required')
-    deleteBranch({ id: selectedBranchToDelete?.id, projectRef })
-  }
-
   return (
-    <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12">
-            <div className="space-y-4">
-              {!canReadBranches ? (
-                <NoPermission resourceText="view this project's branches" />
-              ) : (
-                <>
-                  {isErrorConnections && (
-                    <AlertError
-                      error={connectionsError}
-                      subject="Failed to retrieve GitHub integration connection"
-                    />
-                  )}
+    <ScaffoldContainer>
+      <ScaffoldSection>
+        <div className="col-span-12">
+          <div className="space-y-4">
+            {!canReadBranches ? (
+              <NoPermission resourceText="view this project's branches" />
+            ) : (
+              <>
+                {isErrorConnections && (
+                  <AlertError
+                    error={connectionsError}
+                    subject="Failed to retrieve GitHub integration connection"
+                  />
+                )}
 
-                  {isErrorBranches && (
-                    <AlertError
-                      error={branchesError}
-                      subject="Failed to retrieve preview branches"
-                    />
-                  )}
+                {isErrorBranches && (
+                  <AlertError error={branchesError} subject="Failed to retrieve preview branches" />
+                )}
 
-                  {!isError && (
-                    <div className="space-y-4">
-                      {gitlessBranching && (
-                        <>
-                          {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
-                            <div className="rounded border rounded-lg bg-background px-6 py-4">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-sm text-foreground-light">
-                                  <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
-                                  <span className="text-foreground">{currentBranch.name}</span>
-                                  last viewed
-                                </div>
-                                <Button
-                                  type="primary"
-                                  size="tiny"
-                                  loading={isUpdating}
-                                  onClick={() =>
-                                    currentBranch && handleMarkBranchForReview(currentBranch)
-                                  }
-                                >
-                                  Create merge request
-                                </Button>
+                {!isError && (
+                  <div className="space-y-4">
+                    {gitlessBranching && (
+                      <>
+                        {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
+                          <div className="rounded border rounded-lg bg-background px-6 py-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2 text-sm text-foreground-light">
+                                <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
+                                <span className="text-foreground">{currentBranch.name}</span>
+                                last viewed
                               </div>
+                              <Button
+                                type="primary"
+                                size="tiny"
+                                loading={currentBranch && isUpdating}
+                                onClick={() =>
+                                  currentBranch && handleMarkBranchForReview(currentBranch)
+                                }
+                              >
+                                Create merge request
+                              </Button>
                             </div>
-                          )}
-                        </>
-                      )}
-                      <BranchManagementSection
-                        header={`${mergeRequestBranches.length} merge requests`}
-                      >
-                        {isLoadingBranches && (
-                          <div className="p-4">
-                            <GenericSkeletonLoader />
                           </div>
                         )}
-                        {mergeRequestBranches.length > 0 ? (
-                          mergeRequestBranches.map((branch) => {
-                            const isPR = branch.pr_number !== undefined
-                            const rowLink = isPR
-                              ? `https://github.com/${repo}/pull/${branch.pr_number}`
-                              : `/project/${branch.project_ref}/merge`
-                            return (
-                              <BranchRow
-                                key={branch.id}
-                                label={
-                                  <div className="flex items-center gap-x-4">
-                                    {branch.name}
-                                    <ArrowRight
-                                      size={14}
-                                      strokeWidth={1.5}
-                                      className="text-foreground-lighter"
-                                    />
-                                    <div className="flex items-center gap-x-2">
-                                      {branch.pr_number ? (
-                                        <p className="text-foreground-lighter">
-                                          #{branch.pr_number}
-                                        </p>
-                                      ) : (
-                                        <>
-                                          <Shield
-                                            size={14}
-                                            strokeWidth={1.5}
-                                            className="text-warning"
-                                          />
-                                          <p className="text-foreground-lighter">
-                                            {mainBranch.name}
-                                          </p>
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-                                }
-                                repo={repo}
-                                branch={branch}
-                                rowLink={rowLink}
-                                external={isPR}
-                                rowActions={
-                                  !isPR && (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button
-                                          type="text"
-                                          icon={<MoreVertical />}
-                                          className="px-1"
-                                          onClick={(e) => e.stopPropagation()}
+                      </>
+                    )}
+                    <BranchManagementSection
+                      header={`${mergeRequestBranches.length} merge requests`}
+                    >
+                      {isLoadingBranches && (
+                        <div className="p-4">
+                          <GenericSkeletonLoader />
+                        </div>
+                      )}
+                      {mergeRequestBranches.length > 0 ? (
+                        mergeRequestBranches.map((branch) => {
+                          const isPR = branch.pr_number !== undefined
+                          const rowLink = isPR
+                            ? `https://github.com/${repo}/pull/${branch.pr_number}`
+                            : `/project/${branch.project_ref}/merge`
+                          return (
+                            <BranchRow
+                              key={branch.id}
+                              label={
+                                <div className="flex items-center gap-x-4">
+                                  {branch.name}
+                                  <ArrowRight
+                                    size={14}
+                                    strokeWidth={1.5}
+                                    className="text-foreground-lighter"
+                                  />
+                                  <div className="flex items-center gap-x-2">
+                                    {branch.pr_number ? (
+                                      <p className="text-foreground-lighter">#{branch.pr_number}</p>
+                                    ) : (
+                                      <>
+                                        <Shield
+                                          size={14}
+                                          strokeWidth={1.5}
+                                          className="text-warning"
                                         />
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent
-                                        className="w-56"
-                                        side="bottom"
-                                        align="end"
-                                      >
-                                        <Tooltip>
-                                          <DropdownMenuItem
-                                            className="gap-x-2"
-                                            disabled={isUpdating}
-                                            onSelect={(e) => {
-                                              e.stopPropagation()
-                                              handleCloseMergeRequest(branch)
-                                            }}
-                                          >
-                                            <X size={14} /> Close this merge request
-                                          </DropdownMenuItem>
-                                        </Tooltip>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  )
-                                }
-                              />
-                            )
-                          })
-                        ) : (
-                          <PullRequestsEmptyState
-                            url={generateCreatePullRequestURL()}
-                            gitlessBranching={gitlessBranching}
-                            projectRef={projectRef ?? '_'}
-                            branches={previewBranches}
-                            onBranchSelected={handleMarkBranchForReview}
-                            isUpdating={isUpdating}
-                            githubConnection={githubConnection}
-                          />
-                        )}
-                      </BranchManagementSection>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                                        <p className="text-foreground-lighter">{mainBranch.name}</p>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              }
+                              repo={repo}
+                              branch={branch}
+                              rowLink={rowLink}
+                              external={isPR}
+                              rowActions={
+                                !isPR && (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        type="text"
+                                        icon={<MoreVertical />}
+                                        className="px-1"
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-56" side="bottom" align="end">
+                                      <Tooltip>
+                                        <DropdownMenuItem
+                                          className="gap-x-2"
+                                          disabled={isUpdating}
+                                          onSelect={(e) => {
+                                            e.stopPropagation()
+                                            handleCloseMergeRequest(branch)
+                                          }}
+                                        >
+                                          <X size={14} /> Close this merge request
+                                        </DropdownMenuItem>
+                                      </Tooltip>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                )
+                              }
+                            />
+                          )
+                        })
+                      ) : (
+                        <PullRequestsEmptyState
+                          url={generateCreatePullRequestURL()}
+                          gitlessBranching={gitlessBranching}
+                          projectRef={projectRef ?? '_'}
+                          branches={previewBranches}
+                          onBranchSelected={handleMarkBranchForReview}
+                          isUpdating={isUpdating}
+                          githubConnection={githubConnection}
+                        />
+                      )}
+                    </BranchManagementSection>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
-
-      <TextConfirmModal
-        variant="warning"
-        visible={selectedBranchToDelete !== undefined}
-        onCancel={() => setSelectedBranchToDelete(undefined)}
-        onConfirm={() => onConfirmDeleteBranch()}
-        loading={isDeleting}
-        title="Delete branch"
-        confirmLabel="Delete branch"
-        confirmPlaceholder="Type in name of branch"
-        confirmString={selectedBranchToDelete?.name ?? ''}
-        alert={{ title: 'You cannot recover this branch once deleted' }}
-        text={
-          <>
-            This will delete your database preview branch{' '}
-            <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
-          </>
-        }
-      />
-    </>
+        </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 

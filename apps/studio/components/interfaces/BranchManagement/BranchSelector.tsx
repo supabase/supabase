@@ -1,9 +1,9 @@
 import { Check, GitMerge, Shield } from 'lucide-react'
 import { useState } from 'react'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Branch } from 'data/branches/branches-query'
 import {
-  Button,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
@@ -48,13 +48,22 @@ export const BranchSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
+        <ButtonTooltip
           icon={<GitMerge size={14} strokeWidth={1.5} />}
           type={type}
           disabled={disabled || availableBranches.length === 0 || isUpdating}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text:
+                availableBranches.length === 0
+                  ? 'All branches currently have merge requests'
+                  : undefined,
+            },
+          }}
         >
           {isUpdating ? 'Creating...' : 'New merge request'}
-        </Button>
+        </ButtonTooltip>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ portal className="p-0 w-80" side="bottom" align="end">
         <Command_Shadcn_>

@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { MessageCircle } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -26,6 +27,7 @@ import { Button } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 const BranchesPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const project = useSelectedProject()
@@ -88,7 +90,16 @@ const BranchesPage: NextPageWithLayout = () => {
   const onConfirmDeleteBranch = () => {
     if (selectedBranchToDelete == undefined) return console.error('No branch selected')
     if (projectRef == undefined) return console.error('Project ref is required')
-    deleteBranch({ id: selectedBranchToDelete?.id, projectRef })
+    deleteBranch(
+      { id: selectedBranchToDelete?.id, projectRef },
+      {
+        onSuccess: () => {
+          if (selectedBranchToDelete.project_ref === ref) {
+            router.push(`/project/${selectedBranchToDelete.parent_project_ref}/branches`)
+          }
+        },
+      }
+    )
   }
 
   return (

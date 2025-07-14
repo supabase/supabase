@@ -1,8 +1,8 @@
+import type { Branch } from 'data/branches/branches-query'
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { StatusIcon } from 'ui'
-import type { Branch } from 'data/branches/branches-query'
 import { useState } from 'react'
+import { StatusIcon } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
 import { useWorkflowRunLogsQuery } from 'data/workflow-runs/workflow-run-logs-query'
@@ -100,7 +100,6 @@ const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
       <DialogContent size="xlarge">
         <DialogHeader>
           <DialogTitle>Workflow Logs</DialogTitle>
-
           <DialogDescription>Select a workflow run to view logs</DialogDescription>
         </DialogHeader>
 
