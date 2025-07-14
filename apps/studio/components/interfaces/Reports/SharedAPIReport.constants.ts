@@ -244,33 +244,31 @@ export const useSharedAPIReport = ({
     })),
   })
 
-  const data = {
-    totalRequests: queries[0].data?.result || [],
-    topRoutes: queries[1].data?.result || [],
-    errorCounts: queries[2].data?.result || [],
-    topErrorRoutes: queries[3].data?.result || [],
-    responseSpeed: queries[4].data?.result || [],
-    topSlowRoutes: queries[5].data?.result || [],
-    networkTraffic: queries[6].data?.result || [],
-  } as const
-  const error = {
-    totalRequests: queries[0].error as string,
-    topRoutes: queries[1].error as string,
-    errorCounts: queries[2].error as string,
-    topErrorRoutes: queries[3].error as string,
-    responseSpeed: queries[4].error as string,
-    topSlowRoutes: queries[5].error as string,
-    networkTraffic: queries[6].error as string,
-  } as const
-  const isLoading = {
-    totalRequests: queries[0].isLoading,
-    topRoutes: queries[1].isLoading,
-    errorCounts: queries[2].isLoading,
-    topErrorRoutes: queries[3].isLoading,
-    responseSpeed: queries[4].isLoading,
-    topSlowRoutes: queries[5].isLoading,
-    networkTraffic: queries[6].isLoading,
-  } as const
+  const keys = Object.keys(SHARED_API_REPORT_SQL) as Array<keyof typeof SHARED_API_REPORT_SQL>
+
+  const data = keys.reduce(
+    (acc, key, i) => {
+      acc[key] = queries[i].data?.result || []
+      return acc
+    },
+    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: unknown[] }
+  )
+
+  const error = keys.reduce(
+    (acc, key, i) => {
+      acc[key] = queries[i].error as string
+      return acc
+    },
+    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: string }
+  )
+
+  const isLoading = keys.reduce(
+    (acc, key, i) => {
+      acc[key] = queries[i].isLoading
+      return acc
+    },
+    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: boolean }
+  )
 
   return {
     data,
