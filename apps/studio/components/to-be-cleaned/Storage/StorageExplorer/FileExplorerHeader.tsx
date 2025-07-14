@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, debounce, isEqual, noop } from 'lodash'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
@@ -13,6 +13,7 @@ import {
   Columns,
   Edit2,
   FolderPlus,
+  Key,
   List,
   Loader,
   RefreshCw,
@@ -34,6 +35,8 @@ import {
   Input,
 } from 'ui'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useParams } from 'common/hooks/useParams'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
@@ -145,6 +148,8 @@ const FileExplorerHeader = ({
   setItemSearchString = noop,
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
+  const { ref: projectRef } = useParams()
+
   const debounceDuration = 300
   const snap = useStorageExplorerStateSnapshot()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
@@ -158,6 +163,17 @@ const FileExplorerHeader = ({
 
   const uploadButtonRef: any = useRef(null)
   const previousBreadcrumbs: any = useRef(null)
+
+  const {
+    data: allApiKeys,
+    isLoading: isLoadingAPIKeys,
+    error: apiKeysError,
+  } = useAPIKeysQuery({ projectRef, reveal: false })
+
+  const apiKeys = useMemo(
+    () => allApiKeys.filter((apiKey) => apiKey.name === 'service_role' || apiKey.type === 'secret'),
+    [allApiKeys]
+  )
 
   const {
     columns,
@@ -358,6 +374,21 @@ const FileExplorerHeader = ({
           >
             Reload
           </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="text" icon={<Key size={16} strokeWidth={2} />}>
+                API Key
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {apiKeys.map((apiKey) => (
+                <DropdownMenuItem key={apiKey.id}>
+                  {apiKey.type === 'legacy' ? apiKey.name : apiKey.prefix}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
