@@ -56,7 +56,7 @@ export const CopyEnvButton = ({
         },
       }}
     >
-      Download
+      Copy env values
     </ButtonTooltip>
   )
 }

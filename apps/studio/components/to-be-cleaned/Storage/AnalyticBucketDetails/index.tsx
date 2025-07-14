@@ -37,7 +37,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { DESCRIPTIONS } from './constants'
+import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './constants'
 import { CopyEnvButton } from './CopyEnvButton'
 import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
 import { NamespaceCard } from './NamespaceCard'
@@ -140,10 +140,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             Tables and objects connected to this Iceberg bucket
           </ScaffoldSectionDescription>
         </ScaffoldHeader>
-        <DocsButton href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket" />
-        {/* <Button type="primary" onClick={() => setImportForeignSchemaShown(true)}>
-          {wrapperTables.length === 0 ? 'Connect a namespace' : 'Connect another namespace'}
-        </Button> */}
+        <DocsButton href="https://supabase.com/docs/guides/storage/analytics/introduction" />
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-4" bottomPadding>
         {state === 'loading' && <GenericSkeletonLoader />}
@@ -191,27 +188,31 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             <div>
               <div className="flex flex-row justify-between items-center">
                 <div>
-                  <ScaffoldSectionTitle>Configuration Details</ScaffoldSectionTitle>
+                  <ScaffoldSectionTitle>Connection Details</ScaffoldSectionTitle>
                   <ScaffoldSectionDescription className="mb-4">
-                    You can use the following configuration details to connect to the bucket from
-                    your code.
+                    You can use the following parameters to connect to the bucket from an Iceberg
+                    client.
                   </ScaffoldSectionDescription>
                 </div>
-                <CopyEnvButton
-                  serverOptions={wrapperMeta.server.options.filter(
-                    (option) => !option.hidden && wrapperValues[option.name]
-                  )}
-                  values={wrapperValues}
-                />
+                <div className="flex flex-row gap-2">
+                  <CopyEnvButton
+                    serverOptions={wrapperMeta.server.options.filter(
+                      (option) => !option.hidden && wrapperValues[option.name]
+                    )}
+                    values={wrapperValues}
+                  />
+                  <DocsButton href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket" />
+                </div>
               </div>
-              <Card className="flex flex-col gap-6 p-6 pb-0">
+              <Card className="flex flex-col gap-8 p-6">
                 {wrapperMeta.server.options
                   .filter((option) => !option.hidden && wrapperValues[option.name])
+                  .sort((a, b) => OPTION_ORDER.indexOf(a.name) - OPTION_ORDER.indexOf(b.name))
                   .map((option) => {
                     return (
                       <DecryptedReadOnlyInput
                         key={option.name}
-                        label={option.label}
+                        label={LABELS[option.name]}
                         value={wrapperValues[option.name]}
                         secureEntry={option.secureEntry}
                         descriptionText={DESCRIPTIONS[option.name]}

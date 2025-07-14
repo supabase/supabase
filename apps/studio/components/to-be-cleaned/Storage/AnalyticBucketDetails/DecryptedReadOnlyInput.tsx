@@ -32,7 +32,6 @@ export const DecryptedReadOnlyInput = ({
 
   return (
     <Input
-      className="h-20"
       label={label}
       readOnly
       copy
