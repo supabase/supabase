@@ -4,7 +4,7 @@ import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
 import { ResponseError } from 'types'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
-import PipelineStatus, { PipelineStatusRequestStatus } from './PipelineStatus'
+import PipelineStatus, { PipelineStatusRequestStatus, PipelineStatusName } from './PipelineStatus'
 import { useParams } from 'common'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useState } from 'react'
@@ -71,12 +71,13 @@ const DestinationRow = ({
     }
     return status
   }
-  
+
   const statusName = getStatusName(pipelineStatus)
   if (
     (requestStatus === PipelineStatusRequestStatus.EnableRequested &&
-      statusName === 'started') ||
-    (requestStatus === PipelineStatusRequestStatus.DisableRequested && statusName === 'stopped')
+      (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED)) ||
+    (requestStatus === PipelineStatusRequestStatus.DisableRequested &&
+      (statusName === PipelineStatusName.STOPPED || statusName === PipelineStatusName.FAILED))
   ) {
     setRequestStatus(PipelineStatusRequestStatus.None)
   }
@@ -198,7 +199,7 @@ const DestinationRow = ({
           sourceId,
           destinationId: destinationId,
           pipelineId: pipeline?.id,
-          enabled: statusName === 'started',
+          enabled: statusName === PipelineStatusName.STARTED,
         }}
       />
     </>
