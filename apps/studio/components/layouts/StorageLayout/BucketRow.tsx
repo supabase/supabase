@@ -67,7 +67,7 @@ const BucketRow = ({
                 <Columns3 className="text-foreground-lighter" size="20" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Analytic bucket</p>
+                <p>Analytics bucket</p>
               </TooltipContent>
             </Tooltip>
           )}

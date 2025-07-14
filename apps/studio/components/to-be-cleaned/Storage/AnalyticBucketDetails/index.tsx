@@ -19,6 +19,7 @@ import {
   ScaffoldSectionTitle,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
@@ -127,6 +128,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
             </a>
           </div>
         )}
+        <DocsButton href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket" />
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-4" bottomPadding>
         {state === 'loading' && <GenericSkeletonLoader />}

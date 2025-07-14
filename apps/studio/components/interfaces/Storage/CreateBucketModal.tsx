@@ -214,14 +214,15 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                         <RadioGroupStackedItem
                           value="ANALYTICS"
                           id="ANALYTICS"
-                          label="Analytic bucket"
+                          label="Analytics bucket"
                           showIndicator={false}
                           disabled={!icebergCatalogEnabled}
                         >
                           <div className="flex  gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Compatible with Iceberg catalogs.
+                                Store Iceberg files and bucket is optimized for analytical
+                                workloads.
                               </p>
                             </div>
                           </div>
@@ -229,8 +230,16 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                             <div className="w-full flex gap-x-2 py-2 items-center">
                               <WarningIcon />
                               <span className="text-xs text-left">
-                                The feature is not enabled for your project. Please contact support
-                                to enable it.
+                                This feature is currently in alpha and not yet enabled for your
+                                project. Sign up{' '}
+                                <a
+                                  className="underline"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  href="https://forms.supabase.com/analytics-buckets"
+                                >
+                                  here
+                                </a>
                               </span>
                             </div>
                           )}
@@ -468,7 +477,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                     <p>
                       You need to install the <span className="text-brand">wrappers</span> extension
                       (with the minimum version of <span>0.5.3</span>) if you want to connect your
-                      Analytic bucket to your database.
+                      Analytics bucket to your database.
                     </p>
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
@@ -491,7 +500,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
               loading={isCreating || isCreatingIcebergWrapper}
               disabled={isCreating || isCreatingIcebergWrapper}
             >
-              Save
+              Create
             </Button>
           </Modal.Content>
         </form>

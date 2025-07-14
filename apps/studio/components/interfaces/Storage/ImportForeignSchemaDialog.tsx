@@ -23,6 +23,7 @@ import {
   Modal,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
@@ -48,6 +49,7 @@ export const ImportForeignSchemaDialog = ({
   const { project } = useProjectContext()
   const { ref } = useParams()
   const [loading, setLoading] = useState(false)
+  const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
   const { data: token, isSuccess: isSuccessToken } = useVaultSecretDecryptedValueQuery({
     projectRef: project?.ref,
@@ -69,7 +71,7 @@ export const ImportForeignSchemaDialog = ({
     defaultValues: {
       bucketName,
       sourceNamespace: 'default',
-      targetSchema: 'public',
+      targetSchema: '',
     },
   })
 
@@ -122,7 +124,7 @@ export const ImportForeignSchemaDialog = ({
       form.reset({
         bucketName,
         sourceNamespace: 'default',
-        targetSchema: 'public',
+        targetSchema: '',
       })
     }
   }, [visible, form, bucketName])
@@ -182,6 +184,7 @@ export const ImportForeignSchemaDialog = ({
                     size="small"
                     selectedSchemaName={field.value}
                     onSelectSchema={(schema) => field.onChange(schema)}
+                    onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
                   />
                 </FormItemLayout>
               )}
@@ -198,6 +201,14 @@ export const ImportForeignSchemaDialog = ({
           </Modal.Content>
         </form>
       </Form_Shadcn_>
+      <SchemaEditor
+        visible={createSchemaSheetOpen}
+        closePanel={() => setCreateSchemaSheetOpen(false)}
+        onSuccess={(schema) => {
+          form.setValue('targetSchema', schema)
+          setCreateSchemaSheetOpen(false)
+        }}
+      />
     </Modal>
   )
 }
