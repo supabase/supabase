@@ -15,7 +15,6 @@ import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-t
 import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
 import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, Card } from 'ui'
-import { ref } from 'yup'
 
 export const NamespaceCard = ({
   bucketName,
@@ -191,7 +190,7 @@ export const NamespaceCard = ({
                   />
                 </Badge>
 
-                <Link href={`/project/${ref}/editor/${table.id}`}>
+                <Link href={`/project/${project?.ref}/editor/${table.id}`}>
                   <Badge className="transition hover:bg-surface-300 pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem] border-l-0">
                     <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                     {table.schema}.{table.table_name}
