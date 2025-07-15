@@ -1,10 +1,14 @@
+import { useState } from 'react'
 import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
+import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 
 import { auth } from 'lib/gotrue'
 import { passwordSchema } from 'lib/schemas'
 import { Button, Form, Input } from 'ui'
+
+import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const WHITELIST_ERRORS = [
   'New password should be different from the old password',
@@ -13,6 +17,8 @@ const WHITELIST_ERRORS = [
 
 const ResetPasswordForm = () => {
   const router = useRouter()
+  const [showConditions, setShowConditions] = useState(false)
+  const [passwordHidden, setPasswordHidden] = useState(true)
 
   const onResetPassword = async ({ password }: { password: string }) => {
     const toastId = toast.loading('Saving password...')
@@ -40,18 +46,35 @@ const ResetPasswordForm = () => {
       validationSchema={passwordSchema}
       onSubmit={onResetPassword}
     >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
+      {({ isSubmitting, values }: { isSubmitting: boolean; values: any }) => {
         return (
           <div className="space-y-4 pt-4">
             <Input
               id="password"
               name="password"
-              type="password"
+              type={passwordHidden ? 'password' : 'text'}
               label="Password"
               placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
               disabled={isSubmitting}
+              onFocus={() => setShowConditions(true)}
               autoComplete="new-password"
+              actions={
+                <Button
+                  icon={passwordHidden ? <Eye /> : <EyeOff />}
+                  type="default"
+                  className="!mr-1"
+                  onClick={() => setPasswordHidden((prev) => !prev)}
+                />
+              }
             />
+
+            <div
+              className={`${
+                showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
+              } transition-all duration-400 overflow-y-hidden`}
+            >
+              <PasswordConditionsHelper password={values.password} />
+            </div>
 
             <div className="border-overlay-border border-t" />
 
@@ -63,7 +86,7 @@ const ResetPasswordForm = () => {
               disabled={isSubmitting}
               loading={isSubmitting}
             >
-              Save New Password
+              Save new password
             </Button>
           </div>
         )

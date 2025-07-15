@@ -22,8 +22,8 @@ const ForgotPasswordPage: NextPageWithLayout = () => {
 
 ForgotPasswordPage.getLayout = (page) => (
   <ForgotPasswordLayout
-    heading="Reset Your Password"
-    subheading="Type in your email and we'll send you a link to reset your password"
+    heading="Forgot your password?"
+    subheading="Type in your email and we'll send you a code to reset the password"
   >
     {page}
   </ForgotPasswordLayout>
