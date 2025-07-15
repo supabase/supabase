@@ -49,7 +49,7 @@ export function SharedAPIReport({
     auth: '/auth',
   }
 
-  const { data, error, isLoading } = useSharedAPIReport({
+  const { data, error, isLoading, isRefreshing } = useSharedAPIReport({
     src: filterByMapSource[filterBy],
     filters: [
       {
@@ -68,7 +68,7 @@ export function SharedAPIReport({
     <div className="grid grid-cols-1 gap-4">
       {!hiddenReports.includes('totalRequests') && (
         <ReportWidget
-          isLoading={isLoading.totalRequests}
+          isLoading={isLoading.totalRequests || isRefreshing}
           title="Total Requests"
           data={data.totalRequests || []}
           error={error.totalRequests}
@@ -79,7 +79,7 @@ export function SharedAPIReport({
       )}
       {!hiddenReports.includes('errorCounts') && (
         <ReportWidget
-          isLoading={isLoading.errorCounts}
+          isLoading={isLoading.errorCounts || isRefreshing}
           title="Response Errors"
           tooltip="Error responses with 4XX or 5XX status codes"
           data={data.errorCounts || []}
@@ -93,7 +93,7 @@ export function SharedAPIReport({
       )}
       {!hiddenReports.includes('responseSpeed') && (
         <ReportWidget
-          isLoading={isLoading.responseSpeed}
+          isLoading={isLoading.responseSpeed || isRefreshing}
           title="Response Speed"
           tooltip="Average response speed of a request (in ms)"
           data={data.responseSpeed || []}
@@ -105,7 +105,7 @@ export function SharedAPIReport({
       )}
       {!hiddenReports.includes('networkTraffic') && (
         <ReportWidget
-          isLoading={isLoading.networkTraffic}
+          isLoading={isLoading.networkTraffic || isRefreshing}
           error={error.networkTraffic}
           title="Network Traffic"
           tooltip="Ingress and egress of requests and responses respectively"

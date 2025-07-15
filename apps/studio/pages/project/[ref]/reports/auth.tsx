@@ -20,6 +20,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { NextPageWithLayout } from 'types'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
+import { useRefreshSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport.constants'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -41,6 +42,7 @@ export default AuthReport
 const AuthUsage = () => {
   const { ref } = useParams()
 
+  const { refetch: refetchSharedAPIReport } = useRefreshSharedAPIReport()
   const {
     selectedDateRange,
     updateDateRange,
@@ -75,6 +77,7 @@ const AuthUsage = () => {
         ])
       })
     })
+    refetchSharedAPIReport()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 

@@ -34,6 +34,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
+import { useRefreshSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport.constants'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -56,6 +57,7 @@ const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { db, chart, ref } = useParams()
   const report = useApiReport()
+  const { refetch: refetchSharedAPIReport } = useRefreshSharedAPIReport()
 
   const {
     data,
@@ -106,6 +108,8 @@ const RealtimeUsage = () => {
         })
       )
     })
+
+    refetchSharedAPIReport()
 
     refresh()
 

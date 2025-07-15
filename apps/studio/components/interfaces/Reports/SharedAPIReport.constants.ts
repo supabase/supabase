@@ -1,7 +1,7 @@
 import { get } from 'data/fetchers'
 import { generateRegexpWhere } from './Reports.constants'
 import { ReportFilterItem } from './Reports.types'
-import { useQueries } from '@tanstack/react-query'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/nextjs'
 
 export const SHARED_API_REPORT_SQL = {
@@ -214,6 +214,8 @@ const fetchLogs = async ({
   return data
 }
 
+const DEFAULT_KEYS = ['shared-api-report']
+
 type SharedAPIReportParams = {
   src: string
   filters: ReportFilterItem[]
@@ -232,7 +234,7 @@ export const useSharedAPIReport = ({
 }: SharedAPIReportParams) => {
   const queries = useQueries({
     queries: Object.entries(SHARED_API_REPORT_SQL).map(([key, value]) => ({
-      queryKey: ['shared-api-report', key, src, filters, start, end, projectRef],
+      queryKey: [...DEFAULT_KEYS, key, src, filters, start, end, projectRef],
       enabled,
       queryFn: () =>
         fetchLogs({
@@ -274,5 +276,14 @@ export const useSharedAPIReport = ({
     data,
     error,
     isLoading,
+    isRefreshing: queries.some((query) => query.isRefetching),
+  }
+}
+
+export const useRefreshSharedAPIReport = () => {
+  const queryClient = useQueryClient()
+
+  return {
+    refetch: () => queryClient.invalidateQueries({ queryKey: DEFAULT_KEYS }),
   }
 }

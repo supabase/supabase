@@ -24,7 +24,6 @@ import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 
 import { analyticsKeys } from 'data/analytics/keys'
-import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
@@ -34,6 +33,10 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
+import {
+  useRefreshSharedAPIReport,
+  useSharedAPIReport,
+} from 'components/interfaces/Reports/SharedAPIReport.constants'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -55,6 +58,7 @@ export default RealtimeReport
 const PostgrestReport = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { db, chart, ref } = useParams()
+  const { refetch } = useRefreshSharedAPIReport()
 
   const state = useDatabaseSelectorStateSnapshot()
   const {
@@ -68,35 +72,6 @@ const PostgrestReport = () => {
     isOrgPlanLoading,
     orgPlan,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
-
-  const queryClient = useQueryClient()
-
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-
-  const onRefreshReport = async () => {
-    if (!selectedDateRange) return
-
-    // [Joshen] Since we can't track individual loading states for each chart
-    // so for now we mock a loading state that only lasts for a second
-    setIsRefreshing(true)
-
-    const { period_start, period_end, interval } = selectedDateRange
-    REALTIME_REPORT_ATTRIBUTES.forEach((attr) => {
-      queryClient.invalidateQueries(
-        analyticsKeys.infraMonitoring(ref, {
-          attribute: attr?.id,
-          startDate: period_start.date,
-          endDate: period_end.date,
-          interval,
-          databaseIdentifier: state.selectedDatabaseId,
-        })
-      )
-    })
-
-    refresh()
-
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
 
   // [Joshen] Empty dependency array as we only want this running once
   useEffect(() => {
@@ -118,20 +93,20 @@ const PostgrestReport = () => {
 
   const handleDatePickerChange = (values: DatePickerValue) => {
     const promptShown = handleDatePickerChangeFromHook(values)
-    if (!promptShown) {
-      report.mergeParams({
-        iso_timestamp_start: values.from,
-        iso_timestamp_end: values.to,
-      })
-    }
+    // if (!promptShown) {
+    //   report.mergeParams({
+    //     iso_timestamp_start: values.from,
+    //     iso_timestamp_end: values.to,
+    //   })
+    // }
   }
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     updateDateRangeFromHook(from, to)
-    report.mergeParams({
-      iso_timestamp_start: from,
-      iso_timestamp_end: to,
-    })
+    // report.mergeParams({
+    //   iso_timestamp_start: from,
+    //   iso_timestamp_end: to,
+    // })
   }
 
   return (
@@ -146,7 +121,7 @@ const PostgrestReport = () => {
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
+              onClick={refetch}
             />
             <div className="flex items-center gap-3">
               <LogsDatePicker
