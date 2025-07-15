@@ -7,6 +7,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -47,27 +48,39 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
             <DialogHeader padding="small">
               <DialogTitle>Update Supabase Assistant Opt-in Level</DialogTitle>
             </DialogHeader>
+
             <DialogSectionSeparator />
-            <DialogSection className="space-y-4" padding="small">
+
+            <DialogSection className="space-y-4 pb-0" padding="small">
               <AIOptInLevelSelector
                 control={form.control}
                 disabled={!canUpdateOrganization || !newOrgAiOptIn || isUpdating}
               />
             </DialogSection>
-            <DialogSectionSeparator />
-            <DialogFooter padding="small">
-              <Button type="default" disabled={isUpdating} onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                form="ai-opt-in-form"
-                loading={isUpdating}
-                disabled={isUpdating || !canUpdateOrganization || !form.formState.isDirty}
-              >
-                Confirm
-              </Button>
+
+            <DialogFooter
+              padding="small"
+              className={cn(!canUpdateOrganization && '!justify-between')}
+            >
+              {!canUpdateOrganization && (
+                <p className="text-sm text-foreground-lighter">
+                  You need additional permissions to update the opt-in level
+                </p>
+              )}
+              <div className="flex items-center gap-x-2">
+                <Button type="default" disabled={isUpdating} onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  form="ai-opt-in-form"
+                  loading={isUpdating}
+                  disabled={isUpdating || !canUpdateOrganization || !form.formState.isDirty}
+                >
+                  Confirm
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </Form_Shadcn_>

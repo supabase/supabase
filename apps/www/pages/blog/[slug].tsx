@@ -10,20 +10,21 @@ import { Badge } from 'ui'
 import dayjs from 'dayjs'
 
 import authors from 'lib/authors.json'
-import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
-import mdxComponents from '~/lib/mdx/mdxComponents'
-import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { generateReadingTime, isNotNullOrUndefined } from 'lib/helpers'
+import mdxComponents from 'lib/mdx/mdxComponents'
+import { mdxSerialize } from 'lib/mdx/mdxSerialize'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from 'lib/posts'
 
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-import CTABanner from '~/components/CTABanner'
-import LW11Summary from '~/components/LaunchWeek/11/LW11Summary'
-import LW12Summary from '~/components/LaunchWeek/12/LWSummary'
-import LW13Summary from '~/components/LaunchWeek/13/Releases/LWSummary'
-import LW14Summary from '~/components/LaunchWeek/14/Releases/LWSummary'
-import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
-import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
-import DefaultLayout from '~/components/Layouts/Default'
+import ShareArticleActions from 'components/Blog/ShareArticleActions'
+import CTABanner from 'components/CTABanner'
+import LW11Summary from 'components/LaunchWeek/11/LW11Summary'
+import LW12Summary from 'components/LaunchWeek/12/LWSummary'
+import LW13Summary from 'components/LaunchWeek/13/Releases/LWSummary'
+import LW14Summary from 'components/LaunchWeek/14/Releases/LWSummary'
+import LW15Summary from 'components/LaunchWeek/15/LWSummary'
+import BlogLinks from 'components/LaunchWeek/7/BlogLinks'
+import LWXSummary from 'components/LaunchWeek/X/LWXSummary'
+import DefaultLayout from 'components/Layouts/Default'
 import { ChevronLeft } from 'lucide-react'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
@@ -139,6 +140,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const isLaunchWeek12 = props.blog.launchweek?.toString().toLocaleLowerCase() === '12'
   const isLaunchWeek13 = props.blog.launchweek?.toString().toLocaleLowerCase() === '13'
   const isLaunchWeek14 = props.blog.launchweek?.toString().toLocaleLowerCase() === '14'
+  const isLaunchWeek15 = props.blog.launchweek?.toString().toLocaleLowerCase() === '15'
 
   const author = authorArray
     .map((authorId) => {
@@ -353,6 +355,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   {isLaunchWeek12 && <LW12Summary />}
                   {isLaunchWeek13 && <LW13Summary />}
                   {isLaunchWeek14 && <LW14Summary />}
+                  {isLaunchWeek15 && <LW15Summary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />

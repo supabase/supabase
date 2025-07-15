@@ -56,10 +56,22 @@ const EdgeFunctionDetailsLayout = ({
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
 
-  const { data: functionFiles = [], error: filesError } = useEdgeFunctionBodyQuery({
-    projectRef: ref,
-    slug: functionSlug,
-  })
+  const { data: functionFiles = [], error: filesError } = useEdgeFunctionBodyQuery(
+    {
+      projectRef: ref,
+      slug: functionSlug,
+    },
+    {
+      retry: false,
+      retryOnMount: true,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
+    }
+  )
 
   const name = selectedFunction?.name || ''
 

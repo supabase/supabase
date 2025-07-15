@@ -4,7 +4,7 @@ import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
 import { ResponseError } from 'types'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
-import PipelineStatus from './PipelineStatus'
+import PipelineStatus, { PipelineStatusRequestStatus } from './PipelineStatus'
 import { useParams } from 'common'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useState } from 'react'
@@ -16,6 +16,8 @@ import DeleteDestination from './DeleteDestination'
 import DestinationPanel from './DestinationPanel'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
+
+const refreshFrequencyMs: number = 5000
 
 interface DestinationRowProps {
   sourceId: number | undefined
@@ -41,7 +43,6 @@ const DestinationRow = ({
   isSuccess: isPipelineSuccess,
 }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
-  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
 
@@ -56,20 +57,20 @@ const DestinationRow = ({
       projectRef,
       pipelineId: pipeline?.id,
     },
-    { refetchInterval }
+    { refetchInterval: refreshFrequencyMs }
   )
-  const [requestStatus, setRequestStatus] = useState<
-    'None' | 'EnableRequested' | 'DisableRequested'
-  >('None')
+  const [requestStatus, setRequestStatus] = useState<PipelineStatusRequestStatus>(
+    PipelineStatusRequestStatus.None
+  )
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
   if (
-    (requestStatus === 'EnableRequested' && pipelineStatus === 'Started') ||
-    (requestStatus === 'DisableRequested' && pipelineStatus === 'Stopped')
+    (requestStatus === PipelineStatusRequestStatus.EnableRequested &&
+      pipelineStatus === 'Started') ||
+    (requestStatus === PipelineStatusRequestStatus.DisableRequested && pipelineStatus === 'Stopped')
   ) {
-    setRefetchInterval(false)
-    setRequestStatus('None')
+    setRequestStatus(PipelineStatusRequestStatus.None)
   }
 
   const onEnableClick = async () => {
@@ -87,8 +88,7 @@ const DestinationRow = ({
     } catch (error) {
       toast.error('Failed to enable destination')
     }
-    setRequestStatus('EnableRequested')
-    setRefetchInterval(5000)
+    setRequestStatus(PipelineStatusRequestStatus.EnableRequested)
   }
   const onDisableClick = async () => {
     if (!projectRef) {
@@ -105,8 +105,7 @@ const DestinationRow = ({
     } catch (error) {
       toast.error('Failed to disable destination')
     }
-    setRequestStatus('DisableRequested')
-    setRefetchInterval(5000)
+    setRequestStatus(PipelineStatusRequestStatus.DisableRequested)
   }
   const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
 
@@ -159,7 +158,7 @@ const DestinationRow = ({
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader></ShimmeringLoader>
             ) : (
-              pipeline.publication_name
+              pipeline.config.publication_name
             )}
           </Table.td>
           <Table.td>

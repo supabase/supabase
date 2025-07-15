@@ -141,6 +141,9 @@ export const createTableEditorTableState = ({
     },
 
     editable,
+    setEditable: (editable: boolean) => {
+      state.editable = editable
+    },
   })
 
   return state
@@ -202,6 +205,12 @@ export const TableEditorTableStateContextProvider = ({
       state.updateTable(table)
     }
   }, [table])
+
+  useEffect(() => {
+    if (state.editable !== props.editable) {
+      state.setEditable(props.editable ?? true)
+    }
+  }, [props.editable, state])
 
   return (
     <TableEditorTableStateContext.Provider value={state}>

@@ -120,9 +120,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       ({
         clientSecret: setupIntent ? setupIntent.client_secret! : '',
         appearance: getStripeElementsAppearanceOptions(resolvedTheme),
-        ...(setupIntent?.pending_subscription_flow_enabled_for_creation === true
-          ? { paymentMethodCreation: 'manual' }
-          : {}),
+        paymentMethodCreation: 'manual',
       }) as const,
     [setupIntent, resolvedTheme]
   )
@@ -553,9 +551,6 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
               <Panel.Content>
                 <NewPaymentMethodElement
                   ref={paymentRef}
-                  pending_subscription_flow_enabled={
-                    setupIntent?.pending_subscription_flow_enabled_for_creation === true
-                  }
                   email={user.profile?.primary_email}
                   readOnly={newOrgLoading || paymentConfirmationLoading}
                 />

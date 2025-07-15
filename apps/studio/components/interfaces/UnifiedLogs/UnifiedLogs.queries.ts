@@ -35,7 +35,11 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
-      whereConditions.push(`${key} = '${value}'`)
+      if (['host', 'pathname'].includes(key)) {
+        whereConditions.push(`${key} LIKE '%${value}%'`)
+      } else {
+        whereConditions.push(`${key} = '${value}'`)
+      }
     }
   })
 
@@ -234,7 +238,7 @@ const getEdgeLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
@@ -253,6 +257,7 @@ const getEdgeLogsQuery = () => {
 
     -- ONLY include logs where the path does not include /rest/
     WHERE edge_logs_request.path NOT LIKE '%/rest/%'
+    AND edge_logs_request.path NOT LIKE '%/storage/%'
     
   `
 }
@@ -273,7 +278,7 @@ const getPostgrestLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
+      edge_logs_request.path as pathname,
       edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
@@ -304,14 +309,15 @@ const getPostgresLogsQuery = () => {
       id,
       pgl.timestamp as timestamp,
       'postgres' as log_type,
-      pgl_parsed.sql_state_code as status,
+      CAST(pgl_parsed.sql_state_code AS STRING) as status,
       CASE
           WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
           ELSE null
       END as level,
-      null as path,
+      null as pathname,
       null as host,
       event_message as event_message,
       null as method,
@@ -341,7 +347,7 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.url as path,
+      fel_request.pathname as pathname,
       fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
@@ -387,7 +393,7 @@ const getAuthLogsQuery = () => {
           WHEN el_in_al_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      el_in_al_request.path as path,
+      el_in_al_request.path as pathname,
       el_in_al_request.host as host,
       null as event_message,
       el_in_al_request.method as method,
@@ -414,30 +420,39 @@ const getAuthLogsQuery = () => {
 }
 
 /**
- * Supavisor logs query fragment
+ * Supabase storage logs query fragment
  */
-const getSupavisorLogsQuery = () => {
+const getSupabaseStorageLogsQuery = () => {
   return `
     select 
-      id, 
-      svl.timestamp as timestamp, 
-      'supavisor' as log_type,
-      'undefined' as status,
+      id,
+      el.timestamp as timestamp,
+      'storage' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
       CASE
-          WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
-          WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      null as path,
-      null as host,
+      edge_logs_request.path as pathname,
+      edge_logs_request.host as host,
       null as event_message,
-      null as method,
-      'api_role' as api_role,
-      null as auth_user,
+      edge_logs_request.method as method,
+      authorization_payload.role as api_role,
+      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
-    from supavisor_logs as svl
-    cross join unnest(metadata) as svl_metadata
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    left join unnest(edge_logs_request.sb) as sb
+    left join unnest(sb.jwt) as jwt
+    left join unnest(jwt.authorization) as auth
+    left join unnest(auth.payload) as authorization_payload
+    -- ONLY include logs where the path includes /storage/
+    WHERE edge_logs_request.path LIKE '%/storage/%'
   `
 }
 
@@ -447,8 +462,6 @@ const getSupavisorLogsQuery = () => {
 const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
-    ${getEdgeLogsQuery()}
-    union all
     ${getPostgrestLogsQuery()}
     union all
     ${getPostgresLogsQuery()}
@@ -457,7 +470,7 @@ WITH unified_logs AS (
     union all
     ${getAuthLogsQuery()}
     union all
-    ${getSupavisorLogsQuery()}
+    ${getSupabaseStorageLogsQuery()}
 )
   `
 }
@@ -478,7 +491,7 @@ SELECT
     log_type,
     status,
     level,
-    path,
+    pathname,
     host,
     event_message,
     method,
@@ -495,11 +508,37 @@ ${finalWhere}
 
 /**
  * Get a count query for the total logs within the timeframe
- * Also returns facets for all filter dimensions
+ * Uses proper faceted search behavior where facets show "what would I get if I selected ONLY this option"
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
+
+  // Helper function to build WHERE clause excluding a specific field
+  const buildFacetWhere = (excludeField: string): string => {
+    const conditions: string[] = []
+
+    Object.entries(search).forEach(([key, value]) => {
+      if (key === excludeField) return // Skip the field we're getting facets for
+      if (EXCLUDED_QUERY_PARAMS.includes(key as any)) return // Skip pagination and special params
+
+      // Handle array filters (IN clause)
+      if (Array.isArray(value) && value.length > 0) {
+        conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+        return
+      }
+
+      // Handle scalar values
+      if (value !== null && value !== undefined) {
+        if (['host', 'pathname'].includes(key)) {
+          conditions.push(`${key} LIKE '%${value}%'`)
+        } else {
+          conditions.push(`${key} = '${value}'`)
+        }
+      }
+    })
+
+    return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+  }
 
   // Create a count query using the same unified logs CTE
   const sql = `
@@ -511,28 +550,66 @@ ${finalWhere}
 
 UNION ALL
 
--- Get counts by level
-SELECT 'level' as dimension, level as value, COUNT(*) as count
-FROM unified_logs
-${finalWhere}
-GROUP BY level
-
-UNION ALL
-
--- Get counts by log_type
+-- Get counts by log_type (exclude log_type filter to avoid self-filtering)
 SELECT 'log_type' as dimension, log_type as value, COUNT(*) as count
 FROM unified_logs
-${finalWhere}
+${buildFacetWhere('log_type') || 'WHERE log_type IS NOT NULL'}
+${buildFacetWhere('log_type') ? ' AND log_type IS NOT NULL' : ''}
 GROUP BY log_type
 
 UNION ALL
 
--- Get counts by method
+-- Get counts by method (exclude method filter to avoid self-filtering)  
 SELECT 'method' as dimension, method as value, COUNT(*) as count
 FROM unified_logs
-${finalWhere}
-WHERE method IS NOT NULL
+${buildFacetWhere('method') || 'WHERE method IS NOT NULL'}
+${buildFacetWhere('method') ? ' AND method IS NOT NULL' : ''}
 GROUP BY method
+
+UNION ALL
+
+-- Get counts by level (exclude level filter to avoid self-filtering)
+SELECT 'level' as dimension, level as value, COUNT(*) as count
+FROM unified_logs
+${buildFacetWhere('level') || 'WHERE level IS NOT NULL'}
+${buildFacetWhere('level') ? ' AND level IS NOT NULL' : ''}
+GROUP BY level
+
+UNION ALL
+
+-- Get counts by status (exclude status filter to avoid self-filtering)
+SELECT 'status' as dimension, status as value, COUNT(*) as count
+FROM unified_logs
+${buildFacetWhere('status') || 'WHERE status IS NOT NULL'}
+${buildFacetWhere('status') ? ' AND status IS NOT NULL' : ''}
+GROUP BY status
+
+UNION ALL
+
+-- Get counts by host (exclude host filter to avoid self-filtering)
+SELECT 'host' as dimension, host as value, COUNT(*) as count
+FROM unified_logs
+${buildFacetWhere('host') || 'WHERE host IS NOT NULL'}
+${buildFacetWhere('host') ? ' AND host IS NOT NULL' : ''}
+GROUP BY host
+
+UNION ALL
+
+-- Get counts by pathname (exclude pathname filter to avoid self-filtering)
+SELECT 'pathname' as dimension, pathname as value, COUNT(*) as count
+FROM unified_logs
+${buildFacetWhere('pathname') || 'WHERE pathname IS NOT NULL'}
+${buildFacetWhere('pathname') ? ' AND pathname IS NOT NULL' : ''}
+GROUP BY pathname
+
+UNION ALL
+
+-- Get counts by auth_user (exclude auth_user filter to avoid self-filtering)
+SELECT 'auth_user' as dimension, auth_user as value, COUNT(*) as count
+FROM unified_logs
+${buildFacetWhere('auth_user') || 'WHERE auth_user IS NOT NULL'}
+${buildFacetWhere('auth_user') ? ' AND auth_user IS NOT NULL' : ''}
+GROUP BY auth_user
 `
 
   return sql

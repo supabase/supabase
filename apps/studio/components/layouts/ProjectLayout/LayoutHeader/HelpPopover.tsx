@@ -77,9 +77,18 @@ export const HelpPopover = () => {
                       title:
                         'I can help you with your project, here are some example prompts to get you started:',
                       prompts: [
-                        'Summarise my database health and performance',
-                        'View and debug my edge function logs',
-                        'Implement row level security for my tables',
+                        {
+                          label: 'Database Health',
+                          description: 'Summarise my database health and performance',
+                        },
+                        {
+                          label: 'Debug Logs',
+                          description: 'View and debug my edge function logs',
+                        },
+                        {
+                          label: 'RLS Setup',
+                          description: 'Implement row level security for my tables',
+                        },
                       ],
                     },
                   })

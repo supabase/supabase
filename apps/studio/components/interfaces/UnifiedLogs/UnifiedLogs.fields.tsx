@@ -5,7 +5,7 @@ import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from 'components/ui/DataTable/DataTable.types'
 import { getLevelColor, getStatusColor } from 'components/ui/DataTable/DataTable.utils'
 import { cn } from 'ui'
-import { LOG_TYPES, METHODS } from './UnifiedLogs.constants'
+import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta, SheetField } from './UnifiedLogs.types'
 import { getLevelLabel } from './UnifiedLogs.utils'
@@ -21,6 +21,55 @@ export const filterFields = [
     commandDisabled: true,
   },
   {
+    label: 'Log Type',
+    value: 'log_type',
+    type: 'checkbox',
+    defaultOpen: true,
+    options: LOG_TYPES.map((type) => ({ label: type, value: type })),
+    component: (props: Option) => {
+      return (
+        <div className="flex w-full items-center justify-between gap-2">
+          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
+            {props.label.replace('_', ' ')}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    label: 'Status',
+    value: 'status',
+    type: 'checkbox',
+    defaultOpen: true,
+    options: [
+      { label: '2xx', value: 200 },
+      { label: '4xx', value: 400 },
+      { label: '4xx', value: 500 },
+    ], // REMINDER: this is a placeholder to set the type in the client.tsx
+    component: (props: Option) => {
+      if (typeof props.value === 'boolean') return null
+      if (typeof props.value === 'undefined') return null
+
+      const statusValue = String(props.value)
+      const statusLabel = STATUS_CODE_LABELS[statusValue as keyof typeof STATUS_CODE_LABELS]
+
+      // Convert string status codes to numbers for HTTP status styling
+      const statusCode = typeof props.value === 'string' ? parseInt(props.value, 10) : props.value
+      const isHttpStatus = !isNaN(statusCode) && statusCode >= 100 && statusCode < 600
+
+      return (
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <span className="flex-shrink-0 text-foreground">{statusValue}</span>
+          {statusLabel && (
+            <span className="text-[0.7rem] text-foreground-lighter truncate" title={statusLabel}>
+              {statusLabel}
+            </span>
+          )}
+        </div>
+      )
+    },
+  },
+  {
     label: 'Level',
     value: 'level',
     type: 'checkbox',
@@ -30,7 +79,7 @@ export const filterFields = [
       // TODO: type `Option` with `options` values via Generics
       const value = props.value as (typeof LEVELS)[number]
       return (
-        <div className="flex w-full max-w-28 items-center justify-between gap-2 font-mono">
+        <div className="flex w-full max-w-28 items-center justify-between gap-2">
           <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
             {props.label}
           </span>
@@ -43,63 +92,62 @@ export const filterFields = [
     },
   },
   {
-    label: 'Log Type',
-    value: 'log_type',
+    label: 'Method',
+    value: 'method',
     type: 'checkbox',
     defaultOpen: true,
-    options: LOG_TYPES.map((type) => ({ label: type, value: type })),
+    options: METHODS.map((method) => ({ label: method, value: method })),
     component: (props: Option) => {
       return (
-        <div className="flex w-full items-center justify-between gap-2 font-mono">
-          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
-            {props.label}
-          </span>
-          <span className="text-xs text-muted-foreground/70">{props.value}</span>
-        </div>
+        <span className="truncate block text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
       )
     },
   },
   {
     label: 'Host',
     value: 'host',
-    type: 'input',
-  },
-  {
-    label: 'Pathname',
-    value: 'pathname',
-    type: 'input',
-  },
-  {
-    label: 'Auth User',
-    value: 'auth_user',
-    type: 'input',
-  },
-  {
-    label: 'Status Code',
-    value: 'status',
     type: 'checkbox',
-    options: [
-      { label: '200', value: 200 },
-      { label: '400', value: 400 },
-      { label: '404', value: 404 },
-      { label: '500', value: 500 },
-    ], // REMINDER: this is a placeholder to set the type in the client.tsx
+    defaultOpen: false,
+    options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
-      if (typeof props.value === 'boolean') return null
-      if (typeof props.value === 'undefined') return null
-      if (typeof props.value === 'string') return null
       return (
-        <span className={cn('font-mono', getStatusColor(props.value).text)}>{props.value}</span>
+        <span className="truncate block text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
       )
     },
   },
   {
-    label: 'Method',
-    value: 'method',
+    label: 'Pathname',
+    value: 'pathname',
     type: 'checkbox',
-    options: METHODS.map((region) => ({ label: region, value: region })),
+    defaultOpen: true,
+    options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
-      return <span className="font-mono">{props.value}</span>
+      return (
+        <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
+          {props.value}
+        </span>
+      )
+    },
+  },
+  {
+    label: 'Auth User',
+    value: 'auth_user',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [], // Will be populated dynamically from facets
+    component: (props: Option) => {
+      return (
+        <div className="flex items-center gap-2 min-w-0">
+          <User size={14} className="text-foreground-lighter flex-shrink-0" />
+          <span className="truncate text-[0.75rem]" title={props.value as string}>
+            {props.value}
+          </span>
+        </div>
+      )
     },
   },
 ] satisfies DataTableFilterField<ColumnSchema>[]
@@ -148,26 +196,6 @@ export const sheetFields = [
       </div>
     ),
     skeletonClassName: 'w-56',
-  },
-  {
-    id: 'status',
-    label: 'Status',
-    type: 'checkbox',
-    component: (props) => {
-      return (
-        <span className={cn('font-mono', getStatusColor(props.status).text)}>{props.status}</span>
-      )
-    },
-    skeletonClassName: 'w-12',
-  },
-  {
-    id: 'method',
-    label: 'Method',
-    type: 'checkbox',
-    component: (props) => {
-      return <span className="font-mono">{props.method}</span>
-    },
-    skeletonClassName: 'w-10',
   },
   {
     id: 'host',

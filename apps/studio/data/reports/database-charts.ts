@@ -41,6 +41,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       id: 'ram-usage',
       label: 'Memory usage',
       docsUrl: 'https://supabase.com/docs/guides/database/inspect#memory-usage',
+      availableIn: ['free', 'pro', 'team'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -85,6 +86,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
+      availableIn: ['free', 'pro', 'team'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -152,6 +154,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       docsUrl:
         'https://supabase.com/docs/guides/database/inspect#disk-inputoutput-operations-per-second-iops',
       syncId: 'database-reports',
+      availableIn: ['free', 'pro', 'team'],
       hide: false,
       showTooltip: true,
       valuePrecision: 2,
@@ -195,6 +198,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       label: 'Disk IO Usage',
       docsUrl: 'https://supabase.com/docs/guides/database/inspect#disk-io-usage',
       syncId: 'database-reports',
+      availableIn: ['pro', 'team'],
       hide: false,
       showTooltip: true,
       format: '%',
@@ -219,88 +223,41 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       ],
     },
     {
-      id: 'disk-size',
-      label: 'Disk Size',
-      docsUrl: 'https://supabase.com/docs/guides/database/inspect#disk-size',
-      syncId: 'database-reports',
-      valuePrecision: 2,
-      hide: false,
+      id: 'client-connections',
+      label: 'Database connections',
+      valuePrecision: 0,
+      availableIn: ['free', 'pro', 'team'],
+      hide: !isFreePlan, // [Jordi] Paid plans can see grouped client connections instead, so this chart is not needed for them. See below.
       showTooltip: true,
-      showLegend: true,
+      showLegend: false,
       showMaxValue: true,
-      showGrid: true,
-      YAxisProps: {
-        width: 65,
-        tickFormatter: (value: any) => formatBytes(value, 1),
-      },
       hideChartType: false,
+      showGrid: true,
+      YAxisProps: { width: 30 },
       defaultChartStyle: 'line',
       attributes: [
         {
-          attribute: 'disk_fs_used_system',
+          attribute: 'pg_stat_database_num_backends',
           provider: 'infra-monitoring',
-          format: 'bytes',
-          label: 'System',
-          tooltip: 'Reserved space for the system to ensure your database runs smoothly',
+          label: 'Total connections',
+          tooltip: 'Total number of client connections to the database',
         },
         {
-          attribute: 'disk_fs_used_wal',
-          provider: 'infra-monitoring',
-          format: 'bytes',
-          label: 'WAL',
-          tooltip:
-            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
-        },
-
-        {
-          attribute: 'pg_database_size',
-          provider: 'infra-monitoring',
-          format: 'bytes',
-          label: 'Database',
-          tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
-        },
-        {
-          attribute: 'disk_fs_size',
-          provider: 'infra-monitoring',
+          attribute: 'max_db_connections',
+          provider: 'reference-line',
+          label: 'Max connections',
+          value: getConnectionLimits(computeSize).direct,
+          tooltip: 'Max available connections for your current compute size',
           isMaxValue: true,
-          format: 'bytes',
-          label: 'Disk Size',
-          tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
-        !isFreePlan &&
-          (isSpendCapEnabled
-            ? {
-                attribute: 'pg_database_size_percent_paid_spendCap',
-                provider: 'reference-line',
-                isReferenceLine: true,
-                strokeDasharray: '4 2',
-                label: 'Spend cap enabled',
-                value:
-                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
-                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
-                opacity: 1,
-              }
-            : {
-                attribute: 'pg_database_size_percent_paid',
-                provider: 'reference-line',
-                isReferenceLine: true,
-                label: '90% - Disk resize threshold',
-                className: '[&_line]:!stroke-yellow-800',
-                value:
-                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) *
-                  1024 *
-                  1024 *
-                  1024 *
-                  0.9, // reaching 90% of the disk size will trigger a disk resize https://supabase.com/docs/guides/platform/database-size
-              }),
       ],
     },
     {
       id: 'client-connections',
-      label: 'Database client connections',
-      docsUrl: 'https://supabase.com/docs/guides/database/inspect#database-client-connections',
+      label: 'Direct Database Client Connections Grouped',
       valuePrecision: 0,
-      hide: false,
+      availableIn: ['pro', 'team'],
+      hide: isFreePlan, // [Jordi] Paid plans can see grouped client connections instead, so this chart is not needed for them. See above.
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
@@ -359,10 +316,11 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     },
     {
       id: 'pgbouncer-connections',
-      label: 'Dedicated Pooler client connections',
+      label: 'Dedicated Pooler Client Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      hide: false,
+      availableIn: ['pro', 'team'],
+      hide: isFreePlan,
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
@@ -393,6 +351,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
+      availableIn: ['pro', 'team'],
       hide: isFreePlan,
       showTooltip: false,
       showLegend: false,
@@ -408,6 +367,84 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           label: 'supavisor',
           tooltip: 'Supavisor connections',
         },
+      ],
+    },
+    {
+      id: 'disk-size',
+      label: 'Disk Usage',
+      syncId: 'database-reports',
+      valuePrecision: 2,
+      availableIn: ['free', 'pro', 'team'],
+      hide: false,
+      showTooltip: true,
+      showLegend: true,
+      showMaxValue: true,
+      showGrid: true,
+      YAxisProps: {
+        width: 65,
+        tickFormatter: (value: any) => formatBytes(value, 1),
+      },
+      hideChartType: false,
+      defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
+      attributes: [
+        {
+          attribute: 'disk_fs_used_system',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'System',
+          tooltip: 'Reserved space for the system to ensure your database runs smoothly',
+        },
+        {
+          attribute: 'disk_fs_used_wal',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'WAL',
+          tooltip:
+            'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
+        },
+
+        {
+          attribute: 'pg_database_size',
+          provider: 'infra-monitoring',
+          format: 'bytes',
+          label: 'Database',
+          tooltip: 'Disk usage by your database (tables, indexes, data, ...)',
+        },
+        {
+          attribute: 'disk_fs_size',
+          provider: 'infra-monitoring',
+          isMaxValue: true,
+          format: 'bytes',
+          label: 'Disk Size',
+          tooltip: 'Disk Size refers to the total space your project occupies on disk',
+        },
+        !isFreePlan &&
+          (isSpendCapEnabled
+            ? {
+                attribute: 'pg_database_size_percent_paid_spendCap',
+                provider: 'reference-line',
+                isReferenceLine: true,
+                strokeDasharray: '4 2',
+                label: 'Spend cap enabled',
+                value:
+                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) * 1024 * 1024 * 1024,
+                className: '[&_line]:!stroke-yellow-800 [&_line]:!opacity-100',
+                opacity: 1,
+              }
+            : {
+                attribute: 'pg_database_size_percent_paid',
+                provider: 'reference-line',
+                isReferenceLine: true,
+                label: '90% - Disk resize threshold',
+                className: '[&_line]:!stroke-yellow-800',
+                value:
+                  (project?.volumeSizeGb || getRecommendedDbSize(computeSize)) *
+                  1024 *
+                  1024 *
+                  1024 *
+                  0.9, // reaching 90% of the disk size will trigger a disk resize https://supabase.com/docs/guides/platform/database-size
+              }),
       ],
     },
   ]
