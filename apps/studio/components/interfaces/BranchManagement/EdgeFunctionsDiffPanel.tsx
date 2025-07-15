@@ -1,4 +1,4 @@
-import { Code, Wind } from 'lucide-react'
+import { Code, Wind, Circle, Plus, Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -34,15 +34,31 @@ const fileKey = (fullPath: string) => basename(fullPath)
 const getStatusColor = (status: FileStatus): string => {
   switch (status) {
     case 'added':
-      return 'bg-brand'
+      return 'text-brand'
     case 'removed':
-      return 'bg-destructive'
+      return 'text-destructive'
     case 'modified':
-      return 'bg-warning'
+      return 'text-warning'
     case 'unchanged':
-      return 'bg-muted'
+      return 'text-muted'
     default:
-      return 'bg-muted'
+      return 'text-muted'
+  }
+}
+
+// Helper to get the status icon for file indicators
+const getStatusIcon = (status: FileStatus) => {
+  switch (status) {
+    case 'added':
+      return Plus
+    case 'removed':
+      return Minus
+    case 'modified':
+      return Circle
+    case 'unchanged':
+      return Circle
+    default:
+      return Circle
   }
 }
 
@@ -65,8 +81,12 @@ const FunctionDiff = ({
     }
   }, [allFileKeys, activeFileKey])
 
-  const currentFile = currentBody.find((f) => fileKey(f.name) === activeFileKey)
-  const mainFile = mainBody.find((f) => fileKey(f.name) === activeFileKey)
+  const currentFile = currentBody.find(
+    (f: EdgeFunctionBodyData[number]) => fileKey(f.name) === activeFileKey
+  )
+  const mainFile = mainBody.find(
+    (f: EdgeFunctionBodyData[number]) => fileKey(f.name) === activeFileKey
+  )
 
   const language = useMemo(() => {
     if (!activeFileKey) return 'plaintext'
@@ -108,12 +128,16 @@ const FunctionDiff = ({
                         : 'text-foreground-light hover:bg-surface-300'
                     )}
                   >
-                    <div
-                      className={cn(
-                        'w-1 h-1 rounded-full flex-shrink-0',
-                        getStatusColor(fileInfo.status)
-                      )}
-                    />
+                    {(() => {
+                      const Icon = getStatusIcon(fileInfo.status)
+                      return (
+                        <Icon
+                          className={cn('flex-shrink-0', getStatusColor(fileInfo.status))}
+                          size={12}
+                          strokeWidth={1}
+                        />
+                      )
+                    })()}
                     <span className="truncate">{fileInfo.key}</span>
                   </button>
                 </li>

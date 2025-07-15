@@ -520,7 +520,8 @@ const MergePage: NextPageWithLayout = () => {
                     >
                       <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
                     </Button>
-                  ) : hasCurrentWorkflowCompleted ? (
+                  ) : hasCurrentWorkflowCompleted &&
+                    currentWorkflowRun?.id === parentBranchWorkflow?.id ? (
                     <Button
                       type="default"
                       onClick={handleCloseBranch}
