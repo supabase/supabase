@@ -13,6 +13,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
+import Link from 'next/link'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -172,12 +173,12 @@ export const DisplayApiSettings = ({
                       {showLegacyText && (
                         <span>
                           Prefer using{' '}
-                          <a
+                          <Link
                             href={`/project/${projectRef}/settings/api-keys/new`}
                             className="text-link underline"
                           >
                             Secret API keys
-                          </a>{' '}
+                          </Link>{' '}
                           instead.
                         </span>
                       )}
@@ -189,12 +190,12 @@ export const DisplayApiSettings = ({
                       {showLegacyText && (
                         <span>
                           Prefer using{' '}
-                          <a
+                          <Link
                             href={`/project/${projectRef}/settings/api-keys/new`}
                             className="text-link underline"
                           >
                             Publishable API keys
-                          </a>{' '}
+                          </Link>{' '}
                           instead.
                         </span>
                       )}
