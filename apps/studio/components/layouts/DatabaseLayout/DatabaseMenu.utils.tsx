@@ -9,10 +9,12 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
+    enablePgReplicate: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
+  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges, enablePgReplicate } =
+    flags || {}
 
   return [
     {
@@ -62,13 +64,24 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
-        {
-          name: 'Replication',
-          key: 'replication',
-          url: `/project/${ref}/database/replication`,
-          label: 'Coming Soon',
-          items: [],
-        },
+        ...(enablePgReplicate
+          ? [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                items: [],
+              },
+            ]
+          : [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                label: 'Coming Soon',
+                items: [],
+              },
+            ]),
       ],
     },
     {

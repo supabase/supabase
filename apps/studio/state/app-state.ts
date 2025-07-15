@@ -51,7 +51,7 @@ const getInitialState = () => {
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
       showProjectApiDocs: false,
-      showEnableBranchingModal: false,
+      showCreateBranchModal: false,
       showFeaturePreviewModal: false,
       selectedFeaturePreview: '',
       showAiSettingsModal: false,
@@ -81,7 +81,7 @@ const getInitialState = () => {
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
-    showEnableBranchingModal: false,
+    showCreateBranchModal: false,
     showFeaturePreviewModal: false,
     selectedFeaturePreview: '',
     showAiSettingsModal: false,
@@ -132,9 +132,9 @@ export const appState = proxy({
     appState.isMfaEnforced = value
   },
 
-  showEnableBranchingModal: false,
-  setShowEnableBranchingModal: (value: boolean) => {
-    appState.showEnableBranchingModal = value
+  showCreateBranchModal: false,
+  setShowCreateBranchModal: (value: boolean) => {
+    appState.showCreateBranchModal = value
   },
 
   showFeaturePreviewModal: false,

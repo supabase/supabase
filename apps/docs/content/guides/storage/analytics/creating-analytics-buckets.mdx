@@ -1,0 +1,38 @@
+---
+title: 'Creating Analytics Buckets'
+subtitle: ''
+---
+
+<Admonition type="caution">
+
+This feature is in **Private Alpha**. API stability and backward compatibility are not guaranteed at this stage. Reach out from this [Form](https://forms.supabase.com/analytics-buckets) to request access
+
+</Admonition>
+
+Analytics Buckets use [Apache Iceberg](https://iceberg.apache.org/), an open-table format for managing large analytical datasets.
+You can interact with them using tools such as [PyIceberg](https://py.iceberg.apache.org/), [Apache Spark](https://spark.apache.org/) or any client which supports the [standard Iceberg REST Catalog API](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/apache/iceberg/main/open-api/rest-catalog-open-api.yaml).
+
+You can create an Analytics Bucket using either the Supabase SDK or the Supabase Dashboard.
+
+### Using the Supabase SDK
+
+```ts
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
+
+supabase.storage.createBucket('my-analytics-bucket', {
+  type: 'ANALYTICS',
+})
+```
+
+### Using the Supabase Dashboard
+
+1. Navigate to the Storage section in the Supabase Dashboard.
+2. Click on "Create Bucket".
+3. Enter a name for your bucket (e.g., my-analytics-bucket).
+4. Select "Analytics Bucket" as the bucket type.
+
+<img alt="Storage schema design" src="/docs/img/storage/iceberg-bucket.png" />
+
+Now, that you have created your Analytics Bucket, you can start [connecting to it](/docs/guides/storage/analytics/connecting-to-analytics-bucket) with Iceberg clients like PyIceberg or Apache Spark.

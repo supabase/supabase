@@ -112,10 +112,8 @@ export const SecretAPIKeys = () => {
                 <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 pr-0">
                   API Key
                 </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
-                  Description
-                </TableHead>
-                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+
+                <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 hidden lg:table-cell">
                   Last Seen
                 </TableHead>
                 <TableHead className="text-right font-mono uppercase text-xs text-foreground-lighter h-auto py-2" />

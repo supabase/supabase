@@ -1,5 +1,5 @@
 import { ChevronDown, Database, Plus, RefreshCw, X } from 'lucide-react'
-import { ComponentProps, useState } from 'react'
+import { ComponentProps, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 
 import { useParams } from 'common'
@@ -29,11 +29,16 @@ interface ReportFilterBarProps {
   isLoading: boolean
   onAddFilter: (filter: ReportFilterItem) => void
   onRemoveFilters: (filters: ReportFilterItem[]) => void
-  onRefresh: () => void
-  onDatepickerChange: ComponentProps<typeof LogsDatePicker>['onSubmit']
+  onRefresh?: () => void
+  onDatepickerChange?: ComponentProps<typeof LogsDatePicker>['onSubmit']
   datepickerTo?: string
   datepickerFrom?: string
   datepickerHelpers: typeof REPORTS_DATEPICKER_HELPERS
+  initialDatePickerValue?: DatePickerValue
+  className?: string
+  selectedProduct?: string
+  showDatabaseSelector?: boolean
+  hideDatepicker?: boolean
 }
 
 const PRODUCT_FILTERS = [
@@ -84,9 +89,14 @@ const ReportFilterBar = ({
   isLoading = false,
   onAddFilter,
   onDatepickerChange,
+  hideDatepicker = false,
   onRemoveFilters,
   onRefresh,
   datepickerHelpers,
+  initialDatePickerValue,
+  className,
+  selectedProduct,
+  showDatabaseSelector = true,
 }: ReportFilterBarProps) => {
   const { ref } = useParams()
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
@@ -118,7 +128,7 @@ const ReportFilterBar = ({
   }
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
-    onDatepickerChange(vals)
+    onDatepickerChange && onDatepickerChange(vals)
     setSelectedRange(vals)
   }
 
@@ -144,86 +154,105 @@ const ReportFilterBar = ({
     setCurrentProductFilter(nextProductFilter)
   }
 
-  const defaultHelper = datepickerHelpers[0]
-  const [selectedRange, setSelectedRange] = useState<DatePickerValue>({
-    to: defaultHelper.calcTo(),
-    from: defaultHelper.calcFrom(),
-    isHelper: true,
-    text: defaultHelper.text,
-  })
+  useEffect(() => {
+    if (selectedProduct) {
+      handleProductFilterChange(PRODUCT_FILTERS.find((p) => p.key === selectedProduct) ?? null)
+    }
+  }, [])
+
+  const getInitialDatePickerValue = () => {
+    if (initialDatePickerValue) {
+      return initialDatePickerValue
+    }
+    const defaultHelper = datepickerHelpers.find((h) => h.default) || datepickerHelpers[0]
+    return {
+      to: defaultHelper.calcTo(),
+      from: defaultHelper.calcFrom(),
+      isHelper: true,
+      text: defaultHelper.text,
+    }
+  }
+
+  const [selectedRange, setSelectedRange] = useState<DatePickerValue>(getInitialDatePickerValue())
 
   return (
-    <div className="flex items-center justify-between">
+    <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
-        <ButtonTooltip
-          type="default"
-          disabled={isLoading}
-          icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
-          className="w-7"
-          tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-          onClick={() => onRefresh()}
-        />
-        <LogsDatePicker
-          onSubmit={handleDatepickerChange}
-          value={selectedRange}
-          helpers={datepickerHelpers}
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="default"
-              className="inline-flex flex-row gap-2"
-              iconRight={<ChevronDown size={14} />}
-            >
-              <span>
-                {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
-              <p>All Requests</p>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {PRODUCT_FILTERS.map((productFilter) => {
-              const Icon = productFilter.icon
+        {onRefresh && (
+          <ButtonTooltip
+            type="default"
+            disabled={isLoading}
+            icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+            className="w-7"
+            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+            onClick={() => onRefresh()}
+          />
+        )}
+        {!hideDatepicker && (
+          <LogsDatePicker
+            onSubmit={handleDatepickerChange}
+            value={selectedRange}
+            helpers={datepickerHelpers}
+          />
+        )}
+        {!selectedProduct && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="default"
+                className="inline-flex flex-row gap-2"
+                iconRight={<ChevronDown size={14} />}
+              >
+                <span>
+                  {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start">
+              <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
+                <p>All Requests</p>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {PRODUCT_FILTERS.map((productFilter) => {
+                const Icon = productFilter.icon
 
-              return (
-                <DropdownMenuItem
-                  key={productFilter.key}
-                  className="space-x-2"
-                  disabled={productFilter.key === currentProductFilter?.key}
-                  onClick={() => handleProductFilterChange(productFilter)}
-                >
-                  {productFilter.key === 'graphql' ? (
-                    <SVG
-                      src={`${BASE_PATH}/img/graphql.svg`}
-                      className="w-[20px] h-[20px] mr-2"
-                      preProcessor={(code) =>
-                        code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
-                      }
-                    />
-                  ) : Icon !== null ? (
-                    <Icon size={20} strokeWidth={1.5} className="mr-2" />
-                  ) : null}
-                  <div className="flex flex-col">
-                    <p
-                      className={cn(
-                        productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
-                        'inline-block'
-                      )}
-                    >
-                      {productFilter.label}
-                    </p>
-                    <p className=" text-left text-foreground-light inline-block w-[180px]">
-                      {productFilter.description}
-                    </p>
-                  </div>
-                </DropdownMenuItem>
-              )
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                return (
+                  <DropdownMenuItem
+                    key={productFilter.key}
+                    className="space-x-2"
+                    disabled={productFilter.key === currentProductFilter?.key}
+                    onClick={() => handleProductFilterChange(productFilter)}
+                  >
+                    {productFilter.key === 'graphql' ? (
+                      <SVG
+                        src={`${BASE_PATH}/img/graphql.svg`}
+                        className="w-[20px] h-[20px] mr-2"
+                        preProcessor={(code) =>
+                          code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
+                        }
+                      />
+                    ) : Icon !== null ? (
+                      <Icon size={20} strokeWidth={1.5} className="mr-2" />
+                    ) : null}
+                    <div className="flex flex-col">
+                      <p
+                        className={cn(
+                          productFilter.key === currentProductFilter?.key ? 'font-bold' : '',
+                          'inline-block'
+                        )}
+                      >
+                        {productFilter.label}
+                      </p>
+                      <p className=" text-left text-foreground-light inline-block w-[180px]">
+                        {productFilter.description}
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                )
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
         {filters
           .filter(
             (filter) =>
@@ -328,11 +357,15 @@ const ReportFilterBar = ({
         </Popover>
       </div>
 
-      <DatabaseSelector
-        additionalOptions={
-          (loadBalancers ?? []).length > 0 ? [{ id: `${ref}-all`, name: 'API Load Balancer' }] : []
-        }
-      />
+      {showDatabaseSelector && (
+        <DatabaseSelector
+          additionalOptions={
+            (loadBalancers ?? []).length > 0
+              ? [{ id: `${ref}-all`, name: 'API Load Balancer' }]
+              : []
+          }
+        />
+      )}
     </div>
   )
 }
