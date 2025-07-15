@@ -56,29 +56,22 @@ export const REPORTS_DATEPICKER_HELPERS: ReportsDatetimeHelper[] = [
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_7_DAYS,
     calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['pro', 'team', 'enterprise'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_14_DAYS,
     calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
   {
     text: REPORT_DATERANGE_HELPER_LABELS.LAST_28_DAYS,
     calcFrom: () => dayjs().subtract(28, 'day').startOf('day').toISOString(),
-    calcTo: () => '',
+    calcTo: () => dayjs().toISOString(),
     availableIn: ['team', 'enterprise'],
   },
 ]
-
-export const createFilteredDatePickerHelpers = (planId: PlanId) => {
-  return REPORTS_DATEPICKER_HELPERS.map((helper) => ({
-    ...helper,
-    disabled: !helper.availableIn?.includes(planId),
-  }))
-}
 
 export const DEFAULT_QUERY_PARAMS = {
   iso_timestamp_start: REPORTS_DATEPICKER_HELPERS[0].calcFrom(),

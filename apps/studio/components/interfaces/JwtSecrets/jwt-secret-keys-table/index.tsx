@@ -1,16 +1,7 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import {
-  CircleArrowUp,
-  Eye,
-  FileKey,
-  Key,
-  MoreVertical,
-  RotateCw,
-  ShieldOff,
-  Timer,
-  Trash2,
-} from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
+import { RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -18,11 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import {
-  JWTAlgorithm,
-  JWTSigningKey,
-  useJWTSigningKeysQuery,
-} from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -34,11 +21,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Badge,
   Button,
   Card,
   CardContent,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -46,29 +31,22 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { AlgorithmHoverCard } from '../algorithm-hover-card'
-import { statusColors, statusLabels } from '../jwt.constants'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
 import { CreateKeyDialog } from './create-key-dialog'
-import { RotateKeyDialog } from './rotate-key-dialog'
 import { KeyDetailsDialog } from './key-details-dialog'
+import { RotateKeyDialog } from './rotate-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
 
-const MotionTableRow = motion(TableRow)
+type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
@@ -76,17 +54,9 @@ export default function JWTSecretKeysTable() {
 
   const newJwtSecrets = useFlag('newJwtSecrets')
 
-  const [selectedKey, setSelectedKey] = useState<JWTSigningKey | null>(null)
-  const [shownDialog, setShownDialog] = useState<
-    'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete' | null
-  >(null)
-
-  const resetDialog = () => {
-    setSelectedKey(null)
-    setShownDialog(null)
-  }
-
-  const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('RS256')
+  const [selectedKey, setSelectedKey] = useState<JWTSigningKey>()
+  const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
+  const [shownDialog, setShownDialog] = useState<DialogType>()
 
   const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery({
     projectRef,
@@ -97,13 +67,26 @@ export default function JWTSecretKeysTable() {
   const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
     useLegacyAPIKeysStatusQuery({ projectRef })
 
-  const legacyMutation = useLegacyJWTSigningKeyCreateMutation()
+  const { mutate: migrateJWTSecret, isLoading: isMigrating } = useLegacyJWTSigningKeyCreateMutation(
+    {
+      onSuccess: () => {
+        setShownDialog(undefined)
+        toast.success('Successfully migrated JWT secret!')
+      },
+    }
+  )
 
-  const updateMutation = useJWTSigningKeyUpdateMutation()
-  const deleteMutation = useJWTSigningKeyDeleteMutation()
+  const { mutate: updateJWTSigningKey, isLoading: isUpdatingJWTSigningKey } =
+    useJWTSigningKeyUpdateMutation({
+      onSuccess: () => {
+        resetDialog()
+        setSelectedKeyToUpdate(undefined)
+      },
+    })
+  const { mutate: deleteJWTSigningKey, isLoading: isDeletingJWTSigningKey } =
+    useJWTSigningKeyDeleteMutation({ onSuccess: () => resetDialog(), onError: () => resetDialog() })
 
-  const isLoadingMutation =
-    updateMutation.isLoading || deleteMutation.isLoading || legacyMutation.isLoading
+  const isLoadingMutation = isUpdatingJWTSigningKey || isDeletingJWTSigningKey || isMigrating
   const isLoading =
     isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
 
@@ -135,60 +118,38 @@ export default function JWTSecretKeysTable() {
     [sortedKeys]
   )
 
-  const handleLegacyMigration = async () => {
-    try {
-      await legacyMutation.mutateAsync({
-        projectRef: projectRef!,
-      })
-    } catch (error) {
-      console.error('Failed to migrate legacy JWT secret to new JWT signing keys', error)
-    }
+  const resetDialog = () => {
+    setSelectedKey(undefined)
+    setShownDialog(undefined)
   }
 
   const handlePreviouslyUsedKey = async (keyId: string) => {
-    updateMutation.mutate(
+    setSelectedKeyToUpdate(keyId)
+    updateJWTSigningKey(
       { projectRef, keyId, status: 'previously_used' },
-      {
-        onSuccess: () => {
-          resetDialog()
-        },
-      }
+      { onSuccess: () => toast.success('Successfully moved key to previously used') }
     )
   }
 
   const handleStandbyKey = (keyId: string) => {
-    updateMutation.mutate(
+    setSelectedKeyToUpdate(keyId)
+    updateJWTSigningKey(
       { projectRef: projectRef!, keyId, status: 'standby' },
-      {
-        onSuccess: () => {
-          resetDialog()
-        },
-      }
+      { onSuccess: () => toast.success('Successfully moved key to standby') }
     )
   }
 
   const handleRevokeKey = (keyId: string) => {
-    updateMutation.mutate(
+    updateJWTSigningKey(
       { projectRef: projectRef!, keyId, status: 'revoked' },
-      {
-        onSuccess: () => {
-          resetDialog()
-        },
-      }
+      { onSuccess: () => toast.success('Successfully revoked key') }
     )
   }
 
   const handleDeleteKey = (keyId: string) => {
-    deleteMutation.mutate(
+    deleteJWTSigningKey(
       { projectRef: projectRef!, keyId },
-      {
-        onSuccess: () => {
-          resetDialog()
-        },
-        onError: () => {
-          resetDialog()
-        },
-      }
+      { onSuccess: () => toast.success('Successfully deleted key') }
     )
   }
 
@@ -211,7 +172,7 @@ export default function JWTSecretKeysTable() {
                 description="Switch the standby key to in use. All new JSON Web Tokens issued by Supabase Auth will be signed with this key."
                 buttonLabel="Rotate keys"
                 onClick={() => setShownDialog('rotate')}
-                loading={isLoadingMutation}
+                loading={isUpdatingJWTSigningKey}
                 icon={<RotateCw className="size-4" />}
                 type="primary"
               />
@@ -232,7 +193,7 @@ export default function JWTSecretKeysTable() {
         ) : (
           <StartUsingJwtSigningKeysBanner
             onClick={() => setShownDialog('legacy')}
-            isLoading={isLoadingMutation}
+            isLoading={isMigrating}
           />
         )}
       </div>
@@ -265,12 +226,15 @@ export default function JWTSecretKeysTable() {
                         <SigningKeyRow
                           key={standbyKey.id}
                           signingKey={standbyKey}
+                          legacyKey={legacyKey}
+                          standbyKey={standbyKey}
+                          isLoading={
+                            selectedKeyToUpdate === standbyKey.id && isUpdatingJWTSigningKey
+                          }
                           setSelectedKey={setSelectedKey}
                           setShownDialog={setShownDialog}
                           handleStandbyKey={handleStandbyKey}
                           handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                          legacyKey={legacyKey}
-                          standbyKey={standbyKey}
                         />
                       )}
                       {inUseKey && (
@@ -316,6 +280,9 @@ export default function JWTSecretKeysTable() {
                         <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Type
                         </TableHead>
+                        <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
+                          Last rotated at
+                        </TableHead>
                         <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Actions
                         </TableHead>
@@ -327,20 +294,27 @@ export default function JWTSecretKeysTable() {
                           <SigningKeyRow
                             key={key.id}
                             signingKey={key}
+                            legacyKey={legacyKey}
+                            standbyKey={standbyKey}
+                            isLoading={selectedKeyToUpdate === key.id && isUpdatingJWTSigningKey}
                             setSelectedKey={setSelectedKey}
                             setShownDialog={setShownDialog}
                             handleStandbyKey={handleStandbyKey}
                             handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                            legacyKey={legacyKey}
-                            standbyKey={standbyKey}
                           />
                         ))}
                       </AnimatePresence>
                     </TableBody>
                   </Table>
                 ) : (
-                  <div className="flex items-center justify-center text-sm text-foreground-light p-6">
-                    No previously used keys
+                  <div className="flex flex-col items-center justify-center text-center text-foreground-light p-8 gap-2">
+                    <Timer className="size-6 text-foreground-lighter" />
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium">No previously used keys</p>
+                      <p className="text-xs text-foreground-lighter">
+                        Rotated keys will appear here for verification of existing tokens
+                      </p>
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -370,6 +344,9 @@ export default function JWTSecretKeysTable() {
                     </TableHead>
                     <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Type
+                    </TableHead>
+                    <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
+                      Last rotated at
                     </TableHead>
                     <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Actions
@@ -455,9 +432,8 @@ export default function JWTSecretKeysTable() {
           </DialogSection>
           <DialogFooter>
             <Button
-              onClick={() => handleLegacyMigration()}
-              disabled={isLoadingMutation}
-              loading={isLoadingMutation}
+              loading={isMigrating}
+              onClick={() => migrateJWTSecret({ projectRef: projectRef! })}
             >
               Migrate JWT secret
             </Button>

@@ -10,7 +10,10 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import {
+  LogsDatePicker,
+  DatePickerValue,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
@@ -26,9 +29,11 @@ import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -68,9 +73,11 @@ const RealtimeUsage = () => {
   const {
     selectedDateRange,
     updateDateRange: updateDateRangeFromHook,
-    handleDatePickerChange,
     datePickerValue,
     datePickerHelpers,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
     isOrgPlanLoading,
     orgPlan,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
@@ -123,6 +130,16 @@ const RealtimeUsage = () => {
     }
   }, [])
 
+  const handleDatePickerChange = (values: DatePickerValue) => {
+    const promptShown = handleDatePickerChangeFromHook(values)
+    if (!promptShown) {
+      report.mergeParams({
+        iso_timestamp_start: values.from,
+        iso_timestamp_end: values.to,
+      })
+    }
+  }
+
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     updateDateRangeFromHook(from, to)
     report.mergeParams({
@@ -150,6 +167,13 @@ const RealtimeUsage = () => {
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="realtimeReportDateRange"
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
@@ -181,46 +205,14 @@ const RealtimeUsage = () => {
               defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
             />
           ))}
-        <ReportStickyNav
-          className="mt-0 border-t"
-          content={
-            <ReportFilterBar
-              onRemoveFilters={removeFilters}
-              hideDatepicker={true}
-              datepickerFrom={selectedDateRange.period_start.date}
-              datepickerTo={selectedDateRange.period_end.date}
-              onAddFilter={addFilter}
-              isLoading={isLoading}
-              filters={filters}
-              selectedProduct="realtime"
-              datepickerHelpers={datePickerHelpers}
-              className="w-full"
-              showDatabaseSelector={false}
-            />
-          }
-        >
-          <ReportWidget
-            isLoading={isLoading}
-            params={params.totalRequests}
-            title="Total Requests"
-            data={data.totalRequests || []}
-            error={error.totalRequest}
-            renderer={TotalRequestsChartRenderer}
-            append={TopApiRoutesRenderer}
-            appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
+        <div className="relative pt-8 mt-8 border-t">
+          <SharedAPIReport
+            filterBy="realtime"
+            start={selectedDateRange?.period_start?.date}
+            end={selectedDateRange?.period_end?.date}
+            hiddenReports={['networkTraffic']}
           />
-          <ReportWidget
-            isLoading={isLoading}
-            params={params.responseSpeed}
-            title="Response Speed"
-            tooltip="Average response speed (in miliseconds) of a request"
-            data={data.responseSpeed || []}
-            error={error.responseSpeed}
-            renderer={ResponseSpeedChartRenderer}
-            appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
-            append={TopApiRoutesRenderer}
-          />
-        </ReportStickyNav>
+        </div>
       </ReportStickyNav>
     </>
   )
