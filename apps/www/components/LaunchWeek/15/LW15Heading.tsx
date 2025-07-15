@@ -113,7 +113,7 @@ const LW15Heading = () => {
           <div
             data-animate
             data-animate-delay={300}
-            className="hidden md:inline-block opacity-0 col-span-3 lg:col-span-2 text-xs overflow-hidden h-fit max-w-[400px]"
+            className="opacity-0 col-span-3 lg:col-span-2 text-xs overflow-hidden h-fit max-w-[400px]"
           >
             Five days of launches to supercharge your development.
           </div>
