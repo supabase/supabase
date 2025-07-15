@@ -19,6 +19,7 @@ import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Re
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { NextPageWithLayout } from 'types'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -133,6 +134,13 @@ const AuthUsage = () => {
               orgPlanId={orgPlan?.id}
             />
           ))}
+        <div className="relative pt-8 mt-8 border-t">
+          <SharedAPIReport
+            filterBy="auth"
+            start={selectedDateRange?.period_start?.date}
+            end={selectedDateRange?.period_end?.date}
+          />
+        </div>
       </ReportStickyNav>
     </>
   )

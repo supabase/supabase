@@ -25,7 +25,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
@@ -42,7 +42,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -282,7 +282,7 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
   const project = useSelectedProject()
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
