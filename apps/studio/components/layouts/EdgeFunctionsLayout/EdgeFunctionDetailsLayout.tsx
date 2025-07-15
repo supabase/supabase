@@ -63,7 +63,7 @@ const EdgeFunctionDetailsLayout = ({
     },
     {
       retry: false,
-      retryOnMount: false,
+      retryOnMount: true,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
       refetchOnMount: false,
