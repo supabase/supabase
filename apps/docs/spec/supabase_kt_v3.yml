@@ -3720,9 +3720,11 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
     notes: |
       Listen to session changes.
+      - `sessionStatus` is a `Flow<SessionStatus>` that emits the current session status. Everything related to the session is handled by this flow.
+      - `events` is a `Flow<AuthEvent>` that emits auth events. This flow is used to listen to auth events that are independent of the current session, like OTP errors, refresh failures, etc. Experimental.
     examples:
       - id: listen-to-auth-changes
-        name: Listen to auth changes
+        name: Listen to session status changes
         isSpotlight: true
         code: |
           ```kotlin
@@ -3742,7 +3744,9 @@ functions:
                       }
                   }
                   SessionStatus.Initializing -> println("Initializing")
-                  is SessionStatus.RefreshFailure -> println("Refresh failure ${it.cause}") //Either a network error or a internal server error
+                  is SessionStatus.RefreshFailure -> {
+                      println("Session expired and could not be refreshed")
+                  }
                   is SessionStatus.NotAuthenticated -> {
                       if(it.isSignOut) {
                           println("User signed out")
@@ -3759,6 +3763,20 @@ functions:
           - `Initializing`,
           - `RefreshFailure(cause)`,
           - `Authenticated(session, source)`
+      - id: listen-to-events
+        name: Listen to auth events
+        isSpotlight: false
+        code: |
+          ```kotlin
+          supabase.auth.events.collect {
+            when(it) {
+              is AuthEvent.OtpError ->
+                println("Found error in current URL / deeplink during the OAuth flow: ${it.error}")
+              is AuthEvent.RefreshFailure -> 
+                println("Failed to refresh session: ${it.error}")
+            }
+          }
+          ```
   - id: reset-password-for-email
     title: 'Send a password reset request'
     notes: |
@@ -4053,7 +4071,7 @@ functions:
               supabaseKey = "supabaseKey"
           ) {
               install(Auth) {
-                  minimalSettings() //disables session saving and auto-refreshing
+                  minimalConfig() //disables session saving and auto-refreshing
               }
               // install other plugins (these will use the service role key)
           }
