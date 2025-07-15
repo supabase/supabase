@@ -29,7 +29,7 @@ export const Branching2Preview = () => {
             Custom roles created through the dashboard are not captured on branch creation.
           </li>
           <li>
-            Only <code>public</code> schema changes are supported right now
+            Only <code>public</code> schema changes are supported right now.
           </li>
           <li>Extensions are not included in the diff process</li>
           <li>
