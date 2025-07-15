@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/stripe-engine-as-sync-library</guid>
   <title>Stripe-To-Postgres Sync Engine as standalone Library</title>
   <link>https://supabase.com/blog/stripe-engine-as-sync-library</link>
-  <description>Sync Stripe webhook data directly to Postgres databases via npm.</description>
+  <description>Sync Stripe webhook data directly to Postgres using standalone TypeScript library.</description>
   <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
 </item>
 <item>

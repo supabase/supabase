@@ -22,7 +22,10 @@ Previously distributed only as a Docker image (`supabase/stripe-sync-engine`), y
 Stripe-Sync-Engine is a webhook listener that transforms Stripe webhooks into structured Postgres inserts/updates. It listens to Stripe webhook events (like `invoice.payment_failed`, `customer.subscription.updated`, etc), normalizes and stores them in a relational format in Postgres.
 
 <Img
-  src="/images/blog/launch-week-15/day-2-stripe-engine/stripe-sync-engine.png"
+  src={{
+    dark: '/images/blog/launch-week-15/day-2-stripe-engine/stripe-sync-engine-dark.png',
+    light: '/images/blog/launch-week-15/day-2-stripe-engine/stripe-sync-engine-light.png',
+  }}
   alt="Stripe Sync Engine Diagram"
 />
 
