@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { streamText, tool, ToolSet } from 'ai'
+import { convertToCoreMessages, CoreMessage, streamText, tool, ToolSet } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -584,31 +584,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
 
+    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
+    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
+    const coreMessages: CoreMessage[] = [
+      {
+        role: 'system',
+        content: system,
+        providerOptions: {
+          bedrock: {
+            // Always cache the system prompt (must not contain dynamic content)
+            cachePoint: { type: 'default' },
+          },
+        },
+      },
+      {
+        role: 'assistant',
+        // Add any dynamic context here
+        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}`,
+      },
+      ...convertToCoreMessages(messages),
+    ]
+
     const result = streamText({
       model,
       maxSteps: 5,
-      messages: [
-        {
-          role: 'system',
-          content: system,
-          providerOptions: {
-            bedrock: { cachePoint: { type: 'default' } },
-          },
-        },
-        {
-          role: 'user',
-          content: `My current project is ${projectRef}. Available Schemas are: ${schemasString}`,
-        },
-        ...messages,
-      ],
+      messages: coreMessages,
       tools,
-    })
-
-    // TODO: Remove after confirming this works
-    result.providerMetadata.then((metadata) => {
-      if (metadata?.bedrock) {
-        console.log('Bedrock usage:', metadata.bedrock.usage)
-      }
     })
 
     result.pipeDataStreamToResponse(res, {
