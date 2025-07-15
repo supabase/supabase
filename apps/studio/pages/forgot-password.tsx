@@ -1,4 +1,4 @@
-import { ForgotPasswordWizard } from 'components/interfaces/SignIn/ForgotPasswordForm'
+import { ForgotPasswordWizard } from 'components/interfaces/SignIn/ForgotPasswordWizard'
 import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
 import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
