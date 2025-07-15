@@ -23,7 +23,7 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   Button,
   DropdownMenu,
@@ -163,7 +163,7 @@ const PreviewBranchActions = ({
   onSelectDeleteBranch: () => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }) => {
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
   const queryClient = useQueryClient()
   const projectRef = branch.parent_project_ref ?? branch.project_ref
 

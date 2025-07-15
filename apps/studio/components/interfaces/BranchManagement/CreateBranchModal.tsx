@@ -22,7 +22,7 @@ import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -50,7 +50,7 @@ export const CreateBranchModal = () => {
   const queryClient = useQueryClient()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
 
   const organization = useSelectedOrganization()

@@ -16,7 +16,7 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BASE_PATH } from 'lib/constants'
 import { useRouter } from 'next/router'
 import {
@@ -50,7 +50,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const router = useRouter()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
