@@ -9,10 +9,12 @@ import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
+  titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
+  availableIn?: string[]
   hideChartType?: boolean
   format?: string
   className?: string
@@ -104,6 +106,7 @@ interface TooltipProps {
   label?: string | number
   attributes?: MultiAttribute[]
   isPercentage?: boolean
+  format?: string | ((value: unknown) => string)
   valuePrecision?: number
   showMaxValue?: boolean
   showTotal?: boolean
@@ -130,6 +133,7 @@ const CustomTooltip = ({
   payload,
   attributes,
   isPercentage,
+  format,
   valuePrecision,
   showTotal,
   isActiveHoveredChart,
@@ -181,6 +185,7 @@ const CustomTooltip = ({
               ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
+            {format === 'ms' ? 'ms' : ''}
 
             {/* Show percentage if max value is set */}
             {!!maxValueData && !isMax && !isPercentage && (
@@ -215,6 +220,7 @@ const CustomTooltip = ({
                     ? formatBytes(total as number, valuePrecision)
                     : numberFormatter(total as number, valuePrecision)}
                   {isPercentage ? '%' : ''}
+                  {format === 'ms' ? 'ms' : ''}
                 </span>
                 {maxValueAttribute &&
                   !isPercentage &&

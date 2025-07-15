@@ -22,14 +22,15 @@ import uuidv4 from 'lib/uuid'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn } from 'ui'
-import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOnboarding } from './AIOnboarding'
 import { AIOptInModal } from './AIOptInModal'
-import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
+import { AssistantChatForm } from './AssistantChatForm'
+import { type SqlSnippet } from './AIAssistant.types'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
 import type { AssistantMessageType } from 'state/ai-assistant-state'
@@ -246,34 +247,20 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const hasMessages = chatMessages.length > 0
   const isShowingOnboarding = !hasMessages && isApiKeySet
 
-  const sendMessageToAssistant = (content: string) => {
-    let finalContent = content
-
-    // Handle SQL snippets based on opt-in level
-    if (aiOptInLevel !== 'disabled') {
-      const sqlSnippetsString =
-        snap.sqlSnippets?.map((snippet: string) => '```sql\n' + snippet + '\n```').join('\n') || ''
-      finalContent = [content, sqlSnippetsString].filter(Boolean).join('\n\n')
-    } else {
-      snap.setSqlSnippets([])
-    }
-
+  const sendMessageToAssistant = (finalContent: string) => {
     const payload = {
       role: 'user',
       createdAt: new Date(),
       content: finalContent,
       id: uuidv4(),
     } as MessageType
+
     snap.clearSqlSnippets()
-
-    // Store the user message in the ref before appending
     lastUserMessageRef.current = payload
-
     append(payload)
-
     setValue('')
 
-    if (content.includes('Help me to debug')) {
+    if (finalContent.includes('Help me to debug')) {
       sendEvent({
         action: 'assistant_debug_submitted',
         groups: {
@@ -319,7 +306,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   useEffect(() => {
     if (snap.open && isInSQLEditor && !!snippetContent) {
-      snap.setSqlSnippets([snippetContent])
+      snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.open, isInSQLEditor, snippetContent])
@@ -497,7 +484,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               onMessageSend={sendMessageToAssistant}
               value={value}
               onValueChange={setValue}
-              sqlSnippets={snap.sqlSnippets as string[] | undefined}
+              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
               onRemoveSnippet={(index) => {
                 const newSnippets = [...(snap.sqlSnippets ?? [])]
                 newSnippets.splice(index, 1)
@@ -552,23 +539,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
         {!isShowingOnboarding && (
           <div className="px-3 pb-3 z-20 relative">
-            {snap.sqlSnippets && snap.sqlSnippets.length > 0 && (
-              <div className="mb-0 mx-4">
-                {snap.sqlSnippets.map((snippet: string, index: number) => (
-                  <CollapsibleCodeBlock
-                    key={index}
-                    hideLineNumbers
-                    value={snippet}
-                    onRemove={() => {
-                      const newSnippets = [...(snap.sqlSnippets ?? [])]
-                      newSnippets.splice(index, 1)
-                      snap.setSqlSnippets(newSnippets)
-                    }}
-                    className="text-xs rounded-b-none border-b-0"
-                  />
-                ))}
-              </div>
-            )}
             {disablePrompts && (
               <Admonition
                 showIcon={false}
@@ -595,7 +565,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             <AssistantChatForm
               textAreaRef={inputRef}
               className={cn(
-                'z-20 [&>textarea]:text-base [&>textarea]:md:text-sm [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+                'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
               )}
               loading={isChatLoading}
               disabled={!isApiKeySet || disablePrompts || isChatLoading}
@@ -607,13 +577,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                     : 'Chat to Postgres...'
               }
               value={value}
-              autoFocus
               onValueChange={(e) => setValue(e.target.value)}
-              onSubmit={(event) => {
-                event.preventDefault()
-                sendMessageToAssistant(value)
+              onSubmit={(finalMessage) => {
+                sendMessageToAssistant(finalMessage)
                 scrollToEnd()
               }}
+              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
+              onRemoveSnippet={(index) => {
+                const newSnippets = [...(snap.sqlSnippets ?? [])]
+                newSnippets.splice(index, 1)
+                snap.setSqlSnippets(newSnippets)
+              }}
+              includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
             />
           </div>
         )}

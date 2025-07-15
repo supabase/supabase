@@ -17,6 +17,7 @@ import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   convertKVStringArrayToJson,
+  FormattedWrapperTable,
   formatWrapperTables,
   makeValidateRequired,
 } from './Wrappers.utils'
@@ -57,11 +58,11 @@ export const EditWrapperSheet = ({
     },
   })
 
-  const [wrapperTables, setWrapperTables] = useState<any[]>(
-    formatWrapperTables(wrapper, wrapperMeta)
-  )
+  const [wrapperTables, setWrapperTables] = useState(formatWrapperTables(wrapper, wrapperMeta))
   const [isEditingTable, setIsEditingTable] = useState(false)
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
+    undefined
+  )
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
   const initialValues = {
@@ -273,15 +274,18 @@ export const EditWrapperSheet = ({
                                   </p>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <Button
-                                    type="default"
-                                    className="px-1"
-                                    icon={<Edit />}
-                                    onClick={() => {
-                                      setIsEditingTable(true)
-                                      setSelectedTableToEdit({ ...table, tableIndex: i })
-                                    }}
-                                  />
+                                  {/* Wrappers which import foreign schema don't have tables and their tables can't be edited */}
+                                  {wrapperMeta.tables.length !== 0 && (
+                                    <Button
+                                      type="default"
+                                      className="px-1"
+                                      icon={<Edit />}
+                                      onClick={() => {
+                                        setIsEditingTable(true)
+                                        setSelectedTableToEdit({ ...table, tableIndex: i })
+                                      }}
+                                    />
+                                  )}
                                   <Button
                                     type="default"
                                     className="px-1"

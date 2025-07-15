@@ -30,7 +30,7 @@ const nextConfig = {
   // swcMinify: true,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     // @ts-ignore
     remotePatterns,
   },

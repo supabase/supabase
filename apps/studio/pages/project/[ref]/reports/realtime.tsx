@@ -10,8 +10,10 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
-import { createFilteredDatePickerHelpers } from 'components/interfaces/Reports/Reports.constants'
+import {
+  LogsDatePicker,
+  DatePickerValue,
+} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import {
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
@@ -20,13 +22,14 @@ import {
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 
 import { analyticsKeys } from 'data/analytics/keys'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { getRealtimeReportAttributes } from 'data/reports/realtime-charts'
 import { useApiReport } from 'data/reports/api-report-query'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
@@ -67,35 +70,37 @@ const RealtimeUsage = () => {
   } = report
 
   const state = useDatabaseSelectorStateSnapshot()
-  const defaultStart = dayjs().subtract(7, 'day').toISOString()
-  const defaultEnd = dayjs().toISOString()
-  const [dateRange, setDateRange] = useState<any>({
-    period_start: { date: defaultStart, time_period: '1d' },
-    period_end: { date: defaultEnd, time_period: 'today' },
-    interval: '1h',
-  })
+  const {
+    selectedDateRange,
+    updateDateRange: updateDateRangeFromHook,
+    datePickerValue,
+    datePickerHelpers,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
+    isOrgPlanLoading,
+    orgPlan,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const queryClient = useQueryClient()
 
-  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
-
   const REALTIME_REPORT_ATTRIBUTES = getRealtimeReportAttributes(isFreePlan)
 
   const onRefreshReport = async () => {
-    if (!dateRange) return
+    if (!selectedDateRange) return
 
     // [Joshen] Since we can't track individual loading states for each chart
     // so for now we mock a loading state that only lasts for a second
     setIsRefreshing(true)
 
-    const { period_start, interval } = dateRange
+    const { period_start, period_end, interval } = selectedDateRange
     REALTIME_REPORT_ATTRIBUTES.forEach((attr) => {
       queryClient.invalidateQueries(
         analyticsKeys.infraMonitoring(ref, {
           attribute: attr?.id,
           startDate: period_start.date,
-          endDate: period_start.end,
+          endDate: period_end.date,
           interval,
           databaseIdentifier: state.selectedDatabaseId,
         })
@@ -125,56 +130,30 @@ const RealtimeUsage = () => {
     }
   }, [])
 
-  const handleIntervalGranularity = (from: string, to: string) => {
-    const conditions = {
-      '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
-      '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
-      '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
-      '1h': dayjs(to).diff(from, 'day') < 10, // less than 10 days
-      '1d': dayjs(to).diff(from, 'day') >= 10, // more than 10 days
-    }
-
-    switch (true) {
-      case conditions['1m']:
-        return '1m'
-      case conditions['10m']:
-        return '10m'
-      case conditions['30m']:
-        return '30m'
-      default:
-        return '1h'
+  const handleDatePickerChange = (values: DatePickerValue) => {
+    const promptShown = handleDatePickerChangeFromHook(values)
+    if (!promptShown) {
+      report.mergeParams({
+        iso_timestamp_start: values.from,
+        iso_timestamp_end: values.to,
+      })
     }
   }
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    setDateRange({
-      period_start: { date: from, time_period: '1d' },
-      period_end: { date: to, time_period: 'today' },
-      interval: handleIntervalGranularity(from, to),
-    })
+    updateDateRangeFromHook(from, to)
     report.mergeParams({
       iso_timestamp_start: from,
       iso_timestamp_end: to,
     })
   }
 
-  // const handleDatepickerChange = (vals: DatePickerValue) => {
-  //   report.mergeParams({
-  //     iso_timestamp_start: vals.from || '',
-  //     iso_timestamp_end: vals.to || '',
-  //   })
-  //   setDateRange({
-  //     period_start: { date: vals.from || '', time_period: '1d' },
-  //     period_end: { date: vals.to || '', time_period: 'today' },
-  //   })
-  // }
-
   return (
     <>
-      <ReportHeader showDatabaseSelector title="Realtime" />
-      <section className="relative pt-16 -mt-2">
-        <div className="absolute inset-0 z-40 pointer-events-none flex flex-col gap-4">
-          <div className="sticky top-0 bg-200 py-4 mb-4 flex items-center space-x-3 pointer-events-auto">
+      <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      <ReportStickyNav
+        content={
+          <>
             <ButtonTooltip
               type="default"
               disabled={isRefreshing}
@@ -184,60 +163,57 @@ const RealtimeUsage = () => {
               onClick={onRefreshReport}
             />
             <div className="flex items-center gap-3">
-              <DateRangePicker
-                loading={false}
-                value="1d"
-                options={TIME_PERIODS_INFRA}
-                currentBillingPeriodStart={undefined}
-                onChange={(values) => {
-                  if (values.interval === '1d') {
-                    setDateRange({ ...values, interval: '1h' })
-                  } else {
-                    setDateRange(values)
-                  }
-                }}
+              <LogsDatePicker
+                onSubmit={handleDatePickerChange}
+                value={datePickerValue}
+                helpers={datePickerHelpers}
               />
-              {dateRange && (
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="realtimeReportDateRange"
+              />
+              {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_start.date).format('MMM D, h:mma')}
+                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRight size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_end.date).format('MMM D, h:mma')}
+                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
                   </p>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          {dateRange &&
-            REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-              <ComposedChartHandler
-                key={chart.id}
-                {...chart}
-                attributes={chart.attributes as MultiAttribute[]}
-                interval={dateRange.interval}
-                startDate={dateRange?.period_start?.date}
-                endDate={dateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-              />
-            ))}
-        </div>
+          </>
+        }
+      >
+        {selectedDateRange &&
+          REALTIME_REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
+            <ComposedChartHandler
+              key={chart.id}
+              {...chart}
+              attributes={chart.attributes as MultiAttribute[]}
+              interval={selectedDateRange.interval}
+              startDate={selectedDateRange?.period_start?.date}
+              endDate={selectedDateRange?.period_end?.date}
+              updateDateRange={updateDateRange}
+              defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+            />
+          ))}
         <div className="relative pt-8 mt-8 border-t">
           <SharedAPIReport
             filterBy="realtime"
-            start={dateRange.period_start.date}
-            end={dateRange.period_end.date}
+            start={selectedDateRange?.period_start?.date}
+            end={selectedDateRange?.period_end?.date}
             hiddenReports={['networkTraffic']}
           />
         </div>
-      </section>
+      </ReportStickyNav>
     </>
   )
 }

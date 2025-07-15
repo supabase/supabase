@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import {
   ProjectServiceStatus,
@@ -39,6 +40,7 @@ const StatusMessage = ({
   if (status === 'COMING_UP') return 'Coming up...'
   if (status === 'ACTIVE_HEALTHY') return 'Healthy'
   if (isProjectNew) return 'Coming up...'
+  if (status) return status
   return 'Unable to connect'
 }
 
@@ -88,6 +90,27 @@ export const ServiceStatus = () => {
   ])
 
   const isBranch = project?.parentRef !== project?.ref
+
+  // Get branches data when on a branch
+  const { data: branches, isLoading: isBranchesLoading } = useBranchesQuery(
+    { projectRef: isBranch ? project?.parentRef : undefined },
+    {
+      enabled: isBranch,
+      refetchInterval: (data) => {
+        if (!data) return false
+        const currentBranch = data.find((branch) => branch.project_ref === ref)
+        return ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_FAILED', 'FUNCTIONS_FAILED'].includes(
+          currentBranch?.status || ''
+        )
+          ? false
+          : 5000
+      },
+    }
+  )
+
+  const currentBranch = isBranch
+    ? branches?.find((branch) => branch.project_ref === ref)
+    : undefined
 
   // [Joshen] Need pooler service check eventually
   const {
@@ -202,8 +225,30 @@ export const ServiceStatus = () => {
           },
         ]
       : []),
+    ...(isBranch
+      ? [
+          {
+            name: 'Migrations',
+            error: undefined,
+            docsUrl: undefined,
+            isLoading: isBranchesLoading,
+            isHealthy: currentBranch?.status === 'FUNCTIONS_DEPLOYED',
+            status: (currentBranch?.status === 'FUNCTIONS_DEPLOYED'
+              ? 'ACTIVE_HEALTHY'
+              : currentBranch?.status === 'FUNCTIONS_FAILED' ||
+                  currentBranch?.status === 'MIGRATIONS_FAILED'
+                ? 'UNHEALTHY'
+                : 'COMING_UP') as ProjectServiceStatus,
+            logsUrl: '/logs/edge-functions-logs',
+          },
+        ]
+      : []),
   ]
 
+  const isMigrationLoading =
+    isBranchesLoading ||
+    currentBranch?.status === 'CREATING_PROJECT' ||
+    currentBranch?.status === 'RUNNING_MIGRATIONS'
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isHealthy)
 
@@ -239,7 +284,7 @@ export const ServiceStatus = () => {
         <Button
           type="default"
           icon={
-            isLoadingChecks || (!allServicesOperational && isProjectNew) ? (
+            isLoadingChecks || (!allServicesOperational && isProjectNew && isMigrationLoading) ? (
               <LoaderIcon />
             ) : (
               <div
@@ -250,7 +295,7 @@ export const ServiceStatus = () => {
             )
           }
         >
-          {isBranch ? 'Preview Branch' : 'Project'} Status
+          {isBranch ? 'Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
