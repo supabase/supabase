@@ -277,7 +277,7 @@ const StorageSettings = () => {
               <div className="px-6 pb-6">
                 <UpgradeToPro
                   primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                  secondaryText="Upgrade to Pro Plan for a configurable upload file size limit of 500 GB and unlock image transformations."
+                  secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED)} and unlock image transformations.`}
                   source="storageSizeLimit"
                 />
               </div>
@@ -287,7 +287,7 @@ const StorageSettings = () => {
                 <UpgradeToPro
                   buttonText="Disable Spend Cap"
                   primaryText="Reduced max upload file size limit due to Spend Cap"
-                  secondaryText="Disable your Spend Cap to allow file uploads of up to 500 GB."
+                  secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED)}.`}
                   source="storageSizeLimit"
                 />
               </div>
