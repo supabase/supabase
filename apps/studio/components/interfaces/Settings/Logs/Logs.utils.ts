@@ -474,7 +474,7 @@ export const fillTimeseries = (
   defaultValue: number,
   min?: string,
   max?: string,
-  minPointsToFill?: number,
+  minPointsToFill: number = 20,
   interval?: string
 ) => {
   if (timeseriesData.length === 0 && !(min && max)) {
@@ -505,7 +505,7 @@ export const fillTimeseries = (
     if (match) {
       step = parseInt(match[1], 10)
       const unitChar = match[2] as 'm' | 'h' | 'd' | 's'
-      const unitMap = { s: 'second', m: 'minute', h: 'hour', d: 'day' }
+      const unitMap = { s: 'second', m: 'minute', h: 'hour', d: 'day' } as const
       truncation = unitMap[unitChar]
     } else {
       // Fallback for invalid format
