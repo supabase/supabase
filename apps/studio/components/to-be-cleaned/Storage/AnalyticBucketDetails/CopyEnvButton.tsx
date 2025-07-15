@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { Copy } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -43,7 +43,7 @@ export const CopyEnvButton = ({
     <ButtonTooltip
       type="primary"
       loading={isLoading}
-      icon={<Download />}
+      icon={<Copy />}
       onClick={onCopy}
       tooltip={{
         content: {
