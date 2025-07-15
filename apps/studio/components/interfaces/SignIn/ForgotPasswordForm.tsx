@@ -1,32 +1,116 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
+import * as z from 'zod'
 
 import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Form, Input } from 'ui'
 import { auth } from 'lib/gotrue'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
+  Input_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-const forgotPasswordSchema = object({
-  email: string().email('Must be a valid email').required('Email is required'),
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Must be a valid email').min(1, 'Email is required'),
 })
 
-const codeSchema = object({
-  code: string().min(6).required('Code is required'),
+const codeSchema = z.object({
+  code: z.string().min(6, 'Code must be at least 6 characters').min(1, 'Code is required'),
 })
 
-const ForgotPasswordForm = () => {
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
+type CodeFormData = z.infer<typeof codeSchema>
+
+export const ForgotPasswordWizard = () => {
+  const [email, setEmail] = useState('')
+
+  if (email) {
+    return <ConfirmResetCodeForm email={email} />
+  }
+
+  return <ForgotPasswordForm onSuccess={(email) => setEmail(email)} />
+}
+
+const ConfirmResetCodeForm = ({ email }: { email: string }) => {
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const codeForm = useForm<CodeFormData>({
+    resolver: zodResolver(codeSchema),
+    defaultValues: { code: '' },
+  })
+
+  const onCodeEntered: SubmitHandler<CodeFormData> = async (data) => {
+    setIsLoading(true)
+    const { error } = await auth.verifyOtp({ email, token: data.code, type: 'recovery' })
+
+    if (error) {
+      setIsLoading(false)
+      toast.error(`Failed to verify code: ${error.message}`)
+    } else {
+      await router.push('reset-password')
+    }
+  }
+
+  return (
+    <Form_Shadcn_ {...codeForm}>
+      <form
+        id="code-input-form"
+        className="flex flex-col pt-4 space-y-4"
+        onSubmit={codeForm.handleSubmit(onCodeEntered)}
+      >
+        <FormField_Shadcn_
+          control={codeForm.control}
+          name="code"
+          render={({ field }) => (
+            <FormItem_Shadcn_>
+              <FormLabel_Shadcn_>Code</FormLabel_Shadcn_>
+              <FormControl_Shadcn_>
+                <Input_Shadcn_
+                  {...field}
+                  placeholder="123456"
+                  autoComplete="off"
+                  disabled={isLoading}
+                />
+              </FormControl_Shadcn_>
+              <FormMessage_Shadcn_ />
+            </FormItem_Shadcn_>
+          )}
+        />
+
+        <div className="border-t border-overlay-border" />
+
+        <Button block form="code-input-form" htmlType="submit" size="medium" loading={isLoading}>
+          Confirm Reset Code
+        </Button>
+      </form>
+    </Form_Shadcn_>
+  )
+}
+
+const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void }) => {
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [email, setEmail] = useState('')
-  const [isCodeInput, setIsCodeInput] = useState(false)
+
+  const forgotPasswordForm = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: '' },
+  })
 
   const { mutate: resetPassword, isLoading } = useResetPasswordMutation({
     onSuccess: () => {
-      setIsCodeInput(true)
+      onSuccess(forgotPasswordForm.getValues('email'))
     },
     onError: (error) => {
       setCaptchaToken(null)
@@ -35,17 +119,15 @@ const ForgotPasswordForm = () => {
     },
   })
 
-  const onForgotPassword = async ({ email }: { email: string }) => {
+  const onForgotPassword: SubmitHandler<ForgotPasswordFormData> = async (data) => {
     let token = captchaToken
     if (!token) {
       const captchaResponse = await captchaRef.current?.execute({ async: true })
       token = captchaResponse?.response ?? null
     }
 
-    setEmail(email)
-
     resetPassword({
-      email,
+      email: data.email,
       hcaptchaToken: token,
       redirectTo: `${
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
@@ -55,109 +137,58 @@ const ForgotPasswordForm = () => {
     })
   }
 
-  const onCodeEntered = async ({ code }: { code: string }) => {
-    const { error } = await auth.verifyOtp({ email, token: code, type: 'recovery' })
-
-    if (error) {
-      toast.error(`Failed to verify code: ${error.message}`)
-    } else {
-      await router.push('reset-password')
-    }
-  }
-
-  if (isCodeInput && email) {
-    return (
-      <Form
-        key="code"
-        validateOnBlur
-        id="code-input-form"
-        initialValues={{ code: '' }}
-        validationSchema={codeSchema}
-        onSubmit={onCodeEntered}
-      >
-        {() => {
-          return (
-            <div className="flex flex-col pt-4 space-y-4">
-              <Input
-                id="code"
-                name="code"
-                label="Code"
-                placeholder="123456"
-                disabled={isLoading}
-                autoComplete="off"
-              />
-
-              <div className="border-t border-overlay-border" />
-
-              <Button
-                block
-                form="code-input-form"
-                htmlType="submit"
-                size="medium"
-                disabled={isLoading}
-                loading={isLoading}
-              >
-                Confirm Reset Code
-              </Button>
-            </div>
-          )
-        }}
-      </Form>
-    )
-  }
-
   return (
-    <Form
-      validateOnBlur
-      id="forgot-password-form"
-      initialValues={{ email: '' }}
-      validationSchema={forgotPasswordSchema}
-      onSubmit={onForgotPassword}
-    >
-      {() => {
-        return (
-          <div className="flex flex-col pt-4 space-y-4">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="you@example.com"
-              disabled={isLoading}
-              autoComplete="email"
-            />
+    <Form_Shadcn_ {...forgotPasswordForm}>
+      <form
+        id="forgot-password-form"
+        className="flex flex-col pt-4 space-y-4"
+        onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)}
+      >
+        <FormField_Shadcn_
+          control={forgotPasswordForm.control}
+          name="email"
+          render={({ field }) => (
+            <FormItemLayout label="Email">
+              <FormControl_Shadcn_>
+                <Input_Shadcn_
+                  {...field}
+                  type="email"
+                  placeholder="you@example.com"
+                  disabled={isLoading}
+                  autoComplete="email"
+                />
+              </FormControl_Shadcn_>
+            </FormItemLayout>
+          )}
+        />
 
-            <div className="self-center">
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            </div>
+        <div className="self-center">
+          <HCaptcha
+            ref={captchaRef}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            size="invisible"
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+            onExpire={() => {
+              setCaptchaToken(null)
+            }}
+          />
+        </div>
 
-            <div className="border-t border-overlay-border" />
+        <div className="border-t border-overlay-border" />
 
-            <Button
-              block
-              form="forgot-password-form"
-              htmlType="submit"
-              size="medium"
-              disabled={isLoading}
-              loading={isLoading}
-            >
-              Send reset code
-            </Button>
-          </div>
-        )
-      }}
-    </Form>
+        <Button
+          block
+          form="forgot-password-form"
+          htmlType="submit"
+          size="medium"
+          disabled={isLoading}
+          loading={isLoading}
+        >
+          Send reset code
+        </Button>
+      </form>
+    </Form_Shadcn_>
   )
 }
-
-export default ForgotPasswordForm

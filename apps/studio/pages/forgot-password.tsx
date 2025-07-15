@@ -1,4 +1,4 @@
-import ForgotPasswordForm from 'components/interfaces/SignIn/ForgotPasswordForm'
+import { ForgotPasswordWizard } from 'components/interfaces/SignIn/ForgotPasswordForm'
 import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
 import Link from 'next/link'
 import type { NextPageWithLayout } from 'types'
@@ -7,7 +7,7 @@ const ForgotPasswordPage: NextPageWithLayout = () => {
   return (
     <>
       <div className="flex flex-col gap-4">
-        <ForgotPasswordForm />
+        <ForgotPasswordWizard />
       </div>
 
       <div className="my-8 self-center text-sm">
