@@ -435,8 +435,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...filteredLocalTools,
     }
 
+    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
-      The current project is ${projectRef}.
       You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
 
       # Response Style:
@@ -581,17 +581,34 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           \`\`\`
 
       # General Instructions:
-      
-      - **Available Schemas**: ${schemasString}
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
 
     const result = streamText({
       model,
       maxSteps: 5,
-      system,
-      messages,
+      messages: [
+        {
+          role: 'system',
+          content: system,
+          providerOptions: {
+            bedrock: { cachePoint: { type: 'default' } },
+          },
+        },
+        {
+          role: 'user',
+          content: `My current project is ${projectRef}. Available Schemas are: ${schemasString}`,
+        },
+        ...messages,
+      ],
       tools,
+    })
+
+    // TODO: Remove after confirming this works
+    result.providerMetadata.then((metadata) => {
+      if (metadata?.bedrock) {
+        console.log('Bedrock usage:', metadata.bedrock.usage)
+      }
     })
 
     result.pipeDataStreamToResponse(res, {
