@@ -111,7 +111,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
 
     if (values.type === 'ANALYTICS' && !icebergCatalogEnabled) {
       toast.error(
-        'The Iceberg catalog feature is not enabled for your project. Please contact support to enable it.'
+        'The Analytics catalog feature is not enabled for your project. Please contact support to enable it.'
       )
       return
     }
@@ -211,39 +211,40 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                             </div>
                           </div>
                         </RadioGroupStackedItem>
-                        <RadioGroupStackedItem
-                          value="ANALYTICS"
-                          id="ANALYTICS"
-                          label="Analytics bucket"
-                          showIndicator={false}
-                          disabled={!icebergCatalogEnabled}
-                        >
-                          <div className="flex  gap-x-5">
-                            <div className="flex flex-col">
-                              <p className="text-foreground-light text-left">
-                                Store Iceberg files and bucket is optimized for analytical
-                                workloads.
-                              </p>
+                        {IS_PLATFORM && (
+                          <RadioGroupStackedItem
+                            value="ANALYTICS"
+                            id="ANALYTICS"
+                            label="Analytics bucket"
+                            showIndicator={false}
+                            disabled={!icebergCatalogEnabled}
+                          >
+                            <div className="flex  gap-x-5">
+                              <div className="flex flex-col">
+                                <p className="text-foreground-light text-left">
+                                  Stores Iceberg files and is optimized for analytical workloads.
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                          {icebergCatalogEnabled ? null : (
-                            <div className="w-full flex gap-x-2 py-2 items-center">
-                              <WarningIcon />
-                              <span className="text-xs text-left">
-                                This feature is currently in alpha and not yet enabled for your
-                                project. Sign up{' '}
-                                <a
-                                  className="underline"
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  href="https://forms.supabase.com/analytics-buckets"
-                                >
-                                  here
-                                </a>
-                              </span>
-                            </div>
-                          )}
-                        </RadioGroupStackedItem>
+                            {icebergCatalogEnabled ? null : (
+                              <div className="w-full flex gap-x-2 py-2 items-center">
+                                <WarningIcon />
+                                <span className="text-xs text-left">
+                                  This feature is currently in alpha and not yet enabled for your
+                                  project. Sign up{' '}
+                                  <a
+                                    className="underline"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href="https://forms.supabase.com/analytics-buckets"
+                                  >
+                                    here
+                                  </a>
+                                </span>
+                              </div>
+                            )}
+                          </RadioGroupStackedItem>
+                        )}
                       </RadioGroupStacked>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
