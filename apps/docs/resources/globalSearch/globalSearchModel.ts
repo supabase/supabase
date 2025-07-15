@@ -40,6 +40,34 @@ export abstract class SearchResultModel {
       return matchResult
     })
   }
+
+  static async searchHybrid(
+    args: RootQueryTypeSearchDocsArgs,
+    requestedFields: Array<string>
+  ): Promise<Result<SearchResultModel[], ApiErrorGeneric>> {
+    const query = args.query.trim()
+    const includeFullContent = requestedFields.includes('content')
+    const embeddingResult = await openAI().createContentEmbedding(query)
+
+    return embeddingResult.flatMapAsync(async (embedding) => {
+      const matchResult = new Result(
+        await supabase().rpc('search_content_hybrid', {
+          query_text: query,
+          query_embedding: embedding,
+          include_full_content: includeFullContent,
+          max_result: args.limit ?? 30,
+        })
+      )
+        .map((matches) =>
+          matches
+            .map(createModelFromMatch)
+            .filter((item): item is SearchResultInterface => item !== null)
+        )
+        .mapError(convertPostgrestToApiError)
+
+      return matchResult
+    })
+  }
 }
 
 function createModelFromMatch({

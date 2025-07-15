@@ -136,7 +136,7 @@ const LayoutHeader = ({
                   {selectedProject && (
                     <>
                       <LayoutHeaderDivider />
-                      <BranchDropdown />
+                      {IS_PLATFORM && <BranchDropdown />}
                     </>
                   )}
                 </motion.div>

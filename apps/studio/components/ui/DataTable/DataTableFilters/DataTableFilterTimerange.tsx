@@ -9,6 +9,7 @@ import { useDataTable } from '../providers/DataTableProvider'
 export function DataTableFilterTimerange<TData>({
   value: _value,
   presets,
+  dateRangeDisabled,
 }: DataTableTimerangeFilterField<TData>) {
   const value = _value as string
   const { table, columnFilters } = useDataTable()
@@ -35,5 +36,7 @@ export function DataTableFilterTimerange<TData>({
     }
   }
 
-  return <DatePickerWithRange {...{ date, setDate, presets }} />
+  return (
+    <DatePickerWithRange dateRangeDisabled={dateRangeDisabled} {...{ date, setDate, presets }} />
+  )
 }

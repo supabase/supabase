@@ -5,7 +5,8 @@ import { ArrowUp, Loader2 } from 'lucide-react'
 import React, { ChangeEvent, memo, useRef } from 'react'
 import { Button, ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
-import { SnippetRow } from './SnippetRow'
+import { SnippetRow, getSnippetContent } from './SnippetRow'
+import { type SqlSnippet } from './AIAssistant.types'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
@@ -28,8 +29,8 @@ export interface FormProps {
   onSubmit: (message: string) => void
   /* The placeholder of the textarea */
   placeholder?: string
-  /* SQL snippets to display above the form */
-  sqlSnippets?: string[]
+  /* SQL snippets to display above the form - can be strings or objects with label and content */
+  sqlSnippets?: SqlSnippet[]
   /* Function to handle removing a SQL snippet */
   onRemoveSnippet?: (index: number) => void
   /* Additional class name for the snippets container */
@@ -67,7 +68,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
         const sqlSnippetsString = sqlSnippets
-          .map((snippet: string) => '```sql\n' + snippet + '\n```')
+          .map((snippet: SqlSnippet) => '```sql\n' + getSnippetContent(snippet) + '\n```')
           .join('\n')
         finalMessage = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
       }

@@ -1,4 +1,5 @@
 import { BASE_PATH } from 'lib/constants'
+import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import type { WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
@@ -2162,19 +2163,22 @@ export const WRAPPERS: WrapperMeta[] = [
     label: 'Iceberg',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/iceberg',
     minimumExtensionVersion: '0.5.3',
+    createComponent: CreateIcebergWrapperSheet,
     server: {
+      // The fields are intentionally not required. The required flag is enforced in the create iceberg wrapper sheet.
+      // In the edit wrapper sheet, all fields are shown and not required.
       options: [
         {
           name: 'vault_aws_access_key_id',
           label: 'AWS Access Key ID',
-          required: true,
+          required: false,
           encrypted: true,
           secureEntry: true,
         },
         {
           name: 'vault_aws_secret_access_key',
           label: 'AWS Secret Access Key',
-          required: true,
+          required: false,
           encrypted: true,
           secureEntry: true,
         },
@@ -2202,21 +2206,21 @@ export const WRAPPERS: WrapperMeta[] = [
         {
           name: 'warehouse',
           label: 'Warehouse',
-          required: true,
+          required: false,
           encrypted: false,
           secureEntry: false,
         },
         {
           name: 's3.endpoint',
           label: 'S3 Endpoint',
-          required: true,
+          required: false,
           encrypted: false,
           secureEntry: false,
         },
         {
           name: 'catalog_uri',
           label: 'Catalog URI',
-          required: true,
+          required: false,
           encrypted: false,
           secureEntry: false,
         },
