@@ -11,7 +11,8 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
   // [Joshen] Wondering if this is a bug with react-day-picker v8 whereby a single selected date
-  // has styles applied for both day_range_start and day_range_end
+  // has styles applied for both day_range_start and day_range_end. This might be fixed with the latest
+  // version of react-day-picker, but in case we can opt for a pure tailwind solution instead of JS
   const fullDateRangeSelected =
     props.mode === 'range' && !!props.selected?.from && !!props.selected?.to
 
