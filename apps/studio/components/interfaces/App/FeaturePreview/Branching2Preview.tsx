@@ -26,7 +26,7 @@ export const Branching2Preview = () => {
         <p className="text-sm text-foreground mb-2 font-medium">Limitations:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            Custom roles created through the dashboard will not be captured on branch creation
+            Custom roles created through the dashboard are not captured on branch creation.
           </li>
           <li>
             Only <code>public</code> schema changes are supported right now
