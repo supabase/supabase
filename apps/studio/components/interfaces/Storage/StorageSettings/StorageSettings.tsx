@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Clock } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -16,6 +15,7 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { formatBytes } from 'lib/helpers'
 import {
   Button,
   FormControl_Shadcn_,
@@ -39,7 +39,6 @@ import {
   StorageSizeUnits,
 } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { formatBytes } from 'lib/helpers'
 
 interface StorageSettingsState {
   fileSizeLimit: number
@@ -172,7 +171,7 @@ const StorageSettings = () => {
                 </div>
 
                 <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
-                  <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
+                  <div className="grid grid-cols-12 col-span-12 gap-2 items-start">
                     <div className="col-span-8">
                       <FormField_Shadcn_
                         control={form.control}
