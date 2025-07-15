@@ -16,7 +16,8 @@ import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { getAuthReportAttributes } from 'data/reports/auth-charts'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { NextPageWithLayout } from 'types'
 
 const AuthReport: NextPageWithLayout = () => {
@@ -41,12 +42,14 @@ const AuthUsage = () => {
 
   const {
     selectedDateRange,
-    updateDateRange: updateDateRangeFromHook,
-    handleDatePickerChange,
+    updateDateRange,
     datePickerValue,
     datePickerHelpers,
     isOrgPlanLoading,
     orgPlan,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const queryClient = useQueryClient()
@@ -74,10 +77,6 @@ const AuthUsage = () => {
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    updateDateRangeFromHook(from, to)
-  }
-
   return (
     <>
       <ReportHeader title="Auth" showDatabaseSelector={false} />
@@ -97,6 +96,13 @@ const AuthUsage = () => {
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="authReportDateRange"
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
@@ -124,6 +130,7 @@ const AuthUsage = () => {
               startDate={selectedDateRange?.period_start?.date}
               endDate={selectedDateRange?.period_end?.date}
               updateDateRange={updateDateRange}
+              orgPlanId={orgPlan?.id}
             />
           ))}
       </ReportStickyNav>

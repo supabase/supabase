@@ -14,10 +14,12 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { useState } from 'react'
 
 import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { NextPageWithLayout } from 'types'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -34,18 +36,22 @@ export const ApiReport: NextPageWithLayout = () => {
     refresh,
   } = report
 
-  const { datePickerHelpers, datePickerValue, handleDatePickerChange } = useReportDateRange(
-    REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
-  )
+  const {
+    datePickerHelpers,
+    datePickerValue,
+    handleDatePickerChange: handleDatePickerChangeFromHook,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
   const handleDatepickerChange = (vals: DatePickerValue) => {
-    // Update localStorage and hook state
-    handleDatePickerChange(vals)
-    // Update query params for the report
-    mergeParams({
-      iso_timestamp_start: vals.from || '',
-      iso_timestamp_end: vals.to || '',
-    })
+    const promptShown = handleDatePickerChangeFromHook(vals)
+    if (!promptShown) {
+      mergeParams({
+        iso_timestamp_start: vals.from || '',
+        iso_timestamp_end: vals.to || '',
+      })
+    }
   }
 
   return (
@@ -53,20 +59,29 @@ export const ApiReport: NextPageWithLayout = () => {
       <ReportHeader title="API Gateway" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <ReportFilterBar
-            onRemoveFilters={removeFilters}
-            onDatepickerChange={handleDatepickerChange}
-            datepickerFrom={params.totalRequests.iso_timestamp_start}
-            datepickerTo={params.totalRequests.iso_timestamp_end}
-            onAddFilter={addFilter}
-            onRefresh={refresh}
-            isLoading={isLoading}
-            filters={filters}
-            datepickerHelpers={datePickerHelpers}
-            initialDatePickerValue={datePickerValue}
-            className="w-full"
-            showDatabaseSelector={false}
-          />
+          <div className="flex items-center gap-3">
+            <ReportFilterBar
+              onRemoveFilters={removeFilters}
+              onDatepickerChange={handleDatepickerChange}
+              datepickerFrom={params.totalRequests.iso_timestamp_start}
+              datepickerTo={params.totalRequests.iso_timestamp_end}
+              onAddFilter={addFilter}
+              onRefresh={refresh}
+              isLoading={isLoading}
+              filters={filters}
+              datepickerHelpers={datePickerHelpers}
+              initialDatePickerValue={datePickerValue}
+              className="w-full"
+              showDatabaseSelector={false}
+            />
+            <UpgradePrompt
+              show={showUpgradePrompt}
+              setShowUpgradePrompt={setShowUpgradePrompt}
+              title="Report date range"
+              description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+              source="apiReportDateRange"
+            />
+          </div>
         }
       >
         <ReportWidget
