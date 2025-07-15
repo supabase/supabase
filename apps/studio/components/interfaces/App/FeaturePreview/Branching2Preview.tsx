@@ -25,9 +25,7 @@ export const Branching2Preview = () => {
       <div className="my-6">
         <p className="text-sm text-foreground mb-2 font-medium">Limitations:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
-          <li>
-            Custom roles created through the dashboard are not captured on branch creation.
-          </li>
+          <li>Custom roles created through the dashboard are not captured on branch creation.</li>
           <li>
             Only <code>public</code> schema changes are supported right now.
           </li>
@@ -45,7 +43,8 @@ export const Branching2Preview = () => {
           </li>
           <li>Migration conflicts must be manually resolved on the preview branch.</li>
           <li>
-            If you have run migrations on <code>main</code>, new branches will be created from existing migrations instead of a full schema dump.
+            If you have run migrations on <code>main</code>, new branches will be created from
+            existing migrations instead of a full schema dump.
           </li>
         </ul>
       </div>
