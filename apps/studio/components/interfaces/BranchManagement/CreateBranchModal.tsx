@@ -10,8 +10,10 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
@@ -22,7 +24,6 @@ import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -50,7 +51,7 @@ export const CreateBranchModal = () => {
   const queryClient = useQueryClient()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
 
   const organization = useSelectedOrganization()
@@ -367,7 +368,7 @@ export const CreateBranchModal = () => {
               >
                 Cancel
               </Button>
-              <Button
+              <ButtonTooltip
                 form={formId}
                 disabled={
                   !isSuccessConnections ||
@@ -380,9 +381,18 @@ export const CreateBranchModal = () => {
                 loading={isCreating}
                 type="primary"
                 htmlType="submit"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      !gitlessBranching && !githubConnection
+                        ? 'Set up a GitHub connection first to create branches'
+                        : undefined,
+                  },
+                }}
               >
                 Create branch
-              </Button>
+              </ButtonTooltip>
             </DialogFooter>
           </form>
         </Form_Shadcn_>
