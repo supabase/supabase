@@ -2470,7 +2470,7 @@ export const deployment: NavMenuConstant = {
         { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
         { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
         { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
-        { name: 'Billing', url: '/docs/guides/platform/manage-your-usage/branching' },
+        { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
     },
     {
