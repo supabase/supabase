@@ -9,16 +9,7 @@ import * as z from 'zod'
 import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { auth } from 'lib/gotrue'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const forgotPasswordSchema = z.object({
@@ -26,7 +17,7 @@ const forgotPasswordSchema = z.object({
 })
 
 const codeSchema = z.object({
-  code: z.string().min(6, 'Code must be at least 6 characters').min(1, 'Code is required'),
+  code: z.string().regex(/^\d{6}$/, 'Code must be 6 digits'),
 })
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
@@ -74,8 +65,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
           control={codeForm.control}
           name="code"
           render={({ field }) => (
-            <FormItem_Shadcn_>
-              <FormLabel_Shadcn_>Code</FormLabel_Shadcn_>
+            <FormItemLayout label="Code">
               <FormControl_Shadcn_>
                 <Input_Shadcn_
                   {...field}
@@ -84,8 +74,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
                   disabled={isLoading}
                 />
               </FormControl_Shadcn_>
-              <FormMessage_Shadcn_ />
-            </FormItem_Shadcn_>
+            </FormItemLayout>
           )}
         />
 
