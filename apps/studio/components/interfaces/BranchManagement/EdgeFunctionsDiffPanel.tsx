@@ -1,4 +1,4 @@
-import { Code, Wind, Circle, Plus, Minus } from 'lucide-react'
+import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -116,32 +116,31 @@ const FunctionDiff = ({
         <div className="flex h-full min-h-0">
           <div className="w-48 border-r bg-surface-200 flex flex-col overflow-y-auto">
             <ul className="divide-y divide-border">
-              {fileInfos.map((fileInfo) => (
-                <li key={fileInfo.key} className="flex">
-                  <button
-                    type="button"
-                    onClick={() => setActiveFileKey(fileInfo.key)}
-                    className={cn(
-                      'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',
-                      activeFileKey === fileInfo.key
-                        ? 'bg-surface-300 text-foreground'
-                        : 'text-foreground-light hover:bg-surface-300'
-                    )}
-                  >
-                    {(() => {
-                      const Icon = getStatusIcon(fileInfo.status)
-                      return (
-                        <Icon
-                          className={cn('flex-shrink-0', getStatusColor(fileInfo.status))}
-                          size={12}
-                          strokeWidth={1}
-                        />
-                      )
-                    })()}
-                    <span className="truncate">{fileInfo.key}</span>
-                  </button>
-                </li>
-              ))}
+              {fileInfos.map((fileInfo) => {
+                const Icon = getStatusIcon(fileInfo.status)
+
+                return (
+                  <li key={fileInfo.key} className="flex">
+                    <button
+                      type="button"
+                      onClick={() => setActiveFileKey(fileInfo.key)}
+                      className={cn(
+                        'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',
+                        activeFileKey === fileInfo.key
+                          ? 'bg-surface-300 text-foreground'
+                          : 'text-foreground-light hover:bg-surface-300'
+                      )}
+                    >
+                      <Icon
+                        className={cn('flex-shrink-0', getStatusColor(fileInfo.status))}
+                        size={12}
+                        strokeWidth={1}
+                      />
+                      <span className="truncate">{fileInfo.key}</span>
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
           </div>
           <div className="flex-1 min-h-0">
