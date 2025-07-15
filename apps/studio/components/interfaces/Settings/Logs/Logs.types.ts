@@ -1,5 +1,6 @@
 import type { Datum } from 'components/ui/Charts/Charts.types'
 import React from 'react'
+import type { PlanId } from 'data/subscriptions/types'
 
 interface Metadata {
   [key: string]: string | number | Object | Object[] | any
@@ -142,6 +143,7 @@ export interface DatetimeHelper {
   calcFrom: () => string
   default?: boolean
   disabled?: boolean
+  availableIn?: PlanId[]
 }
 
 export interface WarehouseCollection {
