@@ -178,7 +178,7 @@ const PostgrestReport = () => {
           </>
         }
       >
-        <div className="relative pt-8 mt-8 border-t">
+        <div className="relative mt-8">
           <SharedAPIReport
             filterBy="postgrest"
             start={selectedDateRange?.period_start?.date}
