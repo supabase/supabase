@@ -1,16 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
+// Dynamically import charts to improve page load
+import dynamic from 'next/dynamic'
+
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 
-import { Button, Checkbox, cn } from 'ui'
+import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
 import { PopupFrame } from 'ui-patterns'
 import { Input } from 'ui/src/components/shadcn/ui/input'
 import { Label } from 'ui/src/components/shadcn/ui/label'
+import ChartPieStacked from '../../design-system/registry/default/block/chart-pie-stacked'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { ChartWithQuery } from '~/components/SurveyResults/ChartWithQuery'
+
+import { FullTimeEmployees } from '~/components/SurveyResults/FullTimeEmployees'
+import { BarChartLabelInside } from '~/components/SurveyResults/BarChartLabelInside'
+import { BarChartNumbersTop } from '~/components/SurveyResults/BarChartNumbersTop'
+const Metrics = dynamic(() => import('~/components/SurveyResults/Metrics'))
 
 import data from '~/data/surveys/state-of-startups-2025'
 
@@ -179,85 +189,30 @@ function StateOfStartupsPage() {
       <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
         <Hero {...pageData.heroSection} />
         <SectionContainer>
-          <div className="flex flex-col text-center gap-4 py-8 items-center justify-center">
-            <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">Stay in touch</h2>
-            <p className="mx-auto text-foreground-lighter w-full">
-              Sign up for our newsletter to be notified when the survey results are available.
-            </p>
-            <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-              {success ? (
-                <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
-                  <p className="text-center text-sm">{success}</p>
-                  <Button onClick={handleReset}>Reset</Button>
-                </div>
-              ) : (
-                <form
-                  noValidate
-                  id="state-of-startups-form"
-                  onSubmit={handleSubmit}
-                  className="w-full max-w-md flex flex-col gap-4 items-center"
-                >
-                  <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2">
-                    {/* Spam prevention */}
-                    <input
-                      type="text"
-                      name="honeypot"
-                      value={honeypot}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setHoneypot(e.target.value)
-                      }
-                      style={{ display: 'none' }}
-                      aria-hidden="true"
-                    />
-                    <Input
-                      required
-                      onChange={handleChange}
-                      value={formData['email']}
-                      name="email"
-                      type="email"
-                      placeholder="Email"
-                    />
-                    <Button
-                      htmlType="submit"
-                      disabled={isSubmitting}
-                      size="small"
-                      onClick={() =>
-                        sendTelemetryEvent({
-                          action: 'register_for_state_of_startups_newsletter_clicked',
-                          properties: { buttonLocation: 'State of Startups 2025 Newsletter Form' },
-                        })
-                      }
-                    >
-                      Register
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-2 text-left">
-                    <Checkbox
-                      required
-                      name="terms"
-                      id="terms"
-                      onChange={handleChange}
-                      className="[&>input]:m-0"
-                    />
-                    <Label htmlFor="terms" className="text-foreground-lighter leading-5">
-                      We process your information in accordance with our{' '}
-                      <Link href="/privacy" className="text-foreground-light hover:underline">
-                        Privacy Policy
-                      </Link>
-                      .
-                    </Label>
-                  </div>
-                  <div
-                    className={cn(
-                      'flex flex-nowrap text-right gap-1 items-center text-xs leading-none transition-opacity opacity-0 text-foreground-lighter',
-                      errors['email'] && 'opacity-100 animate-fade-in',
-                      errors['terms'] && 'opacity-100 animate-fade-in'
-                    )}
-                  >
-                    {errors['email'] ? errors['email'] : errors['terms']}
-                  </div>
-                </form>
-              )}
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <div className="max-w-2xl text-center flex flex-col  gap-4">
+              <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl text-balance">
+                Today’s startup ecosystem is dominated by young, technical builders shipping fast
+                with lean teams.
+              </h2>
+              <p className="mx-auto text-foreground-lighter w-full">
+                Most survey respondents identified as founders (76%), with engineers as the
+                next-largest group (18%). Age-wise, 82% of participants are under 40, with the
+                largest cohort in the 22–29 age range (36.4%). These are early-career founders
+                starting small: 91% of companies have 10 or fewer employees, and 66% were founded
+                within the last year. Two-thirds are bootstrapped, with fewer than 6% reaching
+                Series A or beyond.
+              </p>
+            </div>
+
+            <ChartWithQuery />
+
+            <div className="w-full max-w-lg mt-8 flex flex-col gap-4">
+              <FullTimeEmployees />
+              <BarChartLabelInside />
+              <BarChartNumbersTop />
+              <ChartPieStacked />
+              <Metrics />
             </div>
           </div>
         </SectionContainer>
