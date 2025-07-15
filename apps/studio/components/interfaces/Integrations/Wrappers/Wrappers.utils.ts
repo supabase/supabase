@@ -109,7 +109,7 @@ export const formatWrapperTables = (
   })
 }
 
-export const convertKVStringArrayToJson = (values: string[]) => {
+export const convertKVStringArrayToJson = (values: string[]): Record<string, string> => {
   return Object.fromEntries(values.map((value) => value.split('=')))
 }
 
