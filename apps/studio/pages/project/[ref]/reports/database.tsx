@@ -64,7 +64,8 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const isReportsV2 = useFlag('reportsDatabaseV2')
+  // const isReportsV2 = useFlag('reportsDatabaseV2')
+  const isReportsV2 = false
   const org = useSelectedOrganization()
 
   const {
@@ -229,44 +230,42 @@ const DatabaseUsage = () => {
           </>
         }
       >
-        {showChartsV2 ? (
-          selectedDateRange &&
-          REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
-            <ComposedChartHandler
-              key={chart.id}
-              {...chart}
-              attributes={chart.attributes as MultiAttribute[]}
-              interval={selectedDateRange.interval}
-              startDate={selectedDateRange?.period_start?.date}
-              endDate={selectedDateRange?.period_end?.date}
-              updateDateRange={updateDateRange}
-              defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-              showMaxValue={
-                chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                  ? true
-                  : chart.showMaxValue
-              }
-            />
-          ))
-        ) : (
-          <Panel title={<h2>Database health</h2>}>
-            <Panel.Content className="grid grid-cols-1 gap-4">
-              {selectedDateRange &&
-                REPORT_ATTRIBUTES.filter((attr) => !attr.hide).map((attr) => (
-                  <ChartHandler
-                    key={attr.id}
-                    {...attr}
-                    provider="infra-monitoring"
-                    attribute={attr.id}
-                    label={attr.label}
-                    interval={selectedDateRange.interval}
-                    startDate={selectedDateRange?.period_start?.date}
-                    endDate={selectedDateRange?.period_end?.date}
-                  />
-                ))}
-            </Panel.Content>
-          </Panel>
-        )}
+        {selectedDateRange &&
+          (showChartsV2
+            ? REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
+                <ComposedChartHandler
+                  key={chart.id}
+                  {...chart}
+                  attributes={chart.attributes as MultiAttribute[]}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  showMaxValue={
+                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
+                />
+              ))
+            : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
+                <ComposedChartHandler
+                  key={chart.id}
+                  {...chart}
+                  attributes={chart.attributes as MultiAttribute[]}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  showMaxValue={
+                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
+                />
+              )))}
         {selectedDateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
