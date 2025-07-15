@@ -20,6 +20,7 @@ import { Label } from '@ui/components/shadcn/ui/label'
 
 import { getEdgeFunctionReportAttributes } from 'data/reports/edgefn-charts'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'

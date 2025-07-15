@@ -33,6 +33,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -204,46 +205,14 @@ const RealtimeUsage = () => {
               defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
             />
           ))}
-        <ReportStickyNav
-          className="mt-0 border-t"
-          content={
-            <ReportFilterBar
-              onRemoveFilters={removeFilters}
-              hideDatepicker={true}
-              datepickerFrom={selectedDateRange.period_start.date}
-              datepickerTo={selectedDateRange.period_end.date}
-              onAddFilter={addFilter}
-              isLoading={isLoading}
-              filters={filters}
-              selectedProduct="realtime"
-              datepickerHelpers={datePickerHelpers}
-              className="w-full"
-              showDatabaseSelector={false}
-            />
-          }
-        >
-          <ReportWidget
-            isLoading={isLoading}
-            params={params.totalRequests}
-            title="Total Requests"
-            data={data.totalRequests || []}
-            error={error.totalRequest}
-            renderer={TotalRequestsChartRenderer}
-            append={TopApiRoutesRenderer}
-            appendProps={{ data: data.topRoutes || [], params: params.topRoutes }}
+        <div className="relative pt-8 mt-8 border-t">
+          <SharedAPIReport
+            filterBy="realtime"
+            start={selectedDateRange?.period_start?.date}
+            end={selectedDateRange?.period_end?.date}
+            hiddenReports={['networkTraffic']}
           />
-          <ReportWidget
-            isLoading={isLoading}
-            params={params.responseSpeed}
-            title="Response Speed"
-            tooltip="Average response speed (in miliseconds) of a request"
-            data={data.responseSpeed || []}
-            error={error.responseSpeed}
-            renderer={ResponseSpeedChartRenderer}
-            appendProps={{ data: data.topSlowRoutes || [], params: params.topSlowRoutes }}
-            append={TopApiRoutesRenderer}
-          />
-        </ReportStickyNav>
+        </div>
       </ReportStickyNav>
     </>
   )
