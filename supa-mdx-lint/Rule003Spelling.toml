@@ -246,6 +246,7 @@ allow_list = [
     "PubSub",
     "Prisma",
     "PrivateLink",
+    "PyIceberg",
     "Qodo",
     "README",
     "Redis",
