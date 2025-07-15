@@ -178,6 +178,9 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
               ) : namespaces.length === 0 ? (
                 <Card className="flex flex-col px-20 py-16 items-center justify-center space-y-3">
                   <p className="text-sm text-foreground-light">No namespaces in this bucket</p>
+                  <p className="text-sm text-foreground-lighter">
+                    Create a namespace and add some data to it to get started.
+                  </p>
                 </Card>
               ) : (
                 <Card>
