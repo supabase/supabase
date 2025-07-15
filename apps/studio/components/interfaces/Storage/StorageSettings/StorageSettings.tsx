@@ -33,11 +33,13 @@ import {
   Switch,
 } from 'ui'
 import {
-  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES,
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
+  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN,
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
   StorageSizeUnits,
 } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import { formatBytes } from 'lib/helpers'
 
 interface StorageSettingsState {
   fileSizeLimit: number
@@ -60,6 +62,8 @@ const StorageSettings = () => {
 
   const organization = useSelectedOrganization()
   const isFreeTier = organization?.plan.id === 'free'
+  const isSpendCapOn =
+    organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
 
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
@@ -89,10 +93,12 @@ const StorageSettings = () => {
   }, [isSuccess, config])
 
   const maxBytes = useMemo(() => {
-    if (organization?.usage_billing_enabled) {
+    if (organization?.plan.id === 'free') {
+      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
+    } else if (organization?.usage_billing_enabled) {
       return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
     } else {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
+      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
     }
   }, [organization])
 
@@ -232,8 +238,7 @@ const StorageSettings = () => {
                         limit,
                         storageUnit
                       ).toLocaleString()} bytes. `}
-                    Maximum size in bytes of a file that can be uploaded is 500 GB (
-                    {formattedMaxSizeBytes}).
+                    Maximum upload file size is {formatBytes(maxBytes)}.
                   </p>
                 </div>
               </div>
@@ -271,9 +276,18 @@ const StorageSettings = () => {
             {isFreeTier && (
               <div className="px-6 pb-6">
                 <UpgradeToPro
-                  icon={<Clock size={14} className="text-foreground-muted" />}
                   primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                  secondaryText="Upgrade to the Pro Plan for a configurable upload file size limit of up to 50 GB."
+                  secondaryText="Upgrade to Pro Plan for a configurable upload file size limit of 500 GB and unlock image transformations."
+                  source="storageSizeLimit"
+                />
+              </div>
+            )}
+            {isSpendCapOn && (
+              <div className="px-6 pb-6">
+                <UpgradeToPro
+                  buttonText="Disable Spend Cap"
+                  primaryText="Reduced max upload file size limit due to Spend Cap"
+                  secondaryText="Disable your Spend Cap to allow file uploads of up to 500 GB."
                   source="storageSizeLimit"
                 />
               </div>
