@@ -91,7 +91,7 @@ export const BranchRow = ({
   }
 
   return (
-    <div className="w-full flex items-center justify-between px-4 py-2.5 transition hover:bg-surface-100">
+    <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
       <div className="flex items-center gap-x-3">
         {branch.git_branch && (
           <ButtonTooltip
