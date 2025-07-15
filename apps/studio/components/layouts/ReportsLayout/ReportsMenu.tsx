@@ -29,6 +29,7 @@ const ReportsMenu = () => {
   const edgeFnEnabled = useFlag('edgefunctionreport')
   const realtimeEnabled = useFlag('realtimeReport')
   const storageReportEnabled = useFlag('storagereport')
+  const postgrestReportEnabled = useFlag('postgrestreport')
 
   // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
@@ -133,6 +134,15 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database${preservedQueryParams}`,
         },
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'PostgREST',
+                key: 'postgrest',
+                url: `/project/${ref}/reports/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
         ...(realtimeEnabled
           ? [
               {

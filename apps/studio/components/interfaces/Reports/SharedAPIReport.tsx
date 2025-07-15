@@ -15,19 +15,39 @@ export function SharedAPIReport({
   end,
   hiddenReports = [],
 }: {
-  filterBy: 'auth' | 'realtime' | 'storage' | 'graphql' | 'functions'
+  filterBy: 'auth' | 'realtime' | 'storage' | 'graphql' | 'functions' | 'postgrest'
   start: string
   end: string
   hiddenReports?: SharedAPIReportKey[]
 }) {
   const { ref } = useParams() as { ref: string }
 
+  // [Jordi] Source to fetch the data from
+  const filterByMapSource: Record<SharedAPIReportKey, string> = {
+    functions: 'function_edge_logs',
+    realtime: 'edge_logs',
+    storage: 'edge_logs',
+    graphql: 'edge_logs',
+    postgrest: 'edge_logs',
+    auth: 'edge_logs',
+  }
+
+  // [Jordi] Value to match in the request.path
+  const filterByMapValue: Record<SharedAPIReportKey, string> = {
+    functions: '/functions',
+    realtime: '/realtime',
+    storage: '/storage',
+    graphql: '/graphql',
+    postgrest: '/rest',
+    auth: '/auth',
+  }
+
   const { data, error, isLoading } = useSharedAPIReport({
-    src: filterBy === 'functions' ? 'function_edge_logs' : 'edge_logs',
+    src: filterByMapSource[filterBy],
     filters: [
       {
         key: 'request.path',
-        value: `/${filterBy}`,
+        value: filterByMapValue[filterBy],
         compare: 'matches',
       },
     ],
