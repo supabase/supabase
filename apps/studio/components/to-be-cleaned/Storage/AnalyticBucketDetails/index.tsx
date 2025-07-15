@@ -177,7 +177,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                 <GenericSkeletonLoader />
               ) : namespaces.length === 0 ? (
                 <Card className="flex flex-col px-20 py-16 items-center justify-center space-y-3">
-                  <p className="text-sm text-foreground-light">No namespaces on the bucket yet</p>
+                  <p className="text-sm text-foreground-light">No namespaces in this bucket</p>
                 </Card>
               ) : (
                 <Card>
