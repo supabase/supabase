@@ -179,7 +179,16 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                 <Card className="flex flex-col px-20 py-16 items-center justify-center space-y-3">
                   <p className="text-sm text-foreground-light">No namespaces in this bucket</p>
                   <p className="text-sm text-foreground-lighter">
-                    Create a namespace and add some data to it to get started.
+                    Create a namespace and add some data{' '}
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand underline"
+                      href="https://supabase.com/docs/guides/storage/analytics/connecting-to-analytics-bucket"
+                    >
+                      {' '}
+                      to get started
+                    </a>
                   </p>
                 </Card>
               ) : (

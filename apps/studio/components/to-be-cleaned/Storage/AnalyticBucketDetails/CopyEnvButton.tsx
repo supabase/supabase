@@ -27,9 +27,9 @@ export const CopyEnvButton = ({
             connectionString: project?.connectionString,
             id: values[option.name],
           })
-          return `${option.name.toUpperCase()}=${decryptedValue[0].decrypted_secret}`
+          return `${option.name.toUpperCase().replace('VAULT_', '')}=${decryptedValue[0].decrypted_secret}`
         }
-        return `${option.name.toUpperCase()}=${values[option.name]}`
+        return `${option.name.toUpperCase().replace('.', '_')}=${values[option.name]}`
       })
     ).then((values) => values.join('\n'))
 
