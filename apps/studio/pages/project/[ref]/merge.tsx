@@ -1,13 +1,5 @@
 import dayjs from 'dayjs'
-import {
-  AlertTriangle,
-  ExternalLink,
-  GitBranchIcon,
-  GitMerge,
-  MoreVertical,
-  Shield,
-  X,
-} from 'lucide-react'
+import { AlertTriangle, GitBranchIcon, GitMerge, MoreVertical, Shield, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -33,7 +25,6 @@ import { useBranchesQuery } from 'data/branches/branches-query'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -52,8 +43,6 @@ const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const project = useSelectedProject()
-
-  const gitlessBranching = useFlag('gitlessBranching')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
@@ -314,33 +303,6 @@ const MergePage: NextPageWithLayout = () => {
     setWorkflowFinalStatus(null)
   }, [currentWorkflowRunId])
 
-  if (!gitlessBranching) {
-    return (
-      <PageLayout>
-        <ScaffoldContainer size="full">
-          <div className="flex items-center flex-col justify-center w-full py-16">
-            <ProductEmptyState title="Branch Merge - Coming Soon">
-              <p className="text-sm text-foreground-light">
-                The branch merge feature is currently in development and will be available soon.
-              </p>
-              <div className="flex items-center space-x-2 !mt-4">
-                <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://supabase.com/docs/guides/platform/branching"
-                  >
-                    View the docs
-                  </a>
-                </Button>
-              </div>
-            </ProductEmptyState>
-          </div>
-        </ScaffoldContainer>
-      </PageLayout>
-    )
-  }
-
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
     return (
@@ -349,7 +311,7 @@ const MergePage: NextPageWithLayout = () => {
           <div className="flex items-center flex-col justify-center w-full py-16">
             <ProductEmptyState title="Merge Request">
               <p className="text-sm text-foreground-light">
-                This page is only available for preview branches.
+                You can only review changes when on a preview branch
               </p>
             </ProductEmptyState>
           </div>
@@ -361,9 +323,6 @@ const MergePage: NextPageWithLayout = () => {
   const isMergeDisabled =
     !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
 
-  const isReadyForReview = !!currentBranch?.review_requested_at
-
-  // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
     <div className="flex items-end gap-2">
       <ReviewWithAI
@@ -373,16 +332,7 @@ const MergePage: NextPageWithLayout = () => {
         diffContent={diffContent}
         disabled={!currentBranch || !mainBranch || isCombinedDiffLoading}
       />
-      {!isReadyForReview ? (
-        <Button
-          type="primary"
-          onClick={handleReadyForReview}
-          disabled={!combinedHasChanges || isCombinedDiffLoading}
-          icon={<Shield size={16} strokeWidth={1.5} className="text-brand" />}
-        >
-          Mark as ready for review
-        </Button>
-      ) : isMergeDisabled ? (
+      {isMergeDisabled ? (
         <ButtonTooltip
           tooltip={{
             content: {
@@ -532,7 +482,8 @@ const MergePage: NextPageWithLayout = () => {
                     >
                       <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
                     </Button>
-                  ) : hasCurrentWorkflowCompleted ? (
+                  ) : hasCurrentWorkflowCompleted &&
+                    currentWorkflowRun?.id === parentBranchWorkflow?.id ? (
                     <Button
                       type="default"
                       onClick={handleCloseBranch}

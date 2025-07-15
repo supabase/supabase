@@ -39,26 +39,26 @@ export const days: BuildDay[] = [
     ],
   },
   {
-    title: '',
+    title: 'Create a Supabase backend using Figma Make',
     description: '',
-    id: '',
-    is_shipped: false,
+    id: 'figma',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/figma-make-support-for-supabase',
         label: 'Blog post',
         target: '_blank',
       },
     ],
   },
   {
-    title: '',
+    title: 'Introducing stripe-sync-engine npm package',
     description: '',
-    id: '',
-    is_shipped: false,
+    id: 'stripe-engine',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/stripe-engine-as-sync-library',
         label: 'Blog post',
         target: '_blank',
       },

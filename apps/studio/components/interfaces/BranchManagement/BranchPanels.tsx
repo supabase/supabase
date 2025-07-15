@@ -20,7 +20,7 @@ export const BranchManagementSection = ({
   children,
 }: PropsWithChildren<BranchManagementSectionProps>) => {
   return (
-    <div className="border rounded-lg">
+    <div className="border rounded-lg overflow-hidden">
       <div className="bg-surface-100 shadow-sm flex justify-between items-center px-4 py-3 rounded-t-lg text-xs font-mono uppercase">
         {typeof header === 'string' ? <span>{header}</span> : header}
       </div>
@@ -75,6 +75,7 @@ export const BranchRow = ({
   rowActions,
 }: BranchRowProps) => {
   const router = useRouter()
+  const page = router.pathname.split('/').pop()
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
@@ -91,7 +92,7 @@ export const BranchRow = ({
   }
 
   return (
-    <div className="w-full flex items-center justify-between px-4 py-2.5 transition hover:bg-surface-100">
+    <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
       <div className="flex items-center gap-x-3">
         {branch.git_branch && (
           <ButtonTooltip
@@ -115,7 +116,12 @@ export const BranchRow = ({
               {label || branch.name}
             </div>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Switch to branch</TooltipContent>
+          {((page === 'branches' && !branch.is_default) || page === 'merge-requests') && (
+            <TooltipContent side="bottom">
+              {page === 'branches' && !branch.is_default && 'Switch to branch'}
+              {page === 'merge-requests' && 'View merge request'}
+            </TooltipContent>
+          )}
         </Tooltip>
       </div>
       <div className="flex items-center gap-x-4">

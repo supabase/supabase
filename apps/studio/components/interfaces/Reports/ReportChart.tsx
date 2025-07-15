@@ -7,6 +7,7 @@
  * This component acts as a bridge between the data-fetching logic and the
  * presentational chart component.
  */
+import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import LogChartHandler from 'components/ui/Charts/LogChartHandler'
 import { useChartData } from 'hooks/useChartData'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
@@ -59,6 +60,28 @@ const ReportChart = ({
         ? true
         : chart.showMaxValue,
   })
+
+  const isTopListChart = chart.id === 'top-api-routes' || chart.id === 'top-rpc-functions'
+
+  const chartDataArray = Array.isArray(data) ? data : []
+
+  const { data: filledData, isError: isFillError } = useFillTimeseriesSorted(
+    chartDataArray,
+    'period_start',
+    (chartAttributes.length > 0 ? chartAttributes : chart.attributes).map(
+      (attr: any) => attr.attribute
+    ),
+    0,
+    startDate,
+    endDate,
+    undefined,
+    interval
+  )
+
+  const finalData =
+    chartDataArray.length > 0 && chartDataArray.length < 20 && !isFillError && !isTopListChart
+      ? filledData
+      : chartDataArray
 
   const getExpDemoChartData = () =>
     new Array(20).fill(0).map((_, index) => ({
@@ -129,7 +152,7 @@ const ReportChart = ({
       attributes={
         (chartAttributes.length > 0 ? chartAttributes : chart.attributes) as MultiAttribute[]
       }
-      data={data}
+      data={finalData}
       isLoading={isLoadingChart || isLoading}
       highlightedValue={highlightedValue as any}
       updateDateRange={updateDateRange}
