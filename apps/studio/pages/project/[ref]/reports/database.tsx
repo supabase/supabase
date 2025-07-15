@@ -64,8 +64,7 @@ export default DatabaseReport
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  // const isReportsV2 = useFlag('reportsDatabaseV2')
-  const isReportsV2 = false
+  const isReportsV2 = useFlag('reportsDatabaseV2')
   const org = useSelectedOrganization()
 
   const {
@@ -83,7 +82,8 @@ const DatabaseUsage = () => {
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
   const isTeamsOrEnterprisePlan =
     !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
-  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
+  // const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
+  const showChartsV2 = false
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
@@ -109,7 +109,7 @@ const DatabaseUsage = () => {
     },
   })
 
-  const REPORT_ATTRIBUTES = getReportAttributes(isFreePlan)
+  const REPORT_ATTRIBUTES = getReportAttributes(org!, project!)
   const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)
 
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -140,6 +140,20 @@ const DatabaseUsage = () => {
     })
     if (showChartsV2) {
       REPORT_ATTRIBUTES_V2.forEach((chart: any) => {
+        chart.attributes.forEach((attr: any) => {
+          queryClient.invalidateQueries(
+            analyticsKeys.infraMonitoring(ref, {
+              attribute: attr.attribute,
+              startDate: period_start.date,
+              endDate: period_end.date,
+              interval,
+              databaseIdentifier: state.selectedDatabaseId,
+            })
+          )
+        })
+      })
+    } else {
+      REPORT_ATTRIBUTES.forEach((chart: any) => {
         chart.attributes.forEach((attr: any) => {
           queryClient.invalidateQueries(
             analyticsKeys.infraMonitoring(ref, {
