@@ -41,7 +41,7 @@ function extractSectionsFromOpenApi(filePath, outputPath) {
         for (const route in openApiJson.paths) {
           const methods = openApiJson.paths[route]
           for (const method in methods) {
-            const tag = methods[method].tags[0]
+            const tag = methods[method].tags?.[0]
             const operationId = methods[method].operationId
             // If operationId is not in the form of a slug ignore it.
             // This is intentional because operationId is not defined under the swagger

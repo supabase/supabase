@@ -361,9 +361,6 @@ const MergePage: NextPageWithLayout = () => {
   const isMergeDisabled =
     !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
 
-  const isReadyForReview = !!currentBranch?.review_requested_at
-
-  // Update primary actions - remove push button if branch is out of date (it will be in the notice)
   const primaryActions = (
     <div className="flex items-end gap-2">
       <ReviewWithAI
@@ -373,16 +370,7 @@ const MergePage: NextPageWithLayout = () => {
         diffContent={diffContent}
         disabled={!currentBranch || !mainBranch || isCombinedDiffLoading}
       />
-      {!isReadyForReview ? (
-        <Button
-          type="primary"
-          onClick={handleReadyForReview}
-          disabled={!combinedHasChanges || isCombinedDiffLoading}
-          icon={<Shield size={16} strokeWidth={1.5} className="text-brand" />}
-        >
-          Mark as ready for review
-        </Button>
-      ) : isMergeDisabled ? (
+      {isMergeDisabled ? (
         <ButtonTooltip
           tooltip={{
             content: {
@@ -532,7 +520,8 @@ const MergePage: NextPageWithLayout = () => {
                     >
                       <Link href={`/project/${parentProjectRef}/branches`}>Create new branch</Link>
                     </Button>
-                  ) : hasCurrentWorkflowCompleted ? (
+                  ) : hasCurrentWorkflowCompleted &&
+                    currentWorkflowRun?.id === parentBranchWorkflow?.id ? (
                     <Button
                       type="default"
                       onClick={handleCloseBranch}
