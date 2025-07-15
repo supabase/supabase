@@ -9,13 +9,20 @@ import {
 import { SharedAPIReportKey, useSharedAPIReport } from './SharedAPIReport.constants'
 import { useParams } from 'common'
 
+type SharedAPIReportFilterBy =
+  | 'auth'
+  | 'realtime'
+  | 'storage'
+  | 'graphql'
+  | 'functions'
+  | 'postgrest'
 export function SharedAPIReport({
   filterBy,
   start,
   end,
   hiddenReports = [],
 }: {
-  filterBy: 'auth' | 'realtime' | 'storage' | 'graphql' | 'functions' | 'postgrest'
+  filterBy: SharedAPIReportFilterBy
   start: string
   end: string
   hiddenReports?: SharedAPIReportKey[]
@@ -23,7 +30,7 @@ export function SharedAPIReport({
   const { ref } = useParams() as { ref: string }
 
   // [Jordi] Source to fetch the data from
-  const filterByMapSource: Record<SharedAPIReportKey, string> = {
+  const filterByMapSource: Record<SharedAPIReportFilterBy, string> = {
     functions: 'function_edge_logs',
     realtime: 'edge_logs',
     storage: 'edge_logs',
@@ -33,7 +40,7 @@ export function SharedAPIReport({
   }
 
   // [Jordi] Value to match in the request.path
-  const filterByMapValue: Record<SharedAPIReportKey, string> = {
+  const filterByMapValue: Record<SharedAPIReportFilterBy, string> = {
     functions: '/functions',
     realtime: '/realtime',
     storage: '/storage',
