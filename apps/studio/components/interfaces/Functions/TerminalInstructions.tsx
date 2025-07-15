@@ -1,11 +1,12 @@
-import { Code, ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import {
   Button,
@@ -20,7 +21,7 @@ interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Coll
   removeBorder?: boolean
 }
 
-const TerminalInstructions = forwardRef<
+export const TerminalInstructions = forwardRef<
   ElementRef<typeof Collapsible_Shadcn_>,
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
@@ -29,20 +30,22 @@ const TerminalInstructions = forwardRef<
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   const { data: tokens } = useAccessTokensQuery()
-  const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
-  const apiService = settings?.autoApiService
-  const anonKey = apiService?.defaultApiKey ?? '[YOUR ANON KEY]'
-  const endpoint = settings?.autoApiService.app_config?.endpoint ?? ''
+  const { anonKey } = getAPIKeys(settings)
+  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint ?? ''
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1`
-      : `https://${endpoint}/functions/v1`
+      : `${protocol}://${endpoint}/functions/v1`
 
   // get the .co or .net TLD from the restUrl
-  const restUrl = settings?.autoApiService.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
+  const restUrl = `https://${endpoint}`
+  const restUrlTld = !!endpoint ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const commands: Commands[] = [
     {
@@ -72,7 +75,7 @@ const TerminalInstructions = forwardRef<
     },
     {
       command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${
-        anonKey ?? '[YOUR ANON KEY]'
+        apiKey ?? '[YOUR ANON KEY]'
       }' --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
@@ -136,20 +139,12 @@ const TerminalInstructions = forwardRef<
               </p>
             </div>
             <div className="flex gap-2">
+              <DocsButton href="https://supabase.com/docs/guides/functions" />
               <Button asChild type="default" icon={<ExternalLink />}>
                 <a
-                  href="https://supabase.com/docs/guides/functions"
                   target="_blank"
                   rel="noreferrer"
-                >
-                  Documentation
-                </a>
-              </Button>
-              <Button asChild type="default" icon={<Code />}>
-                <a
                   href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-                  target="_blank"
-                  rel="noreferrer"
                 >
                   Examples
                 </a>
@@ -163,5 +158,3 @@ const TerminalInstructions = forwardRef<
 })
 
 TerminalInstructions.displayName = 'TerminalInstructions'
-
-export default TerminalInstructions

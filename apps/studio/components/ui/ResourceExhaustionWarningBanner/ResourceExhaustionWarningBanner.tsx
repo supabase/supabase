@@ -8,13 +8,14 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, cn
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 
-const ResourceExhaustionWarningBanner = () => {
+export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
   )
+
   // [Joshen] Read only takes higher precedence over multiple resource warnings
   const activeWarnings =
     projectResourceWarnings !== undefined
@@ -70,10 +71,10 @@ const ResourceExhaustionWarningBanner = () => {
   const correctionUrlVariants = {
     undefined: undefined,
     null: '/project/[ref]/settings/[infra-path]',
-    disk_space: '/project/[ref]/settings/database',
-    read_only: '/project/[ref]/settings/database',
-    auth_email_rate_limit: '/project/[ref]/settings/auth',
-    auth_restricted_email_sending: '/project/[ref]/settings/auth',
+    disk_space: '/project/[ref]/settings/compute-and-disk',
+    read_only: '/project/[ref]/settings/compute-and-disk',
+    auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
+    auth_restricted_email_sending: '/project/[ref]/auth/smtp',
     default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
   }
 
@@ -102,7 +103,7 @@ const ResourceExhaustionWarningBanner = () => {
   const onUsageOrInfraAndNotInReadOnlyMode =
     isUsageOrInfraPage && !activeWarnings.includes('is_readonly_mode_enabled')
   const onDatabaseSettingsAndInReadOnlyMode =
-    router.pathname.endsWith('settings/database') &&
+    router.pathname.endsWith('settings/compute-and-disk') &&
     activeWarnings.includes('is_readonly_mode_enabled')
 
   // these take precedence over each other, so there's only one active warning to check
@@ -165,5 +166,3 @@ const ResourceExhaustionWarningBanner = () => {
     </Alert_Shadcn_>
   )
 }
-
-export default ResourceExhaustionWarningBanner

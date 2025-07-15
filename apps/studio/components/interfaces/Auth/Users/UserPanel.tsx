@@ -1,29 +1,45 @@
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
-import { User } from 'data/auth/users-query'
+import { User } from 'data/auth/users-infinite-query'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
   cn,
+  Input_Shadcn_,
   ResizableHandle,
   ResizablePanel,
+  SimpleCodeBlock,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
-import { UserOverview } from './UserOverview'
 import { UserLogs } from './UserLogs'
+import { UserOverview } from './UserOverview'
+import { PANEL_PADDING } from './Users.constants'
 
 interface UserPanelProps {
   selectedUser?: User
   onClose: () => void
 }
 
-export const PANEL_PADDING = 'px-5 py-5'
-
 export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
   const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredProperties = selectedUser
+    ? Object.entries(selectedUser)
+        .filter(
+          ([key, value]) =>
+            key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (typeof value === 'string' && value.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+        .reduce((obj, [key, value]) => {
+          if (value !== undefined) {
+            obj[key as keyof User] = value as any
+          }
+          return obj
+        }, {} as Partial<User>)
+    : {}
 
   return (
     <>
@@ -76,8 +92,26 @@ export const UserPanel = ({ selectedUser, onClose }: UserPanelProps) => {
             value="raw"
             className={cn('mt-0 flex-grow min-h-0 overflow-y-auto', PANEL_PADDING)}
           >
+            <div className="flex items-center mb-2">
+              <Input_Shadcn_
+                autoFocus
+                type="text"
+                placeholder="Filter..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mr-2"
+              />
+              <Button
+                type="text"
+                disabled={!searchQuery}
+                onClick={() => setSearchQuery('')}
+                className="text-xs"
+              >
+                Clear
+              </Button>
+            </div>
             <SimpleCodeBlock className="javascript">
-              {JSON.stringify(selectedUser, null, 2)}
+              {JSON.stringify(filteredProperties, null, 2)}
             </SimpleCodeBlock>
           </TabsContent_Shadcn_>
         </Tabs_Shadcn_>

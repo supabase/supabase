@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
 import { useParams } from 'common'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -36,22 +36,33 @@ import SecondLevelNav from './SecondLevelNav'
 const ProjectAPIDocs = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
+  const isIntroduction =
+    snap.activeDocsSection.length === 1 && snap.activeDocsSection[0] === 'introduction'
   const isEntityDocs =
     snap.activeDocsSection.length === 2 && snap.activeDocsSection[0] === 'entities'
 
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { data } = useProjectApiQuery({ projectRef: ref })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query(
+    { projectRef: ref },
+    { enabled: snap.showProjectApiDocs }
+  )
+  const { data: customDomainData } = useCustomDomainsQuery(
+    { projectRef: ref },
+    { enabled: snap.showProjectApiDocs }
+  )
 
+  const { anonKey } = getAPIKeys(settings)
   const apikey = showKeys
-    ? data?.autoApiService.defaultApiKey ?? 'SUPABASE_CLIENT_ANON_KEY'
+    ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
     : 'SUPABASE_CLIENT_ANON_KEY'
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain?.hostname}`
-      : `https://${data?.autoApiService.endpoint ?? ''}`
+      : `${protocol}://${hostEndpoint ?? ''}`
 
   return (
     <SidePanel
@@ -67,9 +78,11 @@ const ProjectAPIDocs = () => {
             <h4>API Docs</h4>
             <div className="flex items-center space-x-1">
               {!isEntityDocs && <LanguageSelector simplifiedVersion />}
-              <Button type="default" onClick={() => setShowKeys(!showKeys)}>
-                {showKeys ? 'Hide keys' : 'Show keys'}
-              </Button>
+              {isIntroduction && (
+                <Button type="default" onClick={() => setShowKeys(!showKeys)}>
+                  {showKeys ? 'Hide keys' : 'Show keys'}
+                </Button>
+              )}
             </div>
           </div>
 

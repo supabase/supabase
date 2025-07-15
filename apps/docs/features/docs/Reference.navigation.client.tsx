@@ -2,7 +2,7 @@
 
 import * as Collapsible from '@radix-ui/react-collapsible'
 
-import { debounce } from 'lodash'
+import { debounce } from 'lodash-es'
 import { ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -11,9 +11,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 
 import { cn } from 'ui'
 
-import { BASE_PATH } from '~/lib/constants'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { isElementInViewport } from '~/features/ui/helpers.dom'
+import { BASE_PATH } from '~/lib/constants'
 
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
 
@@ -27,27 +27,27 @@ export function ReferenceContentScrollHandler({
   version: string
   isLatestVersion: boolean
 }>) {
-  const checkedPathnameOnLoad = useRef(false)
   const [initiallyScrolled, setInitiallyScrolled] = useState(false)
 
   const pathname = usePathname()
 
   useEffect(() => {
-    if (!checkedPathnameOnLoad.current) {
+    if (!initiallyScrolled) {
       const initialSelectedSection = pathname.replace(
         `/reference/${libPath}/${isLatestVersion ? '' : `${version}/`}`,
         ''
       )
       if (initialSelectedSection) {
         const section = document.getElementById(initialSelectedSection)
-        section?.scrollIntoView()
-        section?.querySelector('h2')?.focus()
+        if (section) {
+          window.scrollTo(0, section.offsetTop - 60 /* space for header + padding */)
+          section.querySelector('h2')?.focus()
+        }
       }
 
-      checkedPathnameOnLoad.current = true
       setInitiallyScrolled(true)
     }
-  }, [pathname, libPath, version, isLatestVersion])
+  }, [pathname, libPath, version, isLatestVersion, initiallyScrolled])
 
   return (
     <ReferenceContentInitiallyScrolledContext.Provider value={initiallyScrolled}>
@@ -60,14 +60,35 @@ export function ReferenceNavigationScrollHandler({
   children,
   ...rest
 }: PropsWithChildren & HTMLAttributes<HTMLDivElement>) {
-  const ref = useRef<HTMLDivElement>()
+  const parentRef = useRef<HTMLElement>()
+  const ref = useRef<HTMLDivElement>(null)
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
+
+  useEffect(() => {
+    if (!ref.current) return
+
+    let scrollingParent: HTMLElement = ref.current
+
+    while (scrollingParent && !(scrollingParent.scrollHeight > scrollingParent.clientHeight)) {
+      const parent = scrollingParent.parentElement
+      if (!parent) break
+      scrollingParent = parent
+    }
+
+    parentRef.current = scrollingParent
+  }, [])
 
   const scrollActiveIntoView = useCallback(() => {
     const currentLink = ref.current?.querySelector('[aria-current=page]') as HTMLElement
     if (currentLink && !isElementInViewport(currentLink)) {
-      currentLink.scrollIntoView({
-        block: 'center',
+      // Calculate the offset of the current link relative to scrollingParent
+      // and scroll the parent to the top of the link.
+      const offsetTop = currentLink.offsetTop
+      const parentOffsetTop = parentRef.current?.offsetTop ?? 0
+      const scrollPosition = offsetTop - parentOffsetTop
+
+      parentRef.current?.scrollTo({
+        top: scrollPosition - 60 /* space for header + padding */,
       })
     }
   }, [])
@@ -122,11 +143,8 @@ function createReferenceSubsectionNavigator(href: string, sectionSlug?: string) 
       evt.preventDefault()
       history.pushState({}, '', `${BASE_PATH}${href}`)
 
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const domElement = document.getElementById(sectionSlug)
-      domElement?.scrollIntoView({
-        behavior: reduceMotion ? 'auto' : 'smooth',
-      })
+      domElement?.scrollIntoView()
       domElement?.querySelector('h2')?.focus()
     }
   }
@@ -141,8 +159,13 @@ export function RefInternalLink({
   sectionSlug?: string
   children: React.ReactNode
 }) {
+  const onClick = useCallback(
+    (evt: MouseEvent) => createReferenceSubsectionNavigator(href, sectionSlug)(evt),
+    [href, sectionSlug]
+  )
+
   return (
-    <Link href={href} onClick={createReferenceSubsectionNavigator(href, sectionSlug)}>
+    <Link href={href} onClick={onClick}>
       {children}
     </Link>
   )
@@ -159,16 +182,29 @@ export function RefLink({
   skipChildren?: boolean
   className?: string
 }) {
-  const ref = useRef<HTMLAnchorElement>()
+  const ref = useRef<HTMLAnchorElement>(null)
 
   const pathname = usePathname()
   const href = deriveHref(basePath, section)
   const isActive =
     pathname === href || (pathname === basePath && href.replace(basePath, '') === '/introduction')
 
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.ariaCurrent = isActive ? 'page' : null
+      ref.current.className = getLinkStyles(isActive, className)
+    }
+  }, [isActive, className])
+
+  const onClick = useCallback(
+    (evt: MouseEvent) => createReferenceSubsectionNavigator(href, section.slug)(evt),
+    [href, section.slug]
+  )
+
   if (!('title' in section)) return null
 
-  const isCompoundSection = !skipChildren && 'items' in section && section.items.length > 0
+  const isCompoundSection =
+    !skipChildren && 'items' in section && section.items && section.items.length > 0
 
   return (
     <>
@@ -181,9 +217,8 @@ export function RefLink({
           // prefetching just wastes bandwidth
           prefetch={false}
           href={href}
-          aria-current={isActive ? 'page' : false}
           className={getLinkStyles(isActive, className)}
-          onClick={createReferenceSubsectionNavigator(href, section.slug)}
+          onClick={onClick}
         >
           {section.title}
         </Link>
@@ -200,7 +235,7 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceS
   const isParentActive = pathname === parentHref
 
   const childHrefs = useMemo(
-    () => new Set(section.items.map((item) => deriveHref(basePath, item))),
+    () => new Set((section.items || []).map((item) => deriveHref(basePath, item))),
     [basePath, section]
   )
   const isChildActive = childHrefs.has(pathname)
@@ -256,7 +291,7 @@ function CompoundRefLink({
       >
         <ul className="space-y-2">
           <RefLink basePath={basePath} section={section} skipChildren />
-          {section.items.map((item, idx) => {
+          {(section.items || []).map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
                 <RefLink basePath={basePath} section={item} />

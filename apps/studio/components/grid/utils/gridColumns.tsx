@@ -2,13 +2,13 @@ import { CalculatedColumn } from 'react-data-grid'
 
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { BooleanEditor } from '../components/editor/BooleanEditor'
-import { DateEditor } from '../components/editor/DateEditor'
-import { DateTimeEditor, DateTimeWithTimezoneEditor } from '../components/editor/DateTimeEditor'
+import { DateTimeEditor } from '../components/editor/DateTimeEditor'
 import { JsonEditor } from '../components/editor/JsonEditor'
 import { NumberEditor } from '../components/editor/NumberEditor'
 import { SelectEditor } from '../components/editor/SelectEditor'
 import { TextEditor } from '../components/editor/TextEditor'
 import { TimeEditor, TimeWithTimezoneEditor } from '../components/editor/TimeEditor'
+import { BinaryFormatter } from '../components/formatter/BinaryFormatter'
 import { BooleanFormatter } from '../components/formatter/BooleanFormatter'
 import { DefaultFormatter } from '../components/formatter/DefaultFormatter'
 import { ForeignKeyFormatter } from '../components/formatter/ForeignKeyFormatter'
@@ -19,6 +19,7 @@ import { SelectColumn } from '../components/grid/SelectColumn'
 import type { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
+  isBinaryColumn,
   isBoolColumn,
   isCiTextColumn,
   isDateColumn,
@@ -36,8 +37,7 @@ export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 export function getGridColumns(
   table: SupaTable,
   options?: {
-    projectRef?: string
-    tableId?: string
+    tableId?: number
     editable?: boolean
     defaultWidth?: string | number
     onAddColumn?: () => void
@@ -66,7 +66,6 @@ export function getGridColumns(
       minWidth: COLUMN_MIN_WIDTH,
       frozen: x.isPrimaryKey || false,
       isLastFrozenColumn: false,
-      // rowGroup: false,
       renderHeaderCell: (props) => (
         <ColumnHeader
           {...props}
@@ -87,7 +86,6 @@ export function getGridColumns(
           )
         : undefined,
       renderCell: getCellRenderer(x, columnType, {
-        projectRef: options?.projectRef,
         tableId: options?.tableId,
       }),
 
@@ -141,10 +139,12 @@ function getCellEditor(
       return (p: any) => <BooleanEditor {...p} isNullable={columnDefinition.isNullable} />
     }
     case 'date': {
-      return DateEditor
+      return DateTimeEditor('date', columnDefinition.isNullable || false)
     }
     case 'datetime': {
-      return columnDefinition.format.endsWith('z') ? DateTimeWithTimezoneEditor : DateTimeEditor
+      return columnDefinition.format.endsWith('z')
+        ? DateTimeEditor('datetimetz', columnDefinition.isNullable || false)
+        : DateTimeEditor('datetime', columnDefinition.isNullable || false)
     }
     case 'time': {
       return columnDefinition.format.endsWith('z') ? TimeWithTimezoneEditor : TimeEditor
@@ -187,7 +187,7 @@ function getCellEditor(
 function getCellRenderer(
   columnDef: SupaColumn,
   columnType: ColumnType,
-  metadata: { projectRef?: string; tableId?: string }
+  metadata: { tableId?: number }
 ) {
   switch (columnType) {
     case 'boolean': {
@@ -198,10 +198,11 @@ function getCellRenderer(
         return DefaultFormatter
       } else {
         // eslint-disable-next-line react/display-name
-        return (p: any) => (
-          <ForeignKeyFormatter {...p} projectRef={metadata.projectRef} tableId={metadata.tableId} />
-        )
+        return (p: any) => <ForeignKeyFormatter {...p} tableId={metadata.tableId} />
       }
+    }
+    case 'binary': {
+      return BinaryFormatter
     }
     case 'json': {
       return JsonFormatter
@@ -235,6 +236,8 @@ function getColumnType(columnDef: SupaColumn): ColumnType {
     return 'boolean'
   } else if (isEnumColumn(columnDef.dataType)) {
     return 'enum'
+  } else if (isBinaryColumn(columnDef.dataType)) {
+    return 'binary'
   } else return 'unknown'
 }
 

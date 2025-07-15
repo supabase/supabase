@@ -40,10 +40,14 @@ Fill in your `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY`:
 
 <StepHikeCompact.Code>
 
-```txt .env.local
+<$CodeTabs>
+
+```txt name=.env.local
 PUBLIC_SUPABASE_URL=<your_supabase_project_url>
 PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
 ```
+
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -63,7 +67,9 @@ Set up server-side hooks in `src/hooks.server.ts`. The hooks:
 
 <StepHikeCompact.Code>
 
-```ts src/hooks.server.ts
+<$CodeTabs>
+
+```ts name=src/hooks.server.ts
 import { createServerClient } from '@supabase/ssr'
 import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
@@ -147,6 +153,8 @@ const authGuard: Handle = async ({ event, resolve }) => {
 export const handle: Handle = sequence(supabase, authGuard)
 ```
 
+</$CodeTabs>
+
 </StepHikeCompact.Code>
 
 </StepHikeCompact.Step>
@@ -161,14 +169,17 @@ To prevent TypeScript errors, add type definitions for the new `event.locals` pr
 
 <StepHikeCompact.Code>
 
-```ts src/app.d.ts
+<$CodeTabs>
+
+```ts name=src/app.d.ts
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js'
+import type { Database } from './database.types.ts' // import generated types
 
 declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      supabase: SupabaseClient
+      supabase: SupabaseClient<Database>
       safeGetSession: () => Promise<{ session: Session | null; user: User | null }>
       session: Session | null
       user: User | null
@@ -184,6 +195,8 @@ declare global {
 export {}
 ```
 
+</$CodeTabs>
+
 </StepHikeCompact.Code>
 
 </StepHikeCompact.Step>
@@ -198,9 +211,9 @@ Create a Supabase client in your root `+layout.ts`. This client can be used to a
 
 <StepHikeCompact.Code>
 
-<CH.Code>
+<$CodeTabs>
 
-```ts src/routes/+layout.ts
+```ts name=src/routes/+layout.ts
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import type { LayoutLoad } from './$types'
@@ -246,7 +259,7 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 }
 ```
 
-```ts src/routes/+layout.server.ts
+```ts name=src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
 export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
@@ -258,7 +271,7 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cooki
 }
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -274,27 +287,31 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 
 <StepHikeCompact.Code>
 
-```svelte src/routes/+layout.svelte
+<$CodeTabs>
+
+```svelte name=src/routes/+layout.svelte
 <script>
-	import { invalidate } from '$app/navigation';
-	import { onMount } from 'svelte';
+  import { invalidate } from '$app/navigation'
+  import { onMount } from 'svelte'
 
-	export let data;
-	$: ({ session, supabase } = data);
+  let { data, children } = $props()
+  let { session, supabase } = $derived(data)
 
-	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
-			if (newSession?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth');
-			}
-		});
+  onMount(() => {
+    const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+      if (newSession?.expires_at !== session?.expires_at) {
+        invalidate('supabase:auth')
+      }
+    })
 
-		return () => data.subscription.unsubscribe();
-	});
+    return () => data.subscription.unsubscribe()
+  })
 </script>
 
-<slot />
+{@render children()}
 ```
+
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -304,42 +321,42 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 
 <StepHikeCompact.Details title="Create your first page">
 
-Create your first page. This example page calls Supabase from the server to get a list of countries from the database.
+Create your first page. This example page calls Supabase from the server to get a list of colors from the database.
 
 This is an example of a public page that uses publicly readable data.
 
-To populate your database, run the [countries quickstart](/dashboard/project/_/sql/quickstarts) from your dashboard.
+To populate your database, run the [colors quickstart](/dashboard/project/_/sql/quickstarts) from your dashboard.
 
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
-<CH.Code>
+<$CodeTabs>
 
-```ts src/routes/+page.server.ts
+```ts name=src/routes/+page.server.ts
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-  const { data: countries } = await supabase.from('countries').select('name').limit(5).order('name')
-  return { countries: countries ?? [] }
+  const { data: colors } = await supabase.from('colors').select('name').limit(5).order('name')
+  return { colors: colors ?? [] }
 }
 ```
 
-```svelte src/routes/+page.svelte
+```svelte name=src/routes/+page.svelte
 <script>
-	export let data;
-	$: ({ countries } = data);
+  let { data } = $props()
+  let { colors } = $derived(data)
 </script>
 
 <h1>Welcome to Supabase!</h1>
 <ul>
-	{#each countries as country}
-		<li>{country.name}</li>
-	{/each}
+  {#each colors as color}
+    <li>{color.name}</li>
+  {/each}
 </ul>
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -369,9 +386,9 @@ Next, create a login page to let users sign up and log in.
 
 <StepHikeCompact.Code>
 
-<CH.Code>
+<$CodeTabs>
 
-```ts src/routes/auth/+page.server.ts
+```ts name=src/routes/auth/+page.server.ts
 import { redirect } from '@sveltejs/kit'
 
 import type { Actions } from './$types'
@@ -406,35 +423,40 @@ export const actions: Actions = {
 }
 ```
 
-```svelte src/routes/auth/+page.svelte
+```svelte name=src/routes/auth/+page.svelte
 <form method="POST" action="?/login">
-	<label>
-		Email
-		<input name="email" type="email" />
-	</label>
-	<label>
-		Password
-		<input name="password" type="password" />
-	</label>
-	<button>Login</button>
-	<button formaction="?/signup">Sign up</button>
+  <label>
+    Email
+    <input name="email" type="email" />
+  </label>
+  <label>
+    Password
+    <input name="password" type="password" />
+  </label>
+  <button>Login</button>
+  <button formaction="?/signup">Sign up</button>
 </form>
 ```
 
-```svelte src/routes/auth/+layout.svelte
+```svelte name=src/routes/auth/+layout.svelte
+<script>
+  let { children } = $props()
+</script>
+
 <header>
-	<nav>
-		<a href="/">Home</a>
-	</nav>
+  <nav>
+    <a href="/">Home</a>
+  </nav>
 </header>
-<slot />
+
+{@render children()}
 ```
 
-```svelte src/routes/auth/error/+page.svelte
+```svelte name=src/routes/auth/error/+page.svelte
 <p>Login error</p>
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 
@@ -450,7 +472,9 @@ Finish the signup flow by creating the API route to handle email verification.
 
 <StepHikeCompact.Code>
 
-```ts src/routes/auth/confirm/+server.ts
+<$CodeTabs>
+
+```ts name=src/routes/auth/confirm/+server.ts
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -484,6 +508,8 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
 }
 ```
 
+</$CodeTabs>
+
 </StepHikeCompact.Code>
 
 </StepHikeCompact.Step>
@@ -500,9 +526,9 @@ To ensure that `hooks.server.ts` runs for every nested path, put a `+layout.serv
 
 <StepHikeCompact.Code>
 
-<CH.Code className="min-h-[30rem]">
+<$CodeTabs>
 
-```ts src/routes/private/+layout.server.ts
+```ts name=src/routes/private/+layout.server.ts
 /**
  * This file is necessary to ensure protection of all routes in the `private`
  * directory. It makes the routes in this directory _dynamic_ routes, which
@@ -510,31 +536,31 @@ To ensure that `hooks.server.ts` runs for every nested path, put a `+layout.serv
  **/
 ```
 
-```svelte src/routes/private/+layout.svelte
+```svelte name=src/routes/private/+layout.svelte
 <script>
-	export let data;
-	$: ({ supabase } = data);
+  let { data, children } = $props()
+  let { supabase } = $derived(data)
 
-	$: logout = async () => {
-		const { error } = await supabase.auth.signOut();
-		if (error) {
-			console.error(error);
-		}
-	};
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error(error)
+    }
+  }
 </script>
 
 <header>
-	<nav>
-		<a href="/">Home</a>
-	</nav>
-	<button on:click={logout}>Logout</button>
+  <nav>
+    <a href="/">Home</a>
+  </nav>
+  <button onclick={logout}>Logout</button>
 </header>
 <main>
-	<slot />
+  {@render children()}
 </main>
 ```
 
-```sql SQL
+```sql name=SQL
 -- Run this SQL against your database to create a `notes` table.
 
 create table notes (
@@ -560,60 +586,59 @@ to authenticated
 using ((select auth.uid()) = user_id);
 ```
 
-```svelte src/routes/private/+page.server.ts
-import type { PageServerLoad } from './$types';
+```svelte name=src/routes/private/+page.server.ts
+import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ depends, locals: { supabase } }) => {
-	depends('supabase:db:notes');
-	const { data: notes } = await supabase.from('notes').select('id,note').order('id');
-	return { notes: notes ?? [] };
-};
+  depends('supabase:db:notes')
+  const { data: notes } = await supabase.from('notes').select('id,note').order('id')
+  return { notes: notes ?? [] }
+}
 ```
 
-```svelte src/routes/private/+page.svelte
+```svelte name=src/routes/private/+page.svelte
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
-	import type { EventHandler } from 'svelte/elements';
+  import { invalidate } from '$app/navigation'
+  import type { EventHandler } from 'svelte/elements'
 
-	import type { PageData } from './$types';
+  import type { PageData } from './$types'
 
-	export let data: PageData;
-	$: ({ notes, supabase, user } = data);
+  let { data } = $props()
+  let { notes, supabase, user } = $derived(data)
 
-	let handleSubmit: EventHandler<SubmitEvent, HTMLFormElement>;
-	$: handleSubmit = async (evt) => {
-		evt.preventDefault();
-		if (!evt.target) return;
+  const handleSubmit: EventHandler<SubmitEvent, HTMLFormElement> = async (evt) => {
+    evt.preventDefault()
+    if (!evt.target) return
 
-		const form = evt.target as HTMLFormElement;
+    const form = evt.target as HTMLFormElement
 
-		const note = (new FormData(form).get('note') ?? '') as string;
-		if (!note) return;
+    const note = (new FormData(form).get('note') ?? '') as string
+    if (!note) return
 
-		const { error } = await supabase.from('notes').insert({ note });
-		if (error) console.error(error);
+    const { error } = await supabase.from('notes').insert({ note })
+    if (error) console.error(error)
 
-		invalidate('supabase:db:notes');
-		form.reset();
-	};
+    invalidate('supabase:db:notes')
+    form.reset()
+  }
 </script>
 
 <h1>Private page for user: {user?.email}</h1>
 <h2>Notes</h2>
 <ul>
-	{#each notes as note}
-		<li>{note.note}</li>
-	{/each}
+  {#each notes as note}
+    <li>{note.note}</li>
+  {/each}
 </ul>
-<form on:submit={handleSubmit}>
-	<label>
-		Add a note
-		<input name="note" type="text" />
-	</label>
+<form onsubmit={handleSubmit}>
+  <label>
+    Add a note
+    <input name="note" type="text" />
+  </label>
 </form>
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 </StepHikeCompact.Code>
 

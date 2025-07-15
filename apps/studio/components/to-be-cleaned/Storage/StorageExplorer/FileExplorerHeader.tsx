@@ -1,12 +1,11 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, debounce, isEqual, noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   Check,
   ChevronLeft,
@@ -160,10 +159,7 @@ const FileExplorerHeader = ({
   const uploadButtonRef: any = useRef(null)
   const previousBreadcrumbs: any = useRef(null)
 
-  const storageExplorerStore = useStorageStore()
   const {
-    view,
-    setView,
     columns,
     sortBy,
     setSortBy,
@@ -177,13 +173,13 @@ const FileExplorerHeader = ({
     refetchAllOpenedFolders,
     addNewFolderPlaceholder,
     clearOpenedFolders,
-    closeFilePreview,
+    setSelectedFilePreview,
     selectedBucket,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
-  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
     if (itemSearchString) setSearchString(itemSearchString)
@@ -208,7 +204,7 @@ const FileExplorerHeader = ({
   const onSelectBack = () => {
     popColumn()
     popOpenedFolders()
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
   }
 
   const onSelectUpload = () => {
@@ -241,11 +237,11 @@ const FileExplorerHeader = ({
     if (paths.length === 0) {
       popColumnAtIndex(0)
       clearOpenedFolders()
-      closeFilePreview()
+      setSelectedFilePreview(undefined)
     } else {
       const pathString = paths.join('/')
       setLoading({ isLoading: true, message: `Navigating to ${pathString}...` })
-      await fetchFoldersByPath(paths)
+      await fetchFoldersByPath({ paths })
       setLoading({ isLoading: false, message: '' })
     }
   }
@@ -333,7 +329,7 @@ const FileExplorerHeader = ({
               ]}
             />
           </form>
-        ) : view === STORAGE_VIEWS.COLUMNS ? (
+        ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
           <HeaderPathEdit
             loading={loading}
             isSearching={snap.isSearching}
@@ -368,7 +364,7 @@ const FileExplorerHeader = ({
               <Button
                 type="text"
                 icon={
-                  view === 'LIST' ? (
+                  snap.view === 'LIST' ? (
                     <List size={16} strokeWidth={2} />
                   ) : (
                     <Columns size={16} strokeWidth={2} />
@@ -380,10 +376,12 @@ const FileExplorerHeader = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40 min-w-0">
               {VIEW_OPTIONS.map((option) => (
-                <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
+                <DropdownMenuItem key={option.key} onClick={() => snap.setView(option.key)}>
                   <div className="flex items-center justify-between w-full">
                     <p>{option.name}</p>
-                    {view === option.key && <Check className="text-brand" strokeWidth={2} />}
+                    {snap.view === option.key && (
+                      <Check size={16} className="text-brand" strokeWidth={2} />
+                    )}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -395,7 +393,9 @@ const FileExplorerHeader = ({
                     <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {sortBy === option.key && <Check className="text-brand" strokeWidth={2} />}
+                        {sortBy === option.key && (
+                          <Check size={16} className="text-brand" strokeWidth={2} />
+                        )}
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -409,7 +409,7 @@ const FileExplorerHeader = ({
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {sortByOrder === option.key && (
-                          <Check className="text-brand" strokeWidth={2} />
+                          <Check size={16} className="text-brand" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -426,64 +426,38 @@ const FileExplorerHeader = ({
             {/* @ts-ignore */}
             <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
           </div>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
-              <Button
-                icon={<Upload size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={onSelectUpload}
-              >
-                Upload files
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateStorage && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to upload files
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger className="w-full">
-              <Button
-                icon={<FolderPlus size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={() => addNewFolderPlaceholder(-1)}
-              >
-                Create folder
-              </Button>
-            </Tooltip.Trigger>
-            {!canUpdateStorage && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to create folders
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+          <ButtonTooltip
+            icon={<Upload size={16} strokeWidth={2} />}
+            type="text"
+            disabled={!canUpdateStorage || breadcrumbs.length === 0}
+            onClick={onSelectUpload}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateStorage
+                  ? 'You need additional permissions to upload files'
+                  : undefined,
+              },
+            }}
+          >
+            Upload files
+          </ButtonTooltip>
+          <ButtonTooltip
+            icon={<FolderPlus size={16} strokeWidth={2} />}
+            type="text"
+            disabled={!canUpdateStorage || breadcrumbs.length === 0}
+            onClick={() => addNewFolderPlaceholder(-1)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateStorage
+                  ? 'You need additional permissions to create folders'
+                  : undefined,
+              },
+            }}
+          >
+            Create folder
+          </ButtonTooltip>
         </div>
 
         <div className="h-6 border-r border-control" />

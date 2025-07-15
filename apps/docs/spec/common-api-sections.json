@@ -3,7 +3,8 @@
     "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
-    "type": "markdown"
+    "type": "markdown",
+    "items": []
   },
   {
     "type": "category",
@@ -58,6 +59,12 @@
     "title": "Database",
     "items": [
       {
+        "id": "v1-apply-a-migration",
+        "title": "Apply a migration",
+        "slug": "v1-apply-a-migration",
+        "type": "operation"
+      },
+      {
         "id": "v1-disable-readonly-mode-temporarily",
         "title": "Disable readonly mode temporarily",
         "slug": "v1-disable-readonly-mode-temporarily",
@@ -106,12 +113,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-supavisor-config",
-        "title": "Get supavisor config",
-        "slug": "v1-get-supavisor-config",
-        "type": "operation"
-      },
-      {
         "id": "v1-list-all-backups",
         "title": "List all backups",
         "slug": "v1-list-all-backups",
@@ -121,6 +122,12 @@
         "id": "v1-list-all-snippets",
         "title": "List all snippets",
         "slug": "v1-list-all-snippets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-migrations",
+        "title": "List migrations",
+        "slug": "v1-list-migrations",
         "type": "operation"
       },
       {
@@ -157,12 +164,6 @@
         "id": "v1-update-ssl-enforcement-config",
         "title": "Update ssl enforcement config",
         "slug": "v1-update-ssl-enforcement-config",
-        "type": "operation"
-      },
-      {
-        "id": "v1-update-supavisor-config",
-        "title": "Update supavisor config",
-        "slug": "v1-update-supavisor-config",
         "type": "operation"
       }
     ]
@@ -226,9 +227,27 @@
     "title": "Edge Functions",
     "items": [
       {
+        "id": "v1-bulk-update-functions",
+        "title": "Bulk update functions",
+        "slug": "v1-bulk-update-functions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-create-a-function",
+        "title": "Create a function",
+        "slug": "v1-create-a-function",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-function",
         "title": "Delete a function",
         "slug": "v1-delete-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "v1-deploy-a-function",
+        "title": "Deploy a function",
+        "slug": "v1-deploy-a-function",
         "type": "operation"
       },
       {
@@ -292,6 +311,18 @@
         "type": "operation"
       },
       {
+        "id": "v1-merge-a-branch",
+        "title": "Merge a branch",
+        "slug": "v1-merge-a-branch",
+        "type": "operation"
+      },
+      {
+        "id": "v1-push-a-branch",
+        "title": "Push a branch",
+        "slug": "v1-push-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-reset-a-branch",
         "title": "Reset a branch",
         "slug": "v1-reset-a-branch",
@@ -319,6 +350,12 @@
         "id": "v1-exchange-oauth-token",
         "title": "Exchange oauth token",
         "slug": "v1-exchange-oauth-token",
+        "type": "operation"
+      },
+      {
+        "id": "v1-revoke-token",
+        "title": "Revoke token",
+        "slug": "v1-revoke-token",
         "type": "operation"
       }
     ]
@@ -358,6 +395,12 @@
     "title": "Projects",
     "items": [
       {
+        "id": "v1-cancel-a-project-restoration",
+        "title": "Cancel a project restoration",
+        "slug": "v1-cancel-a-project-restoration",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-project",
         "title": "Create a project",
         "slug": "v1-create-a-project",
@@ -382,15 +425,21 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-eligibility",
-        "title": "Get postgrest upgrade eligibility",
-        "slug": "v1-get-postgrest-upgrade-eligibility",
+        "id": "v1-get-postgres-upgrade-eligibility",
+        "title": "Get postgres upgrade eligibility",
+        "slug": "v1-get-postgres-upgrade-eligibility",
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-status",
-        "title": "Get postgrest upgrade status",
-        "slug": "v1-get-postgrest-upgrade-status",
+        "id": "v1-get-postgres-upgrade-status",
+        "title": "Get postgres upgrade status",
+        "slug": "v1-get-postgres-upgrade-status",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project",
+        "title": "Get project",
+        "slug": "v1-get-project",
         "type": "operation"
       },
       {
@@ -409,6 +458,24 @@
         "id": "v1-list-all-projects",
         "title": "List all projects",
         "slug": "v1-list-all-projects",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-available-restore-versions",
+        "title": "List available restore versions",
+        "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-pause-a-project",
+        "title": "Pause a project",
+        "slug": "v1-pause-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-a-project",
+        "title": "Restore a project",
+        "slug": "v1-restore-a-project",
         "type": "operation"
       },
       {
@@ -490,9 +557,21 @@
     "title": "Storage",
     "items": [
       {
+        "id": "v1-get-storage-config",
+        "title": "Get storage config",
+        "slug": "v1-get-storage-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-buckets",
         "title": "List all buckets",
         "slug": "v1-list-all-buckets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-storage-config",
+        "title": "Update storage config",
+        "slug": "v1-update-storage-config",
         "type": "operation"
       }
     ]

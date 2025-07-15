@@ -106,7 +106,7 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```bash
-        npm install @supabase/supabase-js
+      npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
@@ -124,12 +124,12 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```js
-        import { createClient } from '@supabase/supabase-js'
+      import { createClient } from '@supabase/supabase-js'
 
-        const supabase = createClient(
-          'https://<project>.supabase.co',
-          '<your-anon-key>'
-        )
+      const supabase = createClient(
+        'https://<project>.supabase.co',
+        '<your-anon-key>'
+      )
       ```
 
     </StepHikeCompact.Code>
@@ -152,17 +152,21 @@ In this example we'll set up a database table, secure it with Row Level Security
     <StepHikeCompact.Code>
 
       ```js
-        const channelA = supabase
-          .channel('schema-db-changes')
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-            },
-            (payload) => console.log(payload)
-          )
-          .subscribe()
+      import { createClient } from '@supabase/supabase-js'
+      const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+      // ---cut---
+      const channelA = supabase
+        .channel('schema-db-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+          },
+          (payload) => console.log(payload)
+        )
+        .subscribe()
       ```
 
     </StepHikeCompact.Code>
@@ -294,7 +298,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 
 The channel name can be any string except 'realtime'.
 
-### Listening to INSERT events
+### Listening to `INSERT` events
 
 <Tabs
   scrollable
@@ -387,7 +391,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 
 The channel name can be any string except 'realtime'.
 
-### Listening to UPDATE events
+### Listening to `UPDATE` events
 
 <Tabs
   scrollable
@@ -480,7 +484,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 
 The channel name can be any string except 'realtime'.
 
-### Listening to DELETE events
+### Listening to `DELETE` events
 
 <Tabs
   scrollable
@@ -832,7 +836,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "todos",
-  filter: "id=eq.1"
+  filter: .eq("id", value: 1)
 )
 
 await myChannel.subscribe()
@@ -883,7 +887,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 Realtime offers filters so you can specify the data your client receives at a more granular level.
 
-### Equal to (eq)
+### Equal to (`eq`)
 
 To listen to changes when a column's value in a table equals a client-specified value:
 
@@ -941,7 +945,7 @@ let changes = await myChannel.postgresChange(
   UpdateAction.self,
   schema: "public",
   table: "messages",
-  filter: "body=eq.hey"
+  filter: .eq("body", value: "hey")
 )
 
 await myChannel.subscribe()
@@ -990,7 +994,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `=` filter.
 
-### Not equal to (neq)
+### Not equal to (`neq`)
 
 To listen to changes when a column's value in a table does not equal a client-specified value:
 
@@ -1048,7 +1052,7 @@ let changes = await myChannel.postgresChange(
   UpdateAction.self,
   schema: "public",
   table: "messages",
-  filter: "body=neq.hey"
+  filter: .neq("body", value: "hey")
 )
 
 await myChannel.subscribe()
@@ -1098,7 +1102,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `!=` filter.
 
-### Less than (lt)
+### Less than (`lt`)
 
 To listen to changes when a column's value in a table is less than a client-specified value:
 
@@ -1156,7 +1160,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "profiles",
-  filter: "age=lt.65"
+  filter: .lt("age", value: 65)
 )
 
 await myChannel.subscribe()
@@ -1205,7 +1209,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `<` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### Less than or equal to (lte)
+### Less than or equal to (`lte`)
 
 To listen to changes when a column's value in a table is less than or equal to a client-specified value:
 
@@ -1263,7 +1267,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "profiles",
-  filter: "age=lte.65"
+  filter: .lte("age", value: 65)
 )
 
 await myChannel.subscribe()
@@ -1312,7 +1316,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres' `<=` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### Greater than (gt)
+### Greater than (`gt`)
 
 To listen to changes when a column's value in a table is greater than a client-specified value:
 
@@ -1370,7 +1374,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "products",
-  filter: "quantity=gt.10"
+  filter: .gt("quantity", value: 10)
 )
 
 await myChannel.subscribe()
@@ -1419,7 +1423,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 This filter uses Postgres's `>` filter, so it works for non-numeric types. Make sure to check the expected behavior of the compared data's type.
 
-### Greater than or equal to (gte)
+### Greater than or equal to (`gte`)
 
 To listen to changes when a column's value in a table is greater than or equal to a client-specified value:
 
@@ -1477,7 +1481,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "products",
-  filter: "quantity=gte.10"
+  filter: .gte("quantity", value: 10)
 )
 
 await myChannel.subscribe()
@@ -1584,7 +1588,7 @@ let changes = await myChannel.postgresChange(
   InsertAction.self,
   schema: "public",
   table: "products",
-  filter: "name=in.(red, blue, yellow)"
+  filter: .in("name", values: ["red", "blue", "yellow"])
 )
 
 await myChannel.subscribe()
@@ -1876,4 +1880,4 @@ Enter your database settings to estimate the maximum throughput for your instanc
 
 Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 
-We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, please reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
+We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.

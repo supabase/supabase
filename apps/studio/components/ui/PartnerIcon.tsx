@@ -1,5 +1,5 @@
 import { Organization } from 'types'
-import { cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface PartnerIconProps {
   organization: Pick<Organization, 'managed_by'>
@@ -46,8 +46,8 @@ function PartnerIcon({
     }
 
     return (
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
           <div
             className={cn(
               'bg-surface-100 dark:bg-surface-200 border rounded flex items-center justify-center hover:bg-surface-400 dark:hover:bg-surface-400 hover:border-stronger flex-shrink-0',
@@ -58,9 +58,9 @@ function PartnerIcon({
           >
             {icon}
           </div>
-        </TooltipTrigger_Shadcn_>
-        <TooltipContent_Shadcn_>{tooltipText}</TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+        </TooltipTrigger>
+        <TooltipContent>{tooltipText}</TooltipContent>
+      </Tooltip>
     )
   }
 

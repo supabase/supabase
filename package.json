@@ -1,56 +1,83 @@
 {
   "name": "supabase",
-  "description": "The open source Firebase alternative.",
+  "description": "The Postgres Development Platform.",
   "version": "0.0.0",
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
+    "build:cms": "turbo run build --filter=cms --parallel",
     "build:studio": "turbo run build --filter=studio",
     "build:design-system": "turbo run build --filter=design-system",
+    "build:docs": "turbo run build --filter=docs",
+    "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml}",
     "dev": "turbo run dev --parallel",
-    "dev:reference": "turbo run dev --filter=reference --parallel",
+    "dev:cms": "turbo run dev --filter=cms --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
+    "dev:studio-local": "pnpm setup:cli && NODE_ENV=test pnpm --prefix ./apps/studio dev",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "test:prettier": "prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
-    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\" \"packages/pg-meta/**/*.ts\"",
-    "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
-    "docker:up": "cd docker && docker compose up",
-    "docker:down": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
-    "docker:remove": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml rm -vfs",
+    "test:prettier": "prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
     "test:studio": "turbo run test --filter=studio",
     "test:studio:watch": "turbo run test --filter=studio -- watch",
-    "test:playwright": "npm --prefix playwright-tests run test",
+
+    "e2e": "pnpm --prefix e2e/studio run e2e",
+    "e2e:dev-hosted": "pnpm --prefix e2e/studio run e2e:dev-hosted",
+    "e2e:dev-selfhosted": "pnpm --prefix e2e/studio run e2e:dev-selfhosted",
+    "e2e:selfhosted": "pnpm --prefix e2e/studio run e2e:selfhosted",
+    "e2e:staging": "pnpm --prefix e2e/studio run e2e:staging",
+    "e2e:prod": "pnpm --prefix e2e/studio run e2e:prod",
+    "e2e:ci": "pnpm --prefix e2e/studio run e2e:ci",
+    "e2e:supabase:start": "pnpm --prefix e2e/studio run supabase:start",
+    "e2e:supabase:stop": "pnpm --prefix e2e/studio run supabase:stop",
+
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
+    "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
-    "api:codegen": "cd packages/api-types && npm run codegen"
+    "api:codegen": "cd packages/api-types && pnpm run codegen",
+    "knip": "pnpx knip@~5.50.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@types/node": "catalog:",
     "eslint": "^8.57.0",
-    "prettier": "^4.0.0-alpha.8",
+    "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
+    "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
-    "turbo": "2.0.4"
+    "supports-color": "^8.0.0",
+    "turbo": "2.3.3",
+    "typescript": "~5.5.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
+  "pnpm": {
+    "overrides": {
+      "@supabase/supabase-js>@supabase/auth-js": "catalog:",
+      "@tanstack/directive-functions-plugin>vite": "catalog:",
+      "@tanstack/react-start-plugin>vite": "catalog:",
+      "esbuild": "^0.25.2",
+      "payload>image-size": "1.2.1"
+    },
+    "neverBuiltDependencies": ["libpg-query"]
+  },
   "engines": {
-    "npm": "^10.0.0",
-    "node": "^20.0.0"
+    "pnpm": ">=9",
+    "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "npm@10.7.0"
+  "packageManager": "pnpm@9.15.5"
 }

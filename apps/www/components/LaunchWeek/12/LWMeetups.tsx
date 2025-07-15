@@ -87,7 +87,7 @@ const LWMeetups = ({ meetups, className }: { meetups?: Meetup[]; className?: str
       </div>
       <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-2 md:gap-x-3 gap-y-1">
         {meets &&
-          meets.map((meetup: Meetup, i: number) => {
+          meets?.map((meetup: Meetup, i: number) => {
             const startAt = new Date(meetup.start_at)
             const endAt = addHours(new Date(meetup.start_at), 3)
             const after = now > startAt

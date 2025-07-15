@@ -1,23 +1,21 @@
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from './useSelectedOrganization'
 
 export function useCurrentOrgPlan() {
   const currentOrg = useSelectedOrganization()
-  const { data, isLoading, isSuccess } = useOrgSubscriptionQuery({
-    orgSlug: currentOrg?.slug,
-  })
 
-  if (isLoading) {
+  if (!currentOrg) {
     return {
       plan: null,
-      isLoading,
+      usageBillingEnabled: null,
+      isLoading: true,
       isSuccess: false,
     }
   } else {
     return {
-      plan: data?.plan,
-      isLoading,
-      isSuccess,
+      plan: currentOrg?.plan,
+      usageBillingEnabled: currentOrg?.usage_billing_enabled,
+      isLoading: false,
+      isSuccess: true,
     }
   }
 }

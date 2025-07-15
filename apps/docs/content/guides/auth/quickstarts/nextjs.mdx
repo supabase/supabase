@@ -18,7 +18,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-     ```sql SQL_EDITOR
+     ```sql name=SQL_EDITOR
       select * from auth.users;
       ````
 
@@ -41,7 +41,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npx create-next-app -e with-supabase
       ```
 
@@ -52,13 +52,13 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.local.example` to `.env.local` and populate with [your project's URL and Anon Key](https://supabase.com/dashboard/project/_/settings/api).
+    Rename `.env.example` to `.env.local` and populate with [your project's URL and Anon Key](https://supabase.com/dashboard/project/_/settings/api).
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```text .env.local
+      ```text name=.env.local
         NEXT_PUBLIC_SUPABASE_URL=your-project-url
         NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
       ```
@@ -72,15 +72,13 @@ hideToc: true
 
     Start the development server, go to http://localhost:3000 in a browser, and you should see the contents of `app/page.tsx`.
 
-    To Sign Up a new user, navigate to http://localhost:3000/login, and click `Sign Up Now`.
-
-    Check out the [Supabase Auth docs](https://supabase.com/docs/guides/auth#authentication) for more authentication methods.
+    To sign up a new user, navigate to http://localhost:3000/sign-up, and click `Sign up`. *NOTE: .env.example must be renamed to .env.local before this route becomes available*
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm run dev
       ```
 
@@ -88,3 +86,8 @@ hideToc: true
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
+
+## Learn more
+
+- [Setting up Server-Side Auth for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs) for a Next.js deep dive
+- [Supabase Auth docs](https://supabase.com/docs/guides/auth#authentication) for more Supabase authentication methods

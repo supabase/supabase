@@ -1,4 +1,3 @@
-import { ProjectApiResponse } from 'data/config/project-api-query'
 import { StorageSizeUnits } from './StorageSettings.constants'
 
 const k = 1024
@@ -26,14 +25,20 @@ export const convertToBytes = (size: number, unit: StorageSizeUnits = StorageSiz
   return size * Math.pow(k, i)
 }
 
-export function getConnectionURL(projectRef: string, projectAPI?: ProjectApiResponse) {
-  if (projectAPI === undefined) return ''
-
-  const projUrl = projectAPI
-    ? `${projectAPI.autoApiService.protocol}://${projectAPI.autoApiService.endpoint}`
-    : `https://${projectRef}.supabase.co`
-
+function getStorageURL(projectRef: string, protocol: string, endpoint?: string) {
+  const projUrl = endpoint ? `${protocol}://${endpoint}` : `https://${projectRef}.supabase.co`
   const url = new URL(projUrl)
+  return url
+}
+
+export function getConnectionURL(projectRef: string, protocol: string, endpoint?: string) {
+  const url = getStorageURL(projectRef, protocol, endpoint)
   url.pathname = '/storage/v1/s3'
+  return url.toString()
+}
+
+export function getCatalogURI(projectRef: string, protocol: string, endpoint?: string) {
+  const url = getStorageURL(projectRef, protocol, endpoint)
+  url.pathname = '/storage/v1/iceberg'
   return url.toString()
 }

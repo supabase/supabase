@@ -1,4 +1,6 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
+import { ProjectLogStatsVariables } from 'data/analytics/project-log-stats-query'
+import { PlanId } from 'data/subscriptions/types'
 
 export interface Notification {
   category: 'info' | 'error' | 'success' | 'loading'
@@ -16,11 +18,12 @@ interface NotificationMetadata {
 }
 
 export interface ChartIntervals {
-  key: 'minutely' | 'hourly' | 'daily' | '5min' | '15min' | '1hr' | '1day' | '7day'
+  key: Exclude<ProjectLogStatsVariables['interval'], undefined>
   label: string
   startValue: number
   startUnit: 'minute' | 'hour' | 'day'
   format?: 'MMM D, h:mm:ssa' | 'MMM D, h:mma' | 'MMM D, ha' | 'MMM D'
+  availableIn?: PlanId[]
 }
 
 export interface VaultSecret {
@@ -29,7 +32,6 @@ export interface VaultSecret {
   description: string
   secret: string
   decryptedSecret?: string
-  key_id: string
   created_at: string
   updated_at: string
 }

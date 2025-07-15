@@ -10,6 +10,7 @@ const WHITELIST_ERRORS = [
   'Password should contain at least one character of each',
   'You attempted to send email to an inactive recipient',
   'email must be an email',
+  'Password is known to be weak and easy to guess, please choose a different one',
 ]
 
 export type SignUpVariables = {

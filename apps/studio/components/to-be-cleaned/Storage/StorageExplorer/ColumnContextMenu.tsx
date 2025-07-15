@@ -2,8 +2,10 @@ import { compact, uniqBy } from 'lodash'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ChevronRight, ChevronsDown, ChevronsUp, Clipboard, Eye, FolderPlus } from 'lucide-react'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
@@ -16,16 +18,17 @@ interface ColumnContextMenuProps {
 }
 
 const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
-  const storageExplorerStore = useStorageStore()
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const {
     columns,
     selectedItems,
     setSelectedItems,
-    setView,
     setSortBy,
     setSortByOrder,
     addNewFolderPlaceholder,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
+
+  const snap = useStorageExplorerStateSnapshot()
 
   const onSelectCreateFolder = (columnIndex = -1) => {
     addNewFolderPlaceholder(columnIndex)
@@ -57,11 +60,13 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
 
   return (
     <Menu id={id} animation="fade">
-      <Item onClick={({ props }) => onSelectCreateFolder(props.index)}>
-        <FolderPlus size="14" strokeWidth={1} />
-        <span className="ml-2 text-xs">New folder</span>
-      </Item>
-      <Separator />
+      {canUpdateFiles && [
+        <Item key="create-folder" onClick={({ props }) => onSelectCreateFolder(props.index)}>
+          <FolderPlus size="14" strokeWidth={1} />
+          <span className="ml-2 text-xs">New folder</span>
+        </Item>,
+        <Separator key="create-folder-separator" />,
+      ]}
       <Item onClick={({ props }) => onSelectAllItemsInColumn(props.index)}>
         <Clipboard size="14" strokeWidth={1} />
         <span className="ml-2 text-xs">Select all items</span>
@@ -75,10 +80,10 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
         }
         arrow={<ChevronRight size="14" strokeWidth={1} />}
       >
-        <Item onClick={() => setView(STORAGE_VIEWS.COLUMNS)}>
+        <Item onClick={() => snap.setView(STORAGE_VIEWS.COLUMNS)}>
           <span className="ml-2 text-xs">As columns</span>
         </Item>
-        <Item onClick={() => setView(STORAGE_VIEWS.LIST)}>
+        <Item onClick={() => snap.setView(STORAGE_VIEWS.LIST)}>
           <span className="ml-2 text-xs">As list</span>
         </Item>
       </Submenu>

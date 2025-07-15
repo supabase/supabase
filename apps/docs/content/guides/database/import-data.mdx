@@ -31,7 +31,7 @@ Supabase dashboard provides a user-friendly way to import data. However, for ver
 
 ### Option 2: Bulk import using pgloader
 
-[pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a PostgreSQL database that supports a wide range of source database engines, including MySQL and MS SQL.
+[pgloader](https://pgloader.io/) is a powerful tool for efficiently importing data into a Postgres database that supports a wide range of source database engines, including MySQL and MS SQL.
 
 You can use it in conjunction with Supabase by following these steps:
 
@@ -75,6 +75,7 @@ Read more about [Bulk data loading.](/docs/guides/database/tables#bulk-data-load
 The Supabase API allows you to programmatically import data into your tables. You can use various client libraries to interact with the API and perform data import operations. This approach is useful when you need to automate data imports, and it gives you fine-grained control over the process. Refer to our [API guide](/docs/guides/api) for more details.
 
 <Admonition type="note">
+
 When importing data via the Supabase API, it's advisable to refrain from bulk imports. This helps ensure a smooth data transfer process and prevents any potential disruptions.
 
 Read more about [Rate Limiting, Resource Allocation, & Abuse Prevention.](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention)
@@ -126,4 +127,4 @@ To build an index after the data import:
 create index index_name on table_name (column_name);
 ```
 
-Read more about [Managing Indexes in PostgreSQL](/docs/guides/database/postgres/indexes).
+Read more about [Managing Indexes in Postgres](/docs/guides/database/postgres/indexes).

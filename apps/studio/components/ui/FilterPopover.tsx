@@ -10,12 +10,12 @@ import {
   ScrollArea,
 } from 'ui'
 
-interface FilterPopoverProps {
+interface FilterPopoverProps<T> {
   title?: string
-  options: any[]
-  activeOptions: any[]
-  valueKey: string
-  labelKey: string
+  options: T[]
+  activeOptions: string[]
+  valueKey: keyof T
+  labelKey: keyof T
   iconKey?: string
   name: string
   variant?: 'rectangular' | 'rounded'
@@ -24,10 +24,11 @@ interface FilterPopoverProps {
   labelClass?: string
   maxHeightClass?: string
   clearButtonText?: string
+  className?: string
   onSaveFilters: (options: string[]) => void
 }
 
-export const FilterPopover = ({
+export const FilterPopover = <T extends Record<string, any>>({
   title,
   options = [],
   activeOptions = [],
@@ -39,10 +40,11 @@ export const FilterPopover = ({
   buttonType,
   disabled,
   labelClass,
+  className,
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
   onSaveFilters,
-}: FilterPopoverProps) => {
+}: FilterPopoverProps<T>) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
@@ -81,7 +83,7 @@ export const FilterPopover = ({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-44" align="start">
+      <PopoverContent_Shadcn_ className={cn('p-0 w-44', className)} align="start" portal={true}>
         <div className="border-b border-overlay bg-surface-200 rounded-t pb-1 px-3">
           <span className="text-xs text-foreground-light">
             {title ?? `Select ${name.toLowerCase()}`}
@@ -108,7 +110,7 @@ export const FilterPopover = ({
                   />
                   <Label_Shadcn_
                     htmlFor={option[valueKey]}
-                    className={cn('flex items-center gap-x-2', labelClass)}
+                    className={cn('flex items-center gap-x-2 text-xs', labelClass)}
                   >
                     {icon && (
                       <img
@@ -140,7 +142,7 @@ export const FilterPopover = ({
             type="primary"
             onClick={() => {
               // Order the selection based on the options provided
-              const sortingOrder = options.map((option) => option[valueKey])
+              const sortingOrder = options.map((option) => option[valueKey]) as string[]
               const sortedSelection = selectedOptions.sort(
                 (a, b) => sortingOrder.indexOf(a) - sortingOrder.indexOf(b)
               )

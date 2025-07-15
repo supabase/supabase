@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -24,7 +23,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
-import { ExternalLink, AlertCircle, AlertTriangle } from 'lucide-react'
+import { ExternalLink, AlertCircle } from 'lucide-react'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
@@ -42,7 +41,6 @@ const CustomDomainSidePanel = () => {
   const visible = panel === 'customDomain'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled custom domain`)
@@ -69,7 +67,7 @@ const CustomDomainSidePanel = () => {
   const availableOptions =
     (addons?.available_addons ?? []).find((addon) => addon.type === 'custom_domain')?.variants ?? []
 
-  const isFreePlan = subscription?.plan?.id === 'free'
+  const isFreePlan = organization?.plan?.id === 'free'
   const hasChanges = selectedOption !== (subscriptionCDOption?.variant.identifier ?? 'cd_none')
   const selectedCustomDomain = availableOptions.find(
     (option) => option.identifier === selectedOption
@@ -180,7 +178,9 @@ const CustomDomainSidePanel = () => {
                       Use the default supabase domain for your API
                     </p>
                     <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm">$0</p>
+                      <p className="text-foreground text-sm" translate="no">
+                        $0
+                      </p>
                       <p className="text-foreground-light translate-y-[1px]"> / month</p>
                     </div>
                   </div>
@@ -205,7 +205,9 @@ const CustomDomainSidePanel = () => {
                         Present a branded experience to your users
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                        <p className="text-foreground text-sm" translate="no">
+                          {formatCurrency(option.price)}
+                        </p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -215,60 +217,11 @@ const CustomDomainSidePanel = () => {
             </Radio.Group>
           </div>
 
-          {hasChanges && (
-            <>
-              {selectedOption === 'cd_none' ||
-              (selectedCustomDomain?.price ?? 0) < (subscriptionCDOption?.variant.price ?? 0)
-                ? subscription?.billing_via_partner === false &&
-                  // Old addon billing with upfront payment
-                  subscription.usage_based_billing_project_addons === false && (
-                    <p className="text-sm text-foreground-light">
-                      <span>
-                        Upon clicking confirm, the add-on is removed immediately and any unused time
-                        in the current billing cycle is added as prorated credits to your
-                        organization and used in subsequent billing cycles.
-                      </span>
-                    </p>
-                  )
-                : !subscription?.billing_via_partner && (
-                    <p className="text-sm text-foreground-light">
-                      {subscription?.usage_based_billing_project_addons === false ? (
-                        <span>
-                          Upon clicking confirm, the amount of{' '}
-                          <span className="text-foreground">
-                            {formatCurrency(selectedCustomDomain?.price)}
-                          </span>{' '}
-                          will be added to your monthly invoice. The addon is prepaid per month and
-                          in case of a downgrade, you get credits for the remaining time. For the
-                          current billing cycle you're immediately charged a prorated amount for the
-                          remaining days.
-                        </span>
-                      ) : (
-                        <span>
-                          There are no immediate charges. The addon is billed at the end of your
-                          billing cycle based on your usage and prorated to the hour.
-                        </span>
-                      )}
-                    </p>
-                  )}
-
-              {
-                // Billed via partner
-                subscription?.billing_via_partner &&
-                  // Project addons are still billed the old way (upfront payment)
-                  subscription?.usage_based_billing_project_addons === false &&
-                  // Scheduled billing plan change
-                  subscription.scheduled_plan_change?.target_plan !== undefined && (
-                    <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription_Shadcn_>
-                        You have a scheduled subscription change that will be canceled if you change
-                        your custom domain add on.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )
-              }
-            </>
+          {hasChanges && selectedOption !== 'cd_none' && (
+            <p className="text-sm text-foreground-light">
+              There are no immediate charges. The addon is billed at the end of your billing cycle
+              based on your usage and prorated to the hour.
+            </p>
           )}
 
           {isFreePlan && (
@@ -278,7 +231,9 @@ const CustomDomainSidePanel = () => {
               title="Custom domains are unavailable on the Free Plan"
               actions={
                 <Button asChild type="default">
-                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                  <Link
+                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=customDomainSidePanel`}
+                  >
                     View available plans
                   </Link>
                 </Button>

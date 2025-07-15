@@ -1,53 +1,45 @@
-import {
-  AccountInformation,
-  AnalyticsSettings,
-  ThemeSettings,
-  ThemeSettingsOld,
-} from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
+import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
+import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
+import { AccountConnections } from 'components/interfaces/Account/Preferences/AccountConnections'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
+import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
-  return (
-    <div className="my-2">
-      <ProfileCard />
-    </div>
-  )
+  return <ProfileCard />
 }
 
 User.getLayout = (page) => (
-  <AccountLayout
-    title="Preferences"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Preferences',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <OrganizationLayout>
+        <AccountLayout title="Preferences">
+          <AccountSettingsLayout>{page}</AccountSettingsLayout>
+        </AccountLayout>
+      </OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default User
 
 const ProfileCard = () => {
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
-
-  const { profile, error, isLoading, isError, isSuccess } = useProfile()
-
-  const experimentalThemeEnabled = useFlag('enableExperimentalTheme')
+  const { error, isLoading, isError, isSuccess } = useProfile()
 
   return (
-    <article className="max-w-4xl p-4">
+    <article>
       {isLoading && (
         <Panel>
           <div className="p-4">
@@ -64,14 +56,18 @@ const ProfileCard = () => {
       )}
       {isSuccess && (
         <>
-          <section>
-            <AccountInformation profile={profile} />
-          </section>
-          {profileUpdateEnabled && isSuccess ? <ProfileInformation profile={profile!} /> : null}
+          {profileUpdateEnabled && isSuccess ? <ProfileInformation /> : null}
+          <AccountIdentities />
         </>
       )}
 
-      <section>{experimentalThemeEnabled ? <ThemeSettings /> : <ThemeSettingsOld />}</section>
+      <section>
+        <AccountConnections />
+      </section>
+
+      <section>
+        <ThemeSettings />
+      </section>
 
       <section>
         <AnalyticsSettings />

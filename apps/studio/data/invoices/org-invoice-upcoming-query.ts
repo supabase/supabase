@@ -18,6 +18,7 @@ export type UpcomingInvoiceResponse = {
   billing_cycle_start: string
   lines: {
     amount: number
+    amount_before_discount: number
     description: string
     proration: boolean
     period: { start: string; end: string }
@@ -27,11 +28,16 @@ export type UpcomingInvoiceResponse = {
     usage_based: boolean
     usage_metric?: PricingMetric
     usage_original?: number
-    breakdown: {
+    breakdown?: {
       project_ref: string
       project_name: string
       usage: number
+      amount?: number
     }[]
+    metadata?: {
+      is_branch: boolean
+      is_read_replica: boolean
+    }
   }[]
 }
 
@@ -50,6 +56,7 @@ export async function getUpcomingInvoice(
   })
 
   if (error) handleError(error)
+
   return data as unknown as UpcomingInvoiceResponse
 }
 

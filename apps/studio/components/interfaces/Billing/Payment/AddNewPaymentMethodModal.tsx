@@ -11,6 +11,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
+import { getStripeElementsAppearanceOptions } from './Payment.utils'
 
 interface AddNewPaymentMethodModalProps {
   visible: boolean
@@ -18,6 +19,7 @@ interface AddNewPaymentMethodModalProps {
   onCancel: () => void
   onConfirm: () => void
   showSetDefaultCheckbox?: boolean
+  autoMarkAsDefaultPaymentMethod?: boolean
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -28,6 +30,7 @@ const AddNewPaymentMethodModal = ({
   onCancel,
   onConfirm,
   showSetDefaultCheckbox,
+  autoMarkAsDefaultPaymentMethod,
 }: AddNewPaymentMethodModalProps) => {
   const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
@@ -88,7 +91,7 @@ const AddNewPaymentMethodModal = ({
 
   const options = {
     clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
+    appearance: getStripeElementsAppearanceOptions(resolvedTheme),
   } as any
 
   const onLocalCancel = () => {
@@ -140,6 +143,7 @@ const AddNewPaymentMethodModal = ({
             onCancel={onLocalCancel}
             onConfirm={onLocalConfirm}
             showSetDefaultCheckbox={showSetDefaultCheckbox}
+            autoMarkAsDefaultPaymentMethod={autoMarkAsDefaultPaymentMethod}
           />
         </Elements>
       </Modal>

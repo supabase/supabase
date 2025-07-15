@@ -33,8 +33,6 @@ const DetailedJsonRow = ({
 export const WarehouseSelectionRenderer = ({ log }: any) => {
   return (
     <div className="overflow-hidden overflow-x-auto space-y-6">
-      <pre>{JSON.stringify(log, null, 2)}</pre>
-      <hr />
       {Object.entries(log).map(([key, value], index) => {
         return (
           <div

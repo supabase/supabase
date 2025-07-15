@@ -27,6 +27,8 @@ connection_string.../postgres?KEY1=VALUE&KEY2=VALUE&KEY3=VALUE
 
 # Errors
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ## ... prepared statement already exists
 
 Supavisor in transaction mode (port 6543) does not support [prepared statements](https://www.postgresql.org/docs/current/sql-prepare.html), which Prisma will try to create in the background.
@@ -54,7 +56,7 @@ Prisma couldn't establish a connection with Postgres or Supavisor before the tim
 ### Solutions: [#solution-cant-reach-database-server-at]
 
 - **Check database health**: Use the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database) to monitor CPU, memory, and I/O usage. If the database is overloaded, consider increasing your [compute size](https://supabase.com/docs/guides/platform/compute-add-ons) or [optimizing your queries](https://supabase.com/docs/guides/database/query-optimization).
-- **Verify connection string**: Double-check the connection string in your Prisma configuration to ensure it matches one in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+- **Verify connection string**: Double-check the connection string in your Prisma configuration to ensure it matches in your [project connect page](https://supabase.com/dashboard/project/_?showConnect=true).
 - **Increase connection timeout**: Try increasing the `connect_timeout` parameter in your Prisma configuration to give it more time to establish a connection.
 
 ```md
@@ -69,7 +71,7 @@ Prisma is unable to allocate connections to pending queries fast enough to meet 
 
 ### Possible causes: [#possible-causes-timed-out-fetching-a-new-connection]
 
-- **Overwhelmed server**: The server hosting Prisma is under heavy load, limiting its ability to manage connections. By default, Prisma will create the default `2 * num_cpus / 2` worth of connections. A common cause for server strain is increasing the `connection_limit` significantly past the default.
+- **Overwhelmed server**: The server hosting Prisma is under heavy load, limiting its ability to manage connections. By default, Prisma will create the default `num_cpus * 2 + 1` worth of connections. A common cause for server strain is increasing the `connection_limit` significantly past the default.
 - **Insufficient pool size**: The Supavisor pooler does not have enough connections available to quickly satisfy Prisma's requests.
 - **Slow queries**: Prisma's queries are taking too long to execute, preventing it from releasing connections for reuse.
 
@@ -162,7 +164,7 @@ An alternative strategy to reference these tables is to duplicate values into Pr
 
 <details>
 	<summary>Show/Hide Details</summary>
-  
+
     ```sql table_in_public
     -- Create the 'profiles' table in the 'public' schema
     create table public.profiles (

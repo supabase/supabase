@@ -1,35 +1,28 @@
 import { AuditLogs } from 'components/interfaces/Account'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
+import { cn } from 'ui'
 
-const User: NextPageWithLayout = () => {
+const Audit: NextPageWithLayout = () => {
   return (
-    <ScaffoldContainerLegacy className="gap-0">
-      <div className="flex items-center justify-between">
-        <FormHeader
-          title="Account audit logs"
-          description="View the audit log trail of actions made from your account"
-        />
-      </div>
+    <ScaffoldContainer className={cn('[&>div]:mt-8')}>
       <AuditLogs />
-    </ScaffoldContainerLegacy>
+    </ScaffoldContainer>
   )
 }
 
-User.getLayout = (page) => (
-  <AccountLayout
-    title="Preferences"
-    breadcrumbs={[
-      {
-        key: `supabase-settings`,
-        label: 'Preferences',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
+Audit.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <OrganizationLayout>
+        <AccountLayout title="Audit Logs">{page}</AccountLayout>
+      </OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
-export default User
+export default Audit

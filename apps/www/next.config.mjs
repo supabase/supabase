@@ -9,7 +9,7 @@ import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
 
 import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 import { withContentlayer } from 'next-contentlayer2'
 
@@ -42,13 +42,26 @@ const withBundleAnalyzer = bundleAnalyzer({
  */
 const nextConfig = {
   basePath: '',
+  assetPrefix: getAssetPrefix(),
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'icons',
+    'api-types',
+    // needed to make the octokit packages work in /changelog
+    '@octokit/plugin-paginate-graphql',
+  ],
+  experimental: {
+    // needed to make the octokit packages work in /changelog
+    esmExternals: 'loose',
+  },
   reactStrictMode: true,
-  swcMinify: true,
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns,
   },
   async headers() {
@@ -57,16 +70,37 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
-            key: 'Strict-Transport-Security',
-            value: '',
-          },
-          {
             key: 'X-Robots-Tag',
             value: 'all',
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
+      {
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+                ? 'max-age=31536000; includeSubDomains; preload'
+                : '',
           },
         ],
       },
@@ -84,7 +118,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    // We are already running linting via GH action, this will skip linting during production build on Vercel.
     ignoreDuringBuilds: true,
   },
 }
@@ -93,4 +127,18 @@ const nextConfig = {
 export default () => {
   const plugins = [withContentlayer, withMDX, withBundleAnalyzer]
   return plugins.reduce((acc, next) => next(acc), nextConfig)
+}
+
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
+
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  return `https://frontend-assets.supabase.com/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }

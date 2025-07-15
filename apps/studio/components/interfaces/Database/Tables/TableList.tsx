@@ -1,4 +1,4 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import {
@@ -30,12 +30,12 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
+import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -49,9 +49,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
@@ -59,9 +59,9 @@ import { formatAllEntities } from './Tables.utils'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: any) => void
-  onDeleteTable: (table: any) => void
-  onDuplicateTable: (table: any) => void
+  onEditTable: (table: PostgresTable) => void
+  onDeleteTable: (table: PostgresTable) => void
+  onDuplicateTable: (table: PostgresTable) => void
 }
 
 const TableList = ({
@@ -73,6 +73,8 @@ const TableList = ({
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
+
+  const prefetchEditorTablePage = usePrefetchEditorTablePage()
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
@@ -182,7 +184,7 @@ const TableList = ({
     (x) => visibleTypes.includes(x.type)
   )
 
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
@@ -200,86 +202,92 @@ const TableList = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 flex-wrap">
-        <SchemaSelector
-          className="w-[260px]"
-          size="small"
-          showError={false}
-          selectedSchemaName={selectedSchema}
-          onSelectSchema={setSelectedSchema}
-        />
-        <Popover_Shadcn_>
-          <PopoverTrigger_Shadcn_ asChild>
-            <Button
-              type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-              className="py-4 px-2"
-              icon={<Filter />}
-            />
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
-            <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-              <p className="text-xs">Show entity types</p>
-              <div className="flex flex-col">
-                {Object.entries(ENTITY_TYPE).map(([key, value]) => (
-                  <div key={key} className="group flex items-center justify-between py-0.5">
-                    <div className="flex items-center gap-x-2">
-                      <Checkbox_Shadcn_
-                        id={key}
-                        name={key}
-                        checked={visibleTypes.includes(value)}
-                        onCheckedChange={() => {
-                          if (visibleTypes.includes(value)) {
-                            setVisibleTypes(visibleTypes.filter((y) => y !== value))
-                          } else {
-                            setVisibleTypes(visibleTypes.concat([value]))
-                          }
-                        }}
-                      />
-                      <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
-                        {key.toLowerCase().replace('_', ' ')}
-                      </Label_Shadcn_>
+    <div className="flex flex-col gap-y-4">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
+        <div className="flex gap-2 items-center">
+          <SchemaSelector
+            className="flex-grow lg:flex-grow-0 w-[180px]"
+            size="tiny"
+            showError={false}
+            selectedSchemaName={selectedSchema}
+            onSelectSchema={setSelectedSchema}
+          />
+          <Popover_Shadcn_>
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button
+                size="tiny"
+                type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                className="px-1"
+                icon={<Filter />}
+              />
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center" portal={true}>
+              <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
+                <p className="text-xs">Show entity types</p>
+                <div className="flex flex-col">
+                  {Object.entries(ENTITY_TYPE).map(([key, value]) => (
+                    <div key={key} className="group flex items-center justify-between py-0.5">
+                      <div className="flex items-center gap-x-2">
+                        <Checkbox_Shadcn_
+                          id={key}
+                          name={key}
+                          checked={visibleTypes.includes(value)}
+                          onCheckedChange={() => {
+                            if (visibleTypes.includes(value)) {
+                              setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                            } else {
+                              setVisibleTypes(visibleTypes.concat([value]))
+                            }
+                          }}
+                        />
+                        <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                          {key.toLowerCase().replace('_', ' ')}
+                        </Label_Shadcn_>
+                      </div>
+                      <Button
+                        size="tiny"
+                        type="default"
+                        onClick={() => setVisibleTypes([value])}
+                        className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
+                      >
+                        Select only
+                      </Button>
                     </div>
-                    <Button
-                      size="tiny"
-                      type="default"
-                      onClick={() => setVisibleTypes([value])}
-                      className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
-                    >
-                      Select only
-                    </Button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+        </div>
+        <div className="flex flex-grow justify-between gap-2 items-center">
+          <Input
+            size="tiny"
+            className="flex-grow lg:flex-grow-0 w-52"
+            placeholder="Search for a table"
+            value={filterString}
+            onChange={(e) => setFilterString(e.target.value)}
+            icon={<Search size={12} />}
+          />
 
-        <Input
-          size="small"
-          className="w-64"
-          placeholder="Search for a table"
-          value={filterString}
-          onChange={(e: any) => setFilterString(e.target.value)}
-          icon={<Search size={12} />}
-        />
-
-        {!isLocked && (
-          <ButtonTooltip
-            className="ml-auto"
-            icon={<Plus />}
-            disabled={!canUpdateTables}
-            onClick={() => onAddTable()}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: 'You need additional permissions to create tables',
-              },
-            }}
-          >
-            New table
-          </ButtonTooltip>
-        )}
+          {!isLocked && (
+            <ButtonTooltip
+              className="w-auto ml-auto"
+              icon={<Plus />}
+              disabled={!canUpdateTables}
+              onClick={() => onAddTable()}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdateTables
+                    ? 'You need additional permissions to create tables'
+                    : undefined,
+                },
+              }}
+            >
+              New table
+            </ButtonTooltip>
+          )}
+        </div>
       </div>
 
       {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
@@ -289,7 +297,7 @@ const TableList = ({
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <div className="my-4 w-full">
+        <div className="w-full">
           <Table
             head={[
               <Table.th key="icon" className="!px-0" />,
@@ -358,8 +366,8 @@ const TableList = ({
                   entities.map((x) => (
                     <Table.tr key={x.id}>
                       <Table.td className="!pl-5 !pr-1">
-                        <Tooltip_Shadcn_>
-                          <TooltipTrigger_Shadcn_ asChild>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
                             {x.type === ENTITY_TYPE.TABLE ? (
                               <Table2
                                 size={15}
@@ -379,9 +387,11 @@ const TableList = ({
                                   x.type === ENTITY_TYPE.FOREIGN_TABLE &&
                                     'text-yellow-900 bg-yellow-500',
                                   x.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                                    'text-purple-1000 bg-purple-500',
-                                  x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                                    'text-foreground-light bg-border-stronger'
+                                    'text-purple-1000 bg-purple-500'
+                                  // [Alaister]: tables endpoint doesn't distinguish between tables and partitioned tables
+                                  // once we update the endpoint to include partitioned tables, we can uncomment this
+                                  // x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                                  //   'text-foreground-light bg-border-stronger'
                                 )}
                               >
                                 {Object.entries(ENTITY_TYPE)
@@ -389,36 +399,25 @@ const TableList = ({
                                   ?.toUpperCase()}
                               </div>
                             )}
-                          </TooltipTrigger_Shadcn_>
-                          <TooltipContent_Shadcn_ side="bottom" className="capitalize">
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="capitalize">
                             {formatTooltipText(x.type)}
-                          </TooltipContent_Shadcn_>
-                        </Tooltip_Shadcn_>
+                          </TooltipContent>
+                        </Tooltip>
                       </Table.td>
                       <Table.td>
                         {/* only show tooltips if required, to reduce noise */}
                         {x.name.length > 20 ? (
-                          <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-                            <Tooltip.Trigger
+                          <Tooltip disableHoverableContent={true}>
+                            <TooltipTrigger
                               asChild
                               className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
                             >
                               <p>{x.name}</p>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                                    'border border-scale-200',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">{x.name}</span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
+                            </TooltipTrigger>
+
+                            <TooltipContent side="bottom">{x.name}</TooltipContent>
+                          </Tooltip>
                         ) : (
                           <p>{x.name}</p>
                         )}
@@ -439,9 +438,7 @@ const TableList = ({
                         {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
                       </Table.td>
                       <Table.td className="hidden xl:table-cell text-center">
-                        {(realtimePublication?.tables ?? []).find(
-                          (table: any) => table.id === x.id
-                        ) ? (
+                        {(realtimePublication?.tables ?? []).find((table) => table.id === x.id) ? (
                           <div className="flex justify-center">
                             <Check size={18} strokeWidth={2} className="text-brand" />
                           </div>
@@ -476,6 +473,9 @@ const TableList = ({
                                   onClick={() =>
                                     router.push(`/project/${project?.ref}/editor/${x.id}`)
                                   }
+                                  onMouseEnter={() =>
+                                    prefetchEditorTablePage({ id: x.id ? String(x.id) : undefined })
+                                  }
                                 >
                                   <Eye size={12} />
                                   <p>View in Table Editor</p>
@@ -484,8 +484,8 @@ const TableList = ({
                                 {x.type === ENTITY_TYPE.TABLE && (
                                   <>
                                     <DropdownMenuSeparator />
-                                    <Tooltip_Shadcn_>
-                                      <TooltipTrigger_Shadcn_ asChild>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
                                         <DropdownMenuItem
                                           className="!pointer-events-auto gap-x-2"
                                           disabled={!canUpdateTables}
@@ -496,13 +496,13 @@ const TableList = ({
                                           <Edit size={12} />
                                           <p>Edit table</p>
                                         </DropdownMenuItem>
-                                      </TooltipTrigger_Shadcn_>
+                                      </TooltipTrigger>
                                       {!canUpdateTables && (
-                                        <TooltipContent_Shadcn_ side="left">
+                                        <TooltipContent side="left">
                                           You need additional permissions to edit this table
-                                        </TooltipContent_Shadcn_>
+                                        </TooltipContent>
                                       )}
-                                    </Tooltip_Shadcn_>
+                                    </Tooltip>
                                     <DropdownMenuItem
                                       key="duplicate-table"
                                       className="space-x-2"
@@ -516,8 +516,8 @@ const TableList = ({
                                       <Copy size={12} />
                                       <span>Duplicate Table</span>
                                     </DropdownMenuItem>
-                                    <Tooltip_Shadcn_>
-                                      <TooltipTrigger_Shadcn_ asChild>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
                                         <DropdownMenuItem
                                           disabled={!canUpdateTables || isLocked}
                                           className="!pointer-events-auto gap-x-2"
@@ -533,13 +533,13 @@ const TableList = ({
                                           <Trash stroke="red" size={12} />
                                           <p>Delete table</p>
                                         </DropdownMenuItem>
-                                      </TooltipTrigger_Shadcn_>
+                                      </TooltipTrigger>
                                       {!canUpdateTables && (
-                                        <TooltipContent_Shadcn_ side="left">
+                                        <TooltipContent side="left">
                                           You need additional permissions to delete tables
-                                        </TooltipContent_Shadcn_>
+                                        </TooltipContent>
                                       )}
-                                    </Tooltip_Shadcn_>
+                                    </Tooltip>
                                   </>
                                 )}
                               </DropdownMenuContent>

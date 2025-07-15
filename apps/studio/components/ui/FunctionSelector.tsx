@@ -112,7 +112,7 @@ const FunctionSelector = ({
                 </div>
               ) : (
                 <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">Choose a function...</p>
+                  <p className="text-foreground-lighter">Select a function</p>
                 </div>
               )}
             </Button>
@@ -124,7 +124,7 @@ const FunctionSelector = ({
                 <CommandEmpty_Shadcn_>No functions found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(functions || []).length > 7 ? 'h-[210px]' : ''}>
-                    {!(functions || []).length && (
+                    {!functions.length && (
                       <CommandItem_Shadcn_
                         key="no-function-found"
                         disabled={true}
@@ -133,7 +133,7 @@ const FunctionSelector = ({
                         {noResultsLabel}
                       </CommandItem_Shadcn_>
                     )}
-                    {functions?.map((func) => (
+                    {functions.map((func) => (
                       <CommandItem_Shadcn_
                         key={func.id}
                         value={func.name.replaceAll('"', '')}

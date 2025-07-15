@@ -8,7 +8,7 @@ export interface AuthorizeRequesterDetailsProps {
   scopes: OAuthScope[]
 }
 
-const ScopeSection = ({
+export const ScopeSection = ({
   description,
   hasReadScope,
   hasWriteScope,
@@ -78,6 +78,11 @@ const AuthorizeRequesterDetails = ({
           <span className="text-amber-900">selected organization and all of its projects.</span>
         </p>
         <div className="pt-2">
+          <ScopeSection
+            description="access to analytics logs."
+            hasReadScope={scopes.includes(OAuthScope.ANALYTICS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_WRITE)}
+          />
           <ScopeSection
             description="access to auth configurations and SSO providers."
             hasReadScope={scopes.includes(OAuthScope.AUTH_READ)}

@@ -5,6 +5,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { TimestampInfo } from 'ui-patterns'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -12,7 +13,7 @@ interface EdgeFunctionSecretProps {
 }
 
 const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps) => {
-  const canUpdateSecrets = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const canUpdateSecrets = useCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
   // [Joshen] Following API's validation:
   // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
   const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
@@ -23,11 +24,21 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
         <p className="truncate py-2">{secret.name}</p>
       </Table.td>
       <Table.td>
-        <div className="flex items-center space-x-2">
-          <p className="font-mono text-sm truncate" title={secret.value}>
-            {secret.value}
-          </p>
-        </div>
+        <p className="font-mono text-sm max-w-96 truncate" title={secret.value}>
+          {secret.value}
+        </p>
+      </Table.td>
+      <Table.td>
+        {!!secret.updated_at ? (
+          <TimestampInfo
+            displayAs="utc"
+            utcTimestamp={secret.updated_at}
+            labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+            className="!text-sm"
+          />
+        ) : (
+          '-'
+        )}
       </Table.td>
       <Table.td>
         <div className="flex items-center justify-end">
@@ -42,7 +53,9 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
                 side: 'bottom',
                 text: isReservedSecret
                   ? 'This is a reserved secret and cannot be deleted'
-                  : 'You need additional permissions to delete edge function secrets',
+                  : !canUpdateSecrets
+                    ? 'You need additional permissions to delete edge function secrets'
+                    : undefined,
               },
             }}
           />

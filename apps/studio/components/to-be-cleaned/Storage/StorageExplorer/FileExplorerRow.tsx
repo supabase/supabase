@@ -1,14 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
-import { useContextMenu } from 'react-contexify'
-import SVG from 'react-inlinesvg'
-
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   AlertCircle,
   Clipboard,
@@ -23,8 +14,19 @@ import {
   Music,
   Trash2,
 } from 'lucide-react'
+import { useContextMenu } from 'react-contexify'
+import SVG from 'react-inlinesvg'
+
+import { useParams } from 'common'
+import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { BASE_PATH } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { toast } from 'sonner'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,6 +36,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   CONTEXT_MENU_KEYS,
@@ -44,8 +49,9 @@ import {
 } from '../Storage.constants'
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
-import { copyPathToFolder } from './StorageExplorer.utils'
+import { copyPathToFolder, downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
+import { useSelectedBucket } from './useSelectedBucket'
 
 export const RowIcon = ({
   view,
@@ -99,7 +105,6 @@ export interface FileExplorerRowProps {
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
   openedFolders: StorageItem[]
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
 }
 
 const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
@@ -109,29 +114,28 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   columnIndex = 0,
   selectedItems = [],
   openedFolders = [],
-  selectedFilePreview,
 }) => {
-  const storageExplorerStore = useStorageStore()
+  const { ref: projectRef, bucketId } = useParams()
+  const { bucket } = useSelectedBucket()
+
   const {
-    getFileUrl,
+    selectedBucket,
+    selectedFilePreview,
     popColumnAtIndex,
     pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
-    setFilePreview,
-    closeFilePreview,
     clearSelectedItems,
-    selectedBucket,
+    setSelectedFilePreview,
+    setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemToRename,
     setSelectedItemsToMove,
-    setSelectedFileCustomExpiry,
     fetchFolderContents,
-    downloadFile,
     downloadFolder,
     selectRangeItems,
-  } = storageExplorerStore
-  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
+  } = useStorageExplorerStateSnapshot()
+  const { onCopyUrl } = useCopyUrl()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -139,23 +143,30 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const { show } = useContextMenu()
 
   const onSelectFile = async (columnIndex: number, file: StorageItem) => {
     popColumnAtIndex(columnIndex)
     popOpenedFoldersAtIndex(columnIndex - 1)
-    setFilePreview(itemWithColumnIndex)
+    setSelectedFilePreview(itemWithColumnIndex)
     clearSelectedItems()
   }
 
   const onSelectFolder = async (columnIndex: number, folder: StorageItem) => {
-    closeFilePreview()
+    if (!bucket) return toast.error('Unable to retrieve bucket details')
+
+    setSelectedFilePreview(undefined)
     clearSelectedItems(columnIndex + 1)
     popOpenedFoldersAtIndex(columnIndex - 1)
     pushOpenedFolderAtIndex(folder, columnIndex)
-    await fetchFolderContents(folder.id, folder.name, columnIndex)
+    await fetchFolderContents({
+      bucketId: bucket.id,
+      folderId: folder.id,
+      folderName: folder.name,
+      index: columnIndex,
+    })
   }
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
@@ -171,7 +182,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     } else {
       setSelectedItems([...selectedItems, itemWithColumnIndex])
     }
-    closeFilePreview()
+    setSelectedFilePreview(undefined)
   }
 
   const rowOptions =
@@ -215,8 +226,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                       {
                         name: 'Get URL',
                         icon: <Clipboard size={14} strokeWidth={1} />,
-                        onClick: () =>
-                          onCopyUrl(itemWithColumnIndex.name, getFileUrl(itemWithColumnIndex)),
+                        onClick: () => onCopyUrl(itemWithColumnIndex.name),
                       },
                     ]
                   : [
@@ -227,30 +237,21 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                           {
                             name: 'Expire in 1 week',
                             onClick: () =>
-                              onCopyUrl(
-                                itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
-                              ),
+                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.WEEK),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: () =>
-                              onCopyUrl(
-                                itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
-                              ),
+                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.MONTH),
                           },
                           {
                             name: 'Expire in 1 year',
                             onClick: () =>
-                              onCopyUrl(
-                                itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
-                              ),
+                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.YEAR),
                           },
                           {
                             name: 'Custom expiry',
-                            onClick: async () => setSelectedFileCustomExpiry(itemWithColumnIndex),
+                            onClick: () => setSelectedFileCustomExpiry(itemWithColumnIndex),
                           },
                         ],
                       },
@@ -270,7 +271,13 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                       {
                         name: 'Download',
                         icon: <Download size={14} strokeWidth={1} />,
-                        onClick: async () => await downloadFile(itemWithColumnIndex),
+                        onClick: async () => {
+                          await downloadFile({
+                            projectRef,
+                            bucketId,
+                            file: itemWithColumnIndex,
+                          })
+                        },
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
@@ -327,13 +334,13 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
       }}
     >
       <div
-        className={[
+        className={cn(
           'storage-row group flex h-full items-center px-2.5',
           'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
           `${isOpened ? 'bg-surface-200' : ''}`,
           `${isPreviewed ? 'bg-green-500 hover:bg-green-500' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
-        ].join(' ')}
+          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+        )}
         onClick={(event) => {
           event.stopPropagation()
           event.preventDefault()
@@ -345,10 +352,10 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
         }}
       >
         <div
-          className={[
+          className={cn(
             'flex items-center',
-            view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]',
-          ].join(' ')}
+            view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
+          )}
         >
           <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
             {!isSelected && (
@@ -382,26 +389,14 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
             {item.name}
           </p>
           {item.isCorrupted && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip>
+              <TooltipTrigger>
                 <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      File is corrupted, please delete and reupload again.
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                File is corrupted, please delete and reupload again.
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
 
@@ -430,7 +425,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
               strokeWidth={2}
             />
           ) : (
-            <DropdownMenu modal={false}>
+            <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
                   <MoreVertical size={16} strokeWidth={2} />

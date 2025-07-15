@@ -1,14 +1,15 @@
 import { Transition } from '@headlessui/react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isEmpty } from 'lodash'
 import { AlertCircle, ChevronDown, Clipboard, Download, Loader, Trash2, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
+import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   DropdownMenu,
@@ -17,27 +18,36 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { StorageItem } from '../Storage.types'
+import { downloadFile } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
+import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 
-const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?: string }) => {
-  if (!mimeType || !previewUrl) {
-    return (
-      <SVG
-        src={`${BASE_PATH}/img/file-filled.svg`}
-        preProcessor={(code) =>
-          code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
-        }
-      />
-    )
-  }
-  if (previewUrl === 'loading') {
+const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
+
+const PreviewFile = ({ item }: { item: StorageItem }) => {
+  const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
+
+  const { data: previewUrl, isLoading } = useFetchFileUrlQuery({
+    file: item,
+    projectRef: projectRef,
+    bucket: selectedBucket,
+  })
+
+  // if the size is not available, we set it to be greater than the max size
+  const size = +(item.metadata?.size ?? PREVIEW_SIZE_LIMIT + 1)
+  const mimeType = item.metadata?.mimetype
+
+  const isSkipped = !!mimeType && !!size && size > PREVIEW_SIZE_LIMIT
+
+  if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
         <Loader size={14} strokeWidth={2} className="animate-spin" />
       </div>
     )
   }
-  if (previewUrl === 'skipped') {
+  if (isSkipped) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
         <SVG
@@ -52,6 +62,17 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?:
       </div>
     )
   }
+  if (!mimeType || !previewUrl) {
+    return (
+      <SVG
+        src={`${BASE_PATH}/img/file-filled.svg`}
+        preProcessor={(code) =>
+          code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
+        }
+      />
+    )
+  }
+
   if (mimeType.includes('image')) {
     return (
       <div
@@ -95,23 +116,20 @@ const PreviewFile = ({ mimeType, previewUrl }: { mimeType?: string; previewUrl?:
 }
 
 const PreviewPane = () => {
-  const storageExplorerStore = useStorageStore()
+  const { ref: projectRef, bucketId } = useParams()
+
   const {
-    getFileUrl,
-    downloadFile,
     selectedBucket,
     selectedFilePreview: file,
-    closeFilePreview,
     setSelectedItemsToDelete,
+    setSelectedFilePreview,
     setSelectedFileCustomExpiry,
-  } = storageExplorerStore
-  const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
+  } = useStorageExplorerStateSnapshot()
+  const { onCopyUrl } = useCopyUrl()
 
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  if (!file) {
-    return null
-  }
+  if (!file) return null
 
   const width = 450
   const isOpen = !isEmpty(file)
@@ -131,26 +149,21 @@ const PreviewPane = () => {
         leaveFrom="transform opacity-100"
         leaveTo="transform opacity-0"
       >
-        <div
-          className="
-        h-full border-l
-        border-overlay bg-surface-100 p-4"
-          style={{ width }}
-        >
+        <div className="h-full border-l border-overlay bg-surface-100 p-4" style={{ width }}>
           {/* Preview Header */}
           <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
             <X
               className="cursor-pointer"
               size={14}
               strokeWidth={2}
-              onClick={() => closeFilePreview()}
+              onClick={() => setSelectedFilePreview(undefined)}
             />
           </div>
 
           {/* Preview Thumbnail*/}
           <div className="my-4 border border-overlay">
             <div className="flex h-56 w-full items-center 2xl:h-72">
-              <PreviewFile mimeType={mimeType} previewUrl={file.previewUrl} />
+              <PreviewFile item={file} />
             </div>
           </div>
 
@@ -192,7 +205,7 @@ const PreviewPane = () => {
                 type="default"
                 icon={<Download size={16} strokeWidth={2} />}
                 disabled={file.isCorrupted}
-                onClick={async () => await downloadFile(file)}
+                onClick={async () => await downloadFile({ projectRef, bucketId, file })}
               >
                 Download
               </Button>
@@ -200,7 +213,7 @@ const PreviewPane = () => {
                 <Button
                   type="outline"
                   icon={<Clipboard size={16} strokeWidth={2} />}
-                  onClick={() => onCopyUrl(file.name, getFileUrl(file))}
+                  onClick={() => onCopyUrl(file.name)}
                   disabled={file.isCorrupted}
                 >
                   Get URL
@@ -220,25 +233,19 @@ const PreviewPane = () => {
                   <DropdownMenuContent side="bottom" align="center">
                     <DropdownMenuItem
                       key="expires-one-week"
-                      onClick={() =>
-                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.WEEK))
-                      }
+                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.WEEK)}
                     >
                       Expire in 1 week
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-month"
-                      onClick={() =>
-                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.MONTH))
-                      }
+                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.MONTH)}
                     >
                       Expire in 1 month
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       key="expires-one-year"
-                      onClick={() =>
-                        onCopyUrl(file.name, getFileUrl(file, URL_EXPIRY_DURATION.YEAR))
-                      }
+                      onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.YEAR)}
                     >
                       Expire in 1 year
                     </DropdownMenuItem>
@@ -252,36 +259,23 @@ const PreviewPane = () => {
                 </DropdownMenu>
               )}
             </div>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="outline"
-                  disabled={!canUpdateFiles}
-                  size="tiny"
-                  icon={<Trash2 strokeWidth={2} />}
-                  onClick={() => setSelectedItemsToDelete([file])}
-                >
-                  Delete file
-                </Button>
-              </Tooltip.Trigger>
-              {!canUpdateFiles && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to delete this file
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+            <ButtonTooltip
+              type="outline"
+              disabled={!canUpdateFiles}
+              size="tiny"
+              icon={<Trash2 strokeWidth={2} />}
+              onClick={() => setSelectedItemsToDelete([file])}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdateFiles
+                    ? 'You need additional permissions to delete this file'
+                    : undefined,
+                },
+              }}
+            >
+              Delete file
+            </ButtonTooltip>
           </div>
         </div>
       </Transition>

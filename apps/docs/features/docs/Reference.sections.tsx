@@ -1,18 +1,10 @@
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import {
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  cn,
-  CodeBlock,
-} from 'ui'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
 
 import ApiSchema from '~/components/ApiSchema'
 import { REFERENCES } from '~/content/navigation.references'
 import { MDXRemoteRefs, getRefMarkdown } from '~/features/docs/Reference.mdx'
-import { MDXProviderReference } from '~/features/docs/Reference.mdx.client'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import {
   getApiEndpointById,
@@ -35,6 +27,7 @@ import {
 } from '~/features/docs/Reference.ui'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
+import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { RefInternalLink } from './Reference.navigation.client'
 import { ApiOperationBodySchemeSelector } from './Reference.ui.client'
 
@@ -45,21 +38,21 @@ type RefSectionsProps = {
 
 async function RefSections({ libraryId, version }: RefSectionsProps) {
   let flattenedSections = await getFlattenedSections(libraryId, version)
-  flattenedSections = trimIntro(flattenedSections)
+  if (flattenedSections) {
+    flattenedSections = trimIntro(flattenedSections)
+  }
 
   return (
-    <MDXProviderReference>
-      <div className="flex flex-col my-16 gap-16">
-        {flattenedSections
-          .filter((section) => section.type !== 'category')
-          .map((section, idx) => (
-            <Fragment key={`${section.id}-${idx}`}>
-              <SectionDivider />
-              <SectionSwitch libraryId={libraryId} version={version} section={section} />
-            </Fragment>
-          ))}
-      </div>
-    </MDXProviderReference>
+    <div className="flex flex-col my-16 gap-16">
+      {(flattenedSections || [])
+        .filter((section) => section.type !== 'category')
+        .map((section, idx) => (
+          <Fragment key={`${section.id}-${idx}`}>
+            <SectionDivider />
+            <SectionSwitch libraryId={libraryId} version={version} section={section} />
+          </Fragment>
+        ))}
+    </div>
   )
 }
 
@@ -164,9 +157,17 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div>
+      <div className="w-full min-w-0">
         {command.description && (
-          <ReactMarkdown className="prose break-words mb-8">{command.description}</ReactMarkdown>
+          <ReactMarkdown className="prose w-full break-words mb-8">
+            {command.description}
+          </ReactMarkdown>
+        )}
+        {command.usage && (
+          <div className="mb-8">
+            <h3 className="mb-2 text-base text-foreground">Usage</h3>
+            <CodeBlock lang="bash">{command.usage}</CodeBlock>
+          </div>
         )}
         {(command.subcommands ?? []).length > 0 && (
           <>
@@ -240,17 +241,11 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
               </TabsList_Shadcn_>
               {command.examples.map((example) => (
                 <TabsContent_Shadcn_ key={example.id} value={example.id}>
-                  <CodeBlock
-                    language="bash"
-                    className="p-4 rounded-md border"
-                    wrapperClassName="mb-8"
-                  >
+                  <CodeBlock lang="bash" className="mb-6">
                     {example.code}
                   </CodeBlock>
                   <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
-                  <CodeBlock language="bash" className="p-4 rounded-md border">
-                    {example.response}
-                  </CodeBlock>
+                  <CodeBlock lang="txt">{example.response}</CodeBlock>
                 </TabsContent_Shadcn_>
               ))}
             </Tabs_Shadcn_>
@@ -295,13 +290,43 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
-      <StickyHeader title={endpointDetails.summary} className="col-[1_/_-1]" />
+      <StickyHeader
+        title={
+          <>
+            {endpointDetails.summary}
+            {endpointDetails.deprecated && (
+              <span
+                className="
+                  uppercase
+                  whitespace-nowrap align-middle inline-block -translate-y-0.5
+                  border border-amber-700 bg-amber-300 text-amber-900
+                  rounded-full font-mono font-medium text-xs px-2 py-0.5 ml-2"
+              >
+                deprecated
+              </span>
+            )}
+          </>
+        }
+        className="col-[1_/_-1]"
+      />
       <div className="flex flex-col gap-12">
         <div className="flex items-center gap-2">
-          <span className="font-mono uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5">
+          <span
+            className={cn(
+              'uppercase text-sm whitespace-nowrap bg-foreground text-background rounded-full font-mono font-medium px-2 py-0.5',
+              endpointDetails.deprecated && 'line-through'
+            )}
+          >
             {endpointDetails.method}
           </span>
-          <code className="text-foreground-lighter break-all">{endpointDetails.path}</code>
+          <code
+            className={cn(
+              'text-foreground-lighter break-all',
+              endpointDetails.deprecated && 'line-through'
+            )}
+          >
+            {endpointDetails.path}
+          </code>
         </div>
         {endpointDetails.description && (
           <ReactMarkdown className="prose break-words mb-8">
@@ -382,7 +407,7 @@ async function FunctionSection({
 }: FunctionSectionProps) {
   const fns = await getFunctionsList(sdkId, version)
 
-  const fn = fns.find((fn) => fn.id === section.id)
+  const fn = fns?.find((fn) => fn.id === section.id)
   if (!fn) return null
 
   let types: MethodTypes | undefined
@@ -447,7 +472,7 @@ async function FunctionSection({
             {fn.examples.map((example) => (
               <TabsContent_Shadcn_ key={example.id} value={example.id}>
                 <MDXRemoteRefs source={example.code} />
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mt-2">
                   {!!example.data?.sql && (
                     <CollapsibleDetails title="Data source" content={example.data.sql} />
                   )}

@@ -1,19 +1,22 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
-export type ProjectUpgradeVariables = {
+export type ProjectUpgradeVariables = components['schemas']['UpgradeDatabaseBody'] & {
   ref: string
-  target_version: number
 }
 
-export async function upgradeProject({ ref, target_version }: ProjectUpgradeVariables) {
+export async function upgradeProject({
+  ref,
+  target_version,
+  release_channel,
+}: ProjectUpgradeVariables) {
   const { data, error } = await post('/v1/projects/{ref}/upgrade', {
     params: { path: { ref } },
-    // @ts-expect-error release_channel param is optional on API end, but not typed properly from generated types
-    body: { target_version: target_version.toString() },
+    body: { target_version: target_version.toString(), release_channel },
   })
   if (error) handleError(error)
   return data

@@ -12,7 +12,7 @@ interface DeleteHookModalProps {
 }
 
 const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
-  const { id, name, schema } = selectedHook ?? {}
+  const { name, schema } = selectedHook ?? {}
 
   const { project } = useProjectContext()
   const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
@@ -28,12 +28,12 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
     if (!project) {
       return console.error('Project ref is required')
     }
-    if (!id) {
+    if (!selectedHook) {
       return toast.error('Unable find selected hook')
     }
 
     deleteDatabaseTrigger({
-      id,
+      trigger: selectedHook,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })
@@ -41,7 +41,7 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
 
   return (
     <TextConfirmModal
-      variant={'warning'}
+      variant="destructive"
       visible={visible}
       size="medium"
       onCancel={() => onClose()}
@@ -53,9 +53,8 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       confirmString={name || ''}
       text={
         <>
-          This will delete the webhook
-          <span className="text-bold text-foreground">{name}</span> rom the schema
-          <span className="text-bold text-foreground">{schema}</span>
+          This will delete the webhook <span className="text-bold text-foreground">{name}</span>{' '}
+          from the schema <span className="text-bold text-foreground">{schema}</span>
         </>
       }
       alert={{ title: 'You cannot recover this webhook once deleted.' }}

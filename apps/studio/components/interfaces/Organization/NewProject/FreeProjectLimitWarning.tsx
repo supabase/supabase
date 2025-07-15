@@ -37,8 +37,12 @@ const FreeProjectLimitWarning = ({
           </p>
 
           <div>
-            <Button asChild type="secondary">
-              <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+            <Button asChild type="default">
+              <Link
+                href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=freeProjectLimitWarning`}
+              >
+                Upgrade plan
+              </Link>
             </Button>
           </div>
         </div>

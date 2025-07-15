@@ -2,6 +2,7 @@ import { getAccessToken } from 'lib/gotrue'
 import { isUndefined } from 'lodash'
 import type { SupaResponse } from 'types/base'
 
+/* @deprecated Use handleError from data/fetchers instead */
 export function handleError<T>(e: any, requestId: string): SupaResponse<T> {
   const message = e?.message ? `An error has occurred: ${e.message}` : 'An error has occurred'
   const error = { code: 500, message, requestId }
@@ -14,7 +15,6 @@ export async function handleResponse<T>(
 ): Promise<SupaResponse<T>> {
   const contentType = response.headers.get('Content-Type')
   if (contentType === 'application/octet-stream') return response as any
-
   try {
     const resTxt = await response.text()
     try {

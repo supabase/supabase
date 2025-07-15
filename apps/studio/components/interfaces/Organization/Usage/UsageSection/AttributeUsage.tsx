@@ -1,6 +1,6 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import clsx from 'clsx'
+import { AlertTriangle, BarChart2 } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
@@ -9,9 +9,8 @@ import SparkBar from 'components/ui/SparkBar'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
-import { useMemo } from 'react'
 import type { ResponseError } from 'types'
-import { Button } from 'ui'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import SectionContent from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
@@ -21,7 +20,6 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import { AlertTriangle, BarChart2 } from 'lucide-react'
 
 export interface AttributeUsageProps {
   slug: string
@@ -55,7 +53,7 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
-  const upgradeUrl = getUpgradeUrl(slug ?? '', subscription)
+  const upgradeUrl = getUpgradeUrl(slug ?? '', subscription, attribute.key)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
   const usageBasedBilling = subscription?.usage_billing_enabled
@@ -102,8 +100,8 @@ const AttributeUsage = ({
                       <div className="flex items-center space-x-4">
                         <p className="text-sm">{attribute.name} usage</p>
                         {showUsageWarning && (
-                          <Tooltip.Root delayDuration={0}>
-                            <Tooltip.Trigger asChild>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
                               {usageRatio >= 1 ? (
                                 <div className="flex items-center space-x-2 min-w-[115px] cursor-help">
                                   <AlertTriangle
@@ -125,28 +123,18 @@ const AttributeUsage = ({
                                   </div>
                                 )
                               )}
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background',
-                                  ].join(' ')}
-                                >
-                                  <p className="text-xs text-foreground">
-                                    Exceeding your plans included usage will lead to restrictions to
-                                    your project.
-                                  </p>
-                                  <p className="text-xs text-foreground">
-                                    Upgrade to a usage-based plan or disable the spend cap to avoid
-                                    restrictions.
-                                  </p>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <p>
+                                Exceeding your plans included usage will lead to restrictions to
+                                your project.
+                              </p>
+                              <p>
+                                Upgrade to a usage-based plan or disable the spend cap to avoid
+                                restrictions.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                     </div>
@@ -154,7 +142,7 @@ const AttributeUsage = ({
                     {currentBillingCycleSelected && usageMeta && !usageMeta.unlimited && (
                       <SparkBar
                         type="horizontal"
-                        barClass={clsx(
+                        barClass={cn(
                           usageRatio >= 1
                             ? usageBasedBilling
                               ? 'bg-foreground-light'
@@ -174,7 +162,7 @@ const AttributeUsage = ({
                       {usageMeta && (
                         <div className="flex items-center justify-between border-b py-1">
                           <p className="text-xs text-foreground-light">
-                            Included in {subscription?.plan?.name.toLowerCase()} plan
+                            Included in {subscription?.plan?.name} Plan
                           </p>
                           {usageMeta.unlimited ? (
                             <p className="text-xs">Unlimited</p>

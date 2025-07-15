@@ -7,26 +7,29 @@ import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button, Image } from 'ui'
+import { useBreakpoint } from 'common'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import EventCallout from '~/components/EventCallout'
 
-import Solutions from 'data/Solutions'
+import MainProducts from '~/data/MainProducts'
 import { PRODUCT_NAMES } from 'shared-data/products'
 import AuthProviders from '~/data/auth.json'
 
 const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
 )
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
 function AuthPage() {
-  // base path for images
+  const isMobile = useBreakpoint(768)
   const { basePath } = useRouter()
 
   const meta_title = 'Auth | Built-in user management'
@@ -52,8 +55,14 @@ function AuthPage() {
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.AUTHENTICATION} />
         <ProductHeader
-          icon={Solutions['authentication'].icon}
-          title={Solutions['authentication'].name}
+          callout={
+            <EventCallout
+              size={isMobile ? 'tiny' : 'small'}
+              className="mb-4 lg:mb-8 -mt-8 lg:-mt-10"
+            />
+          }
+          icon={MainProducts['authentication'].icon}
+          title={MainProducts['authentication'].name}
           h1={[
             <span key={'authentication-h1'}>
               Open Source Auth
@@ -141,6 +150,27 @@ function AuthPage() {
             </div>
           </div>
         </SectionContainer>
+
+        <SingleQuote
+          id="quote"
+          className="[&_q]:max-w-2xl"
+          quote={{
+            text: 'Supabase is not only super easy to get started, but also provides all the backend solutions we require as we continue to grow.',
+            author: 'Alfred Lua',
+            role: 'Cofounder of Pebblely',
+            link: '/customers/pebblely',
+            logo: (
+              <NextImage
+                draggable={false}
+                src="/images/blog/avatars/alfred-lua-pebblely.jpeg"
+                alt="Alfred Lua, Cofounder of Pebblely"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
+        />
 
         <SectionContainer>
           <APISection

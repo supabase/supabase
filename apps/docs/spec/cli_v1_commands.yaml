@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.200.3
+  version: 2.31.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -51,26 +51,33 @@ flags:
     description: use the specified docker network instead of a generated one
     default_value: ''
   - id: output
-    name: --output <[ pretty | json | toml | yaml ]>
+    name: -o, --output <[ env | pretty | json | toml | yaml ]>
     description: output format of status variables
     default_value: pretty
     accepted_values:
+      - id: env
+        name: env
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: pretty
         name: pretty
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: json
         name: json
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: toml
         name: toml
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
       - id: yaml
         name: yaml
-        type: '[ pretty | json | toml | yaml ]'
+        type: '[ env | pretty | json | toml | yaml ]'
   - id: workdir
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
+  - id: 'yes'
+    name: --yes
+    description: answer yes to all prompts
+    default_value: 'false'
 commands:
   - id: supabase-vanity-subdomains
     title: supabase vanity-subdomains
@@ -468,26 +475,6 @@ commands:
     usage: supabase status [flags]
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ env | pretty | json | toml | yaml ]>
-        description: Output format of status variables.
-        default_value: pretty
-        accepted_values:
-          - id: env
-            name: env
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: pretty
-            name: pretty
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ env | pretty | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ env | pretty | json | toml | yaml ]'
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
@@ -537,7 +524,7 @@ commands:
       - id: exclude
         name: -x, --exclude <strings>
         description: |
-          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,inbucket,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
+          Names of containers to not start. [gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor]
         default_value: '[]'
       - id: ignore-health-check
         name: --ignore-health-check
@@ -866,7 +853,11 @@ commands:
     links: []
     usage: supabase snippets list
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-snippets-download
     title: supabase snippets download
     summary: Download contents of a SQL snippet
@@ -875,12 +866,16 @@ commands:
     links: []
     usage: supabase snippets download <snippet-id>
     subcommands: []
-    flags: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-services
     title: supabase services
     summary: Show versions of all Supabase services
     tags:
-      - management-api
+      - local-dev
     links: []
     usage: supabase services
     subcommands: []
@@ -913,6 +908,17 @@ commands:
   - id: supabase-secrets
     title: supabase secrets
     summary: Manage Supabase secrets
+    description: |2
+
+      Provides tools for managing environment variables and secrets for your Supabase project.
+
+      This command group allows you to set, unset, and list secrets that are securely stored and made available to Edge Functions as environment variables.
+
+      Secrets management through the CLI is useful for:
+      - Setting environment-specific configuration
+      - Managing sensitive credentials securely
+
+      Secrets can be set individually or loaded from .env files for convenience.
     tags:
       - management-api
     links: []
@@ -967,6 +973,13 @@ commands:
   - id: supabase-projects
     title: supabase projects
     summary: Manage Supabase projects
+    description: |2
+
+      Provides tools for creating and managing your Supabase projects.
+
+      This command group allows you to list all projects in your organizations, create new projects, delete existing projects, and retrieve API keys. These operations help you manage your Supabase infrastructure programmatically without using the dashboard.
+
+      Project management via CLI is especially useful for automation scripts and when you need to provision environments in a repeatable way.
     tags:
       - management-api
     links: []
@@ -1061,23 +1074,47 @@ commands:
         description: Select a desired instance size for your project.
         default_value: ''
         accepted_values:
-          - id: micro
-            name: micro
-            type: string
-          - id: small
-            name: small
+          - id: large
+            name: large
             type: string
           - id: medium
             name: medium
             type: string
-          - id: large
-            name: large
+          - id: micro
+            name: micro
             type: string
-          - id: xlarge
-            name: xlarge
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
+            type: string
+          - id: 24xlarge
+            name: 24xlarge
+            type: string
+          - id: 24xlarge_high_memory
+            name: 24xlarge_high_memory
+            type: string
+          - id: 24xlarge_optimized_cpu
+            name: 24xlarge_optimized_cpu
+            type: string
+          - id: 24xlarge_optimized_memory
+            name: 24xlarge_optimized_memory
             type: string
           - id: 2xlarge
             name: 2xlarge
+            type: string
+          - id: 48xlarge
+            name: 48xlarge
+            type: string
+          - id: 48xlarge_high_memory
+            name: 48xlarge_high_memory
+            type: string
+          - id: 48xlarge_optimized_cpu
+            name: 48xlarge_optimized_cpu
+            type: string
+          - id: 48xlarge_optimized_memory
+            name: 48xlarge_optimized_memory
             type: string
           - id: 4xlarge
             name: 4xlarge
@@ -1085,11 +1122,14 @@ commands:
           - id: 8xlarge
             name: 8xlarge
             type: string
-          - id: 12xlarge
-            name: 12xlarge
+          - id: pico
+            name: pico
             type: string
-          - id: 16xlarge
-            name: 16xlarge
+          - id: small
+            name: small
+            type: string
+          - id: xlarge
+            name: xlarge
             type: string
   - id: supabase-projects-api-keys
     title: supabase projects api-keys
@@ -1110,6 +1150,7 @@ commands:
       - management-api
     links: []
     subcommands:
+      - supabase-postgres-config-delete
       - supabase-postgres-config-get
       - supabase-postgres-config-update
     flags: []
@@ -1128,6 +1169,10 @@ commands:
         name: --config <strings>
         description: Config overrides specified as a 'key=value' pair
         default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after updating config.
+        default_value: 'false'
       - id: replace-existing-overrides
         name: --replace-existing-overrides
         description: |
@@ -1150,6 +1195,33 @@ commands:
     usage: supabase postgres-config get
     subcommands: []
     flags:
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-postgres-config-delete
+    title: supabase postgres-config delete
+    summary: Delete specific Postgres database config overrides
+    description: |
+      Delete specific config overrides, reverting them to their default values.
+    tags: []
+    links: []
+    usage: supabase postgres-config delete [flags]
+    subcommands: []
+    flags:
+      - id: config
+        name: --config <strings>
+        description: Config keys to delete (comma-separated)
+        default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after deleting config.
+        default_value: 'false'
       - id: experimental
         name: --experimental
         description: enable experimental features
@@ -1298,6 +1370,7 @@ commands:
       - local-dev
     links: []
     subcommands:
+      - supabase-migration-down
       - supabase-migration-fetch
       - supabase-migration-list
       - supabase-migration-new
@@ -1576,6 +1649,31 @@ commands:
         name: --local
         description: Fetches migration history from the local database.
         default_value: 'false'
+  - id: supabase-migration-down
+    title: supabase migration down
+    summary: Resets applied migrations up to the last n versions
+    tags: []
+    links: []
+    usage: supabase migration down [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Resets applied migrations on the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: last
+        name: --last <uint>
+        description: Reset up to the last n migration versions.
+        default_value: '1'
+      - id: linked
+        name: --linked
+        description: Resets applied migrations on the linked project.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Resets applied migrations on the local database.
+        default_value: 'true'
   - id: supabase-logout
     title: supabase logout
     summary: Log out and delete access tokens locally
@@ -1691,7 +1789,7 @@ commands:
       - id: output-dir
         name: --output-dir <string>
         description: Path to save CSV files in
-        default_value: ''
+        default_value: .
       - id: db-url
         name: --db-url <string>
         description: |
@@ -1713,22 +1811,15 @@ commands:
     subcommands:
       - supabase-inspect-db-bloat
       - supabase-inspect-db-blocking
-      - supabase-inspect-db-cache-hit
       - supabase-inspect-db-calls
-      - supabase-inspect-db-index-sizes
-      - supabase-inspect-db-index-usage
+      - supabase-inspect-db-db-stats
+      - supabase-inspect-db-index-stats
       - supabase-inspect-db-locks
       - supabase-inspect-db-long-running-queries
       - supabase-inspect-db-outliers
       - supabase-inspect-db-replication-slots
-      - supabase-inspect-db-role-connections
-      - supabase-inspect-db-seq-scans
-      - supabase-inspect-db-table-index-sizes
-      - supabase-inspect-db-table-record-counts
-      - supabase-inspect-db-table-sizes
-      - supabase-inspect-db-total-index-size
-      - supabase-inspect-db-total-table-sizes
-      - supabase-inspect-db-unused-indexes
+      - supabase-inspect-db-role-stats
+      - supabase-inspect-db-table-stats
       - supabase-inspect-db-vacuum-stats
     flags: []
   - id: supabase-inspect-db-vacuum-stats
@@ -1770,119 +1861,13 @@ commands:
         name: --local
         description: Inspect the local database.
         default_value: 'false'
-  - id: supabase-inspect-db-unused-indexes
-    title: supabase inspect db unused-indexes
-    summary: Show indexes with low usage
-    description: |2
-
-      This command displays indexes that have < 50 scans recorded against them, and are greater than 5 pages in size, ordered by size relative to the number of index scans. This command is generally useful for discovering indexes that are unused. Indexes can impact write performance, as well as read performance should they occupy space in memory, its a good idea to remove indexes that are not needed or being used.
-
-      ```
-              TABLE        │                   INDEX                    │ INDEX SIZE │ INDEX SCANS
-      ─────────────────────┼────────────────────────────────────────────┼────────────┼──────────────
-       public.users        │ user_id_created_at_idx                     │ 97 MB      │           0
-      ```
-    tags: []
-    links: []
-    usage: supabase inspect db unused-indexes
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: |
-          Inspect the database specified by the connection string (must be percent-encoded).
-        default_value: ''
-      - id: linked
-        name: --linked
-        description: Inspect the linked project.
-        default_value: 'true'
-      - id: local
-        name: --local
-        description: Inspect the local database.
-        default_value: 'false'
-  - id: supabase-inspect-db-total-table-sizes
-    title: supabase inspect db total-table-sizes
-    summary: Show total table sizes, including table index sizes
-    description: |2-
-
-      This command displays the total size of each table in the database. It is the sum of the values that `pg_table_size()` and `pg_indexes_size()` gives for each table. System tables inside `pg_catalog` and `information_schema` are not included.
-
-      ```
-                      NAME               │    SIZE
-      ───────────────────────────────────┼─────────────
-        job_run_details                  │ 395 MB
-        slack_msgs                       │ 648 kB
-        emails                           │ 640 kB
-      ```
-    tags: []
-    links: []
-    usage: supabase inspect db total-table-sizes
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: |
-          Inspect the database specified by the connection string (must be percent-encoded).
-        default_value: ''
-      - id: linked
-        name: --linked
-        description: Inspect the linked project.
-        default_value: 'true'
-      - id: local
-        name: --local
-        description: Inspect the local database.
-        default_value: 'false'
-  - id: supabase-inspect-db-total-index-size
-    title: supabase inspect db total-index-size
-    summary: Show total size of all indexes
-    description: |2-
-
-      This command displays the total size of all indexes on the database. It is calculated by taking the number of pages (reported in `relpages`) and multiplying it by the page size (8192 bytes).
-
-      ```
-          SIZE
-        ─────────
-          12 MB
-      ```
-    tags: []
-    links: []
-    usage: supabase inspect db total-index-size
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: |
-          Inspect the database specified by the connection string (must be percent-encoded).
-        default_value: ''
-      - id: linked
-        name: --linked
-        description: Inspect the linked project.
-        default_value: 'true'
-      - id: local
-        name: --local
-        description: Inspect the local database.
-        default_value: 'false'
-  - id: supabase-inspect-db-table-sizes
-    title: supabase inspect db table-sizes
+  - id: supabase-inspect-db-table-stats
+    title: supabase inspect db table-stats
     summary: |
-      Show table sizes of individual tables without their index sizes
-    description: |2-
-
-      This command displays the size of each table in the database. It is calculated by using the system administration function `pg_table_size()`, which includes the size of the main data fork, free space map, visibility map and TOAST data. It does not include the size of the table's indexes.
-
-
-      ```
-                        NAME               │    SIZE
-        ───────────────────────────────────┼─────────────
-          job_run_details                  │ 385 MB
-          emails                           │ 584 kB
-          job                              │ 40 kB
-          sessions                         │ 0 bytes
-          prod_resource_notifications_meta │ 0 bytes
-      ```
+      Show combined table size, index size, and estimated row count
     tags: []
     links: []
-    usage: supabase inspect db table-sizes
+    usage: supabase inspect db table-stats
     subcommands: []
     flags:
       - id: db-url
@@ -1898,149 +1883,12 @@ commands:
         name: --local
         description: Inspect the local database.
         default_value: 'false'
-  - id: supabase-inspect-db-table-record-counts
-    title: supabase inspect db table-record-counts
-    summary: Show estimated number of rows per table
-    description: |2-
-
-      This command displays an estimated count of rows per table, descending by estimated count. The estimated count is derived from `n_live_tup`, which is updated by vacuum operations. Due to the way `n_live_tup` is populated, sparse vs. dense pages can result in estimations that are significantly out from the real count of rows.
-
-
-      ```
-             NAME    │ ESTIMATED COUNT
-        ─────────────┼──────────────────
-          logs       │          322943
-          emails     │            1103
-          job        │               1
-          migrations │               0
-      ```
+  - id: supabase-inspect-db-role-stats
+    title: supabase inspect db role-stats
+    summary: Show information about roles on the database
     tags: []
     links: []
-    usage: supabase inspect db table-record-counts
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: |
-          Inspect the database specified by the connection string (must be percent-encoded).
-        default_value: ''
-      - id: linked
-        name: --linked
-        description: Inspect the linked project.
-        default_value: 'true'
-      - id: local
-        name: --local
-        description: Inspect the local database.
-        default_value: 'false'
-  - id: supabase-inspect-db-table-index-sizes
-    title: supabase inspect db table-index-sizes
-    summary: Show index sizes of individual tables
-    description: |2
-
-      This command displays the total size of indexes for each table. It is calculated by using the system administration function `pg_indexes_size()`.
-
-      ```
-                       TABLE               │ INDEX SIZE
-        ───────────────────────────────────┼─────────────
-          job_run_details                  │ 10104 kB
-          users                            │ 128 kB
-          job                              │ 32 kB
-          instances                        │ 8192 bytes
-          http_request_queue               │ 0 bytes
-      ```
-    tags: []
-    links: []
-    usage: supabase inspect db table-index-sizes
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: |
-          Inspect the database specified by the connection string (must be percent-encoded).
-        default_value: ''
-      - id: linked
-        name: --linked
-        description: Inspect the linked project.
-        default_value: 'true'
-      - id: local
-        name: --local
-        description: Inspect the local database.
-        default_value: 'false'
-  - id: supabase-inspect-db-seq-scans
-    title: supabase inspect db seq-scans
-    summary: Show number of sequential scans recorded against all tables
-    description: |2+
-
-      This command displays the number of sequential scans recorded against all tables, descending by count of sequential scans. Tables that have very high numbers of sequential scans may be underindexed, and it may be worth investigating queries that read from these tables.
-
-
-      ```
-                        NAME               │ COUNT
-        ───────────────────────────────────┼─────────
-          emails                           │ 182435
-          users                            │  25063
-          job_run_details                  │     60
-          schema_migrations                │      0
-          migrations                       │      0
-      ```
-
-    tags: []
-    links: []
-    usage: supabase inspect db seq-scans
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: |
-          Inspect the database specified by the connection string (must be percent-encoded).
-        default_value: ''
-      - id: linked
-        name: --linked
-        description: Inspect the linked project.
-        default_value: 'true'
-      - id: local
-        name: --local
-        description: Inspect the local database.
-        default_value: 'false'
-  - id: supabase-inspect-db-role-connections
-    title: supabase inspect db role-connections
-    summary: Show number of active connections for all database roles
-    description: |2
-
-      This command shows the number of active connections for each database roles to see which specific role might be consuming more connections than expected.
-
-      This is a Supabase specific command. You can see this breakdown on the dashboard as well:
-      https://app.supabase.com/project/_/database/roles
-
-      The maximum number of active connections depends [on your instance size](https://supabase.com/docs/guides/platform/compute-add-ons). You can [manually overwrite](https://supabase.com/docs/guides/platform/performance#allowing-higher-number-of-connections) the allowed number of connection but it is not advised.
-
-      ```
-
-
-                  ROLE NAME         │ ACTIVE CONNCTION
-        ────────────────────────────┼───────────────────
-          authenticator             │                5
-          postgres                  │                5
-          supabase_admin            │                1
-          pgbouncer                 │                1
-          anon                      │                0
-          authenticated             │                0
-          service_role              │                0
-          dashboard_user            │                0
-          supabase_auth_admin       │                0
-          supabase_storage_admin    │                0
-          supabase_functions_admin  │                0
-          pgsodium_keyholder        │                0
-          pg_read_all_data          │                0
-          pg_write_all_data         │                0
-          pg_monitor                │                0
-
-      Active connections 12/90
-
-      ```
-    tags: []
-    links: []
-    usage: supabase inspect db role-connections
+    usage: supabase inspect db role-stats
     subcommands: []
     flags:
       - id: db-url
@@ -2194,13 +2042,13 @@ commands:
         name: --local
         description: Inspect the local database.
         default_value: 'false'
-  - id: supabase-inspect-db-index-usage
-    title: supabase inspect db index-usage
-    summary: Show information about the efficiency of indexes
-    description: "\n\nThis command provides information on the efficiency of indexes, represented as what percentage of total scans were index scans. A low percentage can indicate under indexing, or wrong data being indexed.\n\n```\n       TABLE NAME     │ PERCENTAGE OF TIMES INDEX USED │ ROWS IN TABLE\n  ────────────────────┼────────────────────────────────┼────────────────\n    user_events       │                             99 │       4225318 \n    user_feed         │                             99 │       3581573\n    unindexed_table   │                              0 │        322911\n    job               │                            100 │         33242\n    schema_migrations │                             97 │             0\n    migrations        │ Insufficient data              │             0\n```"
+  - id: supabase-inspect-db-index-stats
+    title: supabase inspect db index-stats
+    summary: |
+      Show combined index size, usage percent, scan counts, and unused status
     tags: []
     links: []
-    usage: supabase inspect db index-usage
+    usage: supabase inspect db index-stats
     subcommands: []
     flags:
       - id: db-url
@@ -2216,26 +2064,13 @@ commands:
         name: --local
         description: Inspect the local database.
         default_value: 'false'
-  - id: supabase-inspect-db-index-sizes
-    title: supabase inspect db index-sizes
-    summary: Show index sizes of individual indexes
-    description: |2-
-
-      This command displays the size of each each index in the database. It is calculated by taking the number of pages (reported in `relpages`) and multiplying it by the page size (8192 bytes).
-
-      ```
-                    NAME              │    SIZE
-        ──────────────────────────────┼─────────────
-          user_events_index           │ 2082 MB
-          job_run_details_pkey        │ 3856 kB
-          schema_migrations_pkey      │ 16 kB
-          refresh_tokens_token_unique │ 8192 bytes
-          users_instance_id_idx       │ 0 bytes
-          buckets_pkey                │ 0 bytes
-      ```
+  - id: supabase-inspect-db-db-stats
+    title: supabase inspect db db-stats
+    summary: |
+      Show stats such as cache hit rates, total sizes, and WAL size
     tags: []
     links: []
-    usage: supabase inspect db index-sizes
+    usage: supabase inspect db db-stats
     subcommands: []
     flags:
       - id: db-url
@@ -2273,41 +2108,6 @@ commands:
     tags: []
     links: []
     usage: supabase inspect db calls
-    subcommands: []
-    flags:
-      - id: db-url
-        name: --db-url <string>
-        description: |
-          Inspect the database specified by the connection string (must be percent-encoded).
-        default_value: ''
-      - id: linked
-        name: --linked
-        description: Inspect the linked project.
-        default_value: 'true'
-      - id: local
-        name: --local
-        description: Inspect the local database.
-        default_value: 'false'
-  - id: supabase-inspect-db-cache-hit
-    title: supabase inspect db cache-hit
-    summary: Show cache hit rates for tables and indices
-    description: |2-
-
-      This command provides information on the efficiency of the buffer cache and how often your queries have to go hit the disk rather than reading from memory. Information on both index reads (`index hit rate`) as well as table reads (`table hit rate`) are shown. In general, databases with low cache hit rates perform worse as it is slower to go to disk than retrieve data from memory. If your table hit rate is low, this can indicate that you do not have enough RAM and you may benefit from upgrading to a larger compute addon with more memory. If your index hit rate is low, this may indicate that there is scope to add more appropriate indexes.
-
-      The hit rates are calculated as a ratio of number of table or index blocks fetched from the postgres buffer cache against the sum of cached blocks and uncached blocks read from disk.
-
-      On smaller compute plans (free, small, medium), a ratio of below 99% can indicate a problem. On larger plans the hit rates may be lower but performance will remain constant as the data may use the OS cache rather than Postgres buffer cache.
-
-      ```
-               NAME      │  RATIO
-        ─────────────────┼───────────
-          index hit rate │ 0.996621
-          table hit rate │ 0.999341
-       ```
-    tags: []
-    links: []
-    usage: supabase inspect db cache-hit
     subcommands: []
     flags:
       - id: db-url
@@ -2436,6 +2236,15 @@ commands:
   - id: supabase-gen
     title: supabase gen
     summary: Run code generation tools
+    description: |2
+
+      Automatically generates type definitions based on your Postgres database schema.
+
+      This command connects to your database (local or remote) and generates typed definitions that match your database tables, views, and stored procedures. By default, it generates TypeScript definitions, but also supports Go and Swift.
+
+      Generated types give you type safety and autocompletion when working with your database in code, helping prevent runtime errors and improving developer experience.
+
+      The types respect relationships, constraints, and custom types defined in your database schema.
     tags:
       - local-dev
     links: []
@@ -2509,23 +2318,6 @@ commands:
     usage: supabase gen keys [flags]
     subcommands: []
     flags:
-      - id: output
-        name: -o, --output <[ env | json | toml | yaml ]>
-        description: Output format of key variables.
-        default_value: env
-        accepted_values:
-          - id: env
-            name: env
-            type: '[ env | json | toml | yaml ]'
-          - id: json
-            name: json
-            type: '[ env | json | toml | yaml ]'
-          - id: toml
-            name: toml
-            type: '[ env | json | toml | yaml ]'
-          - id: yaml
-            name: yaml
-            type: '[ env | json | toml | yaml ]'
       - id: override-name
         name: --override-name <strings>
         description: Override specific variable names.
@@ -2542,6 +2334,15 @@ commands:
   - id: supabase-functions
     title: supabase functions
     summary: Manage Supabase Edge functions
+    description: |2
+
+      Manage Supabase Edge Functions.
+
+      Supabase Edge Functions are server-less functions that run close to your users.
+
+      Edge Functions allow you to execute custom server-side code without deploying or scaling a traditional server. They're ideal for handling webhooks, custom API endpoints, data validation, and serving personalized content.
+
+      Edge Functions are written in TypeScript and run on Deno compatible edge runtime, which is a secure runtime with no package management needed, fast cold starts, and built-in security.
     tags:
       - management-api
     links: []
@@ -2627,6 +2428,13 @@ commands:
   - id: supabase-functions-new
     title: supabase functions new
     summary: Create a new Function locally
+    description: |2
+
+      Creates a new Edge Function with boilerplate code in the `supabase/functions` directory.
+
+      This command generates a starter TypeScript file with the necessary Deno imports and a basic function structure. The function is created as a new directory with the name you specify, containing an `index.ts` file with the function code.
+
+      After creating the function, you can edit it locally and then use `supabase functions serve`  to test it before deploying with `supabase functions deploy`.
     tags: []
     links: []
     usage: supabase functions new <Function name>
@@ -2676,6 +2484,10 @@ commands:
         name: --import-map <string>
         description: Path to import map file.
         default_value: ''
+      - id: jobs
+        name: -j, --jobs <uint>
+        description: Maximum number of parallel jobs.
+        default_value: '1'
       - id: no-verify-jwt
         name: --no-verify-jwt
         description: Disable JWT verification for the Function.
@@ -2684,6 +2496,19 @@ commands:
         name: --project-ref <string>
         description: Project ref of the Supabase project.
         default_value: ''
+      - id: prune
+        name: --prune
+        description: |
+          Delete Functions that exist in Supabase project but not locally.
+        default_value: 'false'
+      - id: use-api
+        name: --use-api
+        description: Use Management API to bundle functions.
+        default_value: 'false'
+      - id: use-docker
+        name: --use-docker
+        description: Use Docker to bundle functions.
+        default_value: 'true'
   - id: supabase-functions-delete
     title: supabase functions delete
     summary: Delete a Function from Supabase
@@ -2866,9 +2691,13 @@ commands:
     summary: Starts local Postgres database
     tags: []
     links: []
-    usage: supabase db start
+    usage: supabase db start [flags]
     subcommands: []
-    flags: []
+    flags:
+      - id: from-backup
+        name: --from-backup <string>
+        description: Path to a logical backup file.
+        default_value: ''
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets the local database to current migrations
@@ -2880,7 +2709,7 @@ commands:
 
       Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql`, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
 
-      Note that since Postgres roles are cluster level entities, those changes will persist between resets. In order to reset custom roles, you need to restart the local development stack.
+      When running db reset with `--linked` or `--db-url` flag, a SQL script is executed to identify and drop all user created entities in the remote database. Since Postgres roles are cluster level entities, any custom roles created through the dashboard or `supabase/roles.sql` will not be deleted by remote reset.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -2901,6 +2730,10 @@ commands:
         description: |
           Resets the database specified by the connection string (must be percent-encoded).
         default_value: ''
+      - id: last
+        name: --last <uint>
+        description: Reset up to the last n migration versions.
+        default_value: '0'
       - id: linked
         name: --linked
         description: Resets the linked project with local migrations.
@@ -2976,7 +2809,7 @@ commands:
         default_value: 'false'
       - id: include-seed
         name: --include-seed
-        description: Include seed data from supabase/seed.sql.
+        description: Include seed data from your config.
         default_value: 'false'
       - id: linked
         name: --linked
@@ -3327,6 +3160,32 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
+  - id: supabase-config
+    title: supabase config
+    summary: Manage Supabase project configurations
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-config-push
+    flags: []
+  - id: supabase-config-push
+    title: supabase config push
+    summary: Pushes local config.toml to the linked project
+    description: |2
+
+      Updates the configurations of a linked Supabase project with the local `supabase/config.toml` file.
+
+      This command allows you to manage project configuration as code by defining settings locally and then pushing them to your remote project.
+    tags: []
+    links: []
+    usage: supabase config push
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
@@ -3472,7 +3331,7 @@ commands:
   - id: supabase-branches-update
     title: supabase branches update
     summary: Update a preview branch
-    description: Update a preview branch by its ID.
+    description: Update a preview branch by its name or ID.
     tags: []
     links: []
     usage: supabase branches update [branch-id] [flags]
@@ -3489,10 +3348,6 @@ commands:
       - id: persistent
         name: --persistent
         description: Switch between ephemeral and persistent branch.
-        default_value: 'false'
-      - id: reset-on-push
-        name: --reset-on-push
-        description: Reset the preview branch on git push.
         default_value: 'false'
       - id: status
         name: --status <string>
@@ -3580,7 +3435,7 @@ commands:
   - id: supabase-branches-delete
     title: supabase branches delete
     summary: Delete a preview branch
-    description: Delete a preview branch by its ID.
+    description: Delete a preview branch by its name or ID.
     tags: []
     links: []
     usage: supabase branches delete [branch-id]
@@ -3613,124 +3468,94 @@ commands:
         description: Select a region to deploy the branch database.
         default_value: ''
         accepted_values:
-          - id: ams
-            name: ams
+          - id: ap-northeast-1
+            name: ap-northeast-1
             type: string
-          - id: arn
-            name: arn
+          - id: ap-northeast-2
+            name: ap-northeast-2
             type: string
-          - id: bog
-            name: bog
+          - id: ap-south-1
+            name: ap-south-1
             type: string
-          - id: bos
-            name: bos
+          - id: ap-southeast-1
+            name: ap-southeast-1
             type: string
-          - id: cdg
-            name: cdg
+          - id: ap-southeast-2
+            name: ap-southeast-2
             type: string
-          - id: den
-            name: den
+          - id: ca-central-1
+            name: ca-central-1
             type: string
-          - id: dfw
-            name: dfw
+          - id: eu-central-1
+            name: eu-central-1
             type: string
-          - id: ewr
-            name: ewr
+          - id: eu-west-1
+            name: eu-west-1
             type: string
-          - id: fra
-            name: fra
+          - id: eu-west-2
+            name: eu-west-2
             type: string
-          - id: gdl
-            name: gdl
+          - id: eu-west-3
+            name: eu-west-3
             type: string
-          - id: gig
-            name: gig
+          - id: sa-east-1
+            name: sa-east-1
             type: string
-          - id: gru
-            name: gru
+          - id: us-east-1
+            name: us-east-1
             type: string
-          - id: hkg
-            name: hkg
+          - id: us-west-1
+            name: us-west-1
             type: string
-          - id: iad
-            name: iad
-            type: string
-          - id: jnb
-            name: jnb
-            type: string
-          - id: lax
-            name: lax
-            type: string
-          - id: lhr
-            name: lhr
-            type: string
-          - id: maa
-            name: maa
-            type: string
-          - id: mad
-            name: mad
-            type: string
-          - id: mia
-            name: mia
-            type: string
-          - id: nrt
-            name: nrt
-            type: string
-          - id: ord
-            name: ord
-            type: string
-          - id: otp
-            name: otp
-            type: string
-          - id: qro
-            name: qro
-            type: string
-          - id: scl
-            name: scl
-            type: string
-          - id: sea
-            name: sea
-            type: string
-          - id: sin
-            name: sin
-            type: string
-          - id: sjc
-            name: sjc
-            type: string
-          - id: syd
-            name: syd
-            type: string
-          - id: waw
-            name: waw
-            type: string
-          - id: yul
-            name: yul
-            type: string
-          - id: yyz
-            name: yyz
+          - id: us-west-2
+            name: us-west-2
             type: string
       - id: size
         name: --size <string>
         description: Select a desired instance size for the branch database.
         default_value: ''
         accepted_values:
-          - id: micro
-            name: micro
-            type: string
-          - id: small
-            name: small
+          - id: large
+            name: large
             type: string
           - id: medium
             name: medium
             type: string
-          - id: large
-            name: large
+          - id: micro
+            name: micro
             type: string
-          - id: xlarge
-            name: xlarge
+          - id: 12xlarge
+            name: 12xlarge
+            type: string
+          - id: 16xlarge
+            name: 16xlarge
+            type: string
+          - id: 24xlarge
+            name: 24xlarge
+            type: string
+          - id: 24xlarge_high_memory
+            name: 24xlarge_high_memory
+            type: string
+          - id: 24xlarge_optimized_cpu
+            name: 24xlarge_optimized_cpu
+            type: string
+          - id: 24xlarge_optimized_memory
+            name: 24xlarge_optimized_memory
             type: string
           - id: 2xlarge
             name: 2xlarge
+            type: string
+          - id: 48xlarge
+            name: 48xlarge
+            type: string
+          - id: 48xlarge_high_memory
+            name: 48xlarge_high_memory
+            type: string
+          - id: 48xlarge_optimized_cpu
+            name: 48xlarge_optimized_cpu
+            type: string
+          - id: 48xlarge_optimized_memory
+            name: 48xlarge_optimized_memory
             type: string
           - id: 4xlarge
             name: 4xlarge
@@ -3738,11 +3563,14 @@ commands:
           - id: 8xlarge
             name: 8xlarge
             type: string
-          - id: 12xlarge
-            name: 12xlarge
+          - id: pico
+            name: pico
             type: string
-          - id: 16xlarge
-            name: 16xlarge
+          - id: small
+            name: small
+            type: string
+          - id: xlarge
+            name: xlarge
             type: string
       - id: experimental
         name: --experimental
@@ -3765,4 +3593,42 @@ commands:
       - id: password
         name: -p, --password <string>
         description: Password to your remote Postgres database.
+        default_value: ''
+  - id: supabase-backups
+    title: supabase backups
+    summary: Manage Supabase physical backups
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-backups-list
+      - supabase-backups-restore
+    flags: []
+  - id: supabase-backups-restore
+    title: supabase backups restore
+    summary: Restore to a specific timestamp using PITR
+    tags: []
+    links: []
+    usage: supabase backups restore [flags]
+    subcommands: []
+    flags:
+      - id: timestamp
+        name: -t, --timestamp <int>
+        description: The recovery time target in seconds since epoch.
+        default_value: '0'
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
+  - id: supabase-backups-list
+    title: supabase backups list
+    summary: Lists available physical backups
+    tags: []
+    links: []
+    usage: supabase backups list
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
         default_value: ''

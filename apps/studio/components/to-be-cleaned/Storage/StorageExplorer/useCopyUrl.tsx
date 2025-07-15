@@ -1,31 +1,58 @@
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants/infrastructure'
-import { copyToClipboard } from 'lib/helpers'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import { copyToClipboard } from 'ui'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { fetchFileUrl } from './useFetchFileUrlQuery'
 
-export const useCopyUrl = (ref: string) => {
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+export const useCopyUrl = () => {
+  const { projectRef, selectedBucket, getPathAlongOpenedFolders } =
+    useStorageExplorerStateSnapshot()
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
 
-  const apiService = (projectSettings?.services ?? []).find(
-    (x) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = `${protocol}://${endpoint ?? '-'}`
+
+  const getFileUrl = useCallback(
+    (fileName: string, expiresIn?: URL_EXPIRY_DURATION) => {
+      const pathToFile = getPathAlongOpenedFolders(false)
+      const formattedPathToFile = [pathToFile, fileName].join('/')
+
+      return fetchFileUrl(
+        formattedPathToFile,
+        projectRef,
+        selectedBucket.id,
+        selectedBucket.public,
+        expiresIn
+      )
+    },
+    [projectRef, selectedBucket.id, selectedBucket.public, getPathAlongOpenedFolders]
   )
-  const apiConfig = apiService?.app_config
-  const apiUrl = `${apiConfig?.protocol ?? 'https'}://${apiConfig?.endpoint ?? '-'}`
 
-  const onCopyUrl = (name: string, url: string | Promise<string>) => {
-    const formattedUrl = Promise.resolve(url).then((url) => {
-      return customDomainData?.customDomain?.status === 'active'
-        ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
-        : url
-    })
+  const onCopyUrl = useCallback(
+    (name: string, expiresIn?: URL_EXPIRY_DURATION) => {
+      const formattedUrl = getFileUrl(name, expiresIn).then((url) => {
+        return customDomainData?.customDomain?.status === 'active'
+          ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
+          : url
+      })
 
-    return copyToClipboard(formattedUrl, () => {
-      toast.success(`Copied URL for ${name} to clipboard.`)
-    })
-  }
+      return copyToClipboard(formattedUrl, () => {
+        toast.success(`Copied URL for ${name} to clipboard.`)
+      })
+    },
+    [
+      apiUrl,
+      customDomainData?.customDomain?.hostname,
+      customDomainData?.customDomain?.status,
+      getFileUrl,
+    ]
+  )
 
   return { onCopyUrl }
 }

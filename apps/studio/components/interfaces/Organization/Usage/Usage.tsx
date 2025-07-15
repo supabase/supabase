@@ -1,15 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import {
+  ScaffoldContainer,
+  ScaffoldContainerLegacy,
+  ScaffoldTitle,
+} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
+import DateRangePicker from 'components/ui/DateRangePicker'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -17,7 +18,8 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { Button, Listbox } from 'ui'
+import { cn, Listbox } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
@@ -57,20 +59,23 @@ const Usage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectRef, isSuccess])
 
-  const billingCycleStart = dayjs.unix(subscription?.current_period_start ?? 0).utc()
-  const billingCycleEnd = dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  const billingCycleStart = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_start ?? 0).utc()
+  }, [subscription])
+
+  const billingCycleEnd = useMemo(() => {
+    return dayjs.unix(subscription?.current_period_end ?? 0).utc()
+  }, [subscription])
 
   const currentBillingCycleSelected = useMemo(() => {
     // Selected by default
-    if (!dateRange?.period_start || !dateRange?.period_end || !subscription) return true
-
-    const { current_period_start, current_period_end } = subscription
+    if (!dateRange?.period_start || !dateRange?.period_end) return true
 
     return (
-      dayjs(dateRange.period_start.date).isSame(new Date(current_period_start * 1000)) &&
-      dayjs(dateRange.period_end.date).isSame(new Date(current_period_end * 1000))
+      dayjs(dateRange.period_start.date).isSame(billingCycleStart) &&
+      dayjs(dateRange.period_end.date).isSame(billingCycleEnd)
     )
-  }, [dateRange, subscription])
+  }, [dateRange, billingCycleStart, billingCycleEnd])
 
   const startDate = useMemo(() => {
     // If end date is in future, set end date to now
@@ -111,103 +116,97 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainer className="sticky top-0 border-b bg-studio z-10 overflow-hidden">
-        <div className="py-4 flex items-center space-x-4">
-          {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Usage</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
+      <div className="sticky top-0 border-b bg-studio z-[1] overflow-hidden ">
+        <ScaffoldContainer className="">
+          <div className="py-4 flex items-center space-x-4">
+            {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
-          {isErrorSubscription && (
-            <AlertError
-              className="w-full"
-              subject="Failed to retrieve usage data"
-              error={subscriptionError}
-            />
-          )}
-
-          {isSuccessSubscription && (
-            <>
-              <DateRangePicker
-                onChange={setDateRange}
-                value={TIME_PERIODS_BILLING[0].key}
-                options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
-                loading={isLoadingSubscription}
-                currentBillingPeriodStart={subscription?.current_period_start}
-                currentBillingPeriodEnd={subscription?.current_period_end}
+            {isErrorSubscription && (
+              <AlertError
+                className="w-full"
+                subject="Failed to retrieve usage data"
+                error={subscriptionError}
               />
+            )}
 
-              <Listbox
-                size="tiny"
-                name="schema"
-                className="w-[180px]"
-                value={selectedProjectRef}
-                onChange={(value: any) => {
-                  if (value === 'all-projects') setSelectedProjectRef(undefined)
-                  else setSelectedProjectRef(value)
-                }}
-              >
-                <Listbox.Option
-                  key="all-projects"
-                  id="all-projects"
-                  label="All projects"
-                  value="all-projects"
+            {isSuccessSubscription && (
+              <>
+                <DateRangePicker
+                  onChange={setDateRange}
+                  value={TIME_PERIODS_BILLING[0].key}
+                  options={[...TIME_PERIODS_BILLING, ...TIME_PERIODS_REPORTS]}
+                  loading={isLoadingSubscription}
+                  currentBillingPeriodStart={subscription?.current_period_start}
+                  currentBillingPeriodEnd={subscription?.current_period_end}
+                />
+
+                <Listbox
+                  size="tiny"
+                  name="schema"
+                  className="w-[180px]"
+                  value={selectedProjectRef}
+                  onChange={(value: any) => {
+                    if (value === 'all-projects') setSelectedProjectRef(undefined)
+                    else setSelectedProjectRef(value)
+                  }}
                 >
-                  All projects
-                </Listbox.Option>
-                {orgProjects?.map((project) => (
                   <Listbox.Option
-                    key={project.ref}
-                    id={project.ref}
-                    value={project.ref}
-                    label={project.name}
+                    key="all-projects"
+                    id="all-projects"
+                    label="All projects"
+                    value="all-projects"
                   >
-                    {project.name}
+                    All projects
                   </Listbox.Option>
-                ))}
-              </Listbox>
+                  {orgProjects?.map((project) => (
+                    <Listbox.Option
+                      key={project.ref}
+                      id={project.ref}
+                      value={project.ref}
+                      label={project.name}
+                    >
+                      {project.name}
+                    </Listbox.Option>
+                  ))}
+                </Listbox>
 
-              <div className="flex flex-col xl:flex-row xl:gap-3">
-                <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
-                  Organization is on the {subscription.plan.name} plan
-                </p>
-                <p className="text-sm text-foreground-light">
-                  {billingCycleStart.format('DD MMM YYYY')} -{' '}
-                  {billingCycleEnd.format('DD MMM YYYY')}
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-      </ScaffoldContainer>
+                <div className="flex flex-col xl:flex-row xl:gap-3">
+                  <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                    Organization is on the {subscription.plan.name} plan
+                  </p>
+                  <p className="text-sm text-foreground-light">
+                    {billingCycleStart.format('DD MMM YYYY')} -{' '}
+                    {billingCycleEnd.format('DD MMM YYYY')}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </ScaffoldContainer>
+      </div>
 
       {selectedProjectRef ? (
         <ScaffoldContainer className="mt-5">
-          <InformationBox
+          <Admonition
+            type="default"
             title="Usage filtered by project"
             description={
-              <div className="space-y-3">
-                <p>
-                  You are currently viewing usage for the "
-                  {selectedProject?.name || selectedProjectRef}" project. Since your organization is
-                  using the new organization-based billing, the included quota is for your whole
-                  organization and not just this project. For billing purposes, we sum up usage from
-                  all your projects. To view your usage quota, set the project filter above back to
-                  "All Projects".
-                </p>
-                <div>
-                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                    <Link
-                      href="https://supabase.com/docs/guides/platform/org-based-billing"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Documentation
-                    </Link>
-                  </Button>
-                </div>
+              <div>
+                You are currently viewing usage for the "
+                {selectedProject?.name || selectedProjectRef}" project. Supabase uses{' '}
+                <Link
+                  href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
+                  target="_blank"
+                >
+                  organization-level billing
+                </Link>{' '}
+                and quotas. For billing purposes, we sum up usage from all your projects. To view
+                your usage quota, set the project filter above back to "All Projects".
               </div>
             }
-            defaultVisibility
-            hideCollapse
-            icon={<Info />}
           />
         </ScaffoldContainer>
       ) : (

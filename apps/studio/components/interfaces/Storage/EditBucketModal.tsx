@@ -3,21 +3,23 @@ import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert, Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
+import { Button, Collapsible, Form, Input, Listbox, Modal, Toggle, cn } from 'ui'
 
 import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
   convertToBytes,
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
 import { IS_PLATFORM } from 'lib/constants'
-import type { StorageBucket } from './Storage.types'
+import { Admonition } from 'ui-patterns'
+import { Bucket } from 'data/storage/buckets-query'
 
 export interface EditBucketModalProps {
   visible: boolean
-  bucket?: StorageBucket
+  bucket?: Bucket
   onClose: () => void
 }
 
@@ -30,7 +32,10 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
       onClose()
     },
   })
-  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const { data } = useProjectStorageConfigQuery(
+    { projectRef: ref },
+    { enabled: IS_PLATFORM && visible }
+  )
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
 
@@ -81,6 +86,10 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
     >
       <Form validateOnBlur={false} initialValues={{}} validate={validate} onSubmit={onSubmit}>
         {({ values, resetForm }: { values: any; resetForm: any }) => {
+          const isChangingBucketVisibility = bucket?.public !== values.public
+          const isMakingBucketPrivate = bucket?.public && !values.public
+          const isMakingBucketPublic = !bucket?.public && values.public
+
           // [Alaister] although this "technically" is breaking the rules of React hooks
           // it won't error because the hooks are always rendered in the same order
           // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -103,45 +112,56 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
 
           return (
             <>
-              <Modal.Content>
+              <Modal.Content className={cn('!px-0', isChangingBucketVisibility && '!pb-0')}>
                 <Input
                   disabled
                   id="name"
                   name="name"
                   type="text"
-                  className="w-full"
+                  className="w-full px-5"
                   layout="vertical"
                   label="Name of bucket"
                   labelOptional="Buckets cannot be renamed once created."
                 />
-                <div className="space-y-2 mt-6">
+                <div className={cn('flex flex-col gap-y-2 mt-6')}>
                   <Toggle
                     id="public"
                     name="public"
                     layout="flex"
                     label="Public bucket"
+                    className="px-5"
                     descriptionText="Anyone can read any object without any authorization"
                   />
-                  {bucket?.public !== values.public && (
-                    <Alert
+                  {isChangingBucketVisibility && (
+                    <Admonition
+                      type="warning"
+                      className="rounded-none border-x-0 border-b-0 mb-0 [&>div>p]:!leading-normal"
                       title={
-                        !bucket?.public && values.public
+                        isMakingBucketPublic
                           ? 'Warning: Making bucket public'
-                          : bucket?.public && !values.public
+                          : isMakingBucketPrivate
                             ? 'Warning: Making bucket private'
                             : ''
                       }
-                      variant="warning"
-                      withIcon
                     >
-                      <p className="mb-2">
-                        {!bucket?.public && values.public
-                          ? `This will make all objects in the bucket "${bucket?.name}" public`
-                          : bucket?.public && !values.public
-                            ? `All objects in "${bucket?.name}" will be made private and will only be accessible via signed URLs or downloaded with the right authorisation headers`
+                      <p>
+                        {isMakingBucketPublic
+                          ? `This will make all objects in your bucket publicly accessible.`
+                          : isMakingBucketPrivate
+                            ? `All objects in your bucket will be private and only accessible via signed URLs, or downloaded with the right authorisation headers.`
                             : ''}
                       </p>
-                    </Alert>
+                      {isMakingBucketPrivate && (
+                        <p>
+                          Assets cached in the CDN may still be publicly accessible. You can
+                          consider{' '}
+                          <InlineLink href="https://supabase.com/docs/guides/storage/cdn/smart-cdn#cache-eviction">
+                            purging the cache
+                          </InlineLink>{' '}
+                          or moving your assets to a new bucket.
+                        </p>
+                      )}
+                    </Admonition>
                   )}
                 </div>
               </Modal.Content>
@@ -204,16 +224,16 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                             </Listbox>
                           </div>
                           {IS_PLATFORM && (
-                            <div className="col-span-12">
+                            <div className="col-span-12 mt-2">
                               <p className="text-foreground-light text-sm">
-                                Note: The{' '}
+                                Note: Individual bucket upload will still be capped at the{' '}
                                 <Link
                                   href={`/project/${ref}/settings/storage`}
-                                  className="text-brand opacity-80 hover:opacity-100 transition"
+                                  className="font-bold underline"
                                 >
                                   global upload limit
                                 </Link>{' '}
-                                takes precedence over this value ({formattedGlobalUploadLimit})
+                                of {formattedGlobalUploadLimit}
                               </p>
                             </div>
                           )}

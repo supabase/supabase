@@ -68,7 +68,7 @@ return new Response(JSON.stringify(data), {
 
 ---
 
-[👉 Next lesson](/04-proxy-supabase-requests-with-cloudflare-workers-and-itty-router)
+[👉 Next lesson](https://github.com/dijonmusters/supabase-data-at-the-edge/tree/main/04-proxy-supabase-requests-with-cloudflare-workers-and-itty-router)
 
 ---
 
