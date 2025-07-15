@@ -14,6 +14,7 @@ export const regionMap = {
   eu: 'eu',
 }
 
+// Default behaviour here is to be throttled (e.g if this env var is not available, IS_THROTTLED should be true, unless specified 'false')
 const IS_THROTTLED = process.env.IS_THROTTLED !== 'false'
 const PRO_MODEL = process.env.AI_PRO_MODEL ?? 'anthropic.claude-3-7-sonnet-20250219-v1:0'
 const NORMAL_MODEL = process.env.AI_NORMAL_MODEL ?? 'anthropic.claude-3-5-haiku-20241022-v1:0'
