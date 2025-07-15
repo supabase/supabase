@@ -45,8 +45,7 @@ export const Branching2Preview = () => {
           </li>
           <li>Conflicts must be manually resolved</li>
           <li>
-            If you have run migrations on <code>main</code>, only migrations are captured in new
-            branches (not the full schema).
+            If you have run migrations on <code>main</code>, new branches will be created from existing migrations instead of a full schema dump.
           </li>
         </ul>
       </div>
