@@ -1747,6 +1747,10 @@ export const storage: NavMenuConstant = {
           name: 'Connecting to Analytics Buckets',
           url: '/guides/storage/analytics/connecting-to-analytics-bucket',
         },
+        {
+          name: 'Limits',
+          url: '/guides/storage/analytics/limits',
+        },
       ],
     },
     {
