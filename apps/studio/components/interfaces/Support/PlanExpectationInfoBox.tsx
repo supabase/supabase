@@ -56,7 +56,11 @@ export const PlanExpectationInfoBox = ({
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-y-2 sm:gap-x-2">
               <Button asChild>
-                <Link href={`/org/${orgSlug}/billing?panel=subscriptionPlan`}>Upgrade project</Link>
+                <Link
+                  href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
+                >
+                  Upgrade project
+                </Link>
               </Button>
               <Button asChild type="default" icon={<ExternalLink />}>
                 <Link

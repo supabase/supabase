@@ -133,3 +133,13 @@ gcloud.json
 # sitemaps
 # apps/www/public/*.xml
 # apps/docs/public/*.xml
+
+# CLI version file
+.temp/cli-latest
+
+.pnpm-store/*
+
+# Sentry CLI config
+**/.sentryclirc
+
+keys.json

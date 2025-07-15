@@ -17,7 +17,11 @@ export const BuiltBySection = forwardRef<ElementRef<'div'>, BuiltBySectionProps>
     if (!name && !docsUrl && !websiteUrl) return null
 
     return (
-      <div ref={ref} className={cn('flex items-center gap-10 px-10', className)} {...props}>
+      <div
+        ref={ref}
+        className={cn('flex flex-wrap items-center gap-8 md:gap-10 px-4 md:px-10', className)}
+        {...props}
+      >
         {name && (
           <div>
             <div className="text-foreground-lighter font-mono text-xs mb-1">BUILT BY</div>

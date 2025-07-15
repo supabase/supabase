@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   format:
     runs-on: ubuntu-latest
@@ -21,7 +24,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9.10.0
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
@@ -47,7 +49,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9.10.0
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4
@@ -73,7 +74,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9.10.0
           run_install: false
       - name: Setup node
         uses: actions/setup-node@v4

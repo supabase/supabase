@@ -22,7 +22,7 @@ const NewProjectPanel = () => {
   return (
     <div className="grid grid-cols-12 gap-4 lg:gap-20">
       <div className="col-span-12">
-        <div className="flex flex-col space-y-20">
+        <div className="flex flex-col space-y-12 md:space-y-20">
           <div className="flex h-full flex-col justify-between">
             <div className="space-y-2">
               <h3 className="text-xl text-foreground">Welcome to your new project</h3>

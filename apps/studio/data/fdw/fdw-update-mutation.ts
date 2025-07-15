@@ -4,7 +4,6 @@ import { toast } from 'sonner'
 import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { foreignTableKeys } from 'data/foreign-tables/keys'
-import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
@@ -16,7 +15,7 @@ import { fdwKeys } from './keys'
 
 export type FDWUpdateVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   wrapper: FDW
   wrapperMeta: WrapperMeta
   formState: {
@@ -32,7 +31,14 @@ export const getUpdateFDWSql = ({
   tables,
 }: Pick<FDWUpdateVariables, 'wrapper' | 'wrapperMeta' | 'formState' | 'tables'>) => {
   const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
-  const createWrapperSql = getCreateFDWSql({ wrapperMeta, formState, tables })
+  const createWrapperSql = getCreateFDWSql({
+    wrapperMeta,
+    formState,
+    tables,
+    mode: 'tables',
+    sourceSchema: '',
+    targetSchema: '',
+  })
 
   const sql = /* SQL */ `
     ${deleteWrapperSql}
@@ -76,7 +82,6 @@ export const useFDWUpdateMutation = ({
         queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
         queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
         queryClient.invalidateQueries(foreignTableKeys.list(projectRef)),
-        queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
         queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
       ])
 

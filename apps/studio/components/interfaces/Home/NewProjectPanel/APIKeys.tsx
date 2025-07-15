@@ -4,7 +4,7 @@ import { AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
@@ -46,11 +46,25 @@ const APIKeys = () => {
     projectRef,
   })
 
+  // API keys should not be empty. However it can be populated with a delay on project creation
+  const apiKeys = settings?.service_api_keys ?? []
+  const isApiKeysEmpty = apiKeys.length === 0
+
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  } = useJwtSecretUpdatingStatusQuery(
+    { projectRef },
+    {
+      enabled: !isProjectSettingsLoading && isApiKeysEmpty,
+    }
+  )
+
+  // Only show JWT loading state if the query is actually enabled
+  const showJwtLoading =
+    isJwtSecretUpdateStatusLoading && !isProjectSettingsLoading && isApiKeysEmpty
+
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
@@ -61,11 +75,7 @@ const APIKeys = () => {
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
-  const apiKeys = settings?.service_api_keys ?? []
   const { anonKey } = getAPIKeys(settings)
-
-  // API keys should not be empty. However it can be populated with a delay on project creation
-  const isApiKeysEmpty = apiKeys.length === 0
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
@@ -90,14 +100,20 @@ const APIKeys = () => {
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
-      ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+      ) : isProjectSettingsLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">
-            {isProjectSettingsLoading || isApiKeysEmpty
-              ? 'Retrieving API keys'
-              : 'JWT secret is being updated'}
-          </p>
+          <p className="text-sm text-foreground-light">Retrieving API keys</p>
+        </div>
+      ) : isApiKeysEmpty ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">Retrieving API keys</p>
+        </div>
+      ) : showJwtLoading ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">JWT secret is being updated</p>
         </div>
       ) : (
         <>

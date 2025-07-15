@@ -1,13 +1,13 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
+import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
 export type GetCellValueVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { schema: string; name: string }
   column: string
   pkMatch: { [key: string]: any }

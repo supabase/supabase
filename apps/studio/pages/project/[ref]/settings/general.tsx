@@ -2,10 +2,11 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import {
   ComplianceConfig,
   CustomDomainConfig,
-  DeleteProjectPanel,
   General,
   TransferProjectPanel,
 } from 'components/interfaces/Settings/General'
+import { DeleteProjectPanel } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
@@ -33,19 +34,20 @@ const ProjectSettings: NextPageWithLayout = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
         <General />
-        {!isBranch ? (
-          <>
-            {/* this is only setable on compliance orgs, currently that means HIPAA orgs */}
-            {hasHipaaAddon && <ComplianceConfig />}
-            <CustomDomainConfig />
-            {projectTransferEnabled && <TransferProjectPanel />}
-            <DeleteProjectPanel />
-          </>
-        ) : null}
+
+        {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
+        {!isBranch && hasHipaaAddon && <ComplianceConfig />}
+        <CustomDomainConfig />
+        {!isBranch && projectTransferEnabled && <TransferProjectPanel />}
+        {!isBranch && <DeleteProjectPanel />}
       </ScaffoldContainer>
     </>
   )
 }
 
-ProjectSettings.getLayout = (page) => <SettingsLayout title="General">{page}</SettingsLayout>
+ProjectSettings.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="General">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 export default ProjectSettings

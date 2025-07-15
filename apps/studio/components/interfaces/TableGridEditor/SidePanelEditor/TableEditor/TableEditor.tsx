@@ -2,8 +2,6 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Badge, Checkbox, Input, SidePanel } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -23,7 +21,9 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -41,6 +41,8 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -80,9 +82,11 @@ const TableEditor = ({
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -130,11 +134,12 @@ const TableEditor = ({
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
   )
 
-  const { data: foreignKeyMeta } = useForeignKeyConstraintsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: table?.schema,
-  })
+  const { data: foreignKeyMeta, isSuccess: isSuccessForeignKeyMeta } =
+    useForeignKeyConstraintsQuery({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: table?.schema,
+    })
   const foreignKeys = (foreignKeyMeta ?? []).filter(
     (fk) => fk.source_schema === table?.schema && fk.source_table === table?.name
   )
@@ -230,10 +235,13 @@ const TableEditor = ({
           isRealtimeEnabled
         )
         setTableFields(tableFields)
-        setFkRelations(formatForeignKeys(foreignKeys))
       }
     }
   }, [visible])
+
+  useEffect(() => {
+    if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
+  }, [isSuccessForeignKeyMeta])
 
   useEffect(() => {
     if (importContent && !isEmpty(importContent)) {
@@ -348,7 +356,20 @@ const TableEditor = ({
             label="Enable Realtime"
             description="Broadcast changes on this table to authorized subscribers"
             checked={tableFields.isRealtimeEnabled}
-            onChange={() => onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })}
+            onChange={() => {
+              sendEvent({
+                action: 'realtime_toggle_table_clicked',
+                properties: {
+                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                  origin: 'tableSidePanel',
+                },
+                groups: {
+                  project: project?.ref ?? 'Unknown',
+                  organization: org?.slug ?? 'Unknown',
+                },
+              })
+              onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
+            }}
             size="medium"
           />
         )}

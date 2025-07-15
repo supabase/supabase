@@ -9,15 +9,12 @@ import { useOrganizationCreateInvitationMutation } from 'data/organization-membe
 import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import {
   useOrganizationMembersQuery,
   type OrganizationMember,
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -31,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
@@ -50,8 +48,8 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
+  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
   const isPendingInviteAcceptance = !!member.invited_id
@@ -95,19 +93,9 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         toast.error(`Failed to resend invitation: ${error.message}`)
       },
     })
-  const { mutate: inviteMemberOld, isLoading: isCreatingInviteOld } =
-    useOrganizationMemberInviteCreateMutation({
-      onSuccess: () => {
-        toast.success('Resent the invitation')
-      },
-      onError: (error) => {
-        toast.error(`Failed to resend the invidation: ${error.message}`)
-      },
-    })
 
   const { mutate: deleteInvitation, isLoading: isDeletingInvite } =
     useOrganizationDeleteInvitationMutation()
-  const { mutate: deleteInvitationOld } = useOrganizationMemberInviteDeleteMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
@@ -124,44 +112,28 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (isOptedIntoProjectLevelPermissions) {
-      deleteInvitation(
-        { slug, id: invitedId, skipInvalidation: true },
-        {
-          onSuccess: () => {
-            if (!member.primary_email) return toast.error('Email is required')
-            const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
-            if (projectScopedRole !== undefined) {
-              const projects = (projectScopedRole?.project_ids ?? [])
-                .map((id) => allProjects?.find((p) => p.id === id)?.ref)
-                .filter(Boolean) as string[]
-              inviteMember({
-                slug,
-                email: member.primary_email,
-                roleId: projectScopedRole.base_role_id,
-                projects,
-              })
-            } else {
-              inviteMember({ slug, email: member.primary_email, roleId })
-            }
-          },
-        }
-      )
-    } else {
-      deleteInvitationOld(
-        { slug, invitedId, invalidateDetail: false },
-        {
-          onSuccess: () => {
-            inviteMemberOld({
+    deleteInvitation(
+      { slug, id: invitedId, skipInvalidation: true },
+      {
+        onSuccess: () => {
+          if (!member.primary_email) return toast.error('Email is required')
+          const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
+          if (projectScopedRole !== undefined) {
+            const projects = (projectScopedRole?.project_ids ?? [])
+              .map((id) => allProjects?.find((p) => p.id === id)?.ref)
+              .filter(Boolean) as string[]
+            inviteMember({
               slug,
-              invitedEmail: member.primary_email!,
-              ownerId: invitedId,
-              roleId,
+              email: member.primary_email,
+              roleId: projectScopedRole.base_role_id,
+              projects,
             })
-          },
-        }
-      )
-    }
+          } else {
+            inviteMember({ slug, email: member.primary_email, roleId })
+          }
+        },
+      }
+    )
   }
 
   const handleRevokeInvitation = (member: OrganizationMember) => {
@@ -169,34 +141,16 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (isOptedIntoProjectLevelPermissions) {
-      deleteInvitation(
-        { slug, id: invitedId },
-        { onSuccess: () => toast.success('Successfully revoked the invitation.') }
-      )
-    } else {
-      deleteInvitationOld(
-        { slug, invitedId },
-        { onSuccess: () => toast.success('Successfully revoked the invitation.') }
-      )
-    }
+    deleteInvitation(
+      { slug, id: invitedId },
+      { onSuccess: () => toast.success('Successfully revoked the invitation.') }
+    )
   }
 
-  if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
+  if (memberIsUser) {
     return (
       <div className="flex items-center justify-end">
-        <ButtonTooltip
-          disabled
-          type="text"
-          className="px-1.5"
-          icon={<MoreVertical size={18} />}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: 'You need additional permissions to manage this team member',
-            },
-          }}
-        />
+        <LeaveTeamButton />
       </div>
     )
   }
@@ -306,7 +260,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               </ul>
               <p className="mt-4 text-foreground-lighter">
                 If you'd like to retain the member's shared SQL snippets, right click on them and
-                "Duplicate personal copy" in the SQL Editor before removing this member.
+                "Duplicate query" in the SQL Editor before removing this member.
               </p>
             </div>
           ),

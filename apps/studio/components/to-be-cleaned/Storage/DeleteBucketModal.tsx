@@ -52,7 +52,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
             deletePolicy({
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              id: policy.id,
+              originalPolicy: policy,
             })
           )
         )
@@ -73,7 +73,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
   const onDeleteBucket = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!bucket) return console.error('No bucket is selected')
-    deleteBucket({ projectRef, id: bucket.id })
+    deleteBucket({ projectRef, id: bucket.id, type: bucket.type })
   }
 
   return (

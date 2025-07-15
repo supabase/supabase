@@ -42,7 +42,7 @@ export const SecretsManagement = () => {
       ? allSecrets.filter(
           (secret) =>
             (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
-            secret.key_id.toLowerCase().includes(searchValue.toLowerCase())
+            (secret?.id ?? '').toLowerCase().includes(searchValue.toLowerCase())
         )
       : allSecrets,
     (s) => {
@@ -56,11 +56,11 @@ export const SecretsManagement = () => {
 
   return (
     <>
-      <div className="space-y-4 p-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+      <div className="space-y-4 p-4 md:p-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div className="flex flex-col md:flex-row md:items-center gap-2">
             <Input
-              className="w-52"
+              className="md:w-52"
               size="tiny"
               placeholder="Search by name or key ID"
               value={searchValue}
@@ -81,7 +81,7 @@ export const SecretsManagement = () => {
                   : []
               }
             />
-            <div className="w-44">
+            <div className="md:w-44">
               <Listbox size="tiny" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="updated_at"
@@ -98,14 +98,6 @@ export const SecretsManagement = () => {
                   label="Sort by name"
                 >
                   Name
-                </Listbox.Option>
-                <Listbox.Option
-                  id="key_id"
-                  className="max-w-[180px]"
-                  value="key_id"
-                  label="Sort by key ID"
-                >
-                  Key ID
                 </Listbox.Option>
               </Listbox>
             </div>

@@ -1,9 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 
-import { IS_PLATFORM } from 'common'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   cn,
@@ -14,19 +11,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
-import Link from 'next/link'
 
 interface AddIntegrationDropdownProps {
   buttonText?: string
+  align?: 'end' | 'center'
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
-
-const Providers: INTEGRATION_TYPES[] = ['firebase', 'auth0', 'awsCognito']
 
 const ProviderDropdownItem = ({
   disabled,
@@ -51,64 +47,29 @@ const ProviderDropdownItem = ({
 }
 
 export const AddIntegrationDropdown = ({
+  align = 'end',
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
-  const organization = useSelectedOrganization()
-
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: organization?.slug },
-    { enabled: IS_PLATFORM }
-  )
+  const isWorkOSEnabled = useFlag('isWorkOSTPAEnabled')
 
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="primary" iconRight={<ChevronDown size={14} strokeWidth={1} />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
+      <DropdownMenuContent align={align} className="w-56">
+        <DropdownMenuLabel>Select Provider</DropdownMenuLabel>
+        <DropdownMenuSeparator />
 
-        {subscription?.plan.id === 'free' ? (
-          <>
-            <DropdownMenuSeparator />
-            <div className="bg-surface-200 -m-1 p-2">
-              <DropdownMenuLabel className="grid gap-1">
-                <p className="text-foreground-light">Unavailable on the Free plan</p>
-                <p className="text-foreground-lighter text-xs">
-                  <Link
-                    target="_href"
-                    rel="noreferrer"
-                    className="underline hover:text-foreground-light transition"
-                    href={`/org/${organization?.slug}/billing`}
-                  >
-                    Upgrade your plan
-                  </Link>{' '}
-                  to add the following providers to your project.
-                </p>
-              </DropdownMenuLabel>
-              <ProviderDropdownItem
-                disabled
-                type="auth0"
-                onSelectIntegrationType={onSelectIntegrationType}
-              />
-              <ProviderDropdownItem
-                disabled
-                type="awsCognito"
-                onSelectIntegrationType={onSelectIntegrationType}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
-            <ProviderDropdownItem
-              type="awsCognito"
-              onSelectIntegrationType={onSelectIntegrationType}
-            />
-          </>
+        <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
+        {isWorkOSEnabled && (
+          <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         )}
+        <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -42,6 +42,7 @@ export const useContentDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

@@ -1223,7 +1223,7 @@ export default {
     base: `
       relative
       bg-dash-sidebar
-      my-4
+      my-4 max-w-screen
       border border-overlay
       rounded-md
       shadow-xl
@@ -1246,10 +1246,10 @@ export default {
       tiny: `sm:align-middle sm:w-full sm:max-w-xs`,
       small: `sm:align-middle sm:w-full sm:max-w-sm`,
       medium: `sm:align-middle sm:w-full sm:max-w-lg`,
-      large: `sm:align-middle sm:w-full max-w-xl`,
-      xlarge: `sm:align-middle sm:w-full max-w-3xl`,
-      xxlarge: `sm:align-middle sm:w-full max-w-6xl`,
-      xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
+      large: `sm:align-middle sm:w-full md:max-w-xl`,
+      xlarge: `sm:align-middle sm:w-full md:max-w-3xl`,
+      xxlarge: `sm:align-middle sm:w-full max-w-screen md:max-w-6xl`,
+      xxxlarge: `sm:align-middle sm:w-full md:max-w-7xl`,
     },
     overlay: `
       z-40

@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -30,6 +31,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const router = useRouter()
+    const org = useSelectedOrganization()
 
     const { type, connection } = props
     const { data: projects } = useProjectsQuery()
@@ -113,7 +115,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  {type === 'Vercel' && (
+                  {type === 'Vercel' && org?.managed_by !== 'vercel-marketplace' && (
                     <DropdownMenuItem
                       className="space-x-2"
                       onSelect={(event) => {
@@ -130,9 +132,8 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       <p>Resync environment variables</p>
                     </DropdownMenuItem>
                   )}
-                  {(type === 'Vercel' || router.pathname !== projectIntegrationUrl) && (
-                    <DropdownMenuSeparator />
-                  )}
+                  {((type === 'Vercel' && org?.managed_by !== 'vercel-marketplace') ||
+                    router.pathname !== projectIntegrationUrl) && <DropdownMenuSeparator />}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
                     <Trash size={14} />
                     <p>Delete connection</p>
@@ -153,18 +154,10 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
           onCancel={onCancel}
           onConfirm={onConfirm}
           loading={isDeleting}
-          alert={
-            type === 'GitHub' && isBranchingEnabled
-              ? {
-                  title: 'Branching will be disabled for this project',
-                  description: ` Deleting this GitHub connection will remove all preview branches on this project,
-                and also disable branching for ${project.name}`,
-                }
-              : undefined
-          }
         >
           <p className="text-sm text-foreground-light">
-            This action cannot be undone. Are you sure you want to delete this {type} connection?
+            Deleting this GitHub connection will stop automatic creation and merging of preview
+            branches. Existing preview branches will remain unchanged.
           </p>
         </ConfirmationModal>
       </>

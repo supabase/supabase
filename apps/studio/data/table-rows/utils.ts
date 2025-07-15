@@ -1,4 +1,4 @@
-import type { Filter, ServiceError, SupaTable } from 'components/grid/types'
+import type { Filter, ServiceError } from 'components/grid/types'
 import { isNumericalColumn } from 'components/grid/utils/types'
 import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
 
@@ -6,7 +6,15 @@ import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
  * temporary fix until we implement a better filter UI
  * which validate input value base on the column type
  */
-export function formatFilterValue(table: SupaTable, filter: Filter) {
+export function formatFilterValue(
+  table: {
+    columns: {
+      name: string
+      format: string
+    }[]
+  },
+  filter: Filter
+) {
   const column = table.columns.find((x) => x.name == filter.column)
   if (column && isNumericalColumn(column.format)) {
     const numberValue = Number(filter.value)

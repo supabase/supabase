@@ -10,8 +10,9 @@ Claims returned must conform to our specification. Supabase Auth will check for 
 
 These are the fields currently available on an access token:
 
-Required Claims: `aud`, `exp`, `iat`, `sub`, `email`, `phone`, `role`, `aal`, `session_id`
-Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
+Required Claims: `iss`, `aud`, `exp`, `iat`, `sub`, `role`, `aal`, `session_id`, `email`, `phone`, `is_anonymous`
+
+Optional Claims: `jti`, `nbf`, `app_metadata`, `user_metadata`, `amr`,
 
 **Inputs**
 
@@ -205,8 +206,60 @@ Return these only if your hook processed the input without errors.
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="add-admin-role"
+  defaultActiveId="minimal-jwt"
 >
+<TabPanel id="minimal-jwt" label="Minimal JWT">
+
+Sometimes the size of the JWT can be a problem especially if you're using a [Server-Side Rendering framework](/docs/guides/auth/server-side). Common situations where the JWT can get too large include:
+
+- The user has a particularly large name, email address or phone number
+- The default JWT has too many claims coming from OAuth providers
+- A large avatar URL is included
+
+To lower the size of the JWT you can define a Custom Access Token hook like the one below which will instruct the Auth server to issue a JWT with only the listed claims. Check the documentation above on what JWT claims must be present and cannot be removed.
+
+Refer to the [Postgres JSON functions](https://www.postgresql.org/docs/current/functions-json.html) on how to manipulate `jsonb` objects.
+
+```sql
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+  declare
+    original_claims jsonb;
+    new_claims jsonb;
+    claim text;
+  begin
+    original_claims = event->'claims';
+    new_claims = '{}'::jsonb;
+
+    foreach claim in array array[
+      -- add claims you want to keep here
+      'iss',
+      'aud',
+      'exp',
+      'iat',
+      'sub',
+      'role',
+      'aal',
+      'session_id',
+      'email',
+      'phone',
+      'is_anonymous'
+   ] loop
+      if original_claims ? claim then
+        -- original_claims contains one of the listed claims, set it on new_claims
+        new_claims = jsonb_set(new_claims, array[claim], original_claims->claim);
+      end if;
+    end loop;
+
+    return jsonb_build_object('claims', new_claims);
+  end
+$$;
+```
+
+</TabPanel>
+
 <TabPanel id="add-admin-role" label="Add admin role">
 
 You can allow registered admin users to perform restricted actions by granting an `admin` claim to their token.
@@ -254,58 +307,6 @@ as $$
     -- Return the modified or original event
     return event;
   end;
-$$;
-
-grant all
-  on table public.profiles
-  to supabase_auth_admin;
-
-revoke all
-  on table public.profiles
-  from authenticated, anon, public;
-```
-
-</TabPanel>
-<TabPanel id="add-metadata-claim-plv8" label="Add claim via plv8">
-You can add custom claims to the access token. In this example, we fetch the level of an existing user from the `profiles` table and assign new users a default level of zero.
-
-For convenience, we enable the `plv8` extension under [`Database > Extensions`](/dashboard/project/_/database/extensions) to run JavaScript within our query.
-
-Create a `profiles` table to hold information:
-
-```sql
-create table profiles (
-  user_id uuid not null primary key references auth.users (id),
-  level integer,
-  is_admin boolean not null default false
-);
-```
-
-```sql
-create or replace function custom_access_token_hook(event jsonb)
-returns jsonb
-language plv8
-as $$
-  var user_level;
-
-  -- Fetch the current user's level from the profiles table
-  var result = plv8.execute("select level from public.profiles where user_id = $1", [event.user_id]);
-  if (result.length > 0) {
-    user_level = result[0].level;
-  } else {
-    -- Assign a default level of 0 if no level is found
-    user_level = 0;
-  }
-
-  -- Check if 'claims' exists in the event object; if not, initialize it
-  if (!event.claims) {
-    event.claims = {};
-  }
-
-  -- Update the level in the claims
-  event.claims.level = user_level;
-
-  return event;
 $$;
 
 grant all
@@ -382,7 +383,7 @@ import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+  const base64_secret = Deno.env.get('CUSTOM_ACCESS_TOKEN_SECRET').replace('v1,whsec_', '')
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret)
   try {
@@ -428,7 +429,7 @@ import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const base64_secret = Deno.env.get('AUTH_CUSTOM_ACCESS_TOKEN_SECRET')
+  const base64_secret = Deno.env.get('CUSTOM_ACCESS_TOKEN_SECRET').replace('v1,whsec_', '')
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret)
   try {
