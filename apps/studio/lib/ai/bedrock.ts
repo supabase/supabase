@@ -35,9 +35,8 @@ async function vercelOidcProvider() {
 }
 
 export const bedrockRegionMap = {
-  us: 'us-east-1',
-  eu: 'eu-central-1',
-  apac: 'ap-southeast-1',
+  us1: 'us-east-1',
+  us3: 'us-west-2',
 } as const
 
 export type BedrockRegion = keyof typeof bedrockRegionMap

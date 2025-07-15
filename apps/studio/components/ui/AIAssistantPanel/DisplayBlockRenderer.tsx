@@ -105,7 +105,7 @@ export const DisplayBlockRenderer = ({
   }
 
   return (
-    <div className="w-auto overflow-x-hidden">
+    <div className="display-block w-auto overflow-x-hidden !my-6">
       <QueryBlock
         label={label}
         sql={sqlQuery}
@@ -117,7 +117,7 @@ export const DisplayBlockRenderer = ({
         showRunButtonIfNotReadOnly={true}
         isLoading={isLoading}
         draggable={isDraggableToReports}
-        runQuery={initialArgs.runQuery === true && !displayData && !manualId}
+        runQuery={false}
         tooltip={
           isDraggableToReports ? (
             <div className="flex items-center gap-x-2">

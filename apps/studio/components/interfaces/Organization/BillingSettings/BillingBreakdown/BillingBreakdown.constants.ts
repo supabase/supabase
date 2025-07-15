@@ -24,7 +24,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     anchor: 'dbSize',
     category: 'Database',
     unitName: 'GB',
-    tip: 'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres. Free Plan projects are limited to 0.5 GB Database Size each.',
+    tip: 'Database size refers to the actual amount of space used by all your database objects, as reported by Postgres. This measurement reflects your current database size at this moment. Free Plan projects are limited to 0.5 GB Database Size each and are monitored across the entire billing period.',
   },
   {
     key: PricingMetric.EGRESS,

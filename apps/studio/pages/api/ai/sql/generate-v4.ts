@@ -1,22 +1,22 @@
 import pgMeta from '@supabase/pg-meta'
-import crypto from 'crypto'
+import { streamText, tool, ToolSet } from 'ai'
+import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { streamText, tool, ToolSet } from 'ai'
 import { IS_PLATFORM } from 'common'
-import { source } from 'common-tags'
+import { getOrganizations } from 'data/organizations/organizations-query'
+import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { aiOptInLevelSchema } from 'hooks/misc/useOrgOptedIntoAi'
+import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import { queryPgMetaSelfHosted } from 'lib/self-hosted'
-import {
-  createSupabaseMCPClient,
-  expectedToolsSchema,
-  filterToolsByOptInLevel,
-  transformToolResult,
-} from './supabase-mcp'
+import { getUnifiedLogsChart } from 'data/logs/unified-logs-chart-query'
+import { getUnifiedLogs } from 'data/logs/unified-logs-infinite-query'
+import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
+import { filterToolsByOptInLevel, toolSetValidationSchema } from 'lib/ai/tool-filter'
 import { getTools } from './tools'
 
 export const maxDuration = 120
@@ -45,10 +45,11 @@ export default wrapper
 const requestBodySchema = z.object({
   messages: z.array(z.any()),
   projectRef: z.string(),
-  aiOptInLevel: aiOptInLevelSchema,
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  chatName: z.string().optional(),
+  orgSlug: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
@@ -66,9 +67,51 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
   }
 
-  const { messages, projectRef, connectionString, aiOptInLevel } = data
+  const { messages: rawMessages, projectRef, connectionString, orgSlug, chatName } = data
 
-  const { model, error: modelError } = await getModel(projectRef) // use project ref as routing key
+  // Server-side safety: limit to last 5 messages and remove `results` property to prevent accidental leakage.
+  // Results property is used to cache results client-side after queries are run
+  // Tool results will still be included in history sent to model
+  const messages = (rawMessages || []).slice(-5).map((msg: any) => {
+    if (msg && msg.role === 'assistant' && 'results' in msg) {
+      const cleanedMsg = { ...msg }
+      delete cleanedMsg.results
+      return cleanedMsg
+    }
+    return msg
+  })
+
+  // Get organizations and compute opt in level server-side
+  const [organizations, projects] = await Promise.all([
+    getOrganizations({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+    getProjects({
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization && { Authorization: authorization }),
+      },
+    }),
+  ])
+
+  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+  const selectedProject = projects.find(
+    (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
+  )
+
+  // If the project is not in the organization specific by the org slug, return an error
+  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+    return res.status(400).json({ error: 'Project and organization do not match' })
+  }
+
+  const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+
+  const isLimited = messages.length > 4
+
+  const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -128,6 +171,197 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           return { status: 'Tool call sent to client for rendering.' }
         },
       }),
+      get_log_counts: tool({
+        description:
+          'Get log counts aggregated by time buckets to understand system health and activity levels. Returns success, warning, and error counts over time. Can filter by log types (edge, auth, postgres, etc.) and levels.',
+        parameters: z.object({
+          dateStart: z
+            .string()
+            .optional()
+            .describe('Start date as ISO string (defaults to 1 hour ago)'),
+          dateEnd: z.string().optional().describe('End date as ISO string (defaults to now)'),
+          level: z
+            .array(z.enum(['success', 'warning', 'error']))
+            .optional()
+            .describe('Filter by log levels'),
+          log_type: z
+            .array(
+              z.enum([
+                'postgres',
+                'edge_function',
+                'auth',
+                'postgrest',
+                'storage',
+                'edge',
+                'function_events',
+                'postgres_upgrade',
+                'supavisor',
+              ])
+            )
+            .optional()
+            .describe('Filter by log types (e.g., ["edge"] for edge logs only)'),
+        }),
+        execute: async (args) => {
+          try {
+            let dateArray: Date[] | null = null
+            if (args.dateStart && args.dateEnd) {
+              dateArray = [new Date(args.dateStart), new Date(args.dateEnd)]
+            }
+
+            const search: QuerySearchParamsType = {
+              date: dateArray,
+              level: args.level || null,
+              log_type: args.log_type || null,
+              latency: null,
+              'timing.dns': null,
+              'timing.connection': null,
+              'timing.tls': null,
+              'timing.ttfb': null,
+              'timing.transfer': null,
+              status: null,
+              regions: null,
+              method: null,
+              host: null,
+              pathname: null,
+              sort: null,
+              size: 40,
+              start: 0,
+              direction: 'next',
+              cursor: new Date(),
+              id: null,
+            }
+
+            let headers = new Headers()
+            if (authorization) headers.set('Authorization', authorization)
+
+            const chartData = await getUnifiedLogsChart({ projectRef, search }, undefined, headers)
+
+            const totalSuccess = chartData.reduce((sum: number, point) => sum + point.success, 0)
+            const totalWarning = chartData.reduce((sum: number, point) => sum + point.warning, 0)
+            const totalError = chartData.reduce((sum: number, point) => sum + point.error, 0)
+
+            return {
+              status: 'success',
+              data: chartData,
+              summary: `Found ${chartData.length} time buckets. Total: ${totalSuccess} success, ${totalWarning} warning, ${totalError} error logs`,
+              totals: {
+                success: totalSuccess,
+                warning: totalWarning,
+                error: totalError,
+              },
+            }
+          } catch (error) {
+            return {
+              status: 'error',
+              error: error instanceof Error ? error.message : 'Unknown error occurred',
+            }
+          }
+        },
+      }),
+      get_logs: tool({
+        description:
+          'Get detailed log entries for analysis and debugging. Use this after get_log_counts to examine specific logs during time periods with errors or unusual activity.',
+        parameters: z.object({
+          dateStart: z
+            .string()
+            .optional()
+            .describe('Start date as ISO string (defaults to 1 hour ago)'),
+          dateEnd: z.string().optional().describe('End date as ISO string (defaults to now)'),
+          level: z
+            .array(z.enum(['success', 'warning', 'error']))
+            .optional()
+            .describe('Filter by log levels'),
+          log_type: z
+            .array(
+              z.enum([
+                'postgres',
+                'edge_function',
+                'auth',
+                'postgrest',
+                'storage',
+                'edge',
+                'function_events',
+                'postgres_upgrade',
+                'supavisor',
+              ])
+            )
+            .optional()
+            .describe('Filter by log types'),
+          limit: z
+            .number()
+            .min(1)
+            .max(20)
+            .default(10)
+            .describe('Maximum number of logs to return (1-100, defaults to 20)'),
+        }),
+        execute: async (args) => {
+          try {
+            let dateArray: Date[] | null = null
+            if (args.dateStart && args.dateEnd) {
+              dateArray = [new Date(args.dateStart), new Date(args.dateEnd)]
+            }
+
+            const search: QuerySearchParamsType = {
+              date: dateArray,
+              level: args.level || null,
+              log_type: args.log_type || null,
+              latency: null,
+              'timing.dns': null,
+              'timing.connection': null,
+              'timing.tls': null,
+              'timing.ttfb': null,
+              'timing.transfer': null,
+              status: null,
+              regions: null,
+              method: null,
+              host: null,
+              pathname: null,
+              sort: null,
+              size: 40,
+              start: 0,
+              direction: 'next',
+              cursor: new Date(),
+              id: null,
+            }
+
+            let headers = new Headers()
+            if (authorization) headers.set('Authorization', authorization)
+
+            const logsData = await getUnifiedLogs(
+              {
+                projectRef,
+                search,
+              },
+              undefined,
+              headers
+            )
+
+            const logs = logsData.data.slice(0, args.limit)
+
+            return {
+              status: 'success',
+              data: logs,
+              summary: `Found ${logs.length} log entries. Showing details for analysis.`,
+              totalFetched: logs.length,
+              hasMore: logsData.nextCursor !== null,
+            }
+          } catch (error) {
+            return {
+              status: 'error',
+              error: error instanceof Error ? error.message : 'Unknown error occurred',
+            }
+          }
+        },
+      }),
+      rename_chat: tool({
+        description: `Rename the current chat session when the current chat name doesn't describe the conversation topic.`,
+        parameters: z.object({
+          newName: z.string().describe('The new name for the chat session. Five words or less.'),
+        }),
+        execute: async () => {
+          return { status: 'Chat request sent to client' }
+        },
+      }),
     }
 
     // Get a list of all schemas to add to context
@@ -174,10 +408,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
 
       const availableMcpTools = await mcpClient.tools()
+      // Filter tools based on the (potentially modified) AI opt-in level
+      const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
 
-      // Validate that the expected tools are available
+      // Validate that only known tools are provided
       const { data: validatedTools, error: validationError } =
-        expectedToolsSchema.safeParse(availableMcpTools)
+        toolSetValidationSchema.safeParse(allowedMcpTools)
 
       if (validationError) {
         console.error('MCP tools validation error:', validationError)
@@ -187,32 +423,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         })
       }
 
-      // Modify the execute_sql tool to add manualToolCallId
-      const modifiedMcpTools = {
-        ...availableMcpTools,
-        execute_sql: transformToolResult(validatedTools.execute_sql, (result) => {
-          const manualToolCallId = `manual_${crypto.randomUUID()}`
-
-          if (typeof result === 'object') {
-            return { ...result, manualToolCallId }
-          } else {
-            console.warn('execute_sql result is not an object, cannot add manualToolCallId')
-            return {
-              error: 'Internal error: Unexpected tool result format',
-              manualToolCallId,
-            }
-          }
-        }),
-      }
-
-      // Filter tools based on the AI opt-in level
-      mcpTools = filterToolsByOptInLevel(modifiedMcpTools, aiOptInLevel)
+      mcpTools = { ...validatedTools }
     }
 
-    // Combine MCP tools with custom tools
+    // Filter local tools based on the (potentially modified) AI opt-in level
+    const filteredLocalTools = filterToolsByOptInLevel(localTools, aiOptInLevel)
+
+    // Combine MCP tools with filtered local tools
     const tools: ToolSet = {
       ...mcpTools,
-      ...localTools,
+      ...filteredLocalTools,
     }
 
     const system = source`
@@ -230,6 +450,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # Core Principles:
       - **Tool Usage Strategy**:
+          - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**. Current chat name: ${chatName}
           - **Always attempt to use MCP tools** like \`list_tables\` and \`list_extensions\` to gather schema information if available. If these tools are not available or return a privacy message, state that you cannot access schema information and will proceed based on general Postgres/Supabase knowledge.
           - For **READ ONLY** queries:
               - Explain your plan.
@@ -256,11 +477,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # Supabase Health & Debugging
       - **General Status**:
-          - **If \`get_logs\`, \`list_tables\`, \`list_extensions\` are available**: Use them to provide a summary overview of the project's health (check recent errors/activity for relevant services like 'postgres', 'api', 'auth').
+          - **If \`get_log_counts\`, \`get_logs\`, \`list_tables\`, \`list_extensions\` are available**: Use \`get_log_counts\` first to get a high-level view of system health by checking success/warning/error counts over time. You can filter by specific log types (e.g., \`log_type: ["edge"]\` for edge logs, \`log_type: ["postgres"]\` for database logs). Then use \`get_logs\` and schema tools to provide a detailed summary overview of the project's health (check recent errors/activity for relevant services like 'postgres', 'api', 'auth').
           - **If tools are NOT available**: Ask the user to check their Supabase dashboard or logs for project health information.
       - **Service Errors**:
-          - **If \`get_logs\` is available**: If facing specific errors related to the database, Edge Functions, or other Supabase services, explain the problem and use the \`get_logs\` tool, specifying the relevant service type (e.g., 'postgres', 'edge functions', 'api') to retrieve logs and diagnose the issue. Briefly summarize the relevant log information in your text response before suggesting a fix.
-          - **If \`get_logs\` is NOT available**: Ask the user to provide relevant logs for the service experiencing errors.
+          - **If \`get_log_counts\` and \`get_logs\` are available**: Start with \`get_log_counts\` to understand the overall error patterns and timeframes. Use log type filtering to focus on specific services (e.g., \`log_type: ["edge"]\` for API errors, \`log_type: ["postgres"]\` for database errors). Then use \`get_logs\` to dive deeper into specific errors. When facing specific errors related to the database, Edge Functions, or other Supabase services, explain the problem and use the \`get_logs\` tool, specifying the relevant service type (e.g., 'postgres', 'edge functions', 'api') to retrieve logs and diagnose the issue. Briefly summarize the relevant log information in your text response before suggesting a fix.
+          - **If only \`get_logs\` is available**: Use the \`get_logs\` tool directly to retrieve logs for the service experiencing errors.
+          - **If tools are NOT available**: Ask the user to provide relevant logs for the service experiencing errors.
 
       # SQL Style:
           - Generated SQL must be valid Postgres SQL.
@@ -297,6 +519,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
                   - UPDATE: \`USING (condition) WITH CHECK (condition)\` (often the same or related conditions)
                   - DELETE: \`USING (condition)\`
               - Prefer \`PERMISSIVE\` policies unless \`RESTRICTIVE\` is explicitly needed.
+              - Avoid recursion errors when writing RLS policies that reference the same table. Use security definer functions to avoid this when needed.
               - Leverage Supabase helper functions: \`auth.uid()\` for the user's ID, \`auth.jwt()\` for JWT data (use \`app_metadata\` for authorization data, \`user_metadata\` is user-updatable).
               - **Performance**: Add indexes on columns used in RLS policies. Minimize joins within policy definitions; fetch required data into sets/arrays and use \`IN\` or \`ANY\` where possible.
       - **Functions**:
@@ -358,6 +581,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           \`\`\`
 
       # General Instructions:
+      
       - **Available Schemas**: ${schemasString}
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
