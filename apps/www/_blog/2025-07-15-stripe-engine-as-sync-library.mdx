@@ -1,12 +1,12 @@
 ---
 title: 'Stripe-To-Postgres Sync Engine as standalone Library'
-description: 'Sync Stripe webhook data directly to Postgres databases via npm.'
+description: 'Sync Stripe webhook data directly to Postgres using standalone TypeScript library.'
 categories:
   - product
   - launch-week
 tags:
   - launch-week
-  - studio
+  - stripe
 date: '2025-07-15:15:00'
 toc_depth: 3
 author: kevcodez
@@ -28,7 +28,7 @@ Stripe-Sync-Engine is a webhook listener that transforms Stripe webhooks into st
 
 ## Why sync Stripe data to Postgres?
 
-While Supabase offers a convenient foreign data wrapper (FDW) for Stripe, sometimes you want your Stripe data _locally available_ in your Postgres database for:
+While Supabase offers a convenient [foreign data wrapper](https://supabase.com/partners/integrations/supabase_wrapper_stripe) (FDW) for Stripe, sometimes you want your Stripe data _locally available_ in your Postgres database for:
 
 - **Lower latency**: Avoid round-trips to the Stripe API.
 - **Better joins**: Query subscriptions, invoices, and charges together.
@@ -111,9 +111,9 @@ Deno.serve(async (req) => {
 })
 ```
 
-1. Deploy your Edge Function initially using `supabase functions deploy`.
-2. Set up a Stripe webhook with the newly deployed Supabase Edge Function url.
-3. Create a new .env file in the `supabase` directory.
+1. Deploy your Edge Function initially using `supabase functions deploy`
+2. Set up a Stripe webhook with the newly deployed Supabase Edge Function url
+3. Create a new .env file in the `supabase` directory
 
 ```
 # Use Dedicated pooler if available
@@ -122,9 +122,9 @@ STRIPE_WEBHOOK_SECRET="whsec_"
 STRIPE_SECRET_KEY="sk_test_..."
 ```
 
-1. Load the secrets using `sh supabase secrets set --env-file ./supabase/.env` .
+1. Load the secrets using `sh supabase secrets set --env-file ./supabase/.env`
 
-As webhooks come in, the data is automatically persisted in the `stripe` schema. For a full guide, please refer to our [repository docs](https://github.com/supabase/stripe-sync-engine/blob/main/edge-function.md).
+As webhooks come in, the data is automatically persisted in the `stripe` schema. For a full guide, please refer to our [repository docs](https://supabase.github.io/stripe-sync-engine/).
 
 ## Final thoughts
 
