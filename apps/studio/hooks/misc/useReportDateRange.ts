@@ -175,10 +175,12 @@ export const useReportDateRange = (
 
   const handleIntervalGranularity = useCallback((from: string, to: string) => {
     const diffInDays = dayjs(to).diff(from, 'day', true)
+    const diffInHours = dayjs(to).diff(from, 'hour', true)
     const conditions = {
-      '1m': dayjs(to).diff(from, 'hour') < 3, // less than 3 hours
-      '10m': dayjs(to).diff(from, 'hour') < 6, // less than 6 hours
-      '30m': dayjs(to).diff(from, 'hour') < 18, // less than 18 hours
+      '1m': diffInHours < 1.1, // less than 1.1 hours
+      '5m': diffInHours < 3.1, // less than 3.1 hours
+      '10m': diffInHours < 6.1, // less than 6.1 hours
+      '30m': diffInHours < 25, // less than 25 hours
       '1h': diffInDays < 10, // less than 10 days
       '1d': diffInDays >= 10, // more than 10 days
     }
@@ -186,6 +188,8 @@ export const useReportDateRange = (
     switch (true) {
       case conditions['1m']:
         return '1m'
+      case conditions['5m']:
+        return '5m'
       case conditions['10m']:
         return '10m'
       case conditions['30m']:
