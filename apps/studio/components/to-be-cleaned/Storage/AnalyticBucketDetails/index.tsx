@@ -144,7 +144,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       <ScaffoldContainer className="flex flex-row justify-between items-center gap-10">
         <ScaffoldHeader>
           <ScaffoldTitle>
-            AnalyticsBucket <span className="text-brand">{bucket.name}</span>
+            Analytics Bucket <span className="text-brand">{bucket.name}</span>
           </ScaffoldTitle>
           <ScaffoldSectionDescription>
             Namespaces and tables connected to this bucket.
