@@ -80,22 +80,20 @@ export const NamespaceRow = ({
         <Badge variant="brand">{namespace}</Badge>
       </TableCell>
       <TableCell className="text-foreground-light">{schema && <Badge>{schema}</Badge>}</TableCell>
-      <TableCell className="text-foreground-light">
+      <TableCell className="text-foreground-light text-center">
         {tablesData ? `${tables.length}/${tablesData.length} connected tables` : ``}
       </TableCell>
       <TableCell className="text-right">
         <div className="flex gap-2 justify-end">
           <ButtonTooltip
-            type="default"
+            type={missingTables.length > 0 ? 'primary' : 'default'}
             icon={<RefreshCw className="h-3 w-3" />}
             loading={isImportingForeignSchema || isLoadingNamespaceTables}
             onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
             disabled={missingTables.length === 0}
-            tooltip={{
-              content: { text: scanTooltip },
-            }}
+            tooltip={{ content: { text: scanTooltip } }}
           >
-            {targetSchema ? 'Add' : 'Connect'}
+            Sync
           </ButtonTooltip>
           {schema ? (
             <a

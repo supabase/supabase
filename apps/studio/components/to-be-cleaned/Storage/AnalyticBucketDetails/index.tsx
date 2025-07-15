@@ -62,7 +62,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
     connectionString: project?.connectionString,
   })
 
-  /** The wrapper instance is the wrapper that is installed for this iceberg bucket. */
+  /** The wrapper instance is the wrapper that is installed for this Analytics bucket. */
   const wrapperInstance = useMemo(() => {
     return data
       ?.filter((wrapper) =>
@@ -144,10 +144,10 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       <ScaffoldContainer className="flex flex-row justify-between items-center gap-10">
         <ScaffoldHeader>
           <ScaffoldTitle>
-            Iceberg Bucket <span className="text-brand">{bucket.name}</span>
+            AnalyticsBucket <span className="text-brand">{bucket.name}</span>
           </ScaffoldTitle>
           <ScaffoldSectionDescription>
-            Tables and objects connected to this Iceberg bucket
+            Namespaces and tables connected to this bucket.
           </ScaffoldSectionDescription>
         </ScaffoldHeader>
         <DocsButton href="https://supabase.com/docs/guides/storage/analytics/introduction" />
@@ -184,10 +184,10 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Namespace</TableHead>
-                        <TableHead>Schema</TableHead>
-                        <TableHead>Tables</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="text-center">Namespace</TableHead>
+                        <TableHead className="text-center">Schema</TableHead>
+                        <TableHead className="text-center">Tables</TableHead>
+                        <TableHead className="text-center">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -273,7 +273,8 @@ const ExtensionNotInstalled = ({
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>
-          You need to install the wrappers extension to connect this Iceberg bucket to the database.
+          You need to install the wrappers extension to connect this Analytics bucket to the
+          database.
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
           <p>
@@ -373,10 +374,10 @@ const WrapperMissing = ({ bucketName }: { bucketName: string }) => {
       <Alert_Shadcn_ variant="warning">
         <WarningIcon />
         <AlertTitle_Shadcn_>
-          This Iceberg bucket does not have a foreign data wrapper setup.
+          This Analytics bucket does not have a foreign data wrapper setup.
         </AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-          <p>You need to setup a wrapper to connect this Iceberg bucket to the database.</p>
+          <p>You need to setup a wrapper to connect this bucket to the database.</p>
         </AlertDescription_Shadcn_>
         <AlertDescription_Shadcn_ className="mt-3">
           <Button type="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
