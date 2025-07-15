@@ -64,3 +64,39 @@ We highly recommend turning on a 'required check' for the Supabase integration. 
   caption='Check the "Require status checks to pass before merging" option.'
   src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
 />
+
+### Email notifications
+
+To catch failures early, we also recommend subscribing to email notifications on your branch. Common errors include migration conflict, function deployment failure, or invalid configuration file.
+
+You can setup a custom GitHub Action to monitor the status of any Supabase Branch.
+
+```yaml name=.github/workflows/notify-failure.yaml
+name: Branch Status
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - main
+      - develop
+    paths:
+      - 'supabase/**'
+
+jobs:
+  failed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fountainhead/action-wait-for-check@v1.2.0
+        id: check
+        with:
+          checkName: Supabase Preview
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ steps.check.outputs.conclusion == 'failure' }}
+        run: exit 1
+```

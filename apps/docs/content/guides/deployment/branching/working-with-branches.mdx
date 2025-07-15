@@ -16,7 +16,9 @@ The preview branch has a record of which migrations have been applied, and only 
 
 If you want to use your own ORM for managing migrations and seed scripts, you will need to run them in GitHub Actions after the preview branch is ready. The branch credentials can be fetched using the following example GHA workflow.
 
-```yaml
+```yaml name=.github/workflows/custom-orm.yaml
+name: Custom ORM
+
 on:
   pull_request:
     types:
@@ -38,7 +40,7 @@ jobs:
         id: check
         with:
           checkName: Supabase Preview
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
   migrate:
