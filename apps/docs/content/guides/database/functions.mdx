@@ -207,7 +207,7 @@ create or replace function get_planets()
 returns setof planets
 language sql
 as $$
-  select * from planets;
+  return query select * from planets;
 $$;
 ```
 
