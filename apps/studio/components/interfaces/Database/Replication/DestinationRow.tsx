@@ -6,7 +6,10 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
 import PipelineStatus, { PipelineStatusRequestStatus, PipelineStatusName } from './PipelineStatus'
 import { useParams } from 'common'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import {
+  ReplicationPipelineStatusData,
+  useReplicationPipelineStatusQuery,
+} from 'data/replication/pipeline-status-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
@@ -65,11 +68,14 @@ const DestinationRow = ({
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
-  const getStatusName = (status: any) => {
+  const getStatusName = (
+    status: ReplicationPipelineStatusData['status'] | undefined
+  ): string | undefined => {
     if (status && typeof status === 'object' && 'name' in status) {
       return status.name
     }
-    return status
+
+    return undefined
   }
 
   const statusName = getStatusName(pipelineStatus)
