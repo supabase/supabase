@@ -35,8 +35,6 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
-  const hasBranchEnabled = project?.is_branch_enabled
-
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
@@ -136,7 +134,6 @@ const BranchesPage: NextPageWithLayout = () => {
                       onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
                       generateCreatePullRequestURL={generateCreatePullRequestURL}
-                      showProductionBranch={hasBranchEnabled}
                     />
                   )}
                 </>
