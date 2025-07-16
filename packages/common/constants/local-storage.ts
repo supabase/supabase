@@ -13,6 +13,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
   UI_PREVIEW_REALTIME_SETTINGS: 'supabase-ui-realtime-settings',
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
+  UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
