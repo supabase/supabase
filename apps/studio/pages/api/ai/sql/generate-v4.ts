@@ -1,5 +1,5 @@
 import pgMeta from '@supabase/pg-meta'
-import { streamText, tool, ToolSet } from 'ai'
+import { convertToCoreMessages, CoreMessage, streamText, tool, ToolSet } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -435,8 +435,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ...filteredLocalTools,
     }
 
+    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
-      The current project is ${projectRef}.
       You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
 
       # Response Style:
@@ -581,16 +581,34 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           \`\`\`
 
       # General Instructions:
-      
-      - **Available Schemas**: ${schemasString}
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
+
+    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
+    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
+    const coreMessages: CoreMessage[] = [
+      {
+        role: 'system',
+        content: system,
+        providerOptions: {
+          bedrock: {
+            // Always cache the system prompt (must not contain dynamic content)
+            cachePoint: { type: 'default' },
+          },
+        },
+      },
+      {
+        role: 'assistant',
+        // Add any dynamic context here
+        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}`,
+      },
+      ...convertToCoreMessages(messages),
+    ]
 
     const result = streamText({
       model,
       maxSteps: 5,
-      system,
-      messages,
+      messages: coreMessages,
       tools,
     })
 
