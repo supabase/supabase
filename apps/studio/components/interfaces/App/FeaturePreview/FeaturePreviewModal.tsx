@@ -57,7 +57,8 @@ const FeaturePreviewModal = () => {
     : selectedFeatureKeyFromQuery
 
   const { flags, onUpdateFlag } = featurePreviewContext
-  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
+  const selectedFeature =
+    FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey) ?? FEATURE_PREVIEWS[0]
   const isSelectedFeatureEnabled = flags[selectedFeatureKey]
 
   const allFeaturePreviews = IS_PLATFORM
@@ -65,10 +66,10 @@ const FeaturePreviewModal = () => {
     : FEATURE_PREVIEWS.filter((x) => !x.isPlatformOnly)
 
   const toggleFeature = () => {
-    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
+    onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
     sendEvent({
       action: isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled',
-      properties: { feature: selectedFeatureKey },
+      properties: { feature: selectedFeature.key },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
@@ -98,7 +99,7 @@ const FeaturePreviewModal = () => {
                       onClick={() => selectFeaturePreview(feature.key)}
                       className={cn(
                         'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
-                        selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
+                        selectedFeature.key === feature.key ? 'bg-surface-300' : 'bg-surface-100'
                       )}
                     >
                       {isEnabled ? (
@@ -133,7 +134,7 @@ const FeaturePreviewModal = () => {
                 </Button>
               </div>
             </div>
-            {FEATURE_PREVIEW_KEY_TO_CONTENT[selectedFeatureKey]}
+            {FEATURE_PREVIEW_KEY_TO_CONTENT[selectedFeature.key]}
           </div>
         </div>
       ) : (
