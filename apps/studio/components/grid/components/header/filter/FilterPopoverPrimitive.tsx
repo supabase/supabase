@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
-import { KeyboardEvent, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import type { Filter, FilterOperator } from 'components/grid/types'
 import useLatest from 'hooks/misc/useLatest'
@@ -21,19 +21,6 @@ export interface FilterPopoverPrimitiveProps {
   portal?: boolean
 }
 
-/**
- * FilterPopoverPrimitive - A component for filtering table columns
- *
- * This component automatically applies filter changes with debouncing as users make them.
- *
- * Implementation note: This component uses a complex sync mechanism to avoid infinite update loops.
- * While it may seem over-engineered, this approach is necessary to handle:
- * 1. Bidirectional data flow (local state ↔ parent state)
- * 2. Debounced updates to reduce update frequency
- * 3. Preventing re-renders from creating endless update cycles
- *
- * The refs track different aspects of state to properly determine when and how to sync.
- */
 export const FilterPopoverPrimitive = ({
   buttonText,
   filters,
@@ -95,10 +82,6 @@ export const FilterPopoverPrimitive = ({
     [localFilters, setLocalFilters]
   )
 
-  function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    // Enter key now just refocuses - immediate updates happen with debouncing
-  }
-
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
@@ -116,7 +99,6 @@ export const FilterPopoverPrimitive = ({
                 filterIdx={index}
                 onChange={onChangeFilter}
                 onDelete={onDeleteFilter}
-                onKeyDown={handleEnterKeyDown}
               />
             ))}
             {localFilters.length == 0 && (
