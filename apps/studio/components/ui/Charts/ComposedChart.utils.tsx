@@ -144,7 +144,9 @@ const CustomTooltip = ({
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
-    const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isRamChart =
+      !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
