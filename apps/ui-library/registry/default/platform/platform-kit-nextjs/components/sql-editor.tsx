@@ -1,21 +1,15 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Editor } from '@monaco-editor/react'
+import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import { Button } from '@/registry/default/components/ui/button'
-import { ResultsTable } from '@/registry/default/platform/platform-kit-nextjs/components/results-table'
-import { Label } from '@/registry/default/components/ui/label'
-import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
 import {
-  ArrowUp,
-  Loader2,
-  BarChart as BarChartIcon,
-  Wand,
-  FileText,
-  AlertTriangle,
-} from 'lucide-react'
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/registry/default/components/ui/chart'
 import { Input } from '@/registry/default/components/ui/input'
-import { Skeleton } from '@/registry/default/components/ui/skeleton'
+import { Label } from '@/registry/default/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/registry/default/components/ui/popover'
 import {
   Select,
@@ -24,16 +18,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/registry/default/components/ui/select'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/registry/default/components/ui/chart'
-import { ToggleGroup, ToggleGroupItem } from '@/registry/default/components/ui/toggle-group'
+import { Skeleton } from '@/registry/default/components/ui/skeleton'
 import { Switch } from '@/registry/default/components/ui/switch'
-import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
+import { ToggleGroup, ToggleGroupItem } from '@/registry/default/components/ui/toggle-group'
+import { ResultsTable } from '@/registry/default/platform/platform-kit-nextjs/components/results-table'
+import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
+import { Editor } from '@monaco-editor/react'
+import {
+  AlertTriangle,
+  ArrowUp,
+  BarChart as BarChartIcon,
+  FileText,
+  Loader2,
+  Wand,
+} from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 interface SqlEditorProps {
   projectRef: string
@@ -217,7 +217,6 @@ export function SqlEditor({
                         </div>
                         <Switch
                           id="show-chart"
-                          size="sm"
                           className="mb-0"
                           checked={isChartVisible}
                           onCheckedChange={setIsChartVisible}

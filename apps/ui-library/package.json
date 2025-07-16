@@ -84,7 +84,7 @@
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
     "unist-util-visit": "^5.0.0",
-    "vaul": "^0.9.6",
+    "vaul": "^0.9.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
