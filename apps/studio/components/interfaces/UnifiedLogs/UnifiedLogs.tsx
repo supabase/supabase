@@ -204,6 +204,7 @@ export const UnifiedLogs = () => {
 
   // REMINDER: this is currently needed for the cmdk search
   // TODO: auto search via API when the user changes the filter instead of hardcoded
+  console.log({ facets })
   const filterFields = useMemo(() => {
     return defaultFilterFields.map((field) => {
       const facetsField = facets?.[field.value]
