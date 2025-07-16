@@ -2088,6 +2088,7 @@ export const security: NavMenuConstant = {
       name: 'Product security',
       url: undefined,
       items: [
+        { name: 'Platform configuration', url: '/guides/security/platform-security' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
       ],
@@ -2170,12 +2171,8 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/multi-factor-authentication',
           items: [
             {
-              name: 'Enable MFA',
-              url: '/guides/platform/multi-factor-authentication',
-            },
-            {
-              name: 'Require MFA for organization members',
-              url: '/guides/platform/org-mfa-enforcement',
+              name: 'Enforce MFA on organization',
+              url: '/guides/platform/mfa/org-mfa-enforcement',
             },
           ],
         },

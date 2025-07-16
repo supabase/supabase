@@ -16,6 +16,13 @@ export const FEATURE_PREVIEWS = [
     isPlatformOnly: true,
   },
   {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
+    name: 'Disable Advisor rules',
+    discussionsUrl: undefined,
+    isNew: true,
+    isPlatformOnly: true,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
     name: 'Directly edit database entities',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',

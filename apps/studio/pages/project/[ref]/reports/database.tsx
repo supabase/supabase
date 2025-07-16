@@ -21,12 +21,11 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
-import {
-  LogsDatePicker,
-  DatePickerValue,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 
 import { analyticsKeys } from 'data/analytics/keys'
 import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
@@ -39,11 +38,9 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import { formatBytes } from 'lib/helpers'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import ReportChart from '../../../../components/interfaces/Reports/ReportChart'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -82,7 +79,7 @@ const DatabaseUsage = () => {
 
   const isTeamsOrEnterprisePlan =
     !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
-  const showChartsV2 = false || isTeamsOrEnterprisePlan
+  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()

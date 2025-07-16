@@ -5,7 +5,6 @@ import { Project } from '../projects/project-detail-query'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getReportAttributes = (org: Organization, project: Project): ReportAttributes[] => {
-  const isFreePlan = org?.plan?.id === 'free'
   const computeSize = project?.infra_compute_size || 'medium'
 
   return [
@@ -111,8 +110,9 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       attributes: [],
     },
     {
-      id: 'database-connections',
-      label: 'Database connections',
+      id: 'pooler-database-connections',
+      label: 'Pooler to Database connections',
+      syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['free', 'pro'],
       hide: false,
@@ -126,7 +126,7 @@ export const getReportAttributes = (org: Organization, project: Project): Report
         {
           attribute: 'pg_stat_database_num_backends',
           provider: 'infra-monitoring',
-          label: 'Pooler to database connections',
+          label: 'Database connections',
           tooltip: 'Number of pooler connections to the database',
         },
       ],
@@ -379,40 +379,11 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     },
     {
       id: 'client-connections',
-      label: 'Database connections',
+      label: 'Database Connections',
+      syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['team', 'enterprise'],
-      hide: !isFreePlan, // [Jordi] Paid plans can see grouped client connections instead, so this chart is not needed for them. See below.
-      showTooltip: true,
-      showLegend: false,
-      showMaxValue: true,
-      hideChartType: false,
-      showGrid: true,
-      YAxisProps: { width: 30 },
-      defaultChartStyle: 'line',
-      attributes: [
-        {
-          attribute: 'pg_stat_database_num_backends',
-          provider: 'infra-monitoring',
-          label: 'Total connections',
-          tooltip: 'Total number of client connections to the database',
-        },
-        {
-          attribute: 'max_db_connections',
-          provider: 'reference-line',
-          label: 'Max connections',
-          value: getConnectionLimits(computeSize).direct,
-          tooltip: 'Max available connections for your current compute size',
-          isMaxValue: true,
-        },
-      ],
-    },
-    {
-      id: 'client-connections',
-      label: 'Direct Database Client Connections Grouped',
-      valuePrecision: 0,
-      availableIn: ['team', 'enterprise'],
-      hide: isFreePlan, // [Jordi] Paid plans can see grouped client connections instead, so this chart is not needed for them. See above.
+      hide: false,
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
@@ -558,7 +529,6 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           tooltip:
             'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
         },
-
         {
           attribute: 'pg_database_size',
           provider: 'infra-monitoring',
