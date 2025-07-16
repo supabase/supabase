@@ -645,5 +645,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/jose-ledesma",
     "author_image_url": "https://avatars.githubusercontent.com/u/52402874?v=4"
+  },
+  {
+    "author_id": "staaldraad",
+    "author": "Etienne Stalmans",
+    "username": "staaldraad",
+    "position": "Security Engineer",
+    "author_url": "https://github.com/staaldraad",
+    "author_image_url": "https://avatars.githubusercontent.com/u/4200832?v=4"
   }
 ]
