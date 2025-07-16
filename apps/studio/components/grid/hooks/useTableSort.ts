@@ -1,8 +1,8 @@
+import { useCallback, useMemo } from 'react'
+
 import { formatSortURLParams, sortsToUrlParams } from 'components/grid/SupabaseGrid.utils'
 import type { Sort } from 'components/grid/types'
 import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
-import { useCallback, useMemo } from 'react'
-
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { useSaveTableEditorState } from './useSaveTableEditorState'
 
