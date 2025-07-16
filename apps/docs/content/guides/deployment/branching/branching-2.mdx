@@ -16,8 +16,9 @@ Branching 2.0 is currently in public alpha. Features and functionality may chang
 With Branching 2.0, you can do the following directly from the Supabase dashboard:
 
 - Create preview branches
-- Pull production branch changes into a branch
-- Merge a branch into production to deploy the changes
+- Make changes to your public schema or edge functions
+- Merge these changes back into production when ready
+- Pull in updates from production
 
 ## Enable Branching 2.0
 
@@ -40,15 +41,27 @@ Use the branch selector in the top bar to change to your branch. Any changes you
 
 You can also use the branch's API keys and connection strings to run changes against the branch from your own code or SQL client.
 
+## Creating a merge request
+
+To review and merge changes from a branch back into your production branch, you must first create a merge request. There are two ways to do this.
+
+The first is to click the merge request button next to the branch selector that's located in the top menu. This will create the merge request and redirect you to the merge page where you can review and merge any changes.
+
+The second is to click on manage branches from within the branch selector, then in the left hand navigation you can click on merge requests. From here you can view all open merge requests and create new ones.
+
 ## Pulling changes from production into a branch
 
-1. Change to your branch using the branch selector in the top menu.
-1. Open the branch selector again, and click **Review changes**.
-1. If there are changes that you need to pull from production, a message will show, prompting you to update your branch. Click **Update branch**.
+When reviewing a merge request you may see a notice at the top of the page asking you to update your branch. This appears when your preview branch has drifted from your production branch. There may be public schema or edge function changes that have been made after your preview branch was created. Clicking update branch will attempt to pull in these changes, but be aware that by doing this your existing edge functions will be replaced. Any new edge functions created on the preview branch will remain untouched.
 
-## Merging changes from a branch into production
+## Limitations
 
-1. Change to your branch using the branch selector in the top menu.
-1. Open the branch selector again, and click **Review changes**.
-1. [Pull any changes](#pulling-changes-from-production-into-a-branch) if necessary.
-1. Click **Merge branch**.
+There are a few limitations you should be aware of before deciding to use branching without git.
+
+- Custom roles created through the dashboard are not captured on branch creation
+- Only public schema changes are supported right now
+- Extensions are not included in the diff process
+- Branches can only be merged to main; merging between preview branches is not supported
+- If your branch is out of date, you can pull in latest changes from main, but keep in mind that all functions will be overwritten
+- Deleting functions must be done manually on main branch
+- Migration conflicts must be manually resolved on the preview branch
+- If you have run migrations on main, new branches will be created from existing migrations instead of a full schema dump
