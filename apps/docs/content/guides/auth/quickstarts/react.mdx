@@ -27,22 +27,35 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Create a React app">
 
-    <StepHikeCompact.Details title="Create a React app">
+    Create a React app using one of the following recommended tools:
 
-    Create a React app using the `create-react-app` command.
+    - [Next.js](https://nextjs.org/)
+    - [React Router](https://reactrouter.com/)
+    - [Expo](https://expo.dev/)
 
-    </StepHikeCompact.Details>
+    *NOTE: The React team has officially deprecated `create-react-app` as of February 2025.
+    For more info, see the React team's announcement: [Sunsetting Create React App](https://react.dev/blog/2025/02/14/sunsetting-create-react-app).*
 
-    <StepHikeCompact.Code>
+  </StepHikeCompact.Details>
 
-      ```bash name=Terminal
-      npx create-react-app my-app
-      ```
+  <StepHikeCompact.Code>
 
-    </StepHikeCompact.Code>
+    ```bash name=Terminal
+    # Next.js app
+    npx create-next-app@latest my-next-app
 
-  </StepHikeCompact.Step>
+    # React Router app
+    npx create-react-router@latest my-react-router-app
+
+    # Expo app (React Native)
+    npx create-expo-app@latest my-expo-app
+    ```
+
+  </StepHikeCompact.Code>
+</StepHikeCompact.Step>
+
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
