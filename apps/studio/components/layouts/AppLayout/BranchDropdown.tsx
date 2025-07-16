@@ -133,8 +133,10 @@ export const BranchDropdown = () => {
             {isBranchingEnabled ? (
               selectedBranch?.is_default ? (
                 <Badge variant="warning">Production</Badge>
+              ) : selectedBranch?.persistent ? (
+                <Badge variant="brand">Persistent</Badge>
               ) : (
-                <Badge variant="brand">Preview Branch</Badge>
+                <Badge variant="brand">Preview</Badge>
               )
             ) : (
               <Badge variant="warning">Production</Badge>
