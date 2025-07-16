@@ -2,6 +2,7 @@ import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock'
 import { createCredentialChain, fromNodeProviderChain } from '@aws-sdk/credential-providers'
 import { CredentialsProviderError } from '@smithy/property-provider'
 import { awsCredentialsProvider } from '@vercel/functions/oidc'
+import { selectWeightedKey } from './util'
 
 const credentialProvider = createCredentialChain(
   // Vercel OIDC provider will be used for staging/production
@@ -34,6 +35,15 @@ async function vercelOidcProvider() {
   }
 }
 
+export async function checkAwsCredentials() {
+  try {
+    const credentials = await credentialProvider()
+    return !!credentials
+  } catch (error) {
+    return false
+  }
+}
+
 export const bedrockRegionMap = {
   use1: 'us-east-1',
   use2: 'us-east-2',
@@ -54,13 +64,15 @@ export type BedrockModel =
   | 'anthropic.claude-3-7-sonnet-20250219-v1:0'
   | 'anthropic.claude-3-5-haiku-20241022-v1:0'
 
+export type RegionWeights = Record<BedrockRegion, number>
+
 /**
  * Weights for distributing requests across Bedrock regions.
  * Weights are proportional to our rate limits per model per region.
  */
-const modelPerRegionRequestWeights: Record<BedrockModel, Record<BedrockRegion, number>> = {
+const modelRegionWeights: Record<BedrockModel, RegionWeights> = {
   ['anthropic.claude-3-7-sonnet-20250219-v1:0']: {
-    use1: 20,
+    use1: 40,
     use2: 10,
     usw2: 10,
     euc1: 10,
@@ -73,50 +85,32 @@ const modelPerRegionRequestWeights: Record<BedrockModel, Record<BedrockRegion, n
   },
 }
 
-export const bedrockForRegion = (region: BedrockRegion) =>
-  createAmazonBedrock({
-    credentialProvider,
-    region: bedrockRegionMap[region],
-  })
-
 /**
- * Selects a region based on a routing key using a consistent hashing algorithm.
+ * Creates a Bedrock client that routes requests to different regions
+ * based on a routing key.
  *
- * Ensures that the same key always maps to the same region
- * while distributing keys according to the weights per region.
+ * Used to load balance requests across multiple regions depending on
+ * their capacities.
  */
-export async function selectBedrockRegion(routingKey: string, model: BedrockModel) {
-  const regions = Object.keys(bedrockRegionMap) as BedrockRegion[]
-  const encoder = new TextEncoder()
-  const data = encoder.encode(routingKey)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+export function createRoutedBedrock(routingKey?: string) {
+  return async (modelId: BedrockModel) => {
+    const regionWeights = modelRegionWeights[modelId]
 
-  // Use first 4 bytes (32 bit integer)
-  const hashInt = new DataView(hashBuffer).getUint32(0)
+    // Select the Bedrock region based on the routing key and the model
+    const bedrockRegion = routingKey
+      ? await selectWeightedKey(routingKey, regionWeights)
+      : // There's a few places where getModel is called without a routing key
+        // Will cause disproportionate load on use1 region
+        'use1'
 
-  const totalWeight = regions.reduce(
-    (sum, region) => sum + modelPerRegionRequestWeights[model][region],
-    0
-  )
+    const bedrock = createAmazonBedrock({
+      credentialProvider,
+      region: bedrockRegionMap[bedrockRegion],
+    })
 
-  let cumulativeWeight = 0
-  const targetWeight = hashInt % totalWeight
+    // Cross-region models require the region prefix
+    const modelName = `${regionPrefixMap[bedrockRegion]}.${modelId}`
 
-  for (const region of regions) {
-    cumulativeWeight += modelPerRegionRequestWeights[model][region]
-    if (cumulativeWeight > targetWeight) {
-      return region
-    }
-  }
-
-  return regions[0]
-}
-
-export async function checkAwsCredentials() {
-  try {
-    const credentials = await credentialProvider()
-    return !!credentials
-  } catch (error) {
-    return false
+    return bedrock(modelName)
   }
 }
