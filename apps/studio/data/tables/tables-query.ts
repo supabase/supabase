@@ -6,6 +6,7 @@ import { useCallback } from 'react'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type TablesVariables = {
   projectRef?: string
@@ -45,7 +46,10 @@ export async function getTables(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/tables', {
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
       query: queryParams as any,
     },
