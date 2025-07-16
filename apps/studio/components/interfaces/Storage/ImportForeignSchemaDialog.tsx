@@ -7,8 +7,9 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import SchemaSelector from 'components/ui/SchemaSelector'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import {
   Button,
   Form_Shadcn_,
@@ -29,19 +30,9 @@ export interface ImportForeignSchemaDialogProps {
   onClose: () => void
 }
 
-const FormSchema = z.object({
-  bucketName: z.string().trim(),
-  sourceNamespace: z.string().trim(),
-  targetSchema: z.string().trim(),
-})
-
-export type ImportForeignSchemaForm = z.infer<typeof FormSchema>
-
 export const ImportForeignSchemaDialog = ({
   bucketName,
   namespace,
-  excludedSchemas,
-  wrapperValues,
   visible,
   onClose,
 }: ImportForeignSchemaDialogProps) => {
@@ -56,17 +47,49 @@ export const ImportForeignSchemaDialog = ({
       onClose()
     },
   })
+  const { data: config } = useProjectPostgrestConfigQuery({ projectRef: project?.ref! })
+  const exposedSchemas = config?.db_schema ? config?.db_schema.replace(/ /g, '').split(',') : []
 
-  const form = useForm<ImportForeignSchemaForm>({
+  const { data: protectedSchemas } = useProtectedSchemas()
+
+  const FormSchema = z.object({
+    bucketName: z.string().trim(),
+    sourceNamespace: z.string().trim(),
+    targetSchema: z
+      .string()
+      .trim()
+      .min(1, 'Schema name is required')
+      .refine(
+        (val) => {
+          if (!protectedSchemas) return true
+          return !protectedSchemas.includes(val)
+        },
+        {
+          message: 'This schema is protected by Supabase and is read-only through the dashboard.',
+        }
+      )
+      .refine(
+        (val) => {
+          if (!exposedSchemas) return true
+          return !exposedSchemas.includes(val)
+        },
+        {
+          message: 'This schema is exposed through the Data API. Please select a different schema.',
+        }
+      ),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       bucketName,
       sourceNamespace: namespace,
       targetSchema: '',
     },
+    mode: 'onChange',
   })
 
-  const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!ref) return console.error('Project ref is required')
     setLoading(true)
 
@@ -131,14 +154,7 @@ export const ImportForeignSchemaDialog = ({
                   description="Select the database schema where the Iceberg data will be accessible. Each schema can only be connected to one namespace."
                   layout="vertical"
                 >
-                  <SchemaSelector
-                    portal={false}
-                    size="small"
-                    selectedSchemaName={field.value}
-                    excludedSchemas={excludedSchemas}
-                    onSelectSchema={(schema) => field.onChange(schema)}
-                    onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
-                  />
+                  <Input_Shadcn_ {...field} placeholder="Enter schema name" />
                 </FormItemLayout>
               )}
             />
