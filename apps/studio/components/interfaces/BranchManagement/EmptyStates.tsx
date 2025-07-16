@@ -63,8 +63,8 @@ export const PreviewBranchesEmptyState = ({
     <div className="flex items-center flex-col justify-center w-full py-10">
       <p>Create your first preview branch</p>
       <p className="text-foreground-light mb-4">
-        Preview branches are used to experiment with changes to your database schema in a safe,
-        non-destructive environment.
+        Preview branches are short-lived environments that let you safely experiment with changes to
+        your database schema without affecting your main database.
       </p>
       <div className="flex items-center space-x-2">
         <DocsButton href="https://supabase.com/docs/guides/platform/branching" />

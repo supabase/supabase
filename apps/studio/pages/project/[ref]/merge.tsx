@@ -320,6 +320,14 @@ const MergePage: NextPageWithLayout = () => {
     )
   }
 
+  console.log(
+    'merge disabled:',
+    !combinedHasChanges,
+    isCombinedDiffLoading,
+    isBranchOutOfDateOverall,
+    isWorkflowRunning
+  )
+
   const isMergeDisabled =
     !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
 
@@ -340,7 +348,7 @@ const MergePage: NextPageWithLayout = () => {
                 ? 'No changes to merge'
                 : isWorkflowRunning
                   ? 'Workflow is currently running'
-                  : 'Branch is out of date',
+                  : 'Unable to merge at this time',
             },
           }}
           type="primary"
