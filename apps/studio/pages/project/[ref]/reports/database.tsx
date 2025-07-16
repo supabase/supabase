@@ -82,7 +82,7 @@ const DatabaseUsage = () => {
 
   const isTeamsOrEnterprisePlan =
     !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
-  const showChartsV2 = false || isTeamsOrEnterprisePlan
+  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
