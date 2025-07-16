@@ -82,7 +82,7 @@ const SignInLayout = ({
 
   return (
     <>
-      <div className="relative flex flex-col bg-alternative h-screen">
+      <div className="relative flex flex-col bg-alternative min-h-screen">
         <div
           className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
             ongoingIncident ? 'mt-14' : 'mt-6'

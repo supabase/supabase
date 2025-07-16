@@ -13,7 +13,7 @@ vi.mock(import('~/lib/openAi'), () => ({
 }))
 
 const rpcSpy = vi.fn().mockImplementation((funcName, params) => {
-  if (funcName === 'search_content') {
+  if (funcName === 'search_content_hybrid') {
     const limit = params?.max_result || 2
     const mockResults = [
       {
@@ -88,7 +88,7 @@ describe('/api/graphql searchDocs', () => {
     expect(json.data).toBeDefined()
     expect(json.data.searchDocs).toBeDefined()
     expect(json.data.searchDocs.nodes).toBeInstanceOf(Array)
-    expect(json.data.searchDocs.nodes).toHaveLength(2)
+    expect(json.data.searchDocs.nodes).toHaveLength(3)
     expect(json.data.searchDocs.nodes[0]).toMatchObject({
       title: 'Test Guide',
       href: '/guides/test',
@@ -117,7 +117,7 @@ describe('/api/graphql searchDocs', () => {
     expect(json.data.searchDocs.nodes).toHaveLength(1)
     expect(json.data.searchDocs.nodes[0].title).toBe('Test Guide')
     expect(rpcSpy).toHaveBeenCalledWith(
-      'search_content',
+      'search_content_hybrid',
       expect.objectContaining({
         max_result: 1,
       })
@@ -146,7 +146,7 @@ describe('/api/graphql searchDocs', () => {
     expect(json.errors).toBeUndefined()
     expect(json.data.searchDocs.nodes[0].content).toBe('Test content')
     expect(rpcSpy).toHaveBeenCalledWith(
-      'search_content',
+      'search_content_hybrid',
       expect.objectContaining({
         include_full_content: true,
       })

@@ -347,6 +347,7 @@ export default function ComposedChart({
               showTooltip ? (
                 <CustomTooltip
                   {...props}
+                  format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}
                   attributes={attributes}

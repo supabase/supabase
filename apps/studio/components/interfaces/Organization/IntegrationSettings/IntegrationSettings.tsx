@@ -28,7 +28,6 @@ import {
 } from 'lib/github'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
-import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
 import { useRouter } from 'next/router'
 
@@ -183,7 +182,6 @@ The GitHub app will watch for changes in your repository such as file changes, b
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />
       <SidePanelVercelProjectLinker />
-      <SidePanelGitHubRepoLinker />
     </>
   )
 }

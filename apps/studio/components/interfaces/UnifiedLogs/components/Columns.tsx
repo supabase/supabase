@@ -20,6 +20,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
     },
     enableHiding: false,
     enableResizing: false,
+    enableSorting: false,
     filterFn: (row, columnId, filterValue) => true,
     size: 48,
     minSize: 48,
@@ -39,6 +40,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
     },
     filterFn: (row, columnId, filterValue) => true,
     enableResizing: false,
+    enableSorting: false,
     size: 130,
     minSize: 130,
     maxSize: 130,
@@ -66,6 +68,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
     minSize: 40,
     maxSize: 40,
     enableResizing: false,
+    enableSorting: false,
     meta: {
       headerClassName:
         'w-[--header-log_type-size] max-w-[--header-log_type-size] min-w-[--header-log_type-size]',
@@ -83,6 +86,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
       return <span className="text-foreground-lighter">{value}</span>
     },
     enableResizing: false,
+    enableSorting: false,
     size: 70,
     minSize: 70,
     meta: {
@@ -113,8 +117,9 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
     },
     filterFn: (row, columnId, filterValue) => true,
     enableResizing: false,
-    size: 50,
-    minSize: 50,
+    enableSorting: false,
+    size: 55,
+    minSize: 55,
     meta: {
       headerClassName:
         'w-[--header-status-size] max-w-[--header-status-size] min-w-[--header-status-size]',
@@ -130,6 +135,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
       const value = row.getValue<ColumnSchema['host']>('host')
       return <TextWithTooltip text={value} />
     },
+    enableSorting: false,
     size: 220,
     minSize: 220,
     meta: {
@@ -144,6 +150,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
       const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
       return <TextWithTooltip text={value} />
     },
+    enableSorting: false,
     size: 320,
     minSize: 320,
     meta: {
@@ -181,6 +188,7 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
       )
     },
     enableResizing: true,
+    enableSorting: false,
     size: 200,
     minSize: 200,
     meta: {

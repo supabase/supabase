@@ -1,6 +1,5 @@
 import Link from 'next/link'
 
-import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
 import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -47,7 +46,6 @@ const IntegrationSettings = () => {
       <ScaffoldDivider />
       <VercelSection isProjectScoped={true} />
       <SidePanelVercelProjectLinker />
-      <SidePanelGitHubRepoLinker />
     </>
   )
 }

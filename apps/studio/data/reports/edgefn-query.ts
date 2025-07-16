@@ -106,24 +106,21 @@ order by
   },
   ExecutionTime: (interval, functionIds) => {
     const granularity = analyticsIntervalToGranularity(interval)
+    const hasFunctions = functionIds && functionIds.length > 0
     return `
 --edgefn-report-execution-time
 select
   timestamp_trunc(timestamp, ${granularity}) as timestamp,
-  function_id,
+  ${hasFunctions ? 'function_id,' : ''}
   avg(m.execution_time_ms) as avg_execution_time
 from
   function_edge_logs
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
-  ${
-    functionIds && functionIds.length > 0
-      ? `where function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})`
-      : ''
-  }
+  ${hasFunctions ? `where function_id IN (${functionIds.map((id) => `'${id}'`).join(',')})` : ''}
 group by
-  timestamp,
-  function_id
+  timestamp
+  ${hasFunctions ? ', function_id' : ''}
 order by
   timestamp desc
     `
@@ -278,41 +275,60 @@ const METRIC_FORMATTER: Record<
     return { data, chartAttributes }
   },
   ExecutionTime: (rawData, attributes, logsMetric, functionIds, edgeFnIdToName) => {
-    // Always use dynamic attributes, so the chart can show per-function stats.
     if (!rawData) return { data: undefined, chartAttributes: attributes }
     const result = rawData.result || []
+    const hasFunctions = functionIds && functionIds.length > 0
 
-    const functionIdsInData = Array.from(new Set(result.map((p: any) => p.function_id))) as string[]
+    if (hasFunctions) {
+      const chartAttributes = functionIds.map((id: string) => ({
+        attribute: id,
+        label: edgeFnIdToName?.(id) ?? id,
+        provider: 'logs',
+        enabled: true,
+      }))
 
-    const chartFunctionIds = functionIds && functionIds.length > 0 ? functionIds : functionIdsInData
+      if (result.length === 0) {
+        return { data: [], chartAttributes }
+      }
 
-    if (chartFunctionIds.length === 0) {
-      return { data: [], chartAttributes: [] } // No data, empty chart
+      const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
+      const data = Array.from(timestamps)
+        .sort()
+        .map((timestamp) => {
+          const point: any = { period_start: timestamp }
+          chartAttributes.forEach((attr) => {
+            point[attr.attribute] = 0
+          })
+          const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
+          matchingPoints.forEach((p: any) => {
+            point[p.function_id as string] = p.avg_execution_time
+          })
+          return point
+        })
+
+      return { data, chartAttributes }
+    } else {
+      const chartAttributes = [
+        {
+          attribute: 'avg_execution_time',
+          label: 'Avg. execution time (ms)',
+          provider: 'logs',
+          enabled: true,
+        },
+      ]
+
+      const data = result
+        .map((p: any) => ({
+          period_start: p.timestamp,
+          avg_execution_time: p.avg_execution_time,
+        }))
+        .sort(
+          (a: { period_start: string }, b: { period_start: string }) =>
+            new Date(a.period_start).getTime() - new Date(b.period_start).getTime()
+        )
+
+      return { data, chartAttributes }
     }
-
-    const chartAttributes = chartFunctionIds.map((id: string) => ({
-      attribute: id,
-      label: edgeFnIdToName?.(id) ?? id,
-      provider: 'logs',
-      enabled: true,
-    }))
-
-    const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
-    const data = Array.from(timestamps)
-      .sort()
-      .map((timestamp) => {
-        const point: any = { period_start: timestamp }
-        chartAttributes.forEach((attr) => {
-          point[attr.attribute] = 0
-        })
-        const matchingPoints = result.filter((p: any) => p.timestamp === timestamp)
-        matchingPoints.forEach((p: any) => {
-          point[p.function_id as string] = p.avg_execution_time
-        })
-        return point
-      })
-
-    return { data, chartAttributes }
   },
 }
 
