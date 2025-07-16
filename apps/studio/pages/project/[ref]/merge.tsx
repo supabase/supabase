@@ -340,7 +340,7 @@ const MergePage: NextPageWithLayout = () => {
                 ? 'No changes to merge'
                 : isWorkflowRunning
                   ? 'Workflow is currently running'
-                  : 'Branch is out of date',
+                  : 'Unable to merge at this time',
             },
           }}
           type="primary"
