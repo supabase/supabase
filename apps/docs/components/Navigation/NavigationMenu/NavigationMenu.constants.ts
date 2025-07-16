@@ -2172,7 +2172,7 @@ export const platform: NavMenuConstant = {
           items: [
             {
               name: 'Require MFA for organization members',
-              url: '/guides/platform/org-mfa-enforcement',
+              url: '/guides/platform/mfa/org-mfa-enforcement',
             },
           ],
         },
