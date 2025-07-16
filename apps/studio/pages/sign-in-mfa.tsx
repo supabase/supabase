@@ -1,12 +1,13 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
+import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
 import { Loading } from 'components/ui/Loading'
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -28,6 +29,8 @@ const SignInMfaPage: NextPageWithLayout = () => {
   const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [loading, setLoading] = useState(true)
+
+  const returnToPath = useMemo(() => getReturnToPath(), [])
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -64,7 +67,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
             addLoginEvent({})
 
             await queryClient.resetQueries()
-            router.push(getReturnToPath())
+            router.push(returnToPath)
             return
           } else {
             // Show the MFA form
@@ -92,6 +95,17 @@ const SignInMfaPage: NextPageWithLayout = () => {
       <div className="flex flex-col flex-1 bg-alternative h-screen items-center justify-center">
         <Loading />
       </div>
+    )
+  }
+
+  if (returnToPath === '/reset-password') {
+    return (
+      <ForgotPasswordLayout
+        heading="Complete two-factor authentication"
+        subheading="Enter the authentication code from your two-factor authentication app before changing your password"
+      >
+        <SignInMfaForm />
+      </ForgotPasswordLayout>
     )
   }
 

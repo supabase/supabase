@@ -44,7 +44,11 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
 
   const onCodeEntered: SubmitHandler<CodeFormData> = async (data) => {
     setIsLoading(true)
-    const { error } = await auth.verifyOtp({ email, token: data.code, type: 'recovery' })
+    const {
+      data: { user },
+      error,
+    } = await auth.verifyOtp({ email, token: data.code, type: 'recovery' })
+
     // This fixes a race condition where the user is redirected to the reset password page without the session being set
     // which causes the user to be redirected to /sign-in page even though he's signed in
     await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -53,7 +57,11 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
       setIsLoading(false)
       toast.error(`Failed to verify code: ${error.message}`)
     } else {
-      await router.push('reset-password')
+      if (user?.factors?.length > 0) {
+        await router.push({ pathname: '/sign-in-mfa', query: { returnTo: '/reset-password' } })
+      } else {
+        await router.push('reset-password')
+      }
     }
   }
 
@@ -84,7 +92,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
         <div className="border-t border-overlay-border" />
 
         <Button block form="code-input-form" htmlType="submit" size="medium" loading={isLoading}>
-          Confirm Reset Code
+          Confirm reset code
         </Button>
       </form>
     </Form_Shadcn_>
