@@ -44,6 +44,8 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -94,6 +96,8 @@ export const CreateBranchModal = () => {
       toast.error(`Failed to create branch: ${error.message}`)
     },
   })
+
+  const canCreateBranch = useCheckPermissions(PermissionAction.CREATE, 'preview_branches')
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
 
@@ -149,6 +153,14 @@ export const CreateBranchModal = () => {
   })
 
   const canSubmit = !isCreating && !isChecking
+  const isDisabled =
+    !isSuccessConnections ||
+    isCreating ||
+    !canSubmit ||
+    isChecking ||
+    (!gitlessBranching && !githubConnection) ||
+    promptProPlanUpgrade ||
+    !canCreateBranch
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -198,6 +210,7 @@ export const CreateBranchModal = () => {
                 <DialogSectionSeparator />
               </>
             )}
+
             <DialogSection
               padding="medium"
               className={cn('space-y-4', promptProPlanUpgrade && 'opacity-25 pointer-events-none')}
@@ -348,9 +361,7 @@ export const CreateBranchModal = () => {
                   </figure>
                 </div>
                 <div className="flex flex-col gap-y-1">
-                  <p className="text-sm text-foreground">
-                    Preview branches are billed $0.01344 per hour
-                  </p>
+                  <p className="text-sm text-foreground">Branches are billed $0.01344 per hour</p>
                   <p className="text-sm text-foreground-light">
                     This cost will continue for as long as the branch has not been removed.
                   </p>
@@ -370,14 +381,7 @@ export const CreateBranchModal = () => {
               </Button>
               <ButtonTooltip
                 form={formId}
-                disabled={
-                  !isSuccessConnections ||
-                  isCreating ||
-                  !canSubmit ||
-                  isChecking ||
-                  (!gitlessBranching && !githubConnection) ||
-                  promptProPlanUpgrade
-                }
+                disabled={isDisabled}
                 loading={isCreating}
                 type="primary"
                 htmlType="submit"

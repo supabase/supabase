@@ -9,7 +9,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Organization } from 'types'
 import {
@@ -27,6 +27,7 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
+import { useBranchesQuery } from 'data/branches/branches-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -119,7 +120,9 @@ export const ProjectDropdown = () => {
         className="flex items-center gap-2 flex-shrink-0 text-sm"
       >
         <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-        <span className="text-foreground max-w-32 lg:max-w-none truncate">{project?.name}</span>
+        <span className="text-foreground max-w-32 lg:max-w-none truncate">
+          {selectedProject?.name}
+        </span>
       </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>

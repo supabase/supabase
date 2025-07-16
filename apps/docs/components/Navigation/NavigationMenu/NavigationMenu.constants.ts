@@ -1718,6 +1718,25 @@ export const storage: NavMenuConstant = {
       ],
     },
     {
+      name: 'Analytics Buckets',
+      url: undefined,
+      items: [
+        { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
+        {
+          name: 'Creating Analytics Buckets',
+          url: '/guides/storage/analytics/creating-analytics-buckets',
+        },
+        {
+          name: 'Connecting to Analytics Buckets',
+          url: '/guides/storage/analytics/connecting-to-analytics-bucket',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/storage/analytics/limits',
+        },
+      ],
+    },
+    {
       name: 'CDN',
       url: undefined,
       items: [

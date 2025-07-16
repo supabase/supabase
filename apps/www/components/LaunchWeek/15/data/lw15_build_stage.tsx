@@ -52,13 +52,13 @@ export const days: BuildDay[] = [
     ],
   },
   {
-    title: '',
+    title: 'Introducing stripe-sync-engine npm package',
     description: '',
-    id: '',
-    is_shipped: false,
+    id: 'stripe-engine',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/stripe-engine-as-sync-library',
         label: 'Blog post',
         target: '_blank',
       },
