@@ -137,6 +137,7 @@ export const filterFields = [
     defaultOpen: false,
     options: [],
     hasDynamicOptions: true,
+    hasAsyncSearch: true,
     component: (props: Option) => {
       return (
         <div className="flex items-center gap-2 min-w-0">
