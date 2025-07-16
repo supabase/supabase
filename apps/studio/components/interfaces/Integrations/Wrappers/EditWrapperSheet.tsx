@@ -58,7 +58,9 @@ export const EditWrapperSheet = ({
     },
   })
 
-  const [wrapperTables, setWrapperTables] = useState(formatWrapperTables(wrapper, wrapperMeta))
+  const [wrapperTables, setWrapperTables] = useState(() =>
+    formatWrapperTables(wrapper, wrapperMeta)
+  )
   const [isEditingTable, setIsEditingTable] = useState(false)
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
     undefined
@@ -93,7 +95,8 @@ export const EditWrapperSheet = ({
 
     const { wrapper_name } = values
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
-    if (wrapperTables.length === 0) errors.tables = 'Please add at least one table'
+    if (!wrapperMeta.canTargetSchema && wrapperTables.length === 0)
+      errors.tables = 'Please add at least one table'
     if (!isEmpty(errors)) return setFormErrors(errors)
 
     updateFDW({

@@ -334,7 +334,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                         />
                       ) : (
                         props.blog.thumb && (
-                          <div className="hidden md:block relative mb-8 w-full aspect-video overflow-auto rounded-lg border">
+                          <div className="hidden md:block relative mb-8 w-full aspect-[3/2] overflow-auto rounded-lg border">
                             <Image
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}

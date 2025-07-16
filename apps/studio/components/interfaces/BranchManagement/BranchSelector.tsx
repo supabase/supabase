@@ -56,9 +56,11 @@ export const BranchSelector = ({
             content: {
               side: 'bottom',
               text:
-                availableBranches.length === 0
-                  ? 'All branches currently have merge requests'
-                  : undefined,
+                branches.length === 0
+                  ? 'Create a branch first to start a merge request'
+                  : availableBranches.length === 0
+                    ? 'All branches currently have merge requests'
+                    : undefined,
             },
           }}
         >

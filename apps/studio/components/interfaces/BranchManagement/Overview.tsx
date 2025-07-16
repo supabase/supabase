@@ -23,7 +23,7 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   Button,
   DropdownMenu,
@@ -35,6 +35,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface OverviewProps {
   isLoading: boolean
@@ -99,7 +100,8 @@ export const Overview = ({
           <div className="flex items-center flex-col justify-center w-full py-10">
             <p>No persistent branches</p>
             <p className="text-foreground-light">
-              Persistent branches are long-lived and not automatically deleted.
+              Persistent branches are long-lived, cannot be reset, and are ideal for staging
+              environments.
             </p>
           </div>
         )}
@@ -163,7 +165,7 @@ const PreviewBranchActions = ({
   onSelectDeleteBranch: () => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }) => {
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
   const queryClient = useQueryClient()
   const projectRef = branch.parent_project_ref ?? branch.project_ref
 
@@ -337,19 +339,20 @@ const PreviewBranchActions = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ConfirmationModal
-        variant="destructive"
+      <TextConfirmModal
+        variant="warning"
         visible={showConfirmResetModal}
-        confirmLabel="Reset branch"
-        title="Confirm branch reset"
-        loading={isResetting}
         onCancel={() => setShowConfirmResetModal(false)}
         onConfirm={onConfirmReset}
-      >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
-        </p>
-      </ConfirmationModal>
+        loading={isResetting}
+        title="Reset branch"
+        confirmLabel="Reset branch"
+        confirmPlaceholder="Type in name of branch"
+        confirmString={branch?.name ?? ''}
+        alert={{
+          title: `Are you sure you want to reset the "${branch.name}" branch? All data will be deleted.`,
+        }}
+      />
 
       <ConfirmationModal
         variant="default"
