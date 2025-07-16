@@ -102,6 +102,15 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       ],
     },
     {
+      id: 'disk-io-usage',
+      label: 'Disk IO Usage',
+      syncId: 'database-reports',
+      availableIn: ['team', 'enterprise'],
+      hide: false,
+      format: '%',
+      attributes: [],
+    },
+    {
       id: 'database-connections',
       label: 'Database connections',
       valuePrecision: 0,
@@ -149,8 +158,8 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       label: 'Dedicated Pooler connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro'],
-      hide: isFreePlan,
+      availableIn: ['pro', 'team'],
+      hide: false,
       showTooltip: false,
       showLegend: false,
       showMaxValue: false,
@@ -165,6 +174,14 @@ export const getReportAttributes = (org: Organization, project: Project): Report
           tooltip: 'PgBouncer connections',
         },
       ],
+    },
+    {
+      id: 'disk-size',
+      label: 'Disk Usage',
+      syncId: 'database-reports',
+      availableIn: ['team', 'enterprise'],
+      hide: false,
+      attributes: [],
     },
   ]
 }

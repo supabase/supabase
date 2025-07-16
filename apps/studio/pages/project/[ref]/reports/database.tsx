@@ -43,6 +43,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import ReportChart from '../../../../components/interfaces/Reports/ReportChart'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -81,7 +82,7 @@ const DatabaseUsage = () => {
 
   const isTeamsOrEnterprisePlan =
     !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
-  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
+  const showChartsV2 = false || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
@@ -243,6 +244,7 @@ const DatabaseUsage = () => {
         }
       >
         {selectedDateRange &&
+          orgPlan?.id &&
           (showChartsV2
             ? REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
                 <ComposedChartHandler
@@ -261,23 +263,39 @@ const DatabaseUsage = () => {
                   }
                 />
               ))
-            : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => (
-                <ComposedChartHandler
-                  key={chart.id}
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={selectedDateRange.interval}
-                  startDate={selectedDateRange?.period_start?.date}
-                  endDate={selectedDateRange?.period_end?.date}
-                  updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  showMaxValue={
-                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
-                />
-              )))}
+            : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart, i) =>
+                chart.availableIn?.includes(orgPlan?.id) ? (
+                  <ComposedChartHandler
+                    key={chart.id}
+                    {...chart}
+                    attributes={chart.attributes as MultiAttribute[]}
+                    interval={selectedDateRange.interval}
+                    startDate={selectedDateRange?.period_start?.date}
+                    endDate={selectedDateRange?.period_end?.date}
+                    updateDateRange={updateDateRange}
+                    defaultChartStyle={
+                      chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
+                    }
+                    showMaxValue={
+                      chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                        ? true
+                        : chart.showMaxValue
+                    }
+                  />
+                ) : (
+                  <ReportChart
+                    key={`${chart.id}-${i}`}
+                    chart={chart}
+                    className="!mb-0"
+                    interval={selectedDateRange.interval}
+                    startDate={selectedDateRange?.period_start?.date}
+                    endDate={selectedDateRange?.period_end?.date}
+                    updateDateRange={updateDateRange}
+                    orgPlanId={orgPlan?.id}
+                    availableIn={chart.availableIn}
+                  />
+                )
+              ))}
         {selectedDateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
