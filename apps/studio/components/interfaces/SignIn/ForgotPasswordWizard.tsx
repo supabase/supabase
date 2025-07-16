@@ -45,6 +45,9 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
   const onCodeEntered: SubmitHandler<CodeFormData> = async (data) => {
     setIsLoading(true)
     const { error } = await auth.verifyOtp({ email, token: data.code, type: 'recovery' })
+    // This fixes a race condition where the user is redirected to the reset password page without the session being set
+    // which causes the user to be redirected to /sign-in page even though he's signed in
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     if (error) {
       setIsLoading(false)
