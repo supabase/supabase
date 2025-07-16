@@ -14,7 +14,7 @@ import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import Panel from 'components/ui/Panel'
 import { useRef, useState } from 'react'
 
@@ -27,6 +27,8 @@ const ReportChart = ({
   functionIds,
   orgPlanId,
   isLoading,
+  availableIn,
+  className,
 }: {
   chart: any
   startDate: string
@@ -36,6 +38,8 @@ const ReportChart = ({
   functionIds?: string[]
   orgPlanId?: string
   isLoading?: boolean
+  availableIn?: string[]
+  className?: string
 }) => {
   const org = useSelectedOrganization()
   const [isHoveringUpgrade, setIsHoveringUpgrade] = useState(false)
@@ -105,11 +109,16 @@ const ReportChart = ({
 
   if (!isAvailable && !isLoading) {
     return (
-      <Panel title={<h2 className="text-sm">{chart.label}</h2>} className="h-[260px] relative">
+      <Panel
+        title={<h2 className="text-sm">{chart.label}</h2>}
+        className={cn('h-[260px] relative', className)}
+      >
         <div className="z-10 flex flex-col items-center justify-center space-y-2 h-full absolute top-0 left-0 w-full bg-surface-100/70 backdrop-blur-md">
           <h2 className="">{chart.label}</h2>
           <p className="text-sm text-foreground-light">
-            This chart is available from Pro plan and above
+            This chart is available from{' '}
+            <span className="capitalize">{!!availableIn?.length ? availableIn[0] : 'Pro'}</span>{' '}
+            plan and above
           </p>
           <Button
             asChild
@@ -118,7 +127,8 @@ const ReportChart = ({
             onMouseLeave={() => setIsHoveringUpgrade(false)}
           >
             <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan&source=reports`}>
-              Upgrade to Pro
+              Upgrade to{' '}
+              <span className="capitalize">{!!availableIn?.length ? availableIn[0] : 'Pro'}</span>
             </Link>
           </Button>
         </div>
