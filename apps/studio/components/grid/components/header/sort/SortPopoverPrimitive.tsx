@@ -1,7 +1,9 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { ChevronDown, List } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { Sort } from 'components/grid/types'
+import useLatest from 'hooks/misc/useLatest'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -10,7 +12,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { useDebounceSync } from '../../../hooks/useDebounceSync'
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
 
@@ -36,8 +37,13 @@ export const SortPopoverPrimitive = ({
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
 
-  // Use synchronized state hook for sorts
-  const [localSorts, setLocalSorts, applySorts] = useDebounceSync(sorts, onApplySorts)
+  const [localSorts, setLocalSorts] = useState(sorts)
+
+  const debouncedSorts = useDebounce(localSorts, 500)
+  const onApplySortsRef = useLatest(onApplySorts)
+  useEffect(() => {
+    onApplySortsRef.current(debouncedSorts)
+  }, [debouncedSorts, onApplySortsRef])
 
   // Display button text based on local state
   const displayButtonText =
@@ -70,7 +76,6 @@ export const SortPopoverPrimitive = ({
         { table: currentTableName, column: columnName as string, ascending: true },
       ]
       setLocalSorts(newSorts)
-      applySorts(newSorts)
     }
   }
 
@@ -79,9 +84,8 @@ export const SortPopoverPrimitive = ({
     (column: string) => {
       const newSorts = localSorts.filter((sort) => sort.column !== column)
       setLocalSorts(newSorts)
-      applySorts(newSorts)
     },
-    [localSorts, setLocalSorts, applySorts]
+    [localSorts, setLocalSorts]
   )
 
   // Toggle ascending/descending for a column
@@ -98,9 +102,8 @@ export const SortPopoverPrimitive = ({
       ]
 
       setLocalSorts(newSorts)
-      applySorts(newSorts)
     },
-    [localSorts, setLocalSorts, applySorts]
+    [localSorts, setLocalSorts]
   )
 
   // Handle drag-and-drop reordering
@@ -125,9 +128,8 @@ export const SortPopoverPrimitive = ({
       ]
 
       setLocalSorts(newSorts)
-      applySorts(newSorts)
     },
-    [localSorts, setLocalSorts, applySorts]
+    [localSorts, setLocalSorts]
   )
 
   // Generate stable keys for SortRow components to avoid reconciliation issues

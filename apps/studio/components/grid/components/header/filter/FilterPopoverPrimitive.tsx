@@ -1,7 +1,9 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
-import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
+import { KeyboardEvent, useCallback, useEffect, useState } from 'react'
 
 import type { Filter, FilterOperator } from 'components/grid/types'
+import useLatest from 'hooks/misc/useLatest'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -10,7 +12,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
-import { useDebounceSync } from '../../../hooks/useDebounceSync'
 import FilterRow from './FilterRow'
 
 export interface FilterPopoverPrimitiveProps {
@@ -42,13 +43,13 @@ export const FilterPopoverPrimitive = ({
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
 
-  // Use synchronized state hook for filters
-  const [localFilters, setLocalFilters, applyFilters] = useDebounceSync(filters, onApplyFilters)
+  const [localFilters, setLocalFilters] = useState(filters)
 
-  // Update local state when filters prop changes
-  useMemo(() => {
-    setLocalFilters(filters)
-  }, [filters])
+  const debouncedFilters = useDebounce(localFilters, 500)
+  const onApplyFiltersRef = useLatest(onApplyFilters)
+  useEffect(() => {
+    onApplyFiltersRef.current(debouncedFilters)
+  }, [debouncedFilters, onApplyFiltersRef])
 
   const displayButtonText =
     buttonText ??
@@ -68,7 +69,6 @@ export const FilterPopoverPrimitive = ({
         },
       ]
       setLocalFilters(newFilters)
-      applyFilters(newFilters)
     }
   }
 
@@ -80,9 +80,8 @@ export const FilterPopoverPrimitive = ({
         ...localFilters.slice(index + 1),
       ]
       setLocalFilters(newFilters)
-      applyFilters(newFilters)
     },
-    [localFilters, setLocalFilters, applyFilters]
+    [localFilters, setLocalFilters]
   )
 
   const onDeleteFilter = useCallback(
@@ -92,9 +91,8 @@ export const FilterPopoverPrimitive = ({
         ...localFilters.slice(index + 1),
       ]
       setLocalFilters(newFilters)
-      applyFilters(newFilters)
     },
-    [localFilters, setLocalFilters, applyFilters]
+    [localFilters, setLocalFilters]
   )
 
   function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
