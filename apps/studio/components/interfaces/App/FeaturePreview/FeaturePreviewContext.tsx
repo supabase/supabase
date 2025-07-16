@@ -100,10 +100,17 @@ export const useIsBranching2Enabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
+export const useIsAdvisorRulesEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+}
+
 export const useFeaturePreviewModal = () => {
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
+
   const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
+  const advisorRulesEnabled = useFlag('advisorRules')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -116,11 +123,13 @@ export const useFeaturePreviewModal = () => {
           return isRealtimeSettingsEnabled
         case 'supabase-ui-branching-2-0':
           return gitlessBranchingEnabled
+        case 'supabase-ui-advisor-rules':
+          return advisorRulesEnabled
         default:
           return true
       }
     },
-    [isRealtimeSettingsEnabled, gitlessBranchingEnabled]
+    [isRealtimeSettingsEnabled, gitlessBranchingEnabled, advisorRulesEnabled]
   )
 
   const selectedFeatureKey = !selectedFeatureKeyFromQuery

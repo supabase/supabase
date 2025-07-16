@@ -7,6 +7,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
+import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
@@ -20,6 +21,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 } = {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]: <Branching2Preview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]: <RealtimeSettingsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]: <InlineEditorPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: <APISidePanelPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
