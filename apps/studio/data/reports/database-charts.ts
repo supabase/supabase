@@ -25,9 +25,6 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       syncId: 'database-reports',
       valuePrecision: 0,
       format: '%',
-      YAxisProps: {
-        width: 0,
-      },
       attributes: [
         {
           attribute: 'ram_usage',
@@ -50,9 +47,6 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       showLegend: false,
       showMaxValue: false,
       showGrid: false,
-      YAxisProps: {
-        width: 0,
-      },
       hideChartType: false,
       defaultChartStyle: 'bar',
       attributes: [
@@ -76,7 +70,7 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       showLegend: true,
       hideChartType: false,
       showGrid: true,
-      showMaxValue: true,
+      showMaxValue: false,
       YAxisProps: {
         width: 35,
         tickFormatter: (value: any) => numberFormatter(value, 2),
@@ -120,7 +114,6 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       showMaxValue: false,
       hideChartType: false,
       showGrid: false,
-      YAxisProps: { width: 0 },
       defaultChartStyle: 'bar',
       attributes: [
         {
@@ -142,7 +135,6 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       showLegend: false,
       showMaxValue: false,
       showGrid: false,
-      YAxisProps: { width: 30 },
       hideChartType: false,
       defaultChartStyle: 'bar',
       attributes: [
@@ -165,7 +157,6 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       showLegend: false,
       showMaxValue: false,
       showGrid: false,
-      YAxisProps: { width: 0 },
       hideChartType: false,
       defaultChartStyle: 'bar',
       attributes: [
