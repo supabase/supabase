@@ -11,6 +11,8 @@ import { useProjectLintRulesQuery } from 'data/lint/lint-rules-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   cn,
@@ -24,10 +26,17 @@ import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'
 import { DisableRuleModal } from './DisableRuleModal'
+import { EnableRuleModal } from './EnableRuleModal'
 
 interface AdvisorRuleItemProps {
   lint: LintInfo
 }
+
+// [Joshen] Context: We're going with a simplified interface for LW15 as we launch
+// this as a feature preview. Going to be purely disabling rules for the whole project,
+// not assigning to members, etc (all these can come in the future when we're ready)
+// Hence using this to clearly indicate where is being simplified
+const SIMPLIFIED_INTERFACE = true
 
 export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
   const { ref: projectRef } = useParams()
@@ -63,6 +72,30 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
     deleteRule({ projectRef, ids: [selectedRuleToDelete] })
   }
 
+  if (SIMPLIFIED_INTERFACE) {
+    return (
+      <Card className="border-b-0 rounded-none">
+        <CardContent className="py-3 flex items-center justify-between text-sm gap-4 cursor-pointer transition hover:bg-surface-200">
+          <div className="flex items-center justify-center [&>svg]:text-foreground-lighter">
+            {lint.icon}
+          </div>
+          <div className="flex-1 flex items-center gap-x-2">
+            <span>{lint.title}</span>
+            {rules.length > 0 && <Badge>Disabled</Badge>}
+          </div>
+          <div className="flex items-center gap-x-2">
+            <DocsButton href={lint.docsLink} />
+            {rules.length > 0 ? (
+              <EnableRuleModal lint={lint} rule={rules[0]} />
+            ) : (
+              <DisableRuleModal lint={lint} />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <>
       <Collapsible_Shadcn_
@@ -89,9 +122,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               </div>
               <div className="flex items-center gap-x-2">
                 <DocsButton href={lint.docsLink} />
-                {/* [Joshen] Using a simplified confirmation modal for LW15, we can use the create panel when ready again */}
-                <DisableRuleModal lint={lint} />
-                {/* <Button
+                <Button
                   type="default"
                   onClick={(e) => {
                     e.stopPropagation()
@@ -99,7 +130,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                   }}
                 >
                   Create rule
-                </Button> */}
+                </Button>
               </div>
               <ChevronRight strokeWidth={1.5} size={16} className="transition" />
             </CardContent>

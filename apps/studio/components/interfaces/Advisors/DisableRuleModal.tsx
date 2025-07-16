@@ -33,7 +33,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
     onSuccess: (_, vars) => {
       const ruleLint = vars.exception.lint_name
       const ruleLintMeta = lintInfoMap.find((x) => x.name === ruleLint)
-      toast.success(`Successfully created new rule for ${ruleLintMeta?.title}`)
+      toast.success(`Successfully disabled the "${ruleLintMeta?.title}" rule`)
 
       if (ruleLintMeta) {
         if (!!routeCategory && routeCategory !== ruleLintMeta.category) {
@@ -65,7 +65,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
       <DialogTrigger asChild>
         <Button type="default">Disable rule</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Confirm to disable rule</DialogTitle>
         </DialogHeader>
@@ -73,7 +73,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
         <DialogSection>
           <p className="text-sm">
             This will silence the "{lint.title}" by hiding this rule in the Advisor reports, as well
-            omitting this rule from email notifications.
+            omitting this rule from email notifications for this project.
           </p>
         </DialogSection>
         <DialogFooter>
