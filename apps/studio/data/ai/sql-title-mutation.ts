@@ -12,11 +12,16 @@ export type SqlTitleGenerateResponse = {
 
 export type SqlTitleGenerateVariables = {
   sql: string
+  useBedrockAssistant?: boolean
 }
 
-export async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
+export async function generateSqlTitle({ sql, useBedrockAssistant }: SqlTitleGenerateVariables) {
+  const url = useBedrockAssistant
+    ? `${BASE_PATH}/api/ai/sql/title-v2`
+    : `${BASE_PATH}/api/ai/sql/title`
+
   const headers = await constructHeaders({ 'Content-Type': 'application/json' })
-  const response = await fetchHandler(`${BASE_PATH}/api/ai/sql/title`, {
+  const response = await fetchHandler(url, {
     headers,
     method: 'POST',
     body: JSON.stringify({

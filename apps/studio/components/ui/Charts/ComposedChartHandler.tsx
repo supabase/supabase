@@ -16,31 +16,9 @@ import { useChartHighlight } from './useChartHighlight'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import { MultiAttribute } from './ComposedChart.utils'
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line'
-
-export type MultiAttribute = {
-  attribute: string
-  provider: Provider
-  label?: string
-  color?: string
-  stackId?: string
-  format?: 'percent' | 'number'
-  description?: string
-  docsLink?: string
-  isMaxValue?: boolean
-  type?: 'line' | 'area-bar'
-  omitFromTotal?: boolean
-  tooltip?: string
-  customValue?: number
-  id?: string
-  value?: number
-  isReferenceLine?: boolean
-  strokeDasharray?: string
-  className?: string
-}
-
-interface ComposedChartHandlerProps {
+export interface ComposedChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
@@ -59,10 +37,11 @@ interface ComposedChartHandlerProps {
   showLegend?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
-  updateDateRange: UpdateDateRange
+  updateDateRange?: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
   docsUrl?: string
+  hide?: boolean
 }
 
 /**
@@ -189,6 +168,7 @@ const ComposedChartHandler = ({
         // Add regular attributes
         attributes.forEach((attr, index) => {
           if (!attr) return
+
           // Handle custom value attributes (like disk size)
           if (attr.customValue !== undefined) {
             point[attr.attribute] = attr.customValue
@@ -200,7 +180,16 @@ const ComposedChartHandler = ({
 
           const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
-          point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
+          let value = matchingPoint?.[attr.attribute] ?? 0
+
+          // Apply value manipulation if provided
+          if (attr.manipulateValue && typeof attr.manipulateValue === 'function') {
+            // Ensure value is a number before manipulation
+            const numericValue = typeof value === 'number' ? value : Number(value) || 0
+            value = attr.manipulateValue(numericValue)
+          }
+
+          point[attr.attribute] = value
         })
 
         // Add reference line values for each timestamp
@@ -276,7 +265,7 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full scroll-mt-16', className)}
+      className={cn('relative w-full scroll-mt-16', className)}
       wrapWithLoading={false}
       id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
@@ -367,6 +356,8 @@ const useAttributeQueries = (
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+  if (props.hide) return null
+
   return (
     <LazyChartWrapper>
       <ComposedChartHandler {...props} />

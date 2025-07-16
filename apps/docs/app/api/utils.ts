@@ -1,5 +1,6 @@
 import { type PostgrestError } from '@supabase/supabase-js'
 import { type ZodError } from 'zod'
+import { isObject } from '~/features/helpers.misc'
 
 type ObjectOrNever = object | never
 
@@ -63,6 +64,53 @@ export class NoDataError<Details extends ObjectOrNever = never> extends ApiError
   }
 }
 
+export class MultiError<ErrorType = unknown, Details extends ObjectOrNever = never> extends Error {
+  constructor(
+    message: string,
+    cause?: Array<ErrorType>,
+    public details?: Details
+  ) {
+    super(message, { cause })
+  }
+
+  get totalErrors(): number {
+    return (this.cause as Array<ErrorType>)?.length || 0
+  }
+
+  appendError(message: string, error: ErrorType): this {
+    this.message = `${this.message}\n\t${message}`
+    ;((this.cause ?? (this.cause = [])) as Array<ErrorType>).push(error)
+    return this
+  }
+}
+
+export class CollectionQueryError extends Error {
+  constructor(
+    message: string,
+    public readonly queryErrors: {
+      count?: PostgrestError
+      data?: PostgrestError
+    }
+  ) {
+    super(message)
+  }
+
+  public static fromErrors(
+    countError: PostgrestError | undefined,
+    dataError: PostgrestError | undefined
+  ): CollectionQueryError {
+    const fetchFailedFor =
+      countError && dataError ? 'count and collection' : countError ? 'count' : 'collection'
+    let message = `Failed to fetch ${fetchFailedFor}`
+    if (countError) message += `: CountError: ${countError.message}`
+    if (dataError) message += `: CollectionError: ${dataError.message}`
+    return new CollectionQueryError(message, {
+      count: countError,
+      data: dataError,
+    })
+  }
+}
+
 export function convertUnknownToApiError(error: unknown): ApiError {
   return new ApiError('Unknown error', error)
 }
@@ -81,4 +129,11 @@ export function convertZodToInvalidRequestError(
   const message = `${prelude ? `${prelude}: ` : ''}${issue.message} at key "${pathStr}"`
 
   return new InvalidRequestError(message, error)
+}
+
+export function extractMessageFromAnyError(error: unknown): string {
+  if (isObject(error) && 'message' in error && typeof error.message === 'string') {
+    return error.message
+  }
+  return String(error)
 }

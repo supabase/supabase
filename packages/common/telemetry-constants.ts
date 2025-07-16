@@ -198,22 +198,6 @@ export interface CronJobHistoryClickedEvent {
 }
 
 /**
- * The FeaturePreviewModal was opened.
- *
- * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
- *
- * @group Events
- * @source studio
- */
-export interface FeaturePreviewsClickedEvent {
-  action: 'feature_previews_clicked'
-  groups: {
-    project: string
-    organization: string
-  }
-}
-
-/**
  * A feature preview was enabled by the user through the FeaturePreviewModal.
  *
  * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
@@ -682,7 +666,7 @@ export interface CustomReportAddSQLBlockClicked {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAssistantSQLBlockAdded {
+export interface CustomReportAssistantSQLBlockAddedEvent {
   action: 'custom_report_assistant_sql_block_added'
   groups: {
     project: string
@@ -1342,6 +1326,44 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
 }
 
 /**
+ * Triggered when the organization MFA enforcement setting is updated.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/security
+ */
+export interface OrganizationMfaEnforcementUpdated {
+  action: 'organization_mfa_enforcement_updated'
+  properties: {
+    mfaEnforced: boolean
+  }
+  groups: {
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a new foreign data wrapper is created in a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/database/integrations
+ */
+export interface ForeignDataWrapperCreatedEvent {
+  action: 'foreign_data_wrapper_created'
+  properties: {
+    /**
+     * The type of the foreign data wrapper, e.g. postgres_fdw, mysql_fdw, etc.
+     */
+    wrapperType: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1355,7 +1377,6 @@ export type TelemetryEvent =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
-  | FeaturePreviewsClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationSimpleVersionSubmittedEvent
@@ -1392,7 +1413,7 @@ export type TelemetryEvent =
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
   | CustomReportAddSQLBlockClicked
-  | CustomReportAssistantSQLBlockAdded
+  | CustomReportAssistantSQLBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
@@ -1420,3 +1441,5 @@ export type TelemetryEvent =
   | SupabaseUiCommandCopyButtonClickedEvent
   | SupportTicketSubmittedEvent
   | AiAssistantInSupportFormClickedEvent
+  | OrganizationMfaEnforcementUpdated
+  | ForeignDataWrapperCreatedEvent

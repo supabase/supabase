@@ -168,7 +168,7 @@ function StateOfStartupsPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/modules/vector`,
+          url: `https://supabase.com/state-of-startups`,
           images: [
             {
               url: meta_image,
@@ -350,7 +350,7 @@ const Hero = (props: any) => {
       >
         <div
           ref={animRef}
-          className="flex flex-col text-center items-center justify-center min-h-[70vh]"
+          className="flex flex-col text-center items-center justify-center min-h-[600px] lg:min-h-[70vh]"
         >
           <div className="absolute overflow-hidden -mx-[15vw] sm:mx-0 inset-0 w-[calc(100%+30vw)] sm:w-full h-full col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7 flex justify-center">
             <svg
@@ -502,7 +502,7 @@ const Hero = (props: any) => {
                   State of Startups
                 </div>
               </div>
-              <p className="p !text-foreground-light max-w-md">{props.subheader}</p>
+              <p className="p !text-foreground-light max-w-lg">{props.subheader}</p>
             </div>
             <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
               <PopupFrame

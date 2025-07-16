@@ -53,6 +53,24 @@ To use your own application code:
 
 1. When you finish configuring your credentials, you will be shown your client ID and secret. Add these to the [Google Auth Provider section of the Supabase Dashboard](/dashboard/project/_/auth/providers).
 
+   Alternatively, you can configure Google authentication using the Management API:
+
+   ```bash
+   # First, get your access token from https://supabase.com/dashboard/account/tokens
+   export SUPABASE_ACCESS_TOKEN="your-access-token"
+   export PROJECT_REF="your-project-ref"
+
+   # Update auth config to enable Google provider
+   curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "external_google_enabled": true,
+       "external_google_client_id": "your-google-client-id",
+       "external_google_secret": "your-google-client-secret"
+     }'
+   ```
+
    <Admonition type="tip">
 
    In local development, you can add the client ID and secret to your `config.toml` file.

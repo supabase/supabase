@@ -60,9 +60,8 @@ const nextConfig = {
     esmExternals: 'loose',
   },
   reactStrictMode: true,
-  swcMinify: true,
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns,
   },
   async headers() {

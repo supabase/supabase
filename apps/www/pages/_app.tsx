@@ -9,6 +9,7 @@ import {
   PageTelemetry,
   ThemeProvider,
   useThemeSandbox,
+  TelemetryTagManager,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
@@ -32,7 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useThemeSandbox()
 
-  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+  const site_title = `${APP_NAME} | The Postgres Development Platform.`
   const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
@@ -107,6 +108,7 @@ export default function App({ Component, pageProps }: AppProps) {
           </ThemeProvider>
         </FeatureFlagProvider>
       </AuthProvider>
+      <TelemetryTagManager />
     </>
   )
 }

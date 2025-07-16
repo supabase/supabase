@@ -45,6 +45,7 @@
       "env": [
         "ANALYZE",
         "NEXT_PUBLIC_SUPPORT_API_URL",
+        "NEXT_PUBLIC_CONTENT_API_URL",
         "NEXT_PUBLIC_BASE_PATH",
         "NEXT_PUBLIC_STRIPE_PUBLIC_KEY",
         "NEXT_PUBLIC_SUPPORT_ANON_KEY",
@@ -53,6 +54,7 @@
         "NEXT_PUBLIC_SITE_URL",
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_CONFIGCAT_SDK_KEY",
+        "NEXT_PUBLIC_CONFIGCAT_PROXY_URL",
         "NEXT_PUBLIC_HCAPTCHA_SITE_KEY",
         "NEXT_PUBLIC_SUPABASE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -67,6 +69,7 @@
         "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
+        "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_VERCEL_ENV",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
@@ -82,16 +85,21 @@
         "OPENAI_API_KEY",
         "AUTH_JWT_SECRET",
         "LOGFLARE_URL",
-        "LOGFLARE_API_KEY",
+        "LOGFLARE_PRIVATE_ACCESS_TOKEN",
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "AWS_BEDROCK_PROFILE",
+        "AWS_BEDROCK_ROLE_ARN",
         "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
-        "VERCEL_URL"
+        "VERCEL_URL",
+        "IS_THROTTLED",
+        "AI_PRO_MODEL",
+        "AI_NORMAL_MODEL"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -119,6 +127,7 @@
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
         "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
+        "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_IS_PLATFORM",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
@@ -144,7 +153,8 @@
         "AWS_SECRET_ACCESS_KEY",
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
-        "SITE_NAME"
+        "SITE_NAME",
+        "LUMA_API_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
@@ -164,6 +174,7 @@
         "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
+        "NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID"

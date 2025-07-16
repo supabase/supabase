@@ -1,17 +1,17 @@
+import dayjs from 'dayjs'
+import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
 
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
-import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { copyToClipboard } from 'lib/helpers'
-import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,

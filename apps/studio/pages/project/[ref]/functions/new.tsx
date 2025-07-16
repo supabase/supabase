@@ -14,10 +14,11 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
+import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -100,11 +101,12 @@ const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
   const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const snap = useAiAssistantStateSnapshot()
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
+
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -169,10 +171,22 @@ const NewFunctionPage = () => {
         title:
           'I can help you understand and improve your edge function. Here are a few example prompts to get you started:',
         prompts: [
-          'Explain what this function does...',
-          'Help me optimize this function...',
-          'Show me how to add more features...',
-          'Help me handle errors better...',
+          {
+            label: 'Explain Function',
+            description: 'Explain what this function does...',
+          },
+          {
+            label: 'Optimize Function',
+            description: 'Help me optimize this function...',
+          },
+          {
+            label: 'Add Features',
+            description: 'Show me how to add more features...',
+          },
+          {
+            label: 'Error Handling',
+            description: 'Help me handle errors better...',
+          },
         ],
       },
     })
@@ -324,7 +338,11 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+        aiEndpoint={
+          useBedrockAssistant
+            ? `${BASE_PATH}/api/ai/edge-function/complete-v2`
+            : `${BASE_PATH}/api/ai/edge-function/complete`
+        }
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,

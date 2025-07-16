@@ -177,6 +177,8 @@ export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
+export { ButtonGroup, ButtonGroupItem } from './src/components/shadcn/ui/button-group'
+
 export {
   Breadcrumb as Breadcrumb_Shadcn_,
   BreadcrumbItem as BreadcrumbItem_Shadcn_,
@@ -221,6 +223,7 @@ export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
+  TooltipPortal,
 } from './src/components/shadcn/ui/tooltip'
 
 export {
@@ -279,3 +282,5 @@ export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
+
+export * from './src/components/KeyboardShortcut/KeyboardShortcut'

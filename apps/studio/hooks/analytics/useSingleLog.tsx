@@ -31,7 +31,7 @@ function useSingleLog({
   const table = queryType ? LOGS_TABLES[queryType] : undefined
   const sql = id && table ? genSingleLogQuery(table, id) : ''
 
-  const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
+  const params: LogsEndpointParams = { ...paramsToMerge, sql }
 
   const isWarehouseQuery = queryType === 'warehouse'
   // Warehouse queries are handled differently
