@@ -21,10 +21,7 @@ import ChartHandler from 'components/ui/Charts/ChartHandler'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
-import {
-  LogsDatePicker,
-  DatePickerValue,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 
