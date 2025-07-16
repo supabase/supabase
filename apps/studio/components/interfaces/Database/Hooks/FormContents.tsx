@@ -82,16 +82,20 @@ export const FormContents = ({
 
   useEffect(() => {
     const isEdgeFunctionSelected = isEdgeFunction({ ref, restUrlTld, url: values.http_url })
+
     if (values.http_url && isEdgeFunctionSelected) {
       const fnSlug = values.http_url.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
-      if (fn?.verify_jwt && !httpHeaders.some((x) => x.name === 'Authorization')) {
-        const authorizationHeader = {
-          id: uuidv4(),
-          name: 'Authorization',
-          value: `Bearer ${legacyServiceRole}`,
+
+      if (fn?.verify_jwt) {
+        if (!httpHeaders.some((x) => x.name === 'Authorization')) {
+          const authorizationHeader = {
+            id: uuidv4(),
+            name: 'Authorization',
+            value: `Bearer ${legacyServiceRole}`,
+          }
+          setHttpHeaders([...httpHeaders, authorizationHeader])
         }
-        setHttpHeaders([...httpHeaders, authorizationHeader])
       } else {
         const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
         setHttpHeaders(updatedHttpHeaders)
