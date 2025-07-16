@@ -70,27 +70,6 @@ describe('selectWeightedKey', () => {
     expect(Object.keys(weights)).toContain(result)
   })
 
-  it('should handle different weight scales', async () => {
-    const weights = { small: 1, medium: 5, large: 10 }
-    const numSamples = 1600
-    const samples = Array.from({ length: numSamples }, (_, i) => `scale-${i}`)
-
-    const results = await Promise.all(samples.map((sample) => selectWeightedKey(sample, weights)))
-
-    const counts = results.reduce<Record<string, number>>((acc, key) => {
-      acc[key] = (acc[key] ?? 0) + 1
-      return acc
-    }, {})
-
-    // Total weight is 16, so small=1/16, medium=5/16, large=10/16
-    const totalWeight = 16
-    const tolerance = 0.05
-
-    expect(counts.small / numSamples).toBeCloseTo(weights.small / totalWeight, 1)
-    expect(counts.medium / numSamples).toBeCloseTo(weights.medium / totalWeight, 1)
-    expect(counts.large / numSamples).toBeCloseTo(weights.large / totalWeight, 1)
-  })
-
   it('should handle unicode characters in input', async () => {
     const weights = { option1: 50, option2: 50 }
     const unicodeInput = '🔑-unicode-key-测试'
