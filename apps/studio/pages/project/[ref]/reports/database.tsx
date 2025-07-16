@@ -79,11 +79,9 @@ const DatabaseUsage = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
-  const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
   const isTeamsOrEnterprisePlan =
     !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
-  // const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
-  const showChartsV2 = false
+  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
 
   const state = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
