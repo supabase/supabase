@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
@@ -14,31 +13,16 @@ import {
   LogsDatePicker,
   DatePickerValue,
 } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import {
-  ResponseSpeedChartRenderer,
-  TopApiRoutesRenderer,
-  TotalRequestsChartRenderer,
-} from 'components/interfaces/Reports/renderers/ApiRenderers'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-
-import { analyticsKeys } from 'data/analytics/keys'
-import { useApiReport } from 'data/reports/api-report-query'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
-import {
-  useRefreshSharedAPIReport,
-  useSharedAPIReport,
-} from 'components/interfaces/Reports/SharedAPIReport.constants'
+import { useRefreshSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport.constants'
 
-const RealtimeReport: NextPageWithLayout = () => {
+const PostgRESTReport: NextPageWithLayout = () => {
   return (
     <ReportPadding>
       <PostgrestReport />
@@ -46,19 +30,18 @@ const RealtimeReport: NextPageWithLayout = () => {
   )
 }
 
-RealtimeReport.getLayout = (page) => (
+PostgRESTReport.getLayout = (page) => (
   <DefaultLayout>
     <ReportsLayout title="PostgREST">{page}</ReportsLayout>
   </DefaultLayout>
 )
 
 export type UpdateDateRange = (from: string, to: string) => void
-export default RealtimeReport
+export default PostgRESTReport
 
 const PostgrestReport = () => {
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const { db, chart, ref } = useParams()
-  const { refetch } = useRefreshSharedAPIReport()
+  const { db, chart } = useParams()
+  const { refetch, isRefetching } = useRefreshSharedAPIReport()
 
   const state = useDatabaseSelectorStateSnapshot()
   const {
@@ -92,33 +75,19 @@ const PostgrestReport = () => {
   }, [])
 
   const handleDatePickerChange = (values: DatePickerValue) => {
-    const promptShown = handleDatePickerChangeFromHook(values)
-    // if (!promptShown) {
-    //   report.mergeParams({
-    //     iso_timestamp_start: values.from,
-    //     iso_timestamp_end: values.to,
-    //   })
-    // }
-  }
-
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    updateDateRangeFromHook(from, to)
-    // report.mergeParams({
-    //   iso_timestamp_start: from,
-    //   iso_timestamp_end: to,
-    // })
+    handleDatePickerChangeFromHook(values)
   }
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      <ReportHeader showDatabaseSelector={false} title="PostgREST" />
       <ReportStickyNav
         content={
           <>
             <ButtonTooltip
               type="default"
-              disabled={isRefreshing}
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              disabled={isRefetching}
+              icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
               className="w-7"
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
               onClick={refetch}
@@ -134,7 +103,7 @@ const PostgrestReport = () => {
                 setShowUpgradePrompt={setShowUpgradePrompt}
                 title="Report date range"
                 description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
-                source="realtimeReportDateRange"
+                source="postgrestReportDateRange"
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">

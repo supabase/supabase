@@ -134,6 +134,15 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database${preservedQueryParams}`,
         },
+        ...(edgeFnEnabled
+          ? [
+              {
+                name: 'Edge Functions',
+                key: 'edge-functions',
+                url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
+              },
+            ]
+          : []),
         ...(postgrestReportEnabled
           ? [
               {
@@ -152,15 +161,7 @@ const ReportsMenu = () => {
               },
             ]
           : []),
-        ...(edgeFnEnabled
-          ? [
-              {
-                name: 'Edge Functions',
-                key: 'edge-functions',
-                url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
-              },
-            ]
-          : []),
+
         ...(storageEnabled
           ? [
               {

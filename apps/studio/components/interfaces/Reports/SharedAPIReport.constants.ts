@@ -285,5 +285,6 @@ export const useRefreshSharedAPIReport = () => {
 
   return {
     refetch: () => queryClient.invalidateQueries({ queryKey: DEFAULT_KEYS }),
+    isRefetching: queryClient.isFetching({ queryKey: DEFAULT_KEYS }) > 0 || false,
   }
 }
