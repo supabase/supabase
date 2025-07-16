@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { fetchHandler, handleError } from 'data/fetchers'
+import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { toast } from 'sonner'
 
@@ -24,7 +24,9 @@ export type CheckCNAMERecordResponse = {
 // [Joshen] Should tally with https://github.com/supabase/cli/blob/63790a1bd43bee06f82c4f510e709925526a4daa/internal/utils/api.go#L98
 export async function checkCNAMERecord({ domain }: CheckCNAMERecordVariables) {
   try {
+    const headers = await constructHeaders({ 'Content-Type': 'application/json' })
     const res: CheckCNAMERecordResponse = await fetchHandler(`${BASE_PATH}/api/check-cname`, {
+      headers,
       method: 'POST',
       body: JSON.stringify({ domain }),
     }).then((res) => res.json())
