@@ -42,15 +42,13 @@ export const filterFields = [
     type: 'checkbox',
     defaultOpen: true,
     options: [],
+    hasDynamicOptions: true,
     component: (props: Option) => {
       if (typeof props.value === 'boolean') return null
       if (typeof props.value === 'undefined') return null
 
       const statusValue = String(props.value)
       const statusLabel = STATUS_CODE_LABELS[statusValue as keyof typeof STATUS_CODE_LABELS]
-
-      // Convert string status codes to numbers for HTTP status styling
-      const statusCode = typeof props.value === 'string' ? parseInt(props.value, 10) : props.value
 
       return (
         <div className="flex items-center gap-2 w-full min-w-0">
@@ -105,8 +103,9 @@ export const filterFields = [
     value: 'host',
     type: 'checkbox',
     defaultOpen: false,
+    options: [],
+    hasDynamicOptions: true,
     hasAsyncSearch: true,
-    options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
       return (
         <span className="truncate block text-[0.75rem]" title={props.value as string}>
@@ -119,9 +118,10 @@ export const filterFields = [
     label: 'Pathname',
     value: 'pathname',
     type: 'checkbox',
-    defaultOpen: true,
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: true,
     hasAsyncSearch: true,
-    options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
       return (
         <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
@@ -135,8 +135,8 @@ export const filterFields = [
     value: 'auth_user',
     type: 'checkbox',
     defaultOpen: false,
-    hasAsyncSearch: true,
-    options: [], // Will be populated dynamically from facets
+    options: [],
+    hasDynamicOptions: true,
     component: (props: Option) => {
       return (
         <div className="flex items-center gap-2 min-w-0">

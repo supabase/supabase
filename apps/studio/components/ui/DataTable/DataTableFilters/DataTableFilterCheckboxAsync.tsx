@@ -45,23 +45,12 @@ export function DataTableFilterCheckboxAsync<TData>({
   const column = table.getColumn(value)
   const filterValue = columnFilters.find((i) => i.id === value)?.value
   const facetedValue = getFacetedUniqueValues?.(table, value) || column?.getFacetedUniqueValues()
-
-  // CHECK: it could be filterValue or searchValue
   const filters = filterValue ? (Array.isArray(filterValue) ? filterValue : [filterValue]) : []
 
-  // Show empty state when no original options are available (not due to search filtering)
   if (!options?.length)
     return (
-      <div className="flex items-center justify-center px-2 py-6 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-            <Search className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">No options available</p>
-            <p className="text-xs text-muted-foreground/70">Try adjusting your filters</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center px-2 py-4 text-center border border-border rounded">
+        <p className="text-xs text-foreground-light">No options available</p>
       </div>
     )
 

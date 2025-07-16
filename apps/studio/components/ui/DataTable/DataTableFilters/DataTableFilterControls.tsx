@@ -53,15 +53,15 @@ export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterCo
                 {(() => {
                   switch (field.type) {
                     case 'checkbox': {
-                      if (field.hasAsyncSearch) {
-                        // [Joshen] Loader here so that CheckboxAsync can retrieve the data
-                        // immediately to be set in its react query state
-                        if (isLoadingCounts && (field?.options ?? []).length === 0) {
-                          return <DataTableFilterCheckboxLoader />
-                        } else {
-                          return <DataTableFilterCheckboxAsync {...field} />
-                        }
-                      } else return <DataTableFilterCheckbox {...field} />
+                      // [Joshen] Loader here so that CheckboxAsync can retrieve the data
+                      // immediately to be set in its react query state
+                      if (field.hasDynamicOptions && isLoadingCounts) {
+                        return <DataTableFilterCheckboxLoader />
+                      } else if (field.hasAsyncSearch) {
+                        return <DataTableFilterCheckboxAsync {...field} />
+                      } else {
+                        return <DataTableFilterCheckbox {...field} />
+                      }
                     }
                     case 'slider': {
                       return <DataTableFilterSlider {...field} />
