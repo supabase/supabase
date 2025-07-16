@@ -320,14 +320,6 @@ const MergePage: NextPageWithLayout = () => {
     )
   }
 
-  console.log(
-    'merge disabled:',
-    !combinedHasChanges,
-    isCombinedDiffLoading,
-    isBranchOutOfDateOverall,
-    isWorkflowRunning
-  )
-
   const isMergeDisabled =
     !combinedHasChanges || isCombinedDiffLoading || isBranchOutOfDateOverall || isWorkflowRunning
 
