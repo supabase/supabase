@@ -24,6 +24,7 @@ import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
+import MergeRequestButton from './MergeRequestButton'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -165,7 +166,7 @@ const LayoutHeader = ({
           <AnimatePresence>
             {projectRef && (
               <motion.div
-                className="ml-3 items-center gap-x-3 flex"
+                className="ml-3 items-center gap-x-2 flex"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -174,7 +175,8 @@ const LayoutHeader = ({
                   ease: 'easeOut',
                 }}
               >
-                {<Connect />}
+                {IS_PLATFORM && <MergeRequestButton />}
+                <Connect />
               </motion.div>
             )}
           </AnimatePresence>
