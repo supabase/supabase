@@ -2453,7 +2453,26 @@ export const deployment: NavMenuConstant = {
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
         { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
-        { name: 'Branching', url: '/guides/deployment/branching' },
+      ],
+    },
+    {
+      name: 'Branching',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/deployment/branching' },
+        { name: 'GitHub integration', url: '/guides/deployment/branching/github-integration' },
+        {
+          name: 'Branching 2.0 (Alpha)',
+          url: '/guides/deployment/branching/branching-2',
+        },
+        {
+          name: 'Working with branches',
+          url: '/guides/deployment/branching/working-with-branches',
+        },
+        { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
+        { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
+        { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
+        { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
     },
     {
