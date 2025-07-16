@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
+// import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -9,6 +9,7 @@ import { useParams } from 'common'
 import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useRouter } from 'next/router'
 import {
   Button,
   Form_Shadcn_,
@@ -27,6 +28,10 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -120,11 +125,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader className="shrink-0 flex items-center gap-4">
-          <SheetTitle>
-            {/* [Joshen] For now, only support "disabling" */}
-            {/* Create a rule for "{lint?.title}" */}
-            Disable rule for "{lint?.title}"
-          </SheetTitle>
+          <SheetTitle>Create a rule for "{lint?.title}"</SheetTitle>
         </SheetHeader>
         <SheetSection className="overflow-auto flex-grow px-0">
           <Form_Shadcn_ {...form}>
@@ -133,8 +134,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
               className="flex flex-col gap-y-4"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              {/* [Joshen] Simplifying for LW to just stick to "disabling", we can renable this once ready to support "assigning" */}
-              {/* <FormField_Shadcn_
+              <FormField_Shadcn_
                 name="is_disabled"
                 control={form.control}
                 render={({ field }) => (
@@ -165,21 +165,15 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                     </Tooltip>
                   </FormItemLayout>
                 )}
-              /> */}
+              />
 
-              {/* <Separator /> */}
+              <Separator />
 
               <FormField_Shadcn_
                 name="assigned_to"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout
-                    // [Joshen] Simplifying for LW to just stick to "disabling"
-                    // label="Assign rule to"
-                    label="Disable rule for"
-                    layout="vertical"
-                    className="px-5"
-                  >
+                  <FormItemLayout label="Assign rule to" layout="vertical" className="px-5">
                     <Select_Shadcn_
                       onValueChange={(val) => {
                         field.onChange(val)

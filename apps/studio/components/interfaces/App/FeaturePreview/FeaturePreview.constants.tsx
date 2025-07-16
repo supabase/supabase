@@ -17,7 +17,7 @@ export const FEATURE_PREVIEWS = [
   },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
-    name: 'Advisor rules',
+    name: 'Disable Advisor rules',
     discussionsUrl: undefined,
     isNew: true,
     isPlatformOnly: true,

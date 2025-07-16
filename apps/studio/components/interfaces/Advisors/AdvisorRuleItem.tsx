@@ -11,7 +11,6 @@ import { useProjectLintRulesQuery } from 'data/lint/lint-rules-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
-  Button,
   Card,
   CardContent,
   cn,
@@ -24,6 +23,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'
+import { DisableRuleModal } from './DisableRuleModal'
 
 interface AdvisorRuleItemProps {
   lint: LintInfo
@@ -89,7 +89,9 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               </div>
               <div className="flex items-center gap-x-2">
                 <DocsButton href={lint.docsLink} />
-                <Button
+                {/* [Joshen] Using a simplified confirmation modal for LW15, we can use the create panel when ready again */}
+                <DisableRuleModal lint={lint} />
+                {/* <Button
                   type="default"
                   onClick={(e) => {
                     e.stopPropagation()
@@ -97,7 +99,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                   }}
                 >
                   Create rule
-                </Button>
+                </Button> */}
               </div>
               <ChevronRight strokeWidth={1.5} size={16} className="transition" />
             </CardContent>
