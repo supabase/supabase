@@ -93,7 +93,7 @@ const Home: NextPageWithLayout = () => {
       <div className={cn('py-16 px-8', !isPaused && 'border-b border-muted ')}>
         <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
-            <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
+            <div className="flex flex-col md:flex-row md:items-end gap-3 w-full">
               <div>
                 {!isMainBranch && (
                   <Link
@@ -105,7 +105,7 @@ const Home: NextPageWithLayout = () => {
                 )}
                 <h1 className="text-3xl">{projectName}</h1>
               </div>
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-2 mb-1">
                 {isOrioleDb && (
                   <Tooltip>
                     <TooltipTrigger asChild>
