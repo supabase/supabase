@@ -1,6 +1,6 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { noop } from 'lodash'
 import { Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
@@ -13,11 +13,10 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema, useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
@@ -39,21 +38,14 @@ const TriggersList = ({
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data: schemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { data: protectedSchemas } = useProtectedSchemas()
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { data = [], isSuccess } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const hasTables = data.filter((a) => !PROTECTED_SCHEMAS.includes(a.schema)).length > 0
+  const hasTables = data.filter((a) => !protectedSchemas.includes(a.schema)).length > 0
 
   const {
     data: triggers,
@@ -115,7 +107,7 @@ const TriggersList = ({
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
-            {!isLocked && (
+            {!isSchemaLocked && (
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
                   disabled={!hasTables || !canCreateTriggers}
@@ -182,7 +174,7 @@ const TriggersList = ({
             )}
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <div className="w-full overflow-hidden overflow-x-auto">
             <Table
@@ -203,7 +195,7 @@ const TriggersList = ({
                 <TriggerList
                   schema={selectedSchema}
                   filterString={filterString}
-                  isLocked={isLocked}
+                  isLocked={isSchemaLocked}
                   editTrigger={editTrigger}
                   deleteTrigger={deleteTrigger}
                 />

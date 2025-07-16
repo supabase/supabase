@@ -1,24 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import { ProtectedSchemaDialog } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
@@ -26,6 +24,9 @@ import {
   Alert_Shadcn_,
   Button,
   Checkbox_Shadcn_,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -87,19 +88,9 @@ const TableEditorMenu = () => {
     [data?.pages]
   )
 
-  const { data: schemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const [protectedSchemas] = partition(
-    (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
-    (schema) => PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const { isSchemaLocked, reason } = useIsProtectedSchema({ schema: selectedSchema })
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -136,7 +127,7 @@ const TableEditorMenu = () => {
           />
 
           <div className="grid gap-3 mx-4">
-            {!isLocked ? (
+            {!isSchemaLocked ? (
               <ButtonTooltip
                 block
                 title="Create a new table"
@@ -164,12 +155,30 @@ const TableEditorMenu = () => {
                   Viewing protected schema
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_ className="text-xs">
-                  <p className="mb-2">
-                    This schema is managed by Supabase and is read-only through the table editor
-                  </p>
-                  <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                    Learn more
-                  </Button>
+                  {reason === 'FDW' ? (
+                    <p>
+                      {' '}
+                      The <code className="text-xs">{selectedSchema}</code> schema is used by
+                      Supabase to connect to analytics buckets and is read-only through the
+                      dashboard.
+                    </p>
+                  ) : (
+                    <>
+                      <p className="mb-2">
+                        This schema is managed by Supabase and is read-only through the table editor
+                      </p>
+                      <Dialog open={showModal} onOpenChange={setShowModal}>
+                        <DialogTrigger asChild>
+                          <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+                            Learn more
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <ProtectedSchemaDialog onClose={() => setShowModal(false)} />
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  )}{' '}
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
@@ -280,7 +289,7 @@ const TableEditorMenu = () => {
                     itemProps={{
                       projectRef: project?.ref!,
                       id: Number(id),
-                      isLocked,
+                      isSchemaLocked,
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -293,8 +302,6 @@ const TableEditorMenu = () => {
           )}
         </div>
       </div>
-
-      <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
     </>
   )
 }
