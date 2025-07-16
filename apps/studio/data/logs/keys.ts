@@ -34,4 +34,17 @@ export const logsKeys = {
       'chart-data',
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
+  serviceFlow: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType | undefined,
+    logId: string | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'service-flow',
+      logId,
+      ...(searchParams ? [searchParams].filter(Boolean) : []),
+    ] as const,
 }

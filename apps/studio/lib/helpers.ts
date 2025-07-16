@@ -1,5 +1,6 @@
 export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
+import type { TablesData } from '../data/tables/tables-query'
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -170,6 +171,64 @@ export const detectOS = () => {
   } else {
     return undefined
   }
+}
+
+/**
+ * Convert a list of tables to SQL
+ * @param t - The list of tables
+ * @returns The SQL string
+ */
+export function tablesToSQL(t: TablesData) {
+  if (!Array.isArray(t)) return ''
+  const warning =
+    '-- WARNING: This schema is for context only and is not meant to be run.\n-- Table order and constraints may not be valid for execution.\n\n'
+  const sql = t
+    .map((table) => {
+      if (!table || !Array.isArray((table as any).columns)) return ''
+
+      const columns = (table as { columns?: any[] }).columns ?? []
+      const columnLines = columns.map((c) => {
+        let line = `  ${c.name} ${c.data_type}`
+        if (c.is_identity) {
+          line += ' GENERATED ALWAYS AS IDENTITY'
+        }
+        if (c.is_nullable === false) {
+          line += ' NOT NULL'
+        }
+        if (c.default_value !== null && c.default_value !== undefined) {
+          line += ` DEFAULT ${c.default_value}`
+        }
+        if (c.is_unique) {
+          line += ' UNIQUE'
+        }
+        if (c.check) {
+          line += ` CHECK (${c.check})`
+        }
+        return line
+      })
+
+      const constraints: string[] = []
+
+      if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
+        const pkCols = table.primary_keys.map((pk: any) => pk.name).join(', ')
+        constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
+      }
+
+      if (Array.isArray(table.relationships)) {
+        table.relationships.forEach((rel: any) => {
+          if (rel && rel.source_table_name === table.name) {
+            constraints.push(
+              `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
+            )
+          }
+        })
+      }
+
+      const allLines = [...columnLines, ...constraints]
+      return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
+    })
+    .join('\n')
+  return warning + sql
 }
 
 /**

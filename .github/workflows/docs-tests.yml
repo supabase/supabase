@@ -42,4 +42,10 @@ jobs:
         run: pnpm i
 
       - name: Run tests
-        run: pnpm run test:docs
+        run: |
+          touch .env
+          # Needed to prevent local Supabase startup from erroring, due to
+          # GitHub Auth being enabled in config
+          echo "GITHUB_CLIENT_ID=dummy-id" >> .env
+          echo "GITHUB_SECRET=dummy-secret" >> .env
+          pnpm run test:docs

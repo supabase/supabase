@@ -151,9 +151,19 @@ const TriggersList = ({
                           title:
                             'I can help you create a new trigger, here are a few example prompts to get you started:',
                           prompts: [
-                            'Create a trigger that logs changes to the users table',
-                            'Create a trigger that updates updated_at timestamp',
-                            'Create a trigger that validates email format before insert',
+                            {
+                              label: 'Log Changes',
+                              description: 'Create a trigger that logs changes to the users table',
+                            },
+                            {
+                              label: 'Update Timestamp',
+                              description: 'Create a trigger that updates updated_at timestamp',
+                            },
+                            {
+                              label: 'Validate Email',
+                              description:
+                                'Create a trigger that validates email format before insert',
+                            },
                           ],
                         },
                       })

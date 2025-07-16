@@ -68,14 +68,14 @@ export function FilterCondition({
       />
       <Input_Shadcn_
         ref={valueRef}
-        value={condition.value?.toString() || ''}
+        value={(condition.value ?? '').toString()}
         onChange={(e) => onValueChange(e.target.value)}
         onFocus={onValueFocus}
         onBlur={onBlur}
         onKeyDown={onKeyDown}
         className="border-none bg-transparent p-0 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 font-mono h-6"
         style={{
-          width: `${Math.max(condition.value?.toString().length || 0, 1)}ch`,
+          width: `${Math.max((condition.value ?? '').toString().length, 1)}ch`,
           minWidth: '1ch',
         }}
         disabled={isLoading}

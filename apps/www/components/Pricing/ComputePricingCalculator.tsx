@@ -30,7 +30,7 @@ const findIntanceValueByColumn = (instance: any, column: string) =>
 
 const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
 
-const ComputePricingCalculator = () => {
+const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivity?: boolean }) => {
   const computeInstances = pricingAddOn.database.rows
   const priceSteps = computeInstances.map((instance) =>
     parsePrice(findIntanceValueByColumn(instance, 'pricing'))
@@ -290,12 +290,13 @@ const ComputePricingCalculator = () => {
             type="outline"
             block
             icon={<Plus />}
-            onClick={() =>
+            onClick={() => {
+              if (disableInteractivity) return
               setActiveInstances([
                 ...activeInstances,
                 { ...computeInstances[0], position: activeInstances.length },
               ])
-            }
+            }}
             className="w-full border-dashed text-foreground-light hover:text-foreground"
           >
             <span className="w-full text-left">Add Project</span>

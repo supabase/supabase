@@ -16,6 +16,7 @@ Artyom Borissov
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
+Brent Newson
 Carel de Waal
 Cemal Kılıç
 Chandana Anumula
@@ -27,6 +28,7 @@ Chris Copplestone
 Chris Gwilliams
 Chris Stockton
 Craig Cannon
+Danny White
 Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
@@ -69,6 +71,7 @@ Laura C
 Laurence Isla
 Lenny Urbanowski
 Long Hoang
+Luca Forstner
 Łukasz Niemier
 Margarita Sandomirskaia
 Mark Burggraf
@@ -89,6 +92,7 @@ Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
 Sam Rose
+Sean Oliver
 Sergio Cioban Filho
 Sreyas Udayavarman
 Stanislav M

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import NavigationItem from '@/components/side-navigation-item'
-import { aiEditorsRules, componentPages, gettingStarted } from '@/config/docs'
+import { aiEditorsRules, componentPages, gettingStarted, platformBlocks } from '@/config/docs'
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
 
@@ -94,6 +94,14 @@ function SideNavigation() {
           {aiEditorsRules.title}
         </div>
         {aiEditorsRules.items.map((item, i) => (
+          <NavigationItem item={item} key={`${item.href}-${i}`} />
+        ))}
+      </div>
+      <div className="pb-6">
+        <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
+          {platformBlocks.title}
+        </div>
+        {platformBlocks.items.map((item, i) => (
           <NavigationItem item={item} key={`${item.href}-${i}`} />
         ))}
       </div>

@@ -1,18 +1,15 @@
 'use client'
 
-// import Image from 'next/image'
 import { hasConsented, LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui/src/components/Button/Button'
 import { cn } from 'ui/src/lib/utils/cn'
-// import { useTheme } from 'next-themes'
 import announcement from '../Banners/data.json'
 import './styles.css'
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
-  // const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     const shouldHide =
@@ -37,20 +34,28 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
+      <video
+        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15/assets/lw15-galaxy.mp4`}
+        autoPlay
+        loop
+        muted
+        className="absolute w-full h-full inset-0 object-cover z-0"
+        style={{
+          opacity: 0.05,
+        }}
+        poster={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15/assets/lw15-galaxy.png`}
+      />
+      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full mb-2">
         <span className="mb-1">{announcement.text}</span>
-        <p
-          style={{
-            fontFamily: 'Departure Mono, Source Code Pro, Office Code Pro, Menlo, monospace',
-          }}
-          className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7"
-        ></p>
+        <p className="relative z-10 text-foreground flex flex-col text-xl w-full leading-7">
+          July 14—18
+        </p>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
           <Link target="_blank" rel="noreferrer" href={`https://supabase.com${announcement.link}`}>
-            Learn more
+            Claim your ticket
           </Link>
         </Button>
         <Button type="default" onClick={handleHide}>

@@ -1,96 +1,62 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import {
-  ArrowRight,
-  CircleArrowUp,
-  Eye,
-  FileKey,
-  Key,
-  MoreVertical,
-  RotateCw,
-  ShieldOff,
-  Timer,
-  Trash2,
-} from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
+import { RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import {
-  JWTAlgorithm,
-  JWTSigningKey,
-  useJWTSigningKeysQuery,
-} from 'data/jwt-signing-keys/jwt-signing-keys-query'
+import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  cn,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from 'ui'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-import { algorithmDescriptions, algorithmLabels } from '../algorithm-details'
-import { AlgorithmHoverCard } from '../algorithm-hover-card'
-import { statusColors, statusLabels } from '../jwt.constants'
 import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
 import { CreateKeyDialog } from './create-key-dialog'
+import { KeyDetailsDialog } from './key-details-dialog'
+import { RotateKeyDialog } from './rotate-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
 
-const MotionTableRow = motion(TableRow)
+type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
 export default function JWTSecretKeysTable() {
   const { ref: projectRef } = useParams()
+  const { project, isLoading: isProjectLoading } = useProjectContext()
+
   const newJwtSecrets = useFlag('newJwtSecrets')
 
-  const [selectedKey, setSelectedKey] = useState<JWTSigningKey | null>(null)
-  const [shownDialog, setShownDialog] = useState<
-    'legacy' | 'create' | 'rotate' | 'confirm-rotate' | 'key-details' | 'revoke' | 'delete' | null
-  >(null)
-
-  const resetDialog = () => {
-    setSelectedKey(null)
-    setShownDialog(null)
-  }
-
-  const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('RS256')
+  const [selectedKey, setSelectedKey] = useState<JWTSigningKey>()
+  const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
+  const [shownDialog, setShownDialog] = useState<DialogType>()
 
   const { data: signingKeys, isLoading: isLoadingSigningKeys } = useJWTSigningKeysQuery({
     projectRef,
@@ -101,14 +67,28 @@ export default function JWTSecretKeysTable() {
   const { data: legacyAPIKeysStatus, isLoading: isLoadingLegacyAPIKeysStatus } =
     useLegacyAPIKeysStatusQuery({ projectRef })
 
-  const legacyMutation = useLegacyJWTSigningKeyCreateMutation()
+  const { mutate: migrateJWTSecret, isLoading: isMigrating } = useLegacyJWTSigningKeyCreateMutation(
+    {
+      onSuccess: () => {
+        setShownDialog(undefined)
+        toast.success('Successfully migrated JWT secret!')
+      },
+    }
+  )
 
-  const updateMutation = useJWTSigningKeyUpdateMutation()
-  const deleteMutation = useJWTSigningKeyDeleteMutation()
+  const { mutate: updateJWTSigningKey, isLoading: isUpdatingJWTSigningKey } =
+    useJWTSigningKeyUpdateMutation({
+      onSuccess: () => {
+        resetDialog()
+        setSelectedKeyToUpdate(undefined)
+      },
+    })
+  const { mutate: deleteJWTSigningKey, isLoading: isDeletingJWTSigningKey } =
+    useJWTSigningKeyDeleteMutation({ onSuccess: () => resetDialog(), onError: () => resetDialog() })
 
-  const isLoadingMutation =
-    updateMutation.isLoading || deleteMutation.isLoading || legacyMutation.isLoading
-  const isLoading = isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
+  const isLoadingMutation = isUpdatingJWTSigningKey || isDeletingJWTSigningKey || isMigrating
+  const isLoading =
+    isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
 
   const sortedKeys = useMemo(() => {
     if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
@@ -138,66 +118,39 @@ export default function JWTSecretKeysTable() {
     [sortedKeys]
   )
 
-  const handleLegacyMigration = async () => {
-    try {
-      await legacyMutation.mutateAsync({
-        projectRef: projectRef!,
-      })
-    } catch (error) {
-      console.error('Failed to migrate legacy JWT secret to new JWT signing keys', error)
-    }
+  const resetDialog = () => {
+    setSelectedKey(undefined)
+    setShownDialog(undefined)
   }
 
   const handlePreviouslyUsedKey = async (keyId: string) => {
-    if (!projectRef) {
-      return
-    }
-    try {
-      await updateMutation.mutateAsync({ projectRef, keyId, status: 'previously_used' })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to move key to previously used', error)
-    }
+    setSelectedKeyToUpdate(keyId)
+    updateJWTSigningKey(
+      { projectRef, keyId, status: 'previously_used' },
+      { onSuccess: () => toast.success('Successfully moved key to previously used') }
+    )
   }
 
-  const handleStandbyKey = async (keyId: string) => {
-    try {
-      await updateMutation.mutateAsync({ projectRef: projectRef!, keyId, status: 'standby' })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to move key to standby', error)
-    }
+  const handleStandbyKey = (keyId: string) => {
+    setSelectedKeyToUpdate(keyId)
+    updateJWTSigningKey(
+      { projectRef: projectRef!, keyId, status: 'standby' },
+      { onSuccess: () => toast.success('Successfully moved key to standby') }
+    )
   }
 
-  const handleRevokeKey = async (keyId: string) => {
-    try {
-      await updateMutation.mutateAsync({ projectRef: projectRef!, keyId, status: 'revoked' })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to revoke key', error)
-    }
+  const handleRevokeKey = (keyId: string) => {
+    updateJWTSigningKey(
+      { projectRef: projectRef!, keyId, status: 'revoked' },
+      { onSuccess: () => toast.success('Successfully revoked key') }
+    )
   }
 
-  const handleDeleteKey = async (keyId: string) => {
-    try {
-      await deleteMutation.mutateAsync({ projectRef: projectRef!, keyId })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to delete key', error)
-    }
-  }
-
-  const handleRotateKey = async () => {
-    try {
-      await updateMutation.mutateAsync({
-        projectRef: projectRef!,
-        keyId: standbyKey!.id,
-        status: 'in_use',
-      })
-      resetDialog()
-    } catch (error) {
-      console.error('Failed to rotate key', error)
-    }
+  const handleDeleteKey = (keyId: string) => {
+    deleteJWTSigningKey(
+      { projectRef: projectRef!, keyId },
+      { onSuccess: () => toast.success('Successfully deleted key') }
+    )
   }
 
   if (isLoading) {
@@ -216,31 +169,31 @@ export default function JWTSecretKeysTable() {
             {standbyKey && (
               <ActionPanel
                 title="Rotate Signing Key"
-                description="Promote the standby key to in use. All new JWTs will be signed with this key. Make sure the standby key has been received by all of your application's components to avoid downtime."
+                description="Switch the standby key to in use. All new JSON Web Tokens issued by Supabase Auth will be signed with this key."
                 buttonLabel="Rotate keys"
                 onClick={() => setShownDialog('rotate')}
-                loading={isLoadingMutation}
-                icon={<RotateCw />}
-                type="warning"
+                loading={isUpdatingJWTSigningKey}
+                icon={<RotateCw className="size-4" />}
+                type="primary"
               />
             )}
 
             {!standbyKey && (
               <ActionPanel
                 title="Create standby key"
-                description="Create a standby key for the next rotation which will be used on next key rotation."
+                description="Set up a new key which you can switch to once it has been picked up by all components of your application."
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isLoadingMutation}
                 type="primary"
-                icon={<Timer />}
+                icon={<Timer className="size-4" />}
               />
             )}
           </>
         ) : (
           <StartUsingJwtSigningKeysBanner
             onClick={() => setShownDialog('legacy')}
-            isLoading={isLoadingMutation}
+            isLoading={isMigrating}
           />
         )}
       </div>
@@ -273,10 +226,15 @@ export default function JWTSecretKeysTable() {
                         <SigningKeyRow
                           key={standbyKey.id}
                           signingKey={standbyKey}
+                          legacyKey={legacyKey}
+                          standbyKey={standbyKey}
+                          isLoading={
+                            selectedKeyToUpdate === standbyKey.id && isUpdatingJWTSigningKey
+                          }
                           setSelectedKey={setSelectedKey}
                           setShownDialog={setShownDialog}
+                          handleStandbyKey={handleStandbyKey}
                           handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                          legacyKey={legacyKey}
                         />
                       )}
                       {inUseKey && (
@@ -285,8 +243,10 @@ export default function JWTSecretKeysTable() {
                           signingKey={inUseKey}
                           setSelectedKey={setSelectedKey}
                           setShownDialog={setShownDialog}
+                          handleStandbyKey={handleStandbyKey}
                           handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                           legacyKey={legacyKey}
+                          standbyKey={standbyKey}
                         />
                       )}
                     </AnimatePresence>
@@ -296,12 +256,13 @@ export default function JWTSecretKeysTable() {
             </Card>
           </div>
 
-          <div className="flex flex-col space-y-2">
-            <div>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <h2 className="text-xl">Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
-                These JWT signing keys are still used to <strong>verify</strong> JWTs already
-                issued. Revoke them once all JWTs have expired.
+                These JWT signing keys are still used to{' '}
+                <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
+                Revoke once all tokens have expired.
               </p>
             </div>
             <Card className="overflow-hidden">
@@ -319,6 +280,9 @@ export default function JWTSecretKeysTable() {
                         <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Type
                         </TableHead>
+                        <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
+                          Last rotated at
+                        </TableHead>
                         <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Actions
                         </TableHead>
@@ -327,104 +291,30 @@ export default function JWTSecretKeysTable() {
                     <TableBody>
                       <AnimatePresence>
                         {previouslyUsedKeys.map((key) => (
-                          <MotionTableRow
+                          <SigningKeyRow
                             key={key.id}
-                            layout
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{
-                              opacity: 1,
-                              height: 'auto',
-                              transition: { duration: 0.2 },
-                            }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="border-b border-dashed border-border"
-                          >
-                            <TableCell className="w-[150px] pr-0 py-2">
-                              <div className="flex -space-x-px items-center">
-                                <Badge
-                                  className={cn(
-                                    statusColors[key.status],
-                                    'rounded-r-none',
-                                    'gap-2 w-full h-6',
-                                    'uppercase font-mono',
-                                    'border-r-0'
-                                  )}
-                                >
-                                  <Key size={13} />
-                                  {statusLabels[key.status]}
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
-                              <div className="">
-                                <Badge
-                                  className={cn(
-                                    'bg-opacity-100 bg-200 border-foreground-muted',
-                                    'rounded-l-none',
-                                    'gap-2 py-2 h-6'
-                                  )}
-                                >
-                                  <span className="truncate">{key.id}</span>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedKey(key)
-                                      setShownDialog('key-details')
-                                    }}
-                                  >
-                                    <Eye size={13} strokeWidth={1.5} />
-                                  </button>
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="truncate max-w-[100px] py-2">
-                              <AlgorithmHoverCard
-                                algorithm={key.algorithm}
-                                legacy={key.id === legacyKey?.id}
-                              />
-                            </TableCell>
-                            <TableCell className="text-right py-2">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button type="text" className="px-2" icon={<MoreVertical />} />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem
-                                    onSelect={() => {
-                                      setSelectedKey(key)
-                                      setShownDialog('key-details')
-                                    }}
-                                  >
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    View key details
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    disabled={!!standbyKey}
-                                    onSelect={() => handleStandbyKey(key.id)}
-                                  >
-                                    <CircleArrowUp className="mr-2 h-4 w-4" />
-                                    Set as standby key
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onSelect={() => {
-                                      setSelectedKey(key)
-                                      setShownDialog('revoke')
-                                    }}
-                                    className="text-destructive"
-                                  >
-                                    <ShieldOff className="mr-2 h-4 w-4" />
-                                    Revoke key
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </MotionTableRow>
+                            signingKey={key}
+                            legacyKey={legacyKey}
+                            standbyKey={standbyKey}
+                            isLoading={selectedKeyToUpdate === key.id && isUpdatingJWTSigningKey}
+                            setSelectedKey={setSelectedKey}
+                            setShownDialog={setShownDialog}
+                            handleStandbyKey={handleStandbyKey}
+                            handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                          />
                         ))}
                       </AnimatePresence>
                     </TableBody>
                   </Table>
                 ) : (
-                  <div className="flex items-center justify-center text-sm text-foreground-light p-6">
-                    No previously used keys
+                  <div className="flex flex-col items-center justify-center text-center text-foreground-light p-8 gap-2">
+                    <Timer className="size-6 text-foreground-lighter" />
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium">No previously used keys</p>
+                      <p className="text-xs text-foreground-lighter">
+                        Rotated keys will appear here for verification of existing tokens
+                      </p>
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -434,8 +324,8 @@ export default function JWTSecretKeysTable() {
       )}
 
       {revokedKeys.length > 0 && (
-        <div className="flex flex-col space-y-2">
-          <div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <h2 className="text-xl">Revoked keys</h2>
             <p className="text-sm text-foreground-lighter">
               These keys are no longer used to verify or sign JWTs.
@@ -455,6 +345,9 @@ export default function JWTSecretKeysTable() {
                     <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Type
                     </TableHead>
+                    <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
+                      Last rotated at
+                    </TableHead>
                     <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Actions
                     </TableHead>
@@ -463,98 +356,16 @@ export default function JWTSecretKeysTable() {
                 <TableBody>
                   <AnimatePresence>
                     {revokedKeys.map((key) => (
-                      <MotionTableRow
+                      <SigningKeyRow
                         key={key.id}
-                        layout
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{
-                          opacity: 1,
-                          height: 'auto',
-                          transition: { duration: 0.2 },
-                        }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="border-b border-dashed border-border"
-                      >
-                        <TableCell className="w-[150px] pr-0 py-2">
-                          <div className="flex -space-x-px items-center">
-                            <Badge
-                              className={cn(
-                                statusColors[key.status],
-                                'rounded-r-none',
-                                'gap-2 w-full h-6',
-                                'uppercase font-mono',
-                                'border-r-0'
-                              )}
-                            >
-                              <Key size={13} />
-                              {statusLabels[key.status]}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
-                          <div className="">
-                            <Badge
-                              className={cn(
-                                'bg-opacity-100 bg-200 border-foreground-muted',
-                                'rounded-l-none',
-                                'gap-2 py-2 h-6'
-                              )}
-                            >
-                              <span className="truncate">{key.id}</span>
-                              <button
-                                onClick={() => {
-                                  setSelectedKey(key)
-                                  setShownDialog('key-details')
-                                }}
-                              >
-                                <Eye size={13} strokeWidth={1.5} />
-                              </button>
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell className="truncate max-w-[100px] py-2">
-                          <AlgorithmHoverCard
-                            algorithm={key.algorithm}
-                            legacy={key.id === legacyKey?.id}
-                          />
-                        </TableCell>
-                        <TableCell className="text-right py-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button type="text" className="px-2" icon={<MoreVertical />} />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onSelect={() => {
-                                  setSelectedKey(key)
-                                  setShownDialog('key-details')
-                                }}
-                              >
-                                <Eye className="mr-2 h-4 w-4" />
-                                View key details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                disabled={!!standbyKey}
-                                onSelect={() => handleStandbyKey(key.id)}
-                              >
-                                <CircleArrowUp className="mr-2 h-4 w-4" />
-                                Set as standby key
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                disabled={key.id === legacyKey?.id}
-                                onSelect={() => {
-                                  setSelectedKey(key)
-                                  setShownDialog('delete')
-                                }}
-                                className="text-destructive"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Permanently delete key
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </MotionTableRow>
+                        signingKey={key}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                      />
                     ))}
                   </AnimatePresence>
                 </TableBody>
@@ -612,18 +423,17 @@ export default function JWTSecretKeysTable() {
             <DialogTitle>Start using new JWT signing keys</DialogTitle>
           </DialogHeader>
           <DialogSectionSeparator />
-          <DialogSection>
+          <DialogSection className="flex flex-col gap-2 text-sm text-foreground-light">
             <p>
               Your project today uses a legacy symmetric JWT secret to create JWTs. To be able to
-              use an asymmetric JWT signing key you first have to migrate it to the new system. This
-              change does not cause any downtime on your project.
+              use an asymmetric JWT signing key you first have to migrate it to the new approach.
             </p>
+            <p>This change does not cause any downtime on your project.</p>
           </DialogSection>
           <DialogFooter>
             <Button
-              onClick={() => handleLegacyMigration()}
-              disabled={isLoadingMutation}
-              loading={isLoadingMutation}
+              loading={isMigrating}
+              onClick={() => migrateJWTSecret({ projectRef: projectRef! })}
             >
               Migrate JWT secret
             </Button>
@@ -637,164 +447,30 @@ export default function JWTSecretKeysTable() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={shownDialog === 'rotate'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Rotate Key</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection>
-            <DialogDescription>
-              {standbyKey ? (
-                <>
-                  The standby key ({algorithmLabels[standbyKey.algorithm]}) will be promoted to 'In
-                  use'. This will:
-                  <ul className="list-disc pl-4 mt-2 space-y-2">
-                    <li>Change the current standby key to 'In use'</li>
-                    <li>Move the current 'In use' key to 'Previously used'</li>
-                    <li>Move any 'Previously used' key to 'Revoked'</li>
-                  </ul>
-                </>
-              ) : (
-                <>
-                  Since there is no standby key, you need to choose an algorithm for the new key:
-                  <div className="mt-4 space-y-4">
-                    <Select_Shadcn_
-                      value={newKeyAlgorithm}
-                      onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
-                    >
-                      <SelectTrigger_Shadcn_ id="rotateAlgorithm">
-                        <SelectValue_Shadcn_ placeholder="Select algorithm" />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="HS256">HS256 (Symmetric)</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="ES256">ES256 (ECC)</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="EdDSA">EdDSA (Ed25519)</SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-                    <p className="text-sm text-foreground-light">
-                      {algorithmDescriptions[newKeyAlgorithm]}
-                    </p>
-                  </div>
-                </>
-              )}
-            </DialogDescription>
-          </DialogSection>
-          <DialogFooter>
-            <Button onClick={() => setShownDialog('confirm-rotate')}>Review Rotation</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {standbyKey && inUseKey && projectRef && (
+        <Dialog open={shownDialog === 'rotate'} onOpenChange={resetDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <RotateKeyDialog
+              projectRef={projectRef}
+              standbyKey={standbyKey}
+              inUseKey={inUseKey}
+              onClose={resetDialog}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
-      <Dialog open={shownDialog === 'confirm-rotate'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-lg overflow-hidden">
-          <DialogHeader>
-            <DialogTitle>Confirm key rotation</DialogTitle>
-            <DialogDescription>
-              Review the key rotation process below. Ensure your application's components have
-              already picked up and are trusting your standby key to avoid downtime.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection className="relative bg">
-            <div className="relative flex flex-col items-center space-y-6 py-6">
-              {standbyKey ? (
-                <div className="flex items-center">
-                  <Badge
-                    className={cn(statusColors['standby'], 'px-3 py-1 space-x-1 items-baseline')}
-                  >
-                    <Timer size={13} className="self-center" />
-                    <span>STANDBY KEY</span>
-                    <span className="text-xs font-mono text-foreground-light">
-                      {algorithmLabels[standbyKey!.algorithm]}
-                    </span>
-                  </Badge>
-                  <ArrowRight className="h-4 w-4 mx-1 text-foreground-light" />
-                  <Badge className={cn(statusColors['in_use'], 'px-3 py-1 space-x-1')}>
-                    <Key size={13} />
-                    <span>CURRENTLY USED</span>
-                  </Badge>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Badge
-                    className={cn(
-                      'bg-surface-300 bg-opacity-100 text-foreground border border-foreground-muted px-3 py-1 space-x-1'
-                    )}
-                  >
-                    <Key size={13} className="mr-1.5" />
-                    <span>New Key</span>
-                    <span className="text-xs font-mono text-foreground-light">
-                      {algorithmLabels[newKeyAlgorithm]}
-                    </span>
-                  </Badge>
-                  <ArrowRight className="h-4 w-4 text-foreground-light" />
-                  <Badge className={cn(statusColors['in_use'], 'px-3 py-1')}>
-                    <Key size={13} className="mr-1.5" />
-                    CURRENTLY USED
-                  </Badge>
-                </div>
-              )}
-
-              <div className="flex items-center">
-                <Badge className={cn(statusColors['in_use'], 'px-3 py-1 space-x-1 items-baseline')}>
-                  <Key size={13} className="self-center" />
-                  <span>CURRENTLY USED</span>
-                  <span className="text-xs font-mono text-foreground-light">
-                    {inUseKey?.algorithm && algorithmLabels[inUseKey.algorithm]}
-                  </span>
-                </Badge>
-                <ArrowRight className="h-4 w-4 mx-1 text-foreground-light" />
-                <Badge className={cn(statusColors['previously_used'], 'px-3 py-1 space-x-1')}>
-                  <Timer size={13} />
-                  <span>PREVIOUS KEY</span>
-                </Badge>
-              </div>
-            </div>
-          </DialogSection>
-          <DialogFooter>
-            <Button type="outline" onClick={resetDialog}>
-              Cancel
-            </Button>
-            <Button onClick={() => handleRotateKey()} loading={isLoadingMutation}>
-              Confirm rotation
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={shownDialog === 'key-details'} onOpenChange={resetDialog}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-medium">Key Details</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection className="flex flex-col gap-6">
-            {selectedKey && (
-              <>
-                <div className="bg-surface-100/50 border rounded-md">
-                  <div className="flex items-center gap-2 px-3 py-2 border-b">
-                    <FileKey strokeWidth={1.5} size={15} className="text-foreground-light" />
-                    <h4 className="text-xs font-mono">Public Key (PEM format)</h4>
-                  </div>
-                  <pre className="bg-surface-100 p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all max-h-40">
-                    {typeof selectedKey.public_jwk === 'string'
-                      ? selectedKey.public_jwk
-                      : JSON.stringify(selectedKey.public_jwk ?? '', null, 2)}
-                  </pre>
-                </div>
-                <div>
-                  <h4 className="text-sm mb-2">JWKS URL</h4>
-                  <pre className="bg-surface-100 border p-3 rounded-md text-xs overflow-x-auto break-all">
-                    {`${window.location.origin}/jwt/v1/jwks.json`}
-                  </pre>
-                </div>
-              </>
-            )}
-          </DialogSection>
-        </DialogContent>
-      </Dialog>
+      {selectedKey && project && (
+        <Dialog open={shownDialog === 'key-details'} onOpenChange={resetDialog}>
+          <DialogContent className="sm:max-w-lg">
+            <KeyDetailsDialog
+              selectedKey={selectedKey}
+              restURL={project.restUrl}
+              onClose={resetDialog}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {selectedKey &&
         selectedKey.status === 'previously_used' &&
