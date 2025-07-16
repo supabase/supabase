@@ -1,3 +1,4 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { format } from 'date-fns'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { HTMLAttributes, useEffect, useState } from 'react'
@@ -23,7 +24,6 @@ import {
 } from 'ui'
 import { presets as defaultPresets } from './DataTable.constants'
 import type { DatePreset, DateRangeDisabled } from './DataTable.types'
-import { useDebounce } from './hooks/useDebounce'
 import { kdbClassName } from './primitives/Kbd'
 
 interface DatePickerWithRangeProps extends HTMLAttributes<HTMLDivElement> {
