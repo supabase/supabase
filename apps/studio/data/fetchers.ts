@@ -16,7 +16,7 @@ export const fetchHandler: typeof fetch = async (input, init) => {
     return await fetch(input, init)
   } catch (err: any) {
     if (err instanceof TypeError && err.message === 'Failed to fetch') {
-      console.log(err)
+      console.error(err)
       throw new Error('Unable to reach the server. Please check your network or try again later.')
     }
     throw err
