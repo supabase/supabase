@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
@@ -23,8 +24,8 @@ import { FeedbackDropdown } from './FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
-import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 import MergeRequestButton from './MergeRequestButton'
+import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -61,6 +62,7 @@ const LayoutHeader = ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const { setMobileMenuOpen } = useAppStateSnapshot()
+  const gitlessBranching = useIsBranching2Enabled()
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -175,7 +177,7 @@ const LayoutHeader = ({
                   ease: 'easeOut',
                 }}
               >
-                {IS_PLATFORM && <MergeRequestButton />}
+                {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
                 <Connect />
               </motion.div>
             )}
