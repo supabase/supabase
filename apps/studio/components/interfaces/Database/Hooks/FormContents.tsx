@@ -96,6 +96,9 @@ export const FormContents = ({
         const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
         setHttpHeaders(updatedHttpHeaders)
       }
+    } else {
+      const updatedHttpHeaders = httpHeaders.filter((x) => x.name !== 'Authorization')
+      setHttpHeaders(updatedHttpHeaders)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.http_url])
@@ -193,7 +196,13 @@ export const FormContents = ({
                 label=""
                 beforeLabel={
                   <div className="flex items-center space-x-5">
-                    <Image src={webhook.icon} layout="fixed" width="32" height="32" />
+                    <Image
+                      alt={webhook.label}
+                      src={webhook.icon}
+                      layout="fixed"
+                      width="32"
+                      height="32"
+                    />
                     <div className="flex-col space-y-0">
                       <div className="flex space-x-2">
                         <p className="text-foreground">{webhook.label}</p>
