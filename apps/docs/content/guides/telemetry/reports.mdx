@@ -33,12 +33,20 @@ Reports can be filtered by time range to focus your analysis on specific periods
 
 The Database report provides the most comprehensive view into your Postgres instance's health and performance characteristics. These charts help you identify performance bottlenecks, resource constraints, and optimization opportunities at a glance.
 
-<Admonition type="note">
+The following charts are available for Free and Pro plans:
 
-Advanced Database monitoring charts are currently available only for Teams and Enterprise plans.
-[Upgrade your plan](https://supabase.com/dashboard/org/_/billing) to access these features.
+| Chart                        | Available Plans | Description                                  | Key Insights                                  |
+| ---------------------------- | --------------- | -------------------------------------------- | --------------------------------------------- |
+| Memory usage                 | Free, Pro       | RAM usage percentage by the database         | Memory pressure and resource utilization      |
+| CPU usage                    | Free, Pro       | Average CPU usage percentage                 | CPU-intensive query identification            |
+| Disk IOPS                    | Free, Pro       | Read/write operations per second with limits | IO bottleneck detection and workload analysis |
+| Database connections         | Free, Pro       | Number of pooler connections to the database | Connection pool monitoring                    |
+| Shared Pooler connections    | All             | Client connections to the shared pooler      | Shared pooler usage patterns                  |
+| Dedicated Pooler connections | All             | Client connections to PgBouncer              | Dedicated pooler connection monitoring        |
 
-</Admonition>
+### Advanced monitoring
+
+The following charts provide a more advanced and detailed view of your database performance and are available only for Teams and Enterprise plans.
 
 ### Memory usage
 
@@ -204,10 +212,10 @@ Actions you can take:
 | Implement data archival                                                          | Archive historical data to reduce active storage needs               |
 | [Upgrade disk size](https://supabase.com/docs/guides/platform/database-size)     | Increase storage capacity when approaching limits                    |
 
-### Database client connections
+### Database connections
 
 <Image
-  alt="Database client connections chart"
+  alt="Database connections chart"
   zoomable
   src={{
     dark: '/docs/img/database/reports/db-client-connections-chart-dark.png',
