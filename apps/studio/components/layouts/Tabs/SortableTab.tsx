@@ -71,6 +71,13 @@ export const SortableTab = ({
     >
       <TabsTrigger_Shadcn_
         value={tab.id}
+        onAuxClick={(e) => {
+          // Middle click closes tab
+          if (e.button === 1) {
+            e.preventDefault()
+            onClose(tab.id)
+          }
+        }}
         onDoubleClick={() => tabs.makeTabPermanent(tab.id)}
         className={cn(
           'flex items-center gap-2 pl-3 pr-2.5 text-xs',

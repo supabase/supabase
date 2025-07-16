@@ -96,7 +96,10 @@
         "FORCE_ASSET_CDN",
         "ASSET_CDN_S3_ENDPOINT",
         "SITE_NAME",
-        "VERCEL_URL"
+        "VERCEL_URL",
+        "IS_THROTTLED",
+        "AI_PRO_MODEL",
+        "AI_NORMAL_MODEL"
       ],
       "passThroughEnv": ["CURRENT_CLI_VERSION"],
       "outputs": [".next/**", "!.next/cache/**"]

@@ -14,6 +14,7 @@ export interface ReportAttributes {
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
+  availableIn?: string[]
   hideChartType?: boolean
   format?: string
   className?: string
@@ -130,6 +131,7 @@ export const calculateTotalChartAggregate = (
 const CustomTooltip = ({
   active,
   payload,
+  label,
   attributes,
   isPercentage,
   format,
@@ -138,12 +140,13 @@ const CustomTooltip = ({
   isActiveHoveredChart,
 }: TooltipProps) => {
   if (active && payload && payload.length) {
-    const timestamp = payload[0].payload.timestamp
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
-    const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isRamChart =
+      !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
@@ -202,7 +205,7 @@ const CustomTooltip = ({
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
+        <p className="font-medium">{label}</p>
         <div className="grid gap-0">
           {payload
             .reverse()

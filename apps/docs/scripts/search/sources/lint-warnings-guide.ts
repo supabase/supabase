@@ -111,6 +111,6 @@ export class LintWarningsGuideSource extends BaseSource {
   extractIndexedContent(): string {
     const sections = this.sections ?? []
     const sectionText = sections.map(({ content }) => content).join('\n\n')
-    return `# ${this.lint.path}\n\n${sectionText}`
+    return `# Database Advisor: Lint ${this.lint.path}\n\nThis is a database lint rule for Supabase, targeting the lint ID ${this.lint.path}. Lint rules help enforce performance and security best practices for your Supabase database.\n\n${sectionText}`
   }
 }

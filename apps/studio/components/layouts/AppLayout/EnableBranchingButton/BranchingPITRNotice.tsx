@@ -24,11 +24,12 @@ export const BranchingPITRNotice = () => {
           <Clock className="text-warning-700" size={20} strokeWidth={2} />
         </figure>
       </div>
-      <div className="flex grow items-center justify-between">
+      <div className="flex grow items-center justify-between gap-4">
         <div className="flex flex-col gap-y-1">
           <p className="text-sm text-foreground">Consider enabling Point in Time Recovery (PITR)</p>
           <p className="text-sm text-foreground-light">
-            This ensures you can recover data if you make a bad migration (e.g. delete a column).
+            This ensures you can recover production data if you merge a bad migration (e.g. delete a
+            column).
           </p>
         </div>
         {!canUpdateSubscription ? (

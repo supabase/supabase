@@ -79,7 +79,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.176.1
+    image: supabase/gotrue:v2.177.0
     restart: unless-stopped
     healthcheck:
       test:
@@ -231,7 +231,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.24.7
+    image: supabase/storage-api:v1.25.7
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -296,7 +296,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.89.3
+    image: supabase/postgres-meta:v0.91.0
     restart: unless-stopped
     depends_on:
       db:
@@ -475,7 +475,7 @@ services:
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
     container_name: supabase-pooler
-    image: supabase/supavisor:2.5.6
+    image: supabase/supavisor:2.5.7
     restart: unless-stopped
     ports:
       - ${POSTGRES_PORT}:5432

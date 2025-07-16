@@ -52,8 +52,6 @@ const getInitialState = () => {
       docsLanguage: 'js',
       showProjectApiDocs: false,
       showCreateBranchModal: false,
-      showFeaturePreviewModal: false,
-      selectedFeaturePreview: '',
       showAiSettingsModal: false,
       showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
@@ -82,8 +80,6 @@ const getInitialState = () => {
     docsLanguage: 'js',
     showProjectApiDocs: false,
     showCreateBranchModal: false,
-    showFeaturePreviewModal: false,
-    selectedFeaturePreview: '',
     showAiSettingsModal: false,
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
@@ -135,16 +131,6 @@ export const appState = proxy({
   showCreateBranchModal: false,
   setShowCreateBranchModal: (value: boolean) => {
     appState.showCreateBranchModal = value
-  },
-
-  showFeaturePreviewModal: false,
-  setShowFeaturePreviewModal: (value: boolean) => {
-    appState.showFeaturePreviewModal = value
-  },
-
-  selectedFeaturePreview: '',
-  setSelectedFeaturePreview: (value: string) => {
-    appState.selectedFeaturePreview = value
   },
 
   showAiSettingsModal: false,

@@ -3,7 +3,8 @@
     "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
-    "type": "markdown"
+    "type": "markdown",
+    "items": []
   },
   {
     "type": "category",
@@ -58,6 +59,12 @@
     "title": "Database",
     "items": [
       {
+        "id": "v1-apply-a-migration",
+        "title": "Apply a migration",
+        "slug": "v1-apply-a-migration",
+        "type": "operation"
+      },
+      {
         "id": "v1-disable-readonly-mode-temporarily",
         "title": "Disable readonly mode temporarily",
         "slug": "v1-disable-readonly-mode-temporarily",
@@ -106,12 +113,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-supavisor-config",
-        "title": "Get supavisor config",
-        "slug": "v1-get-supavisor-config",
-        "type": "operation"
-      },
-      {
         "id": "v1-list-all-backups",
         "title": "List all backups",
         "slug": "v1-list-all-backups",
@@ -121,6 +122,12 @@
         "id": "v1-list-all-snippets",
         "title": "List all snippets",
         "slug": "v1-list-all-snippets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-migrations",
+        "title": "List migrations",
+        "slug": "v1-list-migrations",
         "type": "operation"
       },
       {
@@ -157,12 +164,6 @@
         "id": "v1-update-ssl-enforcement-config",
         "title": "Update ssl enforcement config",
         "slug": "v1-update-ssl-enforcement-config",
-        "type": "operation"
-      },
-      {
-        "id": "v1-update-supavisor-config",
-        "title": "Update supavisor config",
-        "slug": "v1-update-supavisor-config",
         "type": "operation"
       }
     ]
@@ -307,6 +308,12 @@
         "id": "v1-list-all-branches",
         "title": "List all branches",
         "slug": "v1-list-all-branches",
+        "type": "operation"
+      },
+      {
+        "id": "v1-merge-a-branch",
+        "title": "Merge a branch",
+        "slug": "v1-merge-a-branch",
         "type": "operation"
       },
       {

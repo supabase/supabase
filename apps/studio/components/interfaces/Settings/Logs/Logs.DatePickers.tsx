@@ -5,8 +5,10 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 
 import { Label } from '@ui/components/shadcn/ui/label'
+import { Badge } from '@ui/components/shadcn/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
 import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -27,8 +29,8 @@ export type DatePickerValue = {
 
 interface Props {
   value: DatePickerValue
-  onSubmit: (args: DatePickerValue) => void
   helpers: DatetimeHelper[]
+  onSubmit: (value: DatePickerValue) => void
 }
 
 export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {
@@ -215,6 +217,16 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const showHelperBadge = (helper?: DatetimeHelper) => {
+    if (!helper) return false
+    if (!helper.availableIn?.length) return false
+
+    if (helper.availableIn.includes('free')) return false
+    if (helper.availableIn.includes(orgPlan?.id || 'free') && !isOrgPlanLoading) return false
+    return true
+  }
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
@@ -239,7 +251,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
             <Label
               key={helper.text}
               className={cn(
-                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs',
+                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
                 {
                   'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
                 }
@@ -253,6 +265,15 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
                 aria-disabled={helper.disabled}
               ></RadioGroupItem>
               {helper.text}
+              {showHelperBadge(helper) ? (
+                <Badge
+                  size="small"
+                  variant="outline"
+                  className="h-5 text-[10px] text-foreground-light capitalize"
+                >
+                  {helper.availableIn?.[0] || ''}
+                </Badge>
+              ) : null}
             </Label>
           ))}
         </RadioGroup>

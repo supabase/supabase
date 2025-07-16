@@ -86,7 +86,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const projectRefForGitHubLinker = selectedProject?.parent_project_ref ?? selectedProject?.ref
+
     const {
       editorPanel,
       mobileMenuOpen,
@@ -108,7 +108,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const showProductMenu = selectedProject
       ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
         (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings'))
+          router.pathname.includes('/project/[ref]/settings')) ||
+        router.pathname.includes('/project/[ref]/branches')
       : true
 
     const ignorePausedState =
@@ -324,6 +325,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
+  const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
@@ -387,7 +389,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding) {
+  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
     return <BuildingState />
   }
 

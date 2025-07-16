@@ -23,6 +23,7 @@ import {
   singleThemes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
 export function UserDropdown() {
   const router = useRouter()
@@ -31,6 +32,7 @@ export function UserDropdown() {
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const setCommandMenuOpen = useSetCommandMenuOpen()
+  const { openFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
     <DropdownMenu>
@@ -87,8 +89,8 @@ export function UserDropdown() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex gap-2"
-                onClick={() => appStateSnapshot.setShowFeaturePreviewModal(true)}
-                onSelect={() => appStateSnapshot.setShowFeaturePreviewModal(true)}
+                onClick={openFeaturePreviewModal}
+                onSelect={openFeaturePreviewModal}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews

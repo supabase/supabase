@@ -30,10 +30,13 @@ export type Slider = {
   options?: Option[]
 }
 
+export type DateRangeDisabled = { before?: Date; after?: Date }
+
 export type Timerange = {
   type: 'timerange'
   options?: Option[] // required for TS
   presets?: DatePreset[]
+  dateRangeDisabled?: DateRangeDisabled
 }
 
 export type Base<TData> = {

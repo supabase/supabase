@@ -1501,6 +1501,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   }
                                 },
                                 {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "email",
                                   "type": {
                                     "type": "intrinsic",
@@ -1944,6 +1952,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -2679,6 +2695,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   }
                                 },
                                 {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "email",
                                   "type": {
                                     "type": "intrinsic",
@@ -3119,6 +3143,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -3587,6 +3619,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -4342,6 +4382,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   }
                                 },
                                 {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "email",
                                   "type": {
                                     "type": "intrinsic",
@@ -4914,6 +4962,20 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                     "name": "string"
                   },
                   "isOptional": true
+                },
+                {
+                  "name": "userStorage",
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "Stores the user object in a separate storage location from the rest of the session data. When non-null, \`storage\` will only store a JSON object containing the access and refresh token and some adjacent metadata, while \`userStorage\` will only contain the user object under the key \`storageKey + '-user'\`.",
+                    "text": "When this option is set and cookie storage is used, \`getSession()\` and other functions that load a session from the cookie store might not return back a user. It's very important to always use \`getUser()\` to fetch a user object in those scenarios.\\n",
+                    "tags": [
+                      {
+                        "tag": "experimental",
+                        "text": "\\n"
+                      }
+                    ]
+                  }
                 }
               ]
             }
@@ -5104,6 +5166,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         }
+                                      },
+                                      {
+                                        "name": "deleted_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
                                       },
                                       {
                                         "name": "email",
@@ -5400,6 +5470,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         }
                                       }
                                     ]
+                                  },
+                                  "comment": {
+                                    "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                   }
                                 }
                               ]
@@ -5465,6 +5538,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -5826,13 +5907,97 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
               "type": "intrinsic",
               "name": "string"
             },
-            "isOptional": true
+            "isOptional": true,
+            "comment": {
+              "shortText": "An optional specific JWT you wish to verify, not the one you\\n           can obtain from {@link #getSession}."
+            }
           },
           {
-            "name": "jwks",
+            "name": "options",
             "type": {
               "type": "object",
               "properties": [
+                {
+                  "name": "allowExpired",
+                  "type": {
+                    "type": "intrinsic",
+                    "name": "boolean"
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "If set to \`true\` the \`exp\` claim will not be validated against the current time."
+                  }
+                },
+                {
+                  "name": "jwks",
+                  "type": {
+                    "type": "object",
+                    "properties": [
+                      {
+                        "name": "keys",
+                        "type": {
+                          "type": "array",
+                          "elemType": {
+                            "type": "object",
+                            "name": "JWK",
+                            "properties": [
+                              {
+                                "name": "alg",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true
+                              },
+                              {
+                                "name": "key_ops",
+                                "type": {
+                                  "type": "array",
+                                  "elemType": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                }
+                              },
+                              {
+                                "name": "kid",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true
+                              },
+                              {
+                                "name": "kty",
+                                "type": {
+                                  "type": "union",
+                                  "subTypes": [
+                                    {
+                                      "type": "literal",
+                                      "value": "RSA"
+                                    },
+                                    {
+                                      "type": "literal",
+                                      "value": "EC"
+                                    },
+                                    {
+                                      "type": "literal",
+                                      "value": "oct"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "isOptional": true,
+                  "comment": {
+                    "shortText": "If set, this JSON Web Key Set is going to have precedence over the cached value available on the server."
+                  }
+                },
                 {
                   "name": "keys",
                   "type": {
@@ -5889,9 +6054,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                         }
                       ]
                     }
-                  }
+                  },
+                  "isOptional": true,
+                  "comment": {}
                 }
               ]
+            },
+            "comment": {
+              "shortText": "Various additional options that allow you to customize the\\n               behavior of this method.\\n"
             }
           }
         ],
@@ -6021,7 +6191,10 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
             }
           }
         },
-        "comment": {}
+        "comment": {
+          "shortText": "Extracts the JWT claims present in the access token by first verifying the\\nJWT against the server's JSON Web Key Set endpoint\\n\`/.well-known/jwks.json\` which is often cached, resulting in significantly\\nfaster responses. Prefer this method over {@link #getUser} which always\\nsends a request to the Auth server for each JWT.",
+          "text": "If the project is not using an asymmetric JWT signing key (like ECC or\\nRSA) it always sends a request to the Auth server (similar to {@link\\n#getUser}) to verify the JWT.\\n"
+        }
       },
       "@supabase/auth-js.GoTrueClient.getSession": {
         "name": "@supabase/auth-js.GoTrueClient.getSession",
@@ -6195,6 +6368,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                           "type": "intrinsic",
                                           "name": "string"
                                         }
+                                      },
+                                      {
+                                        "name": "deleted_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
                                       },
                                       {
                                         "name": "email",
@@ -6491,6 +6672,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         }
                                       }
                                     ]
+                                  },
+                                  "comment": {
+                                    "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                   }
                                 }
                               ]
@@ -6662,6 +6846,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -7823,6 +8015,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   }
                                 },
                                 {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "email",
                                   "type": {
                                     "type": "intrinsic",
@@ -8117,6 +8317,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   }
                                 }
                               ]
+                            },
+                            "comment": {
+                              "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                             }
                           }
                         ]
@@ -8377,6 +8580,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                   "type": "intrinsic",
                                                   "name": "string"
                                                 }
+                                              },
+                                              {
+                                                "name": "deleted_at",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                },
+                                                "isOptional": true
                                               },
                                               {
                                                 "name": "email",
@@ -8673,6 +8884,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                                 }
                                               }
                                             ]
+                                          },
+                                          "comment": {
+                                            "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                           }
                                         }
                                       ]
@@ -8894,6 +9108,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                               "type": "intrinsic",
                                               "name": "string"
                                             }
+                                          },
+                                          {
+                                            "name": "deleted_at",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            },
+                                            "isOptional": true
                                           },
                                           {
                                             "name": "email",
@@ -9190,6 +9412,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           }
                                         ]
+                                      },
+                                      "comment": {
+                                        "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                       }
                                     }
                                   ]
@@ -9264,6 +9489,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": "intrinsic",
                                         "name": "string"
                                       }
+                                    },
+                                    {
+                                      "name": "deleted_at",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "isOptional": true
                                     },
                                     {
                                       "name": "email",
@@ -9820,6 +10053,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           },
                                           {
+                                            "name": "deleted_at",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "email",
                                             "type": {
                                               "type": "intrinsic",
@@ -10114,6 +10355,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           }
                                         ]
+                                      },
+                                      "comment": {
+                                        "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                       }
                                     }
                                   ]
@@ -10188,6 +10432,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": "intrinsic",
                                         "name": "string"
                                       }
+                                    },
+                                    {
+                                      "name": "deleted_at",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "isOptional": true
                                     },
                                     {
                                       "name": "email",
@@ -11081,6 +11333,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           },
                                           {
+                                            "name": "deleted_at",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "email",
                                             "type": {
                                               "type": "intrinsic",
@@ -11375,6 +11635,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           }
                                         ]
+                                      },
+                                      "comment": {
+                                        "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                       }
                                     }
                                   ]
@@ -11449,6 +11712,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": "intrinsic",
                                         "name": "string"
                                       }
+                                    },
+                                    {
+                                      "name": "deleted_at",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "isOptional": true
                                     },
                                     {
                                       "name": "email",
@@ -12028,6 +12299,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           },
                                           {
+                                            "name": "deleted_at",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "email",
                                             "type": {
                                               "type": "intrinsic",
@@ -12322,6 +12601,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           }
                                         ]
+                                      },
+                                      "comment": {
+                                        "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                       }
                                     }
                                   ]
@@ -12396,6 +12678,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": "intrinsic",
                                         "name": "string"
                                       }
+                                    },
+                                    {
+                                      "name": "deleted_at",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "isOptional": true
                                     },
                                     {
                                       "name": "email",
@@ -13024,6 +13314,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         }
                                       },
                                       {
+                                        "name": "deleted_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
                                         "name": "email",
                                         "type": {
                                           "type": "intrinsic",
@@ -13318,6 +13616,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         }
                                       }
                                     ]
+                                  },
+                                  "comment": {
+                                    "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                   }
                                 }
                               ]
@@ -13383,6 +13684,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -14726,6 +15035,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         }
                                       },
                                       {
+                                        "name": "deleted_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
                                         "name": "email",
                                         "type": {
                                           "type": "intrinsic",
@@ -15020,6 +15337,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         }
                                       }
                                     ]
+                                  },
+                                  "comment": {
+                                    "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                   }
                                 }
                               ]
@@ -15085,6 +15405,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -15660,6 +15988,1154 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
           "text": "You can use it by providing a SSO domain. Typically you can extract this\\ndomain by asking users for their email address. If this domain is\\nregistered on the Auth instance the redirect will use that organization's\\ncurrently active SSO Identity Provider for the login.\\n\\nIf you have built an organization-specific login page, you can use the\\norganization's SSO Identity Provider UUID directly instead.\\n"
         }
       },
+      "@supabase/auth-js.GoTrueClient.signInWithWeb3": {
+        "name": "@supabase/auth-js.GoTrueClient.signInWithWeb3",
+        "params": [
+          {
+            "name": "credentials",
+            "type": {
+              "type": "union",
+              "name": "SolanaWeb3Credentials",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "chain",
+                      "type": {
+                        "type": "literal",
+                        "value": "solana"
+                      }
+                    },
+                    {
+                      "name": "options",
+                      "type": {
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "captchaToken",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Verification token received when the user completes the captcha on the site."
+                            }
+                          },
+                          {
+                            "name": "signInWithSolana",
+                            "type": {
+                              "type": "nameOnly",
+                              "name": "Partial"
+                            },
+                            "isOptional": true
+                          },
+                          {
+                            "name": "url",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "URL to use with the wallet interface. Some wallets do not allow signing a message for URLs different from the current page."
+                            }
+                          }
+                        ]
+                      },
+                      "isOptional": true
+                    },
+                    {
+                      "name": "statement",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      "isOptional": true,
+                      "comment": {
+                        "shortText": "Optional statement to include in the Sign in with Solana message. Must not include new line characters. Most wallets like Phantom **require specifying a statement!**"
+                      }
+                    },
+                    {
+                      "name": "wallet",
+                      "type": {
+                        "name": "SolanaWallet",
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "publicKey",
+                            "type": {
+                              "type": "union",
+                              "subTypes": [
+                                {
+                                  "type": "object",
+                                  "properties": [
+                                    {
+                                      "type": "function",
+                                      "name": "toBase58",
+                                      "params": [],
+                                      "ret": {
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "literal",
+                                  "value": null
+                                }
+                              ]
+                            },
+                            "isOptional": true
+                          },
+                          {
+                            "type": "function",
+                            "name": "signIn",
+                            "params": [
+                              {
+                                "name": "inputs",
+                                "type": {
+                                  "type": "array",
+                                  "elemType": {
+                                    "type": "nameOnly",
+                                    "name": "SolanaSignInInput"
+                                  }
+                                }
+                              }
+                            ],
+                            "ret": {
+                              "type": {
+                                "type": "promise",
+                                "name": "Promise",
+                                "awaited": {
+                                  "type": "union",
+                                  "subTypes": [
+                                    {
+                                      "type": "nameOnly",
+                                      "name": "SolanaSignInOutput"
+                                    },
+                                    {
+                                      "type": "array",
+                                      "elemType": {
+                                        "type": "nameOnly",
+                                        "name": "SolanaSignInOutput"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "function",
+                            "name": "signMessage",
+                            "params": [
+                              {
+                                "name": "message",
+                                "type": {
+                                  "type": "nameOnly",
+                                  "name": "Uint8Array"
+                                }
+                              },
+                              {
+                                "name": "encoding",
+                                "type": {
+                                  "type": "intrinsic",
+                                  "name": "string"
+                                },
+                                "isOptional": true
+                              }
+                            ],
+                            "ret": {
+                              "type": {
+                                "type": "union",
+                                "subTypes": [
+                                  {
+                                    "type": "intrinsic",
+                                    "name": "undefined"
+                                  },
+                                  {
+                                    "type": "promise",
+                                    "name": "Promise",
+                                    "awaited": {
+                                      "type": "nameOnly",
+                                      "name": "Uint8Array"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "isOptional": true,
+                      "comment": {
+                        "shortText": "Wallet interface to use. If not specified will default to \`window.solana\`."
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "chain",
+                      "type": {
+                        "type": "literal",
+                        "value": "solana"
+                      }
+                    },
+                    {
+                      "name": "message",
+                      "type": {
+                        "type": "intrinsic",
+                        "name": "string"
+                      },
+                      "comment": {
+                        "shortText": "Sign in with Solana compatible message. Must include \`Issued At\`, \`URI\` and \`Version\`."
+                      }
+                    },
+                    {
+                      "name": "options",
+                      "type": {
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "captchaToken",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true,
+                            "comment": {
+                              "shortText": "Verification token received when the user completes the captcha on the site."
+                            }
+                          }
+                        ]
+                      },
+                      "isOptional": true
+                    },
+                    {
+                      "name": "signature",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "Uint8Array"
+                      },
+                      "comment": {
+                        "shortText": "Ed25519 signature of the message."
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "ret": {
+          "type": {
+            "type": "promise",
+            "name": "Promise",
+            "awaited": {
+              "type": "union",
+              "subTypes": [
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "session",
+                            "type": {
+                              "type": "object",
+                              "name": "Session",
+                              "properties": [
+                                {
+                                  "name": "access_token",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "comment": {
+                                    "shortText": "The access token jwt. It is recommended to set the JWT_EXPIRY to a shorter expiry value."
+                                  }
+                                },
+                                {
+                                  "name": "expires_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  },
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "A timestamp of when the token will expire. Returned when a login is confirmed."
+                                  }
+                                },
+                                {
+                                  "name": "expires_in",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "number"
+                                  },
+                                  "comment": {
+                                    "shortText": "The number of seconds until the token expires (since it was issued). Returned when a login is confirmed."
+                                  }
+                                },
+                                {
+                                  "name": "provider_refresh_token",
+                                  "type": {
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "literal",
+                                        "value": null
+                                      },
+                                      {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    ]
+                                  },
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "The oauth provider refresh token. If present, this can be used to refresh the provider_token via the oauth provider's API.\\nNot all oauth providers return a provider refresh token. If the provider_refresh_token is missing, please refer to the oauth provider's documentation for information on how to obtain the provider refresh token."
+                                  }
+                                },
+                                {
+                                  "name": "provider_token",
+                                  "type": {
+                                    "type": "union",
+                                    "subTypes": [
+                                      {
+                                        "type": "literal",
+                                        "value": null
+                                      },
+                                      {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      }
+                                    ]
+                                  },
+                                  "isOptional": true,
+                                  "comment": {
+                                    "shortText": "The oauth provider token. If present, this can be used to make external API requests to the oauth provider used."
+                                  }
+                                },
+                                {
+                                  "name": "refresh_token",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "comment": {
+                                    "shortText": "A one-time used refresh token that never expires."
+                                  }
+                                },
+                                {
+                                  "name": "token_type",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "user",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "User",
+                                    "properties": [
+                                      {
+                                        "name": "action_link",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "app_metadata",
+                                        "type": {
+                                          "type": "object",
+                                          "name": "UserAppMetadata",
+                                          "properties": [
+                                            {
+                                              "name": "provider",
+                                              "type": {
+                                                "type": "intrinsic",
+                                                "name": "string"
+                                              },
+                                              "isOptional": true
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      {
+                                        "name": "aud",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      },
+                                      {
+                                        "name": "confirmation_sent_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "confirmed_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "created_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      },
+                                      {
+                                        "name": "deleted_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "email",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "email_change_sent_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "email_confirmed_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "factors",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "object",
+                                            "name": "Factor",
+                                            "properties": [
+                                              {
+                                                "name": "created_at",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              {
+                                                "name": "factor_type",
+                                                "type": {
+                                                  "type": "union",
+                                                  "subTypes": [
+                                                    null,
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "totp"
+                                                    },
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "phone"
+                                                    }
+                                                  ]
+                                                },
+                                                "comment": {
+                                                  "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
+                                                }
+                                              },
+                                              {
+                                                "name": "friendly_name",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                },
+                                                "isOptional": true,
+                                                "comment": {
+                                                  "shortText": "Friendly name of the factor, useful to disambiguate between multiple factors."
+                                                }
+                                              },
+                                              {
+                                                "name": "id",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                },
+                                                "comment": {
+                                                  "shortText": "ID of the factor."
+                                                }
+                                              },
+                                              {
+                                                "name": "status",
+                                                "type": {
+                                                  "type": "union",
+                                                  "subTypes": [
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "verified"
+                                                    },
+                                                    {
+                                                      "type": "literal",
+                                                      "value": "unverified"
+                                                    }
+                                                  ]
+                                                },
+                                                "comment": {
+                                                  "shortText": "Factor's status."
+                                                }
+                                              },
+                                              {
+                                                "name": "updated_at",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "id",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        }
+                                      },
+                                      {
+                                        "name": "identities",
+                                        "type": {
+                                          "type": "array",
+                                          "elemType": {
+                                            "type": "object",
+                                            "name": "UserIdentity",
+                                            "properties": [
+                                              {
+                                                "name": "created_at",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                },
+                                                "isOptional": true
+                                              },
+                                              {
+                                                "name": "id",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              {
+                                                "name": "identity_data",
+                                                "type": {
+                                                  "type": "index signature",
+                                                  "keyType": {
+                                                    "type": "intrinsic",
+                                                    "name": "string"
+                                                  },
+                                                  "valueType": {
+                                                    "type": "intrinsic",
+                                                    "name": "any"
+                                                  }
+                                                },
+                                                "isOptional": true
+                                              },
+                                              {
+                                                "name": "identity_id",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              {
+                                                "name": "last_sign_in_at",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                },
+                                                "isOptional": true
+                                              },
+                                              {
+                                                "name": "provider",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              },
+                                              {
+                                                "name": "updated_at",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                },
+                                                "isOptional": true
+                                              },
+                                              {
+                                                "name": "user_id",
+                                                "type": {
+                                                  "type": "intrinsic",
+                                                  "name": "string"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "invited_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "is_anonymous",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "is_sso_user",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "boolean"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "last_sign_in_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "new_email",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "new_phone",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "phone",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "phone_confirmed_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "recovery_sent_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "role",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "updated_at",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      },
+                                      {
+                                        "name": "user_metadata",
+                                        "type": {
+                                          "type": "object",
+                                          "name": "UserMetadata",
+                                          "properties": []
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  "comment": {
+                                    "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "name": "user",
+                            "type": {
+                              "type": "object",
+                              "name": "User",
+                              "properties": [
+                                {
+                                  "name": "action_link",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "app_metadata",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "UserAppMetadata",
+                                    "properties": [
+                                      {
+                                        "name": "provider",
+                                        "type": {
+                                          "type": "intrinsic",
+                                          "name": "string"
+                                        },
+                                        "isOptional": true
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "name": "aud",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "confirmation_sent_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "confirmed_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "created_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "email",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "email_change_sent_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "email_confirmed_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "factors",
+                                  "type": {
+                                    "type": "array",
+                                    "elemType": {
+                                      "type": "object",
+                                      "name": "Factor",
+                                      "properties": [
+                                        {
+                                          "name": "created_at",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        {
+                                          "name": "factor_type",
+                                          "type": {
+                                            "type": "union",
+                                            "subTypes": [
+                                              null,
+                                              {
+                                                "type": "literal",
+                                                "value": "totp"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "phone"
+                                              }
+                                            ]
+                                          },
+                                          "comment": {
+                                            "shortText": "Type of factor. \`totp\` and \`phone\` supported with this version"
+                                          }
+                                        },
+                                        {
+                                          "name": "friendly_name",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "isOptional": true,
+                                          "comment": {
+                                            "shortText": "Friendly name of the factor, useful to disambiguate between multiple factors."
+                                          }
+                                        },
+                                        {
+                                          "name": "id",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "comment": {
+                                            "shortText": "ID of the factor."
+                                          }
+                                        },
+                                        {
+                                          "name": "status",
+                                          "type": {
+                                            "type": "union",
+                                            "subTypes": [
+                                              {
+                                                "type": "literal",
+                                                "value": "verified"
+                                              },
+                                              {
+                                                "type": "literal",
+                                                "value": "unverified"
+                                              }
+                                            ]
+                                          },
+                                          "comment": {
+                                            "shortText": "Factor's status."
+                                          }
+                                        },
+                                        {
+                                          "name": "updated_at",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "id",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  }
+                                },
+                                {
+                                  "name": "identities",
+                                  "type": {
+                                    "type": "array",
+                                    "elemType": {
+                                      "type": "object",
+                                      "name": "UserIdentity",
+                                      "properties": [
+                                        {
+                                          "name": "created_at",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "isOptional": true
+                                        },
+                                        {
+                                          "name": "id",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        {
+                                          "name": "identity_data",
+                                          "type": {
+                                            "type": "index signature",
+                                            "keyType": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            },
+                                            "valueType": {
+                                              "type": "intrinsic",
+                                              "name": "any"
+                                            }
+                                          },
+                                          "isOptional": true
+                                        },
+                                        {
+                                          "name": "identity_id",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        {
+                                          "name": "last_sign_in_at",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "isOptional": true
+                                        },
+                                        {
+                                          "name": "provider",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        },
+                                        {
+                                          "name": "updated_at",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          },
+                                          "isOptional": true
+                                        },
+                                        {
+                                          "name": "user_id",
+                                          "type": {
+                                            "type": "intrinsic",
+                                            "name": "string"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "invited_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_anonymous",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "is_sso_user",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "boolean"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "last_sign_in_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "new_email",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "new_phone",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "phone",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "phone_confirmed_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "recovery_sent_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "role",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "updated_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
+                                  "name": "user_metadata",
+                                  "type": {
+                                    "type": "object",
+                                    "name": "UserMetadata",
+                                    "properties": []
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "literal",
+                        "value": null
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": [
+                    {
+                      "name": "data",
+                      "type": {
+                        "type": "object",
+                        "properties": [
+                          {
+                            "name": "session",
+                            "type": {
+                              "type": "literal",
+                              "value": null
+                            }
+                          },
+                          {
+                            "name": "user",
+                            "type": {
+                              "type": "literal",
+                              "value": null
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "name": "error",
+                      "type": {
+                        "type": "nameOnly",
+                        "name": "AuthError"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "comment": {
+          "shortText": "Signs in a user by verifying a message signed by the user's private key.\\nOnly Solana supported at this time, using the Sign in with Solana standard."
+        }
+      },
       "@supabase/auth-js.GoTrueClient.signOut": {
         "name": "@supabase/auth-js.GoTrueClient.signOut",
         "params": [
@@ -16062,6 +17538,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           },
                                           {
+                                            "name": "deleted_at",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "email",
                                             "type": {
                                               "type": "intrinsic",
@@ -16356,6 +17840,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           }
                                         ]
+                                      },
+                                      "comment": {
+                                        "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                       }
                                     }
                                   ]
@@ -16430,6 +17917,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": "intrinsic",
                                         "name": "string"
                                       }
+                                    },
+                                    {
+                                      "name": "deleted_at",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "isOptional": true
                                     },
                                     {
                                       "name": "email",
@@ -17117,6 +18612,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -17884,6 +19387,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           },
                                           {
+                                            "name": "deleted_at",
+                                            "type": {
+                                              "type": "intrinsic",
+                                              "name": "string"
+                                            },
+                                            "isOptional": true
+                                          },
+                                          {
                                             "name": "email",
                                             "type": {
                                               "type": "intrinsic",
@@ -18178,6 +19689,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                             }
                                           }
                                         ]
+                                      },
+                                      "comment": {
+                                        "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                                       }
                                     }
                                   ]
@@ -18252,6 +19766,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                         "type": "intrinsic",
                                         "name": "string"
                                       }
+                                    },
+                                    {
+                                      "name": "deleted_at",
+                                      "type": {
+                                        "type": "intrinsic",
+                                        "name": "string"
+                                      },
+                                      "isOptional": true
                                     },
                                     {
                                       "name": "email",
@@ -19189,6 +20711,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                     "type": "intrinsic",
                                     "name": "string"
                                   }
+                                },
+                                {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
                                 },
                                 {
                                   "name": "email",
@@ -20903,6 +22433,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                                   }
                                 },
                                 {
+                                  "name": "deleted_at",
+                                  "type": {
+                                    "type": "intrinsic",
+                                    "name": "string"
+                                  },
+                                  "isOptional": true
+                                },
+                                {
                                   "name": "email",
                                   "type": {
                                     "type": "intrinsic",
@@ -21444,6 +22982,14 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           },
                           {
+                            "name": "deleted_at",
+                            "type": {
+                              "type": "intrinsic",
+                              "name": "string"
+                            },
+                            "isOptional": true
+                          },
+                          {
                             "name": "email",
                             "type": {
                               "type": "intrinsic",
@@ -21738,6 +23284,9 @@ exports[`TS type spec parsing > matches snapshot 1`] = `
                             }
                           }
                         ]
+                      },
+                      "comment": {
+                        "shortText": "When using a separate user storage, accessing properties of this object will throw an error."
                       }
                     }
                   ]

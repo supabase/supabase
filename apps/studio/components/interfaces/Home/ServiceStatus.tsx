@@ -239,7 +239,7 @@ export const ServiceStatus = () => {
                   currentBranch?.status === 'MIGRATIONS_FAILED'
                 ? 'UNHEALTHY'
                 : 'COMING_UP') as ProjectServiceStatus,
-            logsUrl: '/logs/edge-functions-logs',
+            logsUrl: '/branches',
           },
         ]
       : []),

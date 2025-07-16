@@ -233,7 +233,9 @@ export default function ComposedChart({
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
-  const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
+  const isRamChart =
+    !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
+    chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
   const isDiskSpaceChart = chartData?.some((att: any) =>
     att.name.toLowerCase().includes('disk_space_')
   )

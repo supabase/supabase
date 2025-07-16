@@ -491,6 +491,13 @@
         "type": "function"
       },
       {
+        "id": "get-claims",
+        "title": "Get user claims from verified JWT",
+        "slug": "auth-getclaims",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-out",
         "title": "Sign out a user",
         "slug": "auth-signout",

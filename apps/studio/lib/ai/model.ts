@@ -14,8 +14,10 @@ export const regionMap = {
   eu: 'eu',
 }
 
-const SONNET_MODEL = 'anthropic.claude-3-7-sonnet-20250219-v1:0'
-const HAIKU_MODEL = 'anthropic.claude-3-haiku-20240307-v1:0'
+// Default behaviour here is to be throttled (e.g if this env var is not available, IS_THROTTLED should be true, unless specified 'false')
+const IS_THROTTLED = process.env.IS_THROTTLED !== 'false'
+const PRO_MODEL = process.env.AI_PRO_MODEL ?? 'anthropic.claude-3-7-sonnet-20250219-v1:0'
+const NORMAL_MODEL = process.env.AI_NORMAL_MODEL ?? 'anthropic.claude-3-5-haiku-20241022-v1:0'
 const OPENAI_MODEL = 'gpt-4.1-2025-04-14'
 
 export type ModelSuccess = {
@@ -47,7 +49,7 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
     // Select the Bedrock region based on the routing key
     const bedrockRegion: BedrockRegion = routingKey ? await selectBedrockRegion(routingKey) : 'us1'
     const bedrock = bedrockForRegion(bedrockRegion)
-    const model = HAIKU_MODEL
+    const model = IS_THROTTLED || isLimited ? NORMAL_MODEL : PRO_MODEL
     const modelName = `${regionMap[bedrockRegion]}.${model}`
 
     return {

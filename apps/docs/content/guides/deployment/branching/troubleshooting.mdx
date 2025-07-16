@@ -1,0 +1,169 @@
+---
+title: 'Troubleshooting'
+description: 'Common issues and solutions for Supabase branching.'
+subtitle: 'Common issues and solutions for Supabase branching'
+---
+
+This guide covers common issues you might encounter when using Supabase branching and how to resolve them.
+
+## Common issues
+
+### Rolling back migrations
+
+You might want to roll back changes you've made in an earlier migration change. For example, you may have pushed a migration file containing schema changes you no longer want.
+
+To fix this, push the latest changes, then delete the preview branch in Supabase and reopen it.
+
+The new preview branch is reseeded from the `./supabase/seed.sql` file by default. Any additional data changes made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
+
+### Deployment failures
+
+A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations, errors within the `config.toml` config, or something else.
+
+To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
+
+### Network restrictions
+
+If you enable [network restrictions](/docs/guides/platform/network-restrictions) on your project, the branching cluster will be blocked from connecting to your project by default. This often results in database connection failures when migrating your production project after merging a development branch.
+
+The workaround is to explicitly allow the IPv6 CIDR range of the branching cluster in your project's [database settings](https://supabase.com/dashboard/project/_/settings/database) page: `2600:1f18:2b7d:f600::/56`
+
+<Image
+  alt="Network restrictions to allow connections from branching cluster"
+  src={{
+    dark: '/docs/img/guides/branching/cidr-dark.png',
+    light: '/docs/img/guides/branching/cidr-light.png',
+  }}
+  className="max-w-[550px] !mx-auto border rounded-md"
+  zoomable
+/>
+
+### Schema drift between preview branches
+
+If multiple preview branches exist, each preview branch might contain different schema changes. This is similar to Git branches, where each branch might contain different code changes.
+
+When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches that haven't been merged yet.
+
+These conflicts can be resolved in the same way as normal Git Conflicts: merge or rebase from the production Git branch to the preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
+
+### Changing production branch
+
+It's not possible to change the Git branch used as the Production branch for Supabase Branching. The only way to change it is to disable and re-enable branching. See [Disable Branching](#disable-branching).
+
+## Migration issues
+
+### Failed migrations
+
+When migrations fail, check:
+
+1. **SQL syntax**: Ensure your migration files contain valid SQL
+2. **Dependencies**: Check if migrations depend on objects that don't exist
+3. **Permissions**: Verify the migration doesn't require superuser privileges
+
+To debug:
+
+```bash
+# Test migrations locally first
+supabase db reset
+
+# Check migration logs in the dashboard
+# Navigate to Branches > Your Branch > View Logs
+```
+
+### Migration order problems
+
+Migrations must run in the correct order. Common issues:
+
+1. **Timestamp conflicts**: Ensure migration files have unique timestamps
+2. **Dependency issues**: Later migrations depending on earlier ones
+3. **Rebase problems**: Timestamps getting out of order after Git rebase
+
+Fix by:
+
+```bash
+# Rename migration files to fix timestamp order
+mv 20240101000000_old.sql 20240102000000_old.sql
+
+# Reset local database to test
+supabase db reset
+```
+
+## Connection issues
+
+### Cannot connect to preview branch
+
+If you can't connect to a preview branch:
+
+1. **Check credentials**: Ensure you're using the correct branch-specific credentials
+2. **Auto-pause**: The branch might be paused. It will resume on the first request
+3. **Network restrictions**: Check if network restrictions are blocking access
+
+### Connection timeouts
+
+Preview branches auto-pause after inactivity. First connections after pause may timeout:
+
+1. **Retry**: The branch will wake up after the first request
+2. **Persistent branches**: Convert frequently-used branches to persistent
+
+## Configuration problems
+
+### Config.toml not applying
+
+If configuration changes aren't applying:
+
+1. **Syntax errors**: Validate your `config.toml` syntax
+2. **Git sync**: Ensure changes are committed and pushed
+3. **Branch refresh**: Try deleting and recreating the branch
+
+### Secrets not available
+
+If secrets aren't working in your branch:
+
+1. **Branch-specific**: Remember secrets are set per branch
+2. **Syntax**: Use correct syntax: `env(SECRET_NAME)`
+3. **CLI version**: Ensure you're using the latest CLI version
+
+## Performance issues
+
+### Slow branch creation
+
+Branch creation might be slow due to:
+
+1. **Large migrations**: Many or complex migration files
+2. **Seed data**: Large seed files take time to process
+3. **Network latency**: Geographic distance from the branch region
+
+### Query performance
+
+Preview branches may have different performance characteristics:
+
+1. **Cold starts**: First queries after auto-pause are slower
+2. **Resource limits**: Preview branches have different resource allocations
+3. **Indexing**: Ensure proper indexes exist in your migrations
+
+## Data issues
+
+### Seed data not loading
+
+If seed data isn't loading:
+
+1. **File location**: Ensure `seed.sql` is in `./supabase/` directory
+2. **SQL errors**: Check for syntax errors in seed file
+3. **Dependencies**: Seed data might reference non-existent tables
+
+### Data persistence
+
+Remember that preview branch data:
+
+1. **Is temporary**: Data is lost when branch is deleted
+2. **Isn't migrated**: Data doesn't move between branches
+3. **Resets on recreation**: Deleting and recreating branch loses data
+
+## Getting help
+
+If you're still experiencing issues:
+
+1. **Check logs**: Review branch logs in the dashboard
+2. **Community**: Ask in [GitHub discussions](https://github.com/orgs/supabase/discussions/18937)
+3. **Support**: Contact support for project-specific issues
+4. **Documentation**: Review the latest documentation for updates

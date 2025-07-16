@@ -1,5 +1,5 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { Query } from '@supabase/pg-meta/src/query'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 
@@ -33,25 +33,26 @@ export const getDecryptedValue = async (
     },
     signal
   )
-  return result
+  return result as { decrypted_secret: string }[]
 }
 
+type getDecryptedValueResult = Awaited<ReturnType<typeof getDecryptedValue>>
 export type VaultSecretsDecryptedValueData = string
 export type VaultSecretsDecryptedValueError = unknown
 
-export const useVaultSecretDecryptedValueQuery = <TData = VaultSecretsDecryptedValueData>(
+export const useVaultSecretDecryptedValueQuery = <TData = string>(
   { projectRef, connectionString, id }: VaultSecretsDecryptedValueVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<VaultSecretsDecryptedValueData, VaultSecretsDecryptedValueError, TData> = {}
+  }: UseQueryOptions<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData> = {}
 ) =>
-  useQuery<VaultSecretsDecryptedValueData, VaultSecretsDecryptedValueError, TData>(
+  useQuery<getDecryptedValueResult, VaultSecretsDecryptedValueError, TData>(
     vaultSecretsKeys.getDecryptedValue(projectRef, id),
     ({ signal }) => getDecryptedValue({ projectRef, connectionString, id }, signal),
     {
       select(data) {
-        return (data[0] as any).decrypted_secret
+        return (data[0]?.decrypted_secret ?? '') as TData
       },
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,

@@ -10,9 +10,10 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { PipelineStatusName } from './PipelineStatus'
 
 interface RowMenuProps {
-  pipelineStatus: string | undefined
+  pipelineStatus: any
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
@@ -32,7 +33,16 @@ const RowMenu = ({
   onEditClick,
   onDeleteClick,
 }: RowMenuProps) => {
-  const pipelineEnabled = pipelineStatus === 'Stopped' ? false : true
+  const getStatusName = (status: any) => {
+    if (status && typeof status === 'object' && 'name' in status) {
+      return status.name
+    }
+    return status
+  }
+
+  const statusName = getStatusName(pipelineStatus)
+  const pipelineEnabled = statusName !== PipelineStatusName.STOPPED
+
   return (
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader></ShimmeringLoader>}

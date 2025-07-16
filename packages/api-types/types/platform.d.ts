@@ -4896,7 +4896,7 @@ export interface components {
       id: string
       public: boolean
       /** @enum {string} */
-      type?: 'STANDARD' | 'ICEBERG'
+      type?: 'STANDARD' | 'ANALYTICS'
     }
     CreateStorageCredentialBody: {
       description: string
@@ -6550,7 +6550,7 @@ export interface components {
       db_port: number
       db_user: string
       default_pool_size?: number
-      ignore_startup_parameters: string
+      ignore_startup_parameters?: string
       inserted_at: string
       max_client_conn?: number
       pgbouncer_enabled: boolean
@@ -6558,6 +6558,10 @@ export interface components {
       pgbouncer_status: 'COMING_UP' | 'COMING_DOWN' | 'RELOADING' | 'ENABLED' | 'DISABLED'
       /** @enum {string} */
       pool_mode: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
       ssl_enforced: boolean
     }
     PgbouncerStatusResponse: {
@@ -7281,6 +7285,14 @@ export interface components {
         }[]
       }
     }
+    RemoveProjectResponse: {
+      id: number
+      name: string
+      ref: string
+      vercel?: {
+        resourceUninstallFailure: boolean
+      }
+    }
     ReplicationDestinationResponse: {
       /** @description Destination config */
       config: {
@@ -7385,11 +7397,38 @@ export interface components {
         tenant_id: string
       }[]
     }
-    ReplicationPipelinesStatusResponse: {
+    ReplicationPipelineStatusResponse: {
       /** @description Pipeline id */
       pipeline_id: number
       /** @description Pipeline status */
-      status: string
+      status:
+        | {
+            /** @enum {string} */
+            name: 'stopped'
+          }
+        | {
+            /** @enum {string} */
+            name: 'starting'
+          }
+        | {
+            /** @enum {string} */
+            name: 'started'
+          }
+        | {
+            /** @enum {string} */
+            name: 'stopping'
+          }
+        | {
+            /** @enum {string} */
+            name: 'unknown'
+          }
+        | {
+            exit_code?: number | null
+            message?: string | null
+            /** @enum {string} */
+            name: 'failed'
+            reason?: string | null
+          }
     }
     ReplicationPublicationsResponse: {
       /** @description List of publications */
@@ -7631,7 +7670,7 @@ export interface components {
       owner: string
       public: boolean
       /** @enum {string} */
-      type?: 'STANDARD' | 'ICEBERG'
+      type?: 'STANDARD' | 'ANALYTICS'
       updated_at: string
     }
     StorageConfigResponse: {
@@ -7660,7 +7699,7 @@ export interface components {
         owner: string
         public: boolean
         /** @enum {string} */
-        type?: 'STANDARD' | 'ICEBERG'
+        type?: 'STANDARD' | 'ANALYTICS'
         updated_at: string
       }
       created_at: string
@@ -8329,7 +8368,11 @@ export interface components {
     }
     UpdatePgbouncerConfigBody: {
       default_pool_size?: number
-      ignore_startup_parameters: string
+      /**
+       * @deprecated
+       * @default options,extra_float_digits
+       */
+      ignore_startup_parameters?: string
       max_client_conn?: number
       /** @deprecated */
       pgbouncer_enabled?: boolean
@@ -8338,6 +8381,10 @@ export interface components {
        * @enum {string}
        */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     UpdatePolicyBody: {
       check?: string
@@ -8359,6 +8406,8 @@ export interface components {
        * @enum {string}
        */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     UpdatePostgresConfigBody: {
       effective_cache_size?: string
@@ -14647,6 +14696,12 @@ export interface operations {
           'application/json': components['schemas']['ProjectDetailResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
     }
   }
   ProjectsRefController_deleteProject: {
@@ -14666,7 +14721,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ProjectRefResponse']
+          'application/json': components['schemas']['RemoveProjectResponse']
         }
       }
       403: {
@@ -18498,7 +18553,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ReplicationPipelinesStatusResponse']
+          'application/json': components['schemas']['ReplicationPipelineStatusResponse']
         }
       }
       403: {

@@ -16,13 +16,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Popover,
   Select,
   cn,
 } from 'ui'
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -262,9 +262,11 @@ const ReportFilterBar = ({
           .map((filter) => (
             <div
               key={`${filter.key}-${filter.compare}-${filter.value}`}
-              className="text-xs rounded border border-foreground-lighter bg-surface-300 px-2 h-7 flex flex-row justify-center gap-1 items-center"
+              className="text-xs rounded-md font-mono bg-surface-300 px-2 h-[26px] flex flex-row justify-center gap-1 items-center"
             >
-              {filter.key} {filter.compare} {filter.value}
+              <span className="">{filter.key}</span>
+              <span className="text-foreground-lighter">{filter.compare}</span>
+              <span className="">{filter.value}</span>
               <Button
                 type="text"
                 size="tiny"
@@ -276,29 +278,23 @@ const ReportFilterBar = ({
               </Button>
             </div>
           ))}
-        <Popover
-          align="end"
-          header={
-            <div className="flex justify-between items-center py-1">
-              <h5 className="text-sm text-foreground">Add Filter</h5>
-
-              <Button
-                type="primary"
-                size="tiny"
-                onClick={() => {
-                  onAddFilter(addFilterValues)
-                  setShowAdder(false)
-                  resetFilterValues()
-                }}
-              >
-                Save
-              </Button>
-            </div>
-          }
-          open={showAdder}
-          onOpenChange={(openValue) => setShowAdder(openValue)}
-          overlay={
-            <div className="px-3 py-3 flex flex-col gap-2">
+        <Popover open={showAdder} onOpenChange={(openValue) => setShowAdder(openValue)}>
+          <PopoverTrigger>
+            <Button
+              asChild
+              type="default"
+              size="tiny"
+              icon={<Plus className={`text-foreground-light `} />}
+            >
+              <span>Add filter</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            align={filters.length > 0 ? 'end' : 'start'}
+            portal={true}
+            className="p-0 w-60"
+          >
+            <div className="flex flex-col gap-3 p-3">
               <Select
                 size="tiny"
                 value={addFilterValues.key}
@@ -306,6 +302,7 @@ const ReportFilterBar = ({
                   setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
                 }}
                 label="Attribute Filter"
+                className="gap-[2px]"
               >
                 {filterKeys.map((key) => (
                   <Select.Option key={key} value={key}>
@@ -323,6 +320,7 @@ const ReportFilterBar = ({
                   }))
                 }}
                 label="Comparison"
+                className="gap-[2px]"
               >
                 {['matches', 'is'].map((value) => (
                   <Select.Option key={value} value={value}>
@@ -333,6 +331,7 @@ const ReportFilterBar = ({
               <Input
                 size="tiny"
                 label="Value"
+                className="gap-[2px]"
                 placeholder={
                   addFilterValues.compare === 'matches'
                     ? 'Provide a regex expression'
@@ -343,17 +342,21 @@ const ReportFilterBar = ({
                 }}
               />
             </div>
-          }
-          showClose
-        >
-          <Button
-            asChild
-            type="default"
-            size="tiny"
-            icon={<Plus className={`text-foreground-light `} />}
-          >
-            <span>Add filter</span>
-          </Button>
+
+            <div className="flex items-center justify-end gap-2 border-t border-default p-2">
+              <Button
+                type="primary"
+                size="tiny"
+                onClick={() => {
+                  onAddFilter(addFilterValues)
+                  setShowAdder(false)
+                  resetFilterValues()
+                }}
+              >
+                Add filter
+              </Button>
+            </div>
+          </PopoverContent>
         </Popover>
       </div>
 
@@ -369,4 +372,5 @@ const ReportFilterBar = ({
     </div>
   )
 }
+
 export default ReportFilterBar

@@ -1,6 +1,6 @@
-import { useRouter } from 'next/router'
-import { CheckCircle2, Settings, AlertCircle } from 'lucide-react'
+import { AlertCircle, ArrowUpRight, CheckCircle2 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -8,8 +8,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Card, CardContent } from 'ui'
-import Link from 'next/link'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 export const GitHubStatus = () => {
   const { ref: projectRef } = useParams()
@@ -33,13 +32,42 @@ export const GitHubStatus = () => {
   const mainBranch = branches?.find((branch) => branch.is_default)
 
   const isConnected = Boolean(githubConnection)
+
   const hasGitBranchSync = Boolean(mainBranch?.git_branch?.trim())
   const hasAutomaticBranching = Boolean(githubConnection?.new_branch_per_pr)
 
   return (
-    <Card>
-      <CardContent className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <HoverCard openDelay={300} closeDelay={100}>
+      <HoverCardTrigger asChild>
+        <Link
+          href={`/project/${parentProjectRef}/settings/integrations`}
+          className="block w-full transition truncate text-sm text-foreground-light hover:text-foreground"
+        >
+          <div className="w-full flex items-center justify-between">
+            <h3 className="">GitHub Integration</h3>
+            <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
+          </div>
+          <p className="mt-1 text-xs text-foreground-lighter flex items-center gap-2">
+            {isConnected ? (
+              <>
+                <Image
+                  className="dark:invert"
+                  src={`${BASE_PATH}/img/icons/github-icon.svg`}
+                  width={16}
+                  height={16}
+                  alt="GitHub"
+                />
+                {githubConnection?.repository.name}
+              </>
+            ) : (
+              'Not connected'
+            )}
+          </p>
+        </Link>
+      </HoverCardTrigger>
+
+      <HoverCardContent side="right" align="start" className="w-80 p-4 space-y-2">
+        <div className="flex items-center gap-2 text-sm">
           <Image
             className="dark:invert"
             src={`${BASE_PATH}/img/icons/github-icon.svg`}
@@ -47,53 +75,42 @@ export const GitHubStatus = () => {
             height={20}
             alt="GitHub"
           />
-
-          <div className="flex flex-col gap-1">
-            <h3 className="text-sm text-foreground">
-              {isConnected
-                ? `Connected to ${githubConnection?.repository.name}`
-                : 'GitHub Integration'}
-            </h3>
-
-            <div className="flex items-center gap-4 text-xs text-foreground-light">
-              {isConnected ? (
-                <>
-                  <div className="flex items-center gap-1">
-                    {hasGitBranchSync ? (
-                      <CheckCircle2 size={12} className="text-brand-600" />
-                    ) : (
-                      <AlertCircle size={12} className="text-warning-600" />
-                    )}
-                    <span>
-                      {hasGitBranchSync
-                        ? `Syncing production (${mainBranch?.git_branch})`
-                        : 'Production sync disabled'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {hasAutomaticBranching ? (
-                      <CheckCircle2 size={12} className="text-brand-600" />
-                    ) : (
-                      <AlertCircle size={12} className="text-warning-600" />
-                    )}
-                    <span>
-                      {hasAutomaticBranching
-                        ? 'Automatically creating branches'
-                        : 'Automatic branching disabled'}
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <span>Not connected to any repository</span>
-              )}
-            </div>
-          </div>
+          <span className="truncate">
+            {isConnected ? githubConnection?.repository.name : 'Not connected'}
+          </span>
         </div>
 
-        <Button asChild type="default" icon={<Settings size={14} />}>
-          <Link href={`/project/${projectRef}/settings/integrations`}>Configure</Link>
-        </Button>
-      </CardContent>
-    </Card>
+        {isConnected ? (
+          <div className="flex flex-col gap-2 text-xs text-foreground-light">
+            <div className="flex items-center gap-2">
+              {hasGitBranchSync ? (
+                <CheckCircle2 size={12} className="text-brand-600" />
+              ) : (
+                <AlertCircle size={12} className="text-warning-600" />
+              )}
+              <span>
+                {hasGitBranchSync
+                  ? `Syncing production (${mainBranch?.git_branch})`
+                  : 'Production sync disabled'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {hasAutomaticBranching ? (
+                <CheckCircle2 size={12} className="text-brand-600" />
+              ) : (
+                <AlertCircle size={12} className="text-warning-600" />
+              )}
+              <span>
+                {hasAutomaticBranching
+                  ? 'Automatically creating branches'
+                  : 'Automatic branching disabled'}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-foreground-light">Not connected to any repository</p>
+        )}
+      </HoverCardContent>
+    </HoverCard>
   )
 }

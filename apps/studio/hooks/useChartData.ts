@@ -18,6 +18,8 @@ import type { ChartData } from 'components/ui/Charts/Charts.types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { useAttributeQueries } from 'components/ui/Charts/LogChartHandler'
 import { useEdgeFunctionReport } from 'data/reports/edgefn-query'
+import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
+import type { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 
 export const useChartData = ({
   attributes,
@@ -27,6 +29,7 @@ export const useChartData = ({
   data,
   highlightedValue,
   functionIds,
+  enabled = true,
 }: {
   attributes: MultiAttribute[]
   startDate: string
@@ -35,6 +38,7 @@ export const useChartData = ({
   data?: ChartData
   highlightedValue?: string | number
   functionIds?: string[]
+  enabled?: boolean
 }) => {
   const router = useRouter()
   const { ref } = router.query
@@ -55,7 +59,7 @@ export const useChartData = ({
     startDate,
     endDate,
     interval: interval as AnalyticsInterval,
-    enabled: logsAttributes.length > 0 && !isEdgeFunctionRoute,
+    enabled: enabled && logsAttributes.length > 0 && !isEdgeFunctionRoute,
   })
 
   const {
@@ -68,9 +72,25 @@ export const useChartData = ({
     startDate,
     endDate,
     interval: interval as AnalyticsInterval,
-    enabled: logsAttributes.length > 0 && isEdgeFunctionRoute,
+    enabled: enabled && logsAttributes.length > 0 && isEdgeFunctionRoute,
     functionIds,
   })
+
+  const {
+    data: infraData,
+    error: infraError,
+    isLoading: isInfraLoading,
+  } = useInfraMonitoringQuery(
+    {
+      projectRef: ref as string,
+      attribute: nonLogsAttributes[0]?.attribute as InfraMonitoringAttribute,
+      interval: interval as AnalyticsInterval,
+      startDate,
+      endDate,
+      databaseIdentifier: state.selectedDatabaseId,
+    },
+    { enabled: enabled && nonLogsAttributes.length > 0 }
+  )
 
   const logsData = isEdgeFunctionRoute ? edgeFunctionData : authData
   const logsChartAttributes = isEdgeFunctionRoute

@@ -1,9 +1,14 @@
 import { cn, ResizablePanel } from 'ui'
+import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
 
-export function FilterSideBar() {
+interface FilterSideBarProps {
+  dateRangeDisabled?: DateRangeDisabled
+}
+
+export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
   const { table } = useDataTable()
 
   return (
@@ -26,7 +31,7 @@ export function FilterSideBar() {
         </div>
       </div>
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        <DataTableFilterControls />
+        <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
       </div>
     </ResizablePanel>
   )

@@ -11,6 +11,7 @@ import { DataTableFilterResetButton } from './DataTableFilterResetButton'
 import { DataTableFilterSlider } from './DataTableFilterSlider'
 import { DataTableFilterTimerange } from './DataTableFilterTimerange'
 
+import { DateRangeDisabled } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
 
 // FIXME: use @container (especially for the slider element) to restructure elements
@@ -18,7 +19,11 @@ import { useDataTable } from '../providers/DataTableProvider'
 // TODO: only pass the columns to generate the filters!
 // https://tanstack.com/table/v8/docs/framework/react/examples/filters
 
-export function DataTableFilterControls() {
+interface DataTableFilterControls {
+  dateRangeDisabled?: DateRangeDisabled
+}
+
+export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterControls) {
   const { filterFields } = useDataTable()
   return (
     <Accordion
@@ -55,7 +60,12 @@ export function DataTableFilterControls() {
                       return <DataTableFilterInput {...field} />
                     }
                     case 'timerange': {
-                      return <DataTableFilterTimerange {...field} />
+                      return (
+                        <DataTableFilterTimerange
+                          dateRangeDisabled={dateRangeDisabled}
+                          {...field}
+                        />
+                      )
                     }
                   }
                 })()}

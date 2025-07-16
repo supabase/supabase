@@ -39,8 +39,10 @@ export const SecretsManagement = () => {
   const allSecrets = data || []
   const secrets = sortBy(
     searchValue.length > 0
-      ? allSecrets.filter((secret) =>
-          (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase())
+      ? allSecrets.filter(
+          (secret) =>
+            (secret?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
+            (secret?.id ?? '').toLowerCase().includes(searchValue.toLowerCase())
         )
       : allSecrets,
     (s) => {

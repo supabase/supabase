@@ -297,7 +297,7 @@ export const UnifiedLogs = () => {
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
         <ResizablePanelGroup direction="horizontal" autoSaveId="logs-layout">
-          <FilterSideBar />
+          <FilterSideBar dateRangeDisabled={{ after: new Date() }} />
           <ResizableHandle
             withHandle
             // disabled={resizableSidebar ? false : true}

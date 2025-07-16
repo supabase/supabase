@@ -1033,6 +1033,49 @@ functions:
               window.location.href = data.url
             }
           ```
+  - id: get-claims
+    title: 'getClaims()'
+    $ref: '@supabase/auth-js.GoTrueClient.getClaims'
+    examples:
+      - id: get-claims
+        name: Get user object
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.getClaims()
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "claims": {
+                "aal": "aal1",
+                "amr": [{
+                  "method": "email",
+                  "timestamp": 1715766000
+                }],
+                "app_metadata": {},
+                "aud": "authenticated",
+                "email": "example@email.com",
+                "exp": 1715769600,
+                "iat": 1715766000,
+                "is_anonymous": false,
+                "iss": "https://api.supabase.com/auth/v1",
+                "phone": "+13334445555",
+                "role": "authenticated",
+                "session_id": "11111111-1111-1111-1111-111111111111",
+                "sub": "11111111-1111-1111-1111-111111111111",
+                "user_metadata": {}
+              },
+              "header": {
+                "alg": "RS256",
+                "typ": "JWT",
+                "kid": "abcdefgh"
+              },
+              "signature": [/** Uint8Array */],
+            },
+            "error": null
+          }
+          ```
   - id: sign-out
     title: 'signOut()'
     $ref: '@supabase/auth-js.GoTrueClient.signOut'

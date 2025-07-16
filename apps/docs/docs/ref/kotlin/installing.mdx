@@ -151,25 +151,25 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
             <TabPanel id="kotlin" label="build.gradle.kts">
 
                 ```kotlin
-                val commonMain by getting {
+                commonMain {
                     dependencies {
-                        //supabase modules
+                        //Supabase modules
                     }
                 }
-                val jvmMain by getting {
+                jvmMain {
                     dependencies {
                         implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
                     }
                 }
-                val androidMain by getting {
-                    dependsOn(jvmMain)
+                androidMain {
+                    dependsOn(jvmMain.get())
                 }
-                val jsMain by getting {
+                jsMain {
                     dependencies {
                         implementation("io.ktor:ktor-client-js:KTOR_VERSION")
                     }
                 }
-                val iosMain by getting {
+                iosMain {
                     dependencies {
                         implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
                     }

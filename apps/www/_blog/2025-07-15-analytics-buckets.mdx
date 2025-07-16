@@ -1,0 +1,154 @@
+---
+title: 'Supabase Analytics Buckets with Iceberg Support'
+description: 'Analytics buckets optimized for large-scale data analysis with Apache Iceberg support.'
+categories:
+  - product
+  - launch-week
+tags:
+  - launch-week
+  - storage
+date: '2025-07-15:10:00'
+toc_depth: 3
+author: oli_rice,fabrizio
+image: launch-week-15/day-2-analytics-buckets/og.jpg
+thumb: launch-week-15/day-2-analytics-buckets/thumb.png
+launchweek: 15
+---
+
+Today we're launching **Supabase Analytics Buckets** in private alpha. These are a new kind of storage bucket optimized for analytics, with built-in support for the [Apache Iceberg](https://iceberg.apache.org/) table format.
+
+Analytics buckets are integrated into Supabase Studio, power table-level views instead of raw files, and can be queried using the new **Supabase Iceberg Wrapper**, also launching in alpha.
+
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/BigtFoFCVBk"
+    title="Supabase Analytics Buckets with Iceberg Support"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+## Why Iceberg
+
+Apache Iceberg is a high-performance, open table format for large-scale analytics on object storage. It brings the performance and features of a database to the flexibility of flat files.
+
+We chose Iceberg for its bottomless data model (append-only, immutable history), built-in snapshotting and versioning (time travel), and support for schema evolution. Iceberg is also an open standard widely supported across the ecosystem. Supabase is committed to [**open standards and portability**](https://supabase.com/blog/open-data-standards-postgres-otel-iceberg), and Iceberg aligns with that goal by enabling users to move data in and out without being locked into proprietary formats.
+
+## Setting up Analytics Buckets
+
+Once your project has been accepted into the alpha release program, Analytics buckets can be created via Studio and the API. To create an analytics bucket, visit `Storage > New bucket` in Studio.
+
+<Img
+  alt="Creating a new analytics bucket"
+  src="/images/blog/launch-week-15/day-2-analytics-buckets/img1.png"
+/>
+
+Analytics buckets are a separate bucket type from standard Supabase Storage buckets. You can't mix file types between the two.
+
+They're stored in a new system table: `storage.buckets_iceberg`. These buckets are not included in the `storage.buckets` table and objects inside them are not shown in `storage.objects`. However, the `listBuckets()` endpoint returns a merged list of standard and analytics buckets for consistency with Studio and API consumers.
+
+<Img
+  alt="Analytics buckets in Studio"
+  src="/images/blog/launch-week-15/day-2-analytics-buckets/img4.png"
+/>
+
+After creating the bucket, we're met with connection details. Copy the `WAREHOUSE`, `VAULT_TOKEN`, and `CATALOG_URI` values and and create an Iceberg namespace and table using your preferred method. The example below uses pyiceberg to create a namespace `market` with table `prices`:
+
+```python
+import datetime
+import pyarrow as pa
+from pyiceberg.catalog.rest import RestCatalog
+from pyiceberg.exceptions import NamespaceAlreadyExistsError, TableAlreadyExistsError
+
+# Define catalog connection details (replace variables)
+WAREHOUSE= ...
+VAULT_TOKEN = ...
+CATALOG_URI= ...
+
+# Connect to Supabase Data Catalog
+catalog = RestCatalog(
+    name="catalog",
+    warehouse=WAREHOUSE,
+    uri=CATALOG_URI,
+    token=VAULT_TOKEN,
+)
+
+# Schema and Table Names
+namespace_name = "market"
+table_name = "prices"
+
+# Create default namespace
+catalog.create_namespace(namespace_name)
+
+df = pa.table({
+    "tenant_id": pa.array([], type=pa.string()),
+    "store_id": pa.array([], type=pa.string()),
+    "item_id": pa.array([], type=pa.string()),
+    "price": pa.array([], type=pa.float64()),
+    "timestamp": pa.array([], type=pa.int64()),
+})
+
+# Create an Iceberg table
+table = catalog.create_table(
+    (namespace_name, table_name),
+    schema=df.schema,
+)
+```
+
+Back in Studio, we can see the newly created our newly created Namespace with `0/1 connected tables`
+
+<Img
+  alt="Iceberg namespace in Studio"
+  src="/images/blog/launch-week-15/day-2-analytics-buckets/img5.png"
+/>
+
+Click connect and select a `Target Schema` to map the Iceberg tables into. It is reccomended to create a standalone schema for your tables. Do not use the `public` schema because that would expose your table over the project's REST API.
+
+<Img
+  alt="Connecting Iceberg tables to schema"
+  src="/images/blog/launch-week-15/day-2-analytics-buckets/img2.png"
+/>
+
+## Querying Analytics Buckets
+
+Viewing an analytics bucket in Supabase Studio redirects you to the Table Editor. Instead of exposing raw Parquet files, the system shows a table explorer, powered by the [**Supabase Iceberg Wrapper**](https://fdw.dev/catalog/).
+
+The wrapper exposes Iceberg tables through a SQL interface, so you can inspect and query your data using Studio, or any SQL IDE. This makes analytical data feel like a native part of your Supabase project.
+
+<Img
+  alt="Querying Iceberg tables in Studio"
+  src="/images/blog/launch-week-15/day-2-analytics-buckets/img3.png"
+/>
+
+In this case the corresponding SQL query to access the data would be
+
+```sql
+select
+  *
+from market_analytics.prices;
+```
+
+## Writing to Analytics Buckets
+
+Writing is a work in progress. We're actively building [**Supabase ETL**](https://github.com/supabase/etl), which will allow you to write directly from Postgres into Iceberg-backed buckets. We'll also add write capability to the Supabase Iceberg Wrapper as soon as write support lands in the upstream [iceberg-rust client library](https://github.com/apache/iceberg-rust). This will complete the workflow of **write → store → query**, all inside Supabase.
+
+Once live, that enables bottomless Postgres storage through shifting records into Analytics Buckets, all using open formats. As a bonus, Iceberg gets us time travel for free.
+
+## Alpha Launch Limits
+
+Analytics Buckets are launching in private alpha with the following constraints:
+
+- Two analytics buckets per project
+- Up to five namespaces per bucket
+- Ten tables per namespace
+- Pricing will be announced in a few weeks
+- You cannot store standard objects in analytics buckets
+
+## Roadmap and What's Next
+
+This launch marks the first step toward full analytical capabilities in Supabase. Over the next few months, we'll introduce SQL catalog support so you can explore Iceberg table metadata directly from the database. Studio will also gain deeper integration for schema inspection, column-level filtering, and time travel queries. Our goal is to make Supabase a full-featured HTAP backend, where you can write, store, and query analytical data seamlessly.
+
+## Try It Out
+
+[Join the waitlist here](https://forms.supabase.com/analytics-buckets) to get early access and start working with bottomless, time-travel-capable analytics data inside Supabase.
