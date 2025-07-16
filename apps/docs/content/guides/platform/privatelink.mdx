@@ -52,8 +52,8 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
 1. Login to your AWS Management Console, ensure you are in the AWS region where your Supabase project is located
 2. Navigate to the AWS Resource Access Manager (RAM) console
 3. Go to [Shared with me > Resource shares](https://console.aws.amazon.com/ram/home#SharedResourceShares)
-4. Locate the resource share from Supabase. 
-    - The resource share will have the format `cust-prod-[region]-pl-[organisation]-rc-share`
+4. Locate the resource share from Supabase.
+   - The resource share will have the format `cust-prod-[region]-pl-[organisation]-rc-share`
 5. Click on the resource share name to view details. Review the list of resource shares - it should only include resources of type vpc-lattice:ResourceConfiguration.
 6. Click **Accept resource share**
 7. Confirm the acceptance in the dialog box
@@ -68,8 +68,8 @@ Ensure your security groups allow traffic on the appropriate ports:
 2. Create a new security group for the endpoint or service network by clicking [Create security group](https://console.aws.amazon.com/vpcconsole/home#CreateSecurityGroup:)
 3. Give your security group a descriptive name and select the appropriate VPC
 4. Add an inbound rule for:
-   - Type: PostgreSQL (TCP, port 5432)
-   - Destination that is appropriate for your network. i.e. the subnet of your VPC or security group of your application instances 
+   - Type: Postgres (TCP, port 5432)
+   - Destination that is appropriate for your network. i.e. the subnet of your VPC or security group of your application instances
 5. Finish creating the security group by clicking **Create security group**
 
 #### Step 4: Create connection
@@ -84,12 +84,12 @@ In your AWS account, you have two options to establish connectivity:
 4. Give your endpoint a name (e.g. `supabase-privatelink-[project name]`)
 5. Under Type, select **Resources**
 6. In the **Resource configurations** section select the appropriate resource configuration
-    - The resource configuration name will be in the format `[organisation]-[project-ref]-rc`
+   - The resource configuration name will be in the format `[organisation]-[project-ref]-rc`
 7. Select your VPC from the dropdown. This should match the VPC you selected for your security group in Step 3
 8. Enable the **Enable DNS name** option if you want to use a DNS record instead of the endpoints IP address(es)
 9. Choose the appropriate subnets for your network
-    - AWS will provision a private ENI for you in each selected subnet
-    - IP address type should be set to IPv4
+   - AWS will provision a private ENI for you in each selected subnet
+   - IP address type should be set to IPv4
 10. Choose the security group you created in Step 3.
 11. Click **Create endpoint**
 12. After creation, you will see the endpoint in the [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) section with a status of "Available"
@@ -101,14 +101,13 @@ In your AWS account, you have two options to establish connectivity:
 
 1. **This method is only recommended if you have an existing VPC Lattice Service Network**
 2. Navigate to the VPC Lattice console in your AWS account
-2. Go to [Service networks](https://console.aws.amazon.com/vpcconsole/home#ServiceNetworks) in the left sidebar and select your service network
+3. Go to [Service networks](https://console.aws.amazon.com/vpcconsole/home#ServiceNetworks) in the left sidebar and select your service network
 4. In the service network details, go to the **Resource configuration associations** tab
 5. Click **Create associations**
 6. Select the appropriate **Resource configuration** from the dropdown
-8. Click **Save changes**
-9. After creation, you will see the resource configuration in the Resource configurations section of your service network with the status "Active"
-10. For connectivity, click on the association details and the domain name will be listed in the **DNS entries** section
-
+7. Click **Save changes**
+8. After creation, you will see the resource configuration in the Resource configurations section of your service network with the status "Active"
+9. For connectivity, click on the association details and the domain name will be listed in the **DNS entries** section
 
 #### Step 5: Test connectivity
 
@@ -134,6 +133,7 @@ Configure your applications to use the private connection details:
 4. Test application connectivity thoroughly
 
 Example connection string update:
+
 ```
 # Before (public)
 postgresql://user:pass@db.[project-ref].supabase.co:5432/postgres
