@@ -74,7 +74,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
 
   if (SIMPLIFIED_INTERFACE) {
     return (
-      <Card className="border-b-0 rounded-none">
+      <Card className="border-b-0 rounded-none last:border-b first:rounded-t-md last:rounded-b-md">
         <CardContent className="py-3 flex items-center justify-between text-sm gap-4 cursor-pointer transition hover:bg-surface-200">
           <div className="flex items-center justify-center [&>svg]:text-foreground-lighter">
             {lint.icon}
