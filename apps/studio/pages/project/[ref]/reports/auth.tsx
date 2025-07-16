@@ -165,7 +165,7 @@ const AuthUsage = () => {
               isLoading={isLoadingData || isRefetching}
               hideDatepicker={true}
               datepickerHelpers={datePickerHelpers}
-              selectedProduct={'realtime'}
+              selectedProduct={'auth'}
               showDatabaseSelector={false}
             />
           </div>
