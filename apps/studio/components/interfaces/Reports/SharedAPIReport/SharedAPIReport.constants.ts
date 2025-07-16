@@ -1,8 +1,11 @@
 import { get } from 'data/fetchers'
-import { generateRegexpWhere } from './Reports.constants'
-import { ReportFilterItem } from './Reports.types'
-import { useQueries } from '@tanstack/react-query'
+import { generateRegexpWhere } from '../Reports.constants'
+import { ReportFilterItem } from '../Reports.types'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/nextjs'
+import { useState } from 'react'
+import { useParams } from 'common'
+import { isEqual } from 'lodash'
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
@@ -214,30 +217,58 @@ const fetchLogs = async ({
   return data
 }
 
+const DEFAULT_KEYS = ['shared-api-report']
+
 type SharedAPIReportParams = {
-  src: string
-  filters: ReportFilterItem[]
+  filterBy: 'auth' | 'realtime' | 'storage' | 'graphql' | 'functions' | 'postgrest'
   start: string
   end: string
   projectRef: string
   enabled?: boolean
 }
 export const useSharedAPIReport = ({
-  src = 'edge_logs',
-  filters,
+  filterBy,
   start,
   end,
-  projectRef,
   enabled = true,
-}: SharedAPIReportParams) => {
+}: Omit<SharedAPIReportParams, 'projectRef'>) => {
+  const { ref } = useParams() as { ref: string }
+  const [filters, setFilters] = useState<ReportFilterItem[]>([])
+  const queryClient = useQueryClient()
+  const filterByMapSource = {
+    functions: 'function_edge_logs',
+    realtime: 'edge_logs',
+    storage: 'edge_logs',
+    graphql: 'edge_logs',
+    postgrest: 'edge_logs',
+    auth: 'edge_logs',
+  }
+
+  const filterByMapValue = {
+    functions: '/functions',
+    realtime: '/realtime',
+    storage: '/storage',
+    graphql: '/graphql',
+    postgrest: '/rest',
+    auth: '/auth',
+  }
+
+  const baseFilter = {
+    key: 'request.path',
+    value: filterByMapValue[filterBy],
+    compare: 'matches' as const,
+  }
+
+  const allFilters = [baseFilter, ...filters]
+
   const queries = useQueries({
     queries: Object.entries(SHARED_API_REPORT_SQL).map(([key, value]) => ({
-      queryKey: ['shared-api-report', key, src, filters, start, end, projectRef],
-      enabled,
+      queryKey: [...DEFAULT_KEYS, key, filterByMapSource[filterBy], filters, start, end, ref],
+      enabled: enabled && !!ref && !!filterBy,
       queryFn: () =>
         fetchLogs({
-          projectRef,
-          sql: value.sql(filters, src),
+          projectRef: ref,
+          sql: value.sql(allFilters, filterByMapSource[filterBy]),
           start,
           end,
         }),
@@ -269,10 +300,39 @@ export const useSharedAPIReport = ({
     },
     {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: boolean }
   )
+  const addFilter = (filter: ReportFilterItem) => {
+    if (isEqual(filter, baseFilter)) return
+    if (filters.some((f) => isEqual(f, filter))) return
+    setFilters((prev) =>
+      [...prev, filter].sort((a, b) => {
+        const keyA = a.key.toLowerCase()
+        const keyB = b.key.toLowerCase()
+        if (keyA < keyB) {
+          return -1
+        }
+        if (keyA > keyB) {
+          return 1
+        }
+        return 0
+      })
+    )
+  }
+
+  const removeFilters = (toRemove: ReportFilterItem[]) => {
+    setFilters((prev) => prev.filter((f) => !toRemove.find((r) => isEqual(f, r))))
+  }
+
+  const isLoadingData = Object.values(isLoading).some(Boolean)
 
   return {
     data,
     error,
     isLoading,
+    isLoadingData,
+    isRefetching: queryClient.isFetching({ queryKey: DEFAULT_KEYS }) > 0 || false,
+    refetch: () => queryClient.invalidateQueries({ queryKey: DEFAULT_KEYS }),
+    filters,
+    addFilter,
+    removeFilters,
   }
 }
