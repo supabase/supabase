@@ -2,7 +2,7 @@ import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useAppStateSnapshot } from 'state/app-state'
+import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Modal } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
@@ -47,7 +47,7 @@ const PolicyEditorModal = ({
   onUpdatePolicy,
   onSaveSuccess = noop,
 }: PolicyEditorModalProps) => {
-  const snap = useAppStateSnapshot()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   const newPolicyTemplate: PolicyFormField = {
     schema,
@@ -95,7 +95,7 @@ const PolicyEditorModal = ({
   const onSelectBackFromTemplates = () => setView(previousView)
 
   const onToggleFeaturePreviewModal = () => {
-    snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+    toggleFeaturePreviewModal()
     onSelectCancel()
   }
 
