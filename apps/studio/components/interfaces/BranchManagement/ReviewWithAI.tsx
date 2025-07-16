@@ -58,7 +58,7 @@ export const ReviewWithAI = ({
     if (diffContent && diffContent.trim()) {
       sqlSnippets.push({
         label: 'Database Changes',
-        content: '-- DATABASE CHANGES TO BER MERGED IN:\n' + diffContent,
+        content: '-- DATABASE CHANGES TO BE MERGED IN:\n' + diffContent,
       })
     }
 
