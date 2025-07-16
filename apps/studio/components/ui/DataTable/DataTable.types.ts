@@ -50,6 +50,7 @@ export type Base<TData> = {
    * Defines if the command input is disabled for this field
    */
   commandDisabled?: boolean
+  hasAsyncSearch?: boolean
 }
 
 export type DataTableCheckboxFilterField<TData> = Base<TData> & Checkbox

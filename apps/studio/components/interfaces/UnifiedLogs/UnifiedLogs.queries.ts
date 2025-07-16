@@ -459,7 +459,7 @@ const getSupabaseStorageLogsQuery = () => {
 /**
  * Combine all log sources to create the unified logs CTE
  */
-const getUnifiedLogsCTE = () => {
+export const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
     ${getPostgrestLogsQuery()}
@@ -538,7 +538,15 @@ const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): s
   return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 }
 
-const getFacetCountCTE = (search: QuerySearchParamsType, facet: string) => {
+export const getFacetCountCTE = ({
+  search,
+  facet,
+  facetSearch,
+}: {
+  search: QuerySearchParamsType
+  facet: string
+  facetSearch?: string
+}) => {
   const MAX_FACETS_QUANTITY = 20
 
   return `
@@ -547,6 +555,7 @@ ${facet}_count AS (
   FROM unified_logs
   ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
   ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
+  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch}%'` : ''}
   GROUP BY ${facet}
   LIMIT ${MAX_FACETS_QUANTITY}
 )
@@ -559,13 +568,13 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   // Create a count query using the same unified logs CTE
   const sql = `
 ${getUnifiedLogsCTE()},
-${getFacetCountCTE(search, 'log_type')},
-${getFacetCountCTE(search, 'method')},
-${getFacetCountCTE(search, 'level')},
-${getFacetCountCTE(search, 'status')},
-${getFacetCountCTE(search, 'host')},
-${getFacetCountCTE(search, 'pathname')},
-${getFacetCountCTE(search, 'auth_user')}
+${getFacetCountCTE({ search, facet: 'log_type' })},
+${getFacetCountCTE({ search, facet: 'method' })},
+${getFacetCountCTE({ search, facet: 'level' })},
+${getFacetCountCTE({ search, facet: 'status' })},
+${getFacetCountCTE({ search, facet: 'host' })},
+${getFacetCountCTE({ search, facet: 'pathname' })},
+${getFacetCountCTE({ search, facet: 'auth_user' })}
 
 -- Get total count
 SELECT 'total' as dimension, 'all' as value, COUNT(*) as count

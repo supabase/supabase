@@ -3,7 +3,7 @@ import { User } from 'lucide-react'
 
 import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from 'components/ui/DataTable/DataTable.types'
-import { getLevelColor, getStatusColor } from 'components/ui/DataTable/DataTable.utils'
+import { getLevelColor } from 'components/ui/DataTable/DataTable.utils'
 import { cn } from 'ui'
 import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
@@ -110,6 +110,7 @@ export const filterFields = [
     value: 'host',
     type: 'checkbox',
     defaultOpen: false,
+    hasAsyncSearch: true,
     options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
       return (
@@ -124,6 +125,7 @@ export const filterFields = [
     value: 'pathname',
     type: 'checkbox',
     defaultOpen: true,
+    hasAsyncSearch: true,
     options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
       return (
@@ -138,6 +140,7 @@ export const filterFields = [
     value: 'auth_user',
     type: 'checkbox',
     defaultOpen: false,
+    hasAsyncSearch: true,
     options: [], // Will be populated dynamically from facets
     component: (props: Option) => {
       return (

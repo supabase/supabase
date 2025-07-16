@@ -1,6 +1,9 @@
-import { Search } from 'lucide-react'
+import { Loader2, Search } from 'lucide-react'
 import { useState } from 'react'
 
+import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
+import { useUnifiedLogsFacetCountQuery } from 'data/logs/unified-logs-facet-count-query'
 import { Checkbox_Shadcn_ as Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
@@ -11,30 +14,56 @@ export function DataTableFilterCheckbox<TData>({
   value: _value,
   options,
   component,
+  hasAsyncSearch,
 }: DataTableCheckboxFilterField<TData>) {
   const value = _value as string
   const [inputValue, setInputValue] = useState('')
-  const { table, columnFilters, isLoading, isLoadingCounts, getFacetedUniqueValues } =
+  const { table, searchParameters, columnFilters, isLoadingCounts, getFacetedUniqueValues } =
     useDataTable()
 
+  // [Joshen] JFYI for simplicity currently, i'm adding UnifiedLogs logic into this file
+  // despite this supposedly being a reusable component - tbh really, this doesn't need to
+  // be reusable perhaps unless we plan for this to be used in another area of the dashboard
+  // but its too early to say for sure atm.
+  const { ref: projectRef } = useParams()
+  const debouncedSearch = useDebounce(inputValue, 1000)
+  const { data = [], isFetching: isFetchingFacetCount } = useUnifiedLogsFacetCountQuery(
+    {
+      projectRef,
+      search: searchParameters,
+      facet: value,
+      facetSearch: debouncedSearch,
+    },
+    {
+      keepPreviousData: true,
+      enabled: hasAsyncSearch && debouncedSearch.length > 0,
+      initialData: debouncedSearch.length === 0 ? options : undefined,
+    }
+  )
+
+  if (value === 'pathname') console.log({ options, data, isFetchingFacetCount })
+
   const column = table.getColumn(value)
-  // REMINDER: avoid using column?.getFilterValue()
   const filterValue = columnFilters.find((i) => i.id === value)?.value
   const facetedValue = getFacetedUniqueValues?.(table, value) || column?.getFacetedUniqueValues()
 
   const Component = component
 
   // filter out the options based on the input value
-  const filterOptions =
-    options?.filter(
-      (option) => inputValue === '' || option.label.toLowerCase().includes(inputValue.toLowerCase())
-    ) || []
+  const filterOptions = hasAsyncSearch
+    ? debouncedSearch.length === 0 || (data.length === 0 && isFetchingFacetCount)
+      ? options || []
+      : data
+    : options?.filter(
+        (option) =>
+          inputValue === '' || option.label.toLowerCase().includes(inputValue.toLowerCase())
+      ) || []
 
   // CHECK: it could be filterValue or searchValue
   const filters = filterValue ? (Array.isArray(filterValue) ? filterValue : [filterValue]) : []
 
   // REMINDER: if no options are defined, while fetching data, we should show a skeleton
-  if (isLoading && !filterOptions?.length)
+  if (isLoadingCounts && !filterOptions?.length)
     return (
       <div className="grid divide-y rounded border border-border">
         {Array.from({ length: 3 }).map((_, index) => (
@@ -64,15 +93,19 @@ export function DataTableFilterCheckbox<TData>({
 
   return (
     <div className="grid gap-2">
-      {options && options.length > 4 ? (
+      {hasAsyncSearch || (options && options.length > 4) ? (
         <InputWithAddons
           placeholder="Search"
           leading={<Search size={14} className="text-foreground-lighter" />}
           containerClassName="h-8 rounded"
           value={inputValue}
+          trailing={
+            isFetchingFacetCount ? <Loader2 size={12} className="animate-spin" /> : undefined
+          }
           onChange={(e) => setInputValue(e.target.value)}
         />
       ) : null}
+
       {/* FIXME: due to the added max-h and overflow-y-auto, the hover state and border is laying on top of the scroll bar */}
       <div className="max-h-[200px] overflow-y-auto rounded border border-border empty:border-none">
         {filterOptions.length === 0 && inputValue !== '' ? (
