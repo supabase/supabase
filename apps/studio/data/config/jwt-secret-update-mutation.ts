@@ -52,11 +52,7 @@ export const useJwtSecretUpdateMutation = ({
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to submit JWT secret update request: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
+        await onError?.(data, variables, context)
       },
       ...options,
     }

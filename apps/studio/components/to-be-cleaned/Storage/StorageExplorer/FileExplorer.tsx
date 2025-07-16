@@ -1,5 +1,4 @@
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useEffect, useRef } from 'react'
 
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
@@ -95,4 +94,4 @@ const FileExplorer = ({
   )
 }
 
-export default observer(FileExplorer)
+export default FileExplorer

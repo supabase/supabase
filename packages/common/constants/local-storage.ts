@@ -11,10 +11,13 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-  UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
-  UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
-  UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
+  UI_PREVIEW_REALTIME_SETTINGS: 'supabase-ui-realtime-settings',
+  UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
+
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
+  TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
+  TERMS_OF_SERVICE_ACKNOWLEDGED: 'terms-of-service-acknowledged',
+  AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
@@ -50,7 +53,10 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
+  API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
+  MIDDLEWARE_OUTAGE_BANNER: 'middleware-outage-banner-2025-05-16',
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  REPORT_DATERANGE: 'supabase-report-daterange',
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
@@ -58,6 +64,10 @@ export const LOCAL_STORAGE_KEYS = {
   // last visited logs page
   LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
+
+  // user impersonation selector previous searches
+  USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
+    `user-impersonation-selector-previous-searches-${ref}`,
 
   /**
    * COMMON
@@ -73,7 +83,7 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
 
-  HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw13-d1',
+  HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
 
   /**
    * WWW
@@ -92,14 +102,13 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-  LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
-  LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
-  LOCAL_STORAGE_KEYS.UI_NEW_LAYOUT_PREVIEW,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
+  LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
 ]
 
 export function clearLocalStorage() {

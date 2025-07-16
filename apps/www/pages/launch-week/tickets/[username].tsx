@@ -2,26 +2,32 @@ import { NextSeo } from 'next-seo'
 import dayjs from 'dayjs'
 import Error from 'next/error'
 import { GetStaticPaths, GetStaticProps } from 'next'
-import { LW14_DATE, LW14_TITLE, LW14_URL, SITE_ORIGIN } from '~/lib/constants'
-import { LwView } from '~/components/LaunchWeek/14/LwView'
-import {
-  Lw14ConfDataProvider,
-  UserTicketData,
-} from '~/components/LaunchWeek/14/hooks/use-conf-data'
+import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
+import { Lw15ConfDataProvider, UserTicketData } from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { createClient } from '@supabase/supabase-js'
-import DefaultLayout from '~/components/Layouts/Default'
-import { Tunnel } from '~/components/LaunchWeek/14/Tunnel'
+import DefaultLayout from 'components/Layouts/Default'
+import LW15TicketPage from 'components/LaunchWeek/15/Ticketing/LW15TicketPage'
+import { useRouter } from 'next/router'
 
 interface Props {
   user: UserTicketData
   ogImageUrl: string
 }
 
-const Lw14Page = ({ user, ogImageUrl }: Props) => {
+const Lw15Page = ({ user, ogImageUrl }: Props) => {
   const username = user?.username
-  const TITLE = `${LW14_TITLE} | ${LW14_DATE}`
-  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const PAGE_URL = `${LW14_URL}/tickets/${username}`
+  const TITLE = `${LW15_TITLE} | ${LW15_DATE}`
+  const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8AM PT.'
+  const PAGE_URL = `${LW15_URL}/tickets/${username}`
+  const { query } = useRouter()
+  const ticketNumber = query.ticketNumber?.toString()
+  const defaultUserData = {
+    id: query.id?.toString(),
+    ticket_number: ticketNumber ? parseInt(ticketNumber, 10) : undefined,
+    name: query.name?.toString(),
+    username: query.username?.toString(),
+    platinum: !!query.platinum,
+  }
 
   if (!username) {
     return <Error statusCode={404} />
@@ -46,16 +52,24 @@ const Lw14Page = ({ user, ogImageUrl }: Props) => {
         }}
       />
 
-      <Lw14ConfDataProvider initState={{ partymodeStatus: 'on' }}>
-        <DefaultLayout className='font-["Departure_Mono"] lg:pt-32 border-b pb-0 md:pb-16 lg:!pb-[230px]'>
-          <LwView />
+      <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
+        <DefaultLayout className="!min-h-fit !h-fit lg:!min-h-[calc(100dvh-66px)] lg:!h-full dark:bg-black">
+          <div
+            style={{
+              fontFamily:
+                "SuisseIntl-Book, custom-font, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
+            }}
+            className="h-full"
+          >
+            <LW15TicketPage user={user} isSharePage />
+          </div>
         </DefaultLayout>
-      </Lw14ConfDataProvider>
+      </Lw15ConfDataProvider>
     </>
   )
 }
 
-export default Lw14Page
+export default Lw15Page
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
@@ -77,42 +91,20 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (username) {
     const { data, error } = await supabaseAdmin!
       .from('tickets_view')
-      .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
-      .eq('launch_week', 'lw14')
+      .select('name, username, ticket_number, metadata, role, company, location')
+      .eq('launch_week', 'lw15')
       .eq('username', username)
       .single()
 
     user = data
   }
 
-  // fetch the platinum ticket
-  // stores the og images in supabase storage
-  if (user?.secret) {
-    fetch(
-      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`
-    )
-  } else if (user?.platinum) {
-    // fetch /api-v2/ticket-og
-    fetch(
-      `${SITE_ORIGIN}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
-    )
-  }
-
-  const ticketType = user?.secret
-    ? user?.platinum
-      ? 'platinumSecret'
-      : 'secret'
-    : user?.platinum
-      ? 'platinum'
-      : 'regular'
-  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw14/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
+  const ticketType = 'regular'
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw15/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {
     props: {
-      user: {
-        ...user,
-        username,
-      },
+      user,
       ogImageUrl,
       key: username,
     },

@@ -1,4 +1,4 @@
-import { forwardRef, memo, useRef } from 'react'
+import { forwardRef, memo, Ref, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
@@ -6,12 +6,13 @@ import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePan
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import RowRenderer from './RowRenderer'
@@ -48,7 +49,7 @@ export const Grid = memo(
         filters,
         onApplyFilters,
       },
-      ref: React.Ref<DataGridHandle> | undefined
+      ref: Ref<DataGridHandle> | undefined
     ) => {
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
@@ -67,6 +68,7 @@ export const Grid = memo(
       }
 
       const table = snap.table
+      const tableEntityType = snap.originalTable?.entity_type
 
       const { mutate: sendEvent } = useSendEventMutation()
       const org = useSelectedOrganization()
@@ -82,13 +84,13 @@ export const Grid = memo(
           table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
 
         const fk = data?.find(
-          (key: any) =>
+          (key) =>
             key.source_schema === table?.schema &&
             key.source_table === table?.name &&
             key.source_columns.includes(columnName) &&
             key.target_schema === targetTableSchema &&
             key.target_table === targetTableName &&
-            key.target_columns.includes(targetColumnName)
+            key.target_columns.includes(targetColumnName ?? '')
         )
 
         return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
@@ -119,11 +121,15 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               style={{ height: `calc(100% - 35px)` }}
-              className="absolute top-9 z-[2] p-2 w-full"
+              className="absolute top-9 p-2 w-full z-[1] pointer-events-none"
             >
               {isLoading && <GenericSkeletonLoader />}
               {isError && (
-                <AlertError error={error} subject="Failed to retrieve rows from table">
+                <AlertError
+                  className="pointer-events-auto"
+                  error={error}
+                  subject="Failed to retrieve rows from table"
+                >
                   {filters.length > 0 && (
                     <p>
                       Verify that the filter values are correct, as the error may stem from an
@@ -137,13 +143,18 @@ export const Grid = memo(
                   {(filters ?? []).length === 0 ? (
                     <div className="flex flex-col items-center justify-center col-span-full h-full">
                       <p className="text-sm text-light">This table is empty</p>
-                      <p className="text-sm text-light mt-1">
-                        Add rows to your table to get started.
-                      </p>
-                      <div className="flex items-center space-x-2 mt-4">
-                        {
+                      {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
+                        <div className="flex items-center space-x-2 mt-4">
+                          <p className="text-sm text-light">
+                            This table is a foreign table. Add data to the connected source to get
+                            started.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2 mt-4">
                           <Button
                             type="default"
+                            className="pointer-events-auto"
                             onClick={() => {
                               tableEditorSnap.onImportData()
                               sendEvent({
@@ -158,8 +169,8 @@ export const Grid = memo(
                           >
                             Import data from CSV
                           </Button>
-                        }
-                      </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center col-span-full">
@@ -167,7 +178,11 @@ export const Grid = memo(
                         The filters applied have returned no results from this table
                       </p>
                       <div className="flex items-center space-x-2 mt-4">
-                        <Button type="default" onClick={() => removeAllFilters()}>
+                        <Button
+                          type="default"
+                          className="pointer-events-auto"
+                          onClick={() => removeAllFilters()}
+                        >
                           Remove all filters
                         </Button>
                       </div>

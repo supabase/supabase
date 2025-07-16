@@ -1,6 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'api-types'
 import { handleError, post } from 'data/fetchers'
 import { CloudProvider } from 'shared-data'
 import type { ResponseError } from 'types'
@@ -10,12 +9,6 @@ export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider
   dbRegion: string
   organizationSlug: string | undefined
-}
-
-export type ProjectCreationPostgresVersion = components['schemas']['ProjectCreationVersionInfo']
-
-export type ProjectCreationPostgresVersionsResponse = {
-  available_versions: ProjectCreationPostgresVersion[]
 }
 
 export async function getPostgresCreationVersions(

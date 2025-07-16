@@ -11,11 +11,12 @@ import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 import { components } from 'api-types'
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
+import { OrgNotFound } from 'components/interfaces/Organization/OrgNotFound'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
 import {
   extractPostgresVersionDetails,
@@ -46,6 +47,7 @@ import {
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -139,13 +141,16 @@ const Wizard: NextPageWithLayout = () => {
   const { slug, projectName } = useParams()
   const currentOrg = useSelectedOrganization()
   const isFreePlan = currentOrg?.plan?.id === 'free'
+  const [lastVisitedOrganization] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+    ''
+  )
 
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
+  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
-  const allowOrioleDB = useFlag('allowOrioleDb')
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
@@ -228,8 +233,11 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
+
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
+  const orgNotFound = isOrganizationsSuccess && (organizations?.length ?? 0) > 0 && isInvalidSlug
   const isEmptyOrganizations = (organizations?.length ?? 0) <= 0 && isOrganizationsSuccess
+
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
@@ -360,7 +368,7 @@ const Wizard: NextPageWithLayout = () => {
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
-      organizationId: currentOrg.id,
+      organizationSlug: currentOrg.slug,
       name: projectName,
       dbPass: dbPass,
       dbRegion: dbRegion,
@@ -402,14 +410,6 @@ const Wizard: NextPageWithLayout = () => {
     if (slug && slug !== '_') form.setValue('organization', slug)
     if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
-
-  useEffect(() => {
-    // Redirect to first org if the slug doesn't match an org slug
-    // this is mainly to capture the /new/new-project url, which is redirected from database.new
-    if (isInvalidSlug && isOrganizationsSuccess && (organizations?.length ?? 0) > 0) {
-      router.push(`/new/${organizations?.[0].slug}`)
-    }
-  }, [isInvalidSlug, isOrganizationsSuccess, organizations])
 
   useEffect(() => {
     if (form.getValues('dbRegion') === undefined && defaultRegion) {
@@ -532,7 +532,6 @@ const Wizard: NextPageWithLayout = () => {
                                   Total Monthly Compute Costs
                                   {/**
                                    * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                   *
                                    * Will be adjusted in the future [kevin]
                                    */}
                                   {organizationProjects.length > 0 && (
@@ -557,7 +556,10 @@ const Wizard: NextPageWithLayout = () => {
                 <Button
                   type="default"
                   disabled={isCreatingNewProject || isSuccessNewProject}
-                  onClick={() => router.push('/projects')}
+                  onClick={() => {
+                    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+                    else router.push('/organizations')
+                  }}
                 >
                   Cancel
                 </Button>
@@ -580,45 +582,49 @@ const Wizard: NextPageWithLayout = () => {
             ) : (
               <div className="divide-y divide-border-muted">
                 <Panel.Content className={['space-y-4'].join(' ')}>
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="organization"
-                    render={({ field }) => (
-                      <FormItemLayout label="Organization" layout="horizontal">
-                        {(organizations?.length ?? 0) > 0 && (
-                          <Select_Shadcn_
-                            onValueChange={(slug) => {
-                              field.onChange(slug)
-                              router.push(`/new/${slug}`)
-                            }}
-                            value={field.value}
-                            defaultValue={field.value}
-                          >
-                            <FormControl_Shadcn_>
-                              <SelectTrigger_Shadcn_>
-                                <SelectValue_Shadcn_ placeholder="Select an organization" />
-                              </SelectTrigger_Shadcn_>
-                            </FormControl_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectGroup_Shadcn_>
-                                {organizations?.map((x) => (
-                                  <SelectItem_Shadcn_
-                                    key={x.id}
-                                    value={x.slug}
-                                    className="flex justify-between"
-                                  >
-                                    <span className="mr-2">{x.name}</span>
-                                    <Badge>{x.plan.name}</Badge>
-                                  </SelectItem_Shadcn_>
-                                ))}
-                              </SelectGroup_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        )}
-                      </FormItemLayout>
-                    )}
-                  />
-                  {!isAdmin && <NotOrganizationOwnerWarning />}
+                  {isAdmin && !isInvalidSlug && (
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="organization"
+                      render={({ field }) => (
+                        <FormItemLayout label="Organization" layout="horizontal">
+                          {(organizations?.length ?? 0) > 0 && (
+                            <Select_Shadcn_
+                              onValueChange={(slug) => {
+                                field.onChange(slug)
+                                router.push(`/new/${slug}`)
+                              }}
+                              value={field.value}
+                              defaultValue={field.value}
+                            >
+                              <FormControl_Shadcn_>
+                                <SelectTrigger_Shadcn_>
+                                  <SelectValue_Shadcn_ placeholder="Select an organization" />
+                                </SelectTrigger_Shadcn_>
+                              </FormControl_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                <SelectGroup_Shadcn_>
+                                  {organizations?.map((x) => (
+                                    <SelectItem_Shadcn_
+                                      key={x.id}
+                                      value={x.slug}
+                                      className="flex justify-between"
+                                    >
+                                      <span className="mr-2">{x.name}</span>
+                                      <Badge>{x.plan.name}</Badge>
+                                    </SelectItem_Shadcn_>
+                                  ))}
+                                </SelectGroup_Shadcn_>
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
+                          )}
+                        </FormItemLayout>
+                      )}
+                    />
+                  )}
+
+                  {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
+                  {orgNotFound && <OrgNotFound slug={slug} />}
                 </Panel.Content>
 
                 {canCreateProject && (
@@ -846,7 +852,7 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {!projectVersionSelectionDisabled && (
+                    {showPostgresVersionSelector && (
                       <Panel.Content>
                         <FormField_Shadcn_
                           control={form.control}
@@ -889,9 +895,7 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     <SecurityOptions form={form} />
-                    {allowOrioleDB && !!availableOrioleVersion && (
-                      <AdvancedConfiguration form={form} />
-                    )}
+                    {!!availableOrioleVersion && <AdvancedConfiguration form={form} />}
                   </>
                 )}
 
@@ -947,8 +951,8 @@ const Wizard: NextPageWithLayout = () => {
           size="large"
           loading={false}
           visible={isComputeCostsConfirmationModalVisible}
-          title={<>Confirm compute costs</>}
-          confirmLabel="Confirm"
+          title="Confirm compute costs"
+          confirmLabel="I understand"
           onCancel={() => setIsComputeCostsConfirmationModalVisible(false)}
           onConfirm={async () => {
             const values = form.getValues()
@@ -961,9 +965,9 @@ const Wizard: NextPageWithLayout = () => {
             <p>
               Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
-              clicking "Confirm", you agree to the additional costs.{' '}
+              clicking "I understand", you agree to the additional costs.{' '}
               <Link
-                href="/docs/guides/platform/manage-your-usage/compute"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                 target="_blank"
                 className="underline"
               >
@@ -993,16 +997,7 @@ const instanceLabel = (instance: string | undefined): string => {
 }
 
 const PageLayout = withAuth(({ children }: PropsWithChildren) => {
-  const { slug } = useParams()
-
-  const { data: organizations } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o) => o.slug === slug)
-
-  return (
-    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
-      {children}
-    </WizardLayoutWithoutAuth>
-  )
+  return <WizardLayoutWithoutAuth>{children}</WizardLayoutWithoutAuth>
 })
 
 Wizard.getLayout = (page) => (

@@ -9,7 +9,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   DropdownMenu,
@@ -26,8 +26,7 @@ import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
 const PreviewFile = ({ item }: { item: StorageItem }) => {
-  const storageExplorerStore = useStorageStore()
-  const { projectRef, selectedBucket } = storageExplorerStore
+  const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
 
   const { data: previewUrl, isLoading } = useFetchFileUrlQuery({
     file: item,
@@ -118,14 +117,14 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
 
 const PreviewPane = () => {
   const { ref: projectRef, bucketId } = useParams()
-  const storageExplorerStore = useStorageStore()
+
   const {
     selectedBucket,
     selectedFilePreview: file,
-    closeFilePreview,
     setSelectedItemsToDelete,
+    setSelectedFilePreview,
     setSelectedFileCustomExpiry,
-  } = storageExplorerStore
+  } = useStorageExplorerStateSnapshot()
   const { onCopyUrl } = useCopyUrl()
 
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
@@ -150,19 +149,14 @@ const PreviewPane = () => {
         leaveFrom="transform opacity-100"
         leaveTo="transform opacity-0"
       >
-        <div
-          className="
-        h-full border-l
-        border-overlay bg-surface-100 p-4"
-          style={{ width }}
-        >
+        <div className="h-full border-l border-overlay bg-surface-100 p-4" style={{ width }}>
           {/* Preview Header */}
           <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
             <X
               className="cursor-pointer"
               size={14}
               strokeWidth={2}
-              onClick={() => closeFilePreview()}
+              onClick={() => setSelectedFilePreview(undefined)}
             />
           </div>
 

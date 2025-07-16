@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 
+import { IS_PLATFORM } from 'lib/constants'
 import { apiKeysKeys } from './keys'
 
 type LegacyKeys = {
@@ -43,12 +44,12 @@ type PublishableKeys = {
   updated_at?: string
 }
 
-export interface APIKeysVariables {
+interface APIKeysVariables {
   projectRef?: string
   reveal: boolean
 }
 
-export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
+async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
@@ -74,7 +75,7 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
     apiKeysKeys.list(projectRef),
     ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     {
-      enabled: enabled && !!projectRef,
+      enabled: IS_PLATFORM && enabled && !!projectRef,
       ...options,
     }
   )

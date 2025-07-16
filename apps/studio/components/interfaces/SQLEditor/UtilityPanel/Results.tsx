@@ -3,13 +3,13 @@ import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
 import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
-import { copyToClipboard } from 'lib/helpers'
 import {
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
 

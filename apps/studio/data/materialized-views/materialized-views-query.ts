@@ -7,7 +7,7 @@ import { materializedViewKeys } from './keys'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 

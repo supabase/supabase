@@ -1,4 +1,5 @@
 import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
+import Link from 'next/link'
 
 import Table from 'components/to-be-cleaned/Table'
 import PartnerIcon from 'components/ui/PartnerIcon'
@@ -9,7 +10,6 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
-import Link from 'next/link'
 import {
   Badge,
   HoverCardContent_Shadcn_,
@@ -19,7 +19,7 @@ import {
   cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
+import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
 
 interface MemberRowProps {
@@ -41,7 +41,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
 
   const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
-  const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
@@ -73,7 +72,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
       <Table.td>
         <div className="flex items-center gap-x-4">
           <ProfileImage
-            alt={member.username}
+            alt={member.primary_email ?? member.username ?? ''}
             src={profileImageUrl}
             className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
             placeholder={
@@ -88,11 +87,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             }
           />
           <div className="flex item-center gap-x-2">
-            {isInvitedUser === undefined ? (
-              <p className="text-foreground-light truncate">{member.primary_email}</p>
-            ) : (
-              <p className="text-foreground truncate">{getUserDisplayName(member)}</p>
-            )}
+            <p className="text-foreground-light truncate">{member.primary_email}</p>
             {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
           </div>
 
@@ -208,7 +203,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
         )}
       </Table.td>
 
-      <Table.td>{!memberIsUser && <MemberActions member={member} />}</Table.td>
+      <Table.td>
+        <MemberActions member={member} />
+      </Table.td>
     </Table.tr>
   )
 }

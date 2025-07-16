@@ -1,12 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useCreatePipelineMutation } from 'data/replication/create-pipeline-mutation'
-import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
-import { useCreateSourceMutation } from 'data/replication/create-source-mutation'
+import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useUpdateSinkMutation } from 'data/replication/update-sink-mutation'
-import { useUpdatePipelineMutation } from 'data/replication/update-pipeline-mutation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -43,10 +39,12 @@ import * as z from 'zod'
 import PublicationsComboBox from './PublicationsComboBox'
 import NewPublicationPanel from './NewPublicationPanel'
 import { useState, useMemo, useEffect } from 'react'
-import { useReplicationSinkByIdQuery } from 'data/replication/sink-by-id-query'
+import { useReplicationDestinationByIdQuery } from 'data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useCreateDestinationPipelineMutation } from 'data/replication/create-destination-pipeline-mutation'
+import { useUpdateDestinationPipelineMutation } from 'data/replication/update-destination-pipeline-mutation'
 
 interface DestinationPanelProps {
   visible: boolean
@@ -54,7 +52,7 @@ interface DestinationPanelProps {
   onClose: () => void
   existingDestination?: {
     sourceId?: number
-    sinkId: number
+    destinationId: number
     pipelineId?: number
     enabled: boolean
   }
@@ -68,21 +66,22 @@ const DestinationPanel = ({
 }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-  const { mutateAsync: createSource, isLoading: creatingSource } = useCreateSourceMutation()
-  const { mutateAsync: createSink, isLoading: creatingSink } = useCreateSinkMutation()
-  const { mutateAsync: createPipeline, isLoading: creatingPipeline } = useCreatePipelineMutation()
+  const { mutateAsync: createTenantSource, isLoading: creatingTenantSource } =
+    useCreateTenantSourceMutation()
+  const { mutateAsync: createDestinationPipeline, isLoading: creatingDestinationPipeline } =
+    useCreateDestinationPipelineMutation()
   const { mutateAsync: startPipeline, isLoading: startingPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline, isLoading: stoppingPipeline } = useStopPipelineMutation()
-  const { mutateAsync: updateSink, isLoading: updatingSink } = useUpdateSinkMutation()
-  const { mutateAsync: updatePipeline, isLoading: updatingPipeline } = useUpdatePipelineMutation()
+  const { mutateAsync: updateDestinationPipeline, isLoading: updatingDestinationPipeline } =
+    useUpdateDestinationPipelineMutation()
   const { data: publications, isLoading: loadingPublications } = useReplicationPublicationsQuery({
     projectRef,
     sourceId,
   })
 
-  const { data: sinkData } = useReplicationSinkByIdQuery({
+  const { data: destinationData } = useReplicationDestinationByIdQuery({
     projectRef,
-    sinkId: existingDestination?.sinkId,
+    destinationId: existingDestination?.destinationId,
   })
 
   const { data: pipelineData } = useReplicationPipelineByIdQuery({
@@ -90,8 +89,8 @@ const DestinationPanel = ({
     pipelineId: existingDestination?.pipelineId,
   })
 
-  const isCreating = creatingSource || creatingSink || creatingPipeline || startingPipeline
-  const isUpdating = updatingSink || updatingPipeline || stoppingPipeline || startingPipeline
+  const isCreating = creatingTenantSource || creatingDestinationPipeline || startingPipeline
+  const isUpdating = updatingDestinationPipeline || stoppingPipeline || startingPipeline
   const isSubmitting = isCreating || isUpdating
   const editMode = !!existingDestination
 
@@ -106,24 +105,25 @@ const DestinationPanel = ({
     serviceAccountKey: z.string().min(1, 'Service account key is required'),
     publicationName: z.string().min(1, 'Publication is required'),
     maxSize: z.number().min(1, 'Max Size must be greater than 0').int(),
-    maxFillSecs: z.number().min(1, 'Max Fill seconds should be greater than 0').int(),
+    maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int(),
     maxStalenessMins: z.number().nonnegative(),
     enabled: z.boolean(),
   })
   const defaultValues = useMemo(
     () => ({
       type: TypeEnum.enum.BigQuery,
-      name: sinkData?.name ?? '',
-      projectId: sinkData?.config?.big_query?.project_id ?? '',
-      datasetId: sinkData?.config?.big_query?.dataset_id ?? '',
-      serviceAccountKey: sinkData?.config?.big_query?.service_account_key ?? '',
-      publicationName: pipelineData?.publication_name ?? '',
-      maxSize: pipelineData?.config?.config?.max_size ?? 1000,
-      maxFillSecs: pipelineData?.config?.config?.max_fill_secs ?? 10,
-      maxStalenessMins: sinkData?.config?.big_query?.max_staleness_mins ?? 5,
+      name: destinationData?.name ?? '',
+      projectId: destinationData?.config?.big_query?.project_id ?? '',
+      datasetId: destinationData?.config?.big_query?.dataset_id ?? '',
+      // For now, the password will always be set as empty for security reasons.
+      serviceAccountKey: destinationData?.config?.big_query?.service_account_key ?? '',
+      publicationName: pipelineData?.config.publication_name ?? '',
+      maxSize: pipelineData?.config?.batch?.max_size ?? 1000,
+      maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? 10,
+      maxStalenessMins: destinationData?.config?.big_query?.max_staleness_mins ?? 5,
       enabled: existingDestination?.enabled ?? true,
     }),
-    [sinkData, pipelineData, existingDestination]
+    [destinationData, pipelineData, existingDestination]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -144,26 +144,25 @@ const DestinationPanel = ({
           return
         }
         // Update existing destination
-        await updateSink({
+        await updateDestinationPipeline({
+          destinationId: existingDestination.destinationId,
+          pipelineId: existingDestination.pipelineId,
           projectRef,
-          sinkId: existingDestination.sinkId,
-          sinkName: data.name,
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-          maxStalenessMins: data.maxStalenessMins,
-        })
-
-        if (existingDestination.pipelineId) {
-          await updatePipeline({
-            projectRef,
-            pipelineId: existingDestination.pipelineId,
-            sourceId,
-            sinkId: existingDestination.sinkId,
+          destinationName: data.name,
+          destinationConfig: {
+            bigQuery: {
+              projectId: data.projectId,
+              datasetId: data.datasetId,
+              serviceAccountKey: data.serviceAccountKey,
+              maxStalenessMins: data.maxStalenessMins,
+            },
+          },
+          pipelineConfig: {
             publicationName: data.publicationName,
-            config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
-          })
-        }
+            batch: { maxSize: data.maxSize, maxFillMs: data.maxFillMs },
+          },
+          sourceId,
+        })
         if (data.enabled) {
           await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         } else {
@@ -177,20 +176,22 @@ const DestinationPanel = ({
           console.error('Source id is required')
           return
         }
-        const { id: sinkId } = await createSink({
+        const { pipeline_id: pipelineId } = await createDestinationPipeline({
           projectRef,
-          sinkName: data.name,
-          projectId: data.projectId,
-          datasetId: data.datasetId,
-          serviceAccountKey: data.serviceAccountKey,
-          maxStalenessMins: data.maxStalenessMins,
-        })
-        const { id: pipelineId } = await createPipeline({
-          projectRef,
+          destinationName: data.name,
+          destinationConfig: {
+            bigQuery: {
+              projectId: data.projectId,
+              datasetId: data.datasetId,
+              serviceAccountKey: data.serviceAccountKey,
+              maxStalenessMins: data.maxStalenessMins,
+            },
+          },
           sourceId,
-          sinkId,
-          publicationName: data.publicationName,
-          config: { config: { maxSize: data.maxSize, maxFillSecs: data.maxFillSecs } },
+          pipelineConfig: {
+            publicationName: data.publicationName,
+            batch: { maxSize: data.maxSize, maxFillMs: data.maxFillMs },
+          },
         })
         if (data.enabled) {
           await startPipeline({ projectRef, pipelineId })
@@ -204,16 +205,16 @@ const DestinationPanel = ({
   }
   const onEnableReplication = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    await createSource({ projectRef })
+    await createTenantSource({ projectRef })
   }
 
   const { enabled } = form.watch()
 
   useEffect(() => {
-    if (editMode && sinkData && pipelineData) {
+    if (editMode && destinationData && pipelineData) {
       form.reset(defaultValues)
     }
-  }, [sinkData, pipelineData, editMode, defaultValues, form])
+  }, [destinationData, pipelineData, editMode, defaultValues, form])
 
   return (
     <>
@@ -392,7 +393,7 @@ const DestinationPanel = ({
                             />
                             <FormField_Shadcn_
                               control={form.control}
-                              name="maxFillSecs"
+                              name="maxFillMs"
                               render={({ field }) => (
                                 <FormItemLayout
                                   className="mb-4"
@@ -404,7 +405,7 @@ const DestinationPanel = ({
                                     <Input_Shadcn_
                                       {...field}
                                       type="number"
-                                      {...form.register('maxFillSecs', {
+                                      {...form.register('maxFillMs', {
                                         valueAsNumber: true, // Ensure the value is handled as a number
                                       })}
                                       placeholder="Max fill seconds"

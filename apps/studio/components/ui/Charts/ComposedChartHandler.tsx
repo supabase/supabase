@@ -16,24 +16,9 @@ import { useChartHighlight } from './useChartHighlight'
 
 import type { ChartData } from './Charts.types'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import { MultiAttribute } from './ComposedChart.utils'
 
-type Provider = 'infra-monitoring' | 'daily-stats'
-
-export type MultiAttribute = {
-  attribute: string
-  provider: Provider
-  label?: string
-  color?: string
-  format?: 'percent' | 'number'
-  description?: string
-  docsLink?: string
-  isMaxValue?: boolean
-  type?: 'line' | 'area-bar'
-  omitFromTotal?: boolean
-  tooltip?: string
-}
-
-interface ComposedChartHandlerProps {
+export interface ComposedChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
@@ -52,9 +37,11 @@ interface ComposedChartHandlerProps {
   showLegend?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
-  updateDateRange: UpdateDateRange
+  updateDateRange?: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
+  docsUrl?: string
+  hide?: boolean
 }
 
 /**
@@ -124,6 +111,8 @@ const ComposedChartHandler = ({
   updateDateRange,
   valuePrecision,
   isVisible = true,
+  id,
+  ...otherProps
 }: PropsWithChildren<ComposedChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -160,20 +149,56 @@ const ComposedChartHandler = ({
     const timestamps = new Set<string>()
     attributeQueries.forEach((query: any) => {
       query.data?.data?.forEach((point: any) => {
-        timestamps.add(point.period_start)
+        if (point?.period_start) {
+          timestamps.add(point.period_start)
+        }
       })
     })
+
+    const referenceLineQueries = attributeQueries.filter(
+      (_, index) => attributes[index].provider === 'reference-line'
+    )
 
     // Combine data points for each timestamp
     const combined = Array.from(timestamps)
       .sort()
       .map((timestamp) => {
         const point: any = { timestamp }
+
+        // Add regular attributes
         attributes.forEach((attr, index) => {
-          const queryData = attributeQueries[index].data?.data
+          if (!attr) return
+
+          // Handle custom value attributes (like disk size)
+          if (attr.customValue !== undefined) {
+            point[attr.attribute] = attr.customValue
+            return
+          }
+
+          // Skip reference line attributes here, we'll add them below
+          if (attr.provider === 'reference-line') return
+
+          const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
-          point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
+          let value = matchingPoint?.[attr.attribute] ?? 0
+
+          // Apply value manipulation if provided
+          if (attr.manipulateValue && typeof attr.manipulateValue === 'function') {
+            // Ensure value is a number before manipulation
+            const numericValue = typeof value === 'number' ? value : Number(value) || 0
+            value = attr.manipulateValue(numericValue)
+          }
+
+          point[attr.attribute] = value
         })
+
+        // Add reference line values for each timestamp
+        referenceLineQueries.forEach((query: any) => {
+          const attr = query.data.attribute
+          const value = query.data.total
+          point[attr] = value
+        })
+
         return point as DataPoint
       })
 
@@ -240,19 +265,14 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full', className)}
+      className={cn('relative w-full scroll-mt-16', className)}
       wrapWithLoading={false}
+      id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       <Panel.Content className="flex flex-col gap-4">
-        <div
-          className="absolute right-6 z-50 flex justify-between scroll-mt-10"
-          id={label.toLowerCase().replaceAll(' ', '-')}
-        >
-          {children}
-        </div>
+        <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
-          YAxisProps={{ width: 1 }}
           data={combinedData as DataPoint[]}
           format={format}
           xAxisKey="period_start"
@@ -270,6 +290,7 @@ const ComposedChartHandler = ({
           updateDateRange={updateDateRange}
           valuePrecision={valuePrecision}
           hideChartType={hideChartType}
+          {...otherProps}
         />
       </Panel.Content>
     </Panel>
@@ -287,11 +308,12 @@ const useAttributeQueries = (
   isVisible: boolean
 ) => {
   const infraAttributes = attributes
-    .filter((attr) => attr.provider === 'infra-monitoring')
+    .filter((attr) => attr?.provider === 'infra-monitoring')
     .map((attr) => attr.attribute as InfraMonitoringAttribute)
   const dailyStatsAttributes = attributes
-    .filter((attr) => attr.provider === 'daily-stats')
+    .filter((attr) => attr?.provider === 'daily-stats')
     .map((attr) => attr.attribute as ProjectDailyStatsAttribute)
+  const referenceLines = attributes.filter((attr) => attr?.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
     infraAttributes,
@@ -314,10 +336,28 @@ const useAttributeQueries = (
     isVisible
   )
 
-  return [...infraQueries, ...dailyStatsQueries]
+  const referenceLineQueries = referenceLines.map((line) => {
+    let value = line.value || 0
+
+    return {
+      data: {
+        data: [], // Will be populated in combinedData
+        attribute: line.attribute,
+        total: value,
+        maximum: value,
+        totalGrouped: { [line.attribute]: value },
+      },
+      isLoading: false,
+      isError: false,
+    }
+  })
+
+  return [...infraQueries, ...dailyStatsQueries, ...referenceLineQueries]
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+  if (props.hide) return null
+
   return (
     <LazyChartWrapper>
       <ComposedChartHandler {...props} />

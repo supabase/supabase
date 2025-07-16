@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { ChevronDown, Edit2, Trash, XCircle } from 'lucide-react'
+import { ChevronDown, Columns3, Edit2, Trash, XCircle } from 'lucide-react'
 import Link from 'next/link'
 
 import type { Bucket } from 'data/storage/buckets-query'
@@ -13,6 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 
@@ -46,7 +49,7 @@ const BucketRow = ({
       {/* Even though we trim whitespaces from bucket names, there may be some existing buckets with trailing whitespaces. */}
       <Link
         href={`/project/${projectRef}/storage/buckets/${encodeURIComponent(bucket.id)}`}
-        className={cn('py-1 px-3', isSelected ? 'w-[88%]' : 'w-full')}
+        className={'py-1 px-3 grow'}
       >
         <div className="flex items-center justify-between space-x-2 truncate w-full">
           <p
@@ -58,31 +61,45 @@ const BucketRow = ({
             {bucket.name}
           </p>
           {bucket.public && <Badge variant="warning">Public</Badge>}
+          {bucket.type === 'ANALYTICS' && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Columns3 className="text-foreground-lighter" size="20" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Analytics bucket</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </Link>
       {canUpdateBuckets && isSelected ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" icon={<ChevronDown />} className="mr-1 p-0.5" />
+            <Button type="text" icon={<ChevronDown />} className="mr-1 p-1.5 w-7" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuItem
-              key="toggle-private"
-              className="space-x-2"
-              onClick={() => onSelectEditBucket()}
-            >
-              <Edit2 size={14} />
-              <p>Edit bucket</p>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              key="empty-bucket"
-              className="space-x-2"
-              onClick={() => onSelectEmptyBucket()}
-            >
-              <XCircle size={14} />
-              <p>Empty bucket</p>
-            </DropdownMenuItem>
+            {bucket.type === 'ANALYTICS' && (
+              <>
+                <DropdownMenuItem
+                  key="toggle-private"
+                  className="space-x-2"
+                  onClick={() => onSelectEditBucket()}
+                >
+                  <Edit2 size={14} />
+                  <p>Edit bucket</p>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  key="empty-bucket"
+                  className="space-x-2"
+                  onClick={() => onSelectEmptyBucket()}
+                >
+                  <XCircle size={14} />
+                  <p>Empty bucket</p>
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuItem
               key="delete-bucket"
               className="space-x-2"
@@ -94,7 +111,7 @@ const BucketRow = ({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <div className="w-5" />
+        <div className="w-7 mr-1" />
       )}
     </div>
   )

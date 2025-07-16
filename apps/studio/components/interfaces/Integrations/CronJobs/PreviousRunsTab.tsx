@@ -133,15 +133,15 @@ function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
 }
 
 export const PreviousRunsTab = () => {
-  const { childId: jobName } = useParams()
+  const { childId } = useParams()
   const { project } = useProjectContext()
+
+  const jobId = Number(childId)
 
   const { data: cronJobs, isLoading: isLoadingCronJobs } = useCronJobsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const currentJobState = cronJobs?.find((job) => job.jobname === jobName)
 
   const {
     data,
@@ -153,9 +153,9 @@ export const PreviousRunsTab = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      jobId: Number(currentJobState?.jobid),
+      jobId: jobId,
     },
-    { enabled: !!currentJobState?.jobid, staleTime: 30 }
+    { enabled: !!jobId, staleTime: 30 }
   )
 
   useEffect(() => {
@@ -177,6 +177,7 @@ export const PreviousRunsTab = () => {
     [fetchNextPage, isLoadingCronJobRuns]
   )
 
+  const currentJobState = cronJobs?.find((job) => job.jobid === jobId)
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
   return (
@@ -224,7 +225,9 @@ export const PreviousRunsTab = () => {
               <p className="text-xs text-foreground-light">
                 {currentJobState?.schedule ? (
                   <>
-                    <span className="font-mono text-lg">{currentJobState.schedule}</span>
+                    <span className="font-mono text-lg">
+                      {currentJobState.schedule.toLocaleLowerCase()}
+                    </span>
                     <p>
                       {isSecondsFormat(currentJobState.schedule)
                         ? ''

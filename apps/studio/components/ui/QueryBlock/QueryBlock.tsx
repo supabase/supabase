@@ -167,9 +167,14 @@ export const QueryBlock = ({
     onSuccess: (data) => {
       onResults?.(data.result)
       setQueryResult(data.result)
+
+      setReadOnlyError(false)
+      setQueryError(undefined)
     },
     onError: (error) => {
-      if (error?.message.includes('permission denied')) {
+      const permissionDenied = error.message.includes('permission denied')
+      const notOwner = error.message.includes('must be owner')
+      if (permissionDenied || notOwner) {
         setReadOnlyError(true)
         if (showRunButtonIfNotReadOnly) setShowWarning('hasWriteOperation')
       } else {
@@ -253,7 +258,7 @@ export const QueryBlock = ({
             type="text"
             size="tiny"
             className="w-7 h-7"
-            icon={<Code size={14} />}
+            icon={<Code size={14} strokeWidth={1.5} />}
             onClick={() => setShowSql(!showSql)}
             tooltip={{
               content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
@@ -297,7 +302,7 @@ export const QueryBlock = ({
               type="text"
               size="tiny"
               className="w-7 h-7"
-              icon={<Play size={14} />}
+              icon={<Play size={14} strokeWidth={1.5} />}
               loading={isExecuting || isLoading}
               disabled={isLoading}
               onClick={() => {
@@ -419,7 +424,7 @@ export const QueryBlock = ({
                       <Cell
                         key={`cell-${index}`}
                         className="transition-all duration-100"
-                        fill="var(--chart-1)"
+                        fill="hsl(var(--chart-1))"
                         opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
                         enableBackground={12}
                       />

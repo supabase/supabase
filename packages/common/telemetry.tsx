@@ -3,11 +3,12 @@
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
+import Script from 'next/script'
 import { useCallback, useEffect, useRef } from 'react'
 import { useLatest } from 'react-use'
 import { useUser } from './auth'
 import { hasConsented } from './consent-state'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
@@ -17,17 +18,35 @@ import { getSharedTelemetryData } from './telemetry-utils'
 
 const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
 
+// Reexports GoogleTagManager with the right API key set
+export const TelemetryTagManager = () => {
+  const isGTMEnabled = Boolean(IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID)
+
+  if (!isGTMEnabled) {
+    return
+  }
+
+  return (
+    <Script
+      id="consent"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://ss.supabase.com/4icgbaujh.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','60a389s=aWQ9R1RNLVdDVlJMTU43&page=2');`,
+      }}
+    />
+  )
+}
+
 //---
 // PAGE TELEMETRY
 //---
-
 export function handlePageTelemetry(
   API_URL: string,
   pathname?: string,
   featureFlags?: {
     [key: string]: unknown
   },
-  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2Dto']
+  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2']
 ) {
   return post(
     `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
@@ -179,7 +198,7 @@ export const PageTelemetry = ({
 // EVENT TELEMETRY
 // ---
 
-type EventBody = components['schemas']['TelemetryEventBodyV2Dto']
+type EventBody = components['schemas']['TelemetryEventBodyV2']
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
   const consent = hasConsented()

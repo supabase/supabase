@@ -51,11 +51,10 @@ const getInitialState = () => {
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
       showProjectApiDocs: false,
-      showEnableBranchingModal: false,
+      showCreateBranchModal: false,
       showFeaturePreviewModal: false,
       selectedFeaturePreview: '',
       showAiSettingsModal: false,
-      showGenerateSqlModal: false,
       showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
@@ -82,11 +81,10 @@ const getInitialState = () => {
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
-    showEnableBranchingModal: false,
+    showCreateBranchModal: false,
     showFeaturePreviewModal: false,
     selectedFeaturePreview: '',
     showAiSettingsModal: false,
-    showGenerateSqlModal: false,
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
@@ -121,9 +119,22 @@ export const appState = proxy({
     appState.docsLanguage = value
   },
 
-  showEnableBranchingModal: false,
-  setShowEnableBranchingModal: (value: boolean) => {
-    appState.showEnableBranchingModal = value
+  isOptedInTelemetry: false,
+  setIsOptedInTelemetry: (value: boolean | null) => {
+    appState.isOptedInTelemetry = value === null ? false : value
+    if (typeof window !== 'undefined' && value !== null) {
+      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+    }
+  },
+
+  isMfaEnforced: false,
+  setIsMfaEnforced: (value: boolean) => {
+    appState.isMfaEnforced = value
+  },
+
+  showCreateBranchModal: false,
+  setShowCreateBranchModal: (value: boolean) => {
+    appState.showCreateBranchModal = value
   },
 
   showFeaturePreviewModal: false,
@@ -139,11 +150,6 @@ export const appState = proxy({
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
-  },
-
-  showGenerateSqlModal: false,
-  setShowGenerateSqlModal: (value: boolean) => {
-    appState.showGenerateSqlModal = value
   },
 
   showSidebar: true,
@@ -170,6 +176,10 @@ export const appState = proxy({
       ...appState.editorPanel,
       ...value,
     }
+  },
+
+  toggleEditorPanel: (value?: boolean) => {
+    appState.editorPanel.open = value ?? !appState.editorPanel.open
   },
 
   mobileMenuOpen: false,

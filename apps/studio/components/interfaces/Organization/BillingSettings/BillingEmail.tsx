@@ -91,7 +91,7 @@ const BillingEmail = () => {
   useEffect(() => {
     if (billingCustomer) {
       form.reset({
-        billingEmail: billing_email,
+        billingEmail: billing_email ?? '',
         additionalBillingEmails: billingCustomer.additional_emails ?? [],
       })
     }
