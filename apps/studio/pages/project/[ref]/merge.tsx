@@ -423,7 +423,7 @@ const MergePage: NextPageWithLayout = () => {
     }
 
     const reviewRequestedTime = dayjs(currentBranch.review_requested_at).fromNow()
-    return `Review requested ${reviewRequestedTime}`
+    return `Request opened ${reviewRequestedTime}`
   }
 
   return (
