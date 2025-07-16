@@ -65,13 +65,13 @@ export const days: BuildDay[] = [
     ],
   },
   {
-    title: '',
+    title: 'Improved Security Controls and A New Home for Security',
     description: '',
-    id: '',
-    is_shipped: false,
+    id: 'security-homepage',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/improved-security-controls',
         label: 'Blog post',
         target: '_blank',
       },
