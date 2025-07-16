@@ -71,18 +71,18 @@ const useIcebergFdwSchemasQuery = () => {
  * Returns a list of schemas that are protected by Supabase (internal schemas or schemas used by Iceberg FDWs).
  */
 export const useProtectedSchemas = ({
-  withoutSchemas = [],
-}: { withoutSchemas?: string[] } = {}) => {
-  // Stabilize the withoutSchemas array to prevent unnecessary re-computations
+  excludeSchemas = [],
+}: { excludeSchemas?: string[] } = {}) => {
+  // Stabilize the excludeSchemas array to prevent unnecessary re-computations
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stableWithoutSchemas = useMemo(() => withoutSchemas, [JSON.stringify(withoutSchemas)])
+  const stableexcludeSchemas = useMemo(() => excludeSchemas, [JSON.stringify(excludeSchemas)])
 
   const result = useIcebergFdwSchemasQuery()
 
   const schemas = useMemo(() => {
     const schemas = uniq([...INTERNAL_SCHEMAS, ...result.data])
-    return schemas.filter((schema) => !stableWithoutSchemas.includes(schema))
-  }, [result.data, stableWithoutSchemas])
+    return schemas.filter((schema) => !stableexcludeSchemas.includes(schema))
+  }, [result.data, stableexcludeSchemas])
 
   return { ...result, data: schemas }
 }
