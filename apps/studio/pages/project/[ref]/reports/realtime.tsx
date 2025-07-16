@@ -34,7 +34,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
-import { useSharedReport } from 'hooks/misc/useSharedReport'
+import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -79,7 +79,7 @@ const RealtimeUsage = () => {
     addFilter,
     removeFilters,
     isLoadingData,
-  } = useSharedReport({
+  } = useSharedAPIReport({
     filterBy: 'realtime',
     start: selectedDateRange?.period_start?.date,
     end: selectedDateRange?.period_end?.date,

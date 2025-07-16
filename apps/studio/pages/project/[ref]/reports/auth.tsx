@@ -17,11 +17,9 @@ import { getAuthReportAttributes } from 'data/reports/auth-charts'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { NextPageWithLayout } from 'types'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
-import { useRefreshSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import { useSharedReport } from 'hooks/misc/useSharedReport'
+import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 
 const AuthReport: NextPageWithLayout = () => {
@@ -44,7 +42,6 @@ export default AuthReport
 const AuthUsage = () => {
   const { ref } = useParams()
 
-  const { refetch: refetchSharedAPIReport } = useRefreshSharedAPIReport()
   const {
     selectedDateRange,
     updateDateRange,
@@ -67,7 +64,7 @@ const AuthUsage = () => {
     addFilter,
     removeFilters,
     isLoadingData,
-  } = useSharedReport({
+  } = useSharedAPIReport({
     filterBy: 'auth',
     start: selectedDateRange?.period_start?.date,
     end: selectedDateRange?.period_end?.date,

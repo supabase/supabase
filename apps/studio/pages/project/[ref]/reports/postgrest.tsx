@@ -20,7 +20,7 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
-import { useSharedReport } from 'hooks/misc/useSharedReport'
+import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 
 const PostgRESTReport: NextPageWithLayout = () => {
@@ -61,7 +61,7 @@ const PostgrestReport = () => {
     addFilter,
     removeFilters,
     isLoadingData,
-  } = useSharedReport({
+  } = useSharedAPIReport({
     filterBy: 'postgrest',
     start: selectedDateRange?.period_start?.date,
     end: selectedDateRange?.period_end?.date,
