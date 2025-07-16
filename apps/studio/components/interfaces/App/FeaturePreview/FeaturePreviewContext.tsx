@@ -1,5 +1,14 @@
 import { noop } from 'lodash'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import {
+  PropsWithChildren,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { EMPTY_OBJ } from 'lib/void'
@@ -88,4 +97,69 @@ export const useIsRealtimeSettingsEnabled = () => {
 export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+}
+
+export const useFeaturePreviewModal = () => {
+  const router = useRouter()
+
+  const featurePreviewModal = Array.isArray(router.query.featurePreviewModal)
+    ? router.query.featurePreviewModal[0]
+    : router.query.featurePreviewModal
+
+  const selectedFeatureKey = featurePreviewModal?.trim()
+  const showFeaturePreviewModal = selectedFeatureKey !== undefined
+
+  const openFeaturePreviewModal = useCallback(() => {
+    router.replace({
+      pathname: router.pathname,
+      query: { ...router.query, featurePreviewModal: '' },
+    })
+  }, [router])
+
+  const closeFeaturePreviewModal = useCallback(() => {
+    let queryWithoutFeaturePreviewModal = { ...router.query }
+    delete queryWithoutFeaturePreviewModal.featurePreviewModal
+
+    router.replace({
+      pathname: router.pathname,
+      query: queryWithoutFeaturePreviewModal,
+    })
+  }, [router])
+
+  const toggleFeaturePreviewModal = useCallback(() => {
+    if (showFeaturePreviewModal) {
+      closeFeaturePreviewModal()
+    } else {
+      openFeaturePreviewModal()
+    }
+  }, [showFeaturePreviewModal, openFeaturePreviewModal, closeFeaturePreviewModal])
+
+  const selectFeaturePreview = useCallback(
+    (featureKey: string) => {
+      router.replace({
+        pathname: router.pathname,
+        query: { ...router.query, featurePreviewModal: featureKey },
+      })
+    },
+    [router]
+  )
+
+  return useMemo(
+    () => ({
+      showFeaturePreviewModal,
+      selectedFeatureKey,
+      selectFeaturePreview,
+      openFeaturePreviewModal,
+      closeFeaturePreviewModal,
+      toggleFeaturePreviewModal,
+    }),
+    [
+      showFeaturePreviewModal,
+      selectedFeatureKey,
+      selectFeaturePreview,
+      openFeaturePreviewModal,
+      closeFeaturePreviewModal,
+      toggleFeaturePreviewModal,
+    ]
+  )
 }

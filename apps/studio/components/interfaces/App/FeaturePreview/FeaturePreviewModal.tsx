@@ -5,17 +5,16 @@ import { ReactNode } from 'react'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsRealtimeSettingsFFEnabled, useFlag } from 'hooks/ui/useFlag'
+import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { APISidePanelPreview } from './APISidePanelPreview'
+import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
-import { useFeaturePreviewContext } from './FeaturePreviewContext'
+import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { InlineEditorPreview } from './InlineEditorPreview'
 import { RealtimeSettingsPreview } from './RealtimeSettingsPreview'
-import { Branching2Preview } from './Branching2Preview'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -29,7 +28,12 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 
 const FeaturePreviewModal = () => {
   const { ref } = useParams()
-  const snap = useAppStateSnapshot()
+  const {
+    showFeaturePreviewModal,
+    selectedFeatureKey: selectedFeatureKeyFromQuery,
+    selectFeaturePreview,
+    closeFeaturePreviewModal,
+  } = useFeaturePreviewModal()
   const org = useSelectedOrganization()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
@@ -48,10 +52,9 @@ const FeaturePreviewModal = () => {
     }
   }
 
-  const selectedFeatureKey =
-    snap.selectedFeaturePreview === ''
-      ? FEATURE_PREVIEWS.filter((feature) => isReleasedToPublic(feature))[0].key
-      : snap.selectedFeaturePreview
+  const selectedFeatureKey = !selectedFeatureKeyFromQuery
+    ? FEATURE_PREVIEWS.filter((feature) => isReleasedToPublic(feature))[0].key
+    : selectedFeatureKeyFromQuery
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
@@ -70,10 +73,6 @@ const FeaturePreviewModal = () => {
     })
   }
 
-  function handleCloseFeaturePreviewModal() {
-    snap.setShowFeaturePreviewModal(false)
-  }
-
   return (
     <Modal
       hideFooter
@@ -81,8 +80,8 @@ const FeaturePreviewModal = () => {
       size="xlarge"
       className="!max-w-4xl"
       header="Dashboard feature previews"
-      visible={snap.showFeaturePreviewModal}
-      onCancel={handleCloseFeaturePreviewModal}
+      visible={showFeaturePreviewModal}
+      onCancel={closeFeaturePreviewModal}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
         <div className="flex">
@@ -96,7 +95,7 @@ const FeaturePreviewModal = () => {
                   return (
                     <div
                       key={feature.key}
-                      onClick={() => snap.setSelectedFeaturePreview(feature.key)}
+                      onClick={() => selectFeaturePreview(feature.key)}
                       className={cn(
                         'flex items-center space-x-3 p-4 border-b cursor-pointer bg transition',
                         selectedFeatureKey === feature.key ? 'bg-surface-300' : 'bg-surface-100'
