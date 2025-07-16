@@ -108,8 +108,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
-
-  const isLimited = messages.length > 4
+  const isLimited = selectedOrg?.plan.id === 'free'
 
   const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
 
