@@ -6,15 +6,13 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
-import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
+import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
 import { Loading } from 'components/ui/Loading'
-import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import useLatest from 'hooks/misc/useLatest'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
 
-const SignInMfaPage: NextPageWithLayout = () => {
+const ForgotPasswordMfa: NextPageWithLayout = () => {
   const router = useRouter()
 
   const queryClient = useQueryClient()
@@ -23,9 +21,6 @@ const SignInMfaPage: NextPageWithLayout = () => {
     method: signInMethod = 'unknown',
   } = useParams()
   const signInMethodRef = useLatest(signInMethod)
-
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const [loading, setLoading] = useState(true)
 
@@ -54,15 +49,6 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            sendEvent({
-              action: 'sign_in',
-              properties: {
-                category: 'account',
-                method: signInMethodRef.current,
-              },
-            })
-            addLoginEvent({})
-
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return
@@ -96,16 +82,13 @@ const SignInMfaPage: NextPageWithLayout = () => {
   }
 
   return (
-    <SignInLayout
-      heading="Two-factor authentication"
-      subheading="Enter the authentication code from your two-factor authentication app"
-      logoLinkToMarketingSite={true}
+    <ForgotPasswordLayout
+      heading="Complete two-factor authentication"
+      subheading="Enter the authentication code from your two-factor authentication app before changing your password"
     >
-      <div className="flex flex-col gap-5">
-        <SignInMfaForm />
-      </div>
-    </SignInLayout>
+      <SignInMfaForm />
+    </ForgotPasswordLayout>
   )
 }
 
-export default SignInMfaPage
+export default ForgotPasswordMfa

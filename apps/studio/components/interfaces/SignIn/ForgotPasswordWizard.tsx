@@ -58,7 +58,10 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
       toast.error(`Failed to verify code: ${error.message}`)
     } else {
       if (user?.factors?.length) {
-        await router.push({ pathname: '/sign-in-mfa', query: { returnTo: '/reset-password' } })
+        await router.push({
+          pathname: '/forgot-password-mfa',
+          query: { returnTo: '/reset-password' },
+        })
       } else {
         await router.push('reset-password')
       }
