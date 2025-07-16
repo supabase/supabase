@@ -5,7 +5,6 @@ import { Project } from '../projects/project-detail-query'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getReportAttributes = (org: Organization, project: Project): ReportAttributes[] => {
-  const isFreePlan = org?.plan?.id === 'free'
   const computeSize = project?.infra_compute_size || 'medium'
 
   return [
@@ -117,7 +116,7 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       valuePrecision: 0,
       availableIn: ['free', 'pro'],
       hide: false,
-      showTooltip: true,
+      showTooltip: false,
       showLegend: false,
       showMaxValue: false,
       hideChartType: false,
@@ -127,16 +126,8 @@ export const getReportAttributes = (org: Organization, project: Project): Report
         {
           attribute: 'pg_stat_database_num_backends',
           provider: 'infra-monitoring',
-          label: 'Total connections',
-          tooltip: 'Total number of client connections to the database',
-        },
-        {
-          attribute: 'max_db_connections',
-          provider: 'reference-line',
-          label: 'Max connections',
-          value: getConnectionLimits(computeSize).direct,
-          tooltip: 'Max available connections for your current compute size',
-          isMaxValue: true,
+          label: 'Database connections',
+          tooltip: 'Number of pooler connections to the database',
         },
       ],
     },
