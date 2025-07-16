@@ -1,0 +1,140 @@
+---
+title: 'Introducing Branching 2.0'
+description: 'Create, review and merge Supabase branches all within the dashboard.'
+categories:
+  - product
+  - launch-week
+tags:
+  - launch-week
+  - studio
+date: '2025-07-16:00:00'
+toc_depth: 3
+author: saxon_fletcher
+image: launch-week-15/day-3-branching-2-0/og.jpg
+thumb: launch-week-15/day-3-branching-2-0/thumb.png
+launchweek: 15
+---
+
+Branching has been a part of Supabase for some time now, a way for you to experiment or build out new features without affecting your production environment. It requires you to connect your Supabase project to a GitHub repository which automates many parts of the workflow, but this also alienates those who prefer not to use Git. Today, we are announcing Branching 2.0 which removes the Git requirement and makes it super simple to spin up new branches.
+
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/CRARnyYqrOU"
+    title="Introducing Branching 2.0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+## What is branching?
+
+A Supabase branch is essentially a copy of your Supabase project, minus the data. Rather than making risky changes to your production database, edge functions or configuration, you instead spin up a preview branch and make the changes there. This gives you a safe, isolated environment to work from. When you’re happy with your changes, you merge them back into production.
+
+## Current behavior
+
+The current implementation of branching requires a connection to a GitHub repo. For every GitHub pull request created, a corresponding Supabase branch is also created and kept in sync. Database schema/migrations, functions and configuration all stored within your repo and synced up to Supabase when your commits are pushed. For those who want to work in a local and code first way, this is an ideal workflow, however, this is not suitable for those who prefer to work in a database first or no-code way, including AI Builders.
+
+## New behavior
+
+With these new updates you can now create branches with Git, without Git, or a combination of both. This can be done directly through the dashboard, Supabase CLI, or the [Management API](https://supabase.com/docs/reference/api/introduction). Every branch is a direct copy of production, including schema, functions and configurations. You can then connect your app, make changes, and when ready to launch, you have the option to pull those changes down to your codebase or review and merge without leaving the dashboard. For those using separate Supabase projects for this, you no longer need to do so.
+
+### How it works
+
+For this walkthrough we’ll focus purely on a _Gitless_ workflow. If you are someone who prefers to work in a code-first way, you can view our more extensive [guide to branching](https://supabase.com/docs/guides/deployment/branching).
+
+#### Create a new branch.
+
+<Img
+  alt="Database components"
+  src={{
+    light: '/images/blog/launch-week-15/day-3-branching-2-0/create-branch.png',
+    dark: '/images/blog/launch-week-15/day-3-branching-2-0/create-branch.png',
+  }}
+/>
+
+Give your branch a name, optionally sync it to a GitHub branch. If your production branch has previous migrations (e.g., via CLI `db push` ) then these will be run on the new branch. If your production branch has no previous migrations (e.g., all edits have been made through the Table Editor) then a `db dump` will be performed and run as a migration.
+
+#### Make changes to the new branch
+
+<Img
+  alt="Database components"
+  src={{
+    light: '/images/blog/launch-week-15/day-3-branching-2-0/view-branches.png',
+    dark: '/images/blog/launch-week-15/day-3-branching-2-0/view-branches.png',
+  }}
+/>
+
+Use the table editor, SQL editor, connection string or any other means to make changes to your schema or functions.
+
+#### Open a merge request
+
+<Img
+  alt="Database components"
+  src={{
+    light: '/images/blog/launch-week-15/day-3-branching-2-0/view-merge-requests.png',
+    dark: '/images/blog/launch-week-15/day-3-branching-2-0/view-merge-requests.png',
+  }}
+/>
+
+<Img
+  alt="Database components"
+  src={{
+    light: '/images/blog/launch-week-15/day-3-branching-2-0/view-merge-request.png',
+    dark: '/images/blog/launch-week-15/day-3-branching-2-0/view-merge-request.png',
+  }}
+/>
+
+You, someone in your team, or the Supabase Assistant can then review the changes made via the merge page.
+
+#### Pull in latest updates from production
+
+If your branch schema or edge functions are out of date, you will first need to pull in the latest changes from production. Note that by doing this any edge function modifications will be lost but new functions will remain in place untouched.
+
+#### Merge to production
+
+<Img
+  alt="Database components"
+  src={{
+    light: '/images/blog/launch-week-15/day-3-branching-2-0/review-with-ai.png',
+    dark: '/images/blog/launch-week-15/day-3-branching-2-0/review-with-ai.png',
+  }}
+/>
+
+When ready, click the merge button and watch your changes be deployed to production. If your branch is a preview branch you can now choose to remove it or keep it open.
+
+### Current limitations
+
+There are a few limitations you should be aware of before deciding to use branching without git.
+
+- Custom roles created through the dashboard are not captured on branch creation.
+- Only public schema changes are supported right now.
+- Extensions are not included in the diff process
+- Branches can only be merged to main; merging between preview branches is not supported.
+- If your branch is out of date, you can pull in latest changes from main, but keep in mind that all functions will be overwritten.
+- Deleting functions must be done manually on main branch.
+- Migration conflicts must be manually resolved on the preview branch.
+- If you have run migrations on main, new branches will be created from existing migrations instead of a full schema dump.
+
+## When to use
+
+The following table can help you decide whether to use branching with or without git.
+
+|                       | Git                  | Without Git                 |
+| --------------------- | -------------------- | --------------------------- |
+| Isolated environment  | ✅                   | ✅                          |
+| Friction              | Low code             | No code                     |
+| Ease of use           | Extensive repo setup | One click from dashboard    |
+| Merging to production | via Pull Request     | via Merge Request           |
+| Conflict resolution   | File based           | None                        |
+| Version control       | Config as code       | Only migrations are tracked |
+
+## End state
+
+We ultimately want you to be able to work in a way that produces the highest quality software in the shortest time possible. Your workflows may change as you, your team or your product evolves, and we must allow you to move between workflows seamlessly. If you want to start building directly in the dashboard then later move everything to a codebase, you should be able to do that. If you want to spin up a branch for prototyping then later pull down changes to a local migration, that should also be possible.
+
+We aren’t quite there yet, but through the combination of our CLI and web interface, that vision is closer than ever.
+
+## Getting started
+
+We want to stress that these branching updates are in their early stages and thus behind a feature preview. Anyone can opt-in to them via the dashboard but before you do, please read through the existing limitations as it might not yet be suitable for your use case. If you do make use of branching, please reach out with feedback, we’d love to hear it.

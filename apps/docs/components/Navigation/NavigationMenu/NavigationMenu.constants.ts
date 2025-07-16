@@ -2088,6 +2088,7 @@ export const security: NavMenuConstant = {
       name: 'Product security',
       url: undefined,
       items: [
+        { name: 'Platform configuration', url: '/guides/security/platform-security' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
       ],
@@ -2170,12 +2171,8 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/multi-factor-authentication',
           items: [
             {
-              name: 'Enable MFA',
-              url: '/guides/platform/multi-factor-authentication',
-            },
-            {
-              name: 'Require MFA for organization members',
-              url: '/guides/platform/org-mfa-enforcement',
+              name: 'Enforce MFA on organization',
+              url: '/guides/platform/mfa/org-mfa-enforcement',
             },
           ],
         },
@@ -2453,7 +2450,26 @@ export const deployment: NavMenuConstant = {
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
         { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
-        { name: 'Branching', url: '/guides/deployment/branching' },
+      ],
+    },
+    {
+      name: 'Branching',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/deployment/branching' },
+        { name: 'GitHub integration', url: '/guides/deployment/branching/github-integration' },
+        {
+          name: 'Branching 2.0 (Alpha)',
+          url: '/guides/deployment/branching/branching-2',
+        },
+        {
+          name: 'Working with branches',
+          url: '/guides/deployment/branching/working-with-branches',
+        },
+        { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
+        { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
+        { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
+        { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
     },
     {

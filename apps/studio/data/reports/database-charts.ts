@@ -4,28 +4,187 @@ import { Organization } from 'types'
 import { Project } from '../projects/project-detail-query'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
-export const getReportAttributes = (isFreePlan: boolean) => [
-  { id: 'ram_usage', label: 'Memory usage', hide: false },
-  { id: 'avg_cpu_usage', label: 'Average CPU usage', hide: false },
-  { id: 'max_cpu_usage', label: 'Max CPU usage', hide: false },
-  { id: 'disk_iops_write', label: 'Disk IOps write', hide: false },
-  { id: 'disk_iops_read', label: 'Disk IOps read', hide: false },
-  {
-    id: 'pg_stat_database_num_backends',
-    label: 'Pooler to database connections',
-    hide: false,
-  },
-  {
-    id: 'supavisor_connections_active',
-    label: 'Client to Shared Pooler connections',
-    hide: false,
-  },
-  {
-    id: 'client_connections_pgbouncer',
-    label: 'Client to Dedicated Pooler connections',
-    hide: isFreePlan,
-  },
-]
+export const getReportAttributes = (org: Organization, project: Project): ReportAttributes[] => {
+  const isFreePlan = org?.plan?.id === 'free'
+  const computeSize = project?.infra_compute_size || 'medium'
+
+  return [
+    {
+      id: 'ram-usage',
+      label: 'Memory usage',
+      availableIn: ['free', 'pro'],
+      hide: false,
+      showTooltip: false,
+      showLegend: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      showMaxValue: false,
+      showGrid: false,
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      format: '%',
+      attributes: [
+        {
+          attribute: 'ram_usage',
+          provider: 'infra-monitoring',
+          label: 'Memory usage',
+          format: '%',
+          tooltip: 'RAM usage by the database',
+        },
+      ],
+    },
+    {
+      id: 'avg_cpu_usage',
+      label: 'CPU usage',
+      syncId: 'database-reports',
+      format: '%',
+      valuePrecision: 2,
+      availableIn: ['free', 'pro'],
+      hide: false,
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'avg_cpu_usage',
+          provider: 'infra-monitoring',
+          label: 'Average CPU usage',
+          format: '%',
+          tooltip: 'Average CPU usage',
+        },
+      ],
+    },
+    {
+      id: 'disk-iops',
+      label: 'Disk Input/Output operations per second (IOPS)',
+      syncId: 'database-reports',
+      availableIn: ['free', 'pro'],
+      hide: false,
+      showTooltip: true,
+      valuePrecision: 2,
+      showLegend: true,
+      hideChartType: false,
+      showGrid: true,
+      showMaxValue: false,
+      YAxisProps: {
+        width: 35,
+        tickFormatter: (value: any) => numberFormatter(value, 2),
+      },
+      defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/platform/compute-and-disk#compute-size',
+      attributes: [
+        {
+          attribute: 'disk_iops_write',
+          provider: 'infra-monitoring',
+          label: 'write IOPS',
+          tooltip:
+            'Number of write operations per second. High values indicate frequent data writes, logging, or transaction activity',
+        },
+        {
+          attribute: 'disk_iops_read',
+          provider: 'infra-monitoring',
+          label: 'read IOPS',
+          tooltip:
+            'Number of read operations per second. High values suggest frequent disk reads due to queries or poor caching',
+        },
+        {
+          attribute: 'disk_iops_max',
+          provider: 'reference-line',
+          label: 'Max IOPS',
+          value: getIOPSLimits(computeSize),
+          tooltip:
+            'Maximum IOPS (Input/Output Operations Per Second) for your current compute size',
+          isMaxValue: true,
+        },
+      ],
+    },
+    {
+      id: 'disk-io-usage',
+      label: 'Disk IO Usage',
+      syncId: 'database-reports',
+      availableIn: ['team', 'enterprise'],
+      hide: false,
+      format: '%',
+      attributes: [],
+    },
+    {
+      id: 'database-connections',
+      label: 'Database connections',
+      valuePrecision: 0,
+      availableIn: ['free', 'pro'],
+      hide: false,
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: false,
+      hideChartType: false,
+      showGrid: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'pg_stat_database_num_backends',
+          provider: 'infra-monitoring',
+          label: 'Pooler to database connections',
+          tooltip: 'Number of pooler connections to the database',
+        },
+      ],
+    },
+    {
+      id: 'supavisor-connections',
+      label: 'Shared Pooler connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      availableIn: ['free', 'pro'],
+      hide: false,
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'supavisor_connections_active',
+          provider: 'infra-monitoring',
+          label: 'Client to Shared Pooler connections',
+          tooltip: 'Active connections from clients to the shared pooler',
+        },
+      ],
+    },
+    {
+      id: 'pgbouncer-connections',
+      label: 'Dedicated Pooler connections',
+      syncId: 'database-reports',
+      valuePrecision: 0,
+      availableIn: ['pro', 'team'],
+      hide: false,
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'client_connections_pgbouncer',
+          provider: 'infra-monitoring',
+          label: 'Client to Dedicated Pooler connections',
+          tooltip: 'PgBouncer connections',
+        },
+      ],
+    },
+    {
+      id: 'disk-size',
+      label: 'Disk Usage',
+      syncId: 'database-reports',
+      availableIn: ['team', 'enterprise'],
+      hide: false,
+      attributes: [],
+    },
+  ]
+}
 
 export const getReportAttributesV2: (org: Organization, project: Project) => ReportAttributes[] = (
   org,
@@ -40,7 +199,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     {
       id: 'ram-usage',
       label: 'Memory usage',
-      availableIn: ['free', 'pro', 'team'],
+      availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -84,7 +243,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team'],
+      availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -150,7 +309,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
       syncId: 'database-reports',
-      availableIn: ['free', 'pro', 'team'],
+      availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
       valuePrecision: 2,
@@ -194,7 +353,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       id: 'disk-io-usage',
       label: 'Disk IO Usage',
       syncId: 'database-reports',
-      availableIn: ['pro', 'team'],
+      availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
       format: '%',
@@ -222,7 +381,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       id: 'client-connections',
       label: 'Database connections',
       valuePrecision: 0,
-      availableIn: ['free', 'pro', 'team'],
+      availableIn: ['team', 'enterprise'],
       hide: !isFreePlan, // [Jordi] Paid plans can see grouped client connections instead, so this chart is not needed for them. See below.
       showTooltip: true,
       showLegend: false,
@@ -252,7 +411,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       id: 'client-connections',
       label: 'Direct Database Client Connections Grouped',
       valuePrecision: 0,
-      availableIn: ['pro', 'team'],
+      availableIn: ['team', 'enterprise'],
       hide: isFreePlan, // [Jordi] Paid plans can see grouped client connections instead, so this chart is not needed for them. See above.
       showTooltip: true,
       showLegend: true,
