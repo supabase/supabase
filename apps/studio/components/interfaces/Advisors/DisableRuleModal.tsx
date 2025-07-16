@@ -63,17 +63,17 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="default">Disable lint</Button>
+        <Button type="default">Disable rule</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm to disable lint</DialogTitle>
+          <DialogTitle>Confirm to disable rule</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>
           <p className="text-sm">
-            This will silence the "{lint.title}" by hiding this lint in the Advisor reports, as well
-            omitting this lint from email notifications.
+            This will silence the "{lint.title}" by hiding this rule in the Advisor reports, as well
+            omitting this rule from email notifications.
           </p>
         </DialogSection>
         <DialogFooter>
@@ -81,7 +81,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
             Cancel
           </Button>
           <Button loading={isCreating} type="primary" onClick={onCreateRule}>
-            Disable rule
+            Disable
           </Button>
         </DialogFooter>
       </DialogContent>
