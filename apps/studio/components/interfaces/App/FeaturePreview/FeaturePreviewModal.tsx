@@ -5,7 +5,6 @@ import { ReactNode } from 'react'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { APISidePanelPreview } from './APISidePanelPreview'
@@ -30,31 +29,14 @@ const FeaturePreviewModal = () => {
   const { ref } = useParams()
   const {
     showFeaturePreviewModal,
-    selectedFeatureKey: selectedFeatureKeyFromQuery,
+    selectedFeatureKey,
     selectFeaturePreview,
     closeFeaturePreviewModal,
+    isFeaturePreviewReleasedToPublic,
   } = useFeaturePreviewModal()
   const org = useSelectedOrganization()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
-  const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
-  const gitlessBranchingEnabled = useFlag('gitlessBranching')
-
-  // [Joshen] Use this if we want to feature flag previews
-  function isReleasedToPublic(feature: (typeof FEATURE_PREVIEWS)[number]) {
-    switch (feature.key) {
-      case 'supabase-ui-realtime-settings':
-        return isRealtimeSettingsEnabled
-      case 'supabase-ui-branching-2-0':
-        return gitlessBranchingEnabled
-      default:
-        return true
-    }
-  }
-
-  const selectedFeatureKey = !selectedFeatureKeyFromQuery
-    ? FEATURE_PREVIEWS.filter((feature) => isReleasedToPublic(feature))[0].key
-    : selectedFeatureKeyFromQuery
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const selectedFeature =
@@ -89,7 +71,7 @@ const FeaturePreviewModal = () => {
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
               {allFeaturePreviews
-                .filter((feature) => isReleasedToPublic(feature))
+                .filter((feature) => isFeaturePreviewReleasedToPublic(feature))
                 .map((feature) => {
                   const isEnabled = flags[feature.key] ?? false
 

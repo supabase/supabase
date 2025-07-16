@@ -13,6 +13,7 @@ import {
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
+import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -101,20 +102,41 @@ export const useIsBranching2Enabled = () => {
 
 export const useFeaturePreviewModal = () => {
   const router = useRouter()
+  const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
+  const gitlessBranchingEnabled = useFlag('gitlessBranching')
 
   const featurePreviewModal = Array.isArray(router.query.featurePreviewModal)
     ? router.query.featurePreviewModal[0]
     : router.query.featurePreviewModal
 
-  const selectedFeatureKey = featurePreviewModal?.trim()
-  const showFeaturePreviewModal = selectedFeatureKey !== undefined
+  const selectedFeatureKeyFromQuery = featurePreviewModal?.trim()
+  const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== undefined
+
+  // [Joshen] Use this if we want to feature flag previews
+  const isFeaturePreviewReleasedToPublic = useCallback(
+    (feature: (typeof FEATURE_PREVIEWS)[number]) => {
+      switch (feature.key) {
+        case 'supabase-ui-realtime-settings':
+          return isRealtimeSettingsEnabled
+        case 'supabase-ui-branching-2-0':
+          return gitlessBranchingEnabled
+        default:
+          return true
+      }
+    },
+    [isRealtimeSettingsEnabled, gitlessBranchingEnabled]
+  )
+
+  const selectedFeatureKey = !selectedFeatureKeyFromQuery
+    ? FEATURE_PREVIEWS.filter((feature) => isFeaturePreviewReleasedToPublic(feature))[0].key
+    : selectedFeatureKeyFromQuery
 
   const openFeaturePreviewModal = useCallback(() => {
     router.replace({
       pathname: router.pathname,
-      query: { ...router.query, featurePreviewModal: '' },
+      query: { ...router.query, featurePreviewModal: selectedFeatureKey },
     })
-  }, [router])
+  }, [router, selectedFeatureKey])
 
   const closeFeaturePreviewModal = useCallback(() => {
     let queryWithoutFeaturePreviewModal = { ...router.query }
@@ -152,6 +174,7 @@ export const useFeaturePreviewModal = () => {
       openFeaturePreviewModal,
       closeFeaturePreviewModal,
       toggleFeaturePreviewModal,
+      isFeaturePreviewReleasedToPublic,
     }),
     [
       showFeaturePreviewModal,
@@ -160,6 +183,7 @@ export const useFeaturePreviewModal = () => {
       openFeaturePreviewModal,
       closeFeaturePreviewModal,
       toggleFeaturePreviewModal,
+      isFeaturePreviewReleasedToPublic,
     ]
   )
 }
