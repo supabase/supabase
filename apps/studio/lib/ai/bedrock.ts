@@ -50,23 +50,22 @@ export const regionPrefixMap: Record<BedrockRegion, string> = {
   euc1: 'eu',
 }
 
-export enum BedrockModel {
-  SONNET = 'anthropic.claude-3-7-sonnet-20250219-v1:0',
-  HAIKU = 'anthropic.claude-3-haiku-20240307-v1:0',
-}
+export type BedrockModel =
+  | 'anthropic.claude-3-7-sonnet-20250219-v1:0'
+  | 'anthropic.claude-3-5-haiku-20241022-v1:0'
 
 /**
  * Weights for distributing requests across Bedrock regions.
  * Weights are proportional to our rate limits per model per region.
  */
 const modelPerRegionRequestWeights: Record<BedrockModel, Record<BedrockRegion, number>> = {
-  [BedrockModel.SONNET]: {
+  ['anthropic.claude-3-7-sonnet-20250219-v1:0']: {
     use1: 20,
     use2: 10,
     usw2: 10,
     euc1: 10,
   },
-  [BedrockModel.HAIKU]: {
+  ['anthropic.claude-3-5-haiku-20241022-v1:0']: {
     use1: 40,
     use2: 6,
     usw2: 40,
@@ -99,14 +98,17 @@ export async function selectBedrockRegion(routingKey: string, model: BedrockMode
     (sum, region) => sum + modelPerRegionRequestWeights[model][region],
     0
   )
+
   let cumulativeWeight = 0
   const targetWeight = hashInt % totalWeight
+
   for (const region of regions) {
     cumulativeWeight += modelPerRegionRequestWeights[model][region]
     if (cumulativeWeight > targetWeight) {
       return region
     }
   }
+
   return regions[0]
 }
 

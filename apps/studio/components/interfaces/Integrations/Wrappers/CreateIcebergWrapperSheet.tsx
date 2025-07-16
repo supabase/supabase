@@ -8,6 +8,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import {
   Button,
   Form,
@@ -24,6 +25,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CreateWrapperSheetProps } from './CreateWrapperSheet'
 import InputField from './InputField'
 import { makeValidateRequired } from './Wrappers.utils'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'create-wrapper-form'
 
@@ -63,6 +65,8 @@ export const CreateIcebergWrapperSheet = ({
   onClose,
 }: CreateWrapperSheetProps) => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
   const [selectedTarget, setSelectedTarget] = useState<Target>('S3Tables')
@@ -130,6 +134,17 @@ export const CreateIcebergWrapperSheet = ({
       tables: [],
       sourceSchema: values.source_schema,
       targetSchema: values.target_schema,
+    })
+
+    sendEvent({
+      action: 'foreign_data_wrapper_created',
+      properties: {
+        wrapperType: wrapperMeta.label,
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
   }
 

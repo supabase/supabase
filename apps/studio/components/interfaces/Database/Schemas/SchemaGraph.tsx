@@ -226,14 +226,6 @@ export const SchemaGraph = () => {
               >
                 Copy as SQL
               </ButtonTooltip>
-              <ButtonTooltip
-                type="default"
-                loading={isDownloading}
-                className="px-1.5"
-                icon={<Download />}
-                onClick={() => downloadImage('png')}
-                tooltip={{ content: { side: 'bottom', text: 'Download current view as PNG' } }}
-              />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <ButtonTooltip
