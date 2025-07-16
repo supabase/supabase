@@ -12,8 +12,9 @@ export const AdvisorRulesPreview = () => {
   return (
     <div>
       <p className="text-sm text-foreground-light mb-4">
-        Disable specific Advisor categories or lints by specifying rules to ignore them. This could
-        be useful for lints that might not be applicable to your project.
+        Disable specific Advisor categories or rules to prevent them from showing up in Advisor
+        reports or email notifications. This could be useful for rules that might not be applicable
+        to your project.
       </p>
       <Image
         src={`${BASE_PATH}/img/previews/advisor-rule-preview.png`}
@@ -26,7 +27,7 @@ export const AdvisorRulesPreview = () => {
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
-            Allow you to configure advisor rules for your project from the{' '}
+            Allow you to disable advisor rules for your project from the{' '}
             <InlineLink
               href={
                 isRealtimeSettingsEnabled
