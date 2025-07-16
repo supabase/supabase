@@ -111,8 +111,9 @@ export const getReportAttributes = (org: Organization, project: Project): Report
       attributes: [],
     },
     {
-      id: 'database-connections',
-      label: 'Database connections',
+      id: 'pooler-database-connections',
+      label: 'Pooler to Database connections',
+      syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['free', 'pro'],
       hide: false,
@@ -388,6 +389,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     {
       id: 'client-connections',
       label: 'Database Connections',
+      syncId: 'database-reports',
       valuePrecision: 0,
       availableIn: ['team', 'enterprise'],
       hide: false,
@@ -536,7 +538,6 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
           tooltip:
             'Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database',
         },
-
         {
           attribute: 'pg_database_size',
           provider: 'infra-monitoring',
