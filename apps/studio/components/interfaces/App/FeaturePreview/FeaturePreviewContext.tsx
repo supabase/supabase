@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { useRouter } from 'next/router'
+import { useQueryState } from 'nuqs'
 import {
   PropsWithChildren,
   createContext,
@@ -11,9 +11,9 @@ import {
 } from 'react'
 
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
+import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
-import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -101,16 +101,12 @@ export const useIsBranching2Enabled = () => {
 }
 
 export const useFeaturePreviewModal = () => {
-  const router = useRouter()
+  const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
   const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
 
-  const featurePreviewModal = Array.isArray(router.query.featurePreviewModal)
-    ? router.query.featurePreviewModal[0]
-    : router.query.featurePreviewModal
-
-  const selectedFeatureKeyFromQuery = featurePreviewModal?.trim()
-  const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== undefined
+  const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
+  const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
 
   // [Joshen] Use this if we want to feature flag previews
   const isFeaturePreviewReleasedToPublic = useCallback(
@@ -131,22 +127,20 @@ export const useFeaturePreviewModal = () => {
     ? FEATURE_PREVIEWS.filter((feature) => isFeaturePreviewReleasedToPublic(feature))[0].key
     : selectedFeatureKeyFromQuery
 
+  const selectFeaturePreview = useCallback(
+    (featureKey: string) => {
+      setFeaturePreviewModal(featureKey)
+    },
+    [setFeaturePreviewModal]
+  )
+
   const openFeaturePreviewModal = useCallback(() => {
-    router.replace({
-      pathname: router.pathname,
-      query: { ...router.query, featurePreviewModal: selectedFeatureKey },
-    })
-  }, [router, selectedFeatureKey])
+    selectFeaturePreview(selectedFeatureKey)
+  }, [selectFeaturePreview, selectedFeatureKey])
 
   const closeFeaturePreviewModal = useCallback(() => {
-    let queryWithoutFeaturePreviewModal = { ...router.query }
-    delete queryWithoutFeaturePreviewModal.featurePreviewModal
-
-    router.replace({
-      pathname: router.pathname,
-      query: queryWithoutFeaturePreviewModal,
-    })
-  }, [router])
+    setFeaturePreviewModal(null)
+  }, [setFeaturePreviewModal])
 
   const toggleFeaturePreviewModal = useCallback(() => {
     if (showFeaturePreviewModal) {
@@ -155,16 +149,6 @@ export const useFeaturePreviewModal = () => {
       openFeaturePreviewModal()
     }
   }, [showFeaturePreviewModal, openFeaturePreviewModal, closeFeaturePreviewModal])
-
-  const selectFeaturePreview = useCallback(
-    (featureKey: string) => {
-      router.replace({
-        pathname: router.pathname,
-        query: { ...router.query, featurePreviewModal: featureKey },
-      })
-    },
-    [router]
-  )
 
   return useMemo(
     () => ({
