@@ -13,7 +13,8 @@ The [Model Context Protocol](https://modelcontextprotocol.io/introduction) (MCP)
 - [Visual Studio Code](#visual-studio-code-copilot) (Copilot)
 - [Cline](#cline) (VS Code extension)
 - [Claude desktop](#claude-desktop)
-- [Claude code](#claude-code)
+- [Claude Code](#claude-code)
+- [Zed](#zed)
 - [Amp](#amp)
 
 Once connected, your AI assistants can interact with and query your Supabase projects on your behalf.
@@ -100,7 +101,7 @@ For more info on using MCP in VS Code, see the [Copilot documentation](https://c
 
 1. From the new chat screen, you should see a hammer (MCP) icon appear with the new MCP server available.
 
-### Claude code
+### Claude Code
 
 You can add the Supabase MCP server to Claude Code in two ways:
 
@@ -109,11 +110,11 @@ You can add the Supabase MCP server to Claude Code in two ways:
 1. Create a `.mcp.json` file in your project root if it doesn't exist.
 1. Add the following configuration:
 
-   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude code" }} />
+   <$Partial path="mcp_supabase_config.mdx" variables={{ "app": "Claude Code" }} />
 
 1. Save the configuration file.
 
-1. Restart [Claude code](https://claude.ai/code) to apply the new configuration.
+1. Restart [Claude Code](https://claude.ai/code) to apply the new configuration.
 
 #### Option 2: Locally-scoped server (via CLI command)
 
@@ -126,6 +127,16 @@ You can also add the Supabase MCP server as a locally-scoped server, which will 
    ```
 
 Locally-scoped servers take precedence over project-scoped servers with the same name and are stored in your project-specific user settings.
+
+### Zed
+
+1. Open [the Zed editor](https://zed.dev) and navigate to the Extensions page with the following keybinding `cmd-shift-x`/`ctrl-shift-x`.
+
+1. Search for the Supabase MCP extension and install it.
+
+1. Add your `supabase_access_token` in the configuration modal.
+
+You can also install the MCP "directly" in Zed by adding the same JSON snippet in the `settings.json` that you would for any VS Code and forks.
 
 ### Amp
 
