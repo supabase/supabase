@@ -7,8 +7,6 @@ import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 export const getReportAttributes = (org: Organization, project: Project): ReportAttributes[] => {
   const isFreePlan = org?.plan?.id === 'free'
   const computeSize = project?.infra_compute_size || 'medium'
-  // const isSpendCapEnabled =
-  //   org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
 
   return [
     {
