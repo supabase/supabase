@@ -7,8 +7,8 @@
       <language>en</language>
       <lastBuildDate>Wed, 16 Jul 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
-<item>
-<guid>https://supabase.com/blog/improved-security-controls</guid>
+      <item>
+  <guid>https://supabase.com/blog/improved-security-controls</guid>
   <title>Improved Security Controls and A New Home for Security</title>
   <link>https://supabase.com/blog/improved-security-controls</link>
   <description>Access to a new central security page and launch of additional controls.</description>
