@@ -41,11 +41,7 @@ export const filterFields = [
     value: 'status',
     type: 'checkbox',
     defaultOpen: true,
-    options: [
-      { label: '2xx', value: 200 },
-      { label: '4xx', value: 400 },
-      { label: '4xx', value: 500 },
-    ], // REMINDER: this is a placeholder to set the type in the client.tsx
+    options: [],
     component: (props: Option) => {
       if (typeof props.value === 'boolean') return null
       if (typeof props.value === 'undefined') return null
@@ -55,7 +51,6 @@ export const filterFields = [
 
       // Convert string status codes to numbers for HTTP status styling
       const statusCode = typeof props.value === 'string' ? parseInt(props.value, 10) : props.value
-      const isHttpStatus = !isNaN(statusCode) && statusCode >= 100 && statusCode < 600
 
       return (
         <div className="flex items-center gap-2 w-full min-w-0">

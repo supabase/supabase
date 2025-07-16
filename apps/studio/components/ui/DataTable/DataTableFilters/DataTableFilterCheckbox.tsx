@@ -1,79 +1,41 @@
-import { Loader2, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
-import { useUnifiedLogsFacetCountQuery } from 'data/logs/unified-logs-facet-count-query'
 import { Checkbox_Shadcn_ as Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
+import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 
 export function DataTableFilterCheckbox<TData>({
   value: _value,
   options,
   component,
-  hasAsyncSearch,
 }: DataTableCheckboxFilterField<TData>) {
   const value = _value as string
   const [inputValue, setInputValue] = useState('')
-  const { table, searchParameters, columnFilters, isLoadingCounts, getFacetedUniqueValues } =
+  const { table, columnFilters, isLoading, isLoadingCounts, getFacetedUniqueValues } =
     useDataTable()
 
-  // [Joshen] JFYI for simplicity currently, i'm adding UnifiedLogs logic into this file
-  // despite this supposedly being a reusable component - tbh really, this doesn't need to
-  // be reusable perhaps unless we plan for this to be used in another area of the dashboard
-  // but its too early to say for sure atm.
-  const { ref: projectRef } = useParams()
-  const debouncedSearch = useDebounce(inputValue, 1000)
-  const { data = [], isFetching: isFetchingFacetCount } = useUnifiedLogsFacetCountQuery(
-    {
-      projectRef,
-      search: searchParameters,
-      facet: value,
-      facetSearch: debouncedSearch,
-    },
-    {
-      keepPreviousData: true,
-      enabled: hasAsyncSearch && debouncedSearch.length > 0,
-      initialData: debouncedSearch.length === 0 ? options : undefined,
-    }
-  )
-
-  if (value === 'pathname') console.log({ options, data, isFetchingFacetCount })
-
   const column = table.getColumn(value)
+  // REMINDER: avoid using column?.getFilterValue()
   const filterValue = columnFilters.find((i) => i.id === value)?.value
   const facetedValue = getFacetedUniqueValues?.(table, value) || column?.getFacetedUniqueValues()
 
   const Component = component
 
   // filter out the options based on the input value
-  const filterOptions = hasAsyncSearch
-    ? debouncedSearch.length === 0 || (data.length === 0 && isFetchingFacetCount)
-      ? options || []
-      : data
-    : options?.filter(
-        (option) =>
-          inputValue === '' || option.label.toLowerCase().includes(inputValue.toLowerCase())
-      ) || []
+  const filterOptions =
+    options?.filter(
+      (option) => inputValue === '' || option.label.toLowerCase().includes(inputValue.toLowerCase())
+    ) || []
 
   // CHECK: it could be filterValue or searchValue
   const filters = filterValue ? (Array.isArray(filterValue) ? filterValue : [filterValue]) : []
 
   // REMINDER: if no options are defined, while fetching data, we should show a skeleton
-  if (isLoadingCounts && !filterOptions?.length)
-    return (
-      <div className="grid divide-y rounded border border-border">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="flex items-center justify-between gap-2 px-2 py-2.5">
-            <Skeleton className="h-4 w-4 rounded-sm" />
-            <Skeleton className="h-4 w-full rounded-sm" />
-          </div>
-        ))}
-      </div>
-    )
+  if (isLoading && !filterOptions?.length) return <DataTableFilterCheckboxLoader />
 
   // Show empty state when no original options are available (not due to search filtering)
   if (!options?.length)
@@ -93,25 +55,21 @@ export function DataTableFilterCheckbox<TData>({
 
   return (
     <div className="grid gap-2">
-      {hasAsyncSearch || (options && options.length > 4) ? (
+      {options && options.length > 4 ? (
         <InputWithAddons
           placeholder="Search"
           leading={<Search size={14} className="text-foreground-lighter" />}
           containerClassName="h-8 rounded"
           value={inputValue}
-          trailing={
-            isFetchingFacetCount ? <Loader2 size={12} className="animate-spin" /> : undefined
-          }
           onChange={(e) => setInputValue(e.target.value)}
         />
       ) : null}
-
       {/* FIXME: due to the added max-h and overflow-y-auto, the hover state and border is laying on top of the scroll bar */}
       <div className="max-h-[200px] overflow-y-auto rounded border border-border empty:border-none">
         {filterOptions.length === 0 && inputValue !== '' ? (
           <div className="flex items-center justify-center px-2 py-4 text-center">
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">No results found</p>
+            <div className="space-y-0.5">
+              <p className="text-xs text-muted-foreground">No results found</p>
               <p className="text-xs text-muted-foreground/70">Try a different search term</p>
             </div>
           </div>
