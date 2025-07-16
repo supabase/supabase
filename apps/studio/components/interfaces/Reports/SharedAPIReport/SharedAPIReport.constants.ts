@@ -329,7 +329,7 @@ export const useSharedAPIReport = ({
     error,
     isLoading,
     isLoadingData,
-    isRefreshing: queryClient.isFetching({ queryKey: DEFAULT_KEYS }) > 0 || false,
+    isRefetching: queryClient.isFetching({ queryKey: DEFAULT_KEYS }) > 0 || false,
     refetch: () => queryClient.invalidateQueries({ queryKey: DEFAULT_KEYS }),
     filters,
     addFilter,
