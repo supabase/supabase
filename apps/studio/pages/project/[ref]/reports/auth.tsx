@@ -19,8 +19,10 @@ import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Re
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { NextPageWithLayout } from 'types'
-import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
-import { useRefreshSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport.constants'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useRefreshSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
+import { useSharedReport } from 'hooks/misc/useSharedReport'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -55,6 +57,22 @@ const AuthUsage = () => {
     handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
 
+  const {
+    data,
+    error,
+    isLoading,
+    refetch,
+    isRefetching,
+    filters,
+    addFilter,
+    removeFilters,
+    isLoadingData,
+  } = useSharedReport({
+    filterBy: 'auth',
+    start: selectedDateRange?.period_start?.date,
+    end: selectedDateRange?.period_end?.date,
+  })
+
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
 
@@ -77,7 +95,7 @@ const AuthUsage = () => {
         ])
       })
     })
-    refetchSharedAPIReport()
+    refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
@@ -137,11 +155,25 @@ const AuthUsage = () => {
               orgPlanId={orgPlan?.id}
             />
           ))}
-        <div className="relative pt-8 mt-8 border-t">
+        <div>
+          <div className="mb-4">
+            <h5 className="text-foreground mb-2">Auth API Gateway</h5>
+            <ReportFilterBar
+              filters={filters}
+              onAddFilter={addFilter}
+              onRemoveFilters={removeFilters}
+              isLoading={isLoadingData || isRefetching}
+              hideDatepicker={true}
+              datepickerHelpers={datePickerHelpers}
+              selectedProduct={'realtime'}
+              showDatabaseSelector={false}
+            />
+          </div>
           <SharedAPIReport
-            filterBy="auth"
-            start={selectedDateRange?.period_start?.date}
-            end={selectedDateRange?.period_end?.date}
+            data={data}
+            error={error}
+            isLoading={isLoading}
+            isRefetching={isRefetching}
           />
         </div>
       </ReportStickyNav>

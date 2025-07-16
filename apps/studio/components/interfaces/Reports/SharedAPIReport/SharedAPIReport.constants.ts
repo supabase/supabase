@@ -1,6 +1,6 @@
 import { get } from 'data/fetchers'
-import { generateRegexpWhere } from './Reports.constants'
-import { ReportFilterItem } from './Reports.types'
+import { generateRegexpWhere } from '../Reports.constants'
+import { ReportFilterItem } from '../Reports.types'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import * as Sentry from '@sentry/nextjs'
 

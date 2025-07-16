@@ -1,74 +1,33 @@
-import ReportWidget from './ReportWidget'
+import ReportWidget from '../ReportWidget'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
-} from './renderers/ApiRenderers'
-import { SharedAPIReportKey, useSharedAPIReport } from './SharedAPIReport.constants'
-import { useParams } from 'common'
+} from '../renderers/ApiRenderers'
+import { SharedAPIReportKey } from './SharedAPIReport.constants'
 
-type SharedAPIReportFilterBy =
-  | 'auth'
-  | 'realtime'
-  | 'storage'
-  | 'graphql'
-  | 'functions'
-  | 'postgrest'
-export function SharedAPIReport({
-  filterBy,
-  start,
-  end,
-  hiddenReports = [],
-}: {
-  filterBy: SharedAPIReportFilterBy
-  start: string
-  end: string
+type SharedAPIReportWidgetsProps = {
+  data: any
+  error: any
+  isLoading: any
+  isRefetching: boolean
   hiddenReports?: SharedAPIReportKey[]
-}) {
-  const { ref } = useParams() as { ref: string }
+}
 
-  // [Jordi] Source to fetch the data from
-  const filterByMapSource: Record<SharedAPIReportFilterBy, string> = {
-    functions: 'function_edge_logs',
-    realtime: 'edge_logs',
-    storage: 'edge_logs',
-    graphql: 'edge_logs',
-    postgrest: 'edge_logs',
-    auth: 'edge_logs',
-  }
-
-  // [Jordi] Value to match in the request.path
-  const filterByMapValue: Record<SharedAPIReportFilterBy, string> = {
-    functions: '/functions',
-    realtime: '/realtime',
-    storage: '/storage',
-    graphql: '/graphql',
-    postgrest: '/rest',
-    auth: '/auth',
-  }
-
-  const { data, error, isLoading, isRefreshing } = useSharedAPIReport({
-    src: filterByMapSource[filterBy],
-    filters: [
-      {
-        key: 'request.path',
-        value: filterByMapValue[filterBy],
-        compare: 'matches',
-      },
-    ],
-    start,
-    end,
-    projectRef: ref,
-    enabled: !!ref && !!filterBy,
-  })
-
+export function SharedAPIReport({
+  data,
+  error,
+  isLoading,
+  isRefetching,
+  hiddenReports = [],
+}: SharedAPIReportWidgetsProps) {
   return (
     <div className="grid grid-cols-1 gap-4">
       {!hiddenReports.includes('totalRequests') && (
         <ReportWidget
-          isLoading={isLoading.totalRequests || isRefreshing}
+          isLoading={isLoading.totalRequests || isRefetching}
           title="Total Requests"
           data={data.totalRequests || []}
           error={error.totalRequests}
@@ -79,7 +38,7 @@ export function SharedAPIReport({
       )}
       {!hiddenReports.includes('errorCounts') && (
         <ReportWidget
-          isLoading={isLoading.errorCounts || isRefreshing}
+          isLoading={isLoading.errorCounts || isRefetching}
           title="Response Errors"
           tooltip="Error responses with 4XX or 5XX status codes"
           data={data.errorCounts || []}
@@ -93,7 +52,7 @@ export function SharedAPIReport({
       )}
       {!hiddenReports.includes('responseSpeed') && (
         <ReportWidget
-          isLoading={isLoading.responseSpeed || isRefreshing}
+          isLoading={isLoading.responseSpeed || isRefetching}
           title="Response Speed"
           tooltip="Average response speed of a request (in ms)"
           data={data.responseSpeed || []}
@@ -105,7 +64,7 @@ export function SharedAPIReport({
       )}
       {!hiddenReports.includes('networkTraffic') && (
         <ReportWidget
-          isLoading={isLoading.networkTraffic || isRefreshing}
+          isLoading={isLoading.networkTraffic || isRefetching}
           error={error.networkTraffic}
           title="Network Traffic"
           tooltip="Ingress and egress of requests and responses respectively"

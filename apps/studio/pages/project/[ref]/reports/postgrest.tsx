@@ -19,8 +19,9 @@ import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
-import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
-import { useRefreshSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport.constants'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedReport } from 'hooks/misc/useSharedReport'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 
 const PostgRESTReport: NextPageWithLayout = () => {
   return (
@@ -41,20 +42,32 @@ export default PostgRESTReport
 
 const PostgrestReport = () => {
   const { db, chart } = useParams()
-  const { refetch, isRefetching } = useRefreshSharedAPIReport()
-
-  const state = useDatabaseSelectorStateSnapshot()
   const {
     selectedDateRange,
-    updateDateRange: updateDateRangeFromHook,
     datePickerValue,
     datePickerHelpers,
     showUpgradePrompt,
     setShowUpgradePrompt,
     handleDatePickerChange: handleDatePickerChangeFromHook,
-    isOrgPlanLoading,
-    orgPlan,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const {
+    data,
+    error,
+    isLoading,
+    refetch,
+    isRefetching,
+    filters,
+    addFilter,
+    removeFilters,
+    isLoadingData,
+  } = useSharedReport({
+    filterBy: 'postgrest',
+    start: selectedDateRange?.period_start?.date,
+    end: selectedDateRange?.period_end?.date,
+  })
+
+  const state = useDatabaseSelectorStateSnapshot()
 
   // [Joshen] Empty dependency array as we only want this running once
   useEffect(() => {
@@ -83,16 +96,16 @@ const PostgrestReport = () => {
       <ReportHeader showDatabaseSelector={false} title="PostgREST" />
       <ReportStickyNav
         content={
-          <>
-            <ButtonTooltip
-              type="default"
-              disabled={isRefetching}
-              icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={refetch}
-            />
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <ButtonTooltip
+                type="default"
+                disabled={isRefetching}
+                icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                className="w-7"
+                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+                onClick={() => refetch()}
+              />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -119,14 +132,25 @@ const PostgrestReport = () => {
                 </div>
               )}
             </div>
-          </>
+            <ReportFilterBar
+              filters={filters}
+              onAddFilter={addFilter}
+              onRemoveFilters={removeFilters}
+              isLoading={isLoadingData || isRefetching}
+              hideDatepicker={true}
+              datepickerHelpers={datePickerHelpers}
+              selectedProduct={'postgrest'}
+              showDatabaseSelector={false}
+            />
+          </div>
         }
       >
         <div className="relative mt-8">
           <SharedAPIReport
-            filterBy="postgrest"
-            start={selectedDateRange?.period_start?.date}
-            end={selectedDateRange?.period_end?.date}
+            data={data}
+            error={error}
+            isLoading={isLoading}
+            isRefetching={isRefetching}
           />
         </div>
       </ReportStickyNav>
