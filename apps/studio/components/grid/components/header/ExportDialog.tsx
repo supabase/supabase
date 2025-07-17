@@ -68,7 +68,8 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.
 
         <DialogSection className="flex flex-col gap-y-4">
           <p className="text-sm">
-            We highly recommend using the CLI to export your table data, in particular if your table
+            We highly recommend using the CLI to export your table data via{' '}
+            <code>{selectedTab === 'csv' ? 'psql' : 'pg_dump'}</code>, in particular if your table
             is relatively large. This can be done via the following command that you can run in your
             terminal:
           </p>
@@ -106,7 +107,17 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.
             will be saved in the current directory that your terminal is in.
           </p>
 
-          <Admonition type="note" title="You may need to upgrade your version of pg_dump" />
+          {selectedTab === 'sql' && (
+            <Admonition
+              type="note"
+              title="The pg_dump version needs to match your Postgres version"
+            >
+              <p className="!leading-normal">
+                If you run into a server version mismatch error, you will need to update{' '}
+                <code>pg_dump</code> before running the command.
+              </p>
+            </Admonition>
+          )}
         </DialogSection>
         <DialogFooter>
           <Button type="default" onClick={() => onOpenChange(false)}>
