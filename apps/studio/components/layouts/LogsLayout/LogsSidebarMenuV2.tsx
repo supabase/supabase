@@ -91,7 +91,7 @@ export function LogsSidebarMenuV2() {
   const { ref } = useParams() as { ref: string }
 
   const warehouseEnabled = useFlag('warehouse')
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
   const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
@@ -114,6 +114,11 @@ export function LogsSidebarMenuV2() {
 
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+
+  const isUnifiedLogsPreviewAvailable =
+    unifiedLogsFlagEnabled &&
+    !isOrgPlanLoading &&
+    ['team', 'enterprise'].includes(orgPlan?.id ?? '')
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
