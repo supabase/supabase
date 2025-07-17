@@ -241,18 +241,12 @@ const getEdgeLogsQuery = () => {
       edge_logs_request.path as pathname,
       null as event_message,
       edge_logs_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    left join unnest(edge_logs_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
 
     -- ONLY include logs where the path does not include /rest/
     WHERE edge_logs_request.path NOT LIKE '%/rest/%'
@@ -280,18 +274,12 @@ const getPostgrestLogsQuery = () => {
       edge_logs_request.path as pathname,
       null as event_message,
       edge_logs_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    left join unnest(edge_logs_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
 
     -- ONLY include logs where the path includes /rest/
     WHERE edge_logs_request.path LIKE '%/rest/%'
@@ -318,8 +306,6 @@ const getPostgresLogsQuery = () => {
       null as pathname,
       event_message as event_message,
       null as method,
-      'api_role' as api_role,
-      null as auth_user,
       null as log_count,
       null as logs
     from postgres_logs as pgl
@@ -347,18 +333,12 @@ const getEdgeFunctionLogsQuery = () => {
       fel_request.pathname as pathname,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       function_logs_agg.function_log_count as log_count,
       function_logs_agg.logs as logs
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
     cross join unnest(fel_metadata.request) as fel_request
-    left join unnest(fel_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
     left join (
     SELECT
         fl_metadata.execution_id,
@@ -392,8 +372,6 @@ const getAuthLogsQuery = () => {
       el_in_al_request.path as pathname,
       null as event_message,
       el_in_al_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
     from auth_logs as al
@@ -404,10 +382,6 @@ const getAuthLogsQuery = () => {
         cross join unnest (el_in_al_metadata.response) as el_in_al_response 
         cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
         cross join unnest (el_in_al_metadata.request) as el_in_al_request
-        left join unnest(el_in_al_request.sb) as sb
-        left join unnest(sb.jwt) as jwt
-        left join unnest(jwt.authorization) as auth
-        left join unnest(auth.payload) as authorization_payload
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
     WHERE al_metadata.request_id is not null
@@ -433,18 +407,12 @@ const getSupabaseStorageLogsQuery = () => {
       edge_logs_request.path as pathname,
       null as event_message,
       edge_logs_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    left join unnest(edge_logs_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
     -- ONLY include logs where the path includes /storage/
     WHERE edge_logs_request.path LIKE '%/storage/%'
   `
@@ -488,8 +456,6 @@ SELECT
     pathname,
     event_message,
     method,
-    api_role,
-    auth_user,
     log_count,
     logs
 FROM unified_logs
