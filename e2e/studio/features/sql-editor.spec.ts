@@ -150,9 +150,6 @@ test.describe('SQL Editor', () => {
     const runButton = page.getByTestId('sql-run-button')
     await page.getByRole('button', { name: 'Favorites' }).click()
     await page.getByRole('button', { name: 'Shared' }).click()
-    // remove all favourite and shared snippets
-    // await removeFavouriteSnippets()
-    // await removeSharedSnippets()
 
     // write some sql in the editor
     await page.getByTestId('sql-editor-new-query-button').click()
