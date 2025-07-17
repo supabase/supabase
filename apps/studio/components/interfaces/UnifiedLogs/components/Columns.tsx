@@ -193,8 +193,8 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       },
       enableResizing: true,
       enableSorting: false,
-      size: 400,
-      minSize: 400,
+      size: 200,
+      minSize: 200,
       maxSize: 400,
     })
   }
