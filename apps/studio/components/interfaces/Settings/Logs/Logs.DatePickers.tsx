@@ -33,6 +33,7 @@ interface Props {
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
+  popoverContentProps?: typeof PopoverContent_Shadcn_
 }
 
 export const LogsDatePicker = ({
@@ -40,6 +41,7 @@ export const LogsDatePicker = ({
   helpers,
   value,
   buttonTriggerProps,
+  popoverContentProps,
 }: PropsWithChildren<Props>) => {
   const [open, setOpen] = useState(false)
 
@@ -246,8 +248,9 @@ export const LogsDatePicker = ({
       <PopoverContent_Shadcn_
         className="flex w-full p-0"
         side="bottom"
-        align="center"
+        align="end"
         portal={true}
+        {...popoverContentProps}
       >
         <RadioGroup
           onValueChange={handleHelperChange}
