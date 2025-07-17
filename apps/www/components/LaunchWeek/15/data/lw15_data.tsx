@@ -157,15 +157,15 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/',
+    blog: '/blog/new-observability-features-in-supabase',
     date: 'Thursday',
     published_at: '2025-04-03T07:00:00.000-07:00',
-    title: '',
+    title: 'New Observability Features in Supabase',
     description: '',
     links: [
       {
         type: 'video',
-        href: '',
+        href: 'pLto2PD4-O8',
       },
     ],
     steps: [
