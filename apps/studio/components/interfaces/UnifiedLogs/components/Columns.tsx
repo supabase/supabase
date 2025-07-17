@@ -53,8 +53,8 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       minSize: 48,
       maxSize: 48,
       meta: {
-        cellClassName: 'w-[48px]',
-        headerClassName: 'w-[48px]',
+        cellClassName: 'w-[32px]',
+        headerClassName: 'w-[32px]',
       },
     },
     // Date column - always visible
@@ -96,8 +96,8 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       minSize: 40,
       maxSize: 40,
       meta: {
-        cellClassName: 'w-[40px]',
-        headerClassName: 'w-[40px]',
+        cellClassName: 'w-[32px]',
+        headerClassName: 'w-[32px]',
       },
     },
     // Status column - always visible
