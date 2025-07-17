@@ -11,15 +11,22 @@ import { DataTableFilterResetButton } from './DataTableFilterResetButton'
 import { DataTableFilterSlider } from './DataTableFilterSlider'
 import { DataTableFilterTimerange } from './DataTableFilterTimerange'
 
+import { DateRangeDisabled } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
+import { DataTableFilterCheckboxAsync } from './DataTableFilterCheckboxAsync'
+import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
 
 // FIXME: use @container (especially for the slider element) to restructure elements
 
 // TODO: only pass the columns to generate the filters!
 // https://tanstack.com/table/v8/docs/framework/react/examples/filters
 
-export function DataTableFilterControls() {
-  const { filterFields } = useDataTable()
+interface DataTableFilterControls {
+  dateRangeDisabled?: DateRangeDisabled
+}
+
+export function DataTableFilterControls({ dateRangeDisabled }: DataTableFilterControls) {
+  const { filterFields, isLoadingCounts } = useDataTable()
   return (
     <Accordion
       type="multiple"
@@ -46,7 +53,15 @@ export function DataTableFilterControls() {
                 {(() => {
                   switch (field.type) {
                     case 'checkbox': {
-                      return <DataTableFilterCheckbox {...field} />
+                      // [Joshen] Loader here so that CheckboxAsync can retrieve the data
+                      // immediately to be set in its react query state
+                      if (field.hasDynamicOptions && isLoadingCounts) {
+                        return <DataTableFilterCheckboxLoader />
+                      } else if (field.hasAsyncSearch) {
+                        return <DataTableFilterCheckboxAsync {...field} />
+                      } else {
+                        return <DataTableFilterCheckbox {...field} />
+                      }
                     }
                     case 'slider': {
                       return <DataTableFilterSlider {...field} />
@@ -55,7 +70,12 @@ export function DataTableFilterControls() {
                       return <DataTableFilterInput {...field} />
                     }
                     case 'timerange': {
-                      return <DataTableFilterTimerange {...field} />
+                      return (
+                        <DataTableFilterTimerange
+                          dateRangeDisabled={dateRangeDisabled}
+                          {...field}
+                        />
+                      )
                     }
                   }
                 })()}

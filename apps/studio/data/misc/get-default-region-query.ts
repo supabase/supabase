@@ -37,7 +37,9 @@ export async function getDefaultRegionOption({
 
     if (locLatLon === undefined) return undefined
 
-    const allRegions = cloudProvider === 'AWS' ? AWS_REGIONS_COORDINATES : FLY_REGIONS_COORDINATES
+    const isAWSProvider = ['AWS', 'AWS_K8S'].includes(cloudProvider)
+
+    const allRegions = isAWSProvider ? AWS_REGIONS_COORDINATES : FLY_REGIONS_COORDINATES
     const locations =
       useRestrictedPool && restrictedPool
         ? Object.entries(allRegions)
@@ -55,7 +57,7 @@ export async function getDefaultRegionOption({
     const shortestDistance = Math.min(...distances)
     const closestRegion = Object.keys(locations)[distances.indexOf(shortestDistance)]
 
-    return cloudProvider === 'AWS'
+    return isAWSProvider
       ? AWS_REGIONS[closestRegion as keyof typeof AWS_REGIONS].displayName
       : FLY_REGIONS[closestRegion as keyof typeof FLY_REGIONS].displayName
   } catch (error) {
