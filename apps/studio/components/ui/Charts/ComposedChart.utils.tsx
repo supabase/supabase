@@ -55,6 +55,7 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   customValue?: number
+  [key: string]: any
   /**
    * Manipulate the value of the attribute before it is displayed on the chart.
    * @param value - The value of the attribute.
