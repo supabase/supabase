@@ -181,12 +181,6 @@ export const sheetFields = [
     skeletonClassName: 'w-56',
   },
   {
-    id: 'host',
-    label: 'Host',
-    type: 'input',
-    skeletonClassName: 'w-24',
-  },
-  {
     id: 'pathname',
     label: 'Pathname',
     type: 'input',
