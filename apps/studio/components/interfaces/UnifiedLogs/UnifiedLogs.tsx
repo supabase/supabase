@@ -71,8 +71,6 @@ export const UnifiedLogs = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>(defaultRowSelection)
 
-  const [showBottomLogsPanel, setShowBottomLogsPanelState] = useState(false)
-
   const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(
     'data-table-visibility',
     defaultColumnVisibility
@@ -203,7 +201,11 @@ export const UnifiedLogs = () => {
   }, [isLoading, isFetching, flatData.length, table, selectedRowKey])
 
   // REMINDER: this is currently needed for the cmdk search
+  // [Joshen] This is where facets are getting dynamically loaded
   // TODO: auto search via API when the user changes the filter instead of hardcoded
+
+  // Will need to refactor this bit
+  // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
     return defaultFilterFields.map((field) => {
       const facetsField = facets?.[field.value]
@@ -289,6 +291,7 @@ export const UnifiedLogs = () => {
       rowSelection={rowSelection}
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
+      searchParameters={searchParameters}
       enableColumnOrdering={true}
       isFetching={isFetching}
       isLoading={isLoading}

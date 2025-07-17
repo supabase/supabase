@@ -33,7 +33,8 @@ import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 
 import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
-import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -55,21 +56,7 @@ export default RealtimeReport
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { db, chart, ref } = useParams()
-  const report = useApiReport()
 
-  const {
-    data,
-    error,
-    filters,
-    isLoading,
-    params,
-    mergeParams,
-    removeFilters,
-    addFilter,
-    refresh,
-  } = report
-
-  const state = useDatabaseSelectorStateSnapshot()
   const {
     selectedDateRange,
     updateDateRange: updateDateRangeFromHook,
@@ -81,8 +68,24 @@ const RealtimeUsage = () => {
     isOrgPlanLoading,
     orgPlan,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
-
   const queryClient = useQueryClient()
+  const {
+    data,
+    error,
+    isLoading,
+    refetch,
+    isRefetching,
+    filters,
+    addFilter,
+    removeFilters,
+    isLoadingData,
+  } = useSharedAPIReport({
+    filterBy: 'realtime',
+    start: selectedDateRange?.period_start?.date,
+    end: selectedDateRange?.period_end?.date,
+  })
+
+  const state = useDatabaseSelectorStateSnapshot()
 
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
   const REALTIME_REPORT_ATTRIBUTES = getRealtimeReportAttributes(isFreePlan)
@@ -107,7 +110,7 @@ const RealtimeUsage = () => {
       )
     })
 
-    refresh()
+    refetch()
 
     setTimeout(() => setIsRefreshing(false), 1000)
   }
@@ -132,20 +135,10 @@ const RealtimeUsage = () => {
 
   const handleDatePickerChange = (values: DatePickerValue) => {
     const promptShown = handleDatePickerChangeFromHook(values)
-    if (!promptShown) {
-      report.mergeParams({
-        iso_timestamp_start: values.from,
-        iso_timestamp_end: values.to,
-      })
-    }
   }
 
   const updateDateRange: UpdateDateRange = (from: string, to: string) => {
     updateDateRangeFromHook(from, to)
-    report.mergeParams({
-      iso_timestamp_start: from,
-      iso_timestamp_end: to,
-    })
   }
 
   return (
@@ -153,16 +146,16 @@ const RealtimeUsage = () => {
       <ReportHeader showDatabaseSelector={false} title="Realtime" />
       <ReportStickyNav
         content={
-          <>
-            <ButtonTooltip
-              type="default"
-              disabled={isRefreshing}
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-2">
+              <ButtonTooltip
+                type="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+                onClick={onRefreshReport}
+              />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -189,7 +182,7 @@ const RealtimeUsage = () => {
                 </div>
               )}
             </div>
-          </>
+          </div>
         }
       >
         {selectedDateRange &&
@@ -205,11 +198,25 @@ const RealtimeUsage = () => {
               defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
             />
           ))}
-        <div className="relative pt-8 mt-8 border-t">
+        <div className="">
+          <div className="mb-4">
+            <h5 className="text-foreground mb-2">Realtime API Gateway</h5>
+            <ReportFilterBar
+              filters={filters}
+              onAddFilter={addFilter}
+              onRemoveFilters={removeFilters}
+              isLoading={isLoadingData || isRefetching}
+              hideDatepicker={true}
+              datepickerHelpers={datePickerHelpers}
+              selectedProduct={'realtime'}
+              showDatabaseSelector={false}
+            />
+          </div>
           <SharedAPIReport
-            filterBy="realtime"
-            start={selectedDateRange?.period_start?.date}
-            end={selectedDateRange?.period_end?.date}
+            data={data}
+            error={error}
+            isLoading={isLoading}
+            isRefetching={isRefetching}
             hiddenReports={['networkTraffic']}
           />
         </div>
