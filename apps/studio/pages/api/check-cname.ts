@@ -2,7 +2,7 @@ import { CheckCNAMERecordResponse } from 'data/custom-domains/check-cname-mutati
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { domain } = req.body
+  const { domain } = req.query
 
   try {
     const result: CheckCNAMERecordResponse = await fetch(
