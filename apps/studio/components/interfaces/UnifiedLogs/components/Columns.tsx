@@ -107,9 +107,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       enableResizing: false,
       enableSorting: false,
       filterFn: (row, columnId, filterValue) => true,
-      size: 48,
-      minSize: 48,
-      maxSize: 48,
       meta: {
         headerClassName:
           'w-[--header-level-size] max-w-[--header-level-size] min-w-[--header-level-size]',
@@ -126,9 +123,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       filterFn: (row, columnId, filterValue) => true,
       enableResizing: false,
       enableSorting: false,
-      size: 130,
-      minSize: 130,
-      maxSize: 130,
       meta: {
         headerClassName:
           'w-[--header-date-size] max-w-[--header-date-size] min-w-[--header-date-size]',
@@ -149,9 +143,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       },
       enableHiding: false,
       filterFn: (row, columnId, filterValue) => true,
-      size: 40,
-      minSize: 40,
-      maxSize: 40,
       enableResizing: false,
       enableSorting: false,
       meta: {
@@ -183,8 +174,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       filterFn: (row, columnId, filterValue) => true,
       enableResizing: false,
       enableSorting: false,
-      size: 55,
-      minSize: 55,
       meta: {
         headerClassName:
           'w-[--header-status-size] max-w-[--header-status-size] min-w-[--header-status-size]',
@@ -206,9 +195,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       },
       enableResizing: false,
       enableSorting: false,
-      size: 70,
-      minSize: 70,
-      maxSize: 70,
       meta: {
         cellClassName: 'font-mono text-muted-foreground w-[70px] max-w-[70px] min-w-[70px]',
         headerClassName: 'w-[70px] max-w-[70px] min-w-[70px]',
@@ -227,9 +213,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       },
       enableSorting: false,
       enableResizing: false,
-      size: pathnameWidth,
-      minSize: pathnameWidth,
-      maxSize: DYNAMIC_COLUMN_CONFIG.pathname.maxWidth,
       meta: {
         cellClassName: 'font-mono w-[--col-pathname-size] max-w-[--col-pathname-size]',
         headerClassName: 'min-w-[--header-pathname-size] w-[--header-pathname-size]',
@@ -270,9 +253,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       },
       enableResizing: true,
       enableSorting: false,
-      size: eventMessageWidth,
-      minSize: eventMessageWidth,
-      maxSize: DYNAMIC_COLUMN_CONFIG.event_message.maxWidth,
       meta: {
         headerClassName:
           'w-[--header-event_message-size] max-w-[--header-event_message-size] min-w-[--header-event_message-size]',
