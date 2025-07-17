@@ -14,7 +14,7 @@ import { TextWithTooltip } from './TextWithTooltip'
 const DYNAMIC_COLUMN_CONFIG = {
   pathname: {
     minWidth: 120,
-    maxWidth: 400,
+    maxWidth: 150,
     defaultWidth: 320,
     hideIfEmpty: true,
   },
@@ -207,13 +207,11 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       enableResizing: false,
       enableSorting: false,
       size: 70,
-      minSize: 50,
-      maxSize: 80,
+      minSize: 70,
+      maxSize: 70,
       meta: {
-        cellClassName:
-          'font-mono text-muted-foreground w-[--col-method-size] max-w-[--col-method-size] min-w-[--col-method-size]',
-        headerClassName:
-          'w-[--header-method-size] max-w-[--header-method-size] min-w-[--header-method-size]',
+        cellClassName: 'font-mono text-muted-foreground w-[70px] max-w-[70px] min-w-[70px]',
+        headerClassName: 'w-[70px] max-w-[70px] min-w-[70px]',
       },
     })
   }
@@ -228,6 +226,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
         return <TextWithTooltip text={value} />
       },
       enableSorting: false,
+      enableResizing: false,
       size: pathnameWidth,
       minSize: pathnameWidth,
       maxSize: DYNAMIC_COLUMN_CONFIG.pathname.maxWidth,
