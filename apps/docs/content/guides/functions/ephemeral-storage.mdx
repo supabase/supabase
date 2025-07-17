@@ -1,21 +1,51 @@
 ---
 id: 'function-ephemeral-storage'
-title: 'Ephemeral Storage'
-description: 'Read and write from temporary directory'
-subtitle: 'Read and write from temporary directory'
+title: 'File Storage'
+description: 'Use persistent and ephmeral file storage'
+subtitle: 'Use persistent and ephmeral file storage'
 ---
 
-Edge Functions provides ephemeral file storage. You can read and write files to the `/tmp` directory.
+Edge Functions provides two flavors of file storage:
+* Persistent - backed by S3 protocol, can read/write from any S3 compatible bucket, including Supabase Storage
+* Ephemeral - You can read and write files to the `/tmp` directory. Only suitable for temproary operations
 
-This allows you to:
+You can use file storage to:
 
-- Process uploaded files temporarily without permanent storage
 - Handle complex file transformations and workflows
+- Do data migrations between projects
+- Process user uploaded files and store them
 - Unzip archives and process contents before saving to database
 
 ---
 
-## Overview
+## Persistent Storage
+
+The persistent storage option is built on top of the S3 protocol. It allows you to mount any S3-compatible bucket, including Supabase Storage Buckets, as a directory for your Edge Functions.
+You can perform operations such as reading and writing files to the mounted buckets as you would in a POSIX file system.
+
+To access an S3 bucket from Edge Functions, you must set the following for environment variables in Edge Function Secrets.
+
+- `S3FS_ENDPOINT_URL`
+- `S3FS_REGION`
+- `S3FS_ACCESS_KEY_ID`
+- `S3FS_SECRET_ACCESS_KEY`
+
+Please see the Supabase [Storage S3 guide](https://supabase.com/docs/guides/storage/s3/authentication) on enabling and creating an access key.
+
+To access a file path in your mounted bucket from your Edge Function, use the prefix `/s3/YOUR-BUCKET-NAME`.
+
+```tsx
+// read from S3 bucket
+const data = await Deno.readFile("/s3/my-bucket/results.csv")
+
+// make a directory
+await Deno.mkdir("/s3/my-bucket/sub-dir")
+
+// write to S3 bucket
+await Deno.writeTextFile("/s3/my-bucket/demo.txt", "hello world")
+```
+
+## Ephemeral storage
 
 Ephemeral storage will reset on each function invocation. This means the files you write during an invocation can only be read within the same invocation.
 
@@ -128,30 +158,41 @@ Deno.serve(async (req) => {
 
 ---
 
-## Limitations
+## Using Synchronous File APIs
 
-Currently, the synchronous APIs for creating or writing files are not supported:
+You can safely use the following synchronous Deno APIs (and their Node counterparts) *during initial script evaluation*:
+
+- Deno.statSync
+- Deno.removeSync
+- Deno.writeFileSync
+- Deno.writeTextFileSync
+- Deno.readFileSync
+- Deno.readTextFileSync
+- Deno.mkdirSync
+- Deno.makeTempDirSync
+- Deno.readDirSync
+
+**Please keep in mind** that the sync APIs are available only during initial script evaluation and aren’t supported in callbacks like HTTP handlers or setTimeout.
 
 ```tsx
-// ❌ Not supported
-Deno.writeFileSync('/tmp/file.txt', data)
-Deno.mkdirSync('/tmp/directory')
+Deno.statSync("..."); // ✅
 
-// ✅ Supported
-await Deno.writeFile('/tmp/file.txt', data)
-await Deno.mkdir('/tmp/directory')
-```
+setTimeout(() => {
+    Deno.statSync("..."); // 💣 ERROR! Deno.statSync is blocklisted on the current context
+    });
 
-You can use sync variations of read APIs:
-
-```tsx
-// ✅ Supported
-const data = Deno.readFileSync('/tmp/file.txt')
+Deno.serve(() => {
+    Deno.statSync("..."); // 💣 ERROR! Deno.statSync is blocklisted on the current context
+    });
 ```
 
 ---
 
 ## Limits
+
+There are no limits on S3 buckets you mount for Persistent storage.
+
+Ephemeral Storage:
 
 - Free projects: Up to 256MB of ephemeral storage
 - Paid projects: Up to 512MB of ephemeral storage
