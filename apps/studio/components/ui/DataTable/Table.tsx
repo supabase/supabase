@@ -20,7 +20,7 @@ const Table = forwardRef<HTMLTableElement, ComponentPropsWithRef<typeof ShadcnTa
       className={cn(className)}
       containerProps={{
         onScroll,
-        className: 'h-full w-full overflow-auto table-fixed min-w-max caption-bottom text-sm',
+        className: 'h-full w-full overflow-auto min-w-max caption-bottom text-sm',
       }}
     />
   )
