@@ -99,7 +99,7 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.
           </Tabs_Shadcn_>
 
           <p className="text-sm">
-            You will be prompted with your database password, and the output file{' '}
+            You will be prompted for your database password, and the output file{' '}
             <code>
               {outputName}.{selectedTab}
             </code>{' '}
