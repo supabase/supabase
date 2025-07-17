@@ -182,6 +182,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     ({ signal }) => getUnifiedLogInspection({ projectRef, logId, type, search }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      refetchOnWindowFocus: false,
       ...options,
     }
   )
