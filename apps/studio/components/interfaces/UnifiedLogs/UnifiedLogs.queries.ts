@@ -462,11 +462,15 @@ const getSupabaseStorageLogsQuery = () => {
 export const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
-    select 
-      id
-    from edge_logs as el
+    ${getPostgrestLogsQuery()}
     union all
-    
+    ${getPostgresLogsQuery()}
+    union all 
+    ${getEdgeFunctionLogsQuery()}
+    union all
+    ${getAuthLogsQuery()}
+    union all
+    ${getSupabaseStorageLogsQuery()}
 )
   `
 }
@@ -703,7 +707,7 @@ ${getFacetCountCTE({ search, facet: 'log_type' })},
 ${getFacetCountCTE({ search, facet: 'method' })},
 ${getFacetCountCTE({ search, facet: 'level' })},
 ${getFacetCountCTE({ search, facet: 'status' })},
-${getFacetCountCTE({ search, facet: 'pathname' })},
+${getFacetCountCTE({ search, facet: 'pathname' })}
 
 -- Get total count
 SELECT 'total' as dimension, 'all' as value, COUNT(*) as count
