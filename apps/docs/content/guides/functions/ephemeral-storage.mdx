@@ -6,8 +6,9 @@ subtitle: 'Use persistent and ephmeral file storage'
 ---
 
 Edge Functions provides two flavors of file storage:
-* Persistent - backed by S3 protocol, can read/write from any S3 compatible bucket, including Supabase Storage
-* Ephemeral - You can read and write files to the `/tmp` directory. Only suitable for temporary operations
+
+- Persistent - backed by S3 protocol, can read/write from any S3 compatible bucket, including Supabase Storage
+- Ephemeral - You can read and write files to the `/tmp` directory. Only suitable for temporary operations
 
 You can use file storage to:
 
@@ -36,13 +37,13 @@ To access a file path in your mounted bucket from your Edge Function, use the pr
 
 ```tsx
 // read from S3 bucket
-const data = await Deno.readFile("/s3/my-bucket/results.csv")
+const data = await Deno.readFile('/s3/my-bucket/results.csv')
 
 // make a directory
-await Deno.mkdir("/s3/my-bucket/sub-dir")
+await Deno.mkdir('/s3/my-bucket/sub-dir')
 
 // write to S3 bucket
-await Deno.writeTextFile("/s3/my-bucket/demo.txt", "hello world")
+await Deno.writeTextFile('/s3/my-bucket/demo.txt', 'hello world')
 ```
 
 ## Ephemeral storage
@@ -160,7 +161,7 @@ Deno.serve(async (req) => {
 
 ## Using synchronous file APIs
 
-You can safely use the following synchronous Deno APIs (and their Node counterparts) *during initial script evaluation*:
+You can safely use the following synchronous Deno APIs (and their Node counterparts) _during initial script evaluation_:
 
 - Deno.statSync
 - Deno.removeSync
@@ -175,15 +176,15 @@ You can safely use the following synchronous Deno APIs (and their Node counterpa
 **Keep in mind** that the sync APIs are available only during initial script evaluation and aren’t supported in callbacks like HTTP handlers or `setTimeout`.
 
 ```tsx
-Deno.statSync("..."); // ✅
+Deno.statSync('...') // ✅
 
 setTimeout(() => {
-    Deno.statSync("..."); // 💣 ERROR! Deno.statSync is blocklisted on the current context
-    });
+  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+})
 
 Deno.serve(() => {
-    Deno.statSync("..."); // 💣 ERROR! Deno.statSync is blocklisted on the current context
-    });
+  Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
+})
 ```
 
 ---
