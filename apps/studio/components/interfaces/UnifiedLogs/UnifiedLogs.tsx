@@ -329,14 +329,12 @@ export const UnifiedLogs = () => {
                   ) : null,
                 ]}
               />
-              <div className={cn(isFetchingCharts && 'opacity-60 transition-opacity')}>
-                <TimelineChart
-                  data={unifiedLogsChart}
-                  className="-mb-2"
-                  columnId="timestamp"
-                  chartConfig={filteredChartConfig}
-                />
-              </div>
+              <TimelineChart
+                data={unifiedLogsChart}
+                className={cn('-mb-2', isFetchingCharts && 'opacity-60 transition-opacity')}
+                columnId="timestamp"
+                chartConfig={filteredChartConfig}
+              />
             </DataTableHeaderLayout>
 
             <Separator />
