@@ -45,7 +45,8 @@ const TriggersList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const hasTables = data.filter((a) => !protectedSchemas.includes(a.schema)).length > 0
+  const hasTables =
+    data.filter((a) => !protectedSchemas.find((s) => s.name === a.schema)).length > 0
 
   const {
     data: triggers,

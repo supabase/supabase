@@ -101,7 +101,9 @@ const TableEditor = ({
     connectionString: project?.connectionString,
   })
   const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
-  const enumTypes = (types ?? []).filter((type) => !protectedSchemas.includes(type.schema))
+  const enumTypes = (types ?? []).filter(
+    (type) => !protectedSchemas.find((s) => s.name === type.schema)
+  )
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,

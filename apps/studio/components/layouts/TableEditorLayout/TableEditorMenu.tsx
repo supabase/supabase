@@ -155,7 +155,7 @@ const TableEditorMenu = () => {
                   Viewing protected schema
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_ className="text-xs">
-                  {reason === 'FDW' ? (
+                  {reason === 'fdw' ? (
                     <p>
                       {' '}
                       The <code className="text-xs">{selectedSchema}</code> schema is used by

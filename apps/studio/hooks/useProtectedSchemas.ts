@@ -1,3 +1,6 @@
+import { uniq } from 'lodash'
+import { useMemo } from 'react'
+
 import {
   WRAPPER_HANDLERS,
   WRAPPERS,
@@ -7,11 +10,8 @@ import {
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { uniq } from 'lodash'
-import { useMemo } from 'react'
-
 import { QUEUES_SCHEMA } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 
 /**
  * A list of system schemas that users should not interact with
@@ -79,9 +79,12 @@ export const useProtectedSchemas = ({
 
   const result = useIcebergFdwSchemasQuery()
 
-  const schemas = useMemo(() => {
-    const schemas = uniq([...INTERNAL_SCHEMAS, ...result.data])
-    return schemas.filter((schema) => !stableexcludeSchemas.includes(schema))
+  const schemas = useMemo<{ name: string; type: 'fdw' | 'internal' }[]>(() => {
+    const internalSchemas = INTERNAL_SCHEMAS.map((s) => ({ name: s, type: 'internal' as const }))
+    const fdwSchemas = result.data?.map((s) => ({ name: s, type: 'fdw' as const }))
+
+    const schemas = uniq([...internalSchemas, ...fdwSchemas])
+    return schemas.filter((schema) => !stableexcludeSchemas.includes(schema.name))
   }, [result.data, stableexcludeSchemas])
 
   return { ...result, data: schemas }
@@ -98,18 +101,15 @@ export const useIsProtectedSchema = ({
   excludedSchemas?: string[]
 }):
   | { isSchemaLocked: false; reason: undefined }
-  | { isSchemaLocked: true; reason: 'FDW' | 'Internal' } => {
-  const { data: fdwSchemas } = useIcebergFdwSchemasQuery()
+  | { isSchemaLocked: true; reason: 'fdw' | 'internal' } => {
+  const { data: schemas } = useProtectedSchemas({ excludeSchemas: excludedSchemas })
 
-  const isInternalSchema = INTERNAL_SCHEMAS.filter((s) => !excludedSchemas.includes(s)).includes(
-    schema
-  )
-  const isFdwSchema = fdwSchemas?.includes(schema)
+  const foundSchema = schemas.find((s) => s.name === schema)
 
-  if (isInternalSchema || isFdwSchema) {
+  if (foundSchema) {
     return {
       isSchemaLocked: true,
-      reason: isFdwSchema ? 'FDW' : 'Internal',
+      reason: foundSchema.type,
     }
   }
   return { isSchemaLocked: false, reason: undefined }

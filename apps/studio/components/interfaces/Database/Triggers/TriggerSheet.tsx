@@ -116,7 +116,7 @@ export const TriggerSheet = ({ selectedTrigger, open, setOpen }: TriggerSheetPro
 
   const tables = data
     .sort((a, b) => a.schema.localeCompare(b.schema))
-    .filter((a) => !protectedSchemas.includes(a.schema))
+    .filter((a) => !protectedSchemas.find((s) => s.name === a.schema))
   const isEditing = !!selectedTrigger
 
   const form = useForm<z.infer<typeof FormSchema>>({

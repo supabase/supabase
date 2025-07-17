@@ -44,8 +44,9 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
   const tables = useMemo(() => {
     return (tablesData || []).filter((table) =>
       filterString.length === 0
-        ? !protectedSchemas.includes(table.schema)
-        : !protectedSchemas.includes(table.schema) && table.name.includes(filterString)
+        ? !protectedSchemas.find((s) => s.name === table.schema)
+        : !protectedSchemas.find((s) => s.name === table.schema) &&
+          table.name.includes(filterString)
     )
   }, [tablesData, protectedSchemas, filterString])
 

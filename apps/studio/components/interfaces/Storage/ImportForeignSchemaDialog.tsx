@@ -62,7 +62,7 @@ export const ImportForeignSchemaDialog = ({
       .refine(
         (val) => {
           if (!protectedSchemas) return true
-          return !protectedSchemas.includes(val)
+          return !protectedSchemas.find((s) => s.name === val)
         },
         {
           message: 'This schema is protected by Supabase and is read-only through the dashboard.',

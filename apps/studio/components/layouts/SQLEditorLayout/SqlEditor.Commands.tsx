@@ -307,7 +307,7 @@ function TableSelector() {
     includeColumns: true,
   })
   const tables = useMemo(() => {
-    return tablesData?.filter((table) => !protectedSchemas.includes(table.schema))
+    return tablesData?.filter((table) => !protectedSchemas.find((s) => s.name === table.schema))
   }, [tablesData, protectedSchemas])
 
   return (

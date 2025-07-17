@@ -69,7 +69,7 @@ const ProtectedSchemaWarning = ({ schema, entity }: { schema: string; entity: st
         <AlertCircle strokeWidth={2} />
         <AlertTitle_Shadcn_>Currently viewing {entity} from a protected schema</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
-          {reason === 'FDW' ? (
+          {reason === 'fdw' ? (
             <>
               <p>
                 {' '}
