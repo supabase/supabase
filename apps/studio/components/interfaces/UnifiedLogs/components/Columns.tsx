@@ -52,6 +52,10 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       size: 48,
       minSize: 48,
       maxSize: 48,
+      meta: {
+        cellClassName: 'w-[48px]',
+        headerClassName: 'w-[48px]',
+      },
     },
     // Date column - always visible
     {
@@ -68,7 +72,8 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       minSize: 130,
       maxSize: 130,
       meta: {
-        cellClassName: 'font-mono',
+        cellClassName: 'font-mono w-[130px]',
+        headerClassName: 'w-[130px]',
       },
     },
     // Log type column - always visible
@@ -90,6 +95,10 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       size: 40,
       minSize: 40,
       maxSize: 40,
+      meta: {
+        cellClassName: 'w-[40px]',
+        headerClassName: 'w-[40px]',
+      },
     },
     // Status column - always visible
     {
@@ -118,6 +127,10 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       size: 70,
       minSize: 70,
       maxSize: 70,
+      meta: {
+        cellClassName: 'w-[70px]',
+        headerClassName: 'w-[70px]',
+      },
     },
   ]
 
@@ -136,6 +149,10 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       size: 70,
       minSize: 70,
       maxSize: 70,
+      meta: {
+        cellClassName: 'w-[70px]',
+        headerClassName: 'w-[70px]',
+      },
     })
   }
 
