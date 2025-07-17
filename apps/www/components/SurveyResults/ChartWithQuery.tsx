@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { createClient } from '@supabase/supabase-js'
 
 // import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 // import { ChartContainer } from 'ui'
@@ -140,6 +141,99 @@ function InlineFilterDropdown({ filterKey, filterConfig, selectedValue, setFilte
   )
 }
 
+// Create a separate Supabase client for your external project
+const externalSupabase = createClient(
+  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_ANON_KEY!
+)
+
+// Custom hook to fetch survey data from external Supabase
+function useSurveyData(activeFilters) {
+  console.log('useSurveyData hook called with filters:', activeFilters)
+  const [chartData, setChartData] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        console.log('Fetching survey data with filters:', activeFilters)
+
+        // Build the query based on active filters
+        let query = externalSupabase.from('dummy_survey_responses').select('team_size')
+
+        // Apply filters
+        Object.entries(activeFilters).forEach(([key, value]) => {
+          if (value !== 'all') {
+            query = query.eq(key, value)
+          }
+        })
+
+        const { data, error: fetchError } = await query
+
+        if (fetchError) {
+          console.error('Error fetching data:', fetchError)
+          setError(fetchError.message)
+          return
+        }
+
+        console.log('Raw data from external Supabase:', data)
+
+        // Process the data to count team sizes
+        const teamSizeCounts = {}
+        data.forEach((row) => {
+          teamSizeCounts[row.team_size] = (teamSizeCounts[row.team_size] || 0) + 1
+        })
+
+        console.log('Team size counts:', teamSizeCounts)
+
+        // Calculate percentages
+        const total = data.length
+        const processedData = [
+          {
+            label: '1–10',
+            value: total > 0 ? (((teamSizeCounts['1-10'] || 0) / total) * 100).toFixed(1) : 0,
+          },
+          {
+            label: '11–50',
+            value: total > 0 ? (((teamSizeCounts['11-50'] || 0) / total) * 100).toFixed(1) : 0,
+          },
+          {
+            label: '51–100',
+            value: total > 0 ? (((teamSizeCounts['51-100'] || 0) / total) * 100).toFixed(1) : 0,
+          },
+          {
+            label: '101–250',
+            value: total > 0 ? (((teamSizeCounts['101-250'] || 0) / total) * 100).toFixed(1) : 0,
+          },
+          {
+            label: '250+',
+            value: total > 0 ? (((teamSizeCounts['250+'] || 0) / total) * 100).toFixed(1) : 0,
+          },
+        ].map((item) => ({
+          ...item,
+          value: parseFloat(item.value),
+        }))
+
+        console.log('Processed chart data:', processedData)
+        setChartData(processedData)
+      } catch (err) {
+        console.error('Error in fetchData:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [activeFilters])
+
+  return { chartData, isLoading, error }
+}
+
 export function ChartWithQuery() {
   // Start with all filters unset (showing "all")
   const [activeFilters, setActiveFilters] = useState({
@@ -147,6 +241,9 @@ export function ChartWithQuery() {
     funding_stage: 'all',
     age_group: 'all',
   })
+
+  // Use the custom hook to fetch data
+  const { chartData, isLoading, error } = useSurveyData(activeFilters)
 
   const setFilterValue = (filterKey, value) => {
     setActiveFilters((prev) => ({
@@ -222,50 +319,60 @@ ORDER BY
           <CardTitle>How many full-time employees does your startup have?</CardTitle>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig}>
-            <BarChart
-              accessibilityLayer
-              data={chartData}
-              layout="vertical"
-              margin={{
-                right: 0,
-              }}
-            >
-              <CartesianGrid horizontal={false} />
-              <YAxis
-                dataKey="label"
-                type="category"
-                tickLine={false}
-                tickMargin={64}
-                axisLine={false}
-                hide={false}
-                width={64}
-                tick={{
-                  className: 'text-foreground-lighter',
-                  fontSize: 12,
-                  textAnchor: 'start',
-                  dx: 0,
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-foreground-lighter">Loading data...</div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-red-500">Error: {error}</div>
+            </div>
+          ) : (
+            <ChartContainer config={chartConfig}>
+              <BarChart
+                accessibilityLayer
+                data={chartData}
+                layout="vertical"
+                margin={{
+                  right: 0,
                 }}
-              />
-              <XAxis dataKey="value" type="number" hide />
-              <Bar dataKey="value" layout="vertical" radius={4}>
-                {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={index === 0 ? 'hsl(var(--brand-default))' : 'hsl(var(--brand-300))'}
-                  />
-                ))}
-                <LabelList
-                  dataKey="value"
-                  position="right"
-                  offset={8}
-                  className="fill-foreground"
-                  fontSize={12}
-                  formatter={(value: number) => `${value}%`}
+              >
+                <CartesianGrid horizontal={false} />
+                <YAxis
+                  dataKey="label"
+                  type="category"
+                  tickLine={false}
+                  tickMargin={64}
+                  axisLine={false}
+                  hide={false}
+                  width={64}
+                  tick={{
+                    className: 'text-foreground-lighter',
+                    fontSize: 12,
+                    textAnchor: 'start',
+                    dx: 0,
+                  }}
                 />
-              </Bar>
-            </BarChart>
-          </ChartContainer>
+                <XAxis dataKey="value" type="number" hide />
+                <Bar dataKey="value" layout="vertical" radius={4}>
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={index === 0 ? 'hsl(var(--brand-default))' : 'hsl(var(--brand-300))'}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="value"
+                    position="right"
+                    offset={8}
+                    className="fill-foreground"
+                    fontSize={12}
+                    formatter={(value: number) => `${value}%`}
+                  />
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          )}
         </CardContent>
       </Card>
     </div>
