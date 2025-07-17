@@ -3,8 +3,8 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-    name: 'New Logs',
-    discussionsUrl: undefined,
+    name: 'New Logs Interface',
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
     isNew: true,
     isPlatformOnly: true,
   },
