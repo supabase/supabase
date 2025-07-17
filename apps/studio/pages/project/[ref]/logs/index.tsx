@@ -8,12 +8,15 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { hasLoaded } = useContext(FeatureFlagContext)
+
+  const org = useSelectedOrganization()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const [lastVisitedLogsPage] = useLocalStorageQuery(
@@ -22,10 +25,10 @@ export const LogPage: NextPageWithLayout = () => {
   )
 
   useEffect(() => {
-    if (hasLoaded && !isUnifiedLogsEnabled) {
+    if (hasLoaded && !!org && !isUnifiedLogsEnabled) {
       router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
     }
-  }, [router, hasLoaded, lastVisitedLogsPage, ref, isUnifiedLogsEnabled])
+  }, [router, hasLoaded, org, lastVisitedLogsPage, ref, isUnifiedLogsEnabled])
 
   // Handle redirects when unified logs preview flag changes
   useEffect(() => {
