@@ -233,7 +233,14 @@ export function LogsSidebarMenuV2() {
         className="mx-4 mt-4"
         illustration={<Badge variant="default">Coming soon</Badge>}
         title="New logs"
-        description="Rollout of new logs coming soon"
+        description="Get early early access"
+        actions={
+          <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
+            <Button type="default" size="tiny">
+              Early access
+            </Button>
+          </Link>
+        }
       />
       {isUnifiedLogsPreviewAvailable && (
         <FeaturePreviewSidebarPanel
