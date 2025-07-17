@@ -6,6 +6,7 @@ import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWra
 import { Sidebar } from 'components/interfaces/Sidebar'
 import { useRouter } from 'next/router'
 import { SidebarProvider } from 'ui'
+import { useCheckLatestDeploy } from './../../hooks/use-check-latest-deploy'
 import { LayoutHeader } from './ProjectLayout/LayoutHeader'
 import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
@@ -28,6 +29,8 @@ const DefaultLayout = ({ children, headerTitle }: PropsWithChildren<DefaultLayou
   const { ref } = useParams()
   const router = useRouter()
   const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
+
+  useCheckLatestDeploy()
 
   return (
     <SidebarProvider defaultOpen={false}>
