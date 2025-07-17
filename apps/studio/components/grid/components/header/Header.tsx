@@ -31,10 +31,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Separator,
   SonnerProgress,
 } from 'ui'
+import { ExportDialog } from './ExportDialog'
 import { FilterPopover } from './filter/FilterPopover'
 import { SortPopover } from './sort/SortPopover'
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
@@ -230,6 +234,7 @@ const RowHeader = () => {
   const { sorts } = useTableSort()
 
   const [isExporting, setIsExporting] = useState(false)
+  const [showExportModal, setShowExportModal] = useState<'csv' | 'sql'>()
 
   const { data } = useTableRowsQuery({
     projectRef: project?.ref,
@@ -441,61 +446,79 @@ const RowHeader = () => {
   })
 
   return (
-    <div className="flex items-center gap-x-2">
-      {snap.editable && (
-        <ButtonTooltip
-          type="default"
-          size="tiny"
-          icon={<Trash />}
-          onClick={onRowsDelete}
-          disabled={snap.allRowsSelected && isImpersonatingRole}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text:
-                snap.allRowsSelected && isImpersonatingRole
-                  ? 'Table truncation is not supported when impersonating a role'
-                  : undefined,
-            },
-          }}
-        >
-          {snap.allRowsSelected
-            ? `Delete all rows in table`
-            : snap.selectedRows.size > 1
-              ? `Delete ${snap.selectedRows.size} rows`
-              : `Delete ${snap.selectedRows.size} row`}
-        </ButtonTooltip>
-      )}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
+    <>
+      <div className="flex items-center gap-x-2">
+        {snap.editable && (
+          <ButtonTooltip
             type="default"
             size="tiny"
-            iconRight={<ChevronDown />}
-            loading={isExporting}
-            disabled={isExporting}
+            icon={<Trash />}
+            onClick={onRowsDelete}
+            disabled={snap.allRowsSelected && isImpersonatingRole}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text:
+                  snap.allRowsSelected && isImpersonatingRole
+                    ? 'Table truncation is not supported when impersonating a role'
+                    : undefined,
+              },
+            }}
           >
-            Export
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-40">
-          <DropdownMenuItem onClick={onRowsExportCSV}>
-            <span className="text-foreground-light">Export to CSV</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            {snap.allRowsSelected
+              ? `Delete all rows in table`
+              : snap.selectedRows.size > 1
+                ? `Delete ${snap.selectedRows.size} rows`
+                : `Delete ${snap.selectedRows.size} row`}
+          </ButtonTooltip>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="default"
+              size="tiny"
+              iconRight={<ChevronDown />}
+              loading={isExporting}
+              disabled={isExporting}
+            >
+              Export
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-60">
+            <DropdownMenuItem onClick={onRowsExportCSV}>Export as CSV</DropdownMenuItem>
+            <DropdownMenuItem onClick={onRowsExportSQL}>Export as SQL</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="group">
+                <div>
+                  <p className="group-hover:text-foreground">Export via psql</p>
+                  <p className="text-foreground-lighter">Recommended for large tables</p>
+                </div>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => setShowExportModal('csv')}>
+                  As CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowExportModal('sql')}>
+                  As SQL
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-      {!snap.allRowsSelected && totalRows > allRows.length && (
-        <>
-          <div className="h-6 ml-0.5">
-            <Separator orientation="vertical" />
-          </div>
-          <Button type="text" onClick={() => onSelectAllRows()}>
-            Select all rows in table
-          </Button>
-        </>
-      )}
-    </div>
+        {!snap.allRowsSelected && totalRows > allRows.length && (
+          <>
+            <div className="h-6 ml-0.5">
+              <Separator orientation="vertical" />
+            </div>
+            <Button type="text" onClick={() => onSelectAllRows()}>
+              Select all rows in table
+            </Button>
+          </>
+        )}
+      </div>
+
+      <ExportDialog format={showExportModal} onOpenChange={() => setShowExportModal(undefined)} />
+    </>
   )
 }
