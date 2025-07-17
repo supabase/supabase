@@ -2,6 +2,12 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 
 export const FEATURE_PREVIEWS = [
   {
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
+    name: 'New Logs',
+    isNew: true,
+    isPlatformOnly: true,
+  },
+  {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
     name: 'Branching 2.0',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
@@ -41,13 +47,6 @@ export const FEATURE_PREVIEWS = [
     name: 'Column-level privileges',
     discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     isNew: false,
-    isPlatformOnly: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-    name: 'New Logs',
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: true,
     isPlatformOnly: false,
   },
 ] as const
