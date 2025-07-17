@@ -1,0 +1,136 @@
+---
+title: 'New Observability Features in Supabase'
+description: 'New unified logging, advanced reports, and AI debugging capabilities.'
+categories:
+  - product
+  - launch-week
+tags:
+  - launch-week
+  - studio
+date: '2025-07-17:00:00'
+toc_depth: 3
+author: jonny,saxon_fletcher,jordi,fsansalvadore
+image: launch-week-15/day-4-o11y-day/og.jpg
+thumb: launch-week-15/day-4-o11y-day/thumb.png
+launchweek: 15
+---
+
+We are starting to add OpenTelemetry support to [all](https://github.com/supabase/storage/pull/494) [our](https://github.com/supabase/auth/pull/679) [core](https://github.com/supabase/edge-runtime/pull/554) [products](https://github.com/supabase/realtime/commit/c9683f3f5f94bd2e37494f02c1f4415551e96e5b) and [our Telemetry server](https://github.com/Logflare/logflare/pulls?q=is%3Apr+otel+sort%3Acreated-asc). OpenTelemetry (OTel) standardizes logs, metrics, and traces in a vendor-agnostic format, so you can ingest data into tools like Datadog, Honeycomb, or any monitoring solution you already use. While you'll still have the freedom to bring your own observability stack, we're preparing to surface this data natively in the Supabase dashboard.
+
+Today we are launching
+
+- Preview of our new logging Interface
+- Advanced Product Reports
+- Supabase AI Assistant with debugging capabilities
+
+These updates mark the first step toward unified, end-to-end observability. You won't get the full OTel visualization just yet, but with these foundations in place, you'll soon be able to trace, analyze errors and performance issues, and troubleshoot your entire stack without leaving Supabase.
+
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/pLto2PD4-O8"
+    title="Supabase Observability Day"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+## New logging Interface
+
+Supabase is a collection of seamlessly integrated services. Storage talks to Postgres via the dedicated connection pooler. Edge Functions can talk to Auth and Realtime. If storage uploads fail, you must determine whether the problem lies with the storage server, the dedicated connection pooler, or the database. Until now, pinpointing the root cause meant jumping between multiple log streams.
+
+Starting today, there is one interleaved stream of logs across all services. You can trace a single request across the entire Supabase stack. No more jumping between tabs to diagnose errors.
+
+<Img
+  wide
+  alt="Unified logs"
+  src={{
+    dark: '/images/blog/launch-week-15/day-4-o11y-day/unified-logs-dark.png',
+    light: '/images/blog/launch-week-15/day-4-o11y-day/unified-logs-light.png',
+  }}
+/>
+
+We have also added contextual log views. You can now jump from a function's invocation log directly into its execution logs. What used to require two disconnected sources is now stitched together in one view.
+
+<Img
+  wide
+  alt="Contextual logs"
+  src={{
+    dark: '/images/blog/launch-week-15/day-4-o11y-day/contextual-logs-dark.png',
+    light: '/images/blog/launch-week-15/day-4-o11y-day/contextual-logs-light.png',
+  }}
+/>
+
+The new interface also supports filtering logs by the request status code, method, path, log level and the auth user associated with the request. This means you can quickly find all Postgrest 500 errors, or all requests made by a specific user with a few clicks.
+
+Shoutout to [openstatus.dev](http://openstatus.dev) for providing the inspiration for some of our Log components.
+
+The new logging interface is available as a feature preview today, which you can enable from the dashboard [here](https://supabase.com/dashboard/project/_?featurePreviewModal=supabase-ui-preview-unified-logs). The new interface currently supports API Gateway logs and Postgres logs, with logs for the other products coming soon.
+
+## Advanced Product Reports
+
+Apart from making our logs better, we also revamped the metrics exposed in our product reports. Previously, you had to host your own [Grafana dashboard](https://github.com/supabase/supabase-grafana) to access some of these advanced metrics. We are bringing some of these metrics directly into the dashboard, so that you can access them without any additional setup or maintaining your own production ready monitoring infrastructure.
+
+Each product has its own dedicated [report](https://supabase.com/dashboard/project/_/reports/api-overview) with a common set of metrics like number of requests, egress, and response time, along with product specific metrics like “Realtime connected clients”.
+
+Additionally, you can drill into a specific time frame and filter by various request and response parameters across all reports.
+
+<Img
+  wide
+  alt="Advanced reports"
+  src={{
+    dark: '/images/blog/launch-week-15/day-4-o11y-day/reports-dark.png',
+    light: '/images/blog/launch-week-15/day-4-o11y-day/reports-light.png',
+  }}
+/>
+
+Free users get a basic set of metrics for all products, while some of the advanced metrics (like p99 response time) is available for all paid customers.
+
+Try out the new reports [here](https://supabase.com/dashboard/project/_/reports/api-overview).
+
+## Supabase AI Assistant with debugging capabilities
+
+The Supabase AI Assistant now offers powerful new debugging capabilities, making it easier to identify and resolve issues across your stack.
+
+You can now ask the Assistant to:
+
+- Retrieve logs for any Supabase product
+- Analyze log volume over time to identify spikes
+- Drill into specific time windows to investigate anomalies
+
+This means you can go from "something looks off" to concrete answers, without leaving the chat.
+
+The Assistant also comes with several quality-of-life upgrades:
+
+- **Automatic chat renaming** based on your queries
+- **Branch diff reviews**, perfect for projects using branching environments
+- **A more capable model** with additional controls for data privacy and security improvements built in
+
+It's the fastest way to get answers for your project, whether you're debugging a failing function, reviewing changes between branches, or just trying to understand how your app is behaving in production.
+
+This is an example of how the Assistant can analyze logs to identify issues:
+
+<Img
+  alt="Assistant parsing logs"
+  src={{
+    dark: '/images/blog/launch-week-15/day-4-o11y-day/ai-debugging-dark.png',
+    light: '/images/blog/launch-week-15/day-4-o11y-day/ai-debugging-light.png',
+  }}
+/>
+
+It can also provide recommendations for fixes:
+
+<Img
+  alt="Assistant suggesting fixes"
+  src={{
+    dark: '/images/blog/launch-week-15/day-4-o11y-day/ai-recommendations-dark.png',
+    light: '/images/blog/launch-week-15/day-4-o11y-day/ai-recommendations-light.png',
+  }}
+/>
+
+## What's next
+
+- We'll keep adding more metrics across our reports
+- We're adding logs from the remaining products to new logging interface
+- We plan to make the new logging interface the default experience for all projects soon
+- Expose OpenTelemetry trace information in the logging interface

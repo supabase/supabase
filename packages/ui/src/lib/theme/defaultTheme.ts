@@ -1417,8 +1417,9 @@ export default {
     },
     spinner: `
       absolute
-      text-brand animate-spin
+      text-foreground-lighter animate-spin
       inset-0
+      size-5
       m-auto
     `,
   },

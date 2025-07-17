@@ -1,14 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight, FilePlus, Plus } from 'lucide-react'
+import { ChevronRight, CircleHelpIcon, FilePlus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { IS_PLATFORM, useParams } from 'common'
+import {
+  useFeaturePreviewModal,
+  useUnifiedLogsPreview,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useContentQuery } from 'data/content/content-query'
@@ -17,6 +22,7 @@ import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import {
+  Badge,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -37,6 +43,7 @@ import {
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -82,7 +89,11 @@ export function SidebarCollapsible({
 export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
+
   const warehouseEnabled = useFlag('warehouse')
+  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const { selectFeaturePreview } = useFeaturePreviewModal()
+  const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
   const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
@@ -213,6 +224,36 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
+      {isUnifiedLogsPreviewAvailable && (
+        <FeaturePreviewSidebarPanel
+          className="mx-4 mt-4"
+          title="New Logs Interface"
+          description="Unified view across all services with improved filtering and real-time updates"
+          illustration={<Badge variant="brand">Feature Preview</Badge>}
+          actions={
+            <>
+              <Button
+                size="tiny"
+                type="default"
+                onClick={() => {
+                  enableUnifiedLogs()
+                  router.push(`/project/${ref}/logs`)
+                }}
+              >
+                Enable preview
+              </Button>
+              <ButtonTooltip
+                type="default"
+                className="px-1.5"
+                icon={<CircleHelpIcon />}
+                onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
+                tooltip={{ content: { side: 'bottom', text: 'More information' } }}
+              />
+            </>
+          }
+        />
+      )}
+
       <div className="flex gap-2 p-4 items-center sticky top-0 bg-background-200 z-[1]">
         <InnerSideBarFilters className="w-full p-0 gap-0">
           <InnerSideBarFilterSearchInput

@@ -49,7 +49,6 @@ const ReportChart = ({
   const {
     data,
     isLoading: isLoadingChart,
-    chartAttributes,
     highlightedValue,
   } = useChartData({
     attributes: chart.attributes,
@@ -72,9 +71,7 @@ const ReportChart = ({
   const { data: filledData, isError: isFillError } = useFillTimeseriesSorted(
     chartDataArray,
     'period_start',
-    (chartAttributes.length > 0 ? chartAttributes : chart.attributes).map(
-      (attr: any) => attr.attribute
-    ),
+    chart.attributes.map((attr: any) => attr.attribute),
     0,
     startDate,
     endDate,
@@ -159,9 +156,7 @@ const ReportChart = ({
   return (
     <LogChartHandler
       {...chart}
-      attributes={
-        (chartAttributes.length > 0 ? chartAttributes : chart.attributes) as MultiAttribute[]
-      }
+      attributes={chart.attributes as MultiAttribute[]}
       data={finalData}
       isLoading={isLoadingChart || isLoading}
       highlightedValue={highlightedValue as any}
