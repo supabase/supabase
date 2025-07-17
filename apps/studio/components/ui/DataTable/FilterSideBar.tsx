@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useUnifiedLogsControl } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag } from 'hooks/ui/useFlag'
 import { Button, cn, ResizablePanel } from 'ui'
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
@@ -15,20 +15,15 @@ interface FilterSideBarProps {
 }
 
 export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
-  const { table } = useDataTable()
   const router = useRouter()
   const { ref } = useParams()
-  const unifiedLogsPreviewAvailable = useFlag('unifiedLogsPreviewAvailable')
-  const { isEnabled: unifiedLogsPreview, disable: disableUnifiedLogs } = useUnifiedLogsControl()
+  const { table } = useDataTable()
 
-  // Only show the box if the feature preview is available and currently enabled
-  const showGoBackBox = unifiedLogsPreviewAvailable && unifiedLogsPreview
+  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const { disable: disableUnifiedLogs } = useUnifiedLogsPreview()
 
   const handleGoBackToOldLogs = () => {
-    // Disable the unified logs preview using the helper
     disableUnifiedLogs()
-
-    // Redirect to old logs
     router.push(`/project/${ref}/logs/explorer`)
   }
 
@@ -45,26 +40,26 @@ export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
         'hidden sm:flex'
       )}
     >
-      <div className="border-b border-border px-2 md:top-0">
+      <div className="border-b border-border px-4 md:top-0">
         <div className="flex h-[48px] items-center justify-between gap-3">
-          <p className="px-2 text-foreground text-lg">Logs</p>
-          <div>{table.getState().columnFilters.length ? <DataTableResetButton /> : null}</div>
+          <p className="text-foreground text-lg">Logs</p>
+          {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
         </div>
       </div>
 
-      {showGoBackBox && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4 mb-4"
-          title="Go back to old logs"
-          description="Use the traditional interface."
-          actions={
-            <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
-              Switch back
-            </Button>
-          }
-        />
-      )}
       <div className="flex-1 p-2 sm:overflow-y-scroll">
+        {isUnifiedLogsPreviewAvailable && (
+          <FeaturePreviewSidebarPanel
+            className="mx-2 mt-2 mb-3"
+            title="Go back to old logs"
+            description="Use the traditional interface"
+            actions={
+              <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
+                Switch back
+              </Button>
+            }
+          />
+        )}
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
       </div>
     </ResizablePanel>

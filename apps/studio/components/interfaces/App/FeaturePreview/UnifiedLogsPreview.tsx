@@ -1,8 +1,5 @@
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
 import { InlineLink } from 'components/ui/InlineLink'
-import { BASE_PATH } from 'lib/constants'
-import Image from 'next/image'
 
 export const UnifiedLogsPreview = () => {
   const { ref } = useParams()

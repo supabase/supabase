@@ -4,6 +4,7 @@ export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
     name: 'New Logs',
+    discussionsUrl: undefined,
     isNew: true,
     isPlatformOnly: true,
   },

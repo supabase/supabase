@@ -33,7 +33,7 @@ export function FeaturePreviewSidebarPanel({
         <p className="text-xs text-foreground-light">{description}</p>
       </div>
 
-      {actions && <div className="flex justify-start items-start">{actions}</div>}
+      {actions && <div className="flex justify-start items-start gap-x-2">{actions}</div>}
     </div>
   )
 }

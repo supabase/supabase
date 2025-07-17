@@ -2,26 +2,18 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  useFeaturePreviewContext,
-  useIsUnifiedLogsEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { UnifiedLogs } from 'components/interfaces/UnifiedLogs/UnifiedLogs'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import UnifiedLogsLayout from 'components/layouts/UnifiedLogsLayout/UnifiedLogsLayout'
-import { useFlag } from 'hooks/ui/useFlag'
+import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const unifiedLogsAdminEnabled = useFlag('unifiedLogs')
-  const unifiedLogsPreview = useIsUnifiedLogsEnabled()
-
-  // Check if unified logs should be shown (either admin enabled or user enabled preview)
-  const showUnifiedLogs = unifiedLogsAdminEnabled || unifiedLogsPreview
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const [lastVisitedLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
@@ -29,36 +21,36 @@ export const LogPage: NextPageWithLayout = () => {
   )
 
   useEffect(() => {
-    if (!showUnifiedLogs) {
+    if (!isUnifiedLogsEnabled) {
       router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
     }
-  }, [router, lastVisitedLogsPage, ref, showUnifiedLogs])
+  }, [router, lastVisitedLogsPage, ref, isUnifiedLogsEnabled])
 
   // Handle redirects when unified logs preview flag changes
   useEffect(() => {
     // Only handle redirects if we're currently on a logs page
     if (!router.asPath.includes('/logs')) return
 
-    if (unifiedLogsPreview) {
+    if (isUnifiedLogsEnabled) {
       // If unified logs preview is enabled and we're not already on the main logs page
       if (router.asPath !== `/project/${ref}/logs` && router.asPath.includes('/logs/')) {
         router.push(`/project/${ref}/logs`)
       }
-    } else if (!unifiedLogsAdminEnabled) {
+    } else if (!isUnifiedLogsEnabled) {
       // If unified logs preview is disabled and admin flag is also off
       // and we're on the main logs page, redirect to explorer
       if (router.asPath === `/project/${ref}/logs`) {
         router.push(`/project/${ref}/logs/explorer`)
       }
     }
-  }, [unifiedLogsPreview, unifiedLogsAdminEnabled, router, ref])
+  }, [isUnifiedLogsEnabled, router, ref])
 
-  if (showUnifiedLogs) {
+  if (isUnifiedLogsEnabled) {
     return (
       <DefaultLayout>
-        <UnifiedLogsLayout>
+        <ProjectLayout>
           <UnifiedLogs />
-        </UnifiedLogsLayout>
+        </ProjectLayout>
       </DefaultLayout>
     )
   }

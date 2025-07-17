@@ -1,6 +1,5 @@
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -31,7 +30,6 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 }
 
 const FeaturePreviewModal = () => {
-  const router = useRouter()
   const { ref } = useParams()
   const {
     showFeaturePreviewModal,
@@ -60,14 +58,6 @@ const FeaturePreviewModal = () => {
       properties: { feature: selectedFeature.key },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
-
-    if (selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS) {
-      if (!isSelectedFeatureEnabled) {
-        router.push(`/project/${ref}/logs`)
-      } else {
-        router.push(`/project/${ref}/logs/explorer`)
-      }
-    }
   }
 
   return (
