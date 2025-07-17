@@ -1,0 +1,35 @@
+[data-theme='dark'],
+[data-theme='deep-dark'],
+.dark,
+.deep-dark {
+  --code-token-keyword: var(--primary);
+  --code-foreground: var(--foreground);
+  --code-token-constant: var(--chart-2);
+  --code-token-string: var(--chart-4);
+  --code-token-comment: var(--muted-foreground);
+  --code-token-parameter: var(--foreground);
+  --code-token-function: var(--chart-2);
+  --code-token-string-expression: var(--chart-4);
+  --code-token-punctuation: var(--foreground);
+  --code-token-link: var(--foreground);
+  --code-token-number: var(--foreground);
+  --code-token-property: var(--chart-2);
+  --code-highlight-color: var(--background);
+}
+
+[data-theme='light'],
+.light {
+  --code-token-keyword: var(--primary);
+  --code-foreground: hsl(var(--foreground));
+  --code-token-constant: var(--chart-2);
+  --code-token-string: var(--chart-4);
+  --code-token-comment: var(--muted-foreground);
+  --code-token-parameter: hsl(var(--foreground));
+  --code-token-function: var(--chart-2);
+  --code-token-string-expression: var(--chart-4);
+  --code-token-punctuation: hsl(var(--foreground));
+  --code-token-link: hsl(var(--foreground));
+  --code-token-number: hsl(var(--foreground));
+  --code-token-property: var(--chart-2);
+  --code-highlight-color: var(--background);
+}
