@@ -11,6 +11,7 @@ import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import {
   Button,
+  ButtonProps,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -31,9 +32,15 @@ interface Props {
   value: DatePickerValue
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
+  buttonTriggerProps?: ButtonProps
 }
 
-export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {
+export const LogsDatePicker = ({
+  onSubmit,
+  helpers,
+  value,
+  buttonTriggerProps,
+}: PropsWithChildren<Props>) => {
   const [open, setOpen] = useState(false)
 
   // Reset the state when the popover closes
@@ -230,7 +237,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<Clock size={12} />}>
+        <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
           {value.isHelper
             ? value.text
             : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
