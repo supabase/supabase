@@ -22,6 +22,9 @@ import {
   Button,
 } from 'ui'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { useTheme } from 'next-themes'
+import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
+import { cn } from 'ui'
 
 export const description = 'A bar chart with a custom label'
 
@@ -271,36 +274,15 @@ export function ChartWithQuery() {
     <div className="w-full flex flex-row gap-4">
       <Card className="w-full">
         <CardContent className="p-4">
-          <pre className="text-sm">
-            <code>
-              {`SELECT
+          <InteractiveCodeBlock
+            language="sql"
+            code={`SELECT
   team_size,
   COUNT(*) AS total
 FROM dummy_survey_responses
-WHERE region `}
-              <InlineFilterDropdown
-                filterKey="region"
-                filterConfig={filters.region}
-                selectedValue={activeFilters.region}
-                setFilterValue={setFilterValue}
-              />
-              {`
-  AND funding_stage `}
-              <InlineFilterDropdown
-                filterKey="funding_stage"
-                filterConfig={filters.funding_stage}
-                selectedValue={activeFilters.funding_stage}
-                setFilterValue={setFilterValue}
-              />
-              {`
-  AND age_group `}
-              <InlineFilterDropdown
-                filterKey="age_group"
-                filterConfig={filters.age_group}
-                selectedValue={activeFilters.age_group}
-                setFilterValue={setFilterValue}
-              />
-              {`
+WHERE region [FILTER_PLACEHOLDER_1]
+  AND funding_stage [FILTER_PLACEHOLDER_2]
+  AND age_group [FILTER_PLACEHOLDER_3]
 GROUP BY team_size
 ORDER BY 
   CASE team_size
@@ -310,8 +292,33 @@ ORDER BY
     WHEN '101-250' THEN 4
     WHEN '250+' THEN 5
   END;`}
-            </code>
-          </pre>
+            placeholders={{
+              '[FILTER_PLACEHOLDER_1]': (
+                <InlineFilterDropdown
+                  filterKey="region"
+                  filterConfig={filters.region}
+                  selectedValue={activeFilters.region}
+                  setFilterValue={setFilterValue}
+                />
+              ),
+              '[FILTER_PLACEHOLDER_2]': (
+                <InlineFilterDropdown
+                  filterKey="funding_stage"
+                  filterConfig={filters.funding_stage}
+                  selectedValue={activeFilters.funding_stage}
+                  setFilterValue={setFilterValue}
+                />
+              ),
+              '[FILTER_PLACEHOLDER_3]': (
+                <InlineFilterDropdown
+                  filterKey="age_group"
+                  filterConfig={filters.age_group}
+                  selectedValue={activeFilters.age_group}
+                  setFilterValue={setFilterValue}
+                />
+              ),
+            }}
+          />
         </CardContent>
       </Card>
       <Card className="w-full">
@@ -376,5 +383,90 @@ ORDER BY
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+function InteractiveCodeBlock({ language, code, placeholders }) {
+  const { resolvedTheme } = useTheme()
+
+  return (
+    <Highlight
+      theme={resolvedTheme === 'dark' ? themes.nightOwl : themes.nightOwlLight}
+      code={code}
+      language={language as Language}
+    >
+      {({ className, tokens, getLineProps, getTokenProps }) => {
+        return (
+          <div className="Code codeBlockWrapper group">
+            <pre className={cn('codeBlock', className)}>
+              {tokens.map((line, i) => {
+                const lineProps = getLineProps({ line, key: i })
+
+                // Convert the line to a string to check for placeholders
+                const lineText = line.map((token) => token.content).join('')
+
+                // Check if this line contains any placeholders
+                const hasPlaceholder = Object.keys(placeholders).some((placeholder) =>
+                  lineText.includes(placeholder)
+                )
+
+                if (hasPlaceholder) {
+                  // Handle line with placeholders
+                  let remainingText = lineText
+                  const elements = []
+                  let elementKey = 0
+
+                  // Find and replace placeholders
+                  Object.entries(placeholders).forEach(([placeholder, component]) => {
+                    const placeholderIndex = remainingText.indexOf(placeholder)
+                    if (placeholderIndex !== -1) {
+                      // Add text before placeholder
+                      if (placeholderIndex > 0) {
+                        const beforeText = remainingText.substring(0, placeholderIndex)
+                        elements.push(
+                          <span key={elementKey++} className="token string">
+                            {beforeText}
+                          </span>
+                        )
+                      }
+
+                      // Add placeholder component
+                      elements.push(<span key={elementKey++}>{component}</span>)
+
+                      // Update remaining text
+                      remainingText = remainingText.substring(placeholderIndex + placeholder.length)
+                    }
+                  })
+
+                  // Add any remaining text
+                  if (remainingText) {
+                    elements.push(
+                      <span key={elementKey++} className="token string">
+                        {remainingText}
+                      </span>
+                    )
+                  }
+
+                  return (
+                    <div key={i} {...lineProps}>
+                      {elements}
+                    </div>
+                  )
+                } else {
+                  // Handle normal line without placeholders
+                  return (
+                    <div key={i} {...lineProps}>
+                      {line.map((token, key) => (
+                        <span key={key} {...getTokenProps({ token, key })} />
+                      ))}
+                    </div>
+                  )
+                }
+              })}
+            </pre>
+          </div>
+        )
+      }}
+    </Highlight>
   )
 }
