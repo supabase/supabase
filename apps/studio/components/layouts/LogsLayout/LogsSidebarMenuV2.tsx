@@ -229,6 +229,12 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
+      <FeaturePreviewSidebarPanel
+        className="mx-4 mt-4"
+        illustration={<Badge variant="default">Coming soon</Badge>}
+        title="New logs"
+        description="Rollout of new logs coming soon"
+      />
       {isUnifiedLogsPreviewAvailable && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
