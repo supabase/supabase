@@ -4,14 +4,15 @@ title: 'Realtime Protocol'
 description: 'Understanding Realtime Protocol'
 ---
 
-## Websocket connection setup
+## WebSocket connection setup
 
-To start the connection we use the WebSocket url, which for:
+To start the connection we use the WebSocket URL, which for:
 
-- supabase projects is `wss://<PROJECT_REF>.supabase.co/realtime/v1/websocket?apikey=<API_KEY>`
-- self-hosted projects is `wss://<HOST>:<PORT>/socket/websocket?apikey=<API_KEY>`
+- Supabase projects: `wss://<PROJECT_REF>.supabase.co/realtime/v1/websocket?apikey=<API_KEY>`
+- self-hosted projects: `wss://<HOST>:<PORT>/socket/websocket?apikey=<API_KEY>`
 
-As an example, using the websocat project, you would run the following command in your terminal:
+{/* supa-mdx-lint-disable Rule003Spelling */}
+As an example, using the [websocat](https://github.com/vi/websocat), you would run the following command in your terminal:
 
 ```bash
 # With Supabase
@@ -25,7 +26,7 @@ During this stage you can also set other URL params:
 
 - `log_level`: sets the log level to be used by this connection to help you debug potential issues
 
-After this you would need to send the [phx_join](#phx_join) event to the server to join the Channel.
+After this you would need to send the `phx_join` event to the server to join the Channel.
 
 ## Protocol messages
 
@@ -50,8 +51,8 @@ All messages sent to the server or received from the server follow the same stru
 ### Event types
 
 The following are the main event types used in the Realtime protocol:
-| Event Type | Description | Client Sent? | Server Sent? | Requires Ref? |
-|------------|-------------|---------------|-------------|---------------|
+| Event Type | Description | Client Sent | Server Sent | Requires Ref |
+|------------|-------------|--------------|-------------|--------------|
 | `phx_join` | Initial message to join a channel and configure features | ✅ | ⛔ | ✅ |
 | `phx_close` | Message from server to signal channel closed | ✅ | ⛔ | ⛔ |
 | `phx_leave` | Message to leave a channel | ✅ | ⛔ | ✅ |
@@ -68,7 +69,7 @@ The following are the main event types used in the Realtime protocol:
 
 Each one of these events has a specific payload field structure that defines the data it carries. Below are the details for each event type payload.
 
-#### phx_join
+#### Payload of phx_join
 
 This is the initial message required to join a channel. The client sends this message to the server to join a specific topic and configure the features it wants to use, such as Postgres changes, presence, and broadcasting.
 
@@ -113,19 +114,19 @@ This is the initial message required to join a channel. The client sends this me
     - `filter`: Filter to be used when pulling changes from database. Read more about filters in the usage docs for [Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes)
 - `access_token`: Optional access token for authentication, if not provided, the server will use the default access token.
 
-#### phx_close
+#### Payload of phx_close
 
 This message is sent by the server to signal that the channel has been closed. Payload will be empty object.
 
-#### phx_leave
+#### Payload of phx_leave
 
 This message is sent by the client to leave a channel. It can be used to clean up resources or stop listening for events on that channel. Payload should be empty object.
 
-#### phx_error
+#### Payload of phx_error
 
 This message is sent by the server when an unexpected error occurs in the channel. Payload will be an empty object
 
-#### phx_reply
+#### Payload of phx_reply
 
 These messages are sent by the server on messages that expect a response. Their response can vary with the type of usage.
 
@@ -139,7 +140,7 @@ These messages are sent by the server on messages that expect a response. Their 
 - `status`: The status of the response, can be `ok` or `error`.
 - `response`: The response data, which can vary based on the event that was replied to
 
-##### phx_reply response to phx_join
+##### Payload of phx_reply response to phx_join
 
 Contains the status of the join request and any additional information requested in the `phx_join` payload.
 
@@ -162,15 +163,15 @@ Contains the status of the join request and any additional information requested
   - `schema`: The schema of the table the client is subscribed to
   - `table`: The table the client is subscribed to
 
-##### phx_reply response to presence
+##### Payload of phx_reply response to presence
 
 When replying to presence events, it returns an empty object.
 
-##### phx_reply response on heartbeat
+##### Payload of phx_reply response on heartbeat
 
 When replying to heartbeat events, it returns an empty object.
 
-#### system
+#### Payload of system
 
 System messages are sent by the server to inform the client about the status of Realtime channel subscriptions.
 
@@ -188,11 +189,11 @@ System messages are sent by the server to inform the client about the status of 
 - `extension`: The extension that sent the message.
 - `channel`: The channel to which the message belongs, such as `realtime:room1`.
 
-#### heartbeat
+#### Payload of heartbeat
 
 The heartbeat message should be sent at least every 30 seconds to avoid a connection timeout. Payload should be empty object.
 
-#### access_token
+#### Payload of access_token
 
 Used to setup a new token to be used by Realtime for authentication and to refresh the token to prevent the channel from closing.
 
@@ -204,7 +205,7 @@ Used to setup a new token to be used by Realtime for authentication and to refre
 
 - `access_token`: The new access token to be used for authentication. Either to change it or to refresh it.
 
-#### postgres_changes
+#### Payload of postgres_changes
 
 Server sent message with a change from a listened schema and table. This message is sent when a change occurs in the database that the client is subscribed to. The payload contains the details of the change, including the schema, table, event type, and the new and old values.
 
@@ -242,9 +243,9 @@ Server sent message with a change from a listened schema and table. This message
   - `errors`: Any errors that occurred during the change, if applicable.
   - `latency`: The latency of the change event, in milliseconds.
 
-### broadcast
+### Payload of broadcast
 
-Structure of the broadcast event to be sent to all clients in a channel. The `payload` field contains the event name and the data to be broadcasted.
+Structure of the broadcast event to be sent to all clients in a channel. The `payload` field contains the event name and the data to broadcast.
 
 ```ts
 {
@@ -254,15 +255,15 @@ Structure of the broadcast event to be sent to all clients in a channel. The `pa
 }
 ```
 
-- `event`: The name of the event being broadcasted.
+- `event`: The name of the event to broadcast.
 - `payload`: The data associated with the event, which can be any JSON-serializable data structure.
 - `type`: The type of message, which is always `broadcast` for broadcast messages.
 
-### presence
+### Payload of presence
 
 Presence messages are used to track the online status of clients in a channel. When a client joins or leaves a channel, a presence message is sent to all clients in that channel.
 
-### presence_state
+### Payload of presence_state
 
 After joining, the server sends a `presence_state` message to a client with presence information. The payload field contains keys in UUID format, where each key represents a client and its value is a JSON object containing information about that client.
 
@@ -286,7 +287,7 @@ After joining, the server sends a `presence_state` message to a client with pres
   - `name`: The name of the client.
   - `t`: A timestamp indicating when the client joined or last updated its presence state.
 
-### presence_diff
+### Payload of presence_diff
 
 After a change to the presence state, such as a client joining or leaving, the server sends a presence_diff message to update the client's view of the presence state. The payload field contains two keys, `joins` and `leaves`, which represent clients that have joined and left, respectively. The values associated with each key are UUIDs of the clients.
 
@@ -311,3 +312,7 @@ After a change to the presence state, such as a client joining or leaving, the s
 
 - `joins`: An object containing metadata for clients that have joined the channel, with keys as UUIDs and values as metadata objects.
 - `leaves`: An object containing metadata for clients that have left the channel, with keys as UUIDs and values as metadata objects.
+
+## REST API
+
+The Realtime protocol is primarily designed for WebSocket communication, but it can also be accessed via a REST API. This allows you to interact with the Realtime service using standard HTTP methods.
