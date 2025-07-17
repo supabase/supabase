@@ -14,7 +14,7 @@ describe(`NewAccessTokenButton`, () => {
       response: {
         name: faker.lorem.word(),
         scope: faker.helpers.arrayElement(['V0', undefined]),
-        created_at: faker.date.past(),
+        created_at: faker.date.past().toISOString(),
         id: faker.number.int(),
         token_alias: faker.lorem.words(),
         token: faker.lorem.words(),
