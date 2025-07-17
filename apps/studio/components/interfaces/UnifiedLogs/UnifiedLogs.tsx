@@ -100,6 +100,8 @@ export const UnifiedLogs = () => {
     data: unifiedLogsData,
     isLoading,
     isFetching,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
     hasNextPage,
     refetch: refetchLogs,
     fetchNextPage,
@@ -130,6 +132,9 @@ export const UnifiedLogs = () => {
   }
 
   const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
+
+  // Only fade when filtering (not when loading more data or live mode)
+  const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
@@ -336,7 +341,10 @@ export const UnifiedLogs = () => {
               />
               <TimelineChart
                 data={unifiedLogsChart}
-                className="-mb-2"
+                className={cn(
+                  '-mb-2',
+                  isFetchingCharts && 'opacity-60 transition-opacity duration-150'
+                )}
                 columnId="timestamp"
                 chartConfig={filteredChartConfig}
               />
@@ -351,7 +359,14 @@ export const UnifiedLogs = () => {
                 className="h-full"
               >
                 <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
-                  <ResizablePanel defaultSize={100} minSize={30} className="bg">
+                  <ResizablePanel
+                    defaultSize={100}
+                    minSize={30}
+                    className={cn(
+                      'bg',
+                      isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
+                    )}
+                  >
                     <DataTableInfinite
                       columns={UNIFIED_LOGS_COLUMNS}
                       totalRows={totalDBRowCount}
