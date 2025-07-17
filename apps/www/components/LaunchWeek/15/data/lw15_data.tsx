@@ -160,7 +160,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '/blog/new-observability-features-in-supabase',
     date: 'Thursday',
     published_at: '2025-04-03T07:00:00.000-07:00',
-    title: 'New Observability Features in Supabase',
+    title: 'Introducing New Observability Features in Supabase',
     description: '',
     links: [
       {
