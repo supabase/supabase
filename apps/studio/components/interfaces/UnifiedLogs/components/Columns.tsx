@@ -127,22 +127,6 @@ export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = [
         'font-mono w-[--col-status-size] max-w-[--col-status-size] min-w-[--col-status-size]',
     },
   },
-
-  {
-    accessorKey: 'host',
-    header: 'Host',
-    cell: ({ row }) => {
-      const value = row.getValue<ColumnSchema['host']>('host')
-      return <TextWithTooltip text={value} />
-    },
-    enableSorting: false,
-    size: 220,
-    minSize: 220,
-    meta: {
-      cellClassName: 'font-mono w-[--col-host-size] max-w-[--col-host-size]',
-      headerClassName: 'min-w-[--header-host-size] w-[--header-host-size]',
-    },
-  },
   {
     accessorKey: 'pathname',
     header: 'Pathname',
