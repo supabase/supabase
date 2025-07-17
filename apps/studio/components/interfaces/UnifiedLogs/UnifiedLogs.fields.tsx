@@ -106,20 +106,6 @@ export const filterFields = [
     },
   },
   {
-    label: 'Host',
-    value: 'host',
-    type: 'checkbox',
-    defaultOpen: false,
-    options: [], // Will be populated dynamically from facets
-    component: (props: Option) => {
-      return (
-        <span className="truncate block text-[0.75rem]" title={props.value as string}>
-          {props.value}
-        </span>
-      )
-    },
-  },
-  {
     label: 'Pathname',
     value: 'pathname',
     type: 'checkbox',
