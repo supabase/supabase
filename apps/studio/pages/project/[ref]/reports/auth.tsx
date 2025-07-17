@@ -16,8 +16,11 @@ import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import { getAuthReportAttributes } from 'data/reports/auth-charts'
 import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import type { NextPageWithLayout } from 'types'
+import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
 
 const AuthReport: NextPageWithLayout = () => {
   return (
@@ -41,13 +44,31 @@ const AuthUsage = () => {
 
   const {
     selectedDateRange,
-    updateDateRange: updateDateRangeFromHook,
-    handleDatePickerChange,
+    updateDateRange,
     datePickerValue,
     datePickerHelpers,
     isOrgPlanLoading,
     orgPlan,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
   } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const {
+    data,
+    error,
+    isLoading,
+    refetch,
+    isRefetching,
+    filters,
+    addFilter,
+    removeFilters,
+    isLoadingData,
+  } = useSharedAPIReport({
+    filterBy: 'auth',
+    start: selectedDateRange?.period_start?.date,
+    end: selectedDateRange?.period_end?.date,
+  })
 
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -61,21 +82,11 @@ const AuthUsage = () => {
     setIsRefreshing(true)
     AUTH_REPORT_ATTRIBUTES.forEach((attr) => {
       attr.attributes.forEach((subAttr) => {
-        queryClient.invalidateQueries([
-          'auth-metrics',
-          ref,
-          subAttr.attribute,
-          selectedDateRange.period_start.date,
-          selectedDateRange.period_end.date,
-          selectedDateRange.interval,
-        ])
+        queryClient.invalidateQueries(['auth-logs-report', 'auth-metrics'])
       })
     })
+    refetch()
     setTimeout(() => setIsRefreshing(false), 1000)
-  }
-
-  const updateDateRange: UpdateDateRange = (from: string, to: string) => {
-    updateDateRangeFromHook(from, to)
   }
 
   return (
@@ -97,6 +108,13 @@ const AuthUsage = () => {
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="authReportDateRange"
               />
               {selectedDateRange && (
                 <div className="flex items-center gap-x-2 text-xs">
@@ -124,8 +142,31 @@ const AuthUsage = () => {
               startDate={selectedDateRange?.period_start?.date}
               endDate={selectedDateRange?.period_end?.date}
               updateDateRange={updateDateRange}
+              orgPlanId={orgPlan?.id}
+              isLoading={isRefreshing}
             />
           ))}
+        <div>
+          <div className="mb-4">
+            <h5 className="text-foreground mb-2">Auth API Gateway</h5>
+            <ReportFilterBar
+              filters={filters}
+              onAddFilter={addFilter}
+              onRemoveFilters={removeFilters}
+              isLoading={isLoadingData || isRefetching}
+              hideDatepicker={true}
+              datepickerHelpers={datePickerHelpers}
+              selectedProduct={'auth'}
+              showDatabaseSelector={false}
+            />
+          </div>
+          <SharedAPIReport
+            data={data}
+            error={error}
+            isLoading={isLoading}
+            isRefetching={isRefetching}
+          />
+        </div>
       </ReportStickyNav>
     </>
   )

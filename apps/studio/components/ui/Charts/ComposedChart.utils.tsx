@@ -14,6 +14,7 @@ export interface ReportAttributes {
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
+  availableIn?: string[]
   hideChartType?: boolean
   format?: string
   className?: string
@@ -54,6 +55,7 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   customValue?: number
+  [key: string]: any
   /**
    * Manipulate the value of the attribute before it is displayed on the chart.
    * @param value - The value of the attribute.
@@ -130,6 +132,7 @@ export const calculateTotalChartAggregate = (
 const CustomTooltip = ({
   active,
   payload,
+  label,
   attributes,
   isPercentage,
   format,
@@ -143,7 +146,9 @@ const CustomTooltip = ({
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
-    const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isRamChart =
+      !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
