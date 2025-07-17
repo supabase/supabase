@@ -31,9 +31,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Separator,
   SonnerProgress,
@@ -234,7 +231,7 @@ const RowHeader = () => {
   const { sorts } = useTableSort()
 
   const [isExporting, setIsExporting] = useState(false)
-  const [showExportModal, setShowExportModal] = useState<'csv' | 'sql'>()
+  const [showExportModal, setShowExportModal] = useState(false)
 
   const { data } = useTableRowsQuery({
     projectRef: project?.ref,
@@ -484,25 +481,17 @@ const RowHeader = () => {
               Export
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-60">
+          <DropdownMenuContent className={snap.allRowsSelected ? 'w-52' : 'w-40'}>
             <DropdownMenuItem onClick={onRowsExportCSV}>Export as CSV</DropdownMenuItem>
             <DropdownMenuItem onClick={onRowsExportSQL}>Export as SQL</DropdownMenuItem>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="group">
+            {snap.allRowsSelected && (
+              <DropdownMenuItem className="group" onClick={() => setShowExportModal(true)}>
                 <div>
-                  <p className="group-hover:text-foreground">Export via psql</p>
+                  <p className="group-hover:text-foreground">Export via CLI</p>
                   <p className="text-foreground-lighter">Recommended for large tables</p>
                 </div>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={() => setShowExportModal('csv')}>
-                  As CSV
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowExportModal('sql')}>
-                  As SQL
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -518,7 +507,7 @@ const RowHeader = () => {
         )}
       </div>
 
-      <ExportDialog format={showExportModal} onOpenChange={() => setShowExportModal(undefined)} />
+      <ExportDialog open={showExportModal} onOpenChange={() => setShowExportModal(false)} />
     </>
   )
 }
