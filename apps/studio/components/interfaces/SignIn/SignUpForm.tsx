@@ -61,22 +61,22 @@ const SignUpForm = () => {
         ? location.origin
         : process.env.NEXT_PUBLIC_SITE_URL
     }${BASE_PATH}`
-    
+
     let redirectTo: string
-    
+
     if (isInsideOAuthFlow) {
       redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
     } else {
       // Reconstruct the full URL with all the query parameters to use as the redirectTo parameter
       const { returnTo, auth_id, token, ...otherParams } = router.query
-      
+
       const queryString = Object.entries(otherParams)
         .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
         .join('&')
-      
+
       const basePath = returnTo || '/sign-in'
       const fullPath = queryString ? `${basePath}?${queryString}` : basePath
-      
+
       redirectTo = `${redirectUrlBase}${fullPath}`
     }
 
