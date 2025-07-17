@@ -5,7 +5,7 @@ packages:
 
 catalog:
   '@types/node': ^22.0.0
-  '@supabase/auth-js': 2.71.0-rc.8
+  '@supabase/auth-js': 2.71.1-rc.1
   '@supabase/supabase-js': ^2.47.14
   '@supabase/realtime-js': ^2.11.3
   next: 15.3.1
