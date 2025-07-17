@@ -11637,8 +11637,8 @@ packages:
   fastify-plugin@4.5.1:
     resolution: {integrity: sha512-stRHYGeuqpEZTL1Ef0Ovr2ltazUT9g844X5z/zEBFLG8RYlpDiOCIG+ATvYEp+/zmc7sN29mcIMp8gvYplYPIQ==}
 
-  fastify@4.29.0:
-    resolution: {integrity: sha512-MaaUHUGcCgC8fXQDsDtioaCcag1fmPJ9j64vAKunqZF4aSub040ZGi/ag8NGE2714yREPOKZuHCfpPzuUD3UQQ==}
+  fastify@4.29.1:
+    resolution: {integrity: sha512-m2kMNHIG92tSNWv+Z3UeTR9AWLLuo7KctC7mlFPtMEVrfjIhmQhkQnT9v15qA/BfVq3vvj134Y0jl9SBje3jXQ==}
 
   fastq@1.18.0:
     resolution: {integrity: sha512-QKHXPW0hD8g4UET03SdOdunzSouc9N4AuHdsX8XNcTsuz+yYFILVNIX4l9yHABMhiEI9Db0JTTIpu0wB+Y1QQw==}
@@ -20792,8 +20792,8 @@ snapshots:
 
   '@fastify/ajv-compiler@3.6.0':
     dependencies:
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.17.1
+      ajv-formats: 2.1.1(ajv@8.17.1)
       fast-uri: 2.4.0
 
   '@fastify/busboy@3.1.1': {}
@@ -21897,8 +21897,8 @@ snapshots:
       '@sinclair/typebox': 0.31.28
       close-with-grace: 1.3.0
       crypto-js: 4.2.0
-      fastify: 4.29.0
-      fastify-metrics: 10.6.0(fastify@4.29.0)
+      fastify: 4.29.1
+      fastify-metrics: 10.6.0(fastify@4.29.1)
       pg: 8.11.3
       pg-connection-string: 2.6.2
       pg-format: 1.0.4
@@ -28939,9 +28939,9 @@ snapshots:
     optionalDependencies:
       ajv: 8.17.1
 
-  ajv-formats@3.0.1(ajv@8.12.0):
+  ajv-formats@3.0.1(ajv@8.17.1):
     optionalDependencies:
-      ajv: 8.12.0
+      ajv: 8.17.1
 
   ajv-keywords@3.5.2(ajv@6.12.6):
     dependencies:
@@ -31408,8 +31408,8 @@ snapshots:
   fast-json-stringify@5.16.1:
     dependencies:
       '@fastify/merge-json-schemas': 0.1.1
-      ajv: 8.12.0
-      ajv-formats: 3.0.1(ajv@8.12.0)
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
       fast-deep-equal: 3.1.3
       fast-uri: 2.4.0
       json-schema-ref-resolver: 1.0.1
@@ -31447,15 +31447,15 @@ snapshots:
 
   fastest-stable-stringify@2.0.2: {}
 
-  fastify-metrics@10.6.0(fastify@4.29.0):
+  fastify-metrics@10.6.0(fastify@4.29.1):
     dependencies:
-      fastify: 4.29.0
+      fastify: 4.29.1
       fastify-plugin: 4.5.1
       prom-client: 14.2.0
 
   fastify-plugin@4.5.1: {}
 
-  fastify@4.29.0:
+  fastify@4.29.1:
     dependencies:
       '@fastify/ajv-compiler': 3.6.0
       '@fastify/error': 3.4.1
