@@ -114,25 +114,6 @@ export const filterFields = [
       )
     },
   },
-  {
-    label: 'Auth User',
-    value: 'auth_user',
-    type: 'checkbox',
-    defaultOpen: false,
-    options: [],
-    hasDynamicOptions: true,
-    hasAsyncSearch: true,
-    component: (props: Option) => {
-      return (
-        <div className="flex items-center gap-2 min-w-0">
-          <User size={14} className="text-foreground-lighter flex-shrink-0" />
-          <span className="truncate text-[0.75rem]" title={props.value as string}>
-            {props.value}
-          </span>
-        </div>
-      )
-    },
-  },
 ] satisfies DataTableFilterField<ColumnSchema>[]
 
 export const sheetFields = [
