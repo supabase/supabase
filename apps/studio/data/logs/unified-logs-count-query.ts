@@ -88,6 +88,7 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ({ signal }) => getUnifiedLogsCount({ projectRef, search }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      keepPreviousData: true,
       ...UNIFIED_LOGS_QUERY_OPTIONS,
       ...options,
     }

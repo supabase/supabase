@@ -329,12 +329,14 @@ export const UnifiedLogs = () => {
                   ) : null,
                 ]}
               />
-              <TimelineChart
-                data={unifiedLogsChart}
-                className="-mb-2"
-                columnId="timestamp"
-                chartConfig={filteredChartConfig}
-              />
+              <div className={cn(isFetchingCharts && 'opacity-60 transition-opacity')}>
+                <TimelineChart
+                  data={unifiedLogsChart}
+                  className="-mb-2"
+                  columnId="timestamp"
+                  chartConfig={filteredChartConfig}
+                />
+              </div>
             </DataTableHeaderLayout>
 
             <Separator />
@@ -347,22 +349,24 @@ export const UnifiedLogs = () => {
               >
                 <ResizablePanelGroup key="main-logs" direction="vertical" className="h-full">
                   <ResizablePanel defaultSize={100} minSize={30} className="bg">
-                    <DataTableInfinite
-                      columns={UNIFIED_LOGS_COLUMNS}
-                      totalRows={totalDBRowCount}
-                      filterRows={filterDBRowCount}
-                      totalRowsFetched={totalFetched}
-                      fetchNextPage={fetchNextPage}
-                      hasNextPage={hasNextPage}
-                      renderLiveRow={(props) => {
-                        if (!liveMode.timestamp) return null
-                        if (props?.row?.original.id !== liveMode?.row?.id) return null
-                        return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
-                      }}
-                      setColumnOrder={setColumnOrder}
-                      setColumnVisibility={setColumnVisibility}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
+                    <div className={cn('h-full', isFetching && 'opacity-60 transition-opacity')}>
+                      <DataTableInfinite
+                        columns={UNIFIED_LOGS_COLUMNS}
+                        totalRows={totalDBRowCount}
+                        filterRows={filterDBRowCount}
+                        totalRowsFetched={totalFetched}
+                        fetchNextPage={fetchNextPage}
+                        hasNextPage={hasNextPage}
+                        renderLiveRow={(props) => {
+                          if (!liveMode.timestamp) return null
+                          if (props?.row?.original.id !== liveMode?.row?.id) return null
+                          return <LiveRow colSpan={UNIFIED_LOGS_COLUMNS.length - 1} />
+                        }}
+                        setColumnOrder={setColumnOrder}
+                        setColumnVisibility={setColumnVisibility}
+                        searchParamsParser={SEARCH_PARAMS_PARSER}
+                      />
+                    </div>
                   </ResizablePanel>
                   <LogsListPanel selectedRow={selectedRow} />
                 </ResizablePanelGroup>
