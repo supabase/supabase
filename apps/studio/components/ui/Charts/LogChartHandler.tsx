@@ -131,7 +131,7 @@ const LogChartHandler = ({
       id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       {isLoading && (
-        <div className="absolute inset-0 rounded-md flex w-full flex-col items-center justify-center gap-y-2 bg-surface-100/50 backdrop-blur-sm z-20">
+        <div className="absolute inset-0 rounded-md flex w-full flex-col items-center justify-center gap-y-2 bg-surface-100 backdrop z-20">
           <Loader2 size={18} className="animate-spin text-border-strong" />
           <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
         </div>
