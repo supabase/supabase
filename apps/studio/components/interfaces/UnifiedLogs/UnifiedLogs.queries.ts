@@ -459,7 +459,7 @@ const getSupabaseStorageLogsQuery = () => {
 /**
  * Combine all log sources to create the unified logs CTE
  */
-const getUnifiedLogsCTE = () => {
+export const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
     ${getPostgrestLogsQuery()}
@@ -510,39 +510,72 @@ ${finalWhere}
  * Get a count query for the total logs within the timeframe
  * Uses proper faceted search behavior where facets show "what would I get if I selected ONLY this option"
  */
+
+// Helper function to build WHERE clause excluding a specific field
+const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): string => {
+  const conditions: string[] = []
+
+  Object.entries(search).forEach(([key, value]) => {
+    if (key === excludeField) return // Skip the field we're getting facets for
+    if (EXCLUDED_QUERY_PARAMS.includes(key as any)) return // Skip pagination and special params
+
+    // Handle array filters (IN clause)
+    if (Array.isArray(value) && value.length > 0) {
+      conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      return
+    }
+
+    // Handle scalar values
+    if (value !== null && value !== undefined) {
+      if (['host', 'pathname'].includes(key)) {
+        conditions.push(`${key} LIKE '%${value}%'`)
+      } else {
+        conditions.push(`${key} = '${value}'`)
+      }
+    }
+  })
+
+  return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+}
+
+export const getFacetCountCTE = ({
+  search,
+  facet,
+  facetSearch,
+}: {
+  search: QuerySearchParamsType
+  facet: string
+  facetSearch?: string
+}) => {
+  const MAX_FACETS_QUANTITY = 20
+
+  return `
+${facet}_count AS (
+  SELECT '${facet}' as dimension, ${facet} as value, COUNT(*) as count
+  FROM unified_logs
+  ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
+  ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
+  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch}%'` : ''}
+  GROUP BY ${facet}
+  LIMIT ${MAX_FACETS_QUANTITY}
+)
+`.trim()
+}
+
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
   const { finalWhere } = buildQueryConditions(search)
 
-  // Helper function to build WHERE clause excluding a specific field
-  const buildFacetWhere = (excludeField: string): string => {
-    const conditions: string[] = []
-
-    Object.entries(search).forEach(([key, value]) => {
-      if (key === excludeField) return // Skip the field we're getting facets for
-      if (EXCLUDED_QUERY_PARAMS.includes(key as any)) return // Skip pagination and special params
-
-      // Handle array filters (IN clause)
-      if (Array.isArray(value) && value.length > 0) {
-        conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
-        return
-      }
-
-      // Handle scalar values
-      if (value !== null && value !== undefined) {
-        if (['host', 'pathname'].includes(key)) {
-          conditions.push(`${key} LIKE '%${value}%'`)
-        } else {
-          conditions.push(`${key} = '${value}'`)
-        }
-      }
-    })
-
-    return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
-  }
-
   // Create a count query using the same unified logs CTE
   const sql = `
-${getUnifiedLogsCTE()}
+${getUnifiedLogsCTE()},
+${getFacetCountCTE({ search, facet: 'log_type' })},
+${getFacetCountCTE({ search, facet: 'method' })},
+${getFacetCountCTE({ search, facet: 'level' })},
+${getFacetCountCTE({ search, facet: 'status' })},
+${getFacetCountCTE({ search, facet: 'host' })},
+${getFacetCountCTE({ search, facet: 'pathname' })},
+${getFacetCountCTE({ search, facet: 'auth_user' })}
+
 -- Get total count
 SELECT 'total' as dimension, 'all' as value, COUNT(*) as count
 FROM unified_logs
@@ -551,65 +584,37 @@ ${finalWhere}
 UNION ALL
 
 -- Get counts by log_type (exclude log_type filter to avoid self-filtering)
-SELECT 'log_type' as dimension, log_type as value, COUNT(*) as count
-FROM unified_logs
-${buildFacetWhere('log_type') || 'WHERE log_type IS NOT NULL'}
-${buildFacetWhere('log_type') ? ' AND log_type IS NOT NULL' : ''}
-GROUP BY log_type
+SELECT dimension, value, count from log_type_count
 
 UNION ALL
 
 -- Get counts by method (exclude method filter to avoid self-filtering)  
-SELECT 'method' as dimension, method as value, COUNT(*) as count
-FROM unified_logs
-${buildFacetWhere('method') || 'WHERE method IS NOT NULL'}
-${buildFacetWhere('method') ? ' AND method IS NOT NULL' : ''}
-GROUP BY method
+SELECT dimension, value, count from method_count
 
 UNION ALL
 
 -- Get counts by level (exclude level filter to avoid self-filtering)
-SELECT 'level' as dimension, level as value, COUNT(*) as count
-FROM unified_logs
-${buildFacetWhere('level') || 'WHERE level IS NOT NULL'}
-${buildFacetWhere('level') ? ' AND level IS NOT NULL' : ''}
-GROUP BY level
+SELECT dimension, value, count from level_count
 
 UNION ALL
 
 -- Get counts by status (exclude status filter to avoid self-filtering)
-SELECT 'status' as dimension, status as value, COUNT(*) as count
-FROM unified_logs
-${buildFacetWhere('status') || 'WHERE status IS NOT NULL'}
-${buildFacetWhere('status') ? ' AND status IS NOT NULL' : ''}
-GROUP BY status
+SELECT dimension, value, count from status_count
 
 UNION ALL
 
 -- Get counts by host (exclude host filter to avoid self-filtering)
-SELECT 'host' as dimension, host as value, COUNT(*) as count
-FROM unified_logs
-${buildFacetWhere('host') || 'WHERE host IS NOT NULL'}
-${buildFacetWhere('host') ? ' AND host IS NOT NULL' : ''}
-GROUP BY host
+SELECT dimension, value, count from host_count
 
 UNION ALL
 
 -- Get counts by pathname (exclude pathname filter to avoid self-filtering)
-SELECT 'pathname' as dimension, pathname as value, COUNT(*) as count
-FROM unified_logs
-${buildFacetWhere('pathname') || 'WHERE pathname IS NOT NULL'}
-${buildFacetWhere('pathname') ? ' AND pathname IS NOT NULL' : ''}
-GROUP BY pathname
+SELECT dimension, value, count from pathname_count
 
 UNION ALL
 
 -- Get counts by auth_user (exclude auth_user filter to avoid self-filtering)
-SELECT 'auth_user' as dimension, auth_user as value, COUNT(*) as count
-FROM unified_logs
-${buildFacetWhere('auth_user') || 'WHERE auth_user IS NOT NULL'}
-${buildFacetWhere('auth_user') ? ' AND auth_user IS NOT NULL' : ''}
-GROUP BY auth_user
+SELECT dimension, value, count from auth_user_count
 `
 
   return sql

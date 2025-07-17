@@ -19,8 +19,8 @@ const Hero = () => {
                 <AnnouncementBadge
                   url="/launch-week#main-stage"
                   badge="LW15"
-                  announcement={`Day 3: ${announcement.launch}`}
-                  className="lg:-mt-8"
+                  announcement={`Day 4: ${announcement.launch}`}
+                  className="lg:-mt-8 mb-4 lg:mb-0"
                   hasArrow
                 />
                 <div className="flex flex-col items-center">

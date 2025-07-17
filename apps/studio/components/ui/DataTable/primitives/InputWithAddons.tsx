@@ -31,7 +31,9 @@ export const InputWithAddons = forwardRef<HTMLInputElement, InputWithAddonsProps
           {...props}
         />
         {trailing ? (
-          <div className="border-input bg-muted/50 border-l px-3 py-2">{trailing}</div>
+          <div className="border-input bg-muted/50 border-l px-3 py-2 flex items-center justify-center">
+            {trailing}
+          </div>
         ) : null}
       </div>
     )
