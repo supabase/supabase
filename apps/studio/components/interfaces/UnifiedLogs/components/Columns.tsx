@@ -10,10 +10,20 @@ import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
 
-// Check if column should be hidden when all values are empty
+/**
+ * Determines if a column should be hidden based on its values in the data.
+ * Returns true if all values for the specified columnKey are empty, null, or undefined.
+ * Returns false if data is empty or if any value is present.
+ *
+ * @param data - Array of data rows to check
+ * @param columnKey - The key of the column to check for emptiness
+ * @returns boolean - true if column should be hidden, false otherwise
+ */
 function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): boolean {
+  // If there is no data or the data array is empty, do not hide the column
   if (!data || data.length === 0) return false
 
+  // Check if every row has an empty, null, or undefined value for the given columnKey
   return data.every((row) => {
     const value = row[columnKey]
     return !value || value === '' || value === null || value === undefined
