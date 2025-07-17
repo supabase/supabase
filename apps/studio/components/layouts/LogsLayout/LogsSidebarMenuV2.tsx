@@ -115,10 +115,11 @@ export function LogsSidebarMenuV2() {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
 
-  const isUnifiedLogsPreviewAvailable =
-    unifiedLogsFlagEnabled &&
-    !isOrgPlanLoading &&
-    ['team', 'enterprise'].includes(orgPlan?.id ?? '')
+  // [Joshen] Temporarily hide the call out for unified logs feature preview
+  const isUnifiedLogsPreviewAvailable = false
+  // unifiedLogsFlagEnabled &&
+  // !isOrgPlanLoading &&
+  // ['team', 'enterprise'].includes(orgPlan?.id ?? '')
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
