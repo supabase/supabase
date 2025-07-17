@@ -199,7 +199,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     {
       id: 'ram-usage',
       label: 'Memory usage',
-      docsUrl: 'https://supabase.com/docs/guides/database/inspect#memory-usage',
+      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#memory-usage',
       availableIn: ['team', 'enterprise'],
       hide: false,
       showTooltip: true,
@@ -241,7 +241,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     {
       id: 'cpu-usage',
       label: 'CPU usage',
-      docsUrl: 'https://supabase.com/docs/guides/database/inspect#cpu-usage',
+      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#cpu-usage',
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
@@ -311,7 +311,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       id: 'disk-iops',
       label: 'Disk Input/Output operations per second (IOPS)',
       docsUrl:
-        'https://supabase.com/docs/guides/database/inspect#disk-inputoutput-operations-per-second-iops',
+        'https://supabase.com/docs/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops',
       syncId: 'database-reports',
       availableIn: ['team', 'enterprise'],
       hide: false,
@@ -355,7 +355,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
     {
       id: 'disk-io-usage',
       label: 'Disk IO Usage',
-      docsUrl: 'https://supabase.com/docs/guides/database/inspect#disk-io-usage',
+      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-io-usage',
       syncId: 'database-reports',
       availableIn: ['team', 'enterprise'],
       hide: false,
@@ -395,6 +395,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       showGrid: true,
       YAxisProps: { width: 30 },
       defaultChartStyle: 'line',
+      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#database-connections',
       attributes: [
         {
           attribute: 'client_connections_postgres',
@@ -516,7 +517,7 @@ export const getReportAttributesV2: (org: Organization, project: Project) => Rep
       },
       hideChartType: false,
       defaultChartStyle: 'line',
-      docsUrl: 'https://supabase.com/docs/guides/platform/database-size',
+      docsUrl: 'https://supabase.com/docs/guides/telemetry/reports#disk-size',
       attributes: [
         {
           attribute: 'disk_fs_used_system',
