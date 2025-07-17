@@ -175,12 +175,8 @@ export const useAttributeQueries = (
   data: ChartData | undefined,
   isVisible: boolean
 ) => {
-  const projectRef = typeof ref === 'string' ? ref : Array.isArray(ref) ? ref[0] : ''
-
   const infraAttributes = attributes.filter((attr) => attr.provider === 'infra-monitoring')
   const dailyStatsAttributes = attributes.filter((attr) => attr.provider === 'daily-stats')
-  const mockAttributes = attributes.filter((attr) => attr.provider === 'mock')
-  const referenceLineAttributes = attributes.filter((attr) => attr.provider === 'reference-line')
 
   const infraQueries = useInfraMonitoringQueries(
     infraAttributes.map((attr) => attr.attribute as InfraMonitoringAttribute),
