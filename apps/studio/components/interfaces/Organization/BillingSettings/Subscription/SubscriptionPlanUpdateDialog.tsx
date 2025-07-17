@@ -19,16 +19,20 @@ import { formatCurrency } from 'lib/helpers'
 import { Badge, Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { BillingCustomerDataExistingOrgDialog } from '../BillingCustomerData/BillingCustomerDataExistingOrgDialog'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import {
+  loadStripe,
+  PaymentMethod,
+  StripeElementsOptions,
+} from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { PaymentIntentResult } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
+import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -81,7 +85,18 @@ export const SubscriptionPlanUpdateDialog = ({
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const paymentMethodSelection = useRef<{
-    createPaymentMethod: () => Promise<PaymentMethod | undefined>
+    createPaymentMethod: () => Promise<
+      | {
+          paymentMethod: PaymentMethod
+          address: CustomerAddress
+          taxId: {
+            country: string
+            type: string
+            value: string
+          } | null
+        }
+      | undefined
+    >
   }>(null)
 
   const billingViaPartner = subscription?.billing_via_partner === true
@@ -161,18 +176,14 @@ export const SubscriptionPlanUpdateDialog = ({
 
     setPaymentConfirmationLoading(true)
 
-    const paymentMethod = await paymentMethodSelection.current?.createPaymentMethod()
-    if (paymentMethod) {
-      setSelectedPaymentMethod(paymentMethod.id)
+    const result = await paymentMethodSelection.current?.createPaymentMethod()
+    if (result) {
+      setSelectedPaymentMethod(result.paymentMethod.id)
     } else {
       setPaymentConfirmationLoading(false)
     }
 
-    if (
-      !paymentMethod &&
-      subscription?.payment_method_type !== 'invoice' &&
-      changeType === 'upgrade'
-    ) {
+    if (!result && subscription?.payment_method_type !== 'invoice' && changeType === 'upgrade') {
       return
     }
 
@@ -185,7 +196,7 @@ export const SubscriptionPlanUpdateDialog = ({
     updateOrgSubscription({
       slug: selectedOrganization?.slug,
       tier,
-      paymentMethod: paymentMethod?.id,
+      paymentMethod: result?.paymentMethod?.id,
     })
   }
 
@@ -240,7 +251,7 @@ export const SubscriptionPlanUpdateDialog = ({
       <DialogContent
         onOpenAutoFocus={(event) => event.preventDefault()}
         size="xlarge"
-        className="p-0 overflow-y-auto max-h-[1000px]"
+        className="p-0 overflow-y-auto max-h-[1000px] md:max-w-4xl"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 h-full items-stretch">
           {/* Left Column */}
@@ -544,13 +555,10 @@ export const SubscriptionPlanUpdateDialog = ({
             <div className="pt-4">
               {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
                 <div className="space-y-2 mb-4">
-                  <BillingCustomerDataExistingOrgDialog />
-
                   <PaymentMethodSelection
                     ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
-                    createPaymentMethodInline={true}
                     readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                   />
                 </div>

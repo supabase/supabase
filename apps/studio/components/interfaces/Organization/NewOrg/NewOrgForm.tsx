@@ -32,8 +32,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { BillingCustomerDataNewOrgDialog } from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
-import { FormCustomerData } from '../BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
@@ -42,6 +40,8 @@ import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { NewPaymentMethodElement } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
+import { components } from 'api-types'
+import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -90,6 +90,8 @@ type FormState = z.infer<typeof formSchema>
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
+const newMandatoryAddressInput = true
+
 /**
  * No org selected yet, create a new one
  * [Joshen] Need to refactor to use Form_Shadcn here
@@ -114,8 +116,6 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 
   const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
     useState(false)
-
-  const [customerData, setCustomerData] = useState<FormCustomerData | null>(null)
 
   const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
     () =>
@@ -244,7 +244,14 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
-  async function createOrg(paymentMethodId?: string) {
+  async function createOrg(
+    paymentMethodId?: string,
+    customerData?: {
+      address: components['schemas']['CreateOrganizationBody']['address']
+      billing_name: string
+      tax_id: components['schemas']['CreateOrganizationBody']['tax_id'] | null
+    }
+  ) {
     const dbTier = formState.plan === 'PRO' && !formState.spend_cap ? 'PAYG' : formState.plan
 
     createOrganization({
@@ -263,7 +270,20 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     })
   }
 
-  const paymentRef = useRef<{ createPaymentMethod: () => Promise<any> }>(null)
+  const paymentRef = useRef<{
+    createPaymentMethod: () => Promise<
+      | {
+          paymentMethod: PaymentMethod
+          address: CustomerAddress
+          taxId: {
+            country: string
+            type: string
+            value: string
+          } | null
+        }
+      | undefined
+    >
+  }>(null)
 
   const handleSubmit = async () => {
     setNewOrgLoading(true)
@@ -271,10 +291,19 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     if (formState.plan === 'FREE') {
       await createOrg()
     } else if (!paymentMethod) {
-      const paymentMethod = await paymentRef.current?.createPaymentMethod()
-      if (paymentMethod) {
-        setPaymentMethod(paymentMethod)
-        createOrg(paymentMethod.id)
+      const result = await paymentRef.current?.createPaymentMethod()
+      if (result) {
+        setPaymentMethod(result.paymentMethod)
+        const customerData = {
+          address: {
+            ...result.address.address,
+            line2: result.address.address.line2 ? result.address.address.line2 : undefined,
+          },
+          billing_name: result.address.name!,
+          tax_id: result.taxId,
+        }
+
+        createOrg(result.paymentMethod.id, customerData)
       } else {
         setNewOrgLoading(false)
       }
@@ -532,21 +561,6 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
           </>
         )}
 
-        {formState.plan !== 'FREE' && (
-          <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="grid grid-cols-3">
-              <div className="col-span-1 flex space-x-2 text-sm items-center">
-                <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
-                  Billing Address
-                </Label_Shadcn_>
-              </div>
-              <div className="col-span-2">
-                <BillingCustomerDataNewOrgDialog onCustomerDataChange={setCustomerData} />
-              </div>
-            </div>
-          </Panel.Content>
-        )}
-
         {setupIntent && formState.plan !== 'FREE' && (
           <Panel.Content>
             <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
@@ -555,6 +569,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
                   ref={paymentRef}
                   email={user.profile?.primary_email}
                   readOnly={newOrgLoading || paymentConfirmationLoading}
+                  taxIdConfigurable={true}
                 />
               </Panel.Content>
             </Elements>

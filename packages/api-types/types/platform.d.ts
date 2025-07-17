@@ -6536,6 +6536,7 @@ export interface components {
           last4: string
         }
         created: number
+        has_address: boolean
         id: string
         is_default: boolean
         type: string

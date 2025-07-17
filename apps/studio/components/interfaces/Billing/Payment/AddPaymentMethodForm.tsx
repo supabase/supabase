@@ -1,48 +1,59 @@
-import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import type { SetupIntent } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { NewPaymentMethodElement } from 'components/interfaces/Organization/BillingSettings/PaymentMethods/NewPaymentMethodElement'
 import { organizationKeys } from 'data/organizations/keys'
+import {
+  type CustomerAddress,
+  useOrganizationCustomerProfileQuery,
+} from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useState } from 'react'
+import { isEqual } from 'lodash'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Checkbox_Shadcn_, Label_Shadcn_, Modal } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface AddPaymentMethodFormProps {
   returnUrl: string
   onCancel: () => void
   onConfirm: () => void
-  showSetDefaultCheckbox?: boolean
-  autoMarkAsDefaultPaymentMethod?: boolean
 }
 
 // Stripe docs recommend to use the new SetupIntent flow over
 // manually creating and attaching payment methods via the API
 // Small UX annoyance here, that the page will be refreshed
 
-const AddPaymentMethodForm = ({
-  returnUrl,
-  onCancel,
-  onConfirm,
-  showSetDefaultCheckbox = false,
-  autoMarkAsDefaultPaymentMethod = false,
-}: AddPaymentMethodFormProps) => {
-  const stripe = useStripe()
-  const elements = useElements()
+const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps) => {
   const selectedOrganization = useSelectedOrganization()
 
+  const { data: customerProfile, isLoading: customerProfileLoading } =
+    useOrganizationCustomerProfileQuery({
+      slug: selectedOrganization?.slug,
+    })
+
   const [isSaving, setIsSaving] = useState(false)
-  const [isDefault, setIsDefault] = useState(showSetDefaultCheckbox)
+  const [isDefault, setIsDefault] = useState(true)
+  const [isPrimaryBillingAddress, setIsPrimaryBillingAddress] = useState(true)
 
   const queryClient = useQueryClient()
   const { mutateAsync: markAsDefault } = useOrganizationPaymentMethodMarkAsDefaultMutation()
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+
+  const paymentRef = useRef<{
+    confirmSetup: () => Promise<
+      | {
+          setupIntent: SetupIntent
+          address: CustomerAddress
+          customerName: string
+        }
+      | undefined
+    >
+  }>(null)
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
-
-    if (!stripe || !elements) {
-      console.error('Stripe.js has not loaded')
-      return
-    }
 
     setIsSaving(true)
 
@@ -51,25 +62,20 @@ const AddPaymentMethodForm = ({
       document.body.classList.add('!pointer-events-auto')
     }
 
-    const { error, setupIntent } = await stripe.confirmSetup({
-      elements,
-      redirect: 'if_required',
-      confirmParams: { return_url: returnUrl },
-    })
+    const result = await paymentRef.current?.confirmSetup()
 
-    if (error) {
+    if (!result) {
       setIsSaving(false)
-      toast.error(error?.message ?? ' Failed to save card details')
     } else {
       if (
-        (isDefault || autoMarkAsDefaultPaymentMethod) &&
+        isDefault &&
         selectedOrganization &&
-        typeof setupIntent?.payment_method === 'string'
+        typeof result.setupIntent?.payment_method === 'string'
       ) {
         try {
           await markAsDefault({
             slug: selectedOrganization.slug,
-            paymentMethodId: setupIntent.payment_method,
+            paymentMethodId: result.setupIntent.payment_method,
           })
 
           await queryClient.invalidateQueries(
@@ -82,16 +88,29 @@ const AddPaymentMethodForm = ({
               if (!prev) return prev
               return {
                 ...prev,
-                defaultPaymentMethodId: setupIntent.payment_method,
+                defaultPaymentMethodId: result.setupIntent.payment_method,
                 data: prev.data.map((pm: any) => ({
                   ...pm,
-                  is_default: pm.id === setupIntent.payment_method,
+                  is_default: pm.id === result.setupIntent.payment_method,
                 })),
               }
             }
           )
         } catch (error) {
           toast.error('Failed to set payment method as default')
+        }
+
+        try {
+          if (isPrimaryBillingAddress) {
+            if (result.address && !isEqual(result.address, customerProfile?.address)) {
+              await updateCustomerProfile({
+                billing_name: result.customerName,
+                address: result.address,
+              })
+            }
+          }
+        } catch (error) {
+          toast.error('Failed to update billing address')
         }
       } else {
         if (selectedOrganization) {
@@ -110,33 +129,64 @@ const AddPaymentMethodForm = ({
     }
   }
 
+  if (customerProfileLoading) {
+    return (
+      <Modal.Content>
+        <div className="space-y-2">
+          <ShimmeringLoader />
+          <ShimmeringLoader className="w-3/4" />
+          <ShimmeringLoader className="w-1/2" />
+          <ShimmeringLoader />
+          <ShimmeringLoader />
+          <ShimmeringLoader />
+        </div>
+      </Modal.Content>
+    )
+  }
+
   return (
     <div>
       <Modal.Content
         className={`transition ${isSaving ? 'pointer-events-none opacity-75' : 'opacity-100'}`}
       >
-        <PaymentElement
-          className="[.p-LinkAutofillPrompt]:pt-0"
-          options={{
-            defaultValues: { billingDetails: { email: selectedOrganization?.billing_email ?? '' } },
-          }}
+        <NewPaymentMethodElement
+          readOnly={isSaving}
+          email={selectedOrganization?.billing_email}
+          taxIdConfigurable={false}
+          currentAddress={customerProfile?.address}
+          customerName={customerProfile?.billing_name}
+          ref={paymentRef}
         />
-        {showSetDefaultCheckbox && (
-          <div className="flex items-center gap-x-2 mt-4 mb-2">
-            <Checkbox_Shadcn_
-              id="save-as-default"
-              checked={isDefault}
-              onCheckedChange={(checked) => {
-                if (typeof checked === 'boolean') {
-                  setIsDefault(checked)
-                }
-              }}
-            />
-            <Label_Shadcn_ htmlFor="save-as-default" className="text-foreground-light">
-              Save as default payment method
-            </Label_Shadcn_>
-          </div>
-        )}
+
+        <div className="flex items-center gap-x-2 mt-4 mb-2">
+          <Checkbox_Shadcn_
+            id="save-as-default"
+            checked={isDefault}
+            onCheckedChange={(checked) => {
+              if (typeof checked === 'boolean') {
+                setIsDefault(checked)
+              }
+            }}
+          />
+          <Label_Shadcn_ htmlFor="save-as-default" className="text-foreground-light">
+            Save as default payment method
+          </Label_Shadcn_>
+        </div>
+
+        <div className="flex items-center gap-x-2 mt-4 mb-2">
+          <Checkbox_Shadcn_
+            id="is-primary-billing-address"
+            checked={isPrimaryBillingAddress}
+            onCheckedChange={(checked) => {
+              if (typeof checked === 'boolean') {
+                setIsPrimaryBillingAddress(checked)
+              }
+            }}
+          />
+          <Label_Shadcn_ htmlFor="is-primary-billing-address" className="text-foreground-light">
+            Use the billing address as my organization's primary address
+          </Label_Shadcn_>
+        </div>
       </Modal.Content>
       <Modal.Separator />
       <Modal.Content className="flex items-center space-x-2">

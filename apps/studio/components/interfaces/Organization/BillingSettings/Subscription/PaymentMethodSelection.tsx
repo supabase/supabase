@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   forwardRef,
   useCallback,
@@ -9,15 +8,10 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-
-import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { getURL } from 'lib/helpers'
-import { AlertCircle, CreditCard, Loader, Plus } from 'lucide-react'
+import { Loader, Plus } from 'lucide-react'
 import { Listbox } from 'ui'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
@@ -29,6 +23,7 @@ import { useTheme } from 'next-themes'
 import { Elements } from '@stripe/react-stripe-js'
 import { NewPaymentMethodElement } from '../PaymentMethods/NewPaymentMethodElement'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -36,7 +31,6 @@ export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
-  createPaymentMethodInline: boolean
   readOnly: boolean
 }
 
@@ -45,27 +39,52 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     selectedPaymentMethod,
     onSelectPaymentMethod,
     layout = 'vertical',
-    createPaymentMethodInline = false,
     readOnly,
   }: PaymentMethodSelectionProps,
   ref
 ) {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
-  const [showAddNewPaymentMethodModal, setShowAddNewPaymentMethodModal] = useState(false)
   const captchaLoaded = useIsHCaptchaLoaded()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
   const { resolvedTheme } = useTheme()
-  const paymentRef = useRef<{ createPaymentMethod: () => Promise<PaymentMethod | undefined> }>(null)
+  const paymentRef = useRef<{
+    createPaymentMethod: () => Promise<
+      | {
+          paymentMethod: PaymentMethod
+          address: CustomerAddress
+          taxId: {
+            country: string
+            type: string
+            value: string
+          } | null
+        }
+      | undefined
+    >
+  }>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
 
-  const {
-    data: paymentMethods,
-    isLoading,
-    refetch: refetchPaymentMethods,
-  } = useOrganizationPaymentMethodsQuery({ slug })
+  const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })
+
+  const paymentMethods = useMemo(() => {
+    if (!allPaymentMethods)
+      return {
+        data: [],
+        defaultPaymentMethodId: null,
+      }
+
+    const filtered = allPaymentMethods.data.filter((pm) => pm.has_address)
+    return {
+      data: filtered,
+      defaultPaymentMethodId: allPaymentMethods.data.some(
+        (pm) => pm.id === allPaymentMethods.defaultPaymentMethodId
+      )
+        ? allPaymentMethods.defaultPaymentMethodId
+        : null,
+    }
+  }, [allPaymentMethods])
 
   const captchaRefCallback = useCallback((node: any) => {
     setCaptchaRef(node)
@@ -98,7 +117,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     const loadPaymentForm = async () => {
-      if (setupNewPaymentMethod && createPaymentMethodInline && captchaRef && captchaLoaded) {
+      if (setupNewPaymentMethod && captchaRef && captchaLoaded) {
         let token = captchaToken
 
         try {
@@ -116,17 +135,12 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     loadPaymentForm()
-  }, [createPaymentMethodInline, captchaRef, captchaLoaded, setupNewPaymentMethod])
+  }, [captchaRef, captchaLoaded, setupNewPaymentMethod])
 
   const resetCaptcha = () => {
     setCaptchaToken(null)
     captchaRef?.resetCaptcha()
   }
-
-  const canUpdatePaymentMethods = useCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.payment_methods'
-  )
 
   const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
     () =>
@@ -197,42 +211,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             <Loader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
-        ) : paymentMethods?.data.length === 0 && !createPaymentMethodInline ? (
-          <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-alternative">
-            <div className="flex items-center space-x-4 text-foreground-light">
-              <AlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm">No payment methods</p>
-            </div>
-
-            <ButtonTooltip
-              type="default"
-              disabled={!canUpdatePaymentMethods}
-              icon={<CreditCard />}
-              onClick={() => {
-                if (createPaymentMethodInline) {
-                  setSetupNewPaymentMethod(true)
-                } else {
-                  setShowAddNewPaymentMethodModal(true)
-                }
-              }}
-              htmlType="button"
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canUpdatePaymentMethods ? (
-                    <div className="w-48 text-center">
-                      <span>
-                        You need additional permissions to add new payment methods to this
-                        organization
-                      </span>
-                    </div>
-                  ) : undefined,
-                },
-              }}
-            >
-              Add new
-            </ButtonTooltip>
-          </div>
         ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
           <Listbox
             layout={layout}
@@ -267,11 +245,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             <div
               className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
               onClick={() => {
-                if (createPaymentMethodInline) {
-                  setSetupNewPaymentMethod(true)
-                } else {
-                  setShowAddNewPaymentMethodModal(true)
-                }
+                setSetupNewPaymentMethod(true)
               }}
             >
               <Plus size={16} />
@@ -288,6 +262,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               ref={paymentRef}
               email={selectedOrganization?.billing_email ?? undefined}
               readOnly={readOnly}
+              taxIdConfigurable={true}
             />
           </Elements>
         )}
@@ -303,26 +278,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
           </div>
         )}
       </div>
-
-      <AddNewPaymentMethodModal
-        visible={showAddNewPaymentMethodModal}
-        returnUrl={`${getURL()}/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan&source=paymentMethod`}
-        onCancel={() => setShowAddNewPaymentMethodModal(false)}
-        autoMarkAsDefaultPaymentMethod={true}
-        onConfirm={async () => {
-          setShowAddNewPaymentMethodModal(false)
-          toast.success('Successfully added new payment method')
-          const { data: refetchedPaymentMethods } = await refetchPaymentMethods()
-          if (refetchedPaymentMethods?.data?.length) {
-            // Preselect the card that was just added
-            const mostRecentPaymentMethod = refetchedPaymentMethods?.data.reduce(
-              (prev, current) => (prev.created > current.created ? prev : current),
-              refetchedPaymentMethods.data[0]
-            )
-            onSelectPaymentMethod(mostRecentPaymentMethod.id)
-          }
-        }}
-      />
     </>
   )
 })
