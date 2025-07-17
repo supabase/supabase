@@ -68,10 +68,9 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.
 
         <DialogSection className="flex flex-col gap-y-4">
           <p className="text-sm">
-            We highly recommend using the CLI to export your table data via{' '}
-            <code>{selectedTab === 'csv' ? 'psql' : 'pg_dump'}</code>, in particular if your table
-            is relatively large. This can be done via the following command that you can run in your
-            terminal:
+            We highly recommend using <code>{selectedTab === 'csv' ? 'psql' : 'pg_dump'}</code> to
+            export your table data, in particular if your table is relatively large. This can be
+            done via the following command that you can run in your terminal:
           </p>
 
           <Tabs_Shadcn_ value={selectedTab} onValueChange={setSelectedTab}>
