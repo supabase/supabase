@@ -292,6 +292,7 @@ export function useAuthLogsReport({
     data: rawData,
     error,
     isLoading,
+    isFetching,
   } = useQuery(
     ['auth-logs-report', projectRef, logsMetric, startDate, endDate, interval, sql],
     async () => {
@@ -324,5 +325,6 @@ export function useAuthLogsReport({
     attributes: chartAttributes,
     isLoading,
     error,
+    isFetching,
   }
 }

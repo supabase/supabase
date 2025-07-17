@@ -53,7 +53,7 @@ export const useChartData = ({
     data: authData,
     attributes: authChartAttributes,
     isLoading: isAuthLoading,
-    isRefetching: isAuthRefetching,
+    isFetching: isAuthFetching,
   } = useAuthLogsReport({
     projectRef: ref as string,
     attributes: logsAttributes,
@@ -62,7 +62,6 @@ export const useChartData = ({
     interval: interval as AnalyticsInterval,
     enabled: enabled && logsAttributes.length > 0 && !isEdgeFunctionRoute,
   })
-  const isAuthFetching = isAuthRefetching || isAuthLoading
 
   const {
     data: edgeFunctionData,
