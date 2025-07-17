@@ -41,7 +41,7 @@ import {
   Separator,
 } from 'ui'
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
-import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
+import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsListPanel } from './components/LogsListPanel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
@@ -147,6 +147,12 @@ export const UnifiedLogs = () => {
   const totalDBRowCount = counts?.totalRowCount
   const filterDBRowCount = flatData.length
 
+  // Generate dynamic columns based on current data
+  const dynamicColumns = useMemo(() => {
+    return generateDynamicColumns(flatData)
+  }, [flatData])
+
+  // Memoize facets for performance
   const facets = counts?.facets
   const totalFetched = flatData?.length
 
@@ -169,7 +175,7 @@ export const UnifiedLogs = () => {
 
   const table: Table<any> = useReactTable({
     data: flatData,
-    columns: UNIFIED_LOGS_COLUMNS,
+    columns: dynamicColumns,
     state: {
       columnFilters,
       sorting,
@@ -282,7 +288,7 @@ export const UnifiedLogs = () => {
   return (
     <DataTableProvider
       table={table}
-      columns={UNIFIED_LOGS_COLUMNS}
+      columns={dynamicColumns}
       filterFields={filterFields}
       columnFilters={columnFilters}
       sorting={sorting}
