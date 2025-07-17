@@ -5,23 +5,6 @@ import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { routerMock } from './lib/route-mock'
 import { mswServer } from './lib/msw'
 
-// Warning: `restoreMocks: true` in vitest.config.ts will
-// cause this global mockImplementation to be **reset**
-// before any tests are run!
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
-
 // Uncomment this if HTML in errors are being annoying.
 //
 // configure({
