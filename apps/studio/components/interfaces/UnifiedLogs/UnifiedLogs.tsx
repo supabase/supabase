@@ -41,7 +41,7 @@ import {
   Separator,
 } from 'ui'
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
-import { UNIFIED_LOGS_COLUMNS } from './components/Columns'
+import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsListPanel } from './components/LogsListPanel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
@@ -165,13 +165,18 @@ export const UnifiedLogs = () => {
     return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
   }
 
+  // Generate dynamic columns based on current data
+  const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
+    return generateDynamicColumns(flatData)
+  }, [flatData])
+
   const table: Table<any> = useReactTable({
     data: flatData,
-    columns: UNIFIED_LOGS_COLUMNS,
+    columns: dynamicColumns,
     state: {
       columnFilters,
       sorting,
-      columnVisibility,
+      columnVisibility: { ...columnVisibility, ...dynamicColumnVisibility },
       rowSelection,
       columnOrder,
     },
