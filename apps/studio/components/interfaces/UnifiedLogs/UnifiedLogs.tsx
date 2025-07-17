@@ -134,7 +134,7 @@ export const UnifiedLogs = () => {
   const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
 
   // Only fade when filtering (not when loading more data or live mode)
-  const isFetchingFilters = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
+  const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
@@ -364,7 +364,7 @@ export const UnifiedLogs = () => {
                     minSize={30}
                     className={cn(
                       'bg',
-                      isFetchingFilters && 'opacity-60 transition-opacity duration-150'
+                      isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                     )}
                   >
                     <DataTableInfinite
