@@ -192,6 +192,7 @@ const Indexes = () => {
                               </Button>
                               {!isLocked && (
                                 <Button
+                                  aria-label="Delete index"
                                   type="text"
                                   className="px-1"
                                   icon={<Trash />}
