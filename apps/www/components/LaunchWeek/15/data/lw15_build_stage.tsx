@@ -78,6 +78,19 @@ export const days: BuildDay[] = [
     ],
   },
   {
+    title: 'Algolia Connector for Supabase',
+    description: '',
+    id: 'algolia-connector',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/algolia-connector-for-supabase',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+  },
+  {
     title: '',
     description: '',
     id: '',

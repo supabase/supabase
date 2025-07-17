@@ -8,6 +8,13 @@
       <lastBuildDate>Thu, 17 Jul 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/algolia-connector-for-supabase</guid>
+  <title>Algolia Connector for Supabase</title>
+  <link>https://supabase.com/blog/algolia-connector-for-supabase</link>
+  <description>Bring lightning-fast search to your Supabase apps, with no code required.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/new-observability-features-in-supabase</guid>
   <title>New Observability Features in Supabase</title>
   <link>https://supabase.com/blog/new-observability-features-in-supabase</link>
