@@ -116,7 +116,7 @@ const LogChartHandler = ({
     return (
       <Panel
         className={cn(
-          'flex min-h-[320px] w-full flex-col items-center justify-center gap-y-2',
+          'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
           className
         )}
         wrapWithLoading={false}
@@ -143,7 +143,7 @@ const LogChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full scroll-mt-16', className)}
+      className={cn('relative w-full scroll-mt-16', className)}
       wrapWithLoading={false}
       id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >

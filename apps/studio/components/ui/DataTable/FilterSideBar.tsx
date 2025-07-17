@@ -1,14 +1,20 @@
-import { cn, ResizablePanel, Button } from 'ui'
+import { useRouter } from 'next/router'
+
+import { useParams } from 'common'
+import { useUnifiedLogsControl } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Button, cn, ResizablePanel } from 'ui'
+import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
+import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useUnifiedLogsControl } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useRouter } from 'next/router'
-import { useParams } from 'common'
-import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 
-export function FilterSideBar() {
+interface FilterSideBarProps {
+  dateRangeDisabled?: DateRangeDisabled
+}
+
+export function FilterSideBar({ dateRangeDisabled }: FilterSideBarProps) {
   const { table } = useDataTable()
   const router = useRouter()
   const { ref } = useParams()
@@ -59,7 +65,7 @@ export function FilterSideBar() {
         />
       )}
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        <DataTableFilterControls />
+        <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
       </div>
     </ResizablePanel>
   )

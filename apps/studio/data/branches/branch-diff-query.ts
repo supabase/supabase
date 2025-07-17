@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
@@ -50,7 +51,7 @@ export const useBranchDiffQuery = (
     branchKeys.diff(projectRef, branchId),
     () => getBranchDiff({ branchId, includedSchemas }),
     {
-      enabled: enabled && typeof branchId !== 'undefined' && branchId !== '',
+      enabled: IS_PLATFORM && enabled && typeof branchId !== 'undefined' && branchId !== '',
       ...options,
     }
   )

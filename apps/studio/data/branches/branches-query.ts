@@ -1,6 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
@@ -39,5 +41,5 @@ export const useBranchesQuery = <TData = BranchesData>(
   useQuery<BranchesData, BranchesError, TData>(
     branchKeys.list(projectRef),
     ({ signal }) => getBranches({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined', ...options }
   )
