@@ -14,6 +14,9 @@ export function useFlag<T = boolean>(name: string) {
 
   const store = flagStore.configcat
 
+  // [Joshen] Temporarily disable unified logs completely, including feature preview
+  if (name === 'unifiedLogs') return false
+
   if (!isObjectEmpty(store) && store[name] === undefined) {
     console.error(`Flag key "${name}" does not exist in ConfigCat flag store`)
     return false
