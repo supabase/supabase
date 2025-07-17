@@ -41,7 +41,6 @@ const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
 const STRIPE_JS_URL = 'https://js.stripe.com'
 const STRIPE_NETWORK_URL = 'https://*.stripe.network'
 const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one'
 const VERCEL_URL = 'https://vercel.com'
 const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
 const GITHUB_API_URL = 'https://api.github.com'
@@ -81,7 +80,6 @@ module.exports.getCSP = function getCSP() {
     STRIPE_SUBDOMAINS_URL,
     STRIPE_NETWORK_URL,
     CLOUDFLARE_URL,
-    ONE_ONE_ONE_ONE_URL,
     VERCEL_INSIGHTS_URL,
     GITHUB_API_URL,
     GITHUB_USER_CONTENT_URL,
