@@ -100,6 +100,8 @@ export const UnifiedLogs = () => {
     data: unifiedLogsData,
     isLoading,
     isFetching,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
     hasNextPage,
     refetch: refetchLogs,
     fetchNextPage,
@@ -130,6 +132,9 @@ export const UnifiedLogs = () => {
   }
 
   const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
+
+  // Only fade when filtering (not when loading more data or live mode)
+  const isFetchingFilters = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
@@ -357,7 +362,10 @@ export const UnifiedLogs = () => {
                   <ResizablePanel
                     defaultSize={100}
                     minSize={30}
-                    className={cn('bg', isFetching && 'opacity-60 transition-opacity duration-150')}
+                    className={cn(
+                      'bg',
+                      isFetchingFilters && 'opacity-60 transition-opacity duration-150'
+                    )}
                   >
                     <DataTableInfinite
                       columns={UNIFIED_LOGS_COLUMNS}
