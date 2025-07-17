@@ -441,9 +441,7 @@ const OneTapComponent = () => {
     google.accounts.id.prompt() // Display the One Tap UI
   }
 
-  return (
-    <Script onReady={initializeGoogleOneTap} src="https://accounts.google.com/gsi/client" />
-  )
+  return <Script onReady={initializeGoogleOneTap} src="https://accounts.google.com/gsi/client" />
 }
 
 export default OneTapComponent
