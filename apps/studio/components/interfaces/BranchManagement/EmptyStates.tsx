@@ -24,9 +24,9 @@ export const PullRequestsEmptyState = ({
   gitlessBranching: boolean
 }) => {
   return (
-    <div className="flex items-center flex-col justify-center w-full py-10">
+    <div className="flex items-center flex-col justify-center w-full py-10 px-4">
       <p>No merge requests</p>
-      <p className="text-foreground-light">
+      <p className="text-foreground-light text-center">
         Create your first merge request to merge changes back to the main branch
       </p>
       <div className="flex items-center space-x-2 mt-4">
