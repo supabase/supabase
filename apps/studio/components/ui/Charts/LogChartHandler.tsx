@@ -112,23 +112,6 @@ const LogChartHandler = ({
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
   const chartHighlight = useChartHighlight()
 
-  if (isLoading) {
-    return (
-      <Panel
-        className={cn(
-          'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
-          className
-        )}
-        wrapWithLoading={false}
-        noMargin
-        noHideOverflow
-      >
-        <Loader2 size={18} className="animate-spin text-border-strong" />
-        <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
-      </Panel>
-    )
-  }
-
   if (!data) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
@@ -143,10 +126,16 @@ const LogChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative w-full scroll-mt-16', className)}
+      className={cn('relative w-full overflow-hidden scroll-mt-16', className)}
       wrapWithLoading={false}
       id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
+      {isLoading && (
+        <div className="absolute inset-0 rounded-md flex w-full flex-col items-center justify-center gap-y-2 bg-surface-100/50 backdrop-blur-sm z-20">
+          <Loader2 size={18} className="animate-spin text-border-strong" />
+          <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
+        </div>
+      )}
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart

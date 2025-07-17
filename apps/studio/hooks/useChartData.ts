@@ -53,6 +53,7 @@ export const useChartData = ({
     data: authData,
     attributes: authChartAttributes,
     isLoading: isAuthLoading,
+    isRefetching: isAuthRefetching,
   } = useAuthLogsReport({
     projectRef: ref as string,
     attributes: logsAttributes,
@@ -61,6 +62,7 @@ export const useChartData = ({
     interval: interval as AnalyticsInterval,
     enabled: enabled && logsAttributes.length > 0 && !isEdgeFunctionRoute,
   })
+  const isAuthFetching = isAuthRefetching || isAuthLoading
 
   const {
     data: edgeFunctionData,
@@ -96,7 +98,7 @@ export const useChartData = ({
   const logsChartAttributes = isEdgeFunctionRoute
     ? edgeFunctionChartAttributes
     : authChartAttributes
-  const isLogsLoading = isEdgeFunctionRoute ? isEdgeFunctionLoading : isAuthLoading
+  const isLogsLoading = isEdgeFunctionRoute ? isEdgeFunctionLoading : isAuthFetching
 
   const chartAttributes = useMemo(
     () => nonLogsAttributes.concat(logsChartAttributes || []),
@@ -226,7 +228,7 @@ export const useChartData = ({
 
   return {
     data: combinedData,
-    isLoading: loading,
+    isLoading: loading || isAuthFetching,
     chartAttributes,
     highlightedValue: _highlightedValue,
   }

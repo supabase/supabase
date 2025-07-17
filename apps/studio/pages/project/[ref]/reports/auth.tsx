@@ -82,14 +82,7 @@ const AuthUsage = () => {
     setIsRefreshing(true)
     AUTH_REPORT_ATTRIBUTES.forEach((attr) => {
       attr.attributes.forEach((subAttr) => {
-        queryClient.invalidateQueries([
-          'auth-metrics',
-          ref,
-          subAttr.attribute,
-          selectedDateRange.period_start.date,
-          selectedDateRange.period_end.date,
-          selectedDateRange.interval,
-        ])
+        queryClient.invalidateQueries(['auth-logs-report', 'auth-metrics'])
       })
     })
     refetch()
@@ -150,6 +143,7 @@ const AuthUsage = () => {
               endDate={selectedDateRange?.period_end?.date}
               updateDateRange={updateDateRange}
               orgPlanId={orgPlan?.id}
+              isLoading={isRefreshing}
             />
           ))}
         <div>
