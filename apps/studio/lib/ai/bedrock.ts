@@ -79,9 +79,9 @@ const modelRegionWeights: Record<BedrockModel, RegionWeights> = {
   },
   ['anthropic.claude-3-5-haiku-20241022-v1:0']: {
     use1: 40,
-    use2: 6,
+    use2: 0,
     usw2: 40,
-    euc1: 6,
+    euc1: 0,
   },
 }
 
