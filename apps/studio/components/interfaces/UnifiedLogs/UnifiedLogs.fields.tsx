@@ -105,7 +105,7 @@ export const filterFields = [
     defaultOpen: false,
     options: [],
     hasDynamicOptions: true,
-    hasAsyncSearch: true,
+    hasAsyncSearch: false,
     component: (props: Option) => {
       return (
         <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
