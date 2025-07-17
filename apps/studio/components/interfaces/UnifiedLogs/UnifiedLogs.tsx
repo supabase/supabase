@@ -336,7 +336,10 @@ export const UnifiedLogs = () => {
               />
               <TimelineChart
                 data={unifiedLogsChart}
-                className={cn('-mb-2', isFetchingCharts && 'opacity-60 transition-opacity')}
+                className={cn(
+                  '-mb-2',
+                  isFetchingCharts && 'opacity-60 transition-opacity duration-150'
+                )}
                 columnId="timestamp"
                 chartConfig={filteredChartConfig}
               />
@@ -354,7 +357,7 @@ export const UnifiedLogs = () => {
                   <ResizablePanel
                     defaultSize={100}
                     minSize={30}
-                    className={cn('bg', isFetching && 'opacity-60 transition-opacity')}
+                    className={cn('bg', isFetching && 'opacity-60 transition-opacity duration-150')}
                   >
                     <DataTableInfinite
                       columns={UNIFIED_LOGS_COLUMNS}
