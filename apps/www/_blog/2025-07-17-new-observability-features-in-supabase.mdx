@@ -39,7 +39,7 @@ These updates mark the first step toward unified, end-to-end observability. You 
 
 Supabase is a collection of seamlessly integrated services. Storage talks to Postgres via the dedicated connection pooler. Edge Functions can talk to Auth and Realtime. If storage uploads fail, you must determine whether the problem lies with the storage server, the dedicated connection pooler, or the database. Until now, pinpointing the root cause meant jumping between multiple log streams.
 
-Starting today, you now get one interleaved stream of logs across all services. You can trace a single request across the entire Supabase stack. No more jumping between tabs to diagnose errors. When we launch OpenTelemetry integration in the future, it would complement this view, to make it easier to diagnose performance bottlenecks.
+Starting today, there is one interleaved stream of logs across all services. You can trace a single request across the entire Supabase stack. No more jumping between tabs to diagnose errors.
 
 <Img
   wide
@@ -50,7 +50,7 @@ Starting today, you now get one interleaved stream of logs across all services. 
   }}
 />
 
-We've also added contextual log views. You can now jump from a function's invocation log directly into its execution logs. What used to require two disconnected sources is now stitched together in one view.
+We have also added contextual log views. You can now jump from a function's invocation log directly into its execution logs. What used to require two disconnected sources is now stitched together in one view.
 
 <Img
   wide
@@ -61,9 +61,11 @@ We've also added contextual log views. You can now jump from a function's invoca
   }}
 />
 
+The new interface also supports filtering logs by the request status code, method, path, log level and the auth user associated with the request. This means you can quickly find all Postgrest 500 errors, or all requests made by a specific user with a few clicks.
+
 Shoutout to [openstatus.dev](http://openstatus.dev) for providing the inspiration for some of our Log components.
 
-The new logging interface is available as a feature preview today, which you can enable from the dashboard [here](https://supabase.com/dashboard/project/_?featurePreviewModal=supabase-ui-preview-unified-logs).
+The new logging interface is available as a feature preview today, which you can enable from the dashboard [here](https://supabase.com/dashboard/project/_?featurePreviewModal=supabase-ui-preview-unified-logs). The new interface currently supports API Gateway logs and Postgres logs, with logs for the other products coming soon.
 
 ## Advanced Product Reports
 
@@ -102,7 +104,7 @@ The Assistant also comes with several quality-of-life upgrades:
 
 - **Automatic chat renaming** based on your queries
 - **Branch diff reviews**, perfect for projects using branching environments
-- **A more capable model**, now powered by Amazon Bedrock, with data privacy and security improvements built in
+- **A more capable model** with additional controls for data privacy and security improvements built in
 
 It's the fastest way to get answers for your project, whether you're debugging a failing function, reviewing changes between branches, or just trying to understand how your app is behaving in production.
 
