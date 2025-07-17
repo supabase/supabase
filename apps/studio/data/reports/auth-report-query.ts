@@ -210,7 +210,12 @@ const METRIC_FORMATTER: Record<
 > = {
   ActiveUsers: (rawData, attributes) => defaultFormatter(rawData, attributes),
   SignInAttempts: (rawData, attributes) => {
-    const chartAttributes = attributes
+    const chartAttributes = attributes.map((attr) => {
+      if (attr.attribute === 'SignInAttempts' && attr.login_type_provider) {
+        return { ...attr, attribute: `${attr.attribute}_${attr.login_type_provider}` }
+      }
+      return attr
+    })
     if (!rawData) return { data: undefined, chartAttributes }
     const result = rawData.result || []
     const timestamps = new Set<string>(result.map((p: any) => p.timestamp))
