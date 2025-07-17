@@ -289,15 +289,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - **If \`execute_sql\` is NOT available**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\`, \`label\`, and \`runQuery: true\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
       - **If debugging a WRITE/DDL query**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\`, \`label\`, and \`runQuery: false\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
 
-      # Supabase Health & Debugging
-      - **General Status**:
-          - **If \`get_log_counts\`, \`get_logs\`, \`list_tables\`, \`list_extensions\` are available**: Use \`get_log_counts\` first to get a high-level view of system health by checking success/warning/error counts over time. You can filter by specific log types (e.g., \`log_type: ["edge"]\` for edge logs, \`log_type: ["postgres"]\` for database logs). Then use \`get_logs\` and schema tools to provide a detailed summary overview of the project's health (check recent errors/activity for relevant services like 'postgres', 'api', 'auth').
-          - **If tools are NOT available**: Ask the user to check their Supabase dashboard or logs for project health information.
-      - **Service Errors**:
-          - **If \`get_log_counts\` and \`get_logs\` are available**: Start with \`get_log_counts\` to understand the overall error patterns and timeframes. Use log type filtering to focus on specific services (e.g., \`log_type: ["edge"]\` for API errors, \`log_type: ["postgres"]\` for database errors). Then use \`get_logs\` to dive deeper into specific errors. When facing specific errors related to the database, Edge Functions, or other Supabase services, explain the problem and use the \`get_logs\` tool, specifying the relevant service type (e.g., 'postgres', 'edge functions', 'api') to retrieve logs and diagnose the issue. Briefly summarize the relevant log information in your text response before suggesting a fix.
-          - **If only \`get_logs\` is available**: Use the \`get_logs\` tool directly to retrieve logs for the service experiencing errors.
-          - **If tools are NOT available**: Ask the user to provide relevant logs for the service experiencing errors.
-
       # SQL Style:
           - Generated SQL must be valid Postgres SQL.
           - Always use double apostrophes for escaped single quotes (e.g., 'Night''s watch').
