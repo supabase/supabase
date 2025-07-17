@@ -166,7 +166,7 @@ export const UnifiedLogs = () => {
   }
 
   // Generate dynamic columns based on current data
-  const dynamicColumns = useMemo(() => {
+  const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
     return generateDynamicColumns(flatData)
   }, [flatData])
 
@@ -176,7 +176,7 @@ export const UnifiedLogs = () => {
     state: {
       columnFilters,
       sorting,
-      columnVisibility,
+      columnVisibility: { ...columnVisibility, ...dynamicColumnVisibility },
       rowSelection,
       columnOrder,
     },

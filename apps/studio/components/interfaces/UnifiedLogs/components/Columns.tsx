@@ -31,7 +31,10 @@ function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): 
 }
 
 // Generate dynamic columns based on data
-export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSchema>[] {
+export function generateDynamicColumns(data: ColumnSchema[]): {
+  columns: ColumnDef<ColumnSchema>[]
+  columnVisibility: Record<string, boolean>
+} {
   const hideMethod = shouldHideColumn(data, 'method')
   const hidePathname = shouldHideColumn(data, 'pathname')
   const hideEventMessage = shouldHideColumn(data, 'event_message')
@@ -132,11 +135,8 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
         headerClassName: 'w-[70px]',
       },
     },
-  ]
-
-  // Method column - hide if all values are empty
-  if (!hideMethod) {
-    columns.push({
+    // Method column - controlled by columnVisibility
+    {
       accessorKey: 'method',
       header: 'Method',
       filterFn: 'arrIncludesSome',
@@ -153,12 +153,9 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
         cellClassName: 'w-[70px]',
         headerClassName: 'w-[70px]',
       },
-    })
-  }
-
-  // Pathname column - hide if all values are empty
-  if (!hidePathname) {
-    columns.push({
+    },
+    // Pathname column - controlled by columnVisibility
+    {
       accessorKey: 'pathname',
       header: 'Pathname',
       cell: ({ row }) => {
@@ -174,12 +171,9 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
         cellClassName: 'max-w-[320px]',
         headerClassName: 'max-w-[320px]',
       },
-    })
-  }
-
-  // Event message column - hide if all values are empty
-  if (!hideEventMessage) {
-    columns.push({
+    },
+    // Event message column - controlled by columnVisibility
+    {
       accessorKey: 'event_message',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Event message" />,
       cell: ({ row }) => {
@@ -213,11 +207,18 @@ export function generateDynamicColumns(data: ColumnSchema[]): ColumnDef<ColumnSc
       size: 200,
       minSize: 200,
       maxSize: 400,
-    })
+    },
+  ]
+
+  // Define column visibility based on data
+  const columnVisibility = {
+    method: !hideMethod,
+    pathname: !hidePathname,
+    event_message: !hideEventMessage,
   }
 
-  return columns
+  return { columns, columnVisibility }
 }
 
 // Static fallback columns
-export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns([])
+export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns([]).columns
