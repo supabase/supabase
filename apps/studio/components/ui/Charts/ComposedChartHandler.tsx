@@ -238,7 +238,7 @@ const ComposedChartHandler = ({
     return (
       <Panel
         className={cn(
-          'flex min-h-[320px] w-full flex-col items-center justify-center gap-y-2',
+          'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
           className
         )}
         wrapWithLoading={false}
