@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 16 Jul 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Thu, 17 Jul 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/new-observability-features-in-supabase</guid>
+  <title>New Observability Features in Supabase</title>
+  <link>https://supabase.com/blog/new-observability-features-in-supabase</link>
+  <description>New unified logging, advanced reports, and AI debugging capabilities.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/improved-security-controls</guid>
   <title>Improved Security Controls and A New Home for Security</title>
   <link>https://supabase.com/blog/improved-security-controls</link>
