@@ -239,7 +239,6 @@ const getEdgeLogsQuery = () => {
           ELSE 'success'
       END as level,
       edge_logs_request.path as pathname,
-      edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
       authorization_payload.role as api_role,
@@ -279,7 +278,6 @@ const getPostgrestLogsQuery = () => {
           ELSE 'success'
       END as level,
       edge_logs_request.path as pathname,
-      edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
       authorization_payload.role as api_role,
@@ -318,7 +316,6 @@ const getPostgresLogsQuery = () => {
           ELSE null
       END as level,
       null as pathname,
-      null as host,
       event_message as event_message,
       null as method,
       'api_role' as api_role,
@@ -348,7 +345,6 @@ const getEdgeFunctionLogsQuery = () => {
           ELSE 'success'
       END as level,
       fel_request.pathname as pathname,
-      fel_request.host as host,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
       authorization_payload.role as api_role,
@@ -394,7 +390,6 @@ const getAuthLogsQuery = () => {
           ELSE 'success'
       END as level,
       el_in_al_request.path as pathname,
-      el_in_al_request.host as host,
       null as event_message,
       el_in_al_request.method as method,
       authorization_payload.role as api_role,
@@ -436,7 +431,6 @@ const getSupabaseStorageLogsQuery = () => {
           ELSE 'success'
       END as level,
       edge_logs_request.path as pathname,
-      edge_logs_request.host as host,
       null as event_message,
       edge_logs_request.method as method,
       authorization_payload.role as api_role,
@@ -492,7 +486,6 @@ SELECT
     status,
     level,
     pathname,
-    host,
     event_message,
     method,
     api_role,
