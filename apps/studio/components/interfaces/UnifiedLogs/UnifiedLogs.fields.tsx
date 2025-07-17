@@ -99,22 +99,6 @@ export const filterFields = [
     },
   },
   {
-    label: 'Host',
-    value: 'host',
-    type: 'checkbox',
-    defaultOpen: false,
-    options: [],
-    hasDynamicOptions: true,
-    hasAsyncSearch: true,
-    component: (props: Option) => {
-      return (
-        <span className="truncate block text-[0.75rem]" title={props.value as string}>
-          {props.value}
-        </span>
-      )
-    },
-  },
-  {
     label: 'Pathname',
     value: 'pathname',
     type: 'checkbox',
