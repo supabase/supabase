@@ -4,6 +4,7 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import * as yup from 'yup'
+import { useRouter } from 'next/router'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
 import { BASE_PATH } from 'lib/constants'
@@ -28,6 +29,7 @@ const SignUpForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [passwordHidden, setPasswordHidden] = useState(true)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const router = useRouter()
 
   const [searchParams] = useQueryStates({
     auth_id: parseAsString.withDefault(''),
@@ -59,9 +61,24 @@ const SignUpForm = () => {
         ? location.origin
         : process.env.NEXT_PUBLIC_SITE_URL
     }${BASE_PATH}`
-    const redirectTo = isInsideOAuthFlow
-      ? `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
-      : `${redirectUrlBase}/sign-in`
+
+    let redirectTo: string
+
+    if (isInsideOAuthFlow) {
+      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+    } else {
+      // Reconstruct the full URL with all the query parameters to use as the redirectTo parameter
+      const { returnTo, auth_id, token, ...otherParams } = router.query
+
+      const queryString = Object.entries(otherParams)
+        .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
+        .join('&')
+
+      const basePath = returnTo || '/sign-in'
+      const fullPath = queryString ? `${basePath}?${queryString}` : basePath
+
+      redirectTo = `${redirectUrlBase}${fullPath}`
+    }
 
     signup({
       email,
