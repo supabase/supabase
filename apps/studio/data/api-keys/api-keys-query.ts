@@ -91,18 +91,3 @@ export const getKeys = (apiKeys: APIKey[] = []) => {
 
   return { anonKey, serviceKey, publishableKey, secretKey }
 }
-
-// [Joshen] This one's to make it easier to decide what key to use for where dashboard is declaring any
-// supabase clients. Opt to use publishable + secret key if exists, otherwise fallback to anon + service key
-// e.g Storage Explorer
-// JFYI though that Auth team will eventually introduce a "temp API key" which dashboard can use, which
-// thereafter we can update this function to retrieve said temp API key
-export const getPreferredKeys = (apiKeys: APIKey[] = []) => {
-  const anonKey = apiKeys.find((x) => x.name === 'anon')
-  const serviceKey = apiKeys.find((x) => x.name === 'service_role')
-
-  const publishableKey = apiKeys.find((x) => x.type === 'publishable')
-  const secretKey = apiKeys.find((x) => x.type === 'secret')
-
-  return { anonKey: publishableKey || anonKey, serviceKey: secretKey || serviceKey }
-}

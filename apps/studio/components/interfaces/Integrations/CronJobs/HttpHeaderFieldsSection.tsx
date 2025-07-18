@@ -2,7 +2,7 @@ import { ChevronDown, Plus, Trash } from 'lucide-react'
 import { useFieldArray } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { getPreferredKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import {
   Button,
   cn,
@@ -34,8 +34,8 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   const { ref } = useParams()
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
 
-  const { serviceKey } = getPreferredKeys(apiKeys)
-  const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
+  const { serviceKey, secretKey } = getKeys(apiKeys)
+  const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
     <SheetSection>

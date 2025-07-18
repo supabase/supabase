@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { getPreferredKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -53,8 +53,8 @@ const HTTPRequestFields = ({
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
 
   const edgeFunctions = functions ?? []
-  const { serviceKey } = getPreferredKeys(apiKeys)
-  const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
+  const { serviceKey, secretKey } = getKeys(apiKeys)
+  const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
     <>
