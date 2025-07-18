@@ -10,8 +10,11 @@ import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeatureP
 import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -38,9 +41,12 @@ const EdgeFunctionDetailsLayout = ({
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
-  const { functionSlug, ref } = useParams()
   const org = useSelectedOrganization()
+  const { functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { serviceKey } = getKeys(apiKeys)
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isLoading, can: canReadFunctions } = useAsyncCheckProjectPermissions(
@@ -201,8 +207,9 @@ const EdgeFunctionDetailsLayout = ({
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
             {!!functionSlug && (
-              <Button
+              <ButtonTooltip
                 type="default"
+                disabled={!serviceKey}
                 icon={<Send />}
                 onClick={() => {
                   setIsOpen(true)
@@ -214,9 +221,25 @@ const EdgeFunctionDetailsLayout = ({
                     },
                   })
                 }}
+                tooltip={{
+                  content: {
+                    className: 'text-center w-72',
+                    side: 'bottom',
+                    text: (
+                      <>
+                        Testing edge functions through the dashboard is currently unavailable
+                        temporarily due to the new API keys. Please re-enable{' '}
+                        <InlineLink href={`/project/${ref}/settings/api-keys`}>
+                          legacy JWT keys
+                        </InlineLink>{' '}
+                        if you'd like to test edge functions.
+                      </>
+                    ),
+                  },
+                }}
               >
                 Test
-              </Button>
+              </ButtonTooltip>
             )}
           </div>
         }
