@@ -5,6 +5,18 @@ import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { PROVIDERS } from 'lib/constants'
 
+/**
+ * @deprecated Use useSelectedProjectQuery instead for access to loading states etc
+ *
+ * Example migration:
+ * ```
+ * // Old:
+ * const project = useSelectedProject()
+ *
+ * // New:
+ * const { data: project } = useSelectedProjectQuery()
+ * ```
+ */
 export function useSelectedProject({ enabled = true } = {}) {
   const { ref } = useParams()
   const { data } = useProjectDetailQuery({ ref }, { enabled })
@@ -15,6 +27,32 @@ export function useSelectedProject({ enabled = true } = {}) {
   )
 }
 
+export function useSelectedProjectQuery({ enabled = true } = {}) {
+  const { ref } = useParams()
+
+  return useProjectDetailQuery(
+    { ref },
+    {
+      enabled,
+      select: (data) => {
+        return { ...data, parentRef: data.parent_project_ref ?? data.ref }
+      },
+    }
+  )
+}
+
+/**
+ * @deprecated Use useProjectByRefQuery instead for access to loading states etc
+ *
+ * Example migration:
+ * ```
+ * // Old:
+ * const project = useProjectByRef(ref)
+ *
+ * // New:
+ * const { data: project } = useProjectByRefQuery(ref)
+ * ```
+ */
 export function useProjectByRef(
   ref?: string
 ): Omit<ProjectInfo, 'organization_slug' | 'preview_branch_refs'> | undefined {
@@ -32,6 +70,28 @@ export function useProjectByRef(
     if (project) return project
     return projects?.find((project) => project.ref === ref)
   }, [project, projects, ref])
+}
+
+export function useProjectByRefQuery(ref?: string) {
+  const isLoggedIn = useIsLoggedIn()
+
+  const projectQuery = useProjectDetailQuery({ ref }, { enabled: isLoggedIn })
+
+  // [Alaister]: This is here for the purpose of improving performance.
+  // Chances are, the user will already have the list of projects in the cache.
+  // We can't exclusively rely on this method, as useProjectsQuery does not return branch projects.
+  const projectsQuery = useProjectsQuery({
+    enabled: isLoggedIn,
+    select: (data) => {
+      return data.find((project) => project.ref === ref)
+    },
+  })
+
+  if (projectQuery.isSuccess) {
+    return projectQuery
+  }
+
+  return projectsQuery
 }
 
 export const useIsAwsCloudProvider = () => {
