@@ -82,7 +82,7 @@ export const days: BuildDay[] = [
     ],
   },
   {
-    title: 'Storage: 2x Egress Quota, 3x Cheaper Cached Egress & 10x Larger Uploads',
+    title: 'Storage: 10x Larger Uploads, 3x Cheaper Cached Egress & 2x Egress Quota',
     id: 'cheaper-egress',
     is_shipped: true,
     links: [
