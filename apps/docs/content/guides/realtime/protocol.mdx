@@ -50,11 +50,11 @@ All messages sent to the server or received from the server follow the same stru
 
 ### Event types
 
-The following are the main event types used in the Realtime protocol:
+The following are the event types from the Realtime protocol:
 | Event Type | Description | Client Sent | Server Sent | Requires Ref |
 |------------|-------------|--------------|-------------|--------------|
 | `phx_join` | Initial message to join a channel and configure features | ✅ | ⛔ | ✅ |
-| `phx_close` | Message from server to signal channel closed | ✅ | ⛔ | ⛔ |
+| `phx_close` | Message from server to signal channel closed | ⛔ | ✅ | ⛔ |
 | `phx_leave` | Message to leave a channel | ✅ | ⛔ | ✅ |
 | `phx_error` | Error message sent by the server when an error occurs | ⛔ | ✅ | ⛔ |
 | `phx_reply` | Response to a `phx_join` or other requests | ⛔ | ✅ | ⛔ |
