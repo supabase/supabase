@@ -18,6 +18,8 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import data from '~/data/surveys/state-of-startups-2025'
 
 import { TeamCountChart } from '~/components/SurveyResults/TeamCountChart'
+import { TechnicalFoundersChart } from '~/components/SurveyResults/TechnicalFoundersChart'
+import { PreviousCompanyChart } from '~/components/SurveyResults/PreviousCompanyChart'
 import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
 import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
 import { SectionIntro } from '~/components/SurveyResults/SectionIntro'
@@ -206,6 +208,8 @@ function StateOfStartupsPage() {
 
             <RoleChart />
             <PersonAgeChart />
+            <TechnicalFoundersChart />
+            <PreviousCompanyChart />
             <TeamCountChart />
             <FundingStageChart />
             <HeadquartersChart />

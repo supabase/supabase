@@ -2,11 +2,22 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis, Cell } from 'recharts'
+import {
+  Bar,
+  BarChart,
+  PieChart,
+  Pie,
+  CartesianGrid,
+  LabelList,
+  XAxis,
+  YAxis,
+  Cell,
+} from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { ChartConfig, ChartContainer } from 'ui'
 import { SurveyCodeWindow } from './SurveyCodeWindow'
+import { COLORS } from '@ui/lib/constants'
 
 const chartConfig = {
   value: {
@@ -170,6 +181,12 @@ export function GenericChartWithQuery({
   const isLoading = filtersLoading || dataLoading
   const error = filtersError || dataError
 
+  const COLORS = [
+    'hsl(var(--brand-default))',
+    'hsl(var(--foreground-light))',
+    'hsl(var(--brand-500))',
+  ]
+
   return (
     <div className="w-full flex flex-row gap-4">
       <Card className="w-full">
@@ -187,45 +204,64 @@ export function GenericChartWithQuery({
             </div>
           ) : (
             <ChartContainer config={chartConfig}>
-              <BarChart
-                accessibilityLayer
-                data={chartData}
-                layout="vertical"
-                margin={{
-                  right: 0,
-                }}
-              >
-                <CartesianGrid horizontal={false} />
-                <YAxis
-                  dataKey="label"
-                  type="category"
-                  tickLine={false}
-                  tickMargin={64}
-                  axisLine={false}
-                  hide={false}
-                  width={64}
-                  tick={{
-                    className: 'text-foreground-lighter',
-                    fontSize: 12,
-                    textAnchor: 'start',
-                    dx: 0,
+              {chartType === 'bar' && (
+                <BarChart
+                  accessibilityLayer
+                  data={chartData}
+                  layout="vertical"
+                  margin={{
+                    right: 0,
                   }}
-                />
-                <XAxis dataKey="value" type="number" hide />
-                <Bar dataKey="value" layout="vertical" radius={4}>
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill="hsl(var(--brand-default))" />
-                  ))}
-                  <LabelList
-                    dataKey="value"
-                    position="right"
-                    offset={8}
-                    className="fill-foreground"
-                    fontSize={12}
-                    formatter={(value: number) => `${value}%`}
+                >
+                  <CartesianGrid horizontal={false} />
+                  <YAxis
+                    dataKey="label"
+                    type="category"
+                    tickLine={false}
+                    tickMargin={64}
+                    axisLine={false}
+                    hide={false}
+                    width={64}
+                    tick={{
+                      className: 'text-foreground-lighter',
+                      fontSize: 12,
+                      textAnchor: 'start',
+                      dx: 0,
+                    }}
                   />
-                </Bar>
-              </BarChart>
+                  <XAxis dataKey="value" type="number" hide />
+                  <Bar dataKey="value" layout="vertical" radius={4}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill="hsl(var(--brand-default))" />
+                    ))}
+                    <LabelList
+                      dataKey="value"
+                      position="right"
+                      offset={8}
+                      className="fill-foreground"
+                      fontSize={12}
+                      formatter={(value: number) => `${value}%`}
+                    />
+                  </Bar>
+                </BarChart>
+              )}
+              {chartType === 'pie' && (
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    dataKey="value"
+                    innerRadius={60}
+                    outerRadius={100}
+                    // startAngle={15}
+                    paddingAngle={2}
+                    // label={renderCustomizedLabel}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              )}
             </ChartContainer>
           )}
         </CardContent>

@@ -19,7 +19,6 @@ function generateMonetizationSQL(activeFilters: Record<string, string>) {
   COUNT(*) AS total
 FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
 GROUP BY currently_monetizing
---ORDER BY currently_monetizing
 ORDER BY total DESC;`
 }
 
@@ -30,6 +29,7 @@ export function MonetizationChart() {
       targetColumn="currently_monetizing"
       filterColumns={['headquarters', 'money_raised']}
       generateSQLQuery={generateMonetizationSQL}
+      chartType="pie"
     />
   )
 }
