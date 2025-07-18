@@ -1744,7 +1744,6 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const { serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
-  const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1756,6 +1755,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const hasDataReady = !!project?.ref
     const isDifferentProject = snap.projectRef !== project?.ref
 
+    const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
     if (!isPaused && hasDataReady && isDifferentProject && serviceKey) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
       const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
@@ -1782,7 +1782,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
         })
       )
     }
-  }, [project?.ref, stateRef, serviceKey, isPaused])
+  }, [project?.ref, stateRef, serviceKey, isPaused, protocol, endpoint])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>
