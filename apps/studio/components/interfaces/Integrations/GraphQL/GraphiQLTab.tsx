@@ -31,8 +31,8 @@ export const GraphiQLTab = () => {
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
 
-  const { data: apiKeys, isFetched } = useAPIKeysQuery({ projectRef })
-  const { serviceKey } = getKeys(apiKeys)
+  const { data: apiKeys, isFetched } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { serviceKey, secretKey } = getKeys(apiKeys)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
@@ -74,7 +74,7 @@ export const GraphiQLTab = () => {
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
             userAuthorization ??
-            `Bearer ${serviceKey?.api_key}`,
+            `Bearer ${secretKey?.api_key ?? serviceKey?.api_key}`,
         },
       })
     }
