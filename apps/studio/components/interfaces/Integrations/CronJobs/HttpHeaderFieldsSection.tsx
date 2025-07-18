@@ -2,7 +2,7 @@ import { ChevronDown, Plus, Trash } from 'lucide-react'
 import { useFieldArray } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import {
   Button,
   cn,
@@ -32,8 +32,9 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   })
 
   const { ref } = useParams()
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
-  const { serviceKey } = getAPIKeys(settings)
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+
+  const { serviceKey } = getKeys(apiKeys)
   const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (

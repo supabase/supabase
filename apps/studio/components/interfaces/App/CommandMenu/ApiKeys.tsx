@@ -1,8 +1,8 @@
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
@@ -21,14 +21,11 @@ export function useApiKeysCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { data: settings } = useProjectSettingsV2Query(
-    { projectRef: project?.ref },
-    { enabled: !!project }
-  )
-  const { anonKey, serviceKey } = getAPIKeys(settings)
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
+  const { anonKey, serviceKey } = getKeys(apiKeys)
 
   const commands = useMemo(
     () =>

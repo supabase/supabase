@@ -4,13 +4,13 @@ import { AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { SimpleCodeBlock } from 'ui'
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Input } from 'ui'
+import { Input, SimpleCodeBlock } from 'ui'
 
 const generateInitSnippet = (endpoint: string) => ({
   js: `
@@ -42,13 +42,13 @@ const APIKeys = () => {
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettingsV2Query({
-    projectRef,
-  })
+  } = useProjectSettingsV2Query({ projectRef })
+
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { anonKey, serviceKey } = getKeys(apiKeys)
 
   // API keys should not be empty. However it can be populated with a delay on project creation
-  const apiKeys = settings?.service_api_keys ?? []
-  const isApiKeysEmpty = apiKeys.length === 0
+  const isApiKeysEmpty = !anonKey && !serviceKey
 
   const {
     data,
@@ -56,9 +56,7 @@ const APIKeys = () => {
     isLoading: isJwtSecretUpdateStatusLoading,
   } = useJwtSecretUpdatingStatusQuery(
     { projectRef },
-    {
-      enabled: !isProjectSettingsLoading && isApiKeysEmpty,
-    }
+    { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
   )
 
   // Only show JWT loading state if the query is actually enabled
@@ -75,7 +73,6 @@ const APIKeys = () => {
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
-  const { anonKey } = getAPIKeys(settings)
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
@@ -144,17 +141,13 @@ const APIKeys = () => {
                 <div className="space-y-2">
                   <p className="text-sm">API Key</p>
                   <div className="flex items-center space-x-1 -ml-1">
-                    {anonKey?.tags?.split(',').map((x: any, i: number) => (
-                      <code key={`${x}${i}`} className="text-xs">
-                        {x}
-                      </code>
-                    ))}
-                    <code className="text-xs">{'public'}</code>
+                    <code className="text-xs">{anonKey?.name}</code>
+                    <code className="text-xs">public</code>
                   </div>
                 </div>
               }
               copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-              reveal={anonKey?.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+              reveal={anonKey?.name !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
               value={
                 !canReadAPIKeys
                   ? 'You need additional permissions to view API keys'

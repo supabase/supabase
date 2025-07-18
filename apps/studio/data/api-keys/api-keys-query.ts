@@ -46,8 +46,10 @@ type PublishableKeys = {
 
 interface APIKeysVariables {
   projectRef?: string
-  reveal: boolean
+  reveal?: boolean
 }
+
+type APIKey = LegacyKeys | SecretKeys | PublishableKeys
 
 async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -62,20 +64,35 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
   }
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
-  return data as unknown as (LegacyKeys | SecretKeys | PublishableKeys)[]
+  return data as unknown as APIKey[]
 }
 
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
-  { projectRef, reveal }: APIKeysVariables,
+  { projectRef, reveal = false }: APIKeysVariables,
   { enabled, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
 ) =>
   useQuery<APIKeysData, ResponseError, TData>(
-    apiKeysKeys.list(projectRef),
+    apiKeysKeys.list(projectRef, reveal),
     ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     {
       enabled: IS_PLATFORM && enabled && !!projectRef,
       ...options,
     }
   )
+
+// [Joshen] Auth team will eventually introduce a "temp API key" which dashboard can use
+// to declare supabase clients, so this method to retrieve the keys out of the API keys response
+// is temporary. (Otherwise i'd opt to do this by refactoring the data that's returned from
+// `getAPIKeys` above instead tbh)
+export const getKeys = (apiKeys: APIKey[] = []) => {
+  const anonKey = apiKeys.find((x) => x.name === 'anon')
+  const serviceKey = apiKeys.find((x) => x.name === 'service_role')
+
+  // [Joshen] For now I just want 1 of each, I don't need all
+  const publishableKey = apiKeys.find((x) => x.type === 'publishable')
+  const secretKey = apiKeys.find((x) => x.type === 'secret')
+
+  return { anonKey, serviceKey, publishableKey, secretKey }
+}

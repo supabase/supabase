@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
@@ -20,8 +20,8 @@ interface RealtimeTokensPopoverProps {
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
   const snap = useRoleImpersonationStateSnapshot()
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: config.projectRef })
-  const { anonKey, serviceKey } = getAPIKeys(settings)
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: config.projectRef })
+  const { anonKey, serviceKey } = getKeys(apiKeys)
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     { projectRef: config.projectRef },
