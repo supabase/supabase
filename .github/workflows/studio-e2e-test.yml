@@ -29,8 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     # Make the job non-blocking
     continue-on-error: true
-    # Require approval from designated reviewers before running
-    environment: Studio E2E Tests
+    # Require approval only for external contributors
+    environment: ${{ github.event.pull_request.author_association != 'MEMBER' && 'Studio E2E Tests' || '' }}
 
     env:
       EMAIL: ${{ secrets.CI_EMAIL }}
