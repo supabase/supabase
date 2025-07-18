@@ -59,7 +59,7 @@ function useFilterOptions(filterColumns: string[]) {
             label: column.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
             options: [
               {
-                value: 'all',
+                value: 'unset',
                 label: `All ${column.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}s`,
               },
               ...uniqueValues.map((value) => ({ value, label: value })),
@@ -151,7 +151,7 @@ export function GenericChartWithQuery({
 
   // Start with all filters unset (showing "all")
   const [activeFilters, setActiveFilters] = useState(
-    filterColumns.reduce((acc, col) => ({ ...acc, [col]: 'all' }), {})
+    filterColumns.reduce((acc, col) => ({ ...acc, [col]: 'unset' }), {})
   )
 
   // Generate the SQL query string

@@ -4,11 +4,11 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateCloudProviderSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.headquarters !== 'all') {
+  if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'all') {
+  if (activeFilters.currently_monetizing !== 'unset') {
     whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
   }
 

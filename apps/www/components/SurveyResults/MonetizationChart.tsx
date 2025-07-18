@@ -4,11 +4,11 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateMonetizationSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.headquarters !== 'all') {
+  if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.money_raised !== 'all') {
+  if (activeFilters.money_raised !== 'unset') {
     whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
   }
 

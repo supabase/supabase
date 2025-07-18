@@ -4,15 +4,15 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateTeamCountSQL(activeFilters) {
   const whereClauses = []
 
-  if (activeFilters.headquarters !== 'all') {
+  if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.funding_stage !== 'all') {
+  if (activeFilters.funding_stage !== 'unset') {
     whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
   }
 
-  if (activeFilters.person_age !== 'all') {
+  if (activeFilters.person_age !== 'unset') {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 

@@ -19,10 +19,6 @@ export function FilterDropdown({
   selectedValue: string
   setFilterValue: (filterKey: string, value: string) => void
 }) {
-  const label = filterConfig.label
-  // const displayText = selectedValue === 'all' ? label : selectedValue
-  const displayText = selectedValue
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,22 +26,24 @@ export function FilterDropdown({
           type="text"
           size="tiny"
           className={`inline-flex items-center gap-1 px-2 py-0 h-auto text-sm font-mono bg-background border border-border hover:bg-surface-100 ${
-            displayText === 'Filter' ? 'text-foreground-lighter' : ''
+            selectedValue === 'unset' ? 'text-foreground-lighter' : ''
           }`}
           iconRight={<ChevronDown className="w-3 h-3" />}
         >
-          {label}: {displayText}
+          {selectedValue === 'unset'
+            ? filterConfig.label
+            : `${filterConfig.label}: ${selectedValue}`}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem
-          onClick={() => setFilterValue(filterKey, 'all')}
-          className={selectedValue === 'all' ? 'text-brand-600' : ''}
+          onClick={() => setFilterValue(filterKey, 'unset')}
+          className={selectedValue === 'unset' ? 'text-brand-600' : ''}
         >
-          Reset {label}
+          Unset
         </DropdownMenuItem>
         {filterConfig.options
-          .filter((opt) => opt.value !== 'all')
+          .filter((opt) => opt.value !== 'unset')
           .map((option) => (
             <DropdownMenuItem
               key={option.value}

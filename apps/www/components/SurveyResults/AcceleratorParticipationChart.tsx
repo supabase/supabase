@@ -7,11 +7,11 @@ function generateAcceleratorParticipationSQL(activeFilters: Record<string, strin
   // Always filter out NULL values
   whereClauses.push(`accelerator_participation_normalized IS NOT NULL`)
 
-  if (activeFilters.headquarters !== 'all') {
+  if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.role !== 'all') {
+  if (activeFilters.role !== 'unset') {
     whereClauses.push(`role = '${activeFilters.role}'`)
   }
 

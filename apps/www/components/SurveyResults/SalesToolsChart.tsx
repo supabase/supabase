@@ -4,7 +4,7 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.team_count !== 'all') {
+  if (activeFilters.team_count !== 'unset') {
     whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
