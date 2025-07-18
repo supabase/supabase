@@ -1364,6 +1364,27 @@ export interface ForeignDataWrapperCreatedEvent {
 }
 
 /**
+ * Triggered when a new storage bucket is created in a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/buckets
+ */
+export interface StorageBucketCreatedEvent {
+  action: 'storage_bucket_created'
+  properties: {
+    /**
+     * The type of the bucket created. E.g. standard or analytics iceberg.
+     */
+    bucketType?: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1443,3 +1464,4 @@ export type TelemetryEvent =
   | AiAssistantInSupportFormClickedEvent
   | OrganizationMfaEnforcementUpdated
   | ForeignDataWrapperCreatedEvent
+  | StorageBucketCreatedEvent
