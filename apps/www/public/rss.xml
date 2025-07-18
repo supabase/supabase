@@ -9,7 +9,7 @@
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</guid>
-  <title>Storage: 2x Egress Quota, 3x Cheaper Cached Egress &amp; 10x Larger Uploads</title>
+  <title>Storage: 10x Larger Uploads, 3x Cheaper Cached Egress, and 2x Egress Quota</title>
   <link>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</link>
   <description>Upload files up to 500 GB with significant egress cost reductions.</description>
   <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
