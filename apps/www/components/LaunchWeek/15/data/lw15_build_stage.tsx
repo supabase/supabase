@@ -87,7 +87,7 @@ export const days: BuildDay[] = [
     is_shipped: true,
     links: [
       {
-        url: '/blog/storage-egress-pricing-updates',
+        url: '/blog/storage-500gb-uploads-cheaper-egress-pricing',
         label: 'Blog post',
         target: '_blank',
       },
