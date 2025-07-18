@@ -264,7 +264,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # Core Principles:
       - **Tool Usage Strategy**:
-          - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**. Current chat name: ${chatName}
+          - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**. 
           - **Always attempt to use MCP tools** like \`list_tables\` and \`list_extensions\` to gather schema information if available. If these tools are not available or return a privacy message, state that you cannot access schema information and will proceed based on general Postgres/Supabase knowledge.
           - For **READ ONLY** queries:
               - Explain your plan.
@@ -405,7 +405,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {
         role: 'assistant',
         // Add any dynamic context here
-        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}`,
+        content: `The user's current project is ${projectRef}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName}`,
       },
       ...convertToCoreMessages(messages),
     ]
