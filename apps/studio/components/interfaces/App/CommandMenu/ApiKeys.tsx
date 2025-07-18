@@ -25,7 +25,7 @@ export function useApiKeysCommands() {
   const ref = project?.ref || '_'
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
-  const { anonKey, serviceKey } = getKeys(apiKeys)
+  const { anonKey, serviceKey, publishableKey } = getKeys(apiKeys)
 
   const commands = useMemo(
     () =>
@@ -39,9 +39,10 @@ export function useApiKeysCommands() {
               setIsOpen(false)
             },
             badge: () => (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
                 <Badge>Public</Badge>
+                <Badge className="capitalize">{anonKey.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
@@ -55,9 +56,26 @@ export function useApiKeysCommands() {
               setIsOpen(false)
             },
             badge: () => (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
                 <Badge variant="destructive">Secret</Badge>
+                <Badge className="capitalize">{serviceKey.type}</Badge>
+              </span>
+            ),
+            icon: () => <Key />,
+          },
+        project &&
+          publishableKey && {
+            id: 'publishable-key',
+            name: `Copy publishable API key`,
+            action: () => {
+              copyToClipboard(publishableKey.api_key ?? '')
+              setIsOpen(false)
+            },
+            badge: () => (
+              <span className="flex items-center gap-x-1">
+                <Badge>Project: {project?.name}</Badge>
+                <Badge className="capitalize">{publishableKey.type}</Badge>
               </span>
             ),
             icon: () => <Key />,

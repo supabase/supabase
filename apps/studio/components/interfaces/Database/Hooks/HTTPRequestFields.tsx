@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getPreferredKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -26,7 +26,7 @@ interface HTTPRequestFieldsProps {
   errors: any
   httpHeaders: HTTPArgument[]
   httpParameters: HTTPArgument[]
-  onAddHeader: (header?: any) => void
+  onAddHeaders: (headers?: any[]) => void
   onUpdateHeader: (idx: number, property: string, value: string) => void
   onRemoveHeader: (idx: number) => void
   onAddParameter: () => void
@@ -39,7 +39,7 @@ const HTTPRequestFields = ({
   errors,
   httpHeaders = [],
   httpParameters = [],
-  onAddHeader,
+  onAddHeaders,
   onUpdateHeader,
   onRemoveHeader,
   onAddParameter,
@@ -50,10 +50,10 @@ const HTTPRequestFields = ({
   const { project: selectedProject } = useProjectContext()
 
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
 
   const edgeFunctions = functions ?? []
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = getPreferredKeys(apiKeys)
   const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
@@ -159,30 +159,37 @@ const HTTPRequestFields = ({
                 size="tiny"
                 icon={<Plus />}
                 className={cn(type === 'supabase_function' && 'rounded-r-none px-3')}
-                onClick={onAddHeader}
+                onClick={() => onAddHeaders()}
               >
                 Add a new header
               </Button>
               {type === 'supabase_function' && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button type="default" className="rounded-l-none px-[4px] py-[5px]">
-                      <ChevronDown />
-                    </Button>
+                    <Button
+                      type="default"
+                      icon={<ChevronDown />}
+                      className="rounded-l-none px-[4px] py-[5px]"
+                    />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
                     <DropdownMenuItem
                       key="add-auth-header"
-                      onClick={() =>
-                        onAddHeader({
-                          id: uuidv4(),
-                          name: 'Authorization',
-                          value: `Bearer ${apiKey}`,
-                        })
-                      }
+                      onClick={() => {
+                        onAddHeaders([
+                          {
+                            id: uuidv4(),
+                            name: 'Authorization',
+                            value: `Bearer ${apiKey}`,
+                          },
+                          ...(serviceKey?.type === 'secret'
+                            ? [{ id: uuidv4(), name: 'apikey', value: apiKey }]
+                            : []),
+                        ])
+                      }}
                     >
                       <div className="space-y-1">
-                        <p className="block text-foreground">Add auth header with service key</p>
+                        <p className="block text-foreground">Add auth header with secret key</p>
                         <p className="text-foreground-light">
                           Required if your edge function enforces JWT verification
                         </p>
@@ -192,11 +199,13 @@ const HTTPRequestFields = ({
                     <DropdownMenuItem
                       key="add-source-header"
                       onClick={() =>
-                        onAddHeader({
-                          id: uuidv4(),
-                          name: 'x-supabase-webhook-source',
-                          value: `[Use a secret value]`,
-                        })
+                        onAddHeaders([
+                          {
+                            id: uuidv4(),
+                            name: 'x-supabase-webhook-source',
+                            value: `[Use a secret value]`,
+                          },
+                        ])
                       }
                     >
                       <div className="space-y-1">

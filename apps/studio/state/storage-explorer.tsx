@@ -31,7 +31,7 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getPreferredKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -1115,6 +1115,7 @@ function createStorageExplorerState({
               retryDelays: [0, 200, 500, 1500, 3000, 5000],
               headers: {
                 authorization: `Bearer ${state.serviceKey}`,
+                apikey: state.serviceKey,
                 'x-source': 'supabase-dashboard',
               },
               uploadDataDuringCreation: uploadDataDuringCreation,
@@ -1723,10 +1724,10 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
 
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = getPreferredKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`

@@ -2,7 +2,7 @@ import { ChevronDown, Plus, Trash } from 'lucide-react'
 import { useFieldArray } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getPreferredKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import {
   Button,
   cn,
@@ -32,9 +32,9 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   })
 
   const { ref } = useParams()
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref, reveal: true })
 
-  const { serviceKey } = getKeys(apiKeys)
+  const { serviceKey } = getPreferredKeys(apiKeys)
   const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
@@ -105,15 +105,18 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
               <DropdownMenuContent align="end" side="bottom">
                 <DropdownMenuItem
                   key="add-auth-header"
-                  onClick={() =>
+                  onClick={() => {
                     append({
                       name: 'Authorization',
                       value: `Bearer ${apiKey}`,
                     })
-                  }
+                    if (serviceKey?.type === 'secret') {
+                      append({ name: 'apikey', value: apiKey })
+                    }
+                  }}
                 >
                   <div className="space-y-1">
-                    <p className="block text-foreground">Add auth header with service key</p>
+                    <p className="block text-foreground">Add auth header with secret key</p>
                     <p className="text-foreground-light">
                       Required if your edge function enforces JWT verification
                     </p>

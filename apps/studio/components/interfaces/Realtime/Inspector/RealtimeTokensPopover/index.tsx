@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getPreferredKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -18,10 +18,12 @@ interface RealtimeTokensPopoverProps {
 }
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const snap = useRoleImpersonationStateSnapshot()
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: config.projectRef })
-  const { anonKey, serviceKey } = getKeys(apiKeys)
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: config.projectRef, reveal: true })
+  const { anonKey, serviceKey } = getPreferredKeys(apiKeys)
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
     { projectRef: config.projectRef },
@@ -29,8 +31,6 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   )
   const jwtSecret = postgrestConfig?.jwt_secret
 
-  const { ref } = useParams()
-  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   // only send a telemetry event if the user changes the role. Don't send an event during initial render.
@@ -66,6 +66,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
         token = serviceKey?.api_key
       }
       if (token) {
+        console.log({ token, bearer })
         onChangeConfig({ ...config, token, bearer })
       }
     }
