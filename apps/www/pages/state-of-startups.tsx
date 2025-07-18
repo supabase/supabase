@@ -26,6 +26,9 @@ import { AcceleratorParticipationChart } from '~/components/SurveyResults/Accele
 import { PivotFreqChart } from '~/components/SurveyResults/PivotFreqChart'
 import { FrontendStackChart } from '~/components/SurveyResults/FrontendStackChart'
 import { BackendStackChart } from '~/components/SurveyResults/BackendStackChart'
+import { CloudProviderChart } from '~/components/SurveyResults/CloudProviderChart'
+import { SalesToolsChart } from '~/components/SurveyResults/SalesToolsChart'
+import { PricingChart } from '~/components/SurveyResults/PricingChart'
 
 interface FormData {
   email: string
@@ -229,6 +232,20 @@ function StateOfStartupsPage() {
 
             <FrontendStackChart />
             <BackendStackChart />
+            <CloudProviderChart />
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Go-To-Market"
+              description="Startups start selling through networks and dev communities, then layer in more structured growth."
+              text="The first users come from dev communities, Product Hunt, Hacker News, and personal networks. Most teams use product-led growth and only layer in sales after demand picks up. CRM use is lightweight—Google Sheets and Notion still dominate."
+            />
+
+            <SalesToolsChart />
+            <PricingChart />
           </div>
         </SectionContainer>
       </DefaultLayout>

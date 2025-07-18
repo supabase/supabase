@@ -42,15 +42,12 @@ export const SurveyCodeWindow = ({
         {filters && activeFilters && setFilterValue && (
           <div className="flex flex-wrap gap-4 p-4 border-b border-border">
             {Object.entries(filters).map(([filterKey, filterConfig]) => (
-              <div key={filterKey} className="flex items-center gap-2">
-                <span className="text-sm font-medium">{filterConfig.label}:</span>
-                <FilterDropdown
-                  filterKey={filterKey}
-                  filterConfig={filterConfig}
-                  selectedValue={activeFilters[filterKey]}
-                  setFilterValue={setFilterValue}
-                />
-              </div>
+              <FilterDropdown
+                filterKey={filterKey}
+                filterConfig={filterConfig}
+                selectedValue={activeFilters[filterKey]}
+                setFilterValue={setFilterValue}
+              />
             ))}
           </div>
         )}

@@ -19,7 +19,9 @@ export function FilterDropdown({
   selectedValue: string
   setFilterValue: (filterKey: string, value: string) => void
 }) {
-  const displayText = selectedValue === 'all' ? 'Filter' : `${selectedValue}`
+  const label = filterConfig.label
+  // const displayText = selectedValue === 'all' ? label : selectedValue
+  const displayText = selectedValue
 
   return (
     <DropdownMenu>
@@ -32,7 +34,7 @@ export function FilterDropdown({
           }`}
           iconRight={<ChevronDown className="w-3 h-3" />}
         >
-          {displayText}
+          {label}: {displayText}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -40,7 +42,7 @@ export function FilterDropdown({
           onClick={() => setFilterValue(filterKey, 'all')}
           className={selectedValue === 'all' ? 'text-brand-600' : ''}
         >
-          Unset
+          Reset {label}
         </DropdownMenuItem>
         {filterConfig.options
           .filter((opt) => opt.value !== 'all')
