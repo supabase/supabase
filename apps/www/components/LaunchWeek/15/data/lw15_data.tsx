@@ -155,7 +155,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 4,
     dd: 'Thu',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/new-observability-features-in-supabase',
     date: 'Thursday',
@@ -185,23 +185,23 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
-    isToday: false,
+    shipped: true,
+    isToday: true,
     hasCountdown: false,
     blog: '/blog/',
     date: 'Friday',
     published_at: '2025-04-04T07:00:00.000-07:00',
-    title: '',
+    title: 'tbd',
     description: '',
     links: [
       {
         type: 'video',
         href: '',
       },
-      // {
-      //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://x.com/i/spaces/1jMJgkeNXAbJL',
+      },
     ],
     steps: [
       {

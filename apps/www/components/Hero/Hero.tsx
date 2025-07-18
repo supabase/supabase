@@ -19,7 +19,7 @@ const Hero = () => {
                 <AnnouncementBadge
                   url="/launch-week#main-stage"
                   badge="LW15"
-                  announcement={`Day 4: ${announcement.launch}`}
+                  announcement={`Day 5: ${announcement.launch}`}
                   className="lg:-mt-8 mb-4 lg:mb-0"
                   hasArrow
                 />
