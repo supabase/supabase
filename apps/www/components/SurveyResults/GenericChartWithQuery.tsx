@@ -20,8 +20,6 @@ import {
 import { ChartConfig, ChartContainer } from 'ui'
 import CodeWindow from '~/components/CodeWindow'
 
-export const description = 'A bar chart with a custom label'
-
 const chartConfig = {
   value: {
     label: 'Value',
@@ -34,12 +32,12 @@ const chartConfig = {
 
 // Create a separate Supabase client for your external project
 const externalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_ANON_KEY
 )
 
 // Custom hook to fetch filter options from Supabase
-function useFilterOptions() {
+function useFilterOptions(filterColumns) {
   const [filters, setFilters] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -50,10 +48,8 @@ function useFilterOptions() {
         setIsLoading(true)
         setError(null)
 
-        console.log('Fetching filter options from Supabase')
+        console.log('Fetching filter options from Supabase for columns:', filterColumns)
 
-        // Get distinct values for each filter column
-        const filterColumns = ['headquarters', 'funding_stage', 'person_age']
         const filterOptions = {}
 
         for (const column of filterColumns) {
@@ -94,7 +90,7 @@ function useFilterOptions() {
     }
 
     fetchFilterOptions()
-  }, [])
+  }, [filterColumns])
 
   return { filters, isLoading, error }
 }
@@ -140,43 +136,8 @@ function InlineFilterDropdown({ filterKey, filterConfig, selectedValue, setFilte
   )
 }
 
-// Generate SQL query string based on active filters
-function generateSQLQuery(activeFilters) {
-  // Build WHERE clauses only for active filters
-  const whereClauses = []
-
-  if (activeFilters.headquarters !== 'all') {
-    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
-  }
-
-  if (activeFilters.funding_stage !== 'all') {
-    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
-  }
-
-  if (activeFilters.person_age !== 'all') {
-    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
-  }
-
-  // Build the WHERE clause string
-  const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
-
-  return `SELECT
-  team_count,
-  COUNT(*) AS total
-FROM responses${whereClause ? '\n' + whereClause : ''}
-GROUP BY team_count
-ORDER BY 
-  CASE team_count
-    WHEN '1-10' THEN 1
-    WHEN '11-50' THEN 2
-    WHEN '51-100' THEN 3
-    WHEN '101-250' THEN 4
-    WHEN '250+' THEN 5
-  END;`
-}
-
 // Custom hook to fetch survey data using SQL query via RPC
-function useSurveyData(activeFilters) {
+function useSurveyData(sqlQuery) {
   const [chartData, setChartData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -187,10 +148,6 @@ function useSurveyData(activeFilters) {
         setIsLoading(true)
         setError(null)
 
-        console.log('Fetching survey data with filters:', activeFilters)
-
-        // Generate the SQL query
-        const sqlQuery = generateSQLQuery(activeFilters)
         console.log('Executing SQL query:', sqlQuery)
 
         // Execute the SQL query using Supabase RPC
@@ -211,7 +168,7 @@ function useSurveyData(activeFilters) {
 
         // Transform the data to match chart format
         const processedData = data.map((row) => ({
-          label: row.team_count === '250+' ? '250+' : row.team_count,
+          label: row.label || row.value || row[Object.keys(row)[0]], // Get the first column as label
           value: total > 0 ? parseFloat(((parseInt(row.total) / total) * 100).toFixed(1)) : 0,
         }))
 
@@ -226,24 +183,35 @@ function useSurveyData(activeFilters) {
     }
 
     fetchData()
-  }, [activeFilters])
+  }, [sqlQuery])
 
   return { chartData, isLoading, error }
 }
 
-export function ChartWithQuery() {
+export function GenericChartWithQuery({
+  title,
+  targetColumn,
+  filterColumns,
+  generateSQLQuery,
+  chartType = 'bar', // Could be 'bar', 'pie', etc.
+}) {
   // Get dynamic filter options
-  const { filters, isLoading: filtersLoading, error: filtersError } = useFilterOptions()
+  const {
+    filters,
+    isLoading: filtersLoading,
+    error: filtersError,
+  } = useFilterOptions(filterColumns)
 
   // Start with all filters unset (showing "all")
-  const [activeFilters, setActiveFilters] = useState({
-    headquarters: 'all',
-    funding_stage: 'all',
-    person_age: 'all',
-  })
+  const [activeFilters, setActiveFilters] = useState(
+    filterColumns.reduce((acc, col) => ({ ...acc, [col]: 'all' }), {})
+  )
+
+  // Generate the SQL query string
+  const sqlQuery = generateSQLQuery(activeFilters)
 
   // Use the custom hook to fetch data
-  const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(activeFilters)
+  const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(sqlQuery)
 
   const setFilterValue = (filterKey, value) => {
     setActiveFilters((prev) => ({
@@ -252,9 +220,6 @@ export function ChartWithQuery() {
     }))
   }
 
-  // Generate the SQL query string
-  const sqlQuery = generateSQLQuery(activeFilters)
-
   const isLoading = filtersLoading || dataLoading
   const error = filtersError || dataError
 
@@ -262,7 +227,7 @@ export function ChartWithQuery() {
     <div className="w-full flex flex-row gap-4">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>How many full-time employees does your startup have?</CardTitle>
+          <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (

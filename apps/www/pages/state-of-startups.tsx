@@ -8,21 +8,19 @@ import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 
 import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
-import { PopupFrame } from 'ui-patterns'
 import { Input } from 'ui/src/components/shadcn/ui/input'
 import { Label } from 'ui/src/components/shadcn/ui/label'
 import ChartPieStacked from '../../design-system/registry/default/block/chart-pie-stacked'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { ChartWithQuery } from '~/components/SurveyResults/ChartWithQuery'
-
-import { FullTimeEmployees } from '~/components/SurveyResults/FullTimeEmployees'
-import { BarChartLabelInside } from '~/components/SurveyResults/BarChartLabelInside'
-import { BarChartNumbersTop } from '~/components/SurveyResults/BarChartNumbersTop'
-const Metrics = dynamic(() => import('~/components/SurveyResults/Metrics'))
 
 import data from '~/data/surveys/state-of-startups-2025'
+import { TeamCountChart } from '~/components/SurveyResults/TeamCountChart'
+import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
+import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
+import { SectionIntro } from '~/components/SurveyResults/SectionIntro'
+import { MonetizationChart } from '~/components/SurveyResults/MonetizationChart'
 
 interface FormData {
   email: string
@@ -190,30 +188,27 @@ function StateOfStartupsPage() {
         <Hero {...pageData.heroSection} />
         <SectionContainer>
           <div className="flex flex-col gap-4 py-8 items-center justify-center">
-            <div className="max-w-2xl text-center flex flex-col  gap-4">
-              <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl text-balance">
-                Today’s startup ecosystem is dominated by young, technical builders shipping fast
-                with lean teams.
-              </h2>
-              <p className="mx-auto text-foreground-lighter w-full">
-                Most survey respondents identified as founders (76%), with engineers as the
-                next-largest group (18%). Age-wise, 82% of participants are under 40, with the
-                largest cohort in the 22–29 age range (36.4%). These are early-career founders
-                starting small: 91% of companies have 10 or fewer employees, and 66% were founded
-                within the last year. Two-thirds are bootstrapped, with fewer than 6% reaching
-                Series A or beyond.
-              </p>
-            </div>
+            <SectionIntro
+              title="Founder and Company Basics"
+              description="Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams."
+              text="Most survey respondents identified as founders (76%), with engineers as the next-largest group (18%). Age-wise, 82% of participants are under 40, with the largest cohort in the 22–29 age range (36.4%). These are early-career founders starting small: 91% of companies have 10 or fewer employees, and 66% were founded within the last year. Two-thirds are bootstrapped, with fewer than 6% reaching Series A or beyond."
+            />
 
-            <ChartWithQuery />
+            <TeamCountChart />
+            <FundingStageChart />
+            <HeadquartersChart />
+          </div>
+        </SectionContainer>
 
-            <div className="w-full max-w-lg mt-8 flex flex-col gap-4">
-              <FullTimeEmployees />
-              <BarChartLabelInside />
-              <BarChartNumbersTop />
-              <ChartPieStacked />
-              <Metrics />
-            </div>
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Product and Market"
+              description="Startups are building a diverse mix of software products, iterating quickly, and pursuing monetization selectively."
+              text="TBA"
+            />
+
+            <MonetizationChart />
           </div>
         </SectionContainer>
       </DefaultLayout>
@@ -458,26 +453,6 @@ const Hero = (props: any) => {
                 </div>
               </div>
               <p className="p !text-foreground-light max-w-lg">{props.subheader}</p>
-            </div>
-            <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
-              <PopupFrame
-                trigger={
-                  <Button size="small" asChild>
-                    <span>Take the survey</span>
-                  </Button>
-                }
-                className="[&_.modal-content]:min-h-[650px] [&_.modal-content]:!h-[75vh] [&_.modal-content]:flex [&_.modal-content]:flex-col"
-              >
-                <div className="w-full !h-full flex-1 flex flex-col">
-                  <iframe
-                    src={`https://form.typeform.com/to/si6Z7XlW?embedded=true`}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    className="w-full !min-h-full flex-1"
-                  />
-                </div>
-              </PopupFrame>
             </div>
           </div>
         </div>
