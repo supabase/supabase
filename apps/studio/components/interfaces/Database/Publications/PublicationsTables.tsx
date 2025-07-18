@@ -1,6 +1,6 @@
 import type { PostgresPublication } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
@@ -10,10 +10,10 @@ import InformationBox from 'components/ui/InformationBox'
 import { Loading } from 'components/ui/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { AlertCircle, ChevronLeft, Search } from 'lucide-react'
 import { Button, Input } from 'ui'
 import PublicationsTableItem from './PublicationsTableItem'
-import { ChevronLeft, Search, AlertCircle } from 'lucide-react'
 
 interface PublicationsTablesProps {
   selectedPublication: PostgresPublication
@@ -29,27 +29,26 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
     'publications'
   )
 
+  const { data: protectedSchemas } = useProtectedSchemas()
+
   const {
-    data: tables,
+    data: tablesData,
     isLoading,
     isSuccess,
     isError,
     error,
-  } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    {
-      select(tables) {
-        return tables.filter((table) =>
-          filterString.length === 0
-            ? !PROTECTED_SCHEMAS.includes(table.schema)
-            : !PROTECTED_SCHEMAS.includes(table.schema) && table.name.includes(filterString)
-        )
-      },
-    }
-  )
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const tables = useMemo(() => {
+    return (tablesData || []).filter((table) =>
+      filterString.length === 0
+        ? !protectedSchemas.find((s) => s.name === table.schema)
+        : !protectedSchemas.find((s) => s.name === table.schema) &&
+          table.name.includes(filterString)
+    )
+  }, [tablesData, protectedSchemas, filterString])
 
   return (
     <>
