@@ -31,7 +31,7 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
-import { getPreferredKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
@@ -918,6 +918,20 @@ function createStorageExplorerState({
       columnIndex: number
       isDrop?: boolean
     }) => {
+      if (!state.serviceKey) {
+        toast(
+          <p>
+            Uploading files to Storage through the dashboard is currently unavailable with the new
+            API keys. Please re-enable{' '}
+            <InlineLink href={`/project/${state.projectRef}/settings/api-keys`}>
+              legacy JWT keys
+            </InlineLink>{' '}
+            if you'd like to upload files to Storage through the dashboard.
+          </p>
+        )
+        return
+      }
+
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
@@ -1727,7 +1741,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
 
-  const { serviceKey } = getPreferredKeys(apiKeys)
+  const { serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`

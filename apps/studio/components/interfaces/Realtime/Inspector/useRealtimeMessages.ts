@@ -108,7 +108,6 @@ export const useRealtimeMessages = (
       ...realtimeOptions,
       params: { apikey: token, ...realtimeOptions.params },
     }
-    console.log({ options })
     const realtimeClient = new RealtimeClient(realtimeUrl, options)
 
     if (bearer) {
