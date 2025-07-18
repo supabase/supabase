@@ -1,24 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
 
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis, Cell } from 'recharts'
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Button,
-} from 'ui'
+import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { ChartConfig, ChartContainer } from 'ui'
-import CodeWindow from '~/components/CodeWindow'
+import { SurveyCodeWindow } from './SurveyCodeWindow'
 
 const chartConfig = {
   value: {
@@ -37,7 +25,7 @@ const externalSupabase = createClient(
 )
 
 // Custom hook to fetch filter options from Supabase
-function useFilterOptions(filterColumns) {
+function useFilterOptions(filterColumns: string[]) {
   const [filters, setFilters] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -95,49 +83,8 @@ function useFilterOptions(filterColumns) {
   return { filters, isLoading, error }
 }
 
-// Inline dropdown component for SQL
-function InlineFilterDropdown({ filterKey, filterConfig, selectedValue, setFilterValue }) {
-  const displayText = selectedValue === 'all' ? 'Filter' : `${selectedValue}`
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="text"
-          size="tiny"
-          className={`inline-flex items-center gap-1 px-2 py-0 h-auto text-sm font-mono bg-background border border-border hover:bg-surface-100 ${
-            displayText === 'Filter' ? 'text-foreground-lighter' : ''
-          }`}
-          iconRight={<ChevronDown className="w-3 h-3" />}
-        >
-          {displayText}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem
-          onClick={() => setFilterValue(filterKey, 'all')}
-          className={selectedValue === 'all' ? 'text-brand-600' : ''}
-        >
-          Unset
-        </DropdownMenuItem>
-        {filterConfig.options
-          .filter((opt) => opt.value !== 'all')
-          .map((option) => (
-            <DropdownMenuItem
-              key={option.value}
-              onClick={() => setFilterValue(filterKey, option.value)}
-              className={selectedValue === option.value ? 'text-brand-600' : ''}
-            >
-              = '{option.value}'
-            </DropdownMenuItem>
-          ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
 // Custom hook to fetch survey data using SQL query via RPC
-function useSurveyData(sqlQuery) {
+function useSurveyData(sqlQuery: string) {
   const [chartData, setChartData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -193,7 +140,7 @@ export function GenericChartWithQuery({
   targetColumn,
   filterColumns,
   generateSQLQuery,
-  chartType = 'bar', // Could be 'bar', 'pie', etc.
+  chartType = 'bar', // TODO: Could be 'bar', 'pie', etc.
 }) {
   // Get dynamic filter options
   const {
@@ -282,23 +229,15 @@ export function GenericChartWithQuery({
             </ChartContainer>
           )}
         </CardContent>
-        <CardFooter>
-          <div className="flex flex-wrap gap-4 mt-2">
-            {Object.entries(filters).map(([filterKey, filterConfig]) => (
-              <div key={filterKey} className="flex items-center gap-2">
-                <span className="text-sm font-medium">{filterConfig.label}:</span>
-                <InlineFilterDropdown
-                  filterKey={filterKey}
-                  filterConfig={filterConfig}
-                  selectedValue={activeFilters[filterKey]}
-                  setFilterValue={setFilterValue}
-                />
-              </div>
-            ))}
-          </div>
-        </CardFooter>
       </Card>
-      <CodeWindow code={sqlQuery} lang="sql" className="w-full" />
+      <SurveyCodeWindow
+        code={sqlQuery}
+        lang="sql"
+        className="w-full"
+        filters={filters}
+        activeFilters={activeFilters}
+        setFilterValue={setFilterValue}
+      />
     </div>
   )
 }
