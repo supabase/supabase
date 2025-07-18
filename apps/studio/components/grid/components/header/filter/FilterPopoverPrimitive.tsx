@@ -1,8 +1,9 @@
-import { isEqual } from 'lodash'
+import { useDebounce } from '@uidotdev/usehooks'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
-import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import type { Filter } from 'components/grid/types'
+import type { Filter, FilterOperator } from 'components/grid/types'
+import useLatest from 'hooks/misc/useLatest'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -29,13 +30,13 @@ export const FilterPopoverPrimitive = ({
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
 
-  // Internal state management
-  const [localFilters, setLocalFilters] = useState<Filter[]>(filters)
+  const [localFilters, setLocalFilters] = useState(filters)
 
-  // Update local state when filters prop changes
-  useMemo(() => {
-    setLocalFilters(filters)
-  }, [filters])
+  const debouncedFilters = useDebounce(localFilters, 500)
+  const onApplyFiltersRef = useLatest(onApplyFilters)
+  useEffect(() => {
+    onApplyFiltersRef.current(debouncedFilters)
+  }, [debouncedFilters, onApplyFiltersRef])
 
   const displayButtonText =
     buttonText ??
@@ -46,46 +47,40 @@ export const FilterPopoverPrimitive = ({
   const onAddFilter = () => {
     const column = snap.table.columns[0]?.name
     if (column) {
-      setLocalFilters([
+      const newFilters: Filter[] = [
         ...localFilters,
         {
           column,
-          operator: '=',
+          operator: '=' as FilterOperator,
           value: '',
         },
-      ])
+      ]
+      setLocalFilters(newFilters)
     }
   }
 
-  const onChangeFilter = useCallback((index: number, filter: Filter) => {
-    setLocalFilters((currentFilters) => [
-      ...currentFilters.slice(0, index),
-      filter,
-      ...currentFilters.slice(index + 1),
-    ])
-  }, [])
+  const onChangeFilter = useCallback(
+    (index: number, filter: Filter) => {
+      const newFilters: Filter[] = [
+        ...localFilters.slice(0, index),
+        filter,
+        ...localFilters.slice(index + 1),
+      ]
+      setLocalFilters(newFilters)
+    },
+    [localFilters, setLocalFilters]
+  )
 
-  const onDeleteFilter = useCallback((index: number) => {
-    setLocalFilters((currentFilters) => [
-      ...currentFilters.slice(0, index),
-      ...currentFilters.slice(index + 1),
-    ])
-  }, [])
-
-  const onSelectApplyFilters = () => {
-    // [Joshen] Trim empty spaces in input for only UUID type columns
-    const formattedFilters = localFilters.map((f) => {
-      const column = snap.table.columns.find((c) => c.name === f.column)
-      if (column?.format === 'uuid') return { ...f, value: f.value.trim() }
-      else return f
-    })
-    setLocalFilters(formattedFilters)
-    onApplyFilters(formattedFilters)
-  }
-
-  function handleEnterKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') onSelectApplyFilters()
-  }
+  const onDeleteFilter = useCallback(
+    (index: number) => {
+      const newFilters: Filter[] = [
+        ...localFilters.slice(0, index),
+        ...localFilters.slice(index + 1),
+      ]
+      setLocalFilters(newFilters)
+    },
+    [localFilters, setLocalFilters]
+  )
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -104,7 +99,6 @@ export const FilterPopoverPrimitive = ({
                 filterIdx={index}
                 onChange={onChangeFilter}
                 onDelete={onDeleteFilter}
-                onKeyDown={handleEnterKeyDown}
               />
             ))}
             {localFilters.length == 0 && (
@@ -120,13 +114,6 @@ export const FilterPopoverPrimitive = ({
           <div className="px-3 flex flex-row justify-between">
             <Button icon={<Plus />} type="text" onClick={onAddFilter}>
               Add filter
-            </Button>
-            <Button
-              disabled={isEqual(localFilters, filters)}
-              type="default"
-              onClick={() => onSelectApplyFilters()}
-            >
-              Apply filter
             </Button>
           </div>
         </div>

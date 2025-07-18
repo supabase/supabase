@@ -12,7 +12,7 @@ export interface FilterRowProps {
   filter: Filter
   onChange: (index: number, filter: Filter) => void
   onDelete: (index: number) => void
-  onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void
 }
 
 const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
