@@ -27,22 +27,21 @@ hideToc: true
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Create a React app">
 
-    <StepHikeCompact.Details title="Create a React app">
+    Create a React app using [Vite](https://vitejs.dev/).
 
-    Create a React app using the `create-react-app` command.
+  </StepHikeCompact.Details>
 
-    </StepHikeCompact.Details>
+  <StepHikeCompact.Code>
 
-    <StepHikeCompact.Code>
+    ```bash name=Terminal
+    npm create vite@latest my-app -- --template react
 
-      ```bash name=Terminal
-      npx create-react-app my-app
-      ```
+    ```
 
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
+  </StepHikeCompact.Code>
+</StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
