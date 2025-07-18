@@ -4,19 +4,18 @@ import { Edit, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import SchemaEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SchemaEditor'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { invalidateSchemasQuery, useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Form,
   Input,
-  Label_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -30,7 +29,6 @@ import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface CreateWrapperSheetProps {
   isClosing: boolean
@@ -48,6 +46,7 @@ export const CreateWrapperSheet = ({
   onClose,
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
+
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
@@ -73,7 +72,7 @@ export const CreateWrapperSheet = ({
 
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const { mutate: createFDW, isLoading: isCreating } = useFDWCreateMutation({
+  const { mutateAsync: createFDW, isLoading: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
       setNewTables([])
@@ -85,8 +84,10 @@ export const CreateWrapperSheet = ({
     },
   })
 
-  // prefetch schemas to make sure the schema selector is populated
-  useSchemasQuery({ projectRef: project?.ref, connectionString: project?.connectionString })
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref!,
+    connectionString: project?.connectionString,
+  })
 
   const initialValues = {
     wrapper_name: '',
@@ -97,6 +98,8 @@ export const CreateWrapperSheet = ({
       wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
     ),
   }
+
+  const { mutateAsync: createSchema, isLoading: isCreatingSchema } = useSchemaCreateMutation()
 
   const onUpdateTable = (values: any) => {
     setNewTables((prev) => {
@@ -121,36 +124,65 @@ export const CreateWrapperSheet = ({
     if (values.wrapper_name.length === 0) {
       errors.wrapper_name = 'Please provide a name for your wrapper'
     }
-    if (selectedMode === 'tables' && newTables.length === 0) {
-      errors.tables = 'Please add at least one table'
-    }
-    if (selectedMode === 'schema' && values.source_schema.length === 0) {
-      errors.source_schema = 'Please provide a source schema'
-    }
-    if (!isEmpty(errors)) return setFormErrors(errors)
 
-    createFDW({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      wrapperMeta,
-      formState: { ...values, server_name: `${values.wrapper_name}_server` },
-      mode: selectedMode,
-      tables: newTables,
-      sourceSchema: values.source_schema,
-      targetSchema: values.target_schema,
-    })
+    if (selectedMode === 'tables') {
+      if (newTables.length === 0) {
+        errors.tables = 'Please provide at least one table'
+      }
+    }
+    if (selectedMode === 'schema') {
+      if (values.source_schema.length === 0) {
+        errors.source_schema = 'Please provide a source schema'
+      }
+      if (values.target_schema.length === 0) {
+        errors.target_schema = 'Please provide an unique target schema'
+      }
+      const foundSchema = schemas?.find((s) => s.name === values.target_schema)
+      if (foundSchema) {
+        errors.target_schema = 'This schema already exists. Please specify a unique schema name.'
+      }
+    }
 
-    sendEvent({
-      action: 'foreign_data_wrapper_created',
-      properties: {
-        wrapperType: wrapperMeta.label,
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    setFormErrors(errors)
+    if (!isEmpty(errors)) {
+      return
+    }
+
+    try {
+      await createSchema({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        name: values.target_schema,
+      })
+
+      await createFDW({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        wrapperMeta,
+        formState: { ...values, server_name: `${values.wrapper_name}_server` },
+        mode: selectedMode,
+        tables: newTables,
+        sourceSchema: values.source_schema,
+        targetSchema: values.target_schema,
+      })
+
+      sendEvent({
+        action: 'foreign_data_wrapper_created',
+        properties: {
+          wrapperType: wrapperMeta.label,
+        },
+        groups: {
+          project: project?.ref ?? 'Unknown',
+          organization: org?.slug ?? 'Unknown',
+        },
+      })
+    } catch (error) {
+      console.error(error)
+      // The error will be handled by the mutation onError callback (toast.error)
+    }
   }
+
+  const isLoading = isCreatingWrapper || isCreatingSchema
 
   return (
     <>
@@ -161,7 +193,7 @@ export const CreateWrapperSheet = ({
           onSubmit={onSubmit}
           className="flex-grow flex flex-col h-full"
         >
-          {({ handleReset, values, initialValues, setFieldValue }: any) => {
+          {({ values, initialValues, setFieldValue }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
             const onClosePanel = () => {
@@ -386,18 +418,21 @@ export const CreateWrapperSheet = ({
                           </div>
                         )}
                         <div className="flex flex-col gap-2">
-                          <Label_Shadcn_ className="text-foreground-light">
-                            Target Schema
-                          </Label_Shadcn_>
-                          <SchemaSelector
-                            portal={false}
-                            size="small"
-                            selectedSchemaName={values.target_schema}
-                            onSelectSchema={(schema) => setFieldValue('target_schema', schema)}
-                            onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
+                          <InputField
+                            key="target_schema"
+                            option={{
+                              name: 'target_schema',
+                              label: 'Target Schema',
+                              required: true,
+                              encrypted: false,
+                              secureEntry: false,
+                            }}
+                            loading={false}
+                            error={formErrors['target_schema']}
                           />
                           <p className="text-foreground-lighter text-sm">
-                            Be careful not to use an API exposed schema.
+                            A new schema will be created. All wrapper tables will be created in the
+                            specified target schema.
                           </p>
                         </div>
                       </FormSectionContent>
@@ -411,7 +446,7 @@ export const CreateWrapperSheet = ({
                     type="default"
                     htmlType="button"
                     onClick={onClosePanel}
-                    disabled={isCreating}
+                    disabled={isLoading}
                   >
                     Cancel
                   </Button>
@@ -420,20 +455,11 @@ export const CreateWrapperSheet = ({
                     type="primary"
                     form={FORM_ID}
                     htmlType="submit"
-                    disabled={isCreating}
-                    loading={isCreating}
+                    loading={isLoading}
                   >
                     Create wrapper
                   </Button>
                 </SheetFooter>
-                <SchemaEditor
-                  visible={createSchemaSheetOpen}
-                  closePanel={() => setCreateSchemaSheetOpen(false)}
-                  onSuccess={(schema) => {
-                    setFieldValue('target_schema', schema)
-                    setCreateSchemaSheetOpen(false)
-                  }}
-                />
               </>
             )
           }}
