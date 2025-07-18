@@ -2,7 +2,6 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 
-import { IS_PLATFORM } from 'lib/constants'
 import { apiKeysKeys } from './keys'
 
 type LegacyKeys = {
@@ -77,7 +76,7 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
     apiKeysKeys.list(projectRef, reveal),
     ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     {
-      enabled: IS_PLATFORM && enabled && !!projectRef,
+      enabled: enabled && !!projectRef,
       ...options,
     }
   )
