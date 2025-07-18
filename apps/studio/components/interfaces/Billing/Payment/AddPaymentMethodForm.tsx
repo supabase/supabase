@@ -178,7 +178,7 @@ const AddPaymentMethodForm = ({
           options={{
             mode: 'billing',
             defaultValues: {
-              address: customerProfile?.address,
+              address: customerProfile?.address ?? undefined,
               name: customerProfile?.billing_name,
             },
           }}
