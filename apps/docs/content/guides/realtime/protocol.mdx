@@ -46,7 +46,7 @@ All messages sent to the server or received from the server follow the same stru
 - `event`: The type of event being sent or received. This can be a specific event like `phx_join`, `postgres_changes`, etc.
 - `topic`: The topic to which the message belongs. This is usually a string that identifies the channel or context of the message.
 - `payload`: The data associated with the event. This can be any JSON-serializable data structure, such as an object or an array.
-- `ref`: A unique reference ID for the message. This is used to track the message and its response on the client side when a reply it's needed to proceed.
+- `ref`: A unique reference ID for the message. This is used to track the message and its response on the client side when a reply is needed to proceed.
 
 ### Event types
 
