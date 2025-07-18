@@ -7,10 +7,10 @@ vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
 }))
 
-vi.mock('./bedrock', () => ({
-  bedrockForRegion: vi.fn(() => () => 'bedrock-model'),
+vi.mock('./bedrock', async () => ({
+  ...(await vi.importActual('./bedrock')),
+  createRoutedBedrock: vi.fn(() => () => 'bedrock-model'),
   checkAwsCredentials: vi.fn(),
-  selectBedrockRegion: vi.fn(() => 'us'),
 }))
 
 describe('getModel', () => {
@@ -29,10 +29,7 @@ describe('getModel', () => {
 
     const { model, error } = await getModel()
 
-    console.log('Model:', model)
-
     expect(model).toEqual('bedrock-model')
-    expect(bedrockModule.bedrockForRegion).toHaveBeenCalledWith('us1')
     expect(error).toBeUndefined()
   })
 
@@ -40,7 +37,7 @@ describe('getModel', () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(false)
     process.env.OPENAI_API_KEY = 'test-key'
 
-    const { model } = await getModel('test-key')
+    const { model } = await getModel()
 
     expect(model).toEqual('openai-model')
     expect(openai).toHaveBeenCalledWith('gpt-4.1-2025-04-14')
