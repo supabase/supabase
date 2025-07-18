@@ -9,8 +9,8 @@ tags:
 date: '2025-07-18:10:00'
 toc_depth: 2
 author: inian
-image: launch-week-15/day-4-algolia-connector/og.png
-thumb: launch-week-15/day-4-algolia-connector/thumb.png
+image: launch-week-15/day-5-storage-cheaper-egress/og.png
+thumb: launch-week-15/day-5-storage-cheaper-egress/thumb.png
 launchweek: '15'
 ---
 
@@ -43,13 +43,23 @@ All Supabase traffic flows through our API Gateway, which also functions as a co
 
 Initially, we leant towards keeping our pricing model simple instead of reflecting regional and cache-status variations in egress costs. This unfortunately meant that customers with very high cached storage bandwidth couldn't benefit from our lower cached egress rates.
 
-![CleanShot 2025-07-18@2x.png](attachment:c3b3493b-97bf-4e79-99b4-be8b299b3353:CleanShot_2025-07-182x.png)
+<Img
+  src={{
+    dark: '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-cached-egress-dark.png',
+    light:
+      '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-cached-egress-light.png',
+  }}
+  alt="Cached Egress"
+/>
 
-![CleanShot 2025-07-18@2x.png](attachment:055acdb3-af26-4a6f-bd69-12ff4c71d063:CleanShot_2025-07-182x.png)
-
-![CleanShot 2025-07-18@2x.png](attachment:85e5d5c5-d497-4eac-b7f8-3557c149eecb:CleanShot_2025-07-182x.png)
-
-![CleanShot 2025-07-18@2x.png](attachment:ea646076-c9de-4e3f-9048-0b3af7ae0d9f:CleanShot_2025-07-182x.png)
+<Img
+  src={{
+    dark: '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-uncached-egress-dark.png',
+    light:
+      '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-uncached-egress-light.png',
+  }}
+  alt="Uncached Egress"
+/>
 
 Today, we are introducing a new pricing line item and are able to offer cached egress at a much lower rate of 3c/GB. Combined with the [Smart CDN for storage](https://supabase.com/docs/guides/storage/cdn/smart-cdn), which increases the cache hit rate for storage significantly, this would significantly reduce egress bill for our largest storage users.
 
