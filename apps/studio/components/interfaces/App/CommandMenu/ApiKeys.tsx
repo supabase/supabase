@@ -24,8 +24,8 @@ export function useApiKeysCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
-  const { anonKey, serviceKey, publishableKey } = getKeys(apiKeys)
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
+  const { anonKey, serviceKey, publishableKey, allSecretKeys } = getKeys(apiKeys)
 
   const commands = useMemo(
     () =>
@@ -67,7 +67,7 @@ export function useApiKeysCommands() {
         project &&
           publishableKey && {
             id: 'publishable-key',
-            name: `Copy publishable API key`,
+            name: `Copy publishable key`,
             action: () => {
               copyToClipboard(publishableKey.api_key ?? '')
               setIsOpen(false)
@@ -80,6 +80,23 @@ export function useApiKeysCommands() {
             ),
             icon: () => <Key />,
           },
+        ...(project && allSecretKeys
+          ? allSecretKeys.map((key) => ({
+              id: key.id,
+              name: `Copy secret key (${key.name})`,
+              action: () => {
+                copyToClipboard(key.api_key ?? '')
+                setIsOpen(false)
+              },
+              badge: () => (
+                <span className="flex items-center gap-x-1">
+                  <Badge>Project: {project?.name}</Badge>
+                  <Badge className="capitalize">{key.type}</Badge>
+                </span>
+              ),
+              icon: () => <Key />,
+            }))
+          : []),
         !(anonKey || serviceKey) && {
           id: 'api-keys-project-settings',
           name: 'See API keys in Project Settings',

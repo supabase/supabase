@@ -89,5 +89,7 @@ export const getKeys = (apiKeys: APIKey[] = []) => {
   const publishableKey = apiKeys.find((x) => x.type === 'publishable')
   const secretKey = apiKeys.find((x) => x.type === 'secret')
 
-  return { anonKey, serviceKey, publishableKey, secretKey }
+  const allSecretKeys = apiKeys.filter((x) => x.type === 'secret')
+
+  return { anonKey, serviceKey, publishableKey, secretKey, allSecretKeys }
 }
