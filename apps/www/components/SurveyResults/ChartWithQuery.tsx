@@ -1,17 +1,13 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
-
-// import { Bar, BarChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-// import { ChartContainer } from 'ui'
 
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis, Cell } from 'recharts'
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -21,40 +17,10 @@ import {
   DropdownMenuTrigger,
   Button,
 } from 'ui'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
-import { useTheme } from 'next-themes'
-import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
-import { cn } from 'ui'
+import { ChartConfig, ChartContainer } from 'ui'
+import CodeWindow from '~/components/CodeWindow'
 
 export const description = 'A bar chart with a custom label'
-
-// const chartData = [
-//   { month: "January", desktop: 186, mobile: 80 },
-//   { month: "February", desktop: 305, mobile: 200 },
-//   { month: "March", desktop: 237, mobile: 120 },
-//   { month: "April", desktop: 73, mobile: 190 },
-//   { month: "May", desktop: 209, mobile: 130 },
-//   { month: "June", desktop: 214, mobile: 140 },
-// ]
-
-const chartData = [
-  { label: '1–10', value: 91.1 },
-  { label: '11–50', value: 6.3 },
-  { label: '51–100', value: 1.2 },
-  { label: '101–250', value: 0.8 },
-  { label: '250+', value: 0.6 },
-]
-
-const regions = [
-  { value: 'all', label: 'All Regions' },
-  { value: 'North America', label: 'North America' },
-  { value: 'South America', label: 'South America' },
-  { value: 'Asia', label: 'Asia' },
-  { value: 'Europe', label: 'Europe' },
-  { value: 'Africa', label: 'Africa' },
-  { value: 'Oceania', label: 'Oceania' },
-  { value: 'Remote', label: 'Remote' },
-]
 
 const chartConfig = {
   value: {
@@ -66,46 +32,76 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-// Define all possible filters
-const filters = {
-  region: {
-    label: 'Region',
-    options: [
-      { value: 'all', label: 'All Regions' },
-      { value: 'North America', label: 'North America' },
-      { value: 'South America', label: 'South America' },
-      { value: 'Asia', label: 'Asia' },
-      { value: 'Europe', label: 'Europe' },
-      { value: 'Africa', label: 'Africa' },
-      { value: 'Oceania', label: 'Oceania' },
-      { value: 'Remote', label: 'Remote' },
-    ],
-  },
-  funding_stage: {
-    label: 'Funding Stage',
-    options: [
-      { value: 'all', label: 'All Stages' },
-      { value: 'Bootstrapped', label: 'Bootstrapped' },
-      { value: 'Seed', label: 'Seed' },
-      { value: 'Series A', label: 'Series A' },
-      { value: 'Series B+', label: 'Series B+' },
-    ],
-  },
-  age_group: {
-    label: 'Age Group',
-    options: [
-      { value: 'all', label: 'All Ages' },
-      { value: '18-24', label: '18-24' },
-      { value: '25-34', label: '25-34' },
-      { value: '35-44', label: '35-44' },
-      { value: '45+', label: '45+' },
-    ],
-  },
+// Create a separate Supabase client for your external project
+const externalSupabase = createClient(
+  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_ANON_KEY!
+)
+
+// Custom hook to fetch filter options from Supabase
+function useFilterOptions() {
+  const [filters, setFilters] = useState({})
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    async function fetchFilterOptions() {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        console.log('Fetching filter options from Supabase')
+
+        // Get distinct values for each filter column
+        const filterColumns = ['headquarters', 'funding_stage', 'person_age']
+        const filterOptions = {}
+
+        for (const column of filterColumns) {
+          const { data, error: fetchError } = await externalSupabase
+            .from('responses')
+            .select(column)
+            .not(column, 'is', null)
+            .not(column, 'eq', '')
+
+          if (fetchError) {
+            console.error(`Error fetching ${column} options:`, fetchError)
+            continue
+          }
+
+          // Get unique values and sort them
+          const uniqueValues = [...new Set(data.map((row) => row[column]))].sort()
+
+          filterOptions[column] = {
+            label: column.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+            options: [
+              {
+                value: 'all',
+                label: `All ${column.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}s`,
+              },
+              ...uniqueValues.map((value) => ({ value, label: value })),
+            ],
+          }
+        }
+
+        console.log('Filter options:', filterOptions)
+        setFilters(filterOptions)
+      } catch (err) {
+        console.error('Error fetching filter options:', err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchFilterOptions()
+  }, [])
+
+  return { filters, isLoading, error }
 }
 
 // Inline dropdown component for SQL
 function InlineFilterDropdown({ filterKey, filterConfig, selectedValue, setFilterValue }) {
-  const displayText = selectedValue === 'all' ? 'Filter' : `= '${selectedValue}'` // IS NOT NULL
+  const displayText = selectedValue === 'all' ? 'Filter' : `${selectedValue}`
 
   return (
     <DropdownMenu>
@@ -126,7 +122,7 @@ function InlineFilterDropdown({ filterKey, filterConfig, selectedValue, setFilte
           onClick={() => setFilterValue(filterKey, 'all')}
           className={selectedValue === 'all' ? 'text-brand-600' : ''}
         >
-          IS NOT NULL (All)
+          Unset
         </DropdownMenuItem>
         {filterConfig.options
           .filter((opt) => opt.value !== 'all')
@@ -144,15 +140,43 @@ function InlineFilterDropdown({ filterKey, filterConfig, selectedValue, setFilte
   )
 }
 
-// Create a separate Supabase client for your external project
-const externalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_ANON_KEY!
-)
+// Generate SQL query string based on active filters
+function generateSQLQuery(activeFilters) {
+  // Build WHERE clauses only for active filters
+  const whereClauses = []
 
-// Custom hook to fetch survey data from external Supabase
+  if (activeFilters.headquarters !== 'all') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  }
+
+  if (activeFilters.funding_stage !== 'all') {
+    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  }
+
+  if (activeFilters.person_age !== 'all') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
+  }
+
+  // Build the WHERE clause string
+  const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
+
+  return `SELECT
+  team_count,
+  COUNT(*) AS total
+FROM responses${whereClause ? '\n' + whereClause : ''}
+GROUP BY team_count
+ORDER BY 
+  CASE team_count
+    WHEN '1-10' THEN 1
+    WHEN '11-50' THEN 2
+    WHEN '51-100' THEN 3
+    WHEN '101-250' THEN 4
+    WHEN '250+' THEN 5
+  END;`
+}
+
+// Custom hook to fetch survey data using Supabase query builder
 function useSurveyData(activeFilters) {
-  console.log('useSurveyData hook called with filters:', activeFilters)
   const [chartData, setChartData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -165,8 +189,8 @@ function useSurveyData(activeFilters) {
 
         console.log('Fetching survey data with filters:', activeFilters)
 
-        // Build the query based on active filters
-        let query = externalSupabase.from('dummy_survey_responses').select('team_size')
+        // Build the query using Supabase query builder
+        let query = externalSupabase.from('responses').select('team_count')
 
         // Apply filters
         Object.entries(activeFilters).forEach(([key, value]) => {
@@ -183,12 +207,12 @@ function useSurveyData(activeFilters) {
           return
         }
 
-        console.log('Raw data from external Supabase:', data)
+        console.log('Raw data from Supabase:', data)
 
-        // Process the data to count team sizes
+        // Process the data to count team sizes (matching the SQL GROUP BY logic)
         const teamSizeCounts = {}
         data.forEach((row) => {
-          teamSizeCounts[row.team_size] = (teamSizeCounts[row.team_size] || 0) + 1
+          teamSizeCounts[row.team_count] = (teamSizeCounts[row.team_count] || 0) + 1
         })
 
         console.log('Team size counts:', teamSizeCounts)
@@ -198,28 +222,40 @@ function useSurveyData(activeFilters) {
         const processedData = [
           {
             label: '1–10',
-            value: total > 0 ? (((teamSizeCounts['1-10'] || 0) / total) * 100).toFixed(1) : 0,
+            value:
+              total > 0
+                ? parseFloat((((teamSizeCounts['1-10'] || 0) / total) * 100).toFixed(1))
+                : 0,
           },
           {
             label: '11–50',
-            value: total > 0 ? (((teamSizeCounts['11-50'] || 0) / total) * 100).toFixed(1) : 0,
+            value:
+              total > 0
+                ? parseFloat((((teamSizeCounts['11-50'] || 0) / total) * 100).toFixed(1))
+                : 0,
           },
           {
             label: '51–100',
-            value: total > 0 ? (((teamSizeCounts['51-100'] || 0) / total) * 100).toFixed(1) : 0,
+            value:
+              total > 0
+                ? parseFloat((((teamSizeCounts['51-100'] || 0) / total) * 100).toFixed(1))
+                : 0,
           },
           {
             label: '101–250',
-            value: total > 0 ? (((teamSizeCounts['101-250'] || 0) / total) * 100).toFixed(1) : 0,
+            value:
+              total > 0
+                ? parseFloat((((teamSizeCounts['101-250'] || 0) / total) * 100).toFixed(1))
+                : 0,
           },
           {
             label: '250+',
-            value: total > 0 ? (((teamSizeCounts['250+'] || 0) / total) * 100).toFixed(1) : 0,
+            value:
+              total > 0
+                ? parseFloat((((teamSizeCounts['250+'] || 0) / total) * 100).toFixed(1))
+                : 0,
           },
-        ].map((item) => ({
-          ...item,
-          value: parseFloat(item.value),
-        }))
+        ]
 
         console.log('Processed chart data:', processedData)
         setChartData(processedData)
@@ -238,15 +274,18 @@ function useSurveyData(activeFilters) {
 }
 
 export function ChartWithQuery() {
+  // Get dynamic filter options
+  const { filters, isLoading: filtersLoading, error: filtersError } = useFilterOptions()
+
   // Start with all filters unset (showing "all")
   const [activeFilters, setActiveFilters] = useState({
-    region: 'all',
+    headquarters: 'all',
     funding_stage: 'all',
-    age_group: 'all',
+    person_age: 'all',
   })
 
   // Use the custom hook to fetch data
-  const { chartData, isLoading, error } = useSurveyData(activeFilters)
+  const { chartData, isLoading: dataLoading, error: dataError } = useSurveyData(activeFilters)
 
   const setFilterValue = (filterKey, value) => {
     setActiveFilters((prev) => ({
@@ -255,72 +294,14 @@ export function ChartWithQuery() {
     }))
   }
 
-  // Generate WHERE clause
-  const generateWhereClause = () => {
-    const conditions = []
+  // Generate the SQL query string
+  const sqlQuery = generateSQLQuery(activeFilters)
 
-    Object.entries(activeFilters).forEach(([key, value]) => {
-      if (value !== 'all') {
-        conditions.push(`${key} = '${value}'`)
-      }
-    })
-
-    return conditions.length > 0 ? conditions.join(' AND ') : '1=1'
-  }
-
-  const whereClause = generateWhereClause()
+  const isLoading = filtersLoading || dataLoading
+  const error = filtersError || dataError
 
   return (
     <div className="w-full flex flex-row gap-4">
-      <Card className="w-full">
-        <CardContent className="p-4">
-          <InteractiveCodeBlock
-            language="sql"
-            code={`SELECT
-  team_size,
-  COUNT(*) AS total
-FROM dummy_survey_responses
-WHERE region [FILTER_PLACEHOLDER_1]
-  AND funding_stage [FILTER_PLACEHOLDER_2]
-  AND age_group [FILTER_PLACEHOLDER_3]
-GROUP BY team_size
-ORDER BY 
-  CASE team_size
-    WHEN '1-10' THEN 1
-    WHEN '11-50' THEN 2
-    WHEN '51-100' THEN 3
-    WHEN '101-250' THEN 4
-    WHEN '250+' THEN 5
-  END;`}
-            placeholders={{
-              '[FILTER_PLACEHOLDER_1]': (
-                <InlineFilterDropdown
-                  filterKey="region"
-                  filterConfig={filters.region}
-                  selectedValue={activeFilters.region}
-                  setFilterValue={setFilterValue}
-                />
-              ),
-              '[FILTER_PLACEHOLDER_2]': (
-                <InlineFilterDropdown
-                  filterKey="funding_stage"
-                  filterConfig={filters.funding_stage}
-                  selectedValue={activeFilters.funding_stage}
-                  setFilterValue={setFilterValue}
-                />
-              ),
-              '[FILTER_PLACEHOLDER_3]': (
-                <InlineFilterDropdown
-                  filterKey="age_group"
-                  filterConfig={filters.age_group}
-                  selectedValue={activeFilters.age_group}
-                  setFilterValue={setFilterValue}
-                />
-              ),
-            }}
-          />
-        </CardContent>
-      </Card>
       <Card className="w-full">
         <CardHeader>
           <CardTitle>How many full-time employees does your startup have?</CardTitle>
@@ -363,10 +344,7 @@ ORDER BY
                 <XAxis dataKey="value" type="number" hide />
                 <Bar dataKey="value" layout="vertical" radius={4}>
                   {chartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={index === 0 ? 'hsl(var(--brand-default))' : 'hsl(var(--brand-300))'}
-                    />
+                    <Cell key={`cell-${index}`} fill="hsl(var(--brand-default))" />
                   ))}
                   <LabelList
                     dataKey="value"
@@ -381,92 +359,23 @@ ORDER BY
             </ChartContainer>
           )}
         </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-function InteractiveCodeBlock({ language, code, placeholders }) {
-  const { resolvedTheme } = useTheme()
-
-  return (
-    <Highlight
-      theme={resolvedTheme === 'dark' ? themes.nightOwl : themes.nightOwlLight}
-      code={code}
-      language={language as Language}
-    >
-      {({ className, tokens, getLineProps, getTokenProps }) => {
-        return (
-          <div className="Code codeBlockWrapper group">
-            <pre className={cn('codeBlock', className)}>
-              {tokens.map((line, i) => {
-                const lineProps = getLineProps({ line, key: i })
-
-                // Convert the line to a string to check for placeholders
-                const lineText = line.map((token) => token.content).join('')
-
-                // Check if this line contains any placeholders
-                const hasPlaceholder = Object.keys(placeholders).some((placeholder) =>
-                  lineText.includes(placeholder)
-                )
-
-                if (hasPlaceholder) {
-                  // Handle line with placeholders
-                  let remainingText = lineText
-                  const elements = []
-                  let elementKey = 0
-
-                  // Find and replace placeholders
-                  Object.entries(placeholders).forEach(([placeholder, component]) => {
-                    const placeholderIndex = remainingText.indexOf(placeholder)
-                    if (placeholderIndex !== -1) {
-                      // Add text before placeholder
-                      if (placeholderIndex > 0) {
-                        const beforeText = remainingText.substring(0, placeholderIndex)
-                        elements.push(
-                          <span key={elementKey++} className="token string">
-                            {beforeText}
-                          </span>
-                        )
-                      }
-
-                      // Add placeholder component
-                      elements.push(<span key={elementKey++}>{component}</span>)
-
-                      // Update remaining text
-                      remainingText = remainingText.substring(placeholderIndex + placeholder.length)
-                    }
-                  })
-
-                  // Add any remaining text
-                  if (remainingText) {
-                    elements.push(
-                      <span key={elementKey++} className="token string">
-                        {remainingText}
-                      </span>
-                    )
-                  }
-
-                  return (
-                    <div key={i} {...lineProps}>
-                      {elements}
-                    </div>
-                  )
-                } else {
-                  // Handle normal line without placeholders
-                  return (
-                    <div key={i} {...lineProps}>
-                      {line.map((token, key) => (
-                        <span key={key} {...getTokenProps({ token, key })} />
-                      ))}
-                    </div>
-                  )
-                }
-              })}
-            </pre>
+        <CardFooter>
+          <div className="flex flex-wrap gap-4 mt-2">
+            {Object.entries(filters).map(([filterKey, filterConfig]) => (
+              <div key={filterKey} className="flex items-center gap-2">
+                <span className="text-sm font-medium">{filterConfig.label}:</span>
+                <InlineFilterDropdown
+                  filterKey={filterKey}
+                  filterConfig={filterConfig}
+                  selectedValue={activeFilters[filterKey]}
+                  setFilterValue={setFilterValue}
+                />
+              </div>
+            ))}
           </div>
-        )
-      }}
-    </Highlight>
+        </CardFooter>
+      </Card>
+      <CodeWindow code={sqlQuery} lang="sql" className="w-full" />
+    </div>
   )
 }
