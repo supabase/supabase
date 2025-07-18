@@ -24,8 +24,6 @@ import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
   namespace: string
-  excludedSchemas: string[]
-  wrapperValues: Record<string, string>
   visible: boolean
   onClose: () => void
 }
@@ -33,8 +31,6 @@ export interface ImportForeignSchemaDialogProps {
 export const ImportForeignSchemaDialog = ({
   bucketName,
   namespace,
-  excludedSchemas,
-  wrapperValues,
   visible,
   onClose,
 }: ImportForeignSchemaDialogProps) => {

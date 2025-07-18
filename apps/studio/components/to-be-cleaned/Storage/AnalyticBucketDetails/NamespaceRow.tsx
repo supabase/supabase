@@ -15,7 +15,6 @@ type NamespaceRowProps = {
   bucketName: string
   namespace: string
   schema: string
-  excludedSchemas: string[]
   tables: (FormattedWrapperTable & { id: number })[]
   token: string
   wrapperInstance: FDW
@@ -26,7 +25,6 @@ export const NamespaceRow = ({
   bucketName,
   namespace,
   schema,
-  excludedSchemas,
   tables,
   token,
   wrapperInstance,
@@ -122,8 +120,6 @@ export const NamespaceRow = ({
       <ImportForeignSchemaDialog
         bucketName={bucketName}
         namespace={namespace}
-        excludedSchemas={excludedSchemas}
-        wrapperValues={wrapperValues}
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
