@@ -188,7 +188,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '/blog/',
+    blog: '/blog/persistent-storage-for-faster-edge-functions',
     date: 'Friday',
     published_at: '2025-07-18T07:00:00.000-07:00',
     title: 'Introducing Persistent Storage for Edge Functions',
