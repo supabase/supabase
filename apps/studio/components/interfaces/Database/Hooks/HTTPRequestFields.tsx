@@ -1,8 +1,9 @@
-import { ChevronDown, Plus, Trash } from 'lucide-react'
+import { ChevronDown, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
@@ -143,12 +144,12 @@ const HTTPRequestFields = ({
                   placeholder="Header value"
                   onChange={(event: any) => onUpdateHeader(idx, 'value', event.target.value)}
                 />
-                <Button
-                  type="default"
-                  size="medium"
-                  icon={<Trash size="14" />}
-                  className="px-[10px] py-[9px]"
+                <ButtonTooltip
+                  type="text"
+                  icon={<X />}
+                  className="py-4"
                   onClick={() => onRemoveHeader(idx)}
+                  tooltip={{ content: { side: 'bottom', text: 'Remove header' } }}
                 />
               </div>
             ))}
@@ -234,12 +235,12 @@ const HTTPRequestFields = ({
                   placeholder="Parameter value"
                   onChange={(event: any) => onUpdateParameter(idx, 'value', event.target.value)}
                 />
-                <Button
-                  type="default"
-                  size="medium"
-                  icon={<Trash size="14" />}
-                  className="px-[10px] py-[9px]"
+                <ButtonTooltip
+                  type="text"
+                  className="py-4"
+                  icon={<X />}
                   onClick={() => onRemoveParameter(idx)}
+                  tooltip={{ content: { side: 'bottom', text: 'Remove parameter' } }}
                 />
               </div>
             ))}
