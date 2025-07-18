@@ -15,6 +15,13 @@
   <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</guid>
+  <title>Persistent Storage and 97% Faster Cold Starts for Edge Functions</title>
+  <link>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</link>
+  <description>Mount S3-compatible buckets as persistent file storage in Edge Functions with up to 97% faster cold start times.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/algolia-connector-for-supabase</guid>
   <title>Algolia Connector for Supabase</title>
   <link>https://supabase.com/blog/algolia-connector-for-supabase</link>
