@@ -6,7 +6,7 @@ export const announcement = announcementJSON
 
 export const AnnouncementBanner = () => {
   return (
-    <Announcement show={true} announcementKey="announcement_sos25">
+    <Announcement show={true} announcementKey="announcement_lw15_d2">
       <LW15Banner />
     </Announcement>
   )

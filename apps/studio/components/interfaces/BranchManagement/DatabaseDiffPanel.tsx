@@ -46,7 +46,7 @@ const DatabaseDiffPanel = ({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 py-3">
         <CardTitle>
           <Link
             href={`/project/${currentBranchRef}/database/schema`}

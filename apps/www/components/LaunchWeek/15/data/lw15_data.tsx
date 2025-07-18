@@ -62,7 +62,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 1,
     dd: 'Mon',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/jwt-signing-keys',
     date: 'Monday',
@@ -92,22 +92,18 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    shipped: false,
+    shipped: true,
     isToday: false,
     hasCountdown: false,
-    blog: '/blog/',
+    blog: '/blog/analytics-buckets',
     date: 'Tuesday',
     published_at: '2025-04-01T07:00:00.000-07:00',
-    title: 'Lorem ipsum dolor sit amet',
-    description: <></>,
+    title: 'Introducing Supabase Analytics Buckets with Iceberg Support',
+    description: '',
     links: [
       {
         type: 'video',
-        href: '',
-      },
-      {
-        type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/',
+        href: 'BigtFoFCVBk',
       },
     ],
     steps: [
@@ -127,22 +123,18 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    shipped: false,
+    shipped: true,
     isToday: false,
     hasCountdown: false,
-    blog: '/blog/',
+    blog: '/blog/branching-2-0',
     date: 'Wednesday',
     published_at: '2025-04-02T07:00:00.000-07:00',
-    title: 'Lorem ipsum dolor sit amet',
-    description: <></>,
+    title: 'Introducing Branching 2.0',
+    description: '',
     links: [
       {
         type: 'video',
-        href: '',
-      },
-      {
-        type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/',
+        href: 'CRARnyYqrOU',
       },
     ],
     steps: [
@@ -162,22 +154,18 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    shipped: false,
-    isToday: false,
+    shipped: true,
+    isToday: true,
     hasCountdown: false,
-    blog: '/blog/',
+    blog: '/blog/new-observability-features-in-supabase',
     date: 'Thursday',
     published_at: '2025-04-03T07:00:00.000-07:00',
-    title: 'Lorem ipsum dolor sit amet',
-    description: <></>,
+    title: 'Introducing New Observability Features in Supabase',
+    description: '',
     links: [
       {
         type: 'video',
-        href: '',
-      },
-      {
-        type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/',
+        href: 'pLto2PD4-O8',
       },
     ],
     steps: [
@@ -203,17 +191,17 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '/blog/',
     date: 'Friday',
     published_at: '2025-04-04T07:00:00.000-07:00',
-    title: 'Lorem ipsum dolor sit amet',
+    title: '',
     description: '',
     links: [
       {
         type: 'video',
         href: '',
       },
-      {
-        type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: 'https://twitter.com/i/spaces/',
+      // },
     ],
     steps: [
       {
