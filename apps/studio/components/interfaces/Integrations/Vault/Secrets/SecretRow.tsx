@@ -97,7 +97,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
         </p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" className="px-1" icon={<MoreVertical />} />
+            <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-32">
             <Tooltip>
