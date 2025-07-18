@@ -1,6 +1,6 @@
 ---
-title: 'Persistent Storage and Faster Boot Times for Edge Functions'
-description: 'Mount S3-compatible buckets as persistent file storage in Edge Functions with 97% faster boot times.'
+title: 'Persistent Storage and 97% Faster Cold Starts for Edge Functions'
+description: 'Mount S3-compatible buckets as persistent file storage in Edge Functions with up to 97% faster cold start times.'
 categories:
   - product
   - launch-week
@@ -11,13 +11,13 @@ tags:
   - storage
 date: '2025-07-18:00:00'
 toc_depth: 3
-author: laktek
+author: laktek, nyannyacha
 image: launch-week-15/day-5-persistent-storage-for-functions/og.jpg
 thumb: launch-week-15/day-5-persistent-storage-for-functions/thumb.png
 launchweek: '15'
 ---
 
-Today, we are introducing Persistent Storage to Edge Functions. Previously, Edge Functions only supported ephemeral file storage by writing to `/tmp` directory. Many common libraries for performing tasks, such as zipping/unzipping files and image transformations, are built to work with persistent file storage, so making them work with Edge Functions required extra steps.
+Today, we are introducing Persistent Storage and up to 97% faster cold start times for Edge Functions. Previously, Edge Functions only supported ephemeral file storage by writing to `/tmp` directory. Many common libraries for performing tasks, such as zipping/unzipping files and image transformations, are built to work with persistent file storage, so making them work with Edge Functions required extra steps.
 
 The persistent storage option is built on top of the S3 protocol. It allows you to mount any [S3-compatible bucket](https://supabase.com/docs/guides/storage/s3/compatibility), including [Supabase Storage Buckets](https://supabase.com/docs/guides/storage), as a directory for your Edge Functions. You can perform operations such as reading and writing files to the mounted buckets as you would in a POSIX file system.
 
@@ -100,9 +100,27 @@ Deno.serve(async (req)=>{
 
 ```
 
+## 97% Faster Function Boot Times, Even Under Load
+
+Previously, Edge Functions with large dependencies or doing preparation work at the start (e.g., parsing/loading configs, initializing AI models) would incur a noticeable boot delay. Sometimes, these slow neighbors can impact other functions running on the same machine. All JavaScript _workers_ in the Supabase Edge Functions Runtime were cooperatively scheduled on the same [**Tokio thread pool**](https://github.com/tokio-rs/tokio). If one worker had heavy startup logic, such as parsing JavaScript modules or running synchronous operations, it could delay every worker scheduled after. This led to occasional long‑tail latency spikes in high-traffic projects.
+
+To address this issue, we moved workers which are still performing initial script evaluation onto a dedicated blocking pool. This approach prevents heavy initialization tasks from blocking the Tokio thread, significantly reducing boot time spikes for other functions.
+
+### The result
+
+Boot times are now more predictable and wait times for cold starts are now much faster. Here’s a result of a [benchmark](https://github.com/supabase/edge-runtime/blob/develop/k6/specs/mixed.ts) we did to compare boot times before and after these changes.
+
+| Metric           | Before     | After     | (Delta)   |
+| ---------------- | ---------- | --------- | --------- |
+| **Avg**          | **870 ms** | **42 ms** | **95 %**  |
+| **P95**          | 8,502 ms   | 86 ms     | **99 %**  |
+| **P99**          | 15,069 ms  | 460 ms    | **97 %**  |
+| **Worst**        | 24,300 ms  | 1 630 ms  | **93 %**  |
+| **Spikes > 1 s** | 47 %       | 4 %       | **43 pp** |
+
 ## Support for Synchronous APIs
 
-With the introduction of Persistent Storage, we have enabled the use of **synchronous File APIs** during function boot time**.** Some libraries only support synchronous File APIs (eg, SQLite), and this would allow you to set them up on Edge Functions before it starts processing requests.
+By offloading expensive compute at function boot time onto a separate pool, we were able to enable the use of synchronous File APIs during function boot time. Some libraries only support synchronous File APIs (eg, SQLite), and this would allow you to set them up on Edge Functions before it starts processing requests.
 
 You can now safely use the following synchronous Deno APIs (and their Node counterparts) _during_ initial script evaluation:
 
@@ -129,24 +147,6 @@ Deno.serve(() => {
   Deno.statSync('...') // 💣 ERROR! Deno.statSync is blocklisted on the current context
 })
 ```
-
-## 97% Faster Function Boot Times, Even Under Load
-
-Previously, Edge Functions with large dependencies or doing preparation work at the start (e.g., parsing/loading configs, initializing AI models) would incur a noticeable boot delay. Sometimes, these slow neighbors can impact other functions running on the same machine. All JavaScript _workers_ in the Supabase Edge Functions Runtime were cooperatively scheduled on the same [**Tokio thread pool**](https://github.com/tokio-rs/tokio). If one worker had heavy startup logic, such as parsing JavaScript modules or running synchronous operations, it could delay every worker scheduled after. This led to occasional long‑tail latency spikes in high-traffic projects.
-
-To address this issue, we moved workers which are still performing initial script evaluation onto a dedicated blocking pool. This approach prevents heavy initialization tasks from blocking the Tokio thread, significantly reducing boot time spikes for other functions.
-
-### The result
-
-Boot times are now more predictable and wait times for cold starts are now much faster. Here’s a result of a [benchmark](https://github.com/supabase/edge-runtime/blob/develop/k6/specs/mixed.ts) we did to compare boot times before and after these changes.
-
-| Metric           | Before     | After     | (Delta)   |
-| ---------------- | ---------- | --------- | --------- |
-| **Avg**          | **870 ms** | **42 ms** | **95 %**  |
-| **P95**          | 8,502 ms   | 86 ms     | **99 %**  |
-| **P99**          | 15,069 ms  | 460 ms    | **97 %**  |
-| **Worst**        | 24,300 ms  | 1 630 ms  | **93 %**  |
-| **Spikes > 1 s** | 47 %       | 4 %       | **43 pp** |
 
 ## Try it on Preview Today
 
