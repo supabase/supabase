@@ -156,6 +156,10 @@ If you know or suspect that the JWT secret itself is leaked, refer to the sectio
 
 If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard. This will prevent downtime for your application.
 
+### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
+
+Yes. This allows you to transition between the API keys with zero downtime by gradually swapping your clients while both sets of keys are active. See the next question for how to deactivate your keys once all your clients are switched over.
+
 ### How do I deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
 
 You can do this in the [API Keys](/dashboard/project/_/settings/api-keys/new) dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
