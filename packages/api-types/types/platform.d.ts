@@ -6536,6 +6536,7 @@ export interface components {
           last4: string
         }
         created: number
+        has_address: boolean
         id: string
         is_default: boolean
         type: string
@@ -7835,7 +7836,6 @@ export interface components {
       organization_id: number
       region: string
       status: string
-      subscription_id: string
     }
     UpcomingInvoice: {
       amount_projected?: number
@@ -11308,6 +11308,12 @@ export interface operations {
           'application/json': components['schemas']['CustomerResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve the Billing customer */
       500: {
         headers: {
@@ -11422,6 +11428,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get daily organization stats */
       500: {
         headers: {
@@ -11448,6 +11460,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -11892,6 +11910,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['MemberWithFreeProjectLimit'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve organization members who have reached their free project limit */
       500: {
@@ -12541,6 +12565,12 @@ export interface operations {
           'application/json': components['schemas']['OrgUsageResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get usage stats */
       500: {
         headers: {
@@ -12606,6 +12636,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12643,6 +12674,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12684,6 +12716,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12728,6 +12761,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12765,6 +12799,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12810,6 +12845,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12849,6 +12885,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12890,6 +12927,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12927,6 +12965,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -12970,6 +13009,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13012,6 +13052,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13052,6 +13093,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13089,6 +13131,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13132,6 +13175,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13171,6 +13215,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13220,6 +13265,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13260,6 +13306,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13297,6 +13344,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13340,6 +13388,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13379,6 +13428,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13420,6 +13470,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13457,6 +13508,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13500,6 +13552,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13539,6 +13592,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13580,6 +13634,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13683,6 +13738,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13720,6 +13776,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13763,6 +13820,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13802,6 +13860,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13851,6 +13910,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13888,6 +13948,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13933,6 +13994,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -13972,6 +14034,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -14016,6 +14079,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -14053,6 +14117,7 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -14096,6 +14161,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -14135,6 +14201,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -14179,6 +14246,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -14224,6 +14292,7 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
+        'x-pg-application-name': string
       }
       path: {
         /** @description Project ref */
@@ -16853,6 +16922,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }

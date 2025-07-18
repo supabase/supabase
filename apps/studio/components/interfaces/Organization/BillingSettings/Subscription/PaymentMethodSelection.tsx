@@ -80,10 +80,28 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
 
   const {
-    data: paymentMethods,
+    data: allPaymentMethods,
     isLoading,
     refetch: refetchPaymentMethods,
   } = useOrganizationPaymentMethodsQuery({ slug })
+
+  const paymentMethods = useMemo(() => {
+    if (!allPaymentMethods)
+      return {
+        data: [],
+        defaultPaymentMethodId: null,
+      }
+
+    const filtered = allPaymentMethods.data.filter((pm) => pm.has_address)
+    return {
+      data: filtered,
+      defaultPaymentMethodId: allPaymentMethods.data.some(
+        (pm) => pm.id === allPaymentMethods.defaultPaymentMethodId
+      )
+        ? allPaymentMethods.defaultPaymentMethodId
+        : null,
+    }
+  }, [allPaymentMethods])
 
   const captchaRefCallback = useCallback((node: any) => {
     setCaptchaRef(node)
