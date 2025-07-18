@@ -26,9 +26,12 @@ GROUP BY funding_stage
 ORDER BY 
   CASE funding_stage
     WHEN 'Bootstrapped' THEN 1
-    WHEN 'Seed' THEN 2
-    WHEN 'Series A' THEN 3
-    WHEN 'Series B+' THEN 4
+    WHEN 'Pre-seed' THEN 2
+    WHEN 'Seed' THEN 3
+    WHEN 'Series A' THEN 4
+    WHEN 'Series B' THEN 5
+    WHEN 'Series C' THEN 5
+    WHEN 'Series D+' THEN 6
   END;`
 }
 

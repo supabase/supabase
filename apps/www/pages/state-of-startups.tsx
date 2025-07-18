@@ -21,6 +21,8 @@ import { TeamCountChart } from '~/components/SurveyResults/TeamCountChart'
 import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
 import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
 import { SectionIntro } from '~/components/SurveyResults/SectionIntro'
+import { RoleChart } from '~/components/SurveyResults/RoleChart'
+import { PersonAgeChart } from '~/components/SurveyResults/AgeChart'
 import { MonetizationChart } from '~/components/SurveyResults/MonetizationChart'
 import { AcceleratorParticipationChart } from '~/components/SurveyResults/AcceleratorParticipationChart'
 import { PivotFreqChart } from '~/components/SurveyResults/PivotFreqChart'
@@ -202,6 +204,8 @@ function StateOfStartupsPage() {
               text="Most survey respondents identified as founders (76%), with engineers as the next-largest group (18%). Age-wise, 82% of participants are under 40, with the largest cohort in the 22–29 age range (36.4%). These are early-career founders starting small: 91% of companies have 10 or fewer employees, and 66% were founded within the last year. Two-thirds are bootstrapped, with fewer than 6% reaching Series A or beyond."
             />
 
+            <RoleChart />
+            <PersonAgeChart />
             <TeamCountChart />
             <FundingStageChart />
             <HeadquartersChart />
