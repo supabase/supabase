@@ -175,7 +175,7 @@ ORDER BY
   END;`
 }
 
-// Custom hook to fetch survey data using Supabase query builder
+// Custom hook to fetch survey data using SQL query via RPC
 function useSurveyData(activeFilters) {
   const [chartData, setChartData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -189,73 +189,31 @@ function useSurveyData(activeFilters) {
 
         console.log('Fetching survey data with filters:', activeFilters)
 
-        // Build the query using Supabase query builder
-        let query = externalSupabase.from('responses').select('team_count')
+        // Generate the SQL query
+        const sqlQuery = generateSQLQuery(activeFilters)
+        console.log('Executing SQL query:', sqlQuery)
 
-        // Apply filters
-        Object.entries(activeFilters).forEach(([key, value]) => {
-          if (value !== 'all') {
-            query = query.eq(key, value)
-          }
+        // Execute the SQL query using Supabase RPC
+        const { data, error: fetchError } = await externalSupabase.rpc('execute_sql', {
+          query: sqlQuery,
         })
 
-        const { data, error: fetchError } = await query
-
         if (fetchError) {
-          console.error('Error fetching data:', fetchError)
+          console.error('Error executing SQL query:', fetchError)
           setError(fetchError.message)
           return
         }
 
-        console.log('Raw data from Supabase:', data)
+        console.log('Raw data from SQL query:', data)
 
-        // Process the data to count team sizes (matching the SQL GROUP BY logic)
-        const teamSizeCounts = {}
-        data.forEach((row) => {
-          teamSizeCounts[row.team_count] = (teamSizeCounts[row.team_count] || 0) + 1
-        })
+        // Calculate total for percentage calculation
+        const total = data.reduce((sum, row) => sum + parseInt(row.total), 0)
 
-        console.log('Team size counts:', teamSizeCounts)
-
-        // Calculate percentages
-        const total = data.length
-        const processedData = [
-          {
-            label: '1–10',
-            value:
-              total > 0
-                ? parseFloat((((teamSizeCounts['1-10'] || 0) / total) * 100).toFixed(1))
-                : 0,
-          },
-          {
-            label: '11–50',
-            value:
-              total > 0
-                ? parseFloat((((teamSizeCounts['11-50'] || 0) / total) * 100).toFixed(1))
-                : 0,
-          },
-          {
-            label: '51–100',
-            value:
-              total > 0
-                ? parseFloat((((teamSizeCounts['51-100'] || 0) / total) * 100).toFixed(1))
-                : 0,
-          },
-          {
-            label: '101–250',
-            value:
-              total > 0
-                ? parseFloat((((teamSizeCounts['101-250'] || 0) / total) * 100).toFixed(1))
-                : 0,
-          },
-          {
-            label: '250+',
-            value:
-              total > 0
-                ? parseFloat((((teamSizeCounts['250+'] || 0) / total) * 100).toFixed(1))
-                : 0,
-          },
-        ]
+        // Transform the data to match chart format
+        const processedData = data.map((row) => ({
+          label: row.team_count === '250+' ? '250+' : row.team_count,
+          value: total > 0 ? parseFloat(((parseInt(row.total) / total) * 100).toFixed(1)) : 0,
+        }))
 
         console.log('Processed chart data:', processedData)
         setChartData(processedData)
