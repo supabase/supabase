@@ -7,7 +7,8 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import SchemaSelector from 'components/ui/SchemaSelector'
+import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import {
   Button,
@@ -29,14 +30,6 @@ export interface ImportForeignSchemaDialogProps {
   onClose: () => void
 }
 
-const FormSchema = z.object({
-  bucketName: z.string().trim(),
-  sourceNamespace: z.string().trim(),
-  targetSchema: z.string().trim(),
-})
-
-export type ImportForeignSchemaForm = z.infer<typeof FormSchema>
-
 export const ImportForeignSchemaDialog = ({
   bucketName,
   namespace,
@@ -57,7 +50,26 @@ export const ImportForeignSchemaDialog = ({
     },
   })
 
-  const form = useForm<ImportForeignSchemaForm>({
+  const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
+
+  const FormSchema = z.object({
+    bucketName: z.string().trim(),
+    sourceNamespace: z.string().trim(),
+    targetSchema: z
+      .string()
+      .trim()
+      .min(1, 'Schema name is required')
+      .refine(
+        (val) => {
+          return !schemas?.find((s) => s.name === val)
+        },
+        {
+          message: 'This schema already exists. Please specify a unique schema name.',
+        }
+      ),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       bucketName,
@@ -66,11 +78,19 @@ export const ImportForeignSchemaDialog = ({
     },
   })
 
-  const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
+  const { mutateAsync: createSchema } = useSchemaCreateMutation()
+
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!ref) return console.error('Project ref is required')
     setLoading(true)
 
     try {
+      await createSchema({
+        projectRef: ref,
+        connectionString: project?.connectionString,
+        name: values.targetSchema,
+      })
+
       await importForeignSchema({
         projectRef: ref,
         connectionString: project?.connectionString,
@@ -128,17 +148,10 @@ export const ImportForeignSchemaDialog = ({
               render={({ field }) => (
                 <FormItemLayout
                   label="Target Schema"
-                  description="Select the database schema where the Iceberg data will be accessible. Each schema can only be connected to one namespace."
+                  description="Enter a schema name under which the Iceberg data will be accessible. The schema will be created."
                   layout="vertical"
                 >
-                  <SchemaSelector
-                    portal={false}
-                    size="small"
-                    selectedSchemaName={field.value}
-                    excludedSchemas={excludedSchemas}
-                    onSelectSchema={(schema) => field.onChange(schema)}
-                    onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
-                  />
+                  <Input_Shadcn_ {...field} placeholder="Enter schema name" />
                 </FormItemLayout>
               )}
             />
