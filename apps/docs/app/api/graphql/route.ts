@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { ApiError, convertZodToInvalidRequestError, InvalidRequestError } from '~/app/api/utils'
 import { BASE_PATH, IS_DEV } from '~/lib/constants'
+import { logger, LOGGING_CODES } from '~/lib/logger'
 import { rootGraphQLSchema } from '~/resources/rootSchema'
 import { createQueryDepthLimiter } from './validators'
 
@@ -154,6 +155,16 @@ export async function OPTIONS(request: Request): Promise<NextResponse> {
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
+    const vercelId = request.headers.get('x-vercel-id')
+    logger.info(
+      {
+        vercelId,
+        origin: request.headers.get('Origin'),
+        userAgent: request.headers.get('User-Agent'),
+      },
+      LOGGING_CODES.CONTENT_API_REQUEST_RECEIVED
+    )
+
     const result = await handleGraphQLRequest(request)
     // Do not let Vercel close the process until Sentry has flushed
     // https://github.com/getsentry/sentry-javascript/issues/9626
