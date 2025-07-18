@@ -91,7 +91,7 @@ export function LogsSidebarMenuV2() {
   const { ref } = useParams() as { ref: string }
 
   const warehouseEnabled = useFlag('warehouse')
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
   const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
@@ -114,6 +114,11 @@ export function LogsSidebarMenuV2() {
 
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
+
+  const isUnifiedLogsPreviewAvailable =
+    unifiedLogsFlagEnabled &&
+    !isOrgPlanLoading &&
+    ['team', 'enterprise'].includes(orgPlan?.id ?? '')
 
   const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -224,6 +229,19 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-12 relative">
+      <FeaturePreviewSidebarPanel
+        className="mx-4 mt-4"
+        illustration={<Badge variant="default">Coming soon</Badge>}
+        title="New logs"
+        description="Get early access"
+        actions={
+          <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
+            <Button type="default" size="tiny">
+              Early access
+            </Button>
+          </Link>
+        }
+      />
       {isUnifiedLogsPreviewAvailable && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"

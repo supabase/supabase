@@ -12,16 +12,22 @@ toc_depth: 3
 author: jonny,saxon_fletcher,jordi,fsansalvadore
 image: launch-week-15/day-4-o11y-day/og.jpg
 thumb: launch-week-15/day-4-o11y-day/thumb.png
-launchweek: 15
+launchweek: '15'
 ---
 
 We are starting to add OpenTelemetry support to [all](https://github.com/supabase/storage/pull/494) [our](https://github.com/supabase/auth/pull/679) [core](https://github.com/supabase/edge-runtime/pull/554) [products](https://github.com/supabase/realtime/commit/c9683f3f5f94bd2e37494f02c1f4415551e96e5b) and [our Telemetry server](https://github.com/Logflare/logflare/pulls?q=is%3Apr+otel+sort%3Acreated-asc). OpenTelemetry (OTel) standardizes logs, metrics, and traces in a vendor-agnostic format, so you can ingest data into tools like Datadog, Honeycomb, or any monitoring solution you already use. While you'll still have the freedom to bring your own observability stack, we're preparing to surface this data natively in the Supabase dashboard.
 
-Today we are launching
+Today, we are announcing:
 
-- Preview of our new logging Interface
+- New Logging Interface (coming soon!)
 - Advanced Product Reports
-- Supabase AI Assistant with debugging capabilities
+- Supabase AI Assistant with debugging capabilities (coming soon!)
+
+<Admonition type='note'>
+
+If you would like early access to the new Logging Interface and Supabase AI Assistant with debugging capabilities please sign up [here](https://forms.supabase.com/unified-logs-signup).
+
+</Admonition>
 
 These updates mark the first step toward unified, end-to-end observability. You won't get the full OTel visualization just yet, but with these foundations in place, you'll soon be able to trace, analyze errors and performance issues, and troubleshoot your entire stack without leaving Supabase.
 
@@ -37,9 +43,9 @@ These updates mark the first step toward unified, end-to-end observability. You 
 
 ## New logging Interface
 
-Supabase is a collection of seamlessly integrated services. Storage talks to Postgres via the dedicated connection pooler. Edge Functions can talk to Auth and Realtime. If storage uploads fail, you must determine whether the problem lies with the storage server, the dedicated connection pooler, or the database. Until now, pinpointing the root cause meant jumping between multiple log streams.
+Supabase is a collection of seamlessly integrated services. Storage talks to Postgres via the dedicated connection pooler. Edge Functions can talk to Auth and Realtime. If Storage uploads fail, you must determine whether the problem lies with the Storage server, the dedicated connection pooler, or the database. Previously, pinpointing the root cause meant jumping between multiple log streams.
 
-Starting today, there is one interleaved stream of logs across all services. You can trace a single request across the entire Supabase stack. No more jumping between tabs to diagnose errors.
+Now, there is one interleaved stream of logs across all services. You can trace a single request across the entire Supabase stack. No more jumping between tabs to diagnose errors.
 
 <Img
   wide
@@ -63,15 +69,15 @@ We have also added contextual log views. You can now jump from a function's invo
 
 The new interface also supports filtering logs by the request status code, method, path, log level and the auth user associated with the request. This means you can quickly find all Postgrest 500 errors, or all requests made by a specific user with a few clicks.
 
-Shoutout to [openstatus.dev](http://openstatus.dev) for providing the inspiration for some of our Log components.
+The new interface currently supports API Gateway logs and Postgres logs, with logs for the other products coming soon.
 
-The new logging interface is available as a feature preview today, which you can enable from the dashboard [here](https://supabase.com/dashboard/project/_?featurePreviewModal=supabase-ui-preview-unified-logs). The new interface currently supports API Gateway logs and Postgres logs, with logs for the other products coming soon.
+Shoutout to [openstatus.dev](http://openstatus.dev) for providing the inspiration for some of our Log components.
 
 ## Advanced Product Reports
 
 Apart from making our logs better, we also revamped the metrics exposed in our product reports. Previously, you had to host your own [Grafana dashboard](https://github.com/supabase/supabase-grafana) to access some of these advanced metrics. We are bringing some of these metrics directly into the dashboard, so that you can access them without any additional setup or maintaining your own production ready monitoring infrastructure.
 
-Each product has its own dedicated [report](https://supabase.com/dashboard/project/_/reports/api-overview) with a common set of metrics like number of requests, egress, and response time, along with product specific metrics like “Realtime connected clients”.
+Each product has its own dedicated [report](/dashboard/project/_/reports/api-overview) with a common set of metrics like number of requests, egress, and response time, along with product specific metrics like “Realtime connected clients”.
 
 Additionally, you can drill into a specific time frame and filter by various request and response parameters across all reports.
 
@@ -86,7 +92,7 @@ Additionally, you can drill into a specific time frame and filter by various req
 
 Free users get a basic set of metrics for all products, while some of the advanced metrics (like p99 response time) is available for all paid customers.
 
-Try out the new reports [here](https://supabase.com/dashboard/project/_/reports/api-overview).
+Try out the new reports [here](/dashboard/project/_/reports/api-overview).
 
 ## Supabase AI Assistant with debugging capabilities
 
