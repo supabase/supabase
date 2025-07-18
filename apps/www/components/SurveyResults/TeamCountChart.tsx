@@ -21,7 +21,7 @@ function generateTeamCountSQL(activeFilters) {
   return `SELECT
   team_count,
   COUNT(*) AS total
-FROM responses${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
 GROUP BY team_count
 ORDER BY 
   CASE team_count

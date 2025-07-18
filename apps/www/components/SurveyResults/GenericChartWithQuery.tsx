@@ -42,7 +42,7 @@ function useFilterOptions(filterColumns: string[]) {
 
         for (const column of filterColumns) {
           const { data, error: fetchError } = await externalSupabase
-            .from('responses')
+            .from('responses_2025_e')
             .select(column)
             .not(column, 'is', null)
             .not(column, 'eq', '')

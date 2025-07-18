@@ -17,9 +17,10 @@ function generateMonetizationSQL(activeFilters: Record<string, string>) {
   return `SELECT
   currently_monetizing,
   COUNT(*) AS total
-FROM responses${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
 GROUP BY currently_monetizing
-ORDER BY currently_monetizing;`
+--ORDER BY currently_monetizing
+ORDER BY total DESC;`
 }
 
 export function MonetizationChart() {

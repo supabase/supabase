@@ -16,11 +16,16 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import data from '~/data/surveys/state-of-startups-2025'
+
 import { TeamCountChart } from '~/components/SurveyResults/TeamCountChart'
 import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
 import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
 import { SectionIntro } from '~/components/SurveyResults/SectionIntro'
 import { MonetizationChart } from '~/components/SurveyResults/MonetizationChart'
+import { AcceleratorParticipationChart } from '~/components/SurveyResults/AcceleratorParticipationChart'
+import { PivotFreqChart } from '~/components/SurveyResults/PivotFreqChart'
+import { FrontendStackChart } from '~/components/SurveyResults/FrontendStackChart'
+import { BackendStackChart } from '~/components/SurveyResults/BackendStackChart'
 
 interface FormData {
   email: string
@@ -209,6 +214,21 @@ function StateOfStartupsPage() {
             />
 
             <MonetizationChart />
+            <AcceleratorParticipationChart />
+            <PivotFreqChart />
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Tech Stack"
+              description="The modern stack centers around open tools, modular infrastructure, and cautious spending."
+              text="Postgres is the default database. Supabase is the most widely used hosted option (62.1%), often paired with pgvector for AI workloads. React remains the dominant frontend, while Node.js and Python top the backend. Developer tools like GitHub, Stripe, and Postman round out the stack. Cloud usage reveals a clear split: Supabase leads for managed backends (62%), followed by Vercel (37%) and AWS (27%). Cloudflare (21%) and GCP (13%) are used tactically."
+            />
+
+            <FrontendStackChart />
+            <BackendStackChart />
           </div>
         </SectionContainer>
       </DefaultLayout>
