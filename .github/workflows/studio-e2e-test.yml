@@ -8,12 +8,12 @@ on:
       - 'e2e/studio/**'
       - 'pnpm-lock.yaml'
   pull_request:
-    branches: [master]
     paths:
       - 'packages/pg-meta/**/*'
       - 'apps/studio/**'
       - 'e2e/studio/**'
       - 'pnpm-lock.yaml'
+      - '.github/workflows/studio-e2e-test.yml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
