@@ -5,7 +5,6 @@ import { Fragment, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -22,7 +21,6 @@ export const SecretsManagement = () => {
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
-  const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<VaultSecret>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
 
@@ -104,21 +102,7 @@ export const SecretsManagement = () => {
           </div>
           <div className="flex items-center gap-x-2">
             <DocsButton href="https://supabase.com/docs/guides/database/vault" />
-            <ButtonTooltip
-              type="primary"
-              disabled={!canManageSecrets}
-              onClick={() => setShowAddSecretModal(true)}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canManageSecrets
-                    ? 'You need additional permissions to add secrets'
-                    : undefined,
-                },
-              }}
-            >
-              Add new secret
-            </ButtonTooltip>
+            <AddNewSecretModal canManageSecrets={canManageSecrets} />
           </div>
         </div>
 
@@ -174,10 +158,6 @@ export const SecretsManagement = () => {
       <DeleteSecretModal
         selectedSecret={selectedSecretToRemove}
         onClose={() => setSelectedSecretToRemove(undefined)}
-      />
-      <AddNewSecretModal
-        visible={showAddSecretModal}
-        onClose={() => setShowAddSecretModal(false)}
       />
     </>
   )
