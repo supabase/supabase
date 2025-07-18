@@ -1129,8 +1129,8 @@ function createStorageExplorerState({
               retryDelays: [0, 200, 500, 1500, 3000, 5000],
               headers: {
                 authorization: `Bearer ${state.serviceKey}`,
-                apikey: state.serviceKey,
                 'x-source': 'supabase-dashboard',
+                ...(state.serviceKey.includes('secret') ? { apikey: state.serviceKey } : {}),
               },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
