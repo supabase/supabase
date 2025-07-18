@@ -26,14 +26,13 @@ import { Elements } from '@stripe/react-stripe-js'
 import {
   loadStripe,
   PaymentMethod,
-  StripeAddressElement,
   StripeElementsOptions,
 } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { PaymentIntentResult } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { StripeAddressElementChangeEvent } from '@stripe/stripe-js'
+import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -89,7 +88,7 @@ export const SubscriptionPlanUpdateDialog = ({
     createPaymentMethod: () => Promise<
       | {
           paymentMethod: PaymentMethod
-          address: StripeAddressElementChangeEvent['value']
+          address: CustomerAddress
           taxId: {
             country: string
             type: string
@@ -560,7 +559,6 @@ export const SubscriptionPlanUpdateDialog = ({
                     ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
-                    createPaymentMethodInline={true}
                     readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                   />
                 </div>

@@ -18,8 +18,6 @@ interface AddNewPaymentMethodModalProps {
   returnUrl: string
   onCancel: () => void
   onConfirm: () => void
-  showSetDefaultCheckbox?: boolean
-  autoMarkAsDefaultPaymentMethod?: boolean
 }
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -29,8 +27,6 @@ const AddNewPaymentMethodModal = ({
   returnUrl,
   onCancel,
   onConfirm,
-  showSetDefaultCheckbox,
-  autoMarkAsDefaultPaymentMethod,
 }: AddNewPaymentMethodModalProps) => {
   const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
@@ -142,8 +138,6 @@ const AddNewPaymentMethodModal = ({
             returnUrl={returnUrl}
             onCancel={onLocalCancel}
             onConfirm={onLocalConfirm}
-            showSetDefaultCheckbox={showSetDefaultCheckbox}
-            autoMarkAsDefaultPaymentMethod={autoMarkAsDefaultPaymentMethod}
           />
         </Elements>
       </Modal>

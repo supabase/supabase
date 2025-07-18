@@ -40,8 +40,8 @@ import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { NewPaymentMethodElement } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
-import { StripeAddressElementChangeEvent } from '@stripe/stripe-js'
 import { components } from 'api-types'
+import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -274,7 +274,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     createPaymentMethod: () => Promise<
       | {
           paymentMethod: PaymentMethod
-          address: StripeAddressElementChangeEvent['value']
+          address: CustomerAddress
           taxId: {
             country: string
             type: string
@@ -569,6 +569,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
                   ref={paymentRef}
                   email={user.profile?.primary_email}
                   readOnly={newOrgLoading || paymentConfirmationLoading}
+                  taxIdConfigurable={true}
                 />
               </Panel.Content>
             </Elements>

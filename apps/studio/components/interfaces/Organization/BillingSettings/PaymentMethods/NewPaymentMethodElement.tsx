@@ -34,6 +34,8 @@ import { Form } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Check, ChevronsUpDown, X } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
+import { getURL } from 'lib/helpers'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
@@ -50,9 +52,15 @@ const NewPaymentMethodElement = forwardRef(
     {
       email,
       readOnly,
+      taxIdConfigurable,
+      currentAddress,
+      customerName,
     }: {
       email?: string | null | undefined
       readOnly: boolean
+      taxIdConfigurable: boolean
+      currentAddress?: CustomerAddress | undefined
+      customerName?: string | undefined
     },
     ref
   ) => {
@@ -109,7 +117,7 @@ const NewPaymentMethodElement = forwardRef(
       }
 
       const taxId =
-        purchasingAsBusiness && selectedTaxId
+        taxIdConfigurable && purchasingAsBusiness && selectedTaxId
           ? {
               country: selectedTaxId.countryIso2,
               type: selectedTaxId.type,
@@ -121,14 +129,39 @@ const NewPaymentMethodElement = forwardRef(
       return { paymentMethod, address: address?.value, taxId }
     }
 
+    const confirmSetup = async () => {
+      if (!stripe || !elements) return
+
+      await elements.submit()
+
+      const { error, setupIntent } = await stripe.confirmSetup({
+        elements,
+        redirect: 'if_required',
+        confirmParams: { return_url: `${getURL()}/org/_/billing` },
+      })
+
+      if (error || setupIntent == null) {
+        toast.error(error?.message ?? ' Failed to process card details')
+        return
+      }
+
+      const address = await elements.getElement('address')?.getValue()
+      return { setupIntent, address: address?.value.address, customerName: address?.value.name }
+    }
+
     useImperativeHandle(ref, () => ({
       createPaymentMethod,
+      confirmSetup,
     }))
 
     const addressOptions: StripeAddressElementOptions = useMemo(
       () => ({
         mode: 'billing',
         display: { name: purchasingAsBusiness ? 'organization' : 'full' },
+        defaultValues: {
+          address: currentAddress,
+          name: customerName,
+        },
       }),
       [purchasingAsBusiness]
     )
@@ -157,7 +190,7 @@ const NewPaymentMethodElement = forwardRef(
           options={{ defaultValues: { billingDetails: { email: email ?? undefined } }, readOnly }}
         />
 
-        {fullyLoaded && (
+        {fullyLoaded && taxIdConfigurable && (
           <div className="flex items-center space-x-2">
             <Checkbox_Shadcn_
               id="business"
@@ -181,7 +214,7 @@ const NewPaymentMethodElement = forwardRef(
           onReady={() => setFullyLoaded(true)}
         />
 
-        {purchasingAsBusiness && availableTaxIds.length > 0 && (
+        {purchasingAsBusiness && taxIdConfigurable && availableTaxIds.length > 0 && (
           <Form {...form}>
             <div className="grid grid-cols-2 gap-x-2 w-full">
               <FormField
