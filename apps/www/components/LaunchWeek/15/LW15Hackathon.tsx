@@ -11,35 +11,34 @@ const MotionImage = motion(Image)
 
 const LW15Hackathon: FC = () => {
   return (
-    <>
-      <SectionContainer
-        className="!max-w-none lg:!container lw-nav-anchor flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-2"
-        id="build-stage"
-      >
-        <LW15HackathonImage className="hidden lg:flex" />
-        <div className="w-full h-full flex flex-col justify-between gap-4 lg:col-span-3">
-          <div className="flex flex-col h-full gap-4">
-            <div className="flex flex-col text-6xl">
-              <div className="flex justify-between">
-                <span className="text-foreground-lighter">Hackathon</span>
-              </div>
-              <div>Starts this Friday.</div>
+    <SectionContainer
+      className="!max-w-none lg:!container lw-nav-anchor flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-2"
+      id="build-stage"
+    >
+      <LW15HackathonImage className="hidden lg:flex" />
+      <div className="w-full h-full flex flex-col justify-between gap-4 lg:col-span-3">
+        <div className="flex flex-col h-full gap-4">
+          <div className="flex flex-col text-6xl">
+            <div className="flex justify-between">
+              <span className="text-foreground-lighter">Hackathon</span>
             </div>
-          </div>
-          <LW15HackathonImage className="lg:hidden" />
-          <div className="flex flex-col justify-between gap-4">
-            <div className="text-2xl max-w-[600px] text-foreground-lighter">
-              <p>Build something amazing in 10 days using Supabase.</p>
-              <p>
-                Compete solo or in a team,
-                <br />
-                submit a quick demo and win.
-              </p>
-            </div>
+            <div>Starts this Friday.</div>
           </div>
         </div>
-      </SectionContainer>
-    </>
+        <LW15HackathonImage className="lg:hidden" />
+        <div className="flex flex-col justify-between items-start gap-4">
+          <div className="text-2xl max-w-[350px] text-foreground-lighter">
+            <p>
+              Build something amazing <br /> in 10 days using Supabase.
+            </p>
+            <p>Compete solo or in a team, submit a quick demo and win.</p>
+          </div>
+          <Button type="secondary" size="medium" asChild>
+            <Link href="/blog/lw15-hackathon">Join Hackathon</Link>
+          </Button>
+        </div>
+      </div>
+    </SectionContainer>
   )
 }
 
