@@ -514,6 +514,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/branches/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a database branch
+     * @description Fetches the specified database branch by its name.
+     */
+    get: operations['v1-get-a-branch']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/claim-token': {
     parameters: {
       query?: never
@@ -1571,7 +1591,7 @@ export interface components {
       result?: unknown[]
     }
     ApiKeyResponse: {
-      api_key: string
+      api_key?: string | null
       description?: string | null
       hash?: string | null
       id?: string | null
@@ -1799,6 +1819,7 @@ export interface components {
       sms_vonage_api_key: string | null
       sms_vonage_api_secret: string | null
       sms_vonage_from: string | null
+      /** Format: email */
       smtp_admin_email: string | null
       smtp_host: string | null
       smtp_max_frequency: number | null
@@ -1844,8 +1865,10 @@ export interface components {
         | 'RESIZING'
     }
     BranchResponse: {
+      /** Format: date-time */
       created_at: string
       git_branch?: string
+      /** Format: uuid */
       id: string
       is_default: boolean
       /**
@@ -1859,6 +1882,8 @@ export interface components {
       /** Format: int32 */
       pr_number?: number
       project_ref: string
+      /** Format: date-time */
+      review_requested_at?: string
       /** @enum {string} */
       status:
         | 'CREATING_PROJECT'
@@ -1867,6 +1892,7 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+      /** Format: date-time */
       updated_at: string
     }
     BranchUpdateResponse: {
@@ -1878,6 +1904,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -1893,6 +1920,7 @@ export interface components {
         /** Format: int64 */
         created_at: number
         entrypoint_path?: string
+        ezbr_sha256?: string
         id: string
         import_map?: boolean
         import_map_path?: string
@@ -1940,6 +1968,7 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       git_branch?: string
+      is_default?: boolean
       persistent?: boolean
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
@@ -2025,6 +2054,42 @@ export interface components {
     CreateSigningKeyBody: {
       /** @enum {string} */
       algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      private_jwk?:
+        | {
+            d: string
+            dp: string
+            dq: string
+            /** @enum {string} */
+            e: 'AQAB'
+            /** @enum {string} */
+            kty: 'RSA'
+            n: string
+            p: string
+            q: string
+            qi: string
+          }
+        | {
+            /** @enum {string} */
+            crv: 'P-256'
+            d: string
+            /** @enum {string} */
+            kty: 'EC'
+            x: string
+            y: string
+          }
+        | {
+            /** @enum {string} */
+            crv: 'Ed25519'
+            d: string
+            /** @enum {string} */
+            kty: 'OKP'
+            x: string
+          }
+        | {
+            k: string
+            /** @enum {string} */
+            kty: 'oct'
+          }
       /** @enum {string} */
       status?: 'in_use' | 'standby'
     }
@@ -2096,6 +2161,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2122,6 +2188,7 @@ export interface components {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2138,6 +2205,7 @@ export interface components {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2484,10 +2552,9 @@ export interface components {
         | 'preview'
       duration_estimate_hours: number
       eligible: boolean
-      extension_dependent_objects: string[]
       latest_app_version: string
       legacy_auth_custom_roles: string[]
-      potential_breaking_changes: string[]
+      objects_to_be_dropped: string[]
       target_upgrade_versions: {
         app_version: string
         /** @enum {string} */
@@ -2495,6 +2562,8 @@ export interface components {
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
+      unsupported_extensions: string[]
+      user_defined_objects_in_internal_schemas: string[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
@@ -2637,6 +2706,9 @@ export interface components {
     }
     StorageConfigResponse: {
       features: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -2866,6 +2938,7 @@ export interface components {
       sms_vonage_api_key?: string | null
       sms_vonage_api_secret?: string | null
       sms_vonage_from?: string | null
+      /** Format: email */
       smtp_admin_email?: string | null
       smtp_host?: string | null
       smtp_max_frequency?: number | null
@@ -2879,6 +2952,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       persistent?: boolean
+      request_review?: boolean
       /**
        * @deprecated
        * @description This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.
@@ -3011,6 +3085,9 @@ export interface components {
     }
     UpdateStorageConfigBody: {
       features?: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -3163,6 +3240,10 @@ export interface components {
       max_client_conn?: number
       /** @enum {string} */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     V1PostgrestConfigResponse: {
       db_extra_search_path: string
@@ -4568,6 +4649,42 @@ export interface operations {
         content?: never
       }
       /** @description Failed to disable preview branching */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch database branch */
       500: {
         headers: {
           [name: string]: unknown
@@ -6118,6 +6235,7 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        ezbr_sha256?: string
         /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string
@@ -6239,6 +6357,7 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        ezbr_sha256?: string
         /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string
