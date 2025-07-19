@@ -62,13 +62,3 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
     }
   )
 }
-
-/**
- * @deprecated Use api-keys-query instead!
- */
-export const getAPIKeys = (settings?: ProjectSettings) => {
-  const anonKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')
-  const serviceKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
-
-  return { anonKey, serviceKey }
-}

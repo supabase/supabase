@@ -38,8 +38,8 @@ const EdgeFunctionDetailsLayout = ({
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
-  const { functionSlug, ref } = useParams()
   const org = useSelectedOrganization()
+  const { functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()

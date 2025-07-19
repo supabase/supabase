@@ -9,9 +9,9 @@ import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCa
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
@@ -30,9 +30,9 @@ export const GraphiQLTab = () => {
   const pgGraphqlExtension = (data ?? []).find((ext) => ext.name === 'pg_graphql')
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { data: settings, isFetched } = useProjectSettingsV2Query({ projectRef })
 
-  const { serviceKey } = getAPIKeys(settings)
+  const { data: apiKeys, isFetched } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { serviceKey, secretKey } = getKeys(apiKeys)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
@@ -74,7 +74,7 @@ export const GraphiQLTab = () => {
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
             userAuthorization ??
-            `Bearer ${serviceKey?.api_key}`,
+            `Bearer ${secretKey?.api_key ?? serviceKey?.api_key}`,
         },
       })
     }

@@ -31,8 +31,9 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
@@ -917,6 +918,20 @@ function createStorageExplorerState({
       columnIndex: number
       isDrop?: boolean
     }) => {
+      if (!state.serviceKey) {
+        toast(
+          <p>
+            Uploading files to Storage through the dashboard is currently unavailable with the new
+            API keys. Please re-enable{' '}
+            <InlineLink href={`/project/${state.projectRef}/settings/api-keys`}>
+              legacy JWT keys
+            </InlineLink>{' '}
+            if you'd like to upload files to Storage through the dashboard.
+          </p>
+        )
+        return
+      }
+
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
@@ -1115,6 +1130,7 @@ function createStorageExplorerState({
               headers: {
                 authorization: `Bearer ${state.serviceKey}`,
                 'x-source': 'supabase-dashboard',
+                ...(state.serviceKey.includes('secret') ? { apikey: state.serviceKey } : {}),
               },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
@@ -1722,8 +1738,10 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
-  const { serviceKey } = getAPIKeys(settings)
+
+  const { serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`

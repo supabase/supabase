@@ -3,6 +3,7 @@ import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
@@ -19,7 +20,6 @@ import { Button, Checkbox, Form, Input, Listbox, Radio, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import HTTPRequestFields from './HTTPRequestFields'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
-import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -529,8 +529,8 @@ const FormContents = ({
         errors={errors}
         httpHeaders={httpHeaders}
         httpParameters={httpParameters}
-        onAddHeader={(header?: any) => {
-          if (header) setHttpHeaders(httpHeaders.concat(header))
+        onAddHeaders={(headers?: any[]) => {
+          if (headers) setHttpHeaders(httpHeaders.concat(headers))
           else setHttpHeaders(httpHeaders.concat({ id: uuidv4(), name: '', value: '' }))
         }}
         onUpdateHeader={(idx, property, value) =>
