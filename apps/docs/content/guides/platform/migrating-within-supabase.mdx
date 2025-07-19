@@ -10,9 +10,13 @@ to another project feature](/docs/guides/platform/clone-project).
 
 - If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).
 
-- **Project migration only migrates the Postgres database** and anything else will need to be re-configured.
+- **This guide only migrates the Postgres database**. Some common items to re-configure in the new project include:
+  - Auth Settings and API keys
+  - Edge Functions
+  - Read Replicas
+  - Realtime configuration
 
-### Pre-Migration checklist
+### Before you begin
 
     <Accordion
 
@@ -34,17 +38,6 @@ className="text-foreground-light mt-8 mb-6"
   </div>
   </Accordion>
 
-Here are some items to note down your changes made to re-configure in the new project:
-
-    - Auth Settings and API keys
-    - Edge Functions
-    - Read Replicas
-    - Realtime configuration
-
-### Project backup
-
-If you already have the database backup, skip to the Restore project step.
-
 <Accordion
   type="default"
   openBehaviour="multiple"
@@ -55,7 +48,7 @@ If you already have the database backup, skip to the Restore project step.
 >
     <div className="border-b mt-3 pb-3">
         <AccordionItem
-        header={<span className="text-foreground">Manual project backup</span>}
+        header={<span className="text-foreground">Manual database dump if you do not have a backup</span>}
         id="backup-project"
         >
         <StepHikeCompact>
@@ -105,11 +98,11 @@ If you already have the database backup, skip to the Restore project step.
   </div>
 </Accordion>
 
-### Restore project backup
+### Restore database backup
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Create and configure new project" fullWidth>
+        <StepHikeCompact.Details title="Create and configure new Supabase project" fullWidth>
           Create a [new project](https://database.new). In the new project:
             - If Webhooks were used in the old database, enable [Database Webhooks](/dashboard/project/_/database/hooks).
             - If any non-default extensions were used in the old database, enable the [Extensions](/dashboard/project/_/database/extensions).
@@ -117,7 +110,7 @@ If you already have the database backup, skip to the Restore project step.
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-      <StepHikeCompact.Details title="Get the new Session pooler connection string" fullWidth>
+      <StepHikeCompact.Details title="Get the Session pooler connection string for the newly created project" fullWidth>
       Get your Session pooler connection string from your [Connect page](https://supabase.com/dashboard/project/_?showConnect=true). Example connection string:
       ```bash
         postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[PROJECT-REGION].pooler.supabase.com:5432/postgres
@@ -128,25 +121,39 @@ If you already have the database backup, skip to the Restore project step.
 
     <StepHikeCompact.Step step={4}>
 
-    <StepHikeCompact.Details title="Get the database password" fullWidth>
+    <StepHikeCompact.Details title="Get the database password for the newly created project" fullWidth>
       Reset and copy the password in the [Database Settings](/dashboard/project/_/settings/database). Replace ```[YOUR-PASSWORD]``` in step 2 with the database password.
     </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={5}>
-      <StepHikeCompact.Details title="Restore your Project with the CLI" fullWidth>
-          Replace ```[CONNECTION_STRING]``` with your connection string from the previous steps and run the following command:
+      <StepHikeCompact.Details title="Restore your database backup with psql" fullWidth>
+          Replace ```[CONNECTION_STRING]``` with your connection string. Select the appropriate option and run the command:
 
+        <Tabs
+          scrollable
+          size="large"
+          type="underlined"
+          defaultActiveId="backup-file"
+        >
+          <TabPanel id="backup-file" label="*.backup file">
+          ```bash
+          psql -d [CONNECTION_STRING] -f file/path
+          ```
+          </TabPanel>
+
+          <TabPanel id="sql-file" label="*.sql files">
           ```bash
           psql \
             --single-transaction \
             --variable ON_ERROR_STOP=1 \
             --file roles.sql \
             --file schema.sql \
-            --command 'SET session_replication_role = replica' \
             --file data.sql \
             --dbname [CONNECTION_STRING]
           ```
+          </TabPanel>
+        </Tabs>
       </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
@@ -154,9 +161,7 @@ If you already have the database backup, skip to the Restore project step.
 
 ### Migrate Storage
 
-The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. If you have your storage objects locally (e.g. 90 day paused projects), migrate the storage objects to the new project using this [Google Colab script](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb).
-
-If the old project is still active, use this script to move storage objects from one project to another:
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Migrate storage objects to the new project with the local Supabase Storage Migrator tool.
 
 <Accordion
   type="default"
@@ -168,9 +173,13 @@ If the old project is still active, use this script to move storage objects from
 >
     <div className="border-b mt-3 pb-3">
         <AccordionItem
-        header={<span className="text-foreground">Storage migration script</span>}
+        header={<span className="text-foreground">Alternative Storage migration options</span>}
         id="backup-project"
         >
+        If you have your storage objects locally (e.g. 90 day paused projects), migrate the storage objects to the new project using this [Google Colab script](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb).
+
+        If the old project is still active, use this script to move storage objects from one project to another:
+
         ```js
         // npm install @supabase/supabase-js@1
         const { createClient } = require('@supabase/supabase-js')
@@ -233,7 +242,3 @@ If the old project is still active, use this script to move storage objects from
 
 - If you have created any custom roles with login attribute, you have to manually set their passwords in the new project.
 - If you get this error: **"...received invalid response to GSSAPI negotiation..."**. You are likely using psql and Postgres version 15 or lower. Install the latest version to resolve this issue.
-
-```
-
-```
