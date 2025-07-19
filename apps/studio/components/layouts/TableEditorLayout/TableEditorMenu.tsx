@@ -1,12 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -41,18 +39,16 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { tableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
+import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
-  const { ref, id: _id } = useParams()
-  const router = useRouter()
+  const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isMobile = useBreakpoint()
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -117,12 +113,13 @@ const TableEditorMenu = () => {
     }
   }, [selectedTable?.schema])
 
+  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
-    if (isTableEditorTabsEnabled && ref && entityTypes) {
-      tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
+    if (entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ schemas: [selectedSchema], entities: entityTypes })
     }
-  }, [entityTypes])
+  }, [entityTypes, searchText, selectedSchema, tableEditorTabsCleanUp])
 
   return (
     <>
@@ -183,12 +180,10 @@ const TableEditorMenu = () => {
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
               name="search-tables"
-              aria-labelledby="Search tables"
-              onChange={(e) => {
-                setSearchText(e.target.value)
-              }}
               value={searchText}
               placeholder="Search tables..."
+              aria-labelledby="Search tables"
+              onChange={(e) => setSearchText(e.target.value)}
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}

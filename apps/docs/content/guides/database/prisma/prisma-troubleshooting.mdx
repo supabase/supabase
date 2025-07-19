@@ -56,7 +56,7 @@ Prisma couldn't establish a connection with Postgres or Supavisor before the tim
 ### Solutions: [#solution-cant-reach-database-server-at]
 
 - **Check database health**: Use the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database) to monitor CPU, memory, and I/O usage. If the database is overloaded, consider increasing your [compute size](https://supabase.com/docs/guides/platform/compute-add-ons) or [optimizing your queries](https://supabase.com/docs/guides/database/query-optimization).
-- **Verify connection string**: Double-check the connection string in your Prisma configuration to ensure it matches one in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+- **Verify connection string**: Double-check the connection string in your Prisma configuration to ensure it matches in your [project connect page](https://supabase.com/dashboard/project/_?showConnect=true).
 - **Increase connection timeout**: Try increasing the `connect_timeout` parameter in your Prisma configuration to give it more time to establish a connection.
 
 ```md

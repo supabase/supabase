@@ -23,6 +23,7 @@ import {
 } from 'data/content/content-upsert-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -42,6 +43,7 @@ const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
   const { project } = useProjectContext()
+  const selectedOrg = useSelectedOrganization()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -99,7 +101,7 @@ const Reports = () => {
   function checkEditState() {
     if (config === undefined) return
     /*
-     * Shallow copying the config state variable maintains a mobx reference
+     * Shallow copying the config state variable maintains a reference
      * Instead, we stringify it and parse it again to remove anything
      * that can be mutated at component state level.
      *
@@ -336,7 +338,10 @@ const Reports = () => {
         },
       }
     )
-    sendEvent({ action: 'custom_report_assistant_sql_block_added' })
+    sendEvent({
+      action: 'custom_report_assistant_sql_block_added',
+      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
+    })
   }
 
   useEffect(() => {
@@ -482,7 +487,7 @@ const Reports = () => {
           )}
         </div>
       ) : (
-        <div className="relative mb-16 flex-grow h-64">
+        <div className="relative mb-16 flex-grow">
           {config && startDate && endDate && (
             <GridResize
               startDate={startDate}

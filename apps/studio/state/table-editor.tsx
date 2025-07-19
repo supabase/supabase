@@ -1,7 +1,6 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
 import { proxy, useSnapshot } from 'valtio'
-import { proxySet } from 'valtio/utils'
 
 import type { SupaRow } from 'components/grid/types'
 import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'

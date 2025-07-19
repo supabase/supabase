@@ -2,28 +2,23 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { NavMenu, NavMenuItem } from 'ui'
 import { ScaffoldContainerLegacy, ScaffoldTitle } from '../Scaffold'
 
 function OrganizationSettingsLayout({ children }: PropsWithChildren) {
-  const newLayoutPreview = useNewLayout()
-
   const { slug } = useParams()
-  const currentPath = useCurrentPath()
+  // Get the path without any hash values
+  const fullCurrentPath = useCurrentPath()
+  const [currentPath] = fullCurrentPath.split('#')
 
-  // hide these settings in the new layout
-  // when path equals `/org/${slug}/team`
-  // or `/org/${slug}/integrations`
-  // or `/org/${slug}/usage`
-  // make the function
+  // Hide these settings in the new layout on the following paths
   const isHidden = (path: string) => {
     return (
-      newLayoutPreview &&
-      (path === `/org/${slug}/team` ||
-        path === `/org/${slug}/integrations` ||
-        path === `/org/${slug}/usage`)
+      path === `/org/${slug}/team` ||
+      path === `/org/${slug}/integrations` ||
+      path === `/org/${slug}/usage` ||
+      path === `/org/${slug}/billing`
     )
   }
 
@@ -36,25 +31,9 @@ function OrganizationSettingsLayout({ children }: PropsWithChildren) {
       label: 'General',
       href: `/org/${slug}/general`,
     },
-    !newLayoutPreview && {
-      label: 'Team',
-      href: `/org/${slug}/team`,
-    },
-    !newLayoutPreview && {
-      label: 'Integrations',
-      href: `/org/${slug}/integrations`,
-    },
     {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-    },
-    !newLayoutPreview && {
-      label: 'Usage',
-      href: `/org/${slug}/usage`,
-    },
-    {
-      label: 'Invoices',
-      href: `/org/${slug}/invoices`,
+      label: 'Security',
+      href: `/org/${slug}/security`,
     },
     {
       label: 'OAuth Apps',

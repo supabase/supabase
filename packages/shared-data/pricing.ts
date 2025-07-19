@@ -175,8 +175,8 @@ export const pricing: Pricing = {
         title: 'Branching',
         plans: {
           free: false,
-          pro: '$0.32 per branch, per day',
-          team: '$0.32 per branch, per day',
+          pro: '$0.01344 per branch, per hour',
+          team: '$0.01344 per branch, per hour',
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -591,8 +591,8 @@ export const pricing: Pricing = {
           pro: false,
           team: [
             '$60 per drain per month',
-            'and $0.20 per Million processed',
-            'and $0.09 per GB bandwidth',
+            '+ $0.20 per million events',
+            '+ $0.09 per GB bandwidth',
           ],
           enterprise: 'Custom',
         },
@@ -659,7 +659,7 @@ export const pricing: Pricing = {
         plans: {
           free: 'Owner, Admin, Developer',
           pro: 'Owner, Admin, Developer',
-          team: 'Owner, Admin, Developer, Read-only',
+          team: 'Owner, Admin, Developer, Read-only, Predefined project scoped roles',
           enterprise: 'Custom project scoped roles',
         },
         usage_based: false,

@@ -198,22 +198,6 @@ export interface CronJobHistoryClickedEvent {
 }
 
 /**
- * The FeaturePreviewModal was opened.
- *
- * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
- *
- * @group Events
- * @source studio
- */
-export interface FeaturePreviewsClickedEvent {
-  action: 'feature_previews_clicked'
-  groups: {
-    project: string
-    organization: string
-  }
-}
-
-/**
  * A feature preview was enabled by the user through the FeaturePreviewModal.
  *
  * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
@@ -272,6 +256,10 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
   properties: {
     instanceSize: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -288,6 +276,9 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
    */
   properties: {
     instanceSize: string
+  }
+  groups: {
+    organization: string
   }
 }
 
@@ -602,6 +593,10 @@ export interface AssistantSuggestionRunQueryClickedEvent {
     queryType: string
     category?: string
   }
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -658,6 +653,10 @@ export interface AssistantEditInSqlEditorClickedEvent {
  */
 export interface CustomReportAddSQLBlockClicked {
   action: 'custom_report_add_sql_block_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -667,8 +666,12 @@ export interface CustomReportAddSQLBlockClicked {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAssistantSQLBlockAdded {
+export interface CustomReportAssistantSQLBlockAddedEvent {
   action: 'custom_report_assistant_sql_block_added'
+  groups: {
+    project: string
+    organization: string
+  }
 }
 
 /**
@@ -888,6 +891,23 @@ export interface SeeDocumentationButtonClickedEvent {
  */
 export interface RequestDemoButtonClickedEvent {
   action: 'request_demo_button_clicked'
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, cta banner, product page header.
+     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
+     */
+    buttonLocation: string
+  }
+}
+
+/**
+ * User clicked the "Register" button in the State of Startups 2025 newsletter form.
+ *
+ * @group Events
+ * @source www
+ */
+export interface RegisterStateOfStartups2025NewsletterClicked {
+  action: 'register_for_state_of_startups_newsletter_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, cta banner, product page header.
@@ -1255,6 +1275,40 @@ export interface EdgeFunctionTestSidePanelOpenedEvent {
 }
 
 /**
+ * User submitted a support ticket. Project and organization are optional because the ticket might be about user account issues.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportTicketSubmittedEvent {
+  action: 'support_ticket_submitted'
+  properties: {
+    ticketCategory: string
+  }
+  groups: {
+    project?: string
+    organization?: string
+  }
+}
+
+/**
+ * User clicked the AI Assistant card on top of the support ticket form.
+ * This event is specifically when the user goes back to the AI Assistant in the Studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface AiAssistantInSupportFormClickedEvent {
+  action: 'ai_assistant_in_support_form_clicked'
+  groups: {
+    project?: string
+    organization?: string
+  }
+}
+
+/**
  * User copied the command for a Supabase UI component.
  *
  * @group Events
@@ -1272,6 +1326,44 @@ export interface SupabaseUiCommandCopyButtonClickedEvent {
 }
 
 /**
+ * Triggered when the organization MFA enforcement setting is updated.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/security
+ */
+export interface OrganizationMfaEnforcementUpdated {
+  action: 'organization_mfa_enforcement_updated'
+  properties: {
+    mfaEnforced: boolean
+  }
+  groups: {
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a new foreign data wrapper is created in a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/database/integrations
+ */
+export interface ForeignDataWrapperCreatedEvent {
+  action: 'foreign_data_wrapper_created'
+  properties: {
+    /**
+     * The type of the foreign data wrapper, e.g. postgres_fdw, mysql_fdw, etc.
+     */
+    wrapperType: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1285,7 +1377,6 @@ export type TelemetryEvent =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
-  | FeaturePreviewsClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationSimpleVersionSubmittedEvent
@@ -1322,11 +1413,12 @@ export type TelemetryEvent =
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
   | CustomReportAddSQLBlockClicked
-  | CustomReportAssistantSQLBlockAdded
+  | CustomReportAssistantSQLBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
+  | RegisterStateOfStartups2025NewsletterClicked
   | SignInButtonClickedEvent
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
@@ -1347,3 +1439,7 @@ export type TelemetryEvent =
   | EdgeFunctionTestSendButtonClickedEvent
   | EdgeFunctionTestSidePanelOpenedEvent
   | SupabaseUiCommandCopyButtonClickedEvent
+  | SupportTicketSubmittedEvent
+  | AiAssistantInSupportFormClickedEvent
+  | OrganizationMfaEnforcementUpdated
+  | ForeignDataWrapperCreatedEvent

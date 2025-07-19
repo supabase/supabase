@@ -10,16 +10,17 @@ export type DatabaseExtension = components['schemas']['PostgresExtension']
 
 export type DatabaseExtensionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseExtensions(
   { projectRef, connectionString }: DatabaseExtensionsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
+  let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/extensions', {

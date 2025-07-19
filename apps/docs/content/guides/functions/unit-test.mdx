@@ -7,9 +7,13 @@ subtitle: 'Writing Unit Tests for Edge Functions using Deno Test'
 
 Testing is an essential step in the development process to ensure the correctness and performance of your Edge Functions.
 
+---
+
 ## Testing in Deno
 
 Deno has a built-in test runner that you can use for testing JavaScript or TypeScript code. You can read the [official documentation](https://docs.deno.com/runtime/manual/basics/testing/) for more information and details about the available testing functions.
+
+---
 
 ## Folder structure
 
@@ -28,14 +32,16 @@ We recommend creating your testing in a `supabase/functions/tests` directory, us
     └── config.toml
 ```
 
-## Example script
+---
+
+## Example
 
 The following script is a good example to get started with testing your Edge Functions:
 
 ```typescript function-one-test.ts
 // Import required libraries and modules
 import { assert, assertEquals } from 'jsr:@std/assert@1'
-import { createClient, SupabaseClient } from 'jsr:@supabase/supabase-js@2'
+import { createClient, SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 // Will load the .env file to Deno.env
 import 'jsr:@std/dotenv/load'
@@ -96,20 +102,24 @@ Deno.test('Client Creation Test', testClientCreation)
 Deno.test('Hello-world Function Test', testHelloWorld)
 ```
 
-This test case consists of two parts. The first part tests the client library and verifies that the database can be connected to and returns values from a table (`my_table`). The second part tests the edge function and checks if the received value matches the expected value. Here's a brief overview of the code:
+This test case consists of two parts.
 
-- We import various testing functions from the Deno standard library, including `assert`, `assertExists`, and `assertEquals`.
-- We import the `createClient` and `SupabaseClient` classes from the `@supabase/supabase-js` library to interact with the Supabase client.
-- We define the necessary configuration for the Supabase client, including the Supabase URL, API key, and authentication options.
-- The `testClientCreation` function tests the creation of a Supabase client instance and queries the database for data from a table. It verifies that data is returned from the query.
-- The `testHelloWorld` function tests the "Hello-world" Edge Function by invoking it using the Supabase client's `functions.invoke` method. It checks if the response message matches the expected greeting.
-- We run the tests using the `Deno.test` function, providing a descriptive name for each test case and the corresponding test function.
+1. The first part tests the client library and verifies that the database can be connected to and returns values from a table (`my_table`).
+2. The second part tests the edge function and checks if the received value matches the expected value. Here's a brief overview of the code:
+   - We import various testing functions from the Deno standard library, including `assert`, `assertExists`, and `assertEquals`.
+   - We import the `createClient` and `SupabaseClient` classes from the `@supabase/supabase-js` library to interact with the Supabase client.
+   - We define the necessary configuration for the Supabase client, including the Supabase URL, API key, and authentication options.
+   - The `testClientCreation` function tests the creation of a Supabase client instance and queries the database for data from a table. It verifies that data is returned from the query.
+   - The `testHelloWorld` function tests the "Hello-world" Edge Function by invoking it using the Supabase client's `functions.invoke` method. It checks if the response message matches the expected greeting.
+   - We run the tests using the `Deno.test` function, providing a descriptive name for each test case and the corresponding test function.
 
 <Admonition type="note">
 
 Make sure to replace the placeholders (`supabaseUrl`, `supabaseKey`, `my_table`) with the actual values relevant to your Supabase setup.
 
 </Admonition>
+
+---
 
 ## Running Edge Functions locally
 
@@ -147,6 +157,8 @@ To locally test and debug Edge Functions, you can utilize the Supabase CLI. Let'
    ```bash
    deno test --allow-all supabase/functions/tests/function-one-test.ts
    ```
+
+---
 
 ## Resources
 

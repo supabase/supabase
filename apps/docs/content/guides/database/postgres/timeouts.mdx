@@ -71,7 +71,8 @@ alter role example_role set statement_timeout = '10min'; -- could also use secon
 ```
 
 <Admonition type="tip">
-  If you are changing the timeout for the Supabase Client API calls, you will need to reload PostgREST to reflect the timeout changes by running the following script:
+
+If you are changing the timeout for the Supabase Client API calls, you will need to reload PostgREST to reflect the timeout changes by running the following script:
 
 ```sql
 NOTIFY pgrst, 'reload config';

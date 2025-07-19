@@ -3,7 +3,6 @@ import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } 
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-import { useSnapshot } from 'valtio'
 
 import { IS_PLATFORM } from 'common'
 import {
@@ -11,13 +10,13 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { getTableDefinition } from 'data/database/table-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
@@ -26,11 +25,12 @@ import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { copyToClipboard } from 'lib/helpers'
+import { formatSql } from 'lib/formatSql'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,11 +45,17 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+
 export interface EntityListItemProps {
   id: number | string
   projectRef: string
   isLocked: boolean
   isActive?: boolean
+}
+
+// [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
+function isTableLikeEntityListItem(entity: { type?: string }) {
+  return entity?.type === ENTITY_TYPE.TABLE || entity?.type === ENTITY_TYPE.PARTITIONED_TABLE
 }
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
@@ -63,13 +69,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  // For tabs preview flag logic
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const tabId = createTabId(entity.type, { id: entity.id })
-  const tabStore = getTabsStore(projectRef)
-  const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
+  const tabs = useTabsStateSnapshot()
+  const isPreview = tabs.previewTabId === tabId
 
-  const tabs = useSnapshot(tabStore)
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
@@ -233,7 +236,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       onDoubleClick={(e) => {
         e.preventDefault()
         const tabId = createTabId(entity.type, { id: entity.id })
-        makeTabPermanent(projectRef, tabId)
+        tabs.makeTabPermanent(tabId)
       }}
     >
       <>
@@ -287,6 +290,39 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 <Clipboard size={12} />
                 <span>Copy name</span>
               </DropdownMenuItem>
+
+              {isTableLikeEntityListItem(entity) && (
+                <DropdownMenuItem
+                  key="copy-schema"
+                  className="space-x-2"
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    const toastId = toast.loading('Getting table schema...')
+
+                    const tableDefinition = await getTableDefinition({
+                      id: entity.id,
+                      projectRef: project?.ref,
+                      connectionString: project?.connectionString,
+                    })
+                    if (!tableDefinition) {
+                      return toast.error('Failed to get table schema', { id: toastId })
+                    }
+
+                    try {
+                      const formatted = formatSql(tableDefinition)
+                      await copyToClipboard(formatted)
+                      toast.success('Table schema copied to clipboard', { id: toastId })
+                    } catch (err: any) {
+                      toast.error('Failed to copy schema: ' + (err.message || err), {
+                        id: toastId,
+                      })
+                    }
+                  }}
+                >
+                  <Clipboard size={12} />
+                  <span>Copy table schema</span>
+                </DropdownMenuItem>
+              )}
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>

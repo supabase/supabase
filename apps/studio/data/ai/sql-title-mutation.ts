@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { constructHeaders } from 'data/fetchers'
+import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { ResponseError } from 'types'
 
@@ -12,11 +12,16 @@ export type SqlTitleGenerateResponse = {
 
 export type SqlTitleGenerateVariables = {
   sql: string
+  useBedrockAssistant?: boolean
 }
 
-export async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
+export async function generateSqlTitle({ sql, useBedrockAssistant }: SqlTitleGenerateVariables) {
+  const url = useBedrockAssistant
+    ? `${BASE_PATH}/api/ai/sql/title-v2`
+    : `${BASE_PATH}/api/ai/sql/title`
+
   const headers = await constructHeaders({ 'Content-Type': 'application/json' })
-  const response = await fetch(`${BASE_PATH}/api/ai/sql/title`, {
+  const response = await fetchHandler(url, {
     headers,
     method: 'POST',
     body: JSON.stringify({

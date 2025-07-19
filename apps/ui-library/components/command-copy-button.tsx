@@ -19,10 +19,12 @@ export function CommandCopyButton({ command }: { command: string }) {
 
   const parseCommandForTelemetry = (cmd: string) => {
     // Extract framework from URL (e.g., 'nextjs' from 'password-based-auth-nextjs.json')
-    const frameworkMatch = cmd.match(/\/ui\/r\/.*?-(\w+)\.json/)
+    const frameworkMatch = cmd.match(/ui\/r\/.*?-(nextjs|react|react-router|tanstack)\.json/)
+
+    // if the block doesn't have a framework defined (like infinite query), default to react
     const framework = frameworkMatch
       ? (frameworkMatch[1] as 'nextjs' | 'react-router' | 'tanstack' | 'react')
-      : 'nextjs'
+      : 'react'
 
     // Extract package manager from command prefix (npx, pnpm, yarn, bun)
     const packageManager = cmd.startsWith('npx')
@@ -36,8 +38,8 @@ export function CommandCopyButton({ command }: { command: string }) {
             : ('npm' as const)
 
     // Extract template title from URL (e.g., 'password-based-auth' from 'password-based-auth-nextjs.json')
-    const titleMatch = cmd.match(/\/ui\/r\/(.*?)-\w+\.json/)
-    const title = titleMatch ? titleMatch[1] : ''
+    const titleMatch = cmd.match(/\/ui\/r\/(.*?)\.json/)
+    const title = (titleMatch ? titleMatch[1] : '').replaceAll(`-${framework}`, '')
 
     return {
       framework,

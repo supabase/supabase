@@ -1,17 +1,20 @@
-import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import type { Message as MessageType } from 'ai/react'
+import { DBSchema, IDBPDatabase, openDB } from 'idb'
+import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
-import { debounce } from 'lodash'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 type SuggestionsType = {
   title: string
-  prompts?: string[]
+  prompts?: { label: string; description: string }[]
 }
 
-type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+export type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+
+export type SqlSnippet = string | { label: string; content: string }
 
 type ChatSession = {
   id: string
@@ -24,7 +27,7 @@ type ChatSession = {
 type AiAssistantData = {
   open: boolean
   initialInput: string
-  sqlSnippets?: string[]
+  sqlSnippets?: SqlSnippet[]
   suggestions?: SuggestionsType
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
@@ -285,6 +288,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (chat) {
         chat.messages = []
         chat.updatedAt = new Date()
+        state.suggestions = undefined
         state.sqlSnippets = []
         state.initialInput = ''
       }
@@ -333,7 +337,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
-    setSqlSnippets: (snippets: string[]) => {
+    setSqlSnippets: (snippets: SqlSnippet[]) => {
       state.sqlSnippets = snippets
     },
 
@@ -404,7 +408,7 @@ export type AiAssistantState = AiAssistantData & {
   clearMessages: () => void
   saveMessage: (message: MessageType | MessageType[]) => void
   updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
-  setSqlSnippets: (snippets: string[]) => void
+  setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
   getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
@@ -412,12 +416,8 @@ export type AiAssistantState = AiAssistantData & {
 
 export const AiAssistantStateContext = createContext<AiAssistantState>(createAiAssistantState())
 
-export const AiAssistantStateContextProvider = ({
-  projectRef,
-  children,
-}: PropsWithChildren<{
-  projectRef: string | undefined
-}>) => {
+export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren) => {
+  const project = useSelectedProject()
   // Initialize state. createAiAssistantState now just sets defaults.
   const [state] = useState(() => createAiAssistantState())
 
@@ -426,8 +426,8 @@ export const AiAssistantStateContextProvider = ({
     let isMounted = true
 
     async function loadAndInitializeState() {
-      if (!projectRef || typeof window === 'undefined') {
-        if (projectRef === undefined) {
+      if (!project?.ref || typeof window === 'undefined') {
+        if (project?.ref === undefined) {
           state.resetAiAssistantPanel()
         }
         return // Don't load if no projectRef or not in browser
@@ -436,11 +436,11 @@ export const AiAssistantStateContextProvider = ({
       let loadedState: StoredAiAssistantState | null = null
 
       // 1. Try loading from IndexedDB
-      loadedState = await loadFromIndexedDB(projectRef)
+      loadedState = await loadFromIndexedDB(project?.ref)
 
       // 2. If not in IndexedDB, try migrating from localStorage
       if (!loadedState) {
-        loadedState = await tryMigrateFromLocalStorage(projectRef)
+        loadedState = await tryMigrateFromLocalStorage(project?.ref)
       }
 
       if (!isMounted) return // Component unmounted during async operations
@@ -459,11 +459,11 @@ export const AiAssistantStateContextProvider = ({
     return () => {
       isMounted = false
     }
-  }, [projectRef, state])
+  }, [project?.ref, state])
 
   // Effect to save state to IndexedDB on changes
   useEffect(() => {
-    if (typeof window !== 'undefined' && projectRef) {
+    if (typeof window !== 'undefined' && project?.ref) {
       // Create a debounced version of saveAiState
       const debouncedSaveAiState = debounce(saveAiState, 500)
 
@@ -471,7 +471,7 @@ export const AiAssistantStateContextProvider = ({
         const snap = snapshot(state)
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
-          projectRef: projectRef,
+          projectRef: project?.ref,
           open: snap.open,
           activeChatId: snap.activeChatId,
           chats: snap.chats
@@ -496,7 +496,7 @@ export const AiAssistantStateContextProvider = ({
       }
     }
     return undefined
-  }, [state, projectRef])
+  }, [state, project?.ref])
 
   return (
     <AiAssistantStateContext.Provider value={state}>{children}</AiAssistantStateContext.Provider>

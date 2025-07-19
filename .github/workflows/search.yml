@@ -17,6 +17,10 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}-prod
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -25,12 +29,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      DOCS_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
+      DOCS_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
+      DOCS_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
+      NEXT_PUBLIC_MISC_URL: ${{ secrets.NEXT_PUBLIC_MISC_URL}}
+      NEXT_PUBLIC_MISC_ANON_KEY: ${{ secrets.NEXT_PUBLIC_MISC_ANON_KEY }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
-      SEARCH_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
-      SEARCH_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
-      SEARCH_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Check out repo
@@ -53,10 +59,6 @@ jobs:
 
       - name: Download dependencies
         run: pnpm i
-
-      # Need the miscellaneous use API, which is available publicly (by design) in www
-      - name: Copy environment variables
-        run: cp apps/www/.env.local.example apps/docs/.env
 
       - name: Update embeddings
         working-directory: ./apps/docs

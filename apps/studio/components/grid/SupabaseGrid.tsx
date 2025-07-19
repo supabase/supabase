@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -7,25 +7,21 @@ import { createPortal } from 'react-dom'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useUrlState } from 'hooks/ui/useUrlState'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
-  filtersToUrlParams,
-  formatFilterURLParams,
-  formatSortURLParams,
-  saveTableEditorStateToLocalStorage,
-} from './SupabaseGrid.utils'
+
 import { Shortcuts } from './components/common/Shortcuts'
 import Footer from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
-import { Filter, GridProps } from './types'
-import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
+import { GridProps } from './types'
+
+import { useTableFilter } from './hooks/useTableFilter'
+import { useTableSort } from './hooks/useTableSort'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -40,43 +36,15 @@ export const SupabaseGrid = ({
   const tableId = _id ? Number(_id) : undefined
 
   const { project } = useProjectContext()
+
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
 
-  const { filters: filter, sorts: sort, setParams } = useTableEditorFiltersSort()
-
-  const sorts = formatSortURLParams(snap.table.name, sort as string[] | undefined)
-  const filters = formatFilterURLParams(filter as string[])
-
-  const onApplyFilters = useCallback(
-    (appliedFilters: Filter[]) => {
-      snap.setEnforceExactCount(false)
-      // Reset page to 1 when filters change
-      snap.setPage(1)
-
-      const filters = filtersToUrlParams(appliedFilters)
-
-      setParams((prevParams) => {
-        return {
-          ...prevParams,
-          filter: filters,
-        }
-      })
-
-      if (project?.ref) {
-        saveTableEditorStateToLocalStorage({
-          projectRef: project.ref,
-          tableName: snap.table.name,
-          schema: snap.table.schema,
-          filters: filters,
-        })
-      }
-    },
-    [project?.ref, snap.table.name, snap.table.schema]
-  )
+  const { filters, onApplyFilters } = useTableFilter()
+  const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
@@ -94,15 +62,13 @@ export const SupabaseGrid = ({
     {
       keepPreviousData: true,
       retryDelay: (retryAttempt, error: any) => {
-        if (error && error.message?.includes('does not exist')) {
-          setParams((prevParams) => {
-            return {
-              ...prevParams,
-              ...{ sort: undefined },
-            }
-          })
-        }
-        if (retryAttempt > 3) {
+        const doesNotExistError = error && error.message?.includes('does not exist')
+        const tooManyRequestsError = error.message?.includes('Too Many Requests')
+        const vaultError = error.message?.includes('query vault failed')
+
+        if (doesNotExistError) onApplySorts([])
+
+        if (retryAttempt > 3 || doesNotExistError || tooManyRequestsError || vaultError) {
           return Infinity
         }
         return 5000
@@ -119,7 +85,7 @@ export const SupabaseGrid = ({
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header sorts={sorts} filters={filters} customHeader={customHeader} />
+        <Header customHeader={customHeader} />
 
         {children || (
           <>

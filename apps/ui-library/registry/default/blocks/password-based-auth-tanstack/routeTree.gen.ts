@@ -1,5 +1,3 @@
-// SUPABASE NOTE: THIS FILE WAS ADDED TO SATISFY TANSTACK BUILD CONFIGURATION. IT IS NOT INCLUDED IN THE BLOCK.
-
 /* eslint-disable */
 
 // @ts-nocheck
@@ -14,7 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as ProtectedImport } from './routes/_protected'
-import { Route as ProtectedInfoImport } from './routes/_protected/info'
+import { Route as ProtectedProtectedImport } from './routes/_protected/protected'
 import { Route as AuthConfirmImport } from './routes/auth/confirm'
 import { Route as AuthErrorImport } from './routes/auth/error'
 import { Route as ForgotPasswordImport } from './routes/forgot-password'
@@ -79,9 +77,9 @@ const AuthConfirmRoute = AuthConfirmImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProtectedInfoRoute = ProtectedInfoImport.update({
-  id: '/info',
-  path: '/info',
+const ProtectedProtectedRoute = ProtectedProtectedImport.update({
+  id: '/protected',
+  path: '/protected',
   getParentRoute: () => ProtectedRoute,
 } as any)
 
@@ -138,11 +136,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UpdatePasswordImport
       parentRoute: typeof rootRoute
     }
-    '/_protected/info': {
-      id: '/_protected/info'
-      path: '/info'
-      fullPath: '/info'
-      preLoaderRoute: typeof ProtectedInfoImport
+    '/_protected/protected': {
+      id: '/_protected/protected'
+      path: '/protected'
+      fullPath: '/protected'
+      preLoaderRoute: typeof ProtectedProtectedImport
       parentRoute: typeof ProtectedImport
     }
     '/auth/confirm': {
@@ -165,11 +163,11 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface ProtectedRouteChildren {
-  ProtectedInfoRoute: typeof ProtectedInfoRoute
+  ProtectedProtectedRoute: typeof ProtectedProtectedRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
-  ProtectedInfoRoute: ProtectedInfoRoute,
+  ProtectedProtectedRoute: ProtectedProtectedRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(ProtectedRouteChildren)
@@ -182,7 +180,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/sign-up-success': typeof SignUpSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
-  '/info': typeof ProtectedInfoRoute
+  '/protected': typeof ProtectedProtectedRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
 }
@@ -195,7 +193,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/sign-up-success': typeof SignUpSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
-  '/info': typeof ProtectedInfoRoute
+  '/protected': typeof ProtectedProtectedRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
 }
@@ -209,7 +207,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/sign-up-success': typeof SignUpSuccessRoute
   '/update-password': typeof UpdatePasswordRoute
-  '/_protected/info': typeof ProtectedInfoRoute
+  '/_protected/protected': typeof ProtectedProtectedRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/auth/error': typeof AuthErrorRoute
 }
@@ -224,7 +222,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/sign-up-success'
     | '/update-password'
-    | '/info'
+    | '/protected'
     | '/auth/confirm'
     | '/auth/error'
   fileRoutesByTo: FileRoutesByTo
@@ -236,7 +234,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/sign-up-success'
     | '/update-password'
-    | '/info'
+    | '/protected'
     | '/auth/confirm'
     | '/auth/error'
   id:
@@ -248,7 +246,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/sign-up-success'
     | '/update-password'
-    | '/_protected/info'
+    | '/_protected/protected'
     | '/auth/confirm'
     | '/auth/error'
   fileRoutesById: FileRoutesById
@@ -305,7 +303,7 @@ export const routeTree = rootRoute
     "/_protected": {
       "filePath": "_protected.tsx",
       "children": [
-        "/_protected/info"
+        "/_protected/protected"
       ]
     },
     "/forgot-password": {
@@ -323,8 +321,8 @@ export const routeTree = rootRoute
     "/update-password": {
       "filePath": "update-password.tsx"
     },
-    "/_protected/info": {
-      "filePath": "_protected/info.tsx",
+    "/_protected/protected": {
+      "filePath": "_protected/protected.tsx",
       "parent": "/_protected"
     },
     "/auth/confirm": {

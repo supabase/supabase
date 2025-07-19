@@ -7,13 +7,15 @@ import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationCustomerProfileUpdateVariables = {
-  slug: string
+  slug?: string
   address?: components['schemas']['CustomerResponse']['address']
+  billing_name: string
 }
 
 export async function updateOrganizationCustomerProfile({
   slug,
   address,
+  billing_name,
 }: OrganizationCustomerProfileUpdateVariables) {
   if (!slug) return console.error('Slug is required')
 
@@ -26,7 +28,7 @@ export async function updateOrganizationCustomerProfile({
         slug,
       },
     },
-    body: { address },
+    body: { address: address != null ? address : undefined, billing_name },
   })
   if (error) throw handleError(error)
   return data
@@ -56,13 +58,14 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
     OrganizationCustomerProfileUpdateVariables
   >((vars) => updateOrganizationCustomerProfile(vars), {
     async onSuccess(data, variables, context) {
-      const { address, slug } = variables
+      const { address, slug, billing_name } = variables
 
       // We do not invalidate here as GET endpoint data is stale for 1-2 seconds, so we handle state manually
       queryClient.setQueriesData(organizationKeys.customerProfile(slug), (prev: any) => {
         if (!prev) return prev
         return {
           ...prev,
+          billing_name,
           address,
         }
       })

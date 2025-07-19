@@ -5,12 +5,11 @@ import { ParsedUrlQuery } from 'querystring'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Organization } from 'types'
 import {
@@ -28,6 +27,7 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
+import { useBranchesQuery } from 'data/branches/branches-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -88,13 +88,7 @@ const ProjectLink = ({
   )
 }
 
-interface ProjectDropdownProps {
-  isNewNav?: boolean
-}
-
-const ProjectDropdown = ({ isNewNav = true }: ProjectDropdownProps) => {
-  const newLayoutPreview = useNewLayout()
-
+export const ProjectDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
@@ -121,31 +115,23 @@ const ProjectDropdown = ({ isNewNav = true }: ProjectDropdownProps) => {
 
   return IS_PLATFORM ? (
     <>
-      {newLayoutPreview && (
-        <Link
-          href={`/project/${project?.ref}`}
-          className="flex items-center gap-2 flex-shrink-0 text-sm"
-        >
-          <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-          <span className="text-foreground max-w-32 lg:max-w-none truncate">{project?.name}</span>
-        </Link>
-      )}
+      <Link
+        href={`/project/${project?.ref}`}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
+        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <span className="text-foreground max-w-32 lg:max-w-none truncate">
+          {selectedProject?.name}
+        </span>
+      </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          {newLayoutPreview ? (
-            <Button
-              type="text"
-              size="tiny"
-              className={cn('px-0.25 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
-              iconRight={<ChevronsUpDown strokeWidth={1.5} />}
-            />
-          ) : (
-            <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-              <div className="flex items-center space-x-2">
-                <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
-              </div>
-            </Button>
-          )}
+          <Button
+            type="text"
+            size="tiny"
+            className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+          />
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
@@ -192,9 +178,7 @@ const ProjectDropdown = ({ isNewNav = true }: ProjectDropdownProps) => {
     </>
   ) : (
     <Button type="text">
-      <span className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</span>
+      <span className="text-sm">{selectedProject?.name}</span>
     </Button>
   )
 }
-
-export default ProjectDropdown

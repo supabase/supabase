@@ -21,7 +21,7 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <AuthLayout>
       <PageLayout
-        title="Sign In / Up"
+        title="Sign In / Providers"
         subtitle="Configure authentication providers and login methods for your users"
         navigationItems={navItems}
       >

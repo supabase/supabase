@@ -6,9 +6,9 @@ import { useProfile } from 'lib/profile'
 import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
-function castOrganizationResponseToOrganization(
-  org: components['schemas']['OrganizationResponse']
-): Organization {
+export type OrganizationBase = components['schemas']['OrganizationResponse']
+
+export function castOrganizationResponseToOrganization(org: OrganizationBase): Organization {
   return {
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
@@ -17,8 +17,14 @@ function castOrganizationResponseToOrganization(
   }
 }
 
-export async function getOrganizations(signal?: AbortSignal): Promise<Organization[]> {
-  const { data, error } = await get('/platform/organizations', { signal })
+export async function getOrganizations({
+  signal,
+  headers,
+}: {
+  signal?: AbortSignal
+  headers?: Record<string, string>
+}): Promise<Organization[]> {
+  const { data, error } = await get('/platform/organizations', { signal, headers })
 
   if (error) handleError(error)
   if (!Array.isArray(data)) return []
@@ -38,7 +44,7 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   const { profile } = useProfile()
   return useQuery<OrganizationsData, OrganizationsError, TData>(
     organizationKeys.list(),
-    ({ signal }) => getOrganizations(signal),
+    ({ signal }) => getOrganizations({ signal }),
     { enabled: enabled && profile !== undefined, ...options, staleTime: 30 * 60 * 1000 }
   )
 }

@@ -1,4 +1,7 @@
-import { MousePointerClick, X, Clipboard, Check } from 'lucide-react'
+import { Check, Clipboard, MousePointerClick, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
   CodeBlock,
@@ -9,11 +12,10 @@ import {
   cn,
   copyToClipboard,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 import type { LogData, QueryType } from './Logs.types'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useEffect, useState } from 'react'
+import { jwtAPIKey, apiKey, role as extractRole } from './Logs.utils'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -45,8 +47,12 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
         const status = log?.metadata?.[0]?.response?.[0]?.status_code
         const method = log?.metadata?.[0]?.request?.[0]?.method
         const path = log?.metadata?.[0]?.request?.[0]?.path
+        const search = log?.metadata?.[0]?.request?.[0]?.search
         const user_agent = log?.metadata?.[0]?.request?.[0]?.headers[0].user_agent
         const error_code = log?.metadata?.[0]?.response?.[0]?.headers?.[0]?.x_sb_error_code
+        const apikey = jwtAPIKey(log?.metadata) ?? apiKey(log?.metadata)
+        const role = extractRole(log?.metadata)
+
         const { id, metadata, timestamp, event_message, ...rest } = log
 
         const apiLog = {
@@ -54,15 +60,30 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
           status,
           method,
           path,
+          search,
           user_agent,
           timestamp,
           event_message,
           metadata,
+          ...(apikey ? { apikey } : null),
           ...(error_code ? { error_code } : null),
+          ...(role ? { role } : null),
           ...rest,
         }
 
         return <DefaultPreviewSelectionRenderer log={apiLog} />
+
+      case 'database':
+        const hint = log?.metadata?.[0]?.parsed?.[0]?.hint
+        const detail = log?.metadata?.[0]?.parsed?.[0]?.detail
+        const query = log?.metadata?.[0]?.parsed?.[0]?.query
+        const postgresLog = {
+          ...(hint && { hint }),
+          ...(detail && { detail }),
+          ...(query && { query }),
+          ...log,
+        }
+        return <DefaultPreviewSelectionRenderer log={postgresLog} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }

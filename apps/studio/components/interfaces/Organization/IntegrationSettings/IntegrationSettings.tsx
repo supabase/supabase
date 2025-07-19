@@ -2,7 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
@@ -29,8 +28,8 @@ import {
 } from 'lib/github'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
-import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { useRouter } from 'next/router'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -43,9 +42,8 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const newLayoutPreview = useNewLayout()
-
   const org = useSelectedOrganization()
+  const router = useRouter()
 
   const canReadGithubConnection = useCheckPermissions(
     PermissionAction.READ,
@@ -72,7 +70,7 @@ const IntegrationSettings = () => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const onAddGitHubConnection = useCallback(() => {
-    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+    router.push('/project/_/settings/integrations')
   }, [sidePanelsStateSnapshot])
 
   const onDeleteGitHubConnection = useCallback(
@@ -177,16 +175,13 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
   return (
     <>
-      {newLayoutPreview && (
-        <ScaffoldContainerLegacy>
-          <ScaffoldTitle>Integrations</ScaffoldTitle>
-        </ScaffoldContainerLegacy>
-      )}
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Integrations</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />
       <SidePanelVercelProjectLinker />
-      <SidePanelGitHubRepoLinker />
     </>
   )
 }

@@ -61,18 +61,10 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           )}
         </div>
         <div className="flex items-center space-x-2 group">
-          <Key
-            size={14}
-            strokeWidth={2}
-            className="text-foreground-light transition group-hover:text-brand"
-          />
-          <Link
-            href={`/project/${ref}/integrations/vault/keys?search=${secret.key_id}`}
-            className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
-            title={secret.key_id}
-          >
-            {secret.key_id}
-          </Link>
+          <Key size={14} strokeWidth={2} className="text-foreground-light transition" />
+          <p className="text-foreground-light font-mono text-xs transition" title={secret.id}>
+            {secret.id}
+          </p>
         </div>
       </div>
       <div className="flex items-center space-x-2 w-[40%]">

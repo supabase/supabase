@@ -1,21 +1,49 @@
-import { PropsWithChildren, createContext, useCallback, useContext, useEffect } from 'react'
+import { createContext, PropsWithChildren, useCallback, useContext, useEffect } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
+import { executeSql } from 'data/sql/execute-sql-query'
 import useLatest from 'hooks/misc/useLatest'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'
+import { CustomAccessTokenHookDetails } from '../hooks/misc/useCustomAccessTokenHookDetails'
 
-export function createRoleImpersonationState(projectRef: string) {
+export function createRoleImpersonationState(
+  projectRef: string,
+  customizeAccessTokenRef: {
+    current: (args: {
+      schema: string
+      functionName: string
+      claims: ReturnType<typeof getPostgrestClaims>
+    }) => Promise<any>
+  }
+) {
   const roleImpersonationState = proxy({
     projectRef,
     role: undefined as ImpersonationRole | undefined,
     claims: undefined as ReturnType<typeof getPostgrestClaims> | undefined,
 
-    setRole: (role: ImpersonationRole | undefined) => {
-      roleImpersonationState.role = role
+    setRole: async (
+      role: ImpersonationRole | undefined,
+      customAccessTokenHookDetails?: CustomAccessTokenHookDetails
+    ) => {
+      let claims = role?.type === 'postgrest' ? getPostgrestClaims(projectRef, role) : undefined
 
-      if (role?.type === 'postgrest') {
-        roleImpersonationState.claims = getPostgrestClaims(projectRef, role)
+      if (customAccessTokenHookDetails?.type === 'postgres' && claims !== undefined) {
+        const { schema, functionName } = customAccessTokenHookDetails
+        const updatedClaims = await customizeAccessTokenRef.current({
+          schema,
+          functionName,
+          claims,
+        })
+        if (updatedClaims) {
+          claims = updatedClaims
+        }
+      }
+
+      roleImpersonationState.role = role
+      if (claims) {
+        roleImpersonationState.claims = claims
       }
     },
   })
@@ -26,14 +54,37 @@ export function createRoleImpersonationState(projectRef: string) {
 export type RoleImpersonationState = ReturnType<typeof createRoleImpersonationState>
 
 export const RoleImpersonationStateContext = createContext<RoleImpersonationState>(
-  createRoleImpersonationState('')
+  createRoleImpersonationState('', { current: async () => {} })
 )
 
-export const RoleImpersonationStateContextProvider = ({
-  projectRef,
-  children,
-}: PropsWithChildren<{ projectRef?: string }>) => {
-  const state = useConstant(() => createRoleImpersonationState(projectRef ?? ''))
+export const RoleImpersonationStateContextProvider = ({ children }: PropsWithChildren) => {
+  const project = useSelectedProject()
+  async function customizeAccessToken({
+    schema,
+    functionName,
+    claims,
+  }: {
+    schema: string
+    functionName: string
+    claims: ReturnType<typeof getPostgrestClaims>
+  }) {
+    const event = { user_id: claims.sub, claims, authentication_method: 'password' }
+
+    const result = await executeSql({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      sql: `select ${schema}.${functionName}('${JSON.stringify(event)}'::jsonb) as event;`,
+      queryKey: ['customize-access-token', project?.ref],
+    })
+
+    return result?.result?.[0]?.event?.claims
+  }
+
+  const customizeAccessTokenRef = useLatest(customizeAccessToken)
+
+  const state = useConstant(() =>
+    createRoleImpersonationState(project?.ref ?? '', customizeAccessTokenRef)
+  )
 
   return (
     <RoleImpersonationStateContext.Provider value={state}>
@@ -73,8 +124,4 @@ export function useSubscribeToImpersonatedRole(
 
 export function isRoleImpersonationEnabled(impersonationRole?: ImpersonationRole) {
   return impersonationRole?.type === 'postgrest'
-}
-
-export function useIsRoleImpersonationEnabled() {
-  return isRoleImpersonationEnabled(useRoleImpersonationStateSnapshot().role)
 }

@@ -1,20 +1,14 @@
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
 import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
+import { AccountConnections } from 'components/interfaces/Account/Preferences/AccountConnections'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AccountSettingsLayout from 'components/layouts/AccountLayout/AccountSettingsLayout'
+import { AccountSettingsLayout } from 'components/layouts/AccountLayout/AccountSettingsLayout'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -23,23 +17,7 @@ import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
-  const newLayoutPreview = useNewLayout()
-
-  if (newLayoutPreview) {
-    return <ProfileCard />
-  }
-
-  return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>User Preferences</ScaffoldTitle>
-        <ScaffoldDescription>
-          Manage your profile, account settings, and preferences for your Supabase experience
-        </ScaffoldDescription>
-      </ScaffoldHeader>
-      <ProfileCard />
-    </ScaffoldContainer>
-  )
+  return <ProfileCard />
 }
 
 User.getLayout = (page) => (
@@ -82,6 +60,10 @@ const ProfileCard = () => {
           <AccountIdentities />
         </>
       )}
+
+      <section>
+        <AccountConnections />
+      </section>
 
       <section>
         <ThemeSettings />

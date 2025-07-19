@@ -1,5 +1,5 @@
 interface ResourceWarningMessage {
-  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
   restrictToRoutes?: string[]
 
   bannerContent: {

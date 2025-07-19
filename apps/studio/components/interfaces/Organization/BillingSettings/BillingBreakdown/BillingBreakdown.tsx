@@ -11,19 +11,17 @@ import {
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import SparkBar from 'components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import UpcomingInvoice from './UpcomingInvoice'
-import SparkBar from 'components/ui/SparkBar'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
 
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
+    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const {
     data: subscription,
@@ -43,7 +41,7 @@ const BillingBreakdown = () => {
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail>
-        <div className="sticky space-y-2 top-12 pr-3">
+        <div className="sticky space-y-2 top-12 pr-6">
           <p className="text-foreground text-base m-0">Upcoming Invoice</p>
           <div className="py-2">
             <SparkBar
@@ -74,7 +72,7 @@ const BillingBreakdown = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {!canReadSubscriptions ? (
+        {isPermissionsLoaded && !canReadSubscriptions ? (
           <NoPermission resourceText="view this organization's upcoming invoice" />
         ) : (
           <>

@@ -12,7 +12,7 @@ tags:
   - realtime
 date: '2025-04-02T00:00:01'
 toc_depth: 3
-launchweek: 14
+launchweek: '14'
 ---
 
 Now you can use Realtime Broadcast to scale database changes sent to clients with [Broadcast from Database](/docs/guides/realtime/broadcast#broadcast-from-the-database).
@@ -83,6 +83,8 @@ Then, set up the function that will be called whenever a Database change is dete
 ```sql
 create or replace function public.your_table_changes()
 returns trigger
+security definer
+language plpgsql
 as $$
 begin
     perform realtime.broadcast_changes(
@@ -96,7 +98,7 @@ begin
 		);
     return null;
 end;
-$$ language plpgsql;
+$$;
 ```
 
 Then, set up the trigger conditions under which you will execute the function:

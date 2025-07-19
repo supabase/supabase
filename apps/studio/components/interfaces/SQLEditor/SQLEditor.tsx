@@ -8,23 +8,23 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from 'components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { constructHeaders } from 'data/fetchers'
+import { constructHeaders, isValidConnString } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
+import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
 import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -36,6 +36,7 @@ import {
   useGetImpersonatedRoleState,
 } from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   DropdownMenu,
@@ -51,7 +52,6 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -81,25 +81,26 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
-  const org = useSelectedOrganization()
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
+
   const { profile } = useProfile()
-  const queryClient = useQueryClient()
   const project = useSelectedProject()
-  const organization = useSelectedOrganization()
+  const org = useSelectedOrganization()
+
+  const queryClient = useQueryClient()
+  const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const isOptedInToAI = useOrgOptedIntoAi()
+  const { includeSchemaMetadata, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const {
     sourceSqlDiff,
     setSourceSqlDiff,
     selectedDiffType,
     setSelectedDiffType,
-    pendingTitle,
     setIsAcceptDiffLoading,
     isDiffOpen,
     defaultSqlDiff,
@@ -111,6 +112,8 @@ export const SQLEditor = () => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const scrollTopRef = useRef<number>(0)
+
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
@@ -135,13 +138,12 @@ export const SQLEditor = () => {
 
   useAddDefinitions(id, monacoRef.current)
 
-  /** React query data fetching  */
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
-    projectRef: ref,
-  })
+  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
+    {
+      projectRef: ref,
+    },
+    { enabled: isValidConnString(project?.connectionString) }
+  )
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
@@ -149,7 +151,7 @@ export const SQLEditor = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: includeSchemaMetadata }
+    { enabled: isValidConnString(project?.connectionString) && includeSchemaMetadata }
   )
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
@@ -207,13 +209,15 @@ export const SQLEditor = () => {
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
-        const { title: name } = await generateSqlTitle({ sql })
+        const { title: name } = await generateSqlTitle({ sql, useBedrockAssistant })
         snapV2.renameSnippet({ id, name })
+        const tabId = createTabId('sql', { id })
+        tabs.updateTab(tabId, { label: name })
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
     },
-    [generateSqlTitle, snapV2]
+    [generateSqlTitle, useBedrockAssistant, snapV2]
   )
 
   const prettifyQuery = useCallback(async () => {
@@ -282,7 +286,7 @@ export const SQLEditor = () => {
           return
         }
 
-        if (!hasHipaaAddon && snippet?.snippet.name === untitledSnippetTitle) {
+        if (!isHipaaProjectDisallowed && snippet?.snippet.name === untitledSnippetTitle) {
           // Intentionally don't await title gen (lazy)
           setAiTitle(id, sql)
         }
@@ -296,7 +300,7 @@ export const SQLEditor = () => {
         const connectionString = databases?.find(
           (db) => db.identifier === databaseSelectorState.selectedDatabaseId
         )?.connectionString
-        if (IS_PLATFORM && !connectionString) {
+        if (!isValidConnString(connectionString)) {
           return toast.error('Unable to run query: Connection string is missing')
         }
 
@@ -309,6 +313,7 @@ export const SQLEditor = () => {
           sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
           autoLimit: appendAutoLimit ? limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+          isStatementTimeoutDisabled: true,
           contextualInvalidation: true,
           handleError: (error) => {
             throw error
@@ -327,7 +332,7 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
-      hasHipaaAddon,
+      isHipaaProjectDisallowed,
       execute,
       getImpersonatedRoleState,
       setAiTitle,
@@ -361,6 +366,19 @@ export const SQLEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [profile?.id, project?.id, ref, router, snapV2]
   )
+
+  const onMount = (editor: IStandaloneCodeEditor) => {
+    const tabId = createTabId('sql', { id })
+    const tabData = tabs.tabsMap[tabId]
+
+    // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
+    setTimeout(() => {
+      if (tabData?.metadata?.scrollTop) {
+        editor.setScrollTop(tabData.metadata.scrollTop)
+      }
+    }, 20)
+    editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
+  }
 
   const onDebug = useCallback(async () => {
     try {
@@ -411,10 +429,6 @@ export const SQLEditor = () => {
             range: editorModel.getFullModelRange(),
           },
         ])
-
-        if (pendingTitle) {
-          snapV2.renameSnippet({ id, name: pendingTitle })
-        }
       }
 
       sendEvent({
@@ -430,16 +444,7 @@ export const SQLEditor = () => {
       setIsAcceptDiffLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    sourceSqlDiff,
-    selectedDiffType,
-    handleNewQuery,
-    generateSqlTitle,
-    router,
-    id,
-    pendingTitle,
-    snapV2,
-  ])
+  }, [sourceSqlDiff, selectedDiffType, handleNewQuery, generateSqlTitle, router, id, snapV2])
 
   const discardAiHandler = useCallback(() => {
     sendEvent({
@@ -456,7 +461,9 @@ export const SQLEditor = () => {
     completion,
     isLoading: isCompletionLoading,
   } = useCompletion({
-    api: `${BASE_PATH}/api/ai/sql/complete`,
+    api: useBedrockAssistant
+      ? `${BASE_PATH}/api/ai/sql/complete-v2`
+      : `${BASE_PATH}/api/ai/sql/complete`,
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -487,8 +494,10 @@ export const SQLEditor = () => {
       }))
       const headerData = await constructHeaders()
 
+      const authorizationHeader = headerData.get('Authorization')
+
       await complete(prompt, {
-        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           completionMetadata: {
             textBeforeCursor: context.beforeSelection,
@@ -510,6 +519,12 @@ export const SQLEditor = () => {
     if (id) {
       closeDiff()
       setPromptState((prev) => ({ ...prev, isOpen: false }))
+    }
+    return () => {
+      if (ref) {
+        const tabId = createTabId('sql', { id })
+        tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeDiff, id])
@@ -644,216 +659,208 @@ export const SQLEditor = () => {
         }}
       />
 
-      <ResizablePanelGroup
-        className="flex h-full"
-        direction="horizontal"
-        autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_PANEL_SPLIT_SIZE}
-      >
-        <ResizablePanel minSize={30}>
-          <ResizablePanelGroup
-            className="relative"
-            direction="vertical"
-            autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
-          >
-            <ResizablePanel maxSize={70}>
-              <div className="flex-grow overflow-y-auto border-b h-full">
-                {isLoading ? (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Loader2 className="animate-spin text-brand" />
-                  </div>
-                ) : (
-                  <>
-                    {isDiffOpen && (
-                      <div className="w-full h-full">
-                        <DiffEditor
-                          theme="supabase"
-                          language="pgsql"
-                          original={defaultSqlDiff.original}
-                          modified={defaultSqlDiff.modified}
-                          onMount={(editor) => {
-                            diffEditorRef.current = editor
-                            setIsDiffEditorMounted(true)
-                          }}
-                          options={{
-                            fontSize: 13,
-                            renderSideBySide: false,
-                            minimap: { enabled: false },
-                            wordWrap: 'on',
-                            lineNumbers: 'on',
-                            folding: false,
-                            padding: { top: 4 },
-                            lineNumbersMinChars: 3,
-                          }}
-                        />
-                        {showWidget && (
-                          <ResizableAIWidget
-                            editor={diffEditorRef.current!}
-                            id="ask-ai-diff"
-                            value={promptInput}
-                            onChange={setPromptInput}
-                            onSubmit={(prompt: string) => {
-                              handlePrompt(prompt, {
-                                beforeSelection: promptState.beforeSelection,
-                                selection: promptState.selection || defaultSqlDiff.modified,
-                                afterSelection: promptState.afterSelection,
-                              })
-                            }}
-                            onAccept={acceptAiHandler}
-                            onReject={discardAiHandler}
-                            onCancel={resetPrompt}
-                            isDiffVisible={true}
-                            isLoading={isCompletionLoading}
-                            startLineNumber={Math.max(0, promptState.startLineNumber)}
-                            endLineNumber={promptState.endLineNumber}
-                          />
-                        )}
-                      </div>
-                    )}
-                    <div key={id} className="w-full h-full relative">
-                      <MonacoEditor
-                        autoFocus
-                        id={id}
-                        className={cn(isDiffOpen && 'hidden')}
-                        editorRef={editorRef}
-                        monacoRef={monacoRef}
-                        executeQuery={executeQuery}
-                        onHasSelection={setHasSelection}
-                        onPrompt={({
-                          selection,
-                          beforeSelection,
-                          afterSelection,
-                          startLineNumber,
-                          endLineNumber,
-                        }) => {
-                          setPromptState((prev) => ({
-                            ...prev,
-                            isOpen: true,
-                            selection,
-                            beforeSelection,
-                            afterSelection,
-                            startLineNumber,
-                            endLineNumber,
-                          }))
-                        }}
-                      />
-                      {editorRef.current && promptState.isOpen && !isDiffOpen && (
-                        <ResizableAIWidget
-                          editor={editorRef.current}
-                          id="ask-ai"
-                          value={promptInput}
-                          onChange={setPromptInput}
-                          onSubmit={(prompt: string) => {
-                            handlePrompt(prompt, {
-                              beforeSelection: promptState.beforeSelection,
-                              selection: promptState.selection,
-                              afterSelection: promptState.afterSelection,
-                            })
-                          }}
-                          onCancel={resetPrompt}
-                          isDiffVisible={false}
-                          isLoading={isCompletionLoading}
-                          startLineNumber={Math.max(0, promptState.startLineNumber)}
-                          endLineNumber={promptState.endLineNumber}
-                        />
-                      )}
-                      <AnimatePresence>
-                        {!promptState.isOpen && !editorRef.current?.getValue() && (
-                          <motion.p
-                            initial={{ y: 5, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: 5, opacity: 0 }}
-                            className="text-foreground-lighter absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
-                          >
-                            Hit {os === 'macos' ? <Command size={12} /> : `CTRL+`}K to edit with the
-                            Assistant
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </>
-                )}
-              </div>
-            </ResizablePanel>
-
-            <ResizableHandle withHandle />
-
-            <ResizablePanel maxSize={70}>
+      <div className="flex h-full">
+        <ResizablePanelGroup
+          className="relative"
+          direction="vertical"
+          autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
+        >
+          <ResizablePanel maxSize={70}>
+            <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
                   <Loader2 className="animate-spin text-brand" />
                 </div>
               ) : (
-                <UtilityPanel
-                  id={id}
-                  isExecuting={isExecuting}
-                  isDisabled={isDiffOpen}
-                  hasSelection={hasSelection}
-                  prettifyQuery={prettifyQuery}
-                  executeQuery={executeQuery}
-                  onDebug={onDebug}
-                />
-              )}
-            </ResizablePanel>
-
-            <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
-              {results?.rows !== undefined && !isExecuting && (
-                <GridFooter className="flex items-center justify-between gap-2">
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <p className="text-xs">
-                        <span className="text-foreground">
-                          {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
-                        </span>
-                        <span className="text-foreground-lighter ml-1">
-                          {results.autoLimit !== undefined &&
-                            ` (Limited to only ${results.autoLimit} rows)`}
-                        </span>
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <p className="flex flex-col gap-y-1">
-                        <span>
-                          Results are automatically limited to preserve browser performance, in
-                          particular if your query returns an exceptionally large number of rows.
-                        </span>
-
-                        <span className="text-foreground-light">
-                          You may change or remove this limit from the dropdown on the right
-                        </span>
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                  {results.autoLimit !== undefined && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button type="default" iconRight={<ChevronUp size={14} />}>
-                          Limit results to:{' '}
-                          {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40" align="end">
-                        <DropdownMenuRadioGroup
-                          value={snapV2.limit.toString()}
-                          onValueChange={(val) => snapV2.setLimit(Number(val))}
-                        >
-                          {ROWS_PER_PAGE_OPTIONS.map((option) => (
-                            <DropdownMenuRadioItem
-                              key={option.label}
-                              value={option.value.toString()}
-                            >
-                              {option.label}
-                            </DropdownMenuRadioItem>
-                          ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                <>
+                  {isDiffOpen && (
+                    <div className="w-full h-full">
+                      <DiffEditor
+                        theme="supabase"
+                        language="pgsql"
+                        original={defaultSqlDiff.original}
+                        modified={defaultSqlDiff.modified}
+                        onMount={(editor) => {
+                          diffEditorRef.current = editor
+                          setIsDiffEditorMounted(true)
+                        }}
+                        options={{
+                          fontSize: 13,
+                          renderSideBySide: false,
+                          minimap: { enabled: false },
+                          wordWrap: 'on',
+                          lineNumbers: 'on',
+                          folding: false,
+                          padding: { top: 4 },
+                          lineNumbersMinChars: 3,
+                        }}
+                      />
+                      {showWidget && (
+                        <ResizableAIWidget
+                          editor={diffEditorRef.current!}
+                          id="ask-ai-diff"
+                          value={promptInput}
+                          onChange={setPromptInput}
+                          onSubmit={(prompt: string) => {
+                            handlePrompt(prompt, {
+                              beforeSelection: promptState.beforeSelection,
+                              selection: promptState.selection || defaultSqlDiff.modified,
+                              afterSelection: promptState.afterSelection,
+                            })
+                          }}
+                          onAccept={acceptAiHandler}
+                          onReject={discardAiHandler}
+                          onCancel={resetPrompt}
+                          isDiffVisible={true}
+                          isLoading={isCompletionLoading}
+                          startLineNumber={Math.max(0, promptState.startLineNumber)}
+                          endLineNumber={promptState.endLineNumber}
+                        />
+                      )}
+                    </div>
                   )}
-                </GridFooter>
+                  <div key={id} className="w-full h-full relative">
+                    <MonacoEditor
+                      autoFocus
+                      id={id}
+                      className={cn(isDiffOpen && 'hidden')}
+                      editorRef={editorRef}
+                      monacoRef={monacoRef}
+                      executeQuery={executeQuery}
+                      onHasSelection={setHasSelection}
+                      onMount={onMount}
+                      onPrompt={({
+                        selection,
+                        beforeSelection,
+                        afterSelection,
+                        startLineNumber,
+                        endLineNumber,
+                      }) => {
+                        setPromptState((prev) => ({
+                          ...prev,
+                          isOpen: true,
+                          selection,
+                          beforeSelection,
+                          afterSelection,
+                          startLineNumber,
+                          endLineNumber,
+                        }))
+                      }}
+                    />
+                    {editorRef.current && promptState.isOpen && !isDiffOpen && (
+                      <ResizableAIWidget
+                        editor={editorRef.current}
+                        id="ask-ai"
+                        value={promptInput}
+                        onChange={setPromptInput}
+                        onSubmit={(prompt: string) => {
+                          handlePrompt(prompt, {
+                            beforeSelection: promptState.beforeSelection,
+                            selection: promptState.selection,
+                            afterSelection: promptState.afterSelection,
+                          })
+                        }}
+                        onCancel={resetPrompt}
+                        isDiffVisible={false}
+                        isLoading={isCompletionLoading}
+                        startLineNumber={Math.max(0, promptState.startLineNumber)}
+                        endLineNumber={promptState.endLineNumber}
+                      />
+                    )}
+                    <AnimatePresence>
+                      {!promptState.isOpen && !editorRef.current?.getValue() && (
+                        <motion.p
+                          initial={{ y: 5, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: 5, opacity: 0 }}
+                          className="text-foreground-lighter absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
+                        >
+                          Hit {os === 'macos' ? <Command size={12} /> : `CTRL+`}K to edit with the
+                          Assistant
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </>
               )}
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
+
+          <ResizablePanel maxSize={70}>
+            {isLoading ? (
+              <div className="flex h-full w-full items-center justify-center">
+                <Loader2 className="animate-spin text-brand" />
+              </div>
+            ) : (
+              <UtilityPanel
+                id={id}
+                isExecuting={isExecuting}
+                isDisabled={isDiffOpen}
+                hasSelection={hasSelection}
+                prettifyQuery={prettifyQuery}
+                executeQuery={executeQuery}
+                onDebug={onDebug}
+              />
+            )}
+          </ResizablePanel>
+
+          <div className="max-h-9">
+            {results?.rows !== undefined && !isExecuting && (
+              <GridFooter className="flex items-center justify-between gap-2">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <p className="text-xs">
+                      <span className="text-foreground">
+                        {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
+                      </span>
+                      <span className="text-foreground-lighter ml-1">
+                        {results.autoLimit !== undefined &&
+                          ` (Limited to only ${results.autoLimit} rows)`}
+                      </span>
+                    </p>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="flex flex-col gap-y-1">
+                      <span>
+                        Results are automatically limited to preserve browser performance, in
+                        particular if your query returns an exceptionally large number of rows.
+                      </span>
+
+                      <span className="text-foreground-light">
+                        You may change or remove this limit from the dropdown on the right
+                      </span>
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                {results.autoLimit !== undefined && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" iconRight={<ChevronUp size={14} />}>
+                        Limit results to:{' '}
+                        {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-40" align="end">
+                      <DropdownMenuRadioGroup
+                        value={snapV2.limit.toString()}
+                        onValueChange={(val) => snapV2.setLimit(Number(val))}
+                      >
+                        {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                          <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
+                            {option.label}
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </GridFooter>
+            )}
+          </div>
+        </ResizablePanelGroup>
+      </div>
     </>
   )
 }

@@ -25,7 +25,7 @@ import {
 } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
@@ -85,6 +85,7 @@ const DeployNewReplicaPanel = ({
     (x) => x.organization_id === project?.organization_id
   )
   const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
@@ -182,6 +183,7 @@ const DeployNewReplicaPanel = ({
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
+    !isAwsK8s &&
     !isProWithSpendCapEnabled
 
   const computeAddons =
@@ -191,7 +193,9 @@ const DeployNewReplicaPanel = ({
 
   const availableRegions =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? AVAILABLE_REPLICA_REGIONS.filter((x) => x.key === 'SOUTHEAST_ASIA')
+      ? AVAILABLE_REPLICA_REGIONS.filter((x) =>
+          ['SOUTHEAST_ASIA', 'CENTRAL_EU', 'EAST_US'].includes(x.key)
+        )
       : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {
@@ -236,7 +240,7 @@ const DeployNewReplicaPanel = ({
               </span>
               <div className="mt-3">
                 <Button asChild type="default">
-                  <Link href={`/org/${org?.slug}/invoices`}>View invoices</Link>
+                  <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
                 </Button>
               </div>
             </AlertDescription_Shadcn_>
@@ -257,6 +261,19 @@ const DeployNewReplicaPanel = ({
                 className="mt-3"
                 href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
               />
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        ) : isAwsK8s ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Read replicas are not supported for AWS (Revamped) projects
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                Projects provisioned by other cloud providers currently will not be able to use read
+                replicas
+              </span>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : currentPgVersion < 15 ? (
@@ -442,13 +459,15 @@ const DeployNewReplicaPanel = ({
                   <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
                     <p className="text-sm text-left">
                       New replica will cost an additional{' '}
-                      {formatCurrency(
-                        estComputeMonthlyCost +
-                          additionalCostDiskSize +
-                          Number(additionalCostIOPS) +
-                          Number(additionalCostThroughput)
-                      )}
-                      /month
+                      <span translate="no">
+                        {formatCurrency(
+                          estComputeMonthlyCost +
+                            additionalCostDiskSize +
+                            Number(additionalCostIOPS) +
+                            Number(additionalCostThroughput)
+                        )}
+                        /month
+                      </span>
                     </p>
                     <ChevronDown size={14} className="transition" />
                   </CollapsibleTrigger_Shadcn_>
@@ -472,7 +491,7 @@ const DeployNewReplicaPanel = ({
                         <TableRow>
                           <TableCell className="pl-0">Compute size</TableCell>
                           <TableCell>{selectedComputeMeta?.name}</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(estComputeMonthlyCost)}
                           </TableCell>
                         </TableRow>
@@ -481,14 +500,14 @@ const DeployNewReplicaPanel = ({
                           <TableCell>
                             {((size_gb ?? 0) * 1.25).toLocaleString()} GB ({type})
                           </TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(additionalCostDiskSize)}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-0">IOPS</TableCell>
                           <TableCell>{iops?.toLocaleString()} IOPS</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(+additionalCostIOPS)}
                           </TableCell>
                         </TableRow>
@@ -512,7 +531,10 @@ const DeployNewReplicaPanel = ({
                 read replica on the{' '}
                 <span className="text-foreground">{selectedComputeMeta?.name}</span> size incurs
                 additional{' '}
-                <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
+                <span className="text-foreground" translate="no">
+                  {selectedComputeMeta?.price_description}
+                </span>
+                .
               </p>
             )}
 
