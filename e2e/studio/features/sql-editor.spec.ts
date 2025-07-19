@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test'
-import { isLocal } from '../utils/is-local'
+import { isCLI } from '../utils/is-cli'
 import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
 
@@ -39,7 +39,7 @@ test.describe('SQL Editor', () => {
     }
 
     //  since in local, we don't have access to the supabase platform, reloading would reload all the sql snippets.
-    if (isLocal()) {
+    if (isCLI()) {
       await page.reload()
     }
 
@@ -218,7 +218,7 @@ test.describe('SQL Editor', () => {
     await expect(sharedSnippet).not.toBeVisible()
 
     // delete snippet (for non-local environment)
-    if (!isLocal()) {
+    if (!isCLI()) {
       deleteQuery(page, pwTestQueryName)
 
       await expect(
