@@ -11,7 +11,10 @@ import {
   RadioGroupCardItem,
   Skeleton,
 } from 'ui'
-import { useOrganizationsQuery } from '../data/organizations/organizations-query'
+import {
+  useCloudMarketplaceEligibilityQuery,
+  useOrganizationsQuery,
+} from '../data/organizations/organizations-query'
 import { NextPageWithLayout, Organization } from '../types'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useForm } from 'react-hook-form'
@@ -48,17 +51,21 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
   } = router
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+  const { data: validatedOrgs } = useCloudMarketplaceEligibilityQuery({
+    slugs: organizations?.map((org) => org.slug) || [],
+  })
 
   const sortedOrganizations = useMemo(() => {
     return organizations?.slice().sort((a, b) => a.name.localeCompare(b.name))
   }, [organizations])
 
-  const orgQualifiesForLinking = (org: Organization) => {
-    //TODO(thomas): allow for admin as well?
-    return org.managed_by === 'supabase' && org.is_owner
-  }
-
   const { orgsLinkable, orgsNotLinkable } = useMemo(() => {
+    const orgQualifiesForLinking = (org: Organization) => {
+      const validationResult = validatedOrgs?.find((result) => result.slug === org.slug)
+
+      return validationResult?.is_eligible ?? false
+    }
+
     const linkable: Organization[] = []
     const notLinkable: Organization[] = []
     sortedOrganizations?.forEach((org) => {
@@ -69,7 +76,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
       }
     })
     return { orgsLinkable: linkable, orgsNotLinkable: notLinkable }
-  }, [sortedOrganizations])
+  }, [sortedOrganizations, validatedOrgs])
 
   const { data: projects = [] } = useProjectsQuery()
 
