@@ -1,105 +1,188 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { type SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { toast } from 'sonner'
-
+import { Eye, EyeOff } from 'lucide-react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import InformationBox from 'components/ui/InformationBox'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
-import { Eye, EyeOff, HelpCircle } from 'lucide-react'
-import { Button, Form, Input, Modal } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AddNewSecretModalProps {
-  visible: boolean
-  onClose: () => void
+  canManageSecrets: boolean
 }
 
-const AddNewSecretModal = ({ visible, onClose }: AddNewSecretModalProps) => {
+const SecretSchema = z.object({
+  name: z.string().min(1, 'Please provide a name for your secret'),
+  description: z.string().optional(),
+  secret: z.string().min(1, 'Please enter your secret value'),
+})
+
+const AddNewSecretModal = ({ canManageSecrets }: AddNewSecretModalProps) => {
+  const [visible, setVisible] = useState(false)
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
+  const formId = 'add-vault-secret-form'
+  const form = useForm<z.infer<typeof SecretSchema>>({
+    resolver: zodResolver(SecretSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      secret: '',
+    },
+  })
 
-  const { mutateAsync: addSecret } = useVaultSecretCreateMutation()
+  const { mutate: addSecret, isLoading } = useVaultSecretCreateMutation()
 
-  useEffect(() => {
-    if (visible) {
-      setShowSecretValue(false)
-    }
-  }, [visible])
-
-  const validate = (values: any) => {
-    const errors: any = {}
-    if (values.name.length === 0) errors.name = 'Please provide a name for your secret'
-    if (values.secret.length === 0) errors.secret = 'Please enter your secret value'
-    return errors
-  }
-
-  const onAddNewSecret = async (values: any, { setSubmitting }: any) => {
+  const onSubmit: SubmitHandler<z.infer<typeof SecretSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
 
-    setSubmitting(true)
-
-    try {
-      setSubmitting(true)
-
-      await addSecret({
+    addSecret(
+      {
         projectRef: project.ref,
         connectionString: project?.connectionString,
         name: values.name,
         description: values.description,
         secret: values.secret,
-      })
-      toast.success(`Successfully added new secret ${values.name}`)
-      onClose()
-    } catch (error: any) {
-      // [Joshen] No error handler required as they are all handled within the mutations already
-    } finally {
-      setSubmitting(false)
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Successfully added new secret ${values.name}`)
+          setVisible(false)
+        },
+      }
+    )
   }
 
   return (
-    <Modal hideFooter size="medium" visible={visible} onCancel={onClose} header="Add new secret">
-      <Form
-        id="add-new-secret-form"
-        initialValues={{ name: '', description: '', secret: '' }}
-        validate={validate}
-        validateOnBlur={false}
-        onSubmit={onAddNewSecret}
-      >
-        {({ isSubmitting }: any) => {
-          return (
-            <>
-              <Modal.Content className="space-y-4">
-                <Input id="name" label="Name" />
-                <Input id="description" label="Description" labelOptional="Optional" />
-                <Input
-                  id="secret"
-                  type={showSecretValue ? 'text' : 'password'}
-                  label="Secret value"
-                  actions={
-                    <div className="mr-1">
-                      <Button
-                        type="default"
-                        icon={showSecretValue ? <EyeOff /> : <Eye />}
-                        onClick={() => setShowSecretValue(!showSecretValue)}
-                      />
-                    </div>
-                  }
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="flex items-center justify-end space-x-2">
-                <Button type="default" disabled={isSubmitting} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" disabled={isSubmitting} loading={isSubmitting}>
-                  Add secret
-                </Button>
-              </Modal.Content>
-            </>
-          )
-        }}
-      </Form>
-    </Modal>
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        if (!open) {
+          form.reset()
+        }
+        setVisible(open)
+      }}
+    >
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          type="primary"
+          disabled={!canManageSecrets}
+          onClick={() => {
+            setVisible(true)
+          }}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canManageSecrets
+                ? 'You need additional permissions to add secrets'
+                : undefined,
+            },
+          }}
+        >
+          Add new secret
+        </ButtonTooltip>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add secret</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              className="flex flex-col gap-4"
+              autoComplete="off"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField_Shadcn_
+                key="name"
+                name="name"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout name="name" label="Name">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ id="name" {...field} />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField_Shadcn_
+                key="description"
+                name="description"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout name="description" label="Description" labelOptional="Optional">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ id="description" {...field} data-lpignore="true" />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+              <FormField_Shadcn_
+                key="secret"
+                name="secret"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout name="secret" label="Secret value">
+                    <FormControl_Shadcn_>
+                      <div className="relative">
+                        <Input_Shadcn_
+                          id="secret"
+                          type={showSecretValue ? 'text' : 'password'}
+                          {...field}
+                          data-lpignore="true"
+                        />
+                        <Button
+                          type="default"
+                          title={showSecretValue ? `Hide value` : `Show value`}
+                          aria-label={showSecretValue ? `Hide value` : `Show value`}
+                          className="absolute right-2 top-1 px-3 py-2"
+                          icon={showSecretValue ? <EyeOff /> : <Eye />}
+                          onClick={() => setShowSecretValue(!showSecretValue)}
+                        />
+                      </div>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </form>
+          </Form_Shadcn_>
+        </DialogSection>
+        <DialogFooter>
+          <Button
+            type="default"
+            disabled={isLoading}
+            onClick={() => {
+              form.reset()
+              setVisible(false)
+            }}
+          >
+            Cancel
+          </Button>
+          <Button form={formId} htmlType="submit" loading={isLoading}>
+            Add secret
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
