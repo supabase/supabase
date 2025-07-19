@@ -1,8 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { fetchPost } from 'data/fetchers'
-import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
 
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
@@ -22,19 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
-  const headers = constructHeaders({
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-  })
-  const url = `${process.env.SUPABASE_URL}/auth/v1/invite`
-  const payload = { email: req.body.email }
+  const { data, error } = await supabase.auth.admin.createUser(req.body)
 
-  const response = await fetchPost(url, payload, { headers })
-  if (response.error) {
-    const { code, message } = response.error
-    return res.status(code).json({ message })
-  } else {
-    return res.status(200).json(response)
-  }
+  if (error) return res.status(400).json({ error: { message: error.message } })
+  return res.status(200).json(data.user)
 }
