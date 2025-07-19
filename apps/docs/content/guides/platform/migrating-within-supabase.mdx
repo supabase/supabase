@@ -12,7 +12,7 @@ to another project feature](/docs/guides/platform/clone-project).
 
 - **Project migration only migrates the Postgres database** and anything else will need to be re-configured.
 
-### Pre-Migration Checklist
+### Pre-Migration checklist
 
     <Accordion
 
@@ -154,7 +154,7 @@ If you already have the database backup, skip to the Restore project step.
 
 ### Migrate Storage
 
-The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. If you have your storage objects locally (eg 90 day paused projects), migrate the storage objects to the new project using this [google colab script](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb).
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. If you have your storage objects locally (e.g. 90 day paused projects), migrate the storage objects to the new project using this [Google Colab script](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb).
 
 If the old project is still active, use this script to move storage objects from one project to another:
 
