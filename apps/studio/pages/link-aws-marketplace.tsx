@@ -51,9 +51,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
   } = router
 
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
-  const { data: validatedOrgs } = useCloudMarketplaceEligibilityQuery({
-    slugs: organizations?.map((org) => org.slug) || [],
-  })
+  const { data: eligibilityCheckResult } = useCloudMarketplaceEligibilityQuery()
 
   const sortedOrganizations = useMemo(() => {
     return organizations?.slice().sort((a, b) => a.name.localeCompare(b.name))
@@ -61,7 +59,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
 
   const { orgsLinkable, orgsNotLinkable } = useMemo(() => {
     const orgQualifiesForLinking = (org: Organization) => {
-      const validationResult = validatedOrgs?.find((result) => result.slug === org.slug)
+      const validationResult = eligibilityCheckResult?.find((result) => result.slug === org.slug)
 
       return validationResult?.is_eligible ?? false
     }
@@ -76,7 +74,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
       }
     })
     return { orgsLinkable: linkable, orgsNotLinkable: notLinkable }
-  }, [sortedOrganizations, validatedOrgs])
+  }, [sortedOrganizations, eligibilityCheckResult])
 
   const { data: projects = [] } = useProjectsQuery()
 
