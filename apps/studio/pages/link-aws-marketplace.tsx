@@ -41,6 +41,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import NewOrgAwsMarketplaceForm, {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
 } from '../components/interfaces/Organization/CloudMarketplace/NewOrgAwsMarketplaceForm'
+import Link from 'next/link'
 
 const LinkAwsMarketplace: NextPageWithLayout = () => {
   const orgsExisting = true
@@ -53,6 +54,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
   const { data: eligibilityCheckResult } = useCloudMarketplaceEligibilityQuery()
 
+  // Sort organizations by name ascending
   const sortedOrganizations = useMemo(() => {
     return organizations?.slice().sort((a, b) => a.name.localeCompare(b.name))
   }, [organizations])
@@ -119,31 +121,38 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
     <>
       <ScaffoldContainer>
         <ScaffoldHeader>
-          <ScaffoldTitle>AWS Marketplace Onboarding</ScaffoldTitle>
+          <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
         </ScaffoldHeader>
         <ScaffoldDivider />
         <ScaffoldSection>
           <ScaffoldSectionDetail>
             {orgsExisting ? (
               <>
-                <h1 className="text-xl mb-0">Link your Supabase organization</h1>
-                <p className="mb-5 text-foreground">
-                  Choose an organization on the right and link it to the AWS Marketplace contract
-                  you just accepted so we can route billing through AWS.
+                <p className="mb-6 text-base">
+                  Select an organization and link it to the AWS Marketplace contract you just
+                  accepted. This organization will be managed and billed through AWS Marketplace.
                 </p>
-                <p>
-                  <span className="font-bold">Billing through AWS</span>
-                  <br /> That means that Supabase no longer invoices you directly. Instead, AWS
-                  issues a monthly bill for your Supabase subscription and charges the payment
-                  method you’ve saved in your AWS account. Any plan upgrades or downgrades are
-                  managed through the AWS Marketplace.
+                <p className="text-xs">
+                  <span className="font-bold">Managed and billed through AWS Marketplace</span>
+                  <br />
+                  This means any subscription plan changes are managed through AWS Marketplace, not
+                  the Supabase Dashboard. Supabase will no longer invoice you directly. Instead, AWS
+                  will issue invoices for your Supabase subscription and charge the payment method
+                  saved in your AWS account.{' '}
+                  <Link
+                    href="https://supabase.com/docs/guides/platform"
+                    target="_blank"
+                    className="underline"
+                  >
+                    Read more in our docs.
+                  </Link>
                 </p>
-                <p className="mt-14">
+                <p className="mt-14 text-base">
                   <span className="font-bold">Want to start fresh?</span> Create a new organization
                   and it will be linked automatically.
                 </p>
                 <Button
-                  size="medium"
+                  size="tiny"
                   htmlType="submit"
                   type="primary"
                   onClick={async (e) => {
@@ -250,7 +259,7 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
                     onOpenChange={() => setIsNotLinkableOrgListOpen((prev) => !prev)}
                   >
                     <CollapsibleTrigger_Shadcn_ className="py-2 w-full flex items-center group justify-between">
-                      <p className="text-sm font-bold text-foreground-lighter">
+                      <p className="text-xs font-bold text-foreground-light">
                         Organizations that can't be linked
                       </p>
                       <ChevronRight
@@ -265,12 +274,12 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
                         'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
                       )}
                     >
-                      <p className="text-foreground-light text-sm">
-                        The following organizations are currently unavailable for linking to AWS
-                        Marketplace. This may be due to missing permissions, outstanding invoices or
-                        an existing link to a marketplace. If you'd like to link one of these
-                        organizations, please review the organization settings or contact an
-                        administrator.
+                      <p className="text-foreground-light text-xs">
+                        The following organizations can’t be linked to AWS Marketplace at the
+                        moment. This may be due to missing permissions, outstanding invoices, or an
+                        existing marketplace link. If you'd like to link one of these organizations,
+                        please review the organization settings. You need to be Owner or
+                        Administrator of the organization to link it.
                       </p>
                       <div className="text-sm text-left flex flex-col gap-4 p-0 [&_label]:w-full group] w-full opacity-60">
                         {orgsNotLinkable.map((org) => {
