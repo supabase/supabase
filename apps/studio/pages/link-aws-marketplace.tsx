@@ -42,9 +42,10 @@ import NewOrgAwsMarketplaceForm, {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
 } from '../components/interfaces/Organization/CloudMarketplace/NewOrgAwsMarketplaceForm'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 const LinkAwsMarketplace: NextPageWithLayout = () => {
-  const orgsExisting = true
+  const orgsExisting = false
 
   const router = useRouter()
   const {
@@ -92,9 +93,12 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
     onSuccess: (res) => {
       //TODO(thomas): send tracking event
       setOrgLinkedSuccessfully(true)
+      setTimeout(() => form.reset(), 0)
     },
     onError: (res) => {
-      //TODO(thomas): handle error
+      toast.error(`Failed to link your organization. ${res.message}`, {
+        duration: 5_000,
+      })
     },
   })
 
@@ -159,7 +163,6 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
                     e.preventDefault()
                     setShowOrgCreationDialog(true)
                   }}
-                  disabled={false} //TODO(thomas): add check for permissions
                 >
                   Create organization
                 </Button>

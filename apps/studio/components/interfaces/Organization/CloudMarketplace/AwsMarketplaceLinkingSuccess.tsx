@@ -48,10 +48,10 @@ const AwsMarketplaceLinkingSuccess = ({ visible, onClose }: Props) => {
       >
         <DialogSection>
           <div className="p-4 flex flex-col">
-            <h1 className="text-xl mb-4">AWS Marketplace setup successfully completed</h1>
+            <h1 className="text-xl mb-4">AWS Marketplace Setup completed</h1>
             <p className="text-foreground-light text-sm">
-              The organization is now being managed through AWS Marketplace. Billing for this
-              organization will appear on your AWS invoice.
+              The organization is now being managed and billed through AWS Marketplace. Billing for
+              this organization will appear on your AWS invoice.
             </p>
           </div>
         </DialogSection>
