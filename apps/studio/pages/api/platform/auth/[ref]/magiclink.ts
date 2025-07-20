@@ -26,8 +26,14 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
     Accept: 'application/json',
     Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
   })
-  const url = `${process.env.SUPABASE_URL}/auth/v1/magiclink`
-  const payload = { email: req.body.email }
+  const url = `${process.env.SUPABASE_URL}/auth/v1/otp`
+  const payload = { 
+    email: req.body.email,
+    type: 'magiclink',
+    options: {
+      data: { type: 'magiclink' }
+    }
+  }
   const response = await post(url, payload, { headers })
   return res.status(200).json(response)
 }
