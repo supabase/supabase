@@ -204,7 +204,14 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
       ? parseInt(response.headers.get('Retry-After')!)
       : undefined
 
-  return new ResponseError(message, status, undefined, retryAfter)
+  let error = new ResponseError(message, status, undefined, retryAfter)
+
+  // @ts-expect-error - [Alaister] many of our local api routes check `if (response.error)`.
+  // This is a fix to keep those checks working without breaking changes.
+  // In future we should check for `if (response instanceof ResponseError)` instead.
+  error.error = error
+
+  return error
 }
 
 /**
