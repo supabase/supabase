@@ -11,6 +11,7 @@ import {
 } from 'react'
 
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { EMPTY_OBJ } from 'lib/void'
 import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
@@ -90,6 +91,18 @@ export const useIsInlineEditorEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
 }
 
+export const useUnifiedLogsPreview = () => {
+  const organization = useSelectedOrganization()
+  const { flags, onUpdateFlag } = useFeaturePreviewContext()
+
+  const isTeamsOrEnterprise = ['team', 'enterprise'].includes(organization?.plan.id ?? '')
+  const isEnabled = isTeamsOrEnterprise && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+
+  const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
+  const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
+  return { isEnabled, enable, disable }
+}
+
 export const useIsRealtimeSettingsEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]
@@ -111,6 +124,7 @@ export const useFeaturePreviewModal = () => {
   const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
   const gitlessBranchingEnabled = useFlag('gitlessBranching')
   const advisorRulesEnabled = useFlag('advisorRules')
+  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
 
   const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
   const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
@@ -125,19 +139,28 @@ export const useFeaturePreviewModal = () => {
           return gitlessBranchingEnabled
         case 'supabase-ui-advisor-rules':
           return advisorRulesEnabled
+        case 'supabase-ui-preview-unified-logs':
+          return isUnifiedLogsPreviewAvailable
         default:
           return true
       }
     },
-    [isRealtimeSettingsEnabled, gitlessBranchingEnabled, advisorRulesEnabled]
+    [
+      isRealtimeSettingsEnabled,
+      gitlessBranchingEnabled,
+      advisorRulesEnabled,
+      isUnifiedLogsPreviewAvailable,
+    ]
   )
 
-  const selectedFeatureKey = !selectedFeatureKeyFromQuery
-    ? FEATURE_PREVIEWS.filter((feature) => isFeaturePreviewReleasedToPublic(feature))[0].key
-    : selectedFeatureKeyFromQuery
+  const selectedFeatureKey = (
+    !selectedFeatureKeyFromQuery
+      ? FEATURE_PREVIEWS.filter((feature) => isFeaturePreviewReleasedToPublic(feature))[0].key
+      : selectedFeatureKeyFromQuery
+  ) as (typeof FEATURE_PREVIEWS)[number]['key']
 
   const selectFeaturePreview = useCallback(
-    (featureKey: string) => {
+    (featureKey: (typeof FEATURE_PREVIEWS)[number]['key']) => {
       setFeaturePreviewModal(featureKey)
     },
     [setFeaturePreviewModal]
