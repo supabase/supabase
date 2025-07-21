@@ -39,7 +39,7 @@ describe(`AddNewSecretModal`, () => {
   it(`creates a new secret`, async () => {
     render(
       <ProjectContextProvider projectRef="default">
-        <AddNewSecretModal canManageSecrets />
+        <AddNewSecretModal disabled />
       </ProjectContextProvider>
     )
 
@@ -74,7 +74,7 @@ describe(`AddNewSecretModal`, () => {
   it(`resets the form on cancel`, async () => {
     render(
       <ProjectContextProvider projectRef="default">
-        <AddNewSecretModal canManageSecrets />
+        <AddNewSecretModal disabled />
       </ProjectContextProvider>
     )
 
@@ -119,7 +119,7 @@ describe(`AddNewSecretModal`, () => {
   it(`resets the form on close`, async () => {
     render(
       <ProjectContextProvider projectRef="default">
-        <AddNewSecretModal canManageSecrets />
+        <AddNewSecretModal disabled />
       </ProjectContextProvider>
     )
 
@@ -164,7 +164,7 @@ describe(`AddNewSecretModal`, () => {
   it(`cannot be opened without permission`, async () => {
     render(
       <ProjectContextProvider projectRef="default">
-        <AddNewSecretModal canManageSecrets={false} />
+        <AddNewSecretModal disabled={false} />
       </ProjectContextProvider>
     )
 
