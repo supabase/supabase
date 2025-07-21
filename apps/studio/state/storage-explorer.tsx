@@ -1753,10 +1753,17 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   useEffect(() => {
     const snap = snapshot(stateRef.current)
     const hasDataReady = !!project?.ref
-    const isDifferentProject = snap.projectRef !== project?.ref
-
     const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
-    if (!isPaused && hasDataReady && isDifferentProject && serviceKey) {
+
+    const isDifferentProject = snap.projectRef !== project?.ref
+    const isDifferentResumableUploadUrl = snap.resumableUploadUrl !== resumableUploadUrl
+
+    if (
+      !isPaused &&
+      hasDataReady &&
+      (isDifferentProject || isDifferentResumableUploadUrl) &&
+      serviceKey
+    ) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
       const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
         auth: {
