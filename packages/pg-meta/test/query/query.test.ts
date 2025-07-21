@@ -515,9 +515,7 @@ describe('End-to-end query chaining', () => {
       .filter('name', '~~', '%John%')
       .toSql()
 
-    expect(sql).toBe(
-      "select id, name, email from public.users where id > 10 and name::text ~~ '%John%';"
-    )
+    expect(sql).toBe("select id, name, email from public.users where id > 10 and name ~~ '%John%';")
   })
 
   test('should correctly build a select query with match criteria', () => {
