@@ -25,7 +25,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface AddNewSecretModalProps {
-  canManageSecrets: boolean
+  disabled: boolean
 }
 
 const SecretSchema = z.object({
@@ -34,7 +34,7 @@ const SecretSchema = z.object({
   secret: z.string().min(1, 'Please enter your secret value'),
 })
 
-const AddNewSecretModal = ({ canManageSecrets }: AddNewSecretModalProps) => {
+const AddNewSecretModal = ({ disabled }: AddNewSecretModalProps) => {
   const [visible, setVisible] = useState(false)
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
@@ -83,16 +83,14 @@ const AddNewSecretModal = ({ canManageSecrets }: AddNewSecretModalProps) => {
       <DialogTrigger asChild>
         <ButtonTooltip
           type="primary"
-          disabled={!canManageSecrets}
+          disabled={disabled}
           onClick={() => {
             setVisible(true)
           }}
           tooltip={{
             content: {
               side: 'bottom',
-              text: !canManageSecrets
-                ? 'You need additional permissions to add secrets'
-                : undefined,
+              text: disabled ? 'You need additional permissions to add secrets' : undefined,
             },
           }}
         >

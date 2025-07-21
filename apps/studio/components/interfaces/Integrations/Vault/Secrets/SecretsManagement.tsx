@@ -102,7 +102,7 @@ export const SecretsManagement = () => {
           </div>
           <div className="flex items-center gap-x-2">
             <DocsButton href="https://supabase.com/docs/guides/database/vault" />
-            <AddNewSecretModal canManageSecrets={canManageSecrets} />
+            <AddNewSecretModal disabled={!canManageSecrets} />
           </div>
         </div>
 
