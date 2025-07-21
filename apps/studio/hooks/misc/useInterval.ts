@@ -20,6 +20,4 @@ export function useInterval(callback: () => void, delay: number | false) {
       clearInterval(id)
     }
   }, [delay])
-
-  return {}
 }
