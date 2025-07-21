@@ -83,6 +83,16 @@ const GroupsTelemetry = ({ hasAcceptedConsent }: { hasAcceptedConsent: boolean }
           reset_organization: isLeavingOrgRoute || isLeavingProjectRoute,
           reset_project: isLeavingProjectRoute,
         })
+      } else if (
+        !router.pathname.includes('[ref]') &&
+        !router.pathname.includes('[slug]') &&
+        ((previousPathname ?? '').includes('[ref]') || (previousPathname ?? '').includes('[slug]'))
+      ) {
+        // Reset organization when navigating to a page with no org or project context
+        sendGroupsReset({
+          reset_organization: true,
+          reset_project: true,
+        })
       }
     }
 
