@@ -27,7 +27,24 @@ const secret = {
 }
 
 const Page = ({ onClose }: { onClose: () => void }) => {
+  const [modal, setModal] = useState<string | null>(null)
   const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<VaultSecret>()
+  const renderModal = () => {
+    switch (modal) {
+      case `edit`:
+        return (
+          <EditSecretModal
+            secret={secret}
+            onClose={() => {
+              setModal(null)
+              onClose()
+            }}
+          />
+        )
+      default:
+        return null
+    }
+  }
   return (
     <ProjectContextProvider projectRef="default">
       <DropdownMenu>
@@ -35,24 +52,14 @@ const Page = ({ onClose }: { onClose: () => void }) => {
           <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-32">
-          <DropdownMenuItem
-            className="space-x-2"
-            disabled={false}
-            onClick={() => setSelectedSecretToEdit(secret)}
-          >
+          <DropdownMenuItem className="space-x-2" onClick={() => setModal(`edit`)}>
             <Edit3 size="14" />
             <p>Edit</p>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <EditSecretModal
-        secret={selectedSecretToEdit}
-        onClose={() => {
-          setSelectedSecretToEdit(undefined)
-          onClose()
-        }}
-      />
+      {renderModal()}
     </ProjectContextProvider>
   )
 }

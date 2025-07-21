@@ -122,7 +122,6 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Edit3 size="14" />
                   <p>Edit</p>
                 </DropdownMenuItem>
-              </TooltipTrigger>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}

@@ -99,11 +99,6 @@ export const SecretsManagement = () => {
                   Updated at
                 </SelectItem_Shadcn_>
                 <SelectItem_Shadcn_ value="name" className="text-xs">
-                  id="name"
-                  className="max-w-[180px]"
-                  value="name"
-                  label="Sort by name"
-                >
                   Name
                 </SelectItem_Shadcn_>
               </SelectContent_Shadcn_>
@@ -141,10 +136,7 @@ export const SecretsManagement = () => {
               {secrets.map((secret, idx) => {
                 return (
                   <Fragment key={`secret-${idx}`}>
-                    <SecretRow
-                      secret={secret}
-                      onSelectRemove={setSelectedSecretToRemove}
-                    />
+                    <SecretRow secret={secret} onSelectRemove={setSelectedSecretToRemove} />
                     {idx !== secrets.length - 1 && <Separator />}
                   </Fragment>
                 )
