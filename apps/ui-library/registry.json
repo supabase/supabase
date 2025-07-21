@@ -1138,7 +1138,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
@@ -1162,7 +1162,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/react/lib/supabase/client.ts",
@@ -1178,7 +1178,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/react-router/lib/supabase/client.ts",
@@ -1198,7 +1198,7 @@
       "description": "",
       "registryDependencies": [],
       "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
-      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
+      "docs": "You'll need to add a `.env` file with the following environment variables to your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_OR_ANON_KEY`.",
       "files": [
         {
           "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
