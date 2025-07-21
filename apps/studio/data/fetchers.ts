@@ -181,8 +181,8 @@ async function handleFetchResponse<T>(response: Response): Promise<T | ResponseE
   }
 }
 
-async function handleFetchError<T = unknown>(response: Response): Promise<T | ResponseError> {
-  let resJson: { [prop: string]: any }
+async function handleFetchError(response: Response): Promise<ResponseError> {
+  let resJson: any
 
   const resTxt = await response.text()
   try {
@@ -191,31 +191,17 @@ async function handleFetchError<T = unknown>(response: Response): Promise<T | Re
     resJson = {}
   }
 
-  if (resJson.error && typeof resJson.error === 'string') {
-    if (resJson.error_description) {
-      const error = {
-        code: response.status,
-        message: resJson.error,
-        description: resJson.error_description,
-      }
-      return { error } as unknown as T | ResponseError
-    } else {
-      const error = { code: response.status, message: resJson.error }
-      return { error } as unknown as T | ResponseError
-    }
-  } else if (resJson.message) {
-    const error = { code: response.status, message: resJson.message }
-    return { error } as unknown as T | ResponseError
-  } else if (resJson.msg) {
-    const error = { code: response.status, message: resJson.msg }
-    return { error } as unknown as T | ResponseError
-  } else if (resJson.error && resJson.error.message) {
-    return { error: { code: response.status, ...resJson.error } } as unknown as T | ResponseError
-  } else {
-    const message = resTxt ?? `An error has occurred: ${response.status}`
-    const error = { code: response.status, message }
-    return { error } as unknown as T | ResponseError
-  }
+  const message =
+    resJson.message ??
+    resJson.msg ??
+    resJson.error ??
+    resTxt ??
+    `An error has occurred: ${response.status}`
+  const retryAfter = response.headers.get('Retry-After')
+    ? parseInt(response.headers.get('Retry-After')!)
+    : undefined
+
+  return new ResponseError(message, response.status, undefined, retryAfter)
 }
 
 /**
