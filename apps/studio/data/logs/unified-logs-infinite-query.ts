@@ -168,6 +168,7 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     },
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      keepPreviousData: true,
       getPreviousPageParam: (firstPage) => {
         if (!firstPage.prevCursor) return null
         const result = { cursor: firstPage.prevCursor, direction: 'prev' }
