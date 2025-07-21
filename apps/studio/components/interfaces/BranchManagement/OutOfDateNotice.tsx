@@ -13,6 +13,9 @@ import {
 } from 'ui'
 import { GitBranchIcon } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
@@ -41,6 +44,12 @@ export const OutOfDateNotice = ({
 }: OutOfDateNoticeProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const hasOutdatedMigrations = isBranchOutOfDateMigrations && missingMigrationsCount > 0
+  const selectedOrg = useSelectedOrganization()
+  const project = useSelectedProject()
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const isBranch = project?.parent_project_ref !== undefined
+  const parentProjectRef = isBranch ? project?.parent_project_ref : project?.ref
 
   const getTitle = () => {
     if (hasOutdatedMigrations && (hasMissingFunctions || hasOutOfDateFunctions)) {
@@ -58,11 +67,38 @@ export const OutOfDateNotice = ({
   }
 
   const handleUpdateClick = () => {
+    // Track branch update
+    sendEvent({
+      action: 'branch_updated',
+      properties: {
+        modifiedEdgeFunctions: hasEdgeFunctionModifications,
+        source: 'out_of_date_notice',
+      },
+      groups: {
+        project: parentProjectRef ?? 'Unknown',
+        organization: selectedOrg?.slug ?? 'Unknown',
+      },
+    })
+
     onPush()
   }
 
   const handleConfirmUpdate = () => {
     setIsDialogOpen(false)
+
+    // Track branch update
+    sendEvent({
+      action: 'branch_updated',
+      properties: {
+        modifiedEdgeFunctions: hasEdgeFunctionModifications,
+        source: 'out_of_date_notice',
+      },
+      groups: {
+        project: parentProjectRef ?? 'Unknown',
+        organization: selectedOrg?.slug ?? 'Unknown',
+      },
+    })
+
     onPush()
   }
 
