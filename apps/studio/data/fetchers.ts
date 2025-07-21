@@ -6,8 +6,8 @@ import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import { ResponseError } from 'types'
-// generated from openapi-typescript
-import type { paths } from './api'
+import type { paths } from './api' // generated from openapi-typescript
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
@@ -72,6 +72,9 @@ function pgMetaGuard(request: Request) {
         request.headers.get('X-Request-Id') ?? undefined,
         retryAfterHeader ? parseInt(retryAfterHeader) : undefined
       )
+    }
+    if (!request.headers.get('x-pg-application-name')) {
+      request.headers.set('x-pg-application-name', DEFAULT_PLATFORM_APPLICATION_NAME)
     }
   }
   return request
