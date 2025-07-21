@@ -14,7 +14,6 @@ import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Loader, Plus } from 'lucide-react'
 import { Listbox } from 'ui'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
@@ -27,6 +26,8 @@ import {
 } from '../PaymentMethods/NewPaymentMethodElement'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -48,13 +49,16 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
 ) {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
-  const captchaLoaded = useIsHCaptchaLoaded()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
+  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
+    useOrganizationCustomerProfileQuery({
+      slug,
+    })
 
   const hidePaymentMethodsWithoutAddress = useFlag('hidePaymentMethodsWithoutAddress')
 
@@ -111,7 +115,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     const loadPaymentForm = async () => {
-      if (setupNewPaymentMethod && captchaRef && captchaLoaded) {
+      if (setupNewPaymentMethod && captchaRef) {
         let token = captchaToken
 
         try {
@@ -129,7 +133,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
 
     loadPaymentForm()
-  }, [captchaRef, captchaLoaded, setupNewPaymentMethod])
+  }, [captchaRef, setupNewPaymentMethod])
 
   const resetCaptcha = () => {
     setCaptchaToken(null)
@@ -256,12 +260,14 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               ref={paymentRef}
               email={selectedOrganization?.billing_email ?? undefined}
               readOnly={readOnly}
-              taxIdConfigurable={true}
+              taxIdConfigurable={false}
+              customerName={customerProfile?.billing_name}
+              currentAddress={customerProfile?.address}
             />
           </Elements>
         )}
 
-        {setupIntentLoading && (
+        {(setupIntentLoading || isCustomerProfileLoading) && (
           <div className="space-y-2">
             <ShimmeringLoader className="h-10" />
             <div className="grid grid-cols-2 gap-4">

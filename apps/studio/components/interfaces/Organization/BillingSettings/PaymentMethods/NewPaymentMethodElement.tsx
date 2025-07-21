@@ -31,7 +31,7 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
-import { TAX_IDS } from '../BillingCustomerData/TaxID.constants'
+import { TAX_IDS, type TaxId } from '../BillingCustomerData/TaxID.constants'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { Form } from '@ui/components/shadcn/ui/form'
@@ -39,7 +39,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getURL } from 'lib/helpers'
-import type { CustomerAddress } from 'data/organizations/types'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import type { PaymentMethod } from '@stripe/stripe-js'
 
 export const BillingCustomerDataSchema = z.object({
@@ -83,12 +83,14 @@ const NewPaymentMethodElement = forwardRef(
       readOnly,
       taxIdConfigurable,
       currentAddress,
+      currentTaxId,
       customerName,
     }: {
       email?: string | null | undefined
       readOnly: boolean
       taxIdConfigurable: boolean
       currentAddress?: CustomerAddress | undefined
+      currentTaxId?: CustomerTaxId | undefined
       customerName?: string | undefined
     },
     ref
@@ -121,7 +123,7 @@ const NewPaymentMethodElement = forwardRef(
     const { tax_id_name } = form.watch()
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
-    const [purchasingAsBusiness, setPurchasingAsBusiness] = useState(false)
+    const [purchasingAsBusiness, setPurchasingAsBusiness] = useState(currentTaxId != null)
     const [stripeAddress, setStripeAddress] = useState<
       StripeAddressElementChangeEvent['value'] | undefined
     >(undefined)

@@ -17,7 +17,6 @@ import { useOrganizationCreditTopUpMutation } from 'data/organizations/organizat
 import { subscriptionKeys } from 'data/subscriptions/keys'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -82,7 +81,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   const [topUpModalVisible, setTopUpModalVisible] = useState(false)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
-  const captchaLoaded = useIsHCaptchaLoaded()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -96,7 +94,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   }
 
   const initHcaptcha = async () => {
-    if (topUpModalVisible && captchaRef && captchaLoaded) {
+    if (topUpModalVisible && captchaRef) {
       let token = captchaToken
 
       try {
@@ -116,7 +114,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
   useEffect(() => {
     initHcaptcha()
-  }, [topUpModalVisible, captchaRef, captchaLoaded])
+  }, [topUpModalVisible, captchaRef])
 
   const [paymentIntentSecret, setPaymentIntentSecret] = useState('')
   const [paymentIntentConfirmation, setPaymentIntentConfirmation] = useState<PaymentIntentResult>()
@@ -225,10 +223,21 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           />
           <DialogHeader>
             <DialogTitle>Top Up Credits</DialogTitle>
-            <DialogDescription>
-              On successful payment, an invoice will be issued and you'll be granted credits.
-              Credits will be applied to outstanding and future invoices and are not refundable. The
-              topped up credits do not expire.
+            <DialogDescription className="space-y-2">
+              <p className="prose text-sm">
+                On successful payment, an invoice will be issued and you'll be granted credits.
+                Credits will be applied to outstanding and future invoices and are not refundable.
+                The topped up credits do not expire.
+              </p>
+              <p className="prose text-sm">
+                For larger discounted credit packages, please{' '}
+                <Link
+                  href={`/support/new?slug=${slug}&subject=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.SALES_ENQUIRY}`}
+                  target="_blank"
+                >
+                  reach out.
+                </Link>
+              </p>
             </DialogDescription>
           </DialogHeader>
 
@@ -258,16 +267,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     />
                   )}
                 />
-
-                <p className="prose text-sm">
-                  For larger discounted credit packages, please{' '}
-                  <Link
-                    href={`/support/new?slug=${slug}&subject=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.SALES_ENQUIRY}`}
-                    target="_blank"
-                  >
-                    reach out.
-                  </Link>
-                </p>
 
                 {paymentIntentConfirmation && paymentIntentConfirmation.error && (
                   <Alert_Shadcn_ variant="destructive">
