@@ -8,21 +8,28 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { VaultSecret } from 'types'
-import { Button, Input, Listbox, Separator } from 'ui'
+import {
+  Button,
+  Input,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Separator,
+} from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
-import EditSecretModal from './EditSecretModal'
 import SecretRow from './SecretRow'
+import { VaultSecret } from 'types'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
   const { project } = useProjectContext()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
-  const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<VaultSecret>()
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
+  const [selectedSort, setSelectedSort] = useState('updated_at')
 
   const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
@@ -47,7 +54,7 @@ export const SecretsManagement = () => {
       if (selectedSort === 'updated_at') {
         return Number(new Date(s.updated_at))
       } else {
-        return s[selectedSort]
+        return s[selectedSort as keyof VaultSecret]
       }
     }
   )
@@ -79,26 +86,26 @@ export const SecretsManagement = () => {
                   : []
               }
             />
-            <div className="md:w-44">
-              <Listbox size="tiny" value={selectedSort} onChange={setSelectedSort}>
-                <Listbox.Option
-                  id="updated_at"
-                  className="max-w-[180px]"
-                  value="updated_at"
-                  label="Sort by updated at"
-                >
+            <Select_Shadcn_ value={selectedSort} onValueChange={setSelectedSort}>
+              <SelectTrigger_Shadcn_ size="tiny" className="md:w-44">
+                <SelectValue_Shadcn_ asChild>
+                  <>Sort by {selectedSort}</>
+                </SelectValue_Shadcn_>
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                <SelectItem_Shadcn_ value="updated_at" className="text-xs">
                   Updated at
-                </Listbox.Option>
-                <Listbox.Option
+                </SelectItem_Shadcn_>
+                <SelectItem_Shadcn_ value="name" className="text-xs">
                   id="name"
                   className="max-w-[180px]"
                   value="name"
                   label="Sort by name"
                 >
                   Name
-                </Listbox.Option>
-              </Listbox>
-            </div>
+                </SelectItem_Shadcn_>
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
           </div>
           <div className="flex items-center gap-x-2">
             <DocsButton href="https://supabase.com/docs/guides/database/vault" />
@@ -120,7 +127,6 @@ export const SecretsManagement = () => {
                   <Fragment key={`secret-${idx}`}>
                     <SecretRow
                       secret={secret}
-                      onSelectEdit={setSelectedSecretToEdit}
                       onSelectRemove={setSelectedSecretToRemove}
                     />
                     {idx !== secrets.length - 1 && <Separator />}
@@ -151,12 +157,8 @@ export const SecretsManagement = () => {
         </div>
       </div>
 
-      <EditSecretModal
-        selectedSecret={selectedSecretToEdit}
-        onClose={() => setSelectedSecretToEdit(undefined)}
-      />
       <DeleteSecretModal
-        selectedSecret={selectedSecretToRemove}
+        secret={selectedSecretToRemove}
         onClose={() => setSelectedSecretToRemove(undefined)}
       />
     </>

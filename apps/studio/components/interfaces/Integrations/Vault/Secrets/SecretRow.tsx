@@ -20,17 +20,17 @@ import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decry
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
+import EditSecretModal from './EditSecretModal'
 
 interface SecretRowProps {
   secret: VaultSecret
-  onSelectEdit: (secret: VaultSecret) => void
   onSelectRemove: (secret: VaultSecret) => void
 }
 
 const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
-
+  const [modal, setModal] = useState<string | null>(null)
   const [revealSecret, setRevealSecret] = useState(false)
   const name = secret?.name ?? 'No name provided'
 
@@ -46,6 +46,15 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
       enabled: !!(ref! && secret.id) && revealSecret,
     }
   )
+  const renderModal = () => {
+    const onClose = () => setModal(null)
+    switch (modal) {
+      case `edit`:
+        return <EditSecretModal secret={secret} onClose={onClose} />
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="px-6 py-4 flex items-center space-x-4">
@@ -95,31 +104,25 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {secret.updated_at === secret.created_at ? 'Added' : 'Updated'} on{' '}
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-32">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem
-                  className="space-x-2"
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  title="Manage Secret"
+                  type="text"
+                  className="px-1"
                   disabled={!canManageSecrets}
-                  onClick={() => onSelectEdit(secret)}
-                >
+                  icon={<MoreVertical />}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end" className="w-32">
+                <DropdownMenuItem className="space-x-2" onClick={() => setModal(`edit`)}>
                   <Edit3 size="14" />
                   <p>Edit</p>
                 </DropdownMenuItem>
               </TooltipTrigger>
-              {!canManageSecrets && (
-                <TooltipContent side="bottom">
-                  You need additional permissions to edit secrets
-                </TooltipContent>
-              )}
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -128,15 +131,16 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Trash stroke="red" size="14" />
                   <p className="text-foreground-light">Delete</p>
                 </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canManageSecrets && (
-                <TooltipContent side="bottom">
-                  You need additional permissions to delete secrets
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TooltipTrigger>
+          {!canManageSecrets && (
+            <TooltipContent side="bottom">
+              You need additional permissions to manage secrets
+            </TooltipContent>
+          )}
+        </Tooltip>
+        {renderModal()}
       </div>
     </div>
   )
