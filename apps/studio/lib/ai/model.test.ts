@@ -18,10 +18,11 @@ describe('getModel', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    vi.stubEnv('AWS_BEDROCK_PROFILE', 'test')
   })
 
   afterEach(() => {
-    process.env = { ...originalEnv, AWS_BEDROCK_PROFILE: 'test' }
+    process.env = { ...originalEnv }
   })
 
   it('should return bedrock model when AWS credentials are available', async () => {
