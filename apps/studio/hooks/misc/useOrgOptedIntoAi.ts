@@ -1,38 +1,66 @@
+import { z } from 'zod'
+
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useDisallowHipaa } from 'hooks/misc/useDisallowHipaa'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { OPT_IN_TAGS } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
+import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 
-/**
- * Checks if the organization has opted into sending anonymous data to OpenAI.
- * Also considers if the organization has the HIPAA addon.
- * @returns boolean (false if either not opted in or has the HIPAA addon)
- */
-export function useOrgOptedIntoAi() {
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-  const optInTags = selectedOrganization?.opt_in_tags
-  const isOptedIntoAI = optInTags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+export const aiOptInLevelSchema = z.enum([
+  'disabled',
+  'schema',
+  'schema_and_log',
+  'schema_and_log_and_data',
+])
 
-  const disallowHipaa = useDisallowHipaa()
-  /* if we are in a project context and this has been called,
-   * ensure that we aren't letting HIPAA projects activate AI
-   * returns true if optedIntoAI and no project selected
-   * returns true if optedIntoAI and we are in a project and not HIPAA project
-   * returns false if opted out of AI
-   * returns false if optedIntoAI and we are in a HIPAA project
-   */
-  return isOptedIntoAI && (!selectedProject || disallowHipaa(isOptedIntoAI))
+export type AiOptInLevel = z.infer<typeof aiOptInLevelSchema>
+
+export const getAiOptInLevel = (tags: string[] | undefined): AiOptInLevel => {
+  const hasSql = tags?.includes(OPT_IN_TAGS.AI_SQL)
+  const hasData = tags?.includes(OPT_IN_TAGS.AI_DATA)
+  const hasLog = tags?.includes(OPT_IN_TAGS.AI_LOG)
+
+  if (hasData) {
+    return 'schema_and_log_and_data'
+  } else if (hasLog) {
+    return 'schema_and_log'
+  } else if (hasSql) {
+    return 'schema'
+  } else {
+    return 'disabled'
+  }
 }
 
-export function useOrgOptedIntoAiAndHippaProject() {
+/**
+ * Determines if the organization has opted into *any* level of AI features (schema or schema_and_log or schema_and_log_and_data).
+ * This is primarily for backward compatibility.
+ * @returns boolean (true if opted into schema or schema_and_log or schema_and_log_and_data, false otherwise)
+ */
+export function useOrgOptedIntoAi(): boolean {
+  const { aiOptInLevel } = useOrgAiOptInLevel()
+  return !IS_PLATFORM || aiOptInLevel !== 'disabled'
+}
+
+/**
+ * Determines the organization's specific AI opt-in level and whether schema metadata should be included.
+ * @returns Object with aiOptInLevel and includeSchemaMetadata
+ */
+export function useOrgAiOptInLevel(): {
+  aiOptInLevel: AiOptInLevel
+  includeSchemaMetadata: boolean
+  isHipaaProjectDisallowed: boolean
+} {
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
+
+  // [Joshen] Default to disabled until migration to clean up existing opt in tags are completed
+  // Once toggled on, then we can default to their set opt in level and clean up feature flag
   const optInTags = selectedOrganization?.opt_in_tags
-  const isOptedIntoAI = optInTags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const level = !newOrgAiOptIn ? 'disabled' : getAiOptInLevel(optInTags)
+  const isOptedIntoAI = level !== 'disabled'
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -42,5 +70,17 @@ export function useOrgOptedIntoAiAndHippaProject() {
 
   const preventProjectFromUsingAI = hasHipaaAddon && isProjectSensitive
 
-  return { isOptedInToAI: isOptedIntoAI, isHipaaProjectDisallowed: preventProjectFromUsingAI }
+  // [Joshen] For CLI / self-host, we'd default to 'schema' as opt in level
+  const aiOptInLevel = !IS_PLATFORM
+    ? 'schema'
+    : (isOptedIntoAI && !selectedProject) || (isOptedIntoAI && !preventProjectFromUsingAI)
+      ? level
+      : 'disabled'
+  const includeSchemaMetadata = !IS_PLATFORM || aiOptInLevel !== 'disabled'
+
+  return {
+    aiOptInLevel,
+    includeSchemaMetadata,
+    isHipaaProjectDisallowed: preventProjectFromUsingAI,
+  }
 }

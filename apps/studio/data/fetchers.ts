@@ -6,7 +6,8 @@ import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import { ResponseError } from 'types'
-import type { paths } from './api' // generated from openapi-typescript
+// generated from openapi-typescript
+import type { paths } from './api'
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
@@ -15,6 +16,7 @@ export const fetchHandler: typeof fetch = async (input, init) => {
     return await fetch(input, init)
   } catch (err: any) {
     if (err instanceof TypeError && err.message === 'Failed to fetch') {
+      console.error(err)
       throw new Error('Unable to reach the server. Please check your network or try again later.')
     }
     throw err
@@ -128,8 +130,18 @@ export const {
   OPTIONS: options,
 } = client
 
-export const handleError = (error: unknown): never => {
+type HandleErrorOptions = {
+  alwaysCapture?: boolean
+}
+
+export const handleError = (
+  error: unknown,
+  options: HandleErrorOptions = { alwaysCapture: false }
+): never => {
   if (error && typeof error === 'object') {
+    if (options.alwaysCapture) {
+      Sentry.captureException(error)
+    }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
         ? error.msg

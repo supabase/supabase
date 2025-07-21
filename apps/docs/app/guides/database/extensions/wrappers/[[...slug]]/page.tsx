@@ -3,8 +3,12 @@ import { readFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
+import Link from 'next/link'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { Guide, GuideArticle, GuideHeader, GuideFooter, GuideMdxContent } from '~/features/ui/guide'
+import { newEditLink } from '~/features/helpers.edit-link'
 import {
   genGuideMeta,
   genGuidesStaticParams,
@@ -102,6 +106,7 @@ const pageMap = [
     slug: 'airtable',
     meta: {
       title: 'Airtable',
+      dashboardIntegrationPath: 'airtable_wrapper',
     },
     remoteFile: 'airtable.md',
   },
@@ -109,6 +114,7 @@ const pageMap = [
     slug: 'auth0',
     meta: {
       title: 'Auth0',
+      dashboardIntegrationPath: 'auth0_wrapper',
     },
     remoteFile: 'auth0.md',
   },
@@ -116,6 +122,7 @@ const pageMap = [
     slug: 'bigquery',
     meta: {
       title: 'BigQuery',
+      dashboardIntegrationPath: 'bigquery_wrapper',
     },
     remoteFile: 'bigquery.md',
   },
@@ -123,6 +130,7 @@ const pageMap = [
     slug: 'clerk',
     meta: {
       title: 'Clerk',
+      dashboardIntegrationPath: 'clerk_wrapper',
     },
     remoteFile: 'clerk.md',
   },
@@ -130,6 +138,7 @@ const pageMap = [
     slug: 'clickhouse',
     meta: {
       title: 'ClickHouse',
+      dashboardIntegrationPath: 'clickhouse_wrapper',
     },
     remoteFile: 'clickhouse.md',
   },
@@ -137,20 +146,38 @@ const pageMap = [
     slug: 'cognito',
     meta: {
       title: 'AWS Cognito',
+      dashboardIntegrationPath: 'cognito_wrapper',
     },
     remoteFile: 'cognito.md',
+  },
+  {
+    slug: 'duckdb',
+    meta: {
+      title: 'DuckDB',
+    },
+    remoteFile: 'duckdb.md',
   },
   {
     slug: 'firebase',
     meta: {
       title: 'Firebase',
+      dashboardIntegrationPath: 'firebase_wrapper',
     },
     remoteFile: 'firebase.md',
+  },
+  {
+    slug: 'iceberg',
+    meta: {
+      title: 'Iceberg',
+      dashboardIntegrationPath: 'iceberg_wrapper',
+    },
+    remoteFile: 'iceberg.md',
   },
   {
     slug: 'logflare',
     meta: {
       title: 'Logflare',
+      dashboardIntegrationPath: 'logflare_wrapper',
     },
     remoteFile: 'logflare.md',
   },
@@ -158,6 +185,7 @@ const pageMap = [
     slug: 'mssql',
     meta: {
       title: 'MSSQL',
+      dashboardIntegrationPath: 'mssql_wrapper',
     },
     remoteFile: 'mssql.md',
   },
@@ -165,6 +193,7 @@ const pageMap = [
     slug: 'notion',
     meta: {
       title: 'Notion',
+      dashboardIntegrationPath: 'notion_wrapper',
     },
     remoteFile: 'notion.md',
   },
@@ -172,6 +201,7 @@ const pageMap = [
     slug: 'paddle',
     meta: {
       title: 'Paddle',
+      dashboardIntegrationPath: 'paddle_wrapper',
     },
     remoteFile: 'paddle.md',
   },
@@ -179,6 +209,7 @@ const pageMap = [
     slug: 'redis',
     meta: {
       title: 'Redis',
+      dashboardIntegrationPath: 'redis_wrapper',
     },
     remoteFile: 'redis.md',
   },
@@ -186,6 +217,7 @@ const pageMap = [
     slug: 's3',
     meta: {
       title: 'AWS S3',
+      dashboardIntegrationPath: 's3_wrapper',
     },
     remoteFile: 's3.md',
   },
@@ -193,6 +225,7 @@ const pageMap = [
     slug: 'snowflake',
     meta: {
       title: 'Snowflake',
+      dashboardIntegrationPath: 'snowflake_wrapper',
     },
     remoteFile: 'snowflake.md',
   },
@@ -200,6 +233,7 @@ const pageMap = [
     slug: 'stripe',
     meta: {
       title: 'Stripe',
+      dashboardIntegrationPath: 'stripe_wrapper',
     },
     remoteFile: 'stripe.md',
   },
@@ -240,7 +274,31 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
       } as SerializeOptions)
     : undefined
 
-  return <GuideTemplate meta={meta} mdxOptions={options} {...data} />
+  const dashboardIntegrationURL = getDashboardIntegrationURL(meta.dashboardIntegrationPath)
+
+  return (
+    <Guide meta={meta}>
+      <GuideArticle>
+        <GuideHeader />
+
+        {dashboardIntegrationURL && (
+          <Admonition type="tip" className="mb-4">
+            <p>You can enable the {meta.title} wrapper right from the Supabase dashboard.</p>
+
+            <Button asChild>
+              <Link href={dashboardIntegrationURL} className="no-underline">
+                Open wrapper in dashboard
+              </Link>
+            </Button>
+          </Admonition>
+        )}
+
+        <GuideMdxContent content={data.content} mdxOptions={options} />
+
+        <GuideFooter editLink={data.editLink} />
+      </GuideArticle>
+    </Guide>
+  )
 }
 
 /**
@@ -307,6 +365,12 @@ const getContent = async (params: Params) => {
     content,
     assetsBaseUrl,
   }
+}
+
+const getDashboardIntegrationURL = (wrapperPath?: string) => {
+  return wrapperPath
+    ? `https://supabase.com/dashboard/project/_/integrations/${wrapperPath}/overview`
+    : null
 }
 
 const assetUrlTransform = (url: string, baseUrl: string): string => {

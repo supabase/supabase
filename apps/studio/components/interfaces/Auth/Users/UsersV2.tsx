@@ -119,7 +119,7 @@ export const UsersV2 = () => {
     }
   )
 
-  const { data: countData } = useUsersCountQuery({
+  const { data: countData, refetch: refetchCount } = useUsersCountQuery({
     projectRef,
     connectionString: project?.connectionString,
     keywords: filterKeywords,
@@ -437,7 +437,10 @@ export const UsersV2 = () => {
                   icon={<RefreshCw />}
                   type="default"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => refetch()}
+                  onClick={() => {
+                    refetch()
+                    refetchCount()
+                  }}
                 >
                   Refresh
                 </Button>
