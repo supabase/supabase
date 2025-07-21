@@ -1364,6 +1364,167 @@ export interface ForeignDataWrapperCreatedEvent {
 }
 
 /**
+ * Triggered when a new branch is created.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches
+ */
+export interface BranchCreateButtonClickedEvent {
+  action: 'branch_create_button_clicked'
+  properties: {
+    /**
+     * The type of branch created, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+    /**
+     * Whether the branch was created with a git branch association
+     */
+    gitlessBranching: boolean
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a create merge request is clicked for a branch.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches
+ */
+export interface BranchCreateMergeRequestButtonClickedEvent {
+  action: 'branch_create_merge_request_button_clicked'
+  properties: {
+    /**
+     * The type of branch being merged, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+    origin: 'header' | 'merge_page' | 'branch_selector'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a merge request is closed.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches/merge-requests
+ */
+export interface BranchCloseMergeRequestButtonClickedEvent {
+  action: 'branch_close_merge_request_button_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a user clicks the merge button successfully to attempt merging a branch.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchMergeSubmittedEvent {
+  action: 'branch_merge_submitted'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a branch merge is successful.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchMergeSucceededEvent {
+  action: 'branch_merge_succeeded'
+  properties: {
+    /**
+     * The type of branch being merged, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a branch merge fails.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchMergeFailedEvent {
+  action: 'branch_merge_failed'
+  properties: {
+    /**
+     * The type of branch being merged, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+    /**
+     * The error message or reason for failure
+     */
+    error?: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a branch is updated on push with latest changes from production.
+ * Does not include renaming and linking to GitHub branch.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchUpdatedEvent {
+  action: 'branch_updated'
+  properties: {
+    /**
+     * The source of the update action
+     */
+    source: 'merge_page' | 'out_of_date_notice'
+    modifiedEdgeFunctions?: boolean
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a user clicks the review with assistant button for a merge.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchReviewWithAssistantClickedEvent {
+  action: 'branch_review_with_assistant_clicked'
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1443,3 +1604,11 @@ export type TelemetryEvent =
   | AiAssistantInSupportFormClickedEvent
   | OrganizationMfaEnforcementUpdated
   | ForeignDataWrapperCreatedEvent
+  | BranchCreateButtonClickedEvent
+  | BranchCreateMergeRequestButtonClickedEvent
+  | BranchCloseMergeRequestButtonClickedEvent
+  | BranchMergeSubmittedEvent
+  | BranchMergeSucceededEvent
+  | BranchMergeFailedEvent
+  | BranchUpdatedEvent
+  | BranchReviewWithAssistantClickedEvent
