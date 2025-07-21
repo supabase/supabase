@@ -21,7 +21,7 @@ describe('getModel', () => {
   })
 
   afterEach(() => {
-    process.env = { ...originalEnv }
+    process.env = { ...originalEnv, AWS_BEDROCK_PROFILE: 'test' }
   })
 
   it('should return bedrock model when AWS credentials are available', async () => {
