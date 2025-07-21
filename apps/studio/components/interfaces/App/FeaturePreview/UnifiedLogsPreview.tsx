@@ -19,6 +19,9 @@ export const UnifiedLogsPreview = () => {
         Experience our enhanced logs interface with improved filtering, real-time updates, and a
         unified view across all your services. Built for better performance and easier debugging.
       </p>
+      <p className="text-foreground-light text-sm mb-4">
+        This interface will only be available for organizations on the Team plan or above.
+      </p>
       <div className="space-y-2 !mt-4">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">

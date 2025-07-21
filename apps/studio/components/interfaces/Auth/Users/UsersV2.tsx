@@ -587,7 +587,10 @@ export const UsersV2 = () => {
         visible={!!selectedUserToDelete}
         selectedUser={selectedUserToDelete}
         onClose={() => setSelectedUserToDelete(undefined)}
-        onDeleteSuccess={() => setSelectedUserToDelete(undefined)}
+        onDeleteSuccess={() => {
+          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
+          setSelectedUserToDelete(undefined)
+        }}
       />
     </>
   )

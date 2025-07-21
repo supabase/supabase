@@ -54,7 +54,7 @@ export interface WeekDayProps {
   steps: StepProps[] | []
 }
 
-export const endOfLW13Hackathon = '2025-04-04T23:59:59.999-08:00'
+export const endOfLW13Hackathon = '2025-07-04T23:59:59.999-08:00'
 
 const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
   {
@@ -66,7 +66,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '/blog/jwt-signing-keys',
     date: 'Monday',
-    published_at: '2025-03-31T07:00:00.000-07:00',
+    published_at: '2025-07-14T07:00:00.000-07:00',
     title: 'Introducing JWT Signing Keys',
     description: '',
     links: [
@@ -97,7 +97,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '/blog/analytics-buckets',
     date: 'Tuesday',
-    published_at: '2025-04-01T07:00:00.000-07:00',
+    published_at: '2025-07-15T07:00:00.000-07:00',
     title: 'Introducing Supabase Analytics Buckets with Iceberg Support',
     description: '',
     links: [
@@ -128,7 +128,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '/blog/branching-2-0',
     date: 'Wednesday',
-    published_at: '2025-04-02T07:00:00.000-07:00',
+    published_at: '2025-07-16T07:00:00.000-07:00',
     title: 'Introducing Branching 2.0',
     description: '',
     links: [
@@ -155,11 +155,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 4,
     dd: 'Thu',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/new-observability-features-in-supabase',
     date: 'Thursday',
-    published_at: '2025-04-03T07:00:00.000-07:00',
+    published_at: '2025-07-17T07:00:00.000-07:00',
     title: 'Introducing New Observability Features in Supabase',
     description: '',
     links: [
@@ -185,23 +185,23 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
+    shipped: true,
     isToday: false,
     hasCountdown: false,
-    blog: '/blog/',
+    blog: '/blog/persistent-storage-for-faster-edge-functions',
     date: 'Friday',
-    published_at: '2025-04-04T07:00:00.000-07:00',
-    title: '',
+    published_at: '2025-07-18T07:00:00.000-07:00',
+    title: 'Introducing Persistent Storage for Edge Functions',
     description: '',
     links: [
       {
         type: 'video',
-        href: '',
+        href: 'h3mQrDC4g14',
       },
-      // {
-      //   type: 'xSpace',
-      //   href: 'https://twitter.com/i/spaces/',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://x.com/i/spaces/1jMJgkeNXAbJL',
+      },
     ],
     steps: [
       {
