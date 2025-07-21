@@ -176,7 +176,7 @@ export const handleError = (
   throw new ResponseError(undefined)
 }
 
-// [Joshen] The methods below are brought over from lib/common/fetchers because we still need them
+// [Joshen] The methods below are brought over from lib/common/fetch because we still need them
 // primarily for our own endpoints in the dashboard repo. So consolidating all the fetch methods into here.
 
 async function handleFetchResponse<T>(response: Response): Promise<T | ResponseError> {
@@ -191,6 +191,21 @@ async function handleFetchResponse<T>(response: Response): Promise<T | ResponseE
       // return as text plain
       return resTxt as any
     }
+  } catch (e) {
+    return handleError(response) as T | ResponseError
+  }
+}
+
+async function handleFetchHeadResponse<T>(
+  response: Response,
+  headers: string[]
+): Promise<T | ResponseError> {
+  try {
+    const res = {} as any
+    headers.forEach((header: string) => {
+      res[header] = response.headers.get(header)
+    })
+    return res
   } catch (e) {
     return handleError(response) as T | ResponseError
   }
@@ -231,6 +246,34 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
 
 /**
  * To be used only for dashboard API endpoints. Use `fetch` directly if calling a non dashboard API endpoint
+ */
+export async function fetchGet<T = any>(
+  url: string,
+  options?: { [prop: string]: any }
+): Promise<T | ResponseError> {
+  try {
+    const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
+    const headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      ...DEFAULT_HEADERS,
+      ...otherHeaders,
+    })
+    const response = await fetch(url, {
+      headers,
+      method: 'GET',
+      referrerPolicy: 'no-referrer-when-downgrade',
+      ...otherOptions,
+      signal: abortSignal,
+    })
+    if (!response.ok) return handleFetchError(response)
+    return handleFetchResponse(response)
+  } catch (error) {
+    return handleFetchError(error)
+  }
+}
+
+/**
+ * To be used only for dashboard API endpoints. Use `fetch` directly if calling a non dashboard API endpoint
  *
  * Exception for `bucket-object-download-mutation` as openapi-fetch doesn't support octet-stream responses
  */
@@ -247,15 +290,48 @@ export async function fetchPost<T = any>(
       ...otherHeaders,
     })
     const response = await fetch(url, {
+      headers,
       method: 'POST',
       body: JSON.stringify(data),
       referrerPolicy: 'no-referrer-when-downgrade',
-      headers,
       ...otherOptions,
       signal: abortSignal,
     })
     if (!response.ok) return handleFetchError(response)
     return handleFetchResponse(response)
+  } catch (error) {
+    return handleFetchError(error)
+  }
+}
+
+/**
+ * To be used only for dashboard API endpoints. Use `fetch` directly if calling a non dashboard API endpoint
+ */
+export async function fetchHeadWithTimeout<T = any>(
+  url: string,
+  headersToRetrieve: string[],
+  options?: { [prop: string]: any }
+): Promise<T | ResponseError> {
+  try {
+    const timeout = options?.timeout ?? 60000
+
+    const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
+    const headers = await constructHeaders({
+      'Content-Type': 'application/json',
+      ...DEFAULT_HEADERS,
+      ...otherHeaders,
+    })
+
+    const response = await fetch(url, {
+      method: 'HEAD',
+      referrerPolicy: 'no-referrer-when-downgrade',
+      headers,
+      ...otherOptions,
+      signal: AbortSignal.timeout(timeout),
+    })
+
+    if (!response.ok) return handleFetchError(response)
+    return handleFetchHeadResponse(response, headersToRetrieve)
   } catch (error) {
     return handleFetchError(error)
   }
