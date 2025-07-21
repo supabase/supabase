@@ -181,27 +181,30 @@ async function handleFetchResponse<T>(response: Response): Promise<T | ResponseE
   }
 }
 
-async function handleFetchError(response: Response): Promise<ResponseError> {
-  let resJson: any
+async function handleFetchError(response: unknown): Promise<ResponseError> {
+  let resJson: any = {}
 
-  const resTxt = await response.text()
-  try {
-    resJson = JSON.parse(resTxt)
-  } catch (_) {
-    resJson = {}
+  if (response instanceof Error) {
+    resJson = response
   }
+
+  if (response instanceof Response) {
+    resJson = await response.json()
+  }
+
+  const status = response instanceof Response ? response.status : undefined
 
   const message =
     resJson.message ??
     resJson.msg ??
     resJson.error ??
-    resTxt ??
-    `An error has occurred: ${response.status}`
-  const retryAfter = response.headers.get('Retry-After')
-    ? parseInt(response.headers.get('Retry-After')!)
-    : undefined
+    `An error has occurred: ${status ?? 'Unknown error'}`
+  const retryAfter =
+    response instanceof Response && response.headers.get('Retry-After')
+      ? parseInt(response.headers.get('Retry-After')!)
+      : undefined
 
-  return new ResponseError(message, response.status, undefined, retryAfter)
+  return new ResponseError(message, status, undefined, retryAfter)
 }
 
 /**
@@ -232,6 +235,6 @@ export async function fetchPost<T = any>(
     if (!response.ok) return handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
-    return handleFetchError(error as any)
+    return handleFetchError(error)
   }
 }
