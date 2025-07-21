@@ -16,6 +16,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
@@ -23,7 +24,6 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   DropdownMenu,
@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
@@ -45,7 +46,6 @@ interface OverviewProps {
   onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
   generateCreatePullRequestURL: (branchName?: string) => string
-  showProductionBranch?: boolean
 }
 
 export const Overview = ({
@@ -57,33 +57,41 @@ export const Overview = ({
   onSelectCreateBranch,
   onSelectDeleteBranch,
   generateCreatePullRequestURL,
-  showProductionBranch = true,
 }: OverviewProps) => {
   const [persistentBranches, ephemeralBranches] = partition(
     previewBranches,
     (branch) => branch.persistent
   )
+  const { ref: projectRef } = useParams()
 
   return (
     <>
-      {showProductionBranch && (
-        <BranchManagementSection header="Production branch">
-          {isLoading && <BranchRowLoader />}
-          {isSuccess && mainBranch !== undefined && (
-            <BranchRow
-              branch={mainBranch}
-              label={
-                <div className="flex items-center gap-x-2">
-                  <Shield size={14} strokeWidth={1.5} className="text-warning" />
-                  {mainBranch.name}
-                </div>
-              }
-              repo={repo}
-              rowActions={<MainBranchActions branch={mainBranch} repo={repo} />}
-            />
-          )}
-        </BranchManagementSection>
-      )}
+      <BranchManagementSection header="Production branch">
+        {isLoading && <BranchRowLoader />}
+        {isSuccess && mainBranch !== undefined && (
+          <BranchRow
+            branch={mainBranch}
+            label={
+              <div className="flex items-center gap-x-2">
+                <Shield size={14} strokeWidth={1.5} className="text-warning" />
+                {mainBranch.name}
+              </div>
+            }
+            repo={repo}
+            rowActions={<MainBranchActions branch={mainBranch} repo={repo} />}
+          />
+        )}
+        {isSuccess && mainBranch === undefined && (
+          <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
+            <Link href={`/project/${projectRef}`} className="text-foreground block w-full">
+              <div className="flex items-center gap-x-3">
+                <Shield size={14} strokeWidth={1.5} className="text-warning" />
+                main
+              </div>
+            </Link>
+          </div>
+        )}
+      </BranchManagementSection>
 
       {/* Persistent Branches Section */}
       <BranchManagementSection header="Persistent branches">
@@ -91,8 +99,9 @@ export const Overview = ({
         {isSuccess && persistentBranches.length === 0 && (
           <div className="flex items-center flex-col justify-center w-full py-10">
             <p>No persistent branches</p>
-            <p className="text-foreground-light">
-              Persistent branches are long-lived and not automatically deleted.
+            <p className="text-foreground-light text-center">
+              Persistent branches are long-lived, cannot be reset, and are ideal for staging
+              environments.
             </p>
           </div>
         )}
@@ -156,7 +165,7 @@ const PreviewBranchActions = ({
   onSelectDeleteBranch: () => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }) => {
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
   const queryClient = useQueryClient()
   const projectRef = branch.parent_project_ref ?? branch.project_ref
 
@@ -330,19 +339,20 @@ const PreviewBranchActions = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ConfirmationModal
-        variant="destructive"
+      <TextConfirmModal
+        variant="warning"
         visible={showConfirmResetModal}
-        confirmLabel="Reset branch"
-        title="Confirm branch reset"
-        loading={isResetting}
         onCancel={() => setShowConfirmResetModal(false)}
         onConfirm={onConfirmReset}
-      >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
-        </p>
-      </ConfirmationModal>
+        loading={isResetting}
+        title="Reset branch"
+        confirmLabel="Reset branch"
+        confirmPlaceholder="Type in name of branch"
+        confirmString={branch?.name ?? ''}
+        alert={{
+          title: `Are you sure you want to reset the "${branch.name}" branch? All data will be deleted.`,
+        }}
+      />
 
       <ConfirmationModal
         variant="default"
