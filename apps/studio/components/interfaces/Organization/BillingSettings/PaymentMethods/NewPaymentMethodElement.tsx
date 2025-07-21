@@ -101,9 +101,14 @@ const NewPaymentMethodElement = forwardRef(
     const form = useForm<BillingCustomerDataFormValues>({
       resolver: zodResolver(BillingCustomerDataSchema),
       defaultValues: {
-        tax_id_name: '',
-        tax_id_type: '',
-        tax_id_value: '',
+        tax_id_name: currentTaxId
+          ? TAX_IDS.find(
+              (option) =>
+                option.type === currentTaxId.type && option.countryIso2 === currentTaxId.country
+            )?.name || ''
+          : '',
+        tax_id_type: currentTaxId ? currentTaxId.type : '',
+        tax_id_value: currentTaxId ? currentTaxId.value : '',
       },
     })
 

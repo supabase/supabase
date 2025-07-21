@@ -59,6 +59,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     useOrganizationCustomerProfileQuery({
       slug,
     })
+  const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
 
   const hidePaymentMethodsWithoutAddress = useFlag('hidePaymentMethodsWithoutAddress')
 
@@ -260,14 +261,15 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               ref={paymentRef}
               email={selectedOrganization?.billing_email ?? undefined}
               readOnly={readOnly}
-              taxIdConfigurable={false}
+              taxIdConfigurable={true}
               customerName={customerProfile?.billing_name}
               currentAddress={customerProfile?.address}
+              currentTaxId={taxId}
             />
           </Elements>
         )}
 
-        {(setupIntentLoading || isCustomerProfileLoading) && (
+        {(setupIntentLoading || isCustomerProfileLoading || isCustomerTaxIdLoading) && (
           <div className="space-y-2">
             <ShimmeringLoader className="h-10" />
             <div className="grid grid-cols-2 gap-4">

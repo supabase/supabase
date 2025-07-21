@@ -8,6 +8,7 @@ import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { isEqual } from 'lodash'
 import { useRef, useState } from 'react'
@@ -40,6 +41,9 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
   const queryClient = useQueryClient()
   const { mutateAsync: markAsDefault } = useOrganizationPaymentMethodMarkAsDefaultMutation()
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+  const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({
+    slug: selectedOrganization?.slug,
+  })
 
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
@@ -144,9 +148,10 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         <NewPaymentMethodElement
           readOnly={isSaving}
           email={selectedOrganization?.billing_email}
-          taxIdConfigurable={false}
+          taxIdConfigurable={true}
           currentAddress={customerProfile?.address}
           customerName={customerProfile?.billing_name}
+          currentTaxId={taxId}
           ref={paymentRef}
         />
 
