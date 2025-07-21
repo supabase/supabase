@@ -28,7 +28,6 @@ export const SecretsManagement = () => {
   const { project } = useProjectContext()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [showAddSecretModal, setShowAddSecretModal] = useState(false)
   const [selectedSecretToRemove, setSelectedSecretToRemove] = useState<VaultSecret>()
   const [selectedSort, setSelectedSort] = useState('updated_at')
 
