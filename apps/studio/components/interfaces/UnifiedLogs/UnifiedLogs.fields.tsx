@@ -3,7 +3,7 @@ import { User } from 'lucide-react'
 
 import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from 'components/ui/DataTable/DataTable.types'
-import { getLevelColor, getStatusColor } from 'components/ui/DataTable/DataTable.utils'
+import { getLevelColor } from 'components/ui/DataTable/DataTable.utils'
 import { cn } from 'ui'
 import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
@@ -41,21 +41,14 @@ export const filterFields = [
     value: 'status',
     type: 'checkbox',
     defaultOpen: true,
-    options: [
-      { label: '2xx', value: 200 },
-      { label: '4xx', value: 400 },
-      { label: '4xx', value: 500 },
-    ], // REMINDER: this is a placeholder to set the type in the client.tsx
+    options: [],
+    hasDynamicOptions: true,
     component: (props: Option) => {
       if (typeof props.value === 'boolean') return null
       if (typeof props.value === 'undefined') return null
 
       const statusValue = String(props.value)
       const statusLabel = STATUS_CODE_LABELS[statusValue as keyof typeof STATUS_CODE_LABELS]
-
-      // Convert string status codes to numbers for HTTP status styling
-      const statusCode = typeof props.value === 'string' ? parseInt(props.value, 10) : props.value
-      const isHttpStatus = !isNaN(statusCode) && statusCode >= 100 && statusCode < 600
 
       return (
         <div className="flex items-center gap-2 w-full min-w-0">
@@ -106,47 +99,18 @@ export const filterFields = [
     },
   },
   {
-    label: 'Host',
-    value: 'host',
-    type: 'checkbox',
-    defaultOpen: false,
-    options: [], // Will be populated dynamically from facets
-    component: (props: Option) => {
-      return (
-        <span className="truncate block text-[0.75rem]" title={props.value as string}>
-          {props.value}
-        </span>
-      )
-    },
-  },
-  {
     label: 'Pathname',
     value: 'pathname',
     type: 'checkbox',
-    defaultOpen: true,
-    options: [], // Will be populated dynamically from facets
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: true,
+    hasAsyncSearch: false,
     component: (props: Option) => {
       return (
         <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
           {props.value}
         </span>
-      )
-    },
-  },
-  {
-    label: 'Auth User',
-    value: 'auth_user',
-    type: 'checkbox',
-    defaultOpen: false,
-    options: [], // Will be populated dynamically from facets
-    component: (props: Option) => {
-      return (
-        <div className="flex items-center gap-2 min-w-0">
-          <User size={14} className="text-foreground-lighter flex-shrink-0" />
-          <span className="truncate text-[0.75rem]" title={props.value as string}>
-            {props.value}
-          </span>
-        </div>
       )
     },
   },
@@ -196,12 +160,6 @@ export const sheetFields = [
       </div>
     ),
     skeletonClassName: 'w-56',
-  },
-  {
-    id: 'host',
-    label: 'Host',
-    type: 'input',
-    skeletonClassName: 'w-24',
   },
   {
     id: 'pathname',

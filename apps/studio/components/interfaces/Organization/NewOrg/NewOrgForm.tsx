@@ -68,11 +68,13 @@ interface NewOrgFormProps {
   onPlanSelected: (plan: string) => void
 }
 
+const plans = ['FREE', 'PRO', 'TEAM'] as const
+
 const formSchema = z.object({
   plan: z
     .string()
     .transform((val) => val.toUpperCase())
-    .pipe(z.enum(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'] as const)),
+    .pipe(z.enum(plans)),
   name: z.string().min(1),
   kind: z
     .string()
@@ -149,9 +151,10 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 
     if (typeof name === 'string') updateForm('name', name)
     if (typeof kind === 'string') updateForm('kind', kind)
-    if (typeof plan === 'string') {
-      updateForm('plan', plan)
-      onPlanSelected(plan)
+    if (typeof plan === 'string' && plans.includes(plan.toUpperCase() as (typeof plans)[number])) {
+      const uppercasedPlan = plan.toUpperCase() as (typeof plans)[number]
+      updateForm('plan', uppercasedPlan)
+      onPlanSelected(uppercasedPlan)
     }
     if (typeof size === 'string') updateForm('size', size)
     if (typeof spend_cap === 'string') updateForm('spend_cap', spend_cap === 'true')
@@ -251,8 +254,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
         | 'tier_payg'
         | 'tier_pro'
         | 'tier_free'
-        | 'tier_team'
-        | 'tier_enterprise',
+        | 'tier_team',
       ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
