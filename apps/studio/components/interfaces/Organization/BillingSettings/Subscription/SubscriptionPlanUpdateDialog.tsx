@@ -29,6 +29,7 @@ import { PaymentIntentResult } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import type { CustomerAddress } from 'data/organizations/types'
+import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -81,18 +82,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const paymentMethodSelection = useRef<{
-    createPaymentMethod: () => Promise<
-      | {
-          paymentMethod: PaymentMethod
-          address: CustomerAddress
-          taxId: {
-            country: string
-            type: string
-            value: string
-          } | null
-        }
-      | undefined
-    >
+    createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
   }>(null)
 
   const billingViaPartner = subscription?.billing_via_partner === true

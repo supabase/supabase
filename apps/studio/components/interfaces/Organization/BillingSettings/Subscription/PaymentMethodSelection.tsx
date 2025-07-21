@@ -169,11 +169,18 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
 
   // If createPaymentMethod already exists, use it. Otherwise, define it here.
-  const createPaymentMethod = async () => {
+  const createPaymentMethod = async (): ReturnType<
+    PaymentMethodElementRef['createPaymentMethod']
+  > => {
     if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
       return paymentRef.current?.createPaymentMethod()
     } else {
-      return { id: selectedPaymentMethod }
+      return {
+        paymentMethod: { id: selectedPaymentMethod } as PaymentMethod,
+        customerName: customerProfile?.billing_name || '',
+        address: customerProfile?.address,
+        taxId: taxId || null,
+      }
     }
   }
 
