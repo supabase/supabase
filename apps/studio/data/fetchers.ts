@@ -196,41 +196,37 @@ async function handleFetchHeadResponse<T>(
   }
 }
 
-async function handleFetchError<T = unknown>(response: Response): Promise<T | ResponseError> {
-  let resJson: { [prop: string]: any }
+async function handleFetchError(response: unknown): Promise<ResponseError> {
+  let resJson: any = {}
 
-  const resTxt = await response.text()
-  try {
-    resJson = JSON.parse(resTxt)
-  } catch (_) {
-    resJson = {}
+  if (response instanceof Error) {
+    resJson = response
   }
 
-  if (resJson.error && typeof resJson.error === 'string') {
-    if (resJson.error_description) {
-      const error = {
-        code: response.status,
-        message: resJson.error,
-        description: resJson.error_description,
-      }
-      return { error } as unknown as T | ResponseError
-    } else {
-      const error = { code: response.status, message: resJson.error }
-      return { error } as unknown as T | ResponseError
-    }
-  } else if (resJson.message) {
-    const error = { code: response.status, message: resJson.message }
-    return { error } as unknown as T | ResponseError
-  } else if (resJson.msg) {
-    const error = { code: response.status, message: resJson.msg }
-    return { error } as unknown as T | ResponseError
-  } else if (resJson.error && resJson.error.message) {
-    return { error: { code: response.status, ...resJson.error } } as unknown as T | ResponseError
-  } else {
-    const message = resTxt ?? `An error has occurred: ${response.status}`
-    const error = { code: response.status, message }
-    return { error } as unknown as T | ResponseError
+  if (response instanceof Response) {
+    resJson = await response.json()
   }
+
+  const status = response instanceof Response ? response.status : undefined
+
+  const message =
+    resJson.message ??
+    resJson.msg ??
+    resJson.error ??
+    `An error has occurred: ${status ?? 'Unknown error'}`
+  const retryAfter =
+    response instanceof Response && response.headers.get('Retry-After')
+      ? parseInt(response.headers.get('Retry-After')!)
+      : undefined
+
+  let error = new ResponseError(message, status, undefined, retryAfter)
+
+  // @ts-expect-error - [Alaister] many of our local api routes check `if (response.error)`.
+  // This is a fix to keep those checks working without breaking changes.
+  // In future we should check for `if (response instanceof ResponseError)` instead.
+  error.error = error
+
+  return error
 }
 
 /**
@@ -290,7 +286,7 @@ export async function fetchPost<T = any>(
     if (!response.ok) return handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
-    return handleFetchError(error as any)
+    return handleFetchError(error)
   }
 }
 
