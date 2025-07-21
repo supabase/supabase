@@ -34,8 +34,8 @@ import { Form } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Check, ChevronsUpDown, X } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
 import { getURL } from 'lib/helpers'
+import type { CustomerAddress } from 'data/organizations/types'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
@@ -125,8 +125,13 @@ const NewPaymentMethodElement = forwardRef(
             }
           : null
 
-      const address = await elements.getElement('address')?.getValue()
-      return { paymentMethod, address: address?.value, taxId }
+      const addressElement = await elements.getElement('address')!.getValue()
+      return {
+        paymentMethod,
+        address: addressElement.value.address,
+        customerName: addressElement.value.name,
+        taxId,
+      }
     }
 
     const confirmSetup = async () => {

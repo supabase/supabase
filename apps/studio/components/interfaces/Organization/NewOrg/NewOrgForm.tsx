@@ -41,7 +41,7 @@ import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/Payme
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { NewPaymentMethodElement } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
 import { components } from 'api-types'
-import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
+import type { CustomerAddress } from 'data/organizations/types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -275,6 +275,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       | {
           paymentMethod: PaymentMethod
           address: CustomerAddress
+          customerName: string
           taxId: {
             country: string
             type: string
@@ -295,11 +296,8 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       if (result) {
         setPaymentMethod(result.paymentMethod)
         const customerData = {
-          address: {
-            ...result.address.address,
-            line2: result.address.address.line2 ? result.address.address.line2 : undefined,
-          },
-          billing_name: result.address.name!,
+          address: result.address,
+          billing_name: result.customerName,
           tax_id: result.taxId,
         }
 

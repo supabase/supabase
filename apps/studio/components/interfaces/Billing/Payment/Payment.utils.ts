@@ -36,7 +36,7 @@ export const getStripeElementsAppearanceOptions = (
       },
       '.Dropdown': {
         zIndex: '999',
-        overflow: 'show'
+        overflow: 'show',
       },
       '.DropdownItem': {
         zIndex: '999',

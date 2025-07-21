@@ -2,12 +2,10 @@ import type { SetupIntent } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { NewPaymentMethodElement } from 'components/interfaces/Organization/BillingSettings/PaymentMethods/NewPaymentMethodElement'
 import { organizationKeys } from 'data/organizations/keys'
-import {
-  type CustomerAddress,
-  useOrganizationCustomerProfileQuery,
-} from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
+import type { CustomerAddress } from 'data/organizations/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { isEqual } from 'lodash'
 import { useRef, useState } from 'react'

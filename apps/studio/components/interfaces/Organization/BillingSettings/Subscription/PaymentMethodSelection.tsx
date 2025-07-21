@@ -23,7 +23,7 @@ import { useTheme } from 'next-themes'
 import { Elements } from '@stripe/react-stripe-js'
 import { NewPaymentMethodElement } from '../PaymentMethods/NewPaymentMethodElement'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
+import type { CustomerAddress } from 'data/organizations/types'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 

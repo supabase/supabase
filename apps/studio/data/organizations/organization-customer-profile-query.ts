@@ -5,9 +5,6 @@ import { get, handleError } from 'data/fetchers'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
-import { components } from 'api-types'
-
-export type CustomerAddress = components['schemas']['CustomerResponse']['address']
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string

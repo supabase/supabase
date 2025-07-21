@@ -23,16 +23,12 @@ import PaymentMethodSelection from './PaymentMethodSelection'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { Elements } from '@stripe/react-stripe-js'
-import {
-  loadStripe,
-  PaymentMethod,
-  StripeElementsOptions,
-} from '@stripe/stripe-js'
+import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { PaymentIntentResult } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import type { CustomerAddress } from 'data/organizations/organization-customer-profile-query'
+import type { CustomerAddress } from 'data/organizations/types'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
