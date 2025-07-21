@@ -1586,6 +1586,7 @@ export const realtime: NavMenuConstant = {
           name: 'Postgres Changes',
           url: '/guides/realtime/postgres-changes',
         },
+        { name: 'Settings', url: '/guides/realtime/settings' },
       ],
     },
     {
@@ -1622,7 +1623,7 @@ export const realtime: NavMenuConstant = {
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Pricing', url: '/guides/realtime/pricing' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
     },
