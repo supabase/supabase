@@ -246,7 +246,6 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
  */
 export async function fetchGet<T = any>(
   url: string,
-  data: { [prop: string]: any },
   options?: { [prop: string]: any }
 ): Promise<T | ResponseError> {
   try {
@@ -266,7 +265,7 @@ export async function fetchGet<T = any>(
     if (!response.ok) return handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
-    return handleFetchError(error as any)
+    return handleFetchError(error)
   }
 }
 
@@ -312,8 +311,6 @@ export async function fetchHeadWithTimeout<T = any>(
 ): Promise<T | ResponseError> {
   try {
     const timeout = options?.timeout ?? 60000
-    const controller = new AbortController()
-    const id = setTimeout(() => controller.abort(), timeout)
 
     const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
     const headers = await constructHeaders({
@@ -327,13 +324,12 @@ export async function fetchHeadWithTimeout<T = any>(
       referrerPolicy: 'no-referrer-when-downgrade',
       headers,
       ...otherOptions,
-      signal: controller.signal,
+      signal: AbortSignal.timeout(timeout),
     })
-    clearTimeout(id)
 
     if (!response.ok) return handleFetchError(response)
     return handleFetchHeadResponse(response, headersToRetrieve)
   } catch (error) {
-    return handleFetchError(error as any)
+    return handleFetchError(error)
   }
 }

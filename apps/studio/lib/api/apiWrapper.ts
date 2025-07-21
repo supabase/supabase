@@ -1,15 +1,23 @@
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 
-import { ResponseFailure } from 'types'
+import { ResponseError, ResponseFailure } from 'types'
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
 
 export function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
-  return (
-    response !== undefined &&
-    response !== null &&
-    !(typeof response === 'object' && 'error' in response && Boolean(response.error))
-  )
+  if (response === undefined || response === null) {
+    return false
+  }
+
+  if (response instanceof ResponseError) {
+    return false
+  }
+
+  if (typeof response === 'object' && 'error' in response && Boolean(response.error)) {
+    return false
+  }
+
+  return true
 }
 
 // Purpose of this apiWrapper is to function like a global catchall for ANY errors
