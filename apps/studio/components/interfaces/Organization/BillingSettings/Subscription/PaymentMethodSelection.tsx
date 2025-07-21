@@ -26,7 +26,7 @@ import {
   type PaymentMethodElementRef,
 } from '../PaymentMethods/NewPaymentMethodElement'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import type { CustomerAddress } from 'data/organizations/types'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -56,6 +56,8 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
 
+  const hidePaymentMethodsWithoutAddress = useFlag('hidePaymentMethodsWithoutAddress')
+
   const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })
 
   const paymentMethods = useMemo(() => {
@@ -65,7 +67,9 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         defaultPaymentMethodId: null,
       }
 
-    const filtered = allPaymentMethods.data.filter((pm) => pm.has_address)
+    const filtered = allPaymentMethods.data.filter(
+      (pm) => !hidePaymentMethodsWithoutAddress || pm.has_address
+    )
     return {
       data: filtered,
       defaultPaymentMethodId: allPaymentMethods.data.some(

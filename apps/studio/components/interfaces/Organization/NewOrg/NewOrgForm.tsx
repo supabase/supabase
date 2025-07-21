@@ -356,6 +356,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
             </div>
           </div>
         }
+        className="overflow-visible"
       >
         <Panel.Content>
           <p className="text-sm">This is your organization within Supabase.</p>

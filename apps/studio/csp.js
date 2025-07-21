@@ -66,6 +66,8 @@ const USERCENTRICS_APP_URL = 'https://app.usercentrics.eu'
 const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
+const GOOGLE_MAPS_API_URL = 'https://maps.googleapis.com'
+
 module.exports.getCSP = function getCSP() {
   const DEFAULT_SRC_URLS = [
     API_URL,
@@ -86,6 +88,7 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     USERCENTRICS_URLS,
     STAPE_URL,
+    GOOGLE_MAPS_API_URL,
   ]
   const SCRIPT_SRC_URLS = [
     CLOUDFLARE_CDN_URL,
@@ -144,6 +147,7 @@ module.exports.getCSP = function getCSP() {
     ...SCRIPT_SRC_URLS,
     VERCEL_LIVE_URL,
     PUSHER_URL,
+    GOOGLE_MAPS_API_URL,
   ].join(' ')
 
   const frameSrcDirective = [`frame-src 'self'`, ...FRAME_SRC_URLS, VERCEL_LIVE_URL].join(' ')

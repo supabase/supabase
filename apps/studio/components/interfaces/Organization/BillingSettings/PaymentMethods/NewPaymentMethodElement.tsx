@@ -203,6 +203,10 @@ const NewPaymentMethodElement = forwardRef(
     const addressOptions: StripeAddressElementOptions = useMemo(
       () => ({
         mode: 'billing',
+        autocomplete: {
+          apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
+          mode: 'google_maps_api',
+        },
         display: { name: purchasingAsBusiness ? 'organization' : 'full' },
         defaultValues: {
           address: currentAddress,
