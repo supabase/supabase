@@ -21,7 +21,10 @@ import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { useTheme } from 'next-themes'
 import { Elements } from '@stripe/react-stripe-js'
-import { NewPaymentMethodElement } from '../PaymentMethods/NewPaymentMethodElement'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from '../PaymentMethods/NewPaymentMethodElement'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import type { CustomerAddress } from 'data/organizations/types'
 
@@ -50,20 +53,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
   const { resolvedTheme } = useTheme()
-  const paymentRef = useRef<{
-    createPaymentMethod: () => Promise<
-      | {
-          paymentMethod: PaymentMethod
-          address: CustomerAddress
-          taxId: {
-            country: string
-            type: string
-            value: string
-          } | null
-        }
-      | undefined
-    >
-  }>(null)
+  const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
 
   const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })

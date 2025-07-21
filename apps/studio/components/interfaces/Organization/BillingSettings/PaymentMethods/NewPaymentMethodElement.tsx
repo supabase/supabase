@@ -5,7 +5,11 @@
  */
 
 import { AddressElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { StripeAddressElementChangeEvent, StripeAddressElementOptions } from '@stripe/stripe-js'
+import {
+  StripeAddressElementChangeEvent,
+  StripeAddressElementOptions,
+  type SetupIntent,
+} from '@stripe/stripe-js'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -32,10 +36,11 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { Form } from '@ui/components/shadcn/ui/form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { getURL } from 'lib/helpers'
 import type { CustomerAddress } from 'data/organizations/types'
+import type { PaymentMethod } from '@stripe/stripe-js'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
@@ -45,7 +50,31 @@ export const BillingCustomerDataSchema = z.object({
   tax_id_name: z.string(),
 })
 
-export type BillingCustomerDataFormValues = z.infer<typeof BillingCustomerDataSchema>
+type BillingCustomerDataFormValues = z.infer<typeof BillingCustomerDataSchema>
+
+export type PaymentMethodElementRef = {
+  confirmSetup: () => Promise<
+    | {
+        setupIntent: SetupIntent
+        address: CustomerAddress
+        customerName: string
+      }
+    | undefined
+  >
+  createPaymentMethod: () => Promise<
+    | {
+        paymentMethod: PaymentMethod
+        address: CustomerAddress
+        customerName: string
+        taxId: {
+          country: string
+          type: string
+          value: string
+        } | null
+      }
+    | undefined
+  >
+}
 
 const NewPaymentMethodElement = forwardRef(
   (
@@ -97,7 +126,9 @@ const NewPaymentMethodElement = forwardRef(
       StripeAddressElementChangeEvent['value'] | undefined
     >(undefined)
 
-    const createPaymentMethod = async () => {
+    const createPaymentMethod = async (): ReturnType<
+      PaymentMethodElementRef['createPaymentMethod']
+    > => {
       if (!stripe || !elements) return
       await form.trigger()
 
@@ -128,13 +159,16 @@ const NewPaymentMethodElement = forwardRef(
       const addressElement = await elements.getElement('address')!.getValue()
       return {
         paymentMethod,
-        address: addressElement.value.address,
+        address: {
+          ...addressElement.value.address,
+          line2: addressElement.value.address.line2 || undefined,
+        },
         customerName: addressElement.value.name,
         taxId,
       }
     }
 
-    const confirmSetup = async () => {
+    const confirmSetup = async (): ReturnType<PaymentMethodElementRef['confirmSetup']> => {
       if (!stripe || !elements) return
 
       await elements.submit()
@@ -150,8 +184,15 @@ const NewPaymentMethodElement = forwardRef(
         return
       }
 
-      const address = await elements.getElement('address')?.getValue()
-      return { setupIntent, address: address?.value.address, customerName: address?.value.name }
+      const addressElement = await elements.getElement('address')!.getValue()
+      return {
+        setupIntent,
+        address: {
+          ...addressElement.value.address,
+          line2: addressElement.value.address.line2 || undefined,
+        },
+        customerName: addressElement.value.name,
+      }
     }
 
     useImperativeHandle(ref, () => ({

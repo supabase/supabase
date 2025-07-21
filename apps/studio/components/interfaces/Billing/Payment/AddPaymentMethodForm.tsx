@@ -1,6 +1,9 @@
 import type { SetupIntent } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { NewPaymentMethodElement } from 'components/interfaces/Organization/BillingSettings/PaymentMethods/NewPaymentMethodElement'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from 'components/interfaces/Organization/BillingSettings/PaymentMethods/NewPaymentMethodElement'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
@@ -39,16 +42,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
   const { mutateAsync: markAsDefault } = useOrganizationPaymentMethodMarkAsDefaultMutation()
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
 
-  const paymentRef = useRef<{
-    confirmSetup: () => Promise<
-      | {
-          setupIntent: SetupIntent
-          address: CustomerAddress
-          customerName: string
-        }
-      | undefined
-    >
-  }>(null)
+  const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()

@@ -39,7 +39,10 @@ import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import { NewPaymentMethodElement } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
 import { components } from 'api-types'
 import type { CustomerAddress } from 'data/organizations/types'
 
@@ -270,21 +273,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     })
   }
 
-  const paymentRef = useRef<{
-    createPaymentMethod: () => Promise<
-      | {
-          paymentMethod: PaymentMethod
-          address: CustomerAddress
-          customerName: string
-          taxId: {
-            country: string
-            type: string
-            value: string
-          } | null
-        }
-      | undefined
-    >
-  }>(null)
+  const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
   const handleSubmit = async () => {
     setNewOrgLoading(true)
