@@ -47,7 +47,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
       </DropdownMenu>
 
       <EditSecretModal
-        selectedSecret={selectedSecretToEdit}
+        secret={selectedSecretToEdit}
         onClose={() => {
           setSelectedSecretToEdit(undefined)
           onClose()
