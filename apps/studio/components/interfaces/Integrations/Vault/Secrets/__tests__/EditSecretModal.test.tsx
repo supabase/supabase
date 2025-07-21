@@ -14,7 +14,6 @@ import {
 } from 'ui'
 import { Edit3, MoreVertical } from 'lucide-react'
 import { useState } from 'react'
-import { VaultSecret } from 'types/ui'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const secret = {
@@ -28,7 +27,6 @@ const secret = {
 
 const Page = ({ onClose }: { onClose: () => void }) => {
   const [modal, setModal] = useState<string | null>(null)
-  const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<VaultSecret>()
   const renderModal = () => {
     switch (modal) {
       case `edit`:
