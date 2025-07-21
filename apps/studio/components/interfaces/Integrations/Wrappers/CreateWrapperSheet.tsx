@@ -11,6 +11,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { invalidateSchemasQuery, useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import {
   Button,
   Form,
@@ -29,6 +30,7 @@ import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface CreateWrapperSheetProps {
   isClosing: boolean
@@ -47,6 +49,8 @@ export const CreateWrapperSheet = ({
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [newTables, setNewTables] = useState<any[]>([])
   const [isEditingTable, setIsEditingTable] = useState(false)
@@ -88,7 +92,7 @@ export const CreateWrapperSheet = ({
     wrapper_name: '',
     server_name: '',
     source_schema: wrapperMeta.sourceSchemaOption?.defaultValue ?? '',
-    target_schema: 'public',
+    target_schema: '',
     ...Object.fromEntries(
       wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
     ),
@@ -134,6 +138,17 @@ export const CreateWrapperSheet = ({
       tables: newTables,
       sourceSchema: values.source_schema,
       targetSchema: values.target_schema,
+    })
+
+    sendEvent({
+      action: 'foreign_data_wrapper_created',
+      properties: {
+        wrapperType: wrapperMeta.label,
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
   }
 
@@ -381,6 +396,9 @@ export const CreateWrapperSheet = ({
                             onSelectSchema={(schema) => setFieldValue('target_schema', schema)}
                             onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
                           />
+                          <p className="text-foreground-lighter text-sm">
+                            Be careful not to use an API exposed schema.
+                          </p>
                         </div>
                       </FormSectionContent>
                     </FormSection>

@@ -1222,7 +1222,7 @@ functions:
       - name: attributes
         isOptional: false
         type: UserAttributes
-        subContent: 
+        subContent:
           - name: data
             isOptional: true
             type: object

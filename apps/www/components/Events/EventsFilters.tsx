@@ -3,9 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lodash'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useKey } from 'react-use'
-import type PostTypes from '~/types/post'
+import type PostTypes from 'types/post'
 
 import {
   Button,
@@ -23,6 +24,7 @@ interface Props {
   events?: PostTypes[]
   setEvents: (posts: any) => void
   categories: { [key: string]: number }
+  onDemandEvents?: PostTypes[]
 }
 
 /**
@@ -30,7 +32,7 @@ interface Props {
  * search via category and reset q param if present
  */
 
-function EventFilters({ allEvents, setEvents, categories }: Props) {
+function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [category, setCategory] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -207,6 +209,22 @@ function EventFilters({ allEvents, setEvents, categories }: Props) {
               {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}{' '}
             </Button>
           ))}
+          {!!onDemandEvents?.length && (
+            <Button
+              key="on-demand"
+              type="outline"
+              size={is2XL ? 'tiny' : 'small'}
+              className="rounded-full"
+              iconRight={
+                <span className="text-foreground-lighter text-xs flex items-center h-[16px] self-center">
+                  {onDemandEvents.length}
+                </span>
+              }
+              asChild
+            >
+              <Link href="#on-demand">On Demand</Link>
+            </Button>
+          )}
         </div>
       </AnimatePresence>
       {!showSearchInput && (

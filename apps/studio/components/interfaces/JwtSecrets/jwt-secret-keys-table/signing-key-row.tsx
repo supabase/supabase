@@ -1,16 +1,18 @@
+import dayjs from 'dayjs'
 import { motion } from 'framer-motion'
 import {
   CircleArrowDown,
   CircleArrowUp,
-  Trash2,
   Eye,
   Key,
   MoreVertical,
   ShieldOff,
   Timer,
+  Trash2,
 } from 'lucide-react'
 
 import { components } from 'api-types'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import {
   Badge,
@@ -28,12 +30,13 @@ import { statusColors, statusLabels } from '../jwt.constants'
 
 interface SigningKeyRowProps {
   signingKey: components['schemas']['SigningKeyResponse']
-  setSelectedKey: (key: JWTSigningKey | null) => void
-  setShownDialog: (dialog: 'key-details' | 'revoke' | 'delete' | null) => void
+  setSelectedKey: (key?: JWTSigningKey) => void
+  setShownDialog: (dialog?: 'key-details' | 'revoke' | 'delete') => void
   handlePreviouslyUsedKey: (keyId: string) => void
   handleStandbyKey: (keyId: string) => void
   legacyKey?: JWTSigningKey | null
   standbyKey?: JWTSigningKey | null
+  isLoading?: boolean
 }
 
 const MotionTableRow = motion(TableRow)
@@ -46,6 +49,7 @@ export const SigningKeyRow = ({
   handleStandbyKey,
   legacyKey,
   standbyKey,
+  isLoading = false,
 }: SigningKeyRowProps) => (
   <MotionTableRow
     key={signingKey.id}
@@ -73,24 +77,26 @@ export const SigningKeyRow = ({
           )}
         >
           {signingKey.status === 'standby' ? (
-            <Timer className="size-4" />
+            <Timer className="size-4 flex-shrink-0" />
           ) : (
-            <Key className="size-4" />
+            <Key className="size-4 flex-shrink-0" />
           )}
-          {statusLabels[signingKey.status]}
+          <span className="truncate">{statusLabels[signingKey.status]}</span>
         </Badge>
       </div>
     </TableCell>
     <TableCell className="font-mono truncate max-w-[100px] pl-0 py-2">
-      <div className="">
+      <div className="min-w-0 flex">
         <Badge
           className={cn(
             'bg-opacity-100 bg-200 border-foreground-muted',
             'rounded-l-none',
-            'gap-2 py-2 h-6'
+            'gap-2 py-2 h-6 min-w-0 overflow-hidden flex items-center flex-1'
           )}
         >
-          {signingKey.id}
+          <span className="truncate flex-1" title={signingKey.id}>
+            {signingKey.id}
+          </span>
         </Badge>
       </div>
     </TableCell>
@@ -100,13 +106,23 @@ export const SigningKeyRow = ({
         legacy={signingKey.id === legacyKey?.id}
       />
     </TableCell>
+    {(signingKey.status === 'previously_used' || signingKey.status === 'revoked') && (
+      <TableCell className="text-right py-2 text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
+        {dayjs(signingKey.updated_at).fromNow()}
+      </TableCell>
+    )}
     <TableCell className="text-right py-2">
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" className="px-2" icon={<MoreVertical className="size-4" />} />
+            <Button
+              type="text"
+              className="px-1.5"
+              loading={isLoading}
+              icon={<MoreVertical className="size-4" />}
+            />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-52">
             {signingKey.algorithm !== 'HS256' && (
               <DropdownMenuItem
                 onSelect={() => {
@@ -131,15 +147,21 @@ export const SigningKeyRow = ({
             )}
             {signingKey.status === 'previously_used' && (
               <>
-                <DropdownMenuItem
-                  onSelect={() => {
-                    handleStandbyKey(signingKey.id)
-                  }}
+                <DropdownMenuItemTooltip
                   disabled={!!standbyKey}
+                  onSelect={() => handleStandbyKey(signingKey.id)}
+                  tooltip={{
+                    content: {
+                      side: 'left',
+                      text: !!standbyKey
+                        ? 'You may only have one standby key at a time'
+                        : undefined,
+                    },
+                  }}
                 >
                   <CircleArrowUp className="mr-2 size-4" />
                   Move to standby key
-                </DropdownMenuItem>
+                </DropdownMenuItemTooltip>
                 <DropdownMenuItem
                   onSelect={() => {
                     setSelectedKey(signingKey)
@@ -154,15 +176,21 @@ export const SigningKeyRow = ({
             )}
             {signingKey.status === 'revoked' && (
               <>
-                <DropdownMenuItem
-                  onSelect={() => {
-                    handleStandbyKey(signingKey.id)
-                  }}
+                <DropdownMenuItemTooltip
                   disabled={!!standbyKey}
+                  onSelect={() => handleStandbyKey(signingKey.id)}
+                  tooltip={{
+                    content: {
+                      side: 'left',
+                      text: !!standbyKey
+                        ? 'You may only have one standby key at a time'
+                        : undefined,
+                    },
+                  }}
                 >
                   <CircleArrowUp className="mr-2 size-4" />
                   Move to standby key
-                </DropdownMenuItem>
+                </DropdownMenuItemTooltip>
                 <DropdownMenuItem
                   onSelect={() => {
                     setSelectedKey(signingKey)

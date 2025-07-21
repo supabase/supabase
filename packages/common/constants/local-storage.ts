@@ -10,7 +10,12 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
+  UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
+  UI_PREVIEW_REALTIME_SETTINGS: 'supabase-ui-realtime-settings',
+  UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
+  UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
+
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
   TERMS_OF_SERVICE_ACKNOWLEDGED: 'terms-of-service-acknowledged',
@@ -100,10 +105,13 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
 ]
 
 export function clearLocalStorage() {

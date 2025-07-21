@@ -6,7 +6,8 @@ import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import { ResponseError } from 'types'
-import type { paths } from './api' // generated from openapi-typescript
+// generated from openapi-typescript
+import type { paths } from './api'
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
@@ -15,6 +16,7 @@ export const fetchHandler: typeof fetch = async (input, init) => {
     return await fetch(input, init)
   } catch (err: any) {
     if (err instanceof TypeError && err.message === 'Failed to fetch') {
+      console.error(err)
       throw new Error('Unable to reach the server. Please check your network or try again later.')
     }
     throw err
@@ -191,6 +193,39 @@ async function handleFetchResponse<T>(response: Response): Promise<T | ResponseE
   }
 }
 
+async function handleFetchError(response: unknown): Promise<ResponseError> {
+  let resJson: any = {}
+
+  if (response instanceof Error) {
+    resJson = response
+  }
+
+  if (response instanceof Response) {
+    resJson = await response.json()
+  }
+
+  const status = response instanceof Response ? response.status : undefined
+
+  const message =
+    resJson.message ??
+    resJson.msg ??
+    resJson.error ??
+    `An error has occurred: ${status ?? 'Unknown error'}`
+  const retryAfter =
+    response instanceof Response && response.headers.get('Retry-After')
+      ? parseInt(response.headers.get('Retry-After')!)
+      : undefined
+
+  let error = new ResponseError(message, status, undefined, retryAfter)
+
+  // @ts-expect-error - [Alaister] many of our local api routes check `if (response.error)`.
+  // This is a fix to keep those checks working without breaking changes.
+  // In future we should check for `if (response instanceof ResponseError)` instead.
+  error.error = error
+
+  return error
+}
+
 /**
  * To be used only for dashboard API endpoints. Use `fetch` directly if calling a non dashboard API endpoint
  *
@@ -216,9 +251,9 @@ export async function fetchPost<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleError(response)
+    if (!response.ok) return handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
-    return handleError(error)
+    return handleFetchError(error)
   }
 }

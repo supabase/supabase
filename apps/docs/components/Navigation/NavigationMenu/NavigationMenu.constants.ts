@@ -718,8 +718,12 @@ export const auth = {
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
         { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
-        { name: 'JWTs', url: '/guides/auth/jwts' },
-        { name: 'JWT Fields Reference', url: '/guides/auth/jwt-fields' },
+        {
+          name: 'JSON Web Tokens (JWT)',
+          url: '/guides/auth/jwts',
+          items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
+        },
+        { name: 'JWT Signing Keys', url: '/guides/auth/signing-keys' },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
           name: 'Column Level Security',
@@ -1582,6 +1586,7 @@ export const realtime: NavMenuConstant = {
           name: 'Postgres Changes',
           url: '/guides/realtime/postgres-changes',
         },
+        { name: 'Settings', url: '/guides/realtime/settings' },
       ],
     },
     {
@@ -1618,7 +1623,7 @@ export const realtime: NavMenuConstant = {
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Pricing', url: '/guides/realtime/pricing' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
         { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
     },
@@ -1711,6 +1716,25 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Authentication', url: '/guides/storage/s3/authentication' },
         { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
+      ],
+    },
+    {
+      name: 'Analytics Buckets',
+      url: undefined,
+      items: [
+        { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
+        {
+          name: 'Creating Analytics Buckets',
+          url: '/guides/storage/analytics/creating-analytics-buckets',
+        },
+        {
+          name: 'Connecting to Analytics Buckets',
+          url: '/guides/storage/analytics/connecting-to-analytics-bucket',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/storage/analytics/limits',
+        },
       ],
     },
     {
@@ -2065,6 +2089,7 @@ export const security: NavMenuConstant = {
       name: 'Product security',
       url: undefined,
       items: [
+        { name: 'Platform configuration', url: '/guides/security/platform-security' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
       ],
@@ -2147,12 +2172,8 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/multi-factor-authentication',
           items: [
             {
-              name: 'Enable MFA',
-              url: '/guides/platform/multi-factor-authentication',
-            },
-            {
-              name: 'Require MFA for organization members',
-              url: '/guides/platform/org-mfa-enforcement',
+              name: 'Enforce MFA on organization',
+              url: '/guides/platform/mfa/org-mfa-enforcement',
             },
           ],
         },
@@ -2338,6 +2359,10 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/log-drains',
         },
         {
+          name: 'Reports',
+          url: '/guides/telemetry/reports',
+        },
+        {
           name: 'Metrics',
           url: '/guides/telemetry/metrics',
         },
@@ -2430,7 +2455,26 @@ export const deployment: NavMenuConstant = {
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
         { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
-        { name: 'Branching', url: '/guides/deployment/branching' },
+      ],
+    },
+    {
+      name: 'Branching',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/deployment/branching' },
+        { name: 'GitHub integration', url: '/guides/deployment/branching/github-integration' },
+        {
+          name: 'Branching 2.0 (Alpha)',
+          url: '/guides/deployment/branching/branching-2',
+        },
+        {
+          name: 'Working with branches',
+          url: '/guides/deployment/branching/working-with-branches',
+        },
+        { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
+        { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
+        { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
+        { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
     },
     {
