@@ -211,7 +211,7 @@ const NewPaymentMethodElement = forwardRef(
         },
         display: { name: purchasingAsBusiness ? 'organization' : 'full' },
         defaultValues: {
-          address: currentAddress,
+          address: currentAddress ?? undefined,
           name: customerName,
         },
       }),

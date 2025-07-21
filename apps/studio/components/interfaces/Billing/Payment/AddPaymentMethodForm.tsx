@@ -90,24 +90,25 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         } catch (error) {
           toast.error('Failed to set payment method as default')
         }
-
-        try {
-          if (isPrimaryBillingAddress) {
-            if (result.address && !isEqual(result.address, customerProfile?.address)) {
-              await updateCustomerProfile({
-                billing_name: result.customerName,
-                address: result.address,
-              })
-            }
-          }
-        } catch (error) {
-          toast.error('Failed to update billing address')
-        }
       } else {
         if (selectedOrganization) {
           await queryClient.invalidateQueries(
             organizationKeys.paymentMethods(selectedOrganization.slug)
           )
+        }
+      }
+
+      if (isPrimaryBillingAddress) {
+        try {
+          if (result.address && !isEqual(result.address, customerProfile?.address)) {
+            await updateCustomerProfile({
+              slug: selectedOrganization?.slug,
+              billing_name: result.customerName,
+              address: result.address,
+            })
+          }
+        } catch (error) {
+          toast.error('Failed to update billing address')
         }
       }
 
