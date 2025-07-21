@@ -1,6 +1,7 @@
 import { AlertCircle, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -38,7 +39,13 @@ const CustomDomainVerify = () => {
       },
     })
 
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      toast.success(
+        'Cancelled setting up custom domain. It may take a few seconds before your custom domain is fully removed, hence you may need to refresh your browser.'
+      )
+    },
+  })
 
   const hasCAAErrors = customDomain?.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
