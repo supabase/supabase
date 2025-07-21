@@ -79,7 +79,7 @@ const BucketRow = ({
             <Button type="text" icon={<ChevronDown />} className="mr-1 p-1.5 w-7" />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start">
-            {bucket.type === 'ANALYTICS' && (
+            {bucket.type !== 'ANALYTICS' && (
               <>
                 <DropdownMenuItem
                   key="toggle-private"

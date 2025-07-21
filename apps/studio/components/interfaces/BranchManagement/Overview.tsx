@@ -16,6 +16,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
@@ -23,7 +24,6 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { branchKeys } from 'data/branches/keys'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   Button,
   DropdownMenu,
@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
@@ -98,8 +99,9 @@ export const Overview = ({
         {isSuccess && persistentBranches.length === 0 && (
           <div className="flex items-center flex-col justify-center w-full py-10">
             <p>No persistent branches</p>
-            <p className="text-foreground-light">
-              Persistent branches are long-lived and not automatically deleted.
+            <p className="text-foreground-light text-center">
+              Persistent branches are long-lived, cannot be reset, and are ideal for staging
+              environments.
             </p>
           </div>
         )}
@@ -337,19 +339,20 @@ const PreviewBranchActions = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ConfirmationModal
-        variant="destructive"
+      <TextConfirmModal
+        variant="warning"
         visible={showConfirmResetModal}
-        confirmLabel="Reset branch"
-        title="Confirm branch reset"
-        loading={isResetting}
         onCancel={() => setShowConfirmResetModal(false)}
         onConfirm={onConfirmReset}
-      >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
-        </p>
-      </ConfirmationModal>
+        loading={isResetting}
+        title="Reset branch"
+        confirmLabel="Reset branch"
+        confirmPlaceholder="Type in name of branch"
+        confirmString={branch?.name ?? ''}
+        alert={{
+          title: `Are you sure you want to reset the "${branch.name}" branch? All data will be deleted.`,
+        }}
+      />
 
       <ConfirmationModal
         variant="default"

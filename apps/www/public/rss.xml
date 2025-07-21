@@ -5,9 +5,72 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 15 Jul 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 18 Jul 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/launch-week-15-top-10</guid>
+  <title>Top 10 Launches of Launch Week 15</title>
+  <link>https://supabase.com/blog/launch-week-15-top-10</link>
+  <description>Highlights from Launch Week 15</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/lw15-hackathon</guid>
+  <title>Supabase Launch Week 15 Hackathon</title>
+  <link>https://supabase.com/blog/lw15-hackathon</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</guid>
+  <title>Storage: 10x Larger Uploads, 3x Cheaper Cached Egress, and 2x Egress Quota</title>
+  <link>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</link>
+  <description>Upload files up to 500 GB with significant egress cost reductions.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</guid>
+  <title>Persistent Storage and 97% Faster Cold Starts for Edge Functions</title>
+  <link>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</link>
+  <description>Mount S3-compatible buckets as persistent file storage in Edge Functions with up to 97% faster cold start times.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/algolia-connector-for-supabase</guid>
+  <title>Algolia Connector for Supabase</title>
+  <link>https://supabase.com/blog/algolia-connector-for-supabase</link>
+  <description>Bring lightning-fast search to your Supabase apps, with no code required.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/new-observability-features-in-supabase</guid>
+  <title>New Observability Features in Supabase</title>
+  <link>https://supabase.com/blog/new-observability-features-in-supabase</link>
+  <description>New unified logging, advanced reports, and AI debugging capabilities.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/improved-security-controls</guid>
+  <title>Improved Security Controls and A New Home for Security</title>
+  <link>https://supabase.com/blog/improved-security-controls</link>
+  <description>Access to a new central security page and launch of additional controls.</description>
+  <pubDate>Wed, 16 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/branching-2-0</guid>
+  <title>Introducing Branching 2.0</title>
+  <link>https://supabase.com/blog/branching-2-0</link>
+  <description>Create, review and merge Supabase branches all within the dashboard.</description>
+  <pubDate>Wed, 16 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/stripe-engine-as-sync-library</guid>
+  <title>Stripe-To-Postgres Sync Engine as standalone Library</title>
+  <link>https://supabase.com/blog/stripe-engine-as-sync-library</link>
+  <description>Sync Stripe webhook data directly to Postgres using standalone TypeScript library.</description>
+  <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/analytics-buckets</guid>
   <title>Supabase Analytics Buckets with Iceberg Support</title>
   <link>https://supabase.com/blog/analytics-buckets</link>
