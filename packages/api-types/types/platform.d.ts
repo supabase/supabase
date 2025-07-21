@@ -6536,6 +6536,7 @@ export interface components {
           last4: string
         }
         created: number
+        has_address: boolean
         id: string
         is_default: boolean
         type: string
@@ -12635,7 +12636,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12673,7 +12675,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12715,7 +12718,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12760,7 +12764,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12798,7 +12803,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12844,7 +12850,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12884,7 +12891,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12926,7 +12934,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12964,7 +12973,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13008,7 +13018,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13051,7 +13062,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13092,7 +13104,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13130,7 +13143,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13174,7 +13188,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13214,7 +13229,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13264,7 +13280,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13305,7 +13322,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13343,7 +13361,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13387,7 +13406,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13427,7 +13447,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13469,7 +13490,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13507,7 +13529,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13551,7 +13574,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13591,7 +13615,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13633,7 +13658,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13737,7 +13763,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13775,7 +13802,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13819,7 +13847,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13859,7 +13888,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13909,7 +13939,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13947,7 +13978,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13993,7 +14025,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14033,7 +14066,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14078,7 +14112,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14116,7 +14151,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14160,7 +14196,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14200,7 +14237,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14245,7 +14283,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14291,7 +14330,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
