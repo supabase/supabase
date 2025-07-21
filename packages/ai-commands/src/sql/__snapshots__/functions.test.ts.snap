@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`debug fix order of operations 1`] = `
+exports[`debug > fix order of operations 1`] = `
 "create table departments (
   id bigint primary key generated always as identity,
   name text
@@ -14,7 +14,7 @@ create table employees (
 );"
 `;
 
-exports[`debug fix typos 1`] = `
+exports[`debug > fix typos 1`] = `
 "select
   *
 from

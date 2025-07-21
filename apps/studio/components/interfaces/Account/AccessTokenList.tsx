@@ -24,7 +24,7 @@ const AccessTokenList = () => {
 
   return (
     <>
-      <div>
+      <div className="overflow-hidden overflow-x-scroll">
         <Table
           head={[
             <Table.th key="header-token">Token</Table.th>,

@@ -16,9 +16,9 @@ A pull-based Queue is a Message storage and delivery system where consumers acti
 
 ### Message
 
-A Message in a Queue is a json object that is stored until a consumer explicitly processes and removes it, like a task waiting in a to-do list until someone checks and completes it.
+A Message in a Queue is a JSON object that is stored until a consumer explicitly processes and removes it, like a task waiting in a to-do list until someone checks and completes it.
 
-### Queue Types
+### Queue types
 
 Supabase Queues offers three types of Queues:
 
@@ -127,6 +127,18 @@ The permissions required for each Queue API database function:
 | `read` `pop`        | `Select` `Update`        |
 | `archive` `delete`  | `Select` `Delete`        |
 
+To manage your queue permissions, click on the Queue Settings button.
+
+<Image
+  alt="Screenshot of accessing queue settings"
+  src={{
+    dark: '/docs/img/queues-quickstart-queue-settings.png',
+    light: '/docs/img/queues-quickstart-queue-settings.png',
+  }}
+/>
+
+Then enable the required roles permissions.
+
 <Image
   alt="Screenshot of configuring API access for roles from the Queues settings"
   src={{
@@ -141,9 +153,9 @@ The permissions required for each Queue API database function:
 
 </Admonition>
 
-### Enqueuing and Dequeuing Messages
+### Enqueueing and dequeueing messages
 
-Once your Queue has been created, you can begin enqueuing and dequeuing Messages.
+Once your Queue has been created, you can begin enqueueing and dequeueing Messages.
 
 Here's a TypeScript example using the official Supabase client library:
 
@@ -158,7 +170,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 const QueuesTest: React.FC = () => {
   //Add a Message
   const sendToQueue = async () => {
-    const result = await supabase.rpc('send', {
+    const result = await supabase.schema('pgmq_public').rpc('send', {
       queue_name: 'foo',
       message: { hello: 'world' },
       sleep_seconds: 30,
@@ -168,7 +180,7 @@ const QueuesTest: React.FC = () => {
 
   //Dequeue Message
   const popFromQueue = async () => {
-    const result = await supabase.rpc('pop', { queue_name: 'foo' })
+    const result = await supabase.schema('pgmq_public').rpc('pop', { queue_name: 'foo' })
     console.log(result)
   }
 

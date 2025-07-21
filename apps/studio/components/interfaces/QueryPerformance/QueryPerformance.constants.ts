@@ -4,6 +4,12 @@ export enum QUERY_PERFORMANCE_REPORT_TYPES {
   SLOWEST_EXECUTION = 'slowest_execution',
 }
 
+export const QUERY_PERFORMANCE_PRESET_MAP = {
+  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
+  [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
+  [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
+} as const
+
 export const QUERY_PERFORMANCE_REPORTS = {
   [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: [
     { id: 'query', name: 'Query', description: undefined, minWidth: 600 },

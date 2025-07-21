@@ -1,11 +1,12 @@
 'use client'
 
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { compact, debounce, uniqBy } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
 const NUMBER_SOURCES = 2
 
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const FUNCTIONS_URL = '/functions/v1/'
 
 enum PageType {
@@ -188,68 +189,86 @@ function reducer(state: SearchState, action: Action): SearchState {
   }
 }
 
-const useDocsSearch = (supabaseClient: SupabaseClient) => {
+const useDocsSearch = () => {
   const [state, dispatch] = useReducer(reducer, { status: 'initial', key: 0 })
   const key = useRef(0)
 
-  const handleSearch = useCallback(
-    async (query: string) => {
-      key.current += 1
-      const localKey = key.current
-      dispatch({ type: 'newSearchDispatched', key: localKey })
+  const handleSearch = useCallback(async (query: string) => {
+    key.current += 1
+    const localKey = key.current
+    dispatch({ type: 'newSearchDispatched', key: localKey })
 
-      let sourcesLoaded = 0
+    let sourcesLoaded = 0
 
-      supabaseClient
-        .rpc('docs_search_fts', { query: query.trim() })
-        .then(({ data, error }: { data: any; error: any }) => {
-          sourcesLoaded += 1
-          if (error || !Array.isArray(data)) {
-            dispatch({
-              type: 'errored',
-              key: localKey,
-              sourcesLoaded,
-              message: error?.message ?? '',
-            })
-          } else {
-            dispatch({
-              type: 'resultsReturned',
-              key: localKey,
-              sourcesLoaded,
-              results: data,
-            })
-          }
-        })
-
-      fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {
-        method: 'POST',
-        body: JSON.stringify({ query }),
-      })
-        .then((response) => response.json())
-        .then((results) => {
-          if (!Array.isArray(results)) {
-            throw Error("didn't get expected results array")
-          }
-          sourcesLoaded += 1
-          dispatch({
-            type: 'resultsReturned',
-            key: localKey,
-            sourcesLoaded,
-            results,
-          })
-        })
-        .catch((error) => {
-          sourcesLoaded += 1
+    fetch(`${SUPABASE_URL}/rest/v1/rpc/docs_search_fts`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        ...(SUPABASE_ANON_KEY && {
+          apikey: SUPABASE_ANON_KEY,
+          authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        }),
+      },
+      body: JSON.stringify({ query: query.trim() }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        sourcesLoaded += 1
+        if (!Array.isArray(data)) {
           dispatch({
             type: 'errored',
             key: localKey,
             sourcesLoaded,
-            message: error.message ?? '',
+            message: data?.message ?? '',
           })
+        } else {
+          dispatch({
+            type: 'resultsReturned',
+            key: localKey,
+            sourcesLoaded,
+            results: data,
+          })
+        }
+      })
+      .catch((error: unknown) => {
+        sourcesLoaded += 1
+        console.error(`[ERROR] Error fetching Full Text Search results: ${error}`)
+
+        dispatch({
+          type: 'errored',
+          key: localKey,
+          sourcesLoaded,
+          message: '',
         })
-    },
-    [supabaseClient]
-  )
+      })
+
+    fetch(`${SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {
+      method: 'POST',
+      body: JSON.stringify({ query }),
+    })
+      .then((response) => response.json())
+      .then((results) => {
+        if (!Array.isArray(results)) {
+          throw Error("didn't get expected results array")
+        }
+        sourcesLoaded += 1
+        dispatch({
+          type: 'resultsReturned',
+          key: localKey,
+          sourcesLoaded,
+          results,
+        })
+      })
+      .catch((error) => {
+        sourcesLoaded += 1
+        dispatch({
+          type: 'errored',
+          key: localKey,
+          sourcesLoaded,
+          message: error.message ?? '',
+        })
+      })
+  }, [])
 
   const debouncedSearch = useMemo(() => debounce(handleSearch, 150), [handleSearch])
 

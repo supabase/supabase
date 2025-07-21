@@ -1,10 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
-import type { Filter, SupaTable } from 'components/grid/types'
+import { Query } from '@supabase/pg-meta/src/query'
+import type { Filter } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { Entity } from 'data/table-editor/table-editor-types'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
@@ -12,10 +13,10 @@ import { formatFilterValue } from './utils'
 
 export type TableRowDeleteAllVariables = {
   projectRef: string
-  connectionString?: string
-  table: SupaTable
+  connectionString?: string | null
+  table: Entity
   filters: Filter[]
-  impersonatedRole?: ImpersonationRole
+  roleImpersonationState?: RoleImpersonationState
 }
 
 export function getTableRowDeleteAllSql({
@@ -39,18 +40,18 @@ export async function deleteAllTableRow({
   connectionString,
   table,
   filters,
-  impersonatedRole,
+  roleImpersonationState,
 }: TableRowDeleteAllVariables) {
-  const sql = wrapWithRoleImpersonation(getTableRowDeleteAllSql({ table, filters }), {
-    projectRef,
-    role: impersonatedRole,
-  })
+  const sql = wrapWithRoleImpersonation(
+    getTableRowDeleteAllSql({ table, filters }),
+    roleImpersonationState
+  )
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
-    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
   })
 
   return result

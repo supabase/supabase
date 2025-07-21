@@ -1,17 +1,17 @@
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
-  DISK_PRICING,
-  DiskType,
-} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from 'components/interfaces/DiskManagement/DiskManagement.utils'
+import {
+  DISK_PRICING,
+  DiskType,
+} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
@@ -23,11 +23,9 @@ import {
   MAX_REPLICAS_BELOW_XL,
   useReadReplicasQuery,
 } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useIsAwsK8sCloudProvider, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
@@ -71,22 +69,23 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const diskManagementV2 = useFlag('diskManagementV2')
-  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
+  const isNotOnTeamOrEnterprisePlan = useMemo(
+    () => !['team', 'enterprise'].includes(org?.plan.id ?? ''),
+    [org]
+  )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled:
-      subscription !== undefined && !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+    enabled: isNotOnTeamOrEnterprisePlan,
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const hasOverdueInvoices = overdueInvoices.length > 0
+  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
@@ -99,7 +98,7 @@ const DeployNewReplicaPanel = ({
 
   // @ts-ignore
   const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
   const additionalCostDiskSize =
     readReplicaDiskSizes * (DISK_PRICING[type as DiskType]?.storage ?? 0)
@@ -166,14 +165,13 @@ const DeployNewReplicaPanel = ({
     : MAX_REPLICAS_ABOVE_XL
   const reachedMaxReplicas =
     (data ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
-  const isFreePlan = subscription?.plan.id === 'free'
+  const isFreePlan = org?.plan.id === 'free'
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
-  const isProWithSpendCapEnabled =
-    subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
+  const isProWithSpendCapEnabled = org?.plan.id === 'pro' && !org.usage_billing_enabled
   const isMinimallyOnSmallCompute =
     currentComputeAddon?.variant.identifier !== undefined &&
     currentComputeAddon?.variant.identifier !== 'ci_micro'
@@ -185,6 +183,7 @@ const DeployNewReplicaPanel = ({
     isWalgEnabled &&
     currentComputeAddon !== undefined &&
     !hasOverdueInvoices &&
+    !isAwsK8s &&
     !isProWithSpendCapEnabled
 
   const computeAddons =
@@ -194,7 +193,9 @@ const DeployNewReplicaPanel = ({
 
   const availableRegions =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? AVAILABLE_REPLICA_REGIONS.filter((x) => x.key === 'SOUTHEAST_ASIA')
+      ? AVAILABLE_REPLICA_REGIONS.filter((x) =>
+          ['SOUTHEAST_ASIA', 'CENTRAL_EU', 'EAST_US'].includes(x.key)
+        )
       : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {
@@ -239,7 +240,7 @@ const DeployNewReplicaPanel = ({
               </span>
               <div className="mt-3">
                 <Button asChild type="default">
-                  <Link href={`/org/${org?.slug}/invoices`}>View invoices</Link>
+                  <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
                 </Button>
               </div>
             </AlertDescription_Shadcn_>
@@ -260,6 +261,19 @@ const DeployNewReplicaPanel = ({
                 className="mt-3"
                 href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
               />
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        ) : isAwsK8s ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Read replicas are not supported for AWS (Revamped) projects
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                Projects provisioned by other cloud providers currently will not be able to use read
+                replicas
+              </span>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : currentPgVersion < 15 ? (
@@ -299,10 +313,8 @@ const DeployNewReplicaPanel = ({
                   <Link
                     href={
                       isFreePlan
-                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                        : diskAndComputeFormEnabled
-                          ? `/project/${projectRef}/settings/compute-and-disk`
-                          : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelSmallCompute`
+                        : `/project/${projectRef}/settings/compute-and-disk`
                     }
                   >
                     {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
@@ -398,10 +410,8 @@ const DeployNewReplicaPanel = ({
                       <Link
                         href={
                           isFreePlan
-                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                            : diskAndComputeFormEnabled
-                              ? `/project/${projectRef}/settings/compute-and-disk`
-                              : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                            ? `/org/${org?.slug}/billing?panel=subscriptionPlan&source=deployNewReplicaPanelMaxReplicas`
+                            : `/project/${projectRef}/settings/compute-and-disk`
                         }
                       >
                         Upgrade compute size
@@ -449,13 +459,15 @@ const DeployNewReplicaPanel = ({
                   <CollapsibleTrigger_Shadcn_ className="w-full flex items-center justify-between [&[data-state=open]>svg]:!-rotate-180">
                     <p className="text-sm text-left">
                       New replica will cost an additional{' '}
-                      {formatCurrency(
-                        estComputeMonthlyCost +
-                          additionalCostDiskSize +
-                          Number(additionalCostIOPS) +
-                          Number(additionalCostThroughput)
-                      )}
-                      /month
+                      <span translate="no">
+                        {formatCurrency(
+                          estComputeMonthlyCost +
+                            additionalCostDiskSize +
+                            Number(additionalCostIOPS) +
+                            Number(additionalCostThroughput)
+                        )}
+                        /month
+                      </span>
                     </p>
                     <ChevronDown size={14} className="transition" />
                   </CollapsibleTrigger_Shadcn_>
@@ -479,7 +491,7 @@ const DeployNewReplicaPanel = ({
                         <TableRow>
                           <TableCell className="pl-0">Compute size</TableCell>
                           <TableCell>{selectedComputeMeta?.name}</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(estComputeMonthlyCost)}
                           </TableCell>
                         </TableRow>
@@ -488,14 +500,14 @@ const DeployNewReplicaPanel = ({
                           <TableCell>
                             {((size_gb ?? 0) * 1.25).toLocaleString()} GB ({type})
                           </TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(additionalCostDiskSize)}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell className="pl-0">IOPS</TableCell>
                           <TableCell>{iops?.toLocaleString()} IOPS</TableCell>
-                          <TableCell className="text-right font-mono pr-0">
+                          <TableCell className="text-right font-mono pr-0" translate="no">
                             {formatCurrency(+additionalCostIOPS)}
                           </TableCell>
                         </TableRow>
@@ -519,14 +531,17 @@ const DeployNewReplicaPanel = ({
                 read replica on the{' '}
                 <span className="text-foreground">{selectedComputeMeta?.name}</span> size incurs
                 additional{' '}
-                <span className="text-foreground">{selectedComputeMeta?.price_description}</span>.
+                <span className="text-foreground" translate="no">
+                  {selectedComputeMeta?.price_description}
+                </span>
+                .
               </p>
             )}
 
             <p className="text-foreground-light text-sm">
               Read more about{' '}
               <Link
-                href="https://supabase.com/docs/guides/platform/org-based-billing#read-replicas"
+                href="https://supabase.com/docs/guides/platform/manage-your-usage/read-replicas"
                 target="_blank"
                 rel="noreferrer"
                 className="underline hover:text-foreground transition"

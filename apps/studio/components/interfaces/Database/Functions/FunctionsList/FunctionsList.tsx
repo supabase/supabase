@@ -17,7 +17,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
@@ -36,7 +36,7 @@ const FunctionsList = ({
   const router = useRouter()
   const { search } = useParams()
   const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -101,10 +101,10 @@ const FunctionsList = ({
         </div>
       ) : (
         <div className="w-full space-y-4">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center gap-x-2">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
               <SchemaSelector
-                className="w-[180px]"
+                className="w-full lg:w-[180px]"
                 size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
@@ -120,7 +120,7 @@ const FunctionsList = ({
                 size="tiny"
                 icon={<Search size={14} />}
                 value={filterString}
-                className="w-52"
+                className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -131,6 +131,7 @@ const FunctionsList = ({
                   <ButtonTooltip
                     disabled={!canCreateFunctions}
                     onClick={() => createFunction()}
+                    className="flex-grow"
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -148,7 +149,8 @@ const FunctionsList = ({
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}
                     onClick={() =>
-                      setAiAssistantPanel({
+                      aiSnap.newChat({
+                        name: 'Create new function',
                         open: true,
                         initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                       })

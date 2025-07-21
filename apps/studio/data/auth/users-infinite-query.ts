@@ -10,7 +10,7 @@ export type Filter = 'verified' | 'unverified' | 'anonymous'
 
 export type UsersVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   page?: number
   keywords?: string
   filter?: Filter
@@ -20,7 +20,9 @@ export type UsersVariables = {
 }
 
 export const USERS_PAGE_LIMIT = 50
-export type User = components['schemas']['UserBody']
+export type User = components['schemas']['UserBody'] & {
+  providers: readonly string[]
+}
 
 export const getUsersSQL = ({
   page = 0,
@@ -41,11 +43,15 @@ export const getUsersSQL = ({
   const hasValidKeywords = keywords && keywords !== ''
 
   const conditions: string[] = []
-  const baseQueryUsers = `select * from auth.users`
+  const baseQueryUsers = `
+  select *, coalesce((select array_agg(distinct i.provider) from auth.identities i where i.user_id = auth.users.id), '{}'::text[]) as providers from auth.users
+  `.trim()
 
   if (hasValidKeywords) {
+    // [Joshen] Escape single quotes properly
+    const formattedKeywords = keywords.replaceAll("'", "''")
     conditions.push(
-      `id::text like '%${keywords}%' or email like '%${keywords}%' or phone like '%${keywords}%'`
+      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%' or raw_user_meta_data->>'full_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'first_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'last_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'display_name' ilike '%${formattedKeywords}%'`
     )
   }
 
@@ -112,7 +118,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
       enabled: enabled && typeof projectRef !== 'undefined' && isActive,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
-        const hasNextPage = lastPage.result.length <= USERS_PAGE_LIMIT
+        const hasNextPage = lastPage.result.length >= USERS_PAGE_LIMIT
         if (!hasNextPage) return undefined
         return page
       },

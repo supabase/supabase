@@ -1,11 +1,13 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react'
 
-import { useParams } from 'common'
 import { Project, useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { PROJECT_STATUS } from 'lib/constants'
+import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
 import { DatabaseSelectorStateContextProvider } from 'state/database-selector'
 import { RoleImpersonationStateContextProvider } from 'state/role-impersonation-state'
+import { StorageExplorerStateContextProvider } from 'state/storage-explorer'
 import { TableEditorStateContextProvider } from 'state/table-editor'
+import { TabsStateContextProvider } from 'state/tabs'
 
 export interface ProjectContextType {
   project?: Project
@@ -41,20 +43,22 @@ export const ProjectContextProvider = ({
   return (
     <ProjectContext.Provider value={value}>
       <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
-        <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
-          <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-            {children}
-          </RoleImpersonationStateContextProvider>
-        </DatabaseSelectorStateContextProvider>
+        <TabsStateContextProvider key={`tabs-state-${projectRef}`}>
+          <AiAssistantStateContextProvider key={`ai-assistant-state-${projectRef}`}>
+            <StorageExplorerStateContextProvider key={`storage-explorer-state-${projectRef}`}>
+              <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
+                <RoleImpersonationStateContextProvider
+                  key={`role-impersonation-state-${projectRef}`}
+                >
+                  {children}
+                </RoleImpersonationStateContextProvider>
+              </DatabaseSelectorStateContextProvider>
+            </StorageExplorerStateContextProvider>
+          </AiAssistantStateContextProvider>
+        </TabsStateContextProvider>
       </TableEditorStateContextProvider>
     </ProjectContext.Provider>
   )
-}
-
-export const ProjectContextFromParamsProvider = ({ children }: PropsWithChildren<{}>) => {
-  const { ref: projectRef } = useParams()
-
-  return <ProjectContextProvider projectRef={projectRef}>{children}</ProjectContextProvider>
 }
 
 export const useIsProjectActive = () => {

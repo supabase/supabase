@@ -13,22 +13,22 @@ import Image from 'next/image'
 
 interface Props {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  stories: Story[]
-  highlights: Highlight[]
+  label?: string | JSX.Element
+  heading?: string | JSX.Element
+  stories?: Story[]
+  highlights?: Highlight[]
 }
 
 export type Story = {
-  icon: string
+  icon?: string
   url: string
   target?: '_blank' | string
-  heading: string
-  subheading: string | JSX.Element
+  heading?: string
+  subheading?: string | JSX.Element
 }
 
 type Highlight = {
-  icon: LucideIcon
+  icon?: LucideIcon
   heading: string
   subheading: string
   url: string
@@ -45,7 +45,7 @@ const UseCases: FC<Props> = (props) => (
     <div className="overflow-hidden">
       <SectionContainer className="!py-4">
         <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-[300px]">
-          {props.stories.map((story) => (
+          {props.stories?.map((story) => (
             <li key={story.heading} className="w-full">
               <StoryCard story={story} />
             </li>
@@ -74,7 +74,7 @@ const UseCases: FC<Props> = (props) => (
               },
             }}
           >
-            {props.stories.map((story: Story, i: number) => (
+            {props.stories?.map((story: Story, i: number) => (
               <SwiperSlide key={`${story.heading}-mobile`}>
                 <StoryCard story={story} />
               </SwiperSlide>
@@ -85,7 +85,7 @@ const UseCases: FC<Props> = (props) => (
     </div>
     <SectionContainer className="!pt-0">
       <ul className="grid grid-cols-2 gap-4 sm:gap-10 gap-y-10 lg:grid-cols-4 md:gap-12 lg:gap-x-8 mt-8">
-        {props.highlights.map((highlight) => (
+        {props.highlights?.map((highlight) => (
           <HighlightCard highlight={highlight} key={highlight.heading} />
         ))}
       </ul>
@@ -105,13 +105,15 @@ const StoryCard: FC<StoryCardProps> = ({ story }) => (
       innerClassName="flex flex-col justify-between text-foreground-lighter bg-surface-75 p-2"
     >
       <div className="flex flex-col justify-between gap-6 p-3 md:max-w-[230px]">
-        <Image
-          src={story.icon}
-          alt={story.heading}
-          width={150}
-          height={30}
-          className="max-h-[23px] max-w-[150px] w-auto object-contain object-left-bottom filter invert dark:invert-0 opacity-60"
-        />
+        {story.icon && (
+          <Image
+            src={story.icon}
+            alt={story.heading ?? ''}
+            width={150}
+            height={30}
+            className="max-h-[23px] max-w-[150px] w-auto object-contain object-left-bottom filter invert dark:invert-0 opacity-60"
+          />
+        )}
         <h3 className="text-foreground">{story.heading}</h3>
       </div>
       <div className="p-3 bg-surface-200 rounded-lg">
@@ -126,11 +128,11 @@ interface HighlightCardProps {
 }
 
 const HighlightCard: FC<HighlightCardProps> = ({ highlight }) => {
-  const Icon: LucideIcon = highlight.icon
+  const Icon: LucideIcon | undefined = highlight.icon
 
   return (
     <li className="text-foreground text-sm max-w-[250px]">
-      <Icon className="stroke-1 mb-2" />
+      {Icon && <Icon className="stroke-1 mb-2" />}
       <h4 className="text-foreground text-xl lg:text-2xl">{highlight.heading}</h4>
       <p className="text-foreground-lighter text-sm">{highlight.subheading}</p>
       <TextLink hasChevron label="Read story" url={highlight.url} className="mt-4" />

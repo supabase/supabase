@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { isResponseOk, post } from 'lib/common/fetch'
+import { constructHeaders, fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { ResponseError } from 'types'
 
 export type SqlTitleGenerateResponse = {
   title: string
@@ -12,16 +12,33 @@ export type SqlTitleGenerateResponse = {
 
 export type SqlTitleGenerateVariables = {
   sql: string
+  useBedrockAssistant?: boolean
 }
 
-export async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
-  const response = await post<SqlTitleGenerateResponse>(BASE_PATH + '/api/ai/sql/title', { sql })
+export async function generateSqlTitle({ sql, useBedrockAssistant }: SqlTitleGenerateVariables) {
+  const url = useBedrockAssistant
+    ? `${BASE_PATH}/api/ai/sql/title-v2`
+    : `${BASE_PATH}/api/ai/sql/title`
 
-  if (!isResponseOk(response)) {
-    throw response.error
+  const headers = await constructHeaders({ 'Content-Type': 'application/json' })
+  const response = await fetchHandler(url, {
+    headers,
+    method: 'POST',
+    body: JSON.stringify({
+      sql,
+    }),
+  })
+  let body: any
+
+  try {
+    body = await response.json()
+  } catch {}
+
+  if (!response.ok) {
+    throw new ResponseError(body?.message, response.status)
   }
 
-  return response
+  return body as SqlTitleGenerateResponse
 }
 
 type SqlTitleGenerateData = Awaited<ReturnType<typeof generateSqlTitle>>

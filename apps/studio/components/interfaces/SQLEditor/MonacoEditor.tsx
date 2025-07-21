@@ -3,13 +3,13 @@ import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
@@ -24,6 +24,14 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onMount?: (editor: IStandaloneCodeEditor) => void
+  onPrompt?: (value: {
+    selection: string
+    beforeSelection: string
+    afterSelection: string
+    startLineNumber: number
+    endLineNumber: number
+  }) => void
 }
 
 const MonacoEditor = ({
@@ -34,14 +42,17 @@ const MonacoEditor = ({
   className,
   executeQuery,
   onHasSelection,
+  onPrompt,
+  onMount,
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, content } = useParams()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
 
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -84,13 +95,44 @@ const MonacoEditor = ({
         const selectedValue = (editorRef?.current as any)
           .getModel()
           .getValueInRange((editorRef?.current as any)?.getSelection())
-        setAiAssistantPanel({
+        aiSnap.newChat({
+          name: 'Explain code section',
           open: true,
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',
         })
       },
     })
+
+    if (onPrompt) {
+      editor.addAction({
+        id: 'generate-sql',
+        label: 'Generate SQL',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+        run: () => {
+          const selection = editor.getSelection()
+          const model = editor.getModel()
+          if (!model || !selection) return
+
+          const allLines = model.getLinesContent()
+
+          const startLineIndex = selection.startLineNumber - 1
+          const endLineIndex = selection.endLineNumber
+
+          const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
+          const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
+          const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
+
+          onPrompt({
+            selection: selectedText,
+            beforeSelection,
+            afterSelection,
+            startLineNumber: selection?.startLineNumber ?? 0,
+            endLineNumber: selection?.endLineNumber ?? 0,
+          })
+        },
+      })
+    }
 
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =
@@ -99,27 +141,20 @@ const MonacoEditor = ({
       onHasSelection(!noSelection)
     })
 
-    // add margin above first line
-    editorRef.current.changeViewZones((accessor) => {
-      accessor.addZone({
-        afterLineNumber: 0,
-        heightInPx: 4,
-        domNode: document.createElement('div'),
-      })
-    })
-
     if (autoFocus) {
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
+
+    onMount?.(editor)
   }
 
-  // [Joshen] Also needs updating here
-  const debouncedSetSql = debounce((id, value) => {
-    snapV2.setSql(id, value)
-  }, 1000)
+  const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
 
   function handleEditorChange(value: string | undefined) {
+    // make active tab permanent
+    tabsSnap.makeActiveTabPermanent()
+
     const snippetCheck = snapV2.snippets[id]
 
     if (id && value) {
@@ -145,9 +180,7 @@ const MonacoEditor = ({
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
   useEffect(() => {
-    if (content && content.length > 0) {
-      handleEditorChange(content)
-    }
+    if (content && content.length > 0) handleEditorChange(content)
   }, [])
 
   return (
@@ -157,7 +190,7 @@ const MonacoEditor = ({
           type="default"
           className="m-0 py-2 rounded-none border-0 border-b [&>h5]:mb-0.5"
           title="This snippet has been shared to the project and is only editable by the owner who created this snippet"
-          description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate personal copy"'
+          description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate query"'
         />
       )}
       <Editor
@@ -166,14 +199,16 @@ const MonacoEditor = ({
         onMount={handleEditorOnMount}
         onChange={handleEditorChange}
         defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content.sql}
+        defaultValue={snippet?.snippet.content?.sql}
         path={id}
         options={{
           tabSize: 2,
           fontSize: 13,
+          lineDecorationsWidth: 0,
           readOnly: disableEdit,
           minimap: { enabled: false },
           wordWrap: 'on',
+          padding: { top: 4 },
           // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
           // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
           // comment just in case anyone might be wondering. Relevant issues:

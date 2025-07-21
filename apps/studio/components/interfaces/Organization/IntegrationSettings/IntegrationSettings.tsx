@@ -7,10 +7,12 @@ import { Markdown } from 'components/interfaces/Markdown'
 import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
+  ScaffoldContainerLegacy,
   ScaffoldDivider,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
+  ScaffoldTitle,
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
@@ -26,13 +28,13 @@ import {
 } from 'lib/github'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/VercelGithub/IntegrationConnection'
-import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { useRouter } from 'next/router'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
     <img
-      className="border rounded-lg shadow w-48 mt-6 border-body"
+      className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />
@@ -41,6 +43,7 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 
 const IntegrationSettings = () => {
   const org = useSelectedOrganization()
+  const router = useRouter()
 
   const canReadGithubConnection = useCheckPermissions(
     PermissionAction.READ,
@@ -67,7 +70,7 @@ const IntegrationSettings = () => {
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
   const onAddGitHubConnection = useCallback(() => {
-    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+    router.push('/project/_/settings/integrations')
   }, [sidePanelsStateSnapshot])
 
   const onDeleteGitHubConnection = useCallback(
@@ -150,7 +153,6 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
               <EmptyIntegrationConnection
                 onClick={onAddGitHubConnection}
-                orgSlug={org?.slug}
                 showNode={false}
                 disabled={!canCreateGitHubConnection}
               >
@@ -173,11 +175,13 @@ The GitHub app will watch for changes in your repository such as file changes, b
 
   return (
     <>
+      <ScaffoldContainerLegacy>
+        <ScaffoldTitle>Integrations</ScaffoldTitle>
+      </ScaffoldContainerLegacy>
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={false} />
       <SidePanelVercelProjectLinker />
-      <SidePanelGitHubRepoLinker />
     </>
   )
 }

@@ -3,7 +3,8 @@
     "title": "Introduction",
     "id": "introduction",
     "slug": "introduction",
-    "type": "markdown"
+    "type": "markdown",
+    "items": []
   },
   {
     "type": "category",
@@ -58,6 +59,12 @@
     "title": "Database",
     "items": [
       {
+        "id": "v1-apply-a-migration",
+        "title": "Apply a migration",
+        "slug": "v1-apply-a-migration",
+        "type": "operation"
+      },
+      {
         "id": "v1-disable-readonly-mode-temporarily",
         "title": "Disable readonly mode temporarily",
         "slug": "v1-disable-readonly-mode-temporarily",
@@ -106,12 +113,6 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-supavisor-config",
-        "title": "Get supavisor config",
-        "slug": "v1-get-supavisor-config",
-        "type": "operation"
-      },
-      {
         "id": "v1-list-all-backups",
         "title": "List all backups",
         "slug": "v1-list-all-backups",
@@ -121,6 +122,12 @@
         "id": "v1-list-all-snippets",
         "title": "List all snippets",
         "slug": "v1-list-all-snippets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-list-migrations",
+        "title": "List migrations",
+        "slug": "v1-list-migrations",
         "type": "operation"
       },
       {
@@ -157,12 +164,6 @@
         "id": "v1-update-ssl-enforcement-config",
         "title": "Update ssl enforcement config",
         "slug": "v1-update-ssl-enforcement-config",
-        "type": "operation"
-      },
-      {
-        "id": "v1-update-supavisor-config",
-        "title": "Update supavisor config",
-        "slug": "v1-update-supavisor-config",
         "type": "operation"
       }
     ]
@@ -226,6 +227,12 @@
     "title": "Edge Functions",
     "items": [
       {
+        "id": "v1-bulk-update-functions",
+        "title": "Bulk update functions",
+        "slug": "v1-bulk-update-functions",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-function",
         "title": "Create a function",
         "slug": "v1-create-a-function",
@@ -235,6 +242,12 @@
         "id": "v1-delete-a-function",
         "title": "Delete a function",
         "slug": "v1-delete-a-function",
+        "type": "operation"
+      },
+      {
+        "id": "v1-deploy-a-function",
+        "title": "Deploy a function",
+        "slug": "v1-deploy-a-function",
         "type": "operation"
       },
       {
@@ -295,6 +308,12 @@
         "id": "v1-list-all-branches",
         "title": "List all branches",
         "slug": "v1-list-all-branches",
+        "type": "operation"
+      },
+      {
+        "id": "v1-merge-a-branch",
+        "title": "Merge a branch",
+        "slug": "v1-merge-a-branch",
         "type": "operation"
       },
       {
@@ -376,6 +395,12 @@
     "title": "Projects",
     "items": [
       {
+        "id": "v1-cancel-a-project-restoration",
+        "title": "Cancel a project restoration",
+        "slug": "v1-cancel-a-project-restoration",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-a-project",
         "title": "Create a project",
         "slug": "v1-create-a-project",
@@ -436,9 +461,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-list-available-restore-versions",
+        "title": "List available restore versions",
+        "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
         "id": "v1-pause-a-project",
         "title": "Pause a project",
         "slug": "v1-pause-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restore-a-project",
+        "title": "Restore a project",
+        "slug": "v1-restore-a-project",
         "type": "operation"
       },
       {

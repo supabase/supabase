@@ -1,58 +1,47 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { ArrowRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+
+import { useParams } from 'common'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
-import Link from 'next/link'
-import { useEffect, useRef } from 'react'
-
-import { useParams } from 'common'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { getWithTimeout } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { ArrowRight, Loader2 } from 'lucide-react'
+import { PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const queryClient = useQueryClient()
-  const checkServerInterval = useRef<number>()
 
-  // TODO: move to react-query
-  async function checkServer() {
-    if (!project) return
-
-    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
-      timeout: 2000,
-    })
-    if (projectStatus && !projectStatus.error) {
-      const { status } = projectStatus
-      if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-        clearInterval(checkServerInterval.current)
-        if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
-        await invalidateProjectsQuery(queryClient)
-      }
+  useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+      },
+      onSuccess: async (res) => {
+        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+          invalidateProjectsQuery(queryClient)
+        }
+      },
     }
-  }
-
-  useEffect(() => {
-    // check server status every 4s
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => {
-      clearInterval(checkServerInterval.current)
-    }
-  }, [])
+  )
 
   if (project === undefined) return null
 
   return (
-    <div className="mx-auto my-16 w-full max-w-7xl items-center justify-center">
-      <div className="mx-6 flex flex-col space-y-16">
-        <div className=" flex flex-col gap-4">
-          <div className="flex items-center space-x-3">
+    <div className="mx-auto my-8 md:my-16 w-full md:max-w-7xl items-center justify-center">
+      <div className="px-4 md:px-6 flex flex-col space-y-16">
+        <div className="w-full flex flex-col gap-4">
+          <div className="w-full flex flex-col md:flex-row items-start md:items-center gap-3">
             <h1 className="text-3xl text-foreground">{project?.name}</h1>
             <Badge variant="default" className="bg-surface-100 bg-opacity-100">
               <div className="flex items-center gap-2">
@@ -74,8 +63,8 @@ const BuildingState = () => {
           </div>
         </div>
         <div>
-          <div className=" grid grid-cols-12 gap-12">
-            <div className="col-span-12 space-y-12 lg:col-span-4">
+          <div className="w-full grid grid-cols-12 gap-12">
+            <div className="w-full col-span-12 space-y-12 lg:col-span-4">
               <div>
                 <h4 className="text-base text-foreground">While you wait</h4>
 
@@ -122,8 +111,8 @@ const BuildingState = () => {
                 </ul>
               </div>
             </div>
-            <div className="col-span-12  lg:col-span-8">
-              <DisplayApiSettings />
+            <div className="col-span-12  lg:col-span-8 flex flex-col gap-8">
+              <DisplayApiSettings showLegacyText={false} />
               <DisplayConfigSettings />
             </div>
           </div>
@@ -133,9 +122,9 @@ const BuildingState = () => {
         <div className="mx-auto my-16 w-full max-w-7xl space-y-16">
           <div className="space-y-8">
             <div className="mx-6">
-              <h5>Client libraries</h5>
+              <h4 className="text-lg">Client libraries</h4>
             </div>
-            <div className="mx-6 mb-12 grid gap-12 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mx-6 mb-12 md:grid-cols-3">
               {CLIENT_LIBRARIES.map((library) => (
                 <ClientLibrary key={library.language} {...library} />
               ))}
@@ -145,7 +134,7 @@ const BuildingState = () => {
             <div className="mx-6">
               <h5>Example projects</h5>
             </div>
-            <div className="mx-6 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-6 grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
               {EXAMPLE_PROJECTS.map((project) => (
                 <ExampleProject key={project.url} {...project} />
               ))}

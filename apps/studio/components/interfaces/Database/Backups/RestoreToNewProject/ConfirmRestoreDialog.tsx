@@ -11,17 +11,20 @@ import {
   DialogTitle,
 } from 'ui'
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
+import { NewProjectPrice } from './RestoreToNewProject.utils'
 
 interface ConfirmRestoreDialogProps {
   open: boolean
   onOpenChange: (value: boolean) => void
   onSelectContinue: () => void
+  additionalMonthlySpend: NewProjectPrice
 }
 
 export const ConfirmRestoreDialog = ({
   open,
   onOpenChange,
   onSelectContinue,
+  additionalMonthlySpend,
 }: ConfirmRestoreDialogProps) => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
@@ -42,13 +45,6 @@ export const ConfirmRestoreDialog = ({
             </li>
             <li>
               Project region will stay the same: <code>{project?.region || ''}</code>
-            </li>
-            <li>
-              A project can only be restored to another project once. <br />
-              <span className="text-foreground-lighter text-xs">
-                This is a temporary limitation. Please contact us if you need to restore a project
-                to multiple other projects.
-              </span>
             </li>
           </ul>
           <ul>
@@ -71,7 +67,7 @@ export const ConfirmRestoreDialog = ({
             </ul>
           </ul>
         </DialogSection>
-        <AdditionalMonthlySpend />
+        <AdditionalMonthlySpend additionalMonthlySpend={additionalMonthlySpend} />
         <DialogFooter>
           <Button type="outline" onClick={() => onOpenChange(false)}>
             Cancel

@@ -74,7 +74,7 @@ const HomePageCover = (props) => {
       href: '/guides/getting-started/quickstarts/vue',
     },
     {
-      tooltip: 'NuxtJS',
+      tooltip: 'Nuxt',
       icon: '/docs/img/icons/nuxt-icon',
       href: '/guides/getting-started/quickstarts/nuxtjs',
     },

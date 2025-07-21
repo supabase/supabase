@@ -65,7 +65,7 @@ export type FDW = {
 
 export type FDWsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getFDWs(

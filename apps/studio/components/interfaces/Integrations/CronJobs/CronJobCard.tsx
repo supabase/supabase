@@ -1,27 +1,35 @@
-import { toString as CronToString } from 'cronstrue'
+import dayjs from 'dayjs'
 import { Clock, History, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
+  Badge,
   Button,
+  cn,
+  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
   Label_Shadcn_,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { convertCronToString, getNextRun } from './CronJobs.utils'
 
 interface CronJobCardProps {
   job: CronJob
@@ -31,20 +39,33 @@ interface CronJobCardProps {
 
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { project: selectedProject } = useProjectContext()
 
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
 
+  const { data } = useCronJobRunQuery({
+    projectRef: ref,
+    connectionString: selectedProject?.connectionString,
+    jobId: job.jobid,
+  })
+  const lastRun = data?.start_time ? dayjs(data.start_time).valueOf() : undefined
+  const nextRun = getNextRun(job.schedule, data?.start_time)
+  const schedule = convertCronToString(job.schedule)
+
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
 
-  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
-  let schedule = job.schedule
-  try {
-    const scheduleString = CronToString(job.schedule)
-    schedule = scheduleString
-  } catch {}
+  const onEdit = () => {
+    sendEvent({
+      action: 'cron_job_update_clicked',
+      groups: {
+        project: selectedProject?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
+    onEditCronJob(job)
+  }
 
   return (
     <>
@@ -54,7 +75,14 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
         </div>
         <div className="flex flex-col flex-0 overflow-y-auto w-full">
           <div className="flex flex-row justify-between items-center">
-            <span className="text-base text-foreground">{job.jobname}</span>
+            <span
+              className={cn(
+                'text-base',
+                job.jobname ? 'text-foreground' : 'text-foreground-lighter'
+              )}
+            >
+              {job.jobname || 'No name provided'}
+            </span>
             <div className="flex items-center gap-x-2">
               {isLoading ? (
                 <Loader2 size={18} strokeWidth={2} className="animate-spin text-foreground-muted" />
@@ -78,28 +106,51 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 type="default"
                 icon={<History />}
                 onClick={() => {
-                  sendEvent({ action: TelemetryActions.CRON_JOBS_VIEW_PREVIOUS_RUNS_CLICKED })
+                  sendEvent({
+                    action: 'cron_job_history_clicked',
+                    groups: {
+                      project: selectedProject?.ref ?? 'Unknown',
+                      organization: org?.slug ?? 'Unknown',
+                    },
+                  })
                 }}
               >
-                <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
+                <Link
+                  href={`/project/${ref}/integrations/cron/jobs/${encodeURIComponent(job.jobid)}?child-label=${encodeURIComponent(job.jobname || `Job #${job.jobid}`)}`}
+                >
+                  History
+                </Link>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" icon={<MoreVertical />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-36">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      sendEvent({ action: TelemetryActions.CRON_JOB_UPDATE_CLICKED })
-                      onEditCronJob(job)
-                    }}
-                  >
-                    Edit cron job
-                  </DropdownMenuItem>
+                  {job.jobname ? (
+                    <DropdownMenuItem onClick={onEdit}>Edit cron job</DropdownMenuItem>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger className="w-full">
+                        <DropdownMenuItem onClick={onEdit} disabled>
+                          Edit cron job
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        This cron job doesn’t have a name and can’t be edited. Create a new one and
+                        delete this job.
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => {
-                      sendEvent({ action: TelemetryActions.CRON_JOB_DELETE_CLICKED })
+                      sendEvent({
+                        action: 'cron_job_delete_clicked',
+                        groups: {
+                          project: selectedProject?.ref ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
                       onDeleteCronJob(job)
                     }}
                   >
@@ -114,18 +165,73 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
               <div className="grid grid-cols-10 gap-3 items-center">
                 <span className="text-foreground-light col-span-1">Schedule</span>
                 <div className="col-span-9">
-                  <Input
-                    title={schedule}
-                    readOnly
-                    className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
-                    value={schedule}
-                  />
+                  <Input readOnly title={schedule} value={schedule} className="w-96" />
+                </div>
+              </div>
+              <div className="grid grid-cols-10 gap-3 items-center">
+                <span className="text-foreground-light col-span-1">Last run</span>
+                <div className="col-span-9">
+                  <div
+                    className={cn(
+                      'border border-control bg-foreground/[0.026] rounded-md px-3 py-1.5 w-96',
+                      !lastRun && 'text-foreground-lighter'
+                    )}
+                  >
+                    {lastRun ? (
+                      <>
+                        <TimestampInfo
+                          utcTimestamp={lastRun}
+                          labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                          className="font-sans text-sm"
+                        />
+                        {data?.status && (
+                          <Badge
+                            variant={data.status === 'failed' ? 'destructive' : 'success'}
+                            className="capitalize ml-2"
+                          >
+                            {data.status}
+                          </Badge>
+                        )}
+                      </>
+                    ) : (
+                      'Job has not been run yet'
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-10 gap-3 items-center">
+                <span className="text-foreground-light col-span-1">Next run</span>
+                <div className="col-span-9">
+                  <div
+                    className={cn(
+                      'border border-control bg-foreground/[0.026] rounded-md px-3 py-1.5 w-96',
+                      !nextRun && 'text-foreground-lighter'
+                    )}
+                  >
+                    {nextRun ? (
+                      <TimestampInfo
+                        utcTimestamp={nextRun}
+                        labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                        className="font-sans text-sm"
+                      />
+                    ) : (
+                      'Unable to parse next run for job'
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-10 gap-3">
                 <span className="text-foreground-light col-span-1">Command</span>
                 <div className="col-span-9">
-                  <SQLCodeBlock className="py-2">{[job.command.trim()]}</SQLCodeBlock>
+                  <CodeBlock
+                    hideLineNumbers
+                    value={job.command.trim()}
+                    language="sql"
+                    className={cn(
+                      'py-2 px-3.5 max-w-full prose dark:prose-dark',
+                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11'
+                    )}
+                  />
                 </div>
               </div>
             </div>

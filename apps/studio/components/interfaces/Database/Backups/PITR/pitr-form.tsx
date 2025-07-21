@@ -24,12 +24,14 @@ type Props = {
   }) => void
   earliestAvailableBackupUnix: number
   latestAvailableBackupUnix: number
+  disabled?: boolean
 }
 
 export function PITRForm({
   onSubmit,
   earliestAvailableBackupUnix,
   latestAvailableBackupUnix,
+  disabled = false,
 }: Props) {
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
   const earliestAvailableBackup = dayjs
@@ -103,7 +105,7 @@ export function PITRForm({
           <div className="flex items-center justify-end gap-3 p-6">
             <ButtonTooltip
               type="default"
-              disabled={!selectedDate || !isWithinRange}
+              disabled={disabled || !selectedDate || !isWithinRange}
               onClick={handleSubmit}
               tooltip={{
                 content: {
@@ -120,7 +122,7 @@ export function PITRForm({
           </div>
         }
       >
-        <div className="flex justify-between px-10 py-6 space-x-10">
+        <div className="flex justify-between px-4 md:px-10 py-6 space-x-10">
           <div className="w-1/3 space-y-2">
             <DatePicker
               inline

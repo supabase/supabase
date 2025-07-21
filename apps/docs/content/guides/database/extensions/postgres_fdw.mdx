@@ -90,7 +90,7 @@ The extension enables Postgres to query tables and views on a remote Postgres se
 
             Example: Import specific tables
             ```sql
-            import foreign schema "<foreign_schema>""
+            import foreign schema "<foreign_schema>"
             limit to (
                 "<table_name1>",
                 "<table_name2>"
@@ -105,7 +105,7 @@ The extension enables Postgres to query tables and views on a remote Postgres se
         <StepHikeCompact.Code>
 
             ```sql
-            select * from '<foreign_table>'
+            select * from "<foreign_table>"
             ```
         </StepHikeCompact.Code>
     </StepHikeCompact.Step>

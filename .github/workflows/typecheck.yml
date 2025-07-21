@@ -10,26 +10,35 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   typecheck:
     # Uses larger hosted runner as it significantly decreases build times
-    runs-on: [larger-runner-4cpu]
+    runs-on:
+      group: Default Larger Runners
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install deps
-        run: npm ci
+        run: pnpm i
 
       - name: Run TypeScript type check
-        run: npx turbo run typecheck
+        run: pnpm exec turbo run typecheck
 
       - name: Run Lint
-        run: npx turbo run lint
+        run: pnpm exec turbo run lint

@@ -20,7 +20,7 @@ const SectionContent = ({
   return (
     <>
       <ScaffoldContainer>
-        <div className="mx-auto flex flex-col gap-10 py-16">
+        <div className="mx-auto flex flex-col gap-10 py-8 md:py-16">
           <div className="grid grid-cols-12 gap-6">
             <div className="col-span-12 lg:col-span-5">
               <div className="sticky top-32 space-y-6">

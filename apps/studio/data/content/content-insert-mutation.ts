@@ -32,13 +32,12 @@ export async function insertContent(
       type: payload.type,
       visibility: payload.visibility,
       content: payload.content as any,
+      folder_id: payload.folder_id,
     },
     signal,
   })
   if (error) handleError(error)
-
-  // [Joshen] There's an issue with the API codegen due to content endpoint having 2 versions
-  return data as unknown as InsertContentResponse[]
+  return data
 }
 
 export type InsertContentData = Awaited<ReturnType<typeof insertContent>>
@@ -58,7 +57,7 @@ export const useContentInsertMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.list(projectRef))
+        await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

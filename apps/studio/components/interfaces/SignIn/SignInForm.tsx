@@ -8,10 +8,12 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
+import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { LastSignInWrapper } from './LastSignInWrapper'
 
 const signInSchema = object({
@@ -22,10 +24,13 @@ const signInSchema = object({
 const SignInForm = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const [lastSignIn, setLastSignIn] = useLastSignIn()
+  const [_, setLastSignIn] = useLastSignIn()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: addLoginEvent } = useAddLoginEvent()
 
   const onSignIn = async ({ email, password }: { email: string; password: string }) => {
     const toastId = toast.loading('Signing in...')
@@ -56,10 +61,16 @@ const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
+        sendEvent({
+          action: 'sign_in',
+          properties: { category: 'account', method: 'email' },
+        })
+        addLoginEvent({})
+
         await queryClient.resetQueries()
         const returnTo = getReturnToPath()
         // since we're already on the /sign-in page, prevent redirect loops
-        router.push(returnTo === '/sign-in' ? '/projects' : returnTo)
+        router.push(returnTo === '/sign-in' ? '/organizations' : returnTo)
       } catch (error: any) {
         toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
         Sentry.captureMessage('[CRITICAL] Failed to sign in via EP: ' + error.message)

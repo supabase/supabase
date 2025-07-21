@@ -3,6 +3,13 @@ export const databaseCronJobsKeys = {
   delete: () => ['cron-jobs', 'delete'] as const,
   alter: () => ['cronjobs', 'alter'] as const,
   list: (projectRef: string | undefined) => ['projects', projectRef, 'cron-jobs'] as const,
+  run: (projectRef: string | undefined, jobId: number) => [
+    'projects',
+    projectRef,
+    'cron-jobs',
+    jobId,
+    'run',
+  ],
   runsInfinite: (projectRef: string | undefined, jobId: number, options?: object) => [
     'projects',
     projectRef,
