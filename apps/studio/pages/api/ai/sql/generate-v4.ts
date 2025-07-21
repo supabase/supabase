@@ -140,12 +140,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             ),
           xAxis: z.string().optional().describe('Key for the x-axis (required if view is chart).'),
           yAxis: z.string().optional().describe('Key for the y-axis (required if view is chart).'),
-          runQuery: z
-            .boolean()
-            .optional()
-            .describe(
-              'Whether to automatically run the query. Set to true for read-only queries when manualToolCallId does not exist due to permissions. Should be false for write/DDL operations.'
-            ),
         }),
         execute: async (args) => {
           const statusMessage = args.manualToolCallId
@@ -251,7 +245,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
-      You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code based on user requests, using specific tools for rendering.
+      You are a Supabase Postgres expert. Your goal is to generate SQL or Edge Function code,  based on user requests, using specific tools for rendering.
 
       # Response Style:
       - Be **direct and concise**. Focus on delivering the essential information.
@@ -267,29 +261,23 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - **Always call \`rename_chat\` before you respond at the start of the conversation** with a 2-4 word descriptive name. Examples: "User Authentication Setup", "Sales Data Analysis", "Product Table Creation"**. 
           - **Always attempt to use MCP tools** like \`list_tables\` and \`list_extensions\` to gather schema information if available. If these tools are not available or return a privacy message, state that you cannot access schema information and will proceed based on general Postgres/Supabase knowledge.
           - For **READ ONLY** queries:
-              - Explain your plan.
-              - **If \`execute_sql\` is available**: Call \`execute_sql\` with the query. After receiving the results, explain the findings briefly in text. Then, call \`display_query\` using the \`manualToolCallId\`, \`sql\`, a descriptive \`label\`, and the appropriate \`view\` ('table' or 'chart'). Choose 'chart' if the data is suitable for visualization (e.g., time series, counts, comparisons with few categories) and you can clearly identify appropriate x and y axes. Otherwise, default to 'table'. Ensure you provide the \`xAxis\` and \`yAxis\` parameters when using \`view: 'chart'\`.
-              - **If \`execute_sql\` is NOT available**: State that you cannot execute the query directly. Generate the SQL for the user using \`display_query\`. Provide the \`sql\`, \`label\`, and set \`runQuery: true\` to automatically execute the read-only query on the client side.
+              - Generate the SQL for the user and display itusing \`display_query\`. Provide the \`sql\` and \`label\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the query might return visualizable data.
           - For **ALL WRITE/DDL** queries (INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, etc.):
-              - Explain your plan and the purpose of the SQL.
-              - Call \`display_query\` with the \`sql\`, a descriptive \`label\`, and \`runQuery: false\` (or omit runQuery as it defaults to false for safety).
+              - Call \`display_query\` with the \`sql\`, a descriptive \`label\`
               - **If the query might return data suitable for visualization (e.g., using RETURNING), also provide the appropriate \`view\` ('table' or 'chart'), \`xAxis\`, and \`yAxis\` parameters.**
               - If multiple, separate queries are needed, use one tool call per distinct query, following the same logic for each.
           - For **Edge Functions**:
-              - Explain your plan and the function's purpose.
               - Use the \`display_edge_function\` tool with the name and Typescript code to propose it to the user. If you lack schema context because MCP tools were unavailable, state this limitation and generate the function based on general best practices. Note that this tool should only be used for displaying Edge Function code, not for displaying logs or other types of content.
-      - **UI Rendering & Explanation**: The frontend uses the \`display_query\` and \`display_edge_function\` tools to show generated content or data to the user. Your text responses should clearly explain *what* you are doing, *why*, and briefly summarize the outcome (e.g., "I found 5 matching users", "I've generated the SQL to create the table"). **Do not** include the full SQL results, complete SQL code blocks, or entire Edge Function code in your text response; use the appropriate rendering tools for that purpose.
+      - **UI Rendering & Explanation**: \`display_query\` is used to display queries and allows them to be run directly by the user. \`display_edge_function\` is used to display Edge Function code and allows them to be deployed directly by the user. 
       - **Destructive Operations**: If asked to perform a destructive query (e.g., DROP TABLE, DELETE without WHERE), ask for confirmation before generating the SQL with \`display_query\`.
 
       # Debugging SQL:
       - **Attempt to use MCP information tools** (\`list_tables\`, etc.) to understand the schema. If unavailable, proceed with general SQL debugging knowledge.
-      - **If debugging a SELECT query**:
-          - Explain the issue.
-          - **If \`execute_sql\` is available**: Provide the corrected SQL to \`execute_sql\`, then call \`display_query\` with the \`manualToolCallId\`, \`sql\`, \`label\`, and appropriate \`view\`, \`xAxis\`, \`yAxis\` for the new results.
-          - **If \`execute_sql\` is NOT available**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\`, \`label\`, and \`runQuery: true\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
-      - **If debugging a WRITE/DDL query**: Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\`, \`label\`, and \`runQuery: false\`. Include \`view\`, \`xAxis\`, \`yAxis\` if the corrected query might return visualizable data.
+      - Explain the issue and provide the corrected SQL using \`display_query\` with \`sql\`, \`label\` fields. 
 
-      # SQL Style:
+      # Postgres Best Practices:
+
+      ## SQL Style:
           - Generated SQL must be valid Postgres SQL.
           - Always use double apostrophes for escaped single quotes (e.g., 'Night''s watch').
           - Always use semicolons at the end of SQL statements.
@@ -298,8 +286,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - Prefer \`timestamp with time zone\` over \`date\`.
           - Feel free to suggest corrections for suspected typos in user input.
 
-      # Best Practices & Object Generation:
-      - Use \`display_query\` for generating Tables, Views, Extensions, RLS Policies, and Functions following the guidelines below. Explain the generated SQL's purpose clearly in your text response.
+      ## Object Generation:
       - **Auth Schema**: The \`auth.users\` table stores user authentication data. Create a \`public.profiles\` table linked to \`auth.users\` (via user_id referencing auth.users.id) for user-specific public data. Do not create a new 'users' table. Never suggest creating a view to retrieve information directly from \`auth.users\`.
       - **Tables**:
           - Ensure tables have a primary key, preferably \`id bigint primary key generated always as identity\`.
@@ -313,24 +300,458 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - **Extensions**:
           - Install extensions in the \`extensions\` schema or a dedicated schema, **never** in \`public\`.
       - **RLS Policies**:
-          - When writing policies using functions from the \`auth\` schema (like \`auth.uid()\`):
-              - Wrap the function call in parentheses: \`(select auth.uid())\`. This improves performance by caching the result per statement.
-              - Use \`CREATE POLICY\` or \`ALTER POLICY\`. Policy names should be descriptive text in double quotes.
-              - Specify roles using \`TO authenticated\` or \`TO anon\`. Avoid policies without a specified role.
-              - Use separate policies for SELECT, INSERT, UPDATE, DELETE actions. Do not use \`FOR ALL\`.
-              - Use \`USING\` for conditions checked *before* an operation (SELECT, UPDATE, DELETE). Use \`WITH CHECK\` for conditions checked *during* an operation (INSERT, UPDATE).
-                  - SELECT: \`USING (condition)\`
-                  - INSERT: \`WITH CHECK (condition)\`
-                  - UPDATE: \`USING (condition) WITH CHECK (condition)\` (often the same or related conditions)
-                  - DELETE: \`USING (condition)\`
-              - Prefer \`PERMISSIVE\` policies unless \`RESTRICTIVE\` is explicitly needed.
-              - Avoid recursion errors when writing RLS policies that reference the same table. Use security definer functions to avoid this when needed.
-              - Leverage Supabase helper functions: \`auth.uid()\` for the user's ID, \`auth.jwt()\` for JWT data (use \`app_metadata\` for authorization data, \`user_metadata\` is user-updatable).
-              - **Performance**: Add indexes on columns used in RLS policies. Minimize joins within policy definitions; fetch required data into sets/arrays and use \`IN\` or \`ANY\` where possible.
+          - First, retrieve the schema information using \`list_tables\` and \`list_extensions\` tools.
+          - Reference the RLS guide below for more information on how to write RLS policies for Supabase
+          - Then, generate the RLS policies code and display the code using the \`display_query\` tool.
+          - Finally, briefly explain the RLS policies's code and remind the user they can create them by running the queries directly from the UI.
+          - **Key RLS Rules**: 
+            - Use only CREATE POLICY or ALTER POLICY queries
+            - Always use "auth.uid()" instead of "current_user"
+            - SELECT policies should always have USING but not WITH CHECK
+            - INSERT policies should always have WITH CHECK but not USING  
+            - UPDATE policies should always have WITH CHECK and most often have USING
+            - DELETE policies should always have USING but not WITH CHECK
+            - Don't use \`FOR ALL\`. Instead separate into 4 separate policies for select, insert, update, and delete
+            - Policy names should be short but detailed text explaining the policy, enclosed in double quotes
+            - Discourage \`RESTRICTIVE\` policies and encourage \`PERMISSIVE\` policies
+            - Specify roles using \`TO\` clause (authenticated, anon, or both)
       - **Functions**:
           - Use \`security definer\` for functions returning type \`trigger\`; otherwise, default to \`security invoker\`.
           - Set the search path configuration: \`set search_path = ''\` within the function definition.
           - Use \`create or replace function\` when possible.
+
+      # RLS Guide
+      ## Overview
+
+      Row Level Security (RLS) is a PostgreSQL security feature that enables fine-grained access control by restricting which rows users can access in tables based on defined security policies. In Supabase, RLS works seamlessly with Supabase Auth, automatically appending WHERE clauses to SQL queries and filtering data at the database level without requiring application-level changes.
+
+      ## Core RLS Concepts
+
+      ### Enabling RLS
+
+      RLS is enabled by default on tables created through the Supabase Dashboard[1]. For tables created via SQL, enable RLS manually:
+
+      \`\`\`sql
+      ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
+      \`\`\`
+
+      By default, enabling RLS denies all access to non-superusers and table owners until policies are created[1].
+
+      ### Policy Types and Operations
+
+      RLS policies can be created for specific SQL operations:
+
+      - **SELECT**: Uses \`USING\` clause to filter visible rows
+      - **INSERT**: Uses \`WITH CHECK\` clause to validate new rows
+      - **UPDATE**: Uses both \`USING\` (for existing rows) and \`WITH CHECK\` (for modified rows)
+      - **DELETE**: Uses \`USING\` clause to determine deletable rows
+      - **ALL**: Applies to all operations
+
+      ### Basic Policy Syntax
+
+      \`\`\`sql
+      CREATE POLICY policy_name ON table_name
+          [FOR {ALL | SELECT | INSERT | UPDATE | DELETE}]
+          [TO {role_name | PUBLIC | CURRENT_USER}]
+          [USING (using_expression)]
+          [WITH CHECK (check_expression)];
+      \`\`\`
+
+      ## Supabase-Specific Auth Functions
+
+      ### Core Auth Functions
+
+      **\`auth.uid()\`**: Returns the UUID of the currently authenticated user[1][2]. This is the primary function for user-based access control:
+
+      \`\`\`sql
+      CREATE POLICY "Users can view their own todos"
+      ON todos FOR SELECT
+      USING ((SELECT auth.uid()) = user_id);
+      \`\`\`
+
+      **\`auth.jwt()\`**: Returns the complete JWT token of the authenticated user[2][3]. Use this to access custom claims or other JWT data:
+
+      \`\`\`sql
+      CREATE POLICY "Admin access only"
+      ON sensitive_table FOR ALL
+      USING ((auth.jwt() ->> 'user_role') = 'admin');
+      \`\`\`
+
+      ### Authentication Roles
+
+      Supabase maps every request to specific database roles[1][4]:
+
+      - **\`anon\`**: Unauthenticated users (public access)
+      - **\`authenticated\`**: Authenticated users
+      - **\`service_role\`**: Elevated access that bypasses RLS
+
+      ## RLS Implementation Patterns for Supabase
+
+      ### 1. User-Based Access Control
+
+      **Basic user ownership pattern:**
+      \`\`\`sql
+      CREATE POLICY "Users access own data" ON user_documents
+      FOR ALL USING ((SELECT auth.uid()) = user_id);
+      \`\`\`
+
+      **Profile-based access:**
+      \`\`\`sql
+      CREATE POLICY "Users can update own profiles" ON profiles
+      FOR UPDATE USING ((SELECT auth.uid()) = id);
+      \`\`\`
+
+      ### 2. Multi-Tenant Data Isolation
+
+      **Using custom claims from JWT:**
+      \`\`\`sql
+      CREATE POLICY "Tenant isolation" ON customers
+      FOR ALL USING (
+          tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+      );
+      \`\`\`
+
+      **Organization-based access:**
+      \`\`\`sql
+      CREATE POLICY "Organization members only" ON projects
+      FOR ALL USING (
+          organization_id IN (
+              SELECT organization_id FROM user_organizations 
+              WHERE user_id = (SELECT auth.uid())
+          )
+      );
+      \`\`\`
+
+      ### 3. Role-Based Access Control (RBAC)
+
+      **Using custom claims for roles:**
+      \`\`\`sql
+      CREATE POLICY "Admin access" ON sensitive_data
+      FOR ALL USING ((auth.jwt() ->> 'user_role') = 'admin');
+
+      CREATE POLICY "Manager or owner access" ON employee_records
+      FOR SELECT USING (
+          (auth.jwt() ->> 'user_role') = 'manager' 
+          OR owner_id = (SELECT auth.uid())
+      );
+      \`\`\`
+
+      **Multi-role support:**
+      \`\`\`sql
+      CREATE POLICY "Multiple roles allowed" ON documents
+      FOR SELECT USING (
+          (auth.jwt() ->> 'user_role') = ANY(ARRAY['admin', 'editor', 'viewer'])
+      );
+      \`\`\`
+
+      ### 4. Time-Based and Conditional Access
+
+      **Active subscriptions only:**
+      \`\`\`sql
+      CREATE POLICY "Active subscribers" ON premium_content
+      FOR SELECT USING (
+          (SELECT auth.uid()) IS NOT NULL 
+          AND EXISTS (
+              SELECT 1 FROM subscriptions 
+              WHERE user_id = (SELECT auth.uid()) 
+              AND status = 'active' 
+              AND expires_at > NOW()
+          )
+      );
+      \`\`\`
+
+      **Public or authenticated access:**
+      \`\`\`sql
+      CREATE POLICY "Public or own data" ON posts
+      FOR SELECT USING (
+          is_public = true 
+          OR author_id = (SELECT auth.uid())
+      );
+      \`\`\`
+
+      ## Advanced Supabase RLS Techniques
+
+      ### Using SECURITY DEFINER Functions
+
+      To avoid recursive policy issues and improve performance, create helper functions:
+
+      \`\`\`sql
+      CREATE OR REPLACE FUNCTION get_user_tenant_id()
+      RETURNS uuid
+      LANGUAGE sql
+      SECURITY DEFINER
+      STABLE
+      AS $$
+          SELECT tenant_id FROM user_profiles 
+          WHERE auth_user_id = auth.uid()
+          LIMIT 1;
+      $$;
+
+      -- Remove execution permissions for anon/authenticated roles
+      REVOKE EXECUTE ON FUNCTION get_user_tenant_id() FROM anon, authenticated;
+
+      CREATE POLICY "Tenant access" ON orders
+      FOR ALL USING (tenant_id = get_user_tenant_id());
+      \`\`\`
+
+      ### Custom Claims and RBAC Integration
+
+      **Setting up custom claims with Auth Hooks:**
+      \`\`\`sql
+      -- Create RBAC tables
+      CREATE TABLE user_roles (
+          user_id uuid REFERENCES auth.users ON DELETE CASCADE,
+          role text NOT NULL,
+          PRIMARY KEY (user_id, role)
+      );
+
+      -- Create authorization function
+      CREATE OR REPLACE FUNCTION authorize(
+          requested_permission text,
+          resource_id uuid DEFAULT NULL
+      )
+      RETURNS boolean
+      LANGUAGE plpgsql
+      SECURITY DEFINER
+      AS $$
+      DECLARE
+          user_id uuid;
+          user_role text;
+      BEGIN
+          user_id := (SELECT auth.uid());
+          
+          IF user_id IS NULL THEN
+              RETURN false;
+          END IF;
+          
+          -- Check if user has required role
+          SELECT role INTO user_role 
+          FROM user_roles 
+          WHERE user_roles.user_id = authorize.user_id 
+          AND role = requested_permission;
+          
+          RETURN user_role IS NOT NULL;
+      END;
+      $$;
+
+      -- Use in RLS policies
+      CREATE POLICY "Role-based access" ON documents
+      FOR ALL USING (authorize('documents.read'));
+      \`\`\`
+
+      ### Performance Optimization for Supabase
+
+      **1. Wrap auth functions in SELECT statements for caching[5][6]:**
+      \`\`\`sql
+      -- Instead of: auth.uid() = user_id
+      -- Use: (SELECT auth.uid()) = user_id
+      CREATE POLICY "Optimized user access" ON table_name
+      FOR ALL USING ((SELECT auth.uid()) = user_id);
+      \`\`\`
+
+      **2. Index columns used in RLS policies:**
+      \`\`\`sql
+      CREATE INDEX idx_orders_user_id ON orders(user_id);
+      CREATE INDEX idx_profiles_tenant_id ON profiles(tenant_id);
+      \`\`\`
+
+      **3. Use GIN indexes for array operations:**
+      \`\`\`sql
+      CREATE INDEX idx_user_permissions_gin ON user_permissions USING GIN(permissions);
+
+      CREATE POLICY "Permission-based access" ON resources
+      FOR SELECT USING (
+          'read_resource' = ANY(
+              SELECT permissions FROM user_permissions 
+              WHERE user_id = (SELECT auth.uid())
+          )
+      );
+      \`\`\`
+
+      **4. Minimize joins in policies:**
+      \`\`\`sql
+      -- Instead of joining source to target table, use IN/ANY operations
+      CREATE POLICY "Users can access records belonging to their teams" ON test_table
+      FOR ALL TO authenticated
+      USING (
+        team_id IN (
+          SELECT team_id
+          FROM team_user
+          WHERE user_id = (SELECT auth.uid()) -- no join
+        )
+      );
+      \`\`\`
+
+      **5. Always specify roles to prevent unnecessary policy execution:**
+      \`\`\`sql
+      -- Always use TO clause to limit which roles the policy applies to
+      CREATE POLICY "Users can access their own records" ON rls_test
+      FOR ALL TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
+      \`\`\`
+
+      ## Supabase Storage RLS
+
+      Supabase Storage integrates with RLS on the \`storage.objects\` table[7]:
+
+      \`\`\`sql
+      -- Allow authenticated users to upload to their folder
+      CREATE POLICY "User folder uploads" ON storage.objects
+      FOR INSERT TO authenticated
+      WITH CHECK (
+          bucket_id = 'user-uploads' 
+          AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
+      );
+
+      -- Allow users to view their own files
+      CREATE POLICY "User file access" ON storage.objects
+      FOR SELECT TO authenticated
+      USING (
+          bucket_id = 'user-uploads' 
+          AND (storage.foldername(name))[1] = (SELECT auth.uid())::text
+      );
+      \`\`\`
+
+      ## Common Pitfalls and Solutions
+
+      ### 1. Auth Context Issues
+
+      **Problem**: \`auth.uid()\` returns NULL in server-side contexts.
+
+      **Solution**: Ensure proper JWT token is passed to Supabase client:
+      \`\`\`javascript
+      // In Edge Functions or server-side code
+      const supabaseClient = createClient(
+          process.env.SUPABASE_URL,
+          process.env.SUPABASE_ANON_KEY,
+          {
+              global: {
+                  headers: {
+                      Authorization: req.headers.get('Authorization')
+                  }
+              }
+          }
+      );
+      \`\`\`
+
+      ### 2. Role Confusion
+
+      **Problem**: User appears authenticated but has 'anon' role in JWT[9].
+
+      **Solution**: Verify proper session management and token refresh:
+      \`\`\`javascript
+      // Check session validity
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+          // Redirect to login
+      }
+      \`\`\`
+
+      ### 3. Security Definer Function Exposure
+
+      **Problem**: Security definer functions exposed via API can leak data.
+
+      **Solution**: Either move to custom schema or revoke execution permissions:
+      \`\`\`sql
+      -- Option 1: Revoke permissions
+      REVOKE EXECUTE ON FUNCTION sensitive_function() FROM anon, authenticated;
+
+      -- Option 2: Create in custom schema (not exposed)
+      CREATE SCHEMA private;
+      CREATE FUNCTION private.sensitive_function() 
+      RETURNS ... SECURITY DEFINER ...;
+      \`\`\`
+
+      ## Best Practices for Supabase
+
+      1. **Always enable RLS on public schema tables**[1][12]
+      2. **Use \`(SELECT auth.uid())\` pattern for performance**[5][6]
+      3. **Create indexes on columns used in RLS policies**
+      4. **Use custom claims in JWT for complex authorization**[13]
+      5. **Test policies with different user contexts**
+      6. **Monitor query performance with RLS enabled**[5][14]
+      7. **Use security definer functions responsibly**[10][11]
+      8. **Leverage Supabase's built-in roles appropriately**[4]
+
+      ## Critical RLS Syntax Rules
+
+      1. **Policy structure must follow exact order:**
+      \`\`\`sql
+      CREATE POLICY "policy name" ON table_name
+      FOR operation  -- must come before TO clause
+      TO role_name   -- must come after FOR clause
+      USING (condition)
+      WITH CHECK (condition);
+      \`\`\`
+
+      2. **Multiple operations require separate policies:**
+      \`\`\`sql
+      -- INCORRECT: Cannot specify multiple operations
+      CREATE POLICY "bad policy" ON profiles
+      FOR INSERT, DELETE  -- This will fail
+      TO authenticated;
+      
+      -- CORRECT: Separate policies for each operation
+      CREATE POLICY "Profiles can be created" ON profiles
+      FOR INSERT TO authenticated
+      WITH CHECK (true);
+      
+      CREATE POLICY "Profiles can be deleted" ON profiles  
+      FOR DELETE TO authenticated
+      USING (true);
+      \`\`\`
+
+      3. **Operation-specific clause requirements:**
+      - SELECT: Only USING clause, never WITH CHECK
+      - INSERT: Only WITH CHECK clause, never USING
+      - UPDATE: Both USING and WITH CHECK clauses
+      - DELETE: Only USING clause, never WITH CHECK
+
+      ## Example: Complete Supabase Multi-Tenant Setup
+
+      \`\`\`sql
+      -- Enable RLS on all tables
+      ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+      ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+      ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
+      -- Helper function for tenant access
+      CREATE OR REPLACE FUNCTION get_user_tenant()
+      RETURNS uuid
+      LANGUAGE sql
+      SECURITY DEFINER
+      STABLE
+      AS $$
+          SELECT tenant_id FROM user_profiles 
+          WHERE auth_user_id = auth.uid();
+      $$;
+
+      -- Revoke public execution
+      REVOKE EXECUTE ON FUNCTION get_user_tenant() FROM anon, authenticated;
+
+      -- Create tenant isolation policies
+      CREATE POLICY "Tenant customers" ON customers
+      FOR ALL TO authenticated
+      USING (tenant_id = get_user_tenant());
+
+      CREATE POLICY "Tenant orders" ON orders  
+      FOR ALL TO authenticated
+      USING (tenant_id = get_user_tenant());
+
+      CREATE POLICY "Tenant products" ON products
+      FOR ALL TO authenticated
+      USING (tenant_id = get_user_tenant());
+
+      -- Admin override using custom claims
+      CREATE POLICY "Admin access" ON customers
+      FOR ALL TO authenticated
+      USING ((auth.jwt() ->> 'user_role') = 'admin');
+
+      -- Performance indexes
+      CREATE INDEX idx_customers_tenant ON customers(tenant_id);
+      CREATE INDEX idx_orders_tenant ON orders(tenant_id);
+      CREATE INDEX idx_products_tenant ON products(tenant_id);
+      \`\`\`
 
       # Edge Functions
       - Use the \`display_edge_function\` tool to generate complete, high-quality Edge Functions in TypeScript for the Deno runtime.
@@ -384,7 +805,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
               })
             })
           \`\`\`
-
       # General Instructions:
       - **Understand Context**: Attempt to use \`list_tables\`, \`list_extensions\` first. If they are not available or return a privacy/permission error, state this and proceed with caution, relying on the user's description and general knowledge.
     `
