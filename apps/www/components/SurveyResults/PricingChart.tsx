@@ -14,7 +14,7 @@ function generatePricingSQL(activeFilters: Record<string, string>) {
   SELECT 
   unnest(pricing) AS pricing_model,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY pricing_model
 ORDER BY total DESC;
 `

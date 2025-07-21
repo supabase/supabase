@@ -17,7 +17,7 @@ function generateHeadquartersSQL(activeFilters: Record<string, string>) {
   return `SELECT
   headquarters,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY headquarters
 ORDER BY headquarters;`
 }

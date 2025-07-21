@@ -13,7 +13,7 @@ function generateRoleSQL(activeFilters) {
   return `SELECT
   role,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY role
 ORDER BY total DESC`
 }

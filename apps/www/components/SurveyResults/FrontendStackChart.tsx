@@ -18,7 +18,7 @@ function generateFrontendStackSQL(activeFilters: Record<string, string>) {
   SELECT 
   unnest(frontend_stack) AS technology,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
 ORDER BY total DESC;
 `

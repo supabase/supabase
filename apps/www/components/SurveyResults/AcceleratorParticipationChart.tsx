@@ -20,7 +20,7 @@ function generateAcceleratorParticipationSQL(activeFilters: Record<string, strin
   return `SELECT
   accelerator_participation_normalized,
   COUNT(*) AS total
-FROM responses_2025_e
+FROM responses_2025
 ${whereClause}
 GROUP BY accelerator_participation_normalized
 ORDER BY total DESC;`

@@ -14,7 +14,7 @@ function generateSalesToolsSQL(activeFilters: Record<string, string>) {
   SELECT 
   unnest(sales_tools) AS tool_name,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY tool_name
 ORDER BY total DESC;
 `

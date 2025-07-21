@@ -24,7 +24,7 @@ function generateTechnicalFoundersSQL(activeFilters: Record<string, string>) {
     -- ELSE 'Unknown'
   END AS founders_are_technical,
   COUNT(*) AS total
-FROM responses_2025_e
+FROM responses_2025
 ${whereClause}
 GROUP BY founders_are_technical
 ORDER BY total DESC;`

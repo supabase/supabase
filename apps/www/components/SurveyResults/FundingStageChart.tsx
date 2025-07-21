@@ -21,7 +21,7 @@ function generateFundingStageSQL(activeFilters) {
   return `SELECT
   funding_stage,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY funding_stage
 ORDER BY 
   CASE funding_stage

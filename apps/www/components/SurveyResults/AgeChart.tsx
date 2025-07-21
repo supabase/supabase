@@ -17,7 +17,7 @@ function generatePersonAgeSQL(activeFilters) {
   return `SELECT
   person_age,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY person_age
 ORDER BY person_age ASC`
 }

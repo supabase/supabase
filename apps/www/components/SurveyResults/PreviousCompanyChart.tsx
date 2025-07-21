@@ -24,7 +24,7 @@ function generatePreviousCompanySQL(activeFilters: Record<string, string>) {
     -- ELSE 'Unknown'
   END AS previous_company,
   COUNT(*) AS total
-FROM responses_2025_e
+FROM responses_2025
 ${whereClause}
 GROUP BY previous_company
 ORDER BY total DESC;`

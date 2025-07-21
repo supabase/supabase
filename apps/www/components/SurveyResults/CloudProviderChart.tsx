@@ -18,7 +18,7 @@ function generateCloudProviderSQL(activeFilters: Record<string, string>) {
   SELECT 
   unnest(cloud_providers) AS technology,
   COUNT(*) AS total
-FROM responses_2025_e${whereClause ? '\n' + whereClause : ''}
+FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
 ORDER BY total DESC;
 `

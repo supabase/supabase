@@ -17,7 +17,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { ChartConfig, ChartContainer } from 'ui'
 import { SurveyCodeWindow } from './SurveyCodeWindow'
-import { COLORS } from '@ui/lib/constants'
 
 const chartConfig = {
   value: {
@@ -31,8 +30,8 @@ const chartConfig = {
 
 // Create a separate Supabase client for your external project
 const externalSupabase = createClient(
-  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SURVEY_RESULTS_SUPABASE_ANON_KEY
+  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SURVEY_SUPABASE_ANON_KEY
 )
 
 // Custom hook to fetch filter options from Supabase
@@ -53,7 +52,7 @@ function useFilterOptions(filterColumns: string[]) {
 
         for (const column of filterColumns) {
           const { data, error: fetchError } = await externalSupabase
-            .from('responses_2025_e')
+            .from('responses_2025')
             .select(column)
             .not(column, 'is', null)
             .not(column, 'eq', '')
