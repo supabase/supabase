@@ -21,13 +21,13 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
 import EditSecretModal from './EditSecretModal'
+import DeleteSecretModal from './DeleteSecretModal'
 
 interface SecretRowProps {
   secret: VaultSecret
-  onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
+const SecretRow = ({ secret }: SecretRowProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const [modal, setModal] = useState<string | null>(null)
@@ -46,11 +46,14 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
       enabled: !!(ref! && secret.id) && revealSecret,
     }
   )
+
   const renderModal = () => {
     const onClose = () => setModal(null)
     switch (modal) {
       case `edit`:
         return <EditSecretModal secret={secret} onClose={onClose} />
+      case `delete`:
+        return <DeleteSecretModal secret={secret} onClose={onClose} />
       default:
         return null
     }
@@ -122,11 +125,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Edit3 size="14" />
                   <p>Edit</p>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="space-x-2"
-                  disabled={!canManageSecrets}
-                  onClick={() => onSelectRemove(secret)}
-                >
+                <DropdownMenuItem className="space-x-2" onClick={() => setModal(`delete`)}>
                   <Trash stroke="red" size="14" />
                   <p className="text-foreground-light">Delete</p>
                 </DropdownMenuItem>
