@@ -24,8 +24,6 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
-    include: [resolve(dirname, './**/*.test.{ts,tsx}')],
-    restoreMocks: true,
     setupFiles: [
       resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/polyfills.js'),
