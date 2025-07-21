@@ -79,7 +79,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   })
 
   let aiOptInLevel: AiOptInLevel = 'schema'
-  let isLimited = true
+  let isLimited = false
 
   if (IS_PLATFORM) {
     // Get organizations and compute opt in level server-side
