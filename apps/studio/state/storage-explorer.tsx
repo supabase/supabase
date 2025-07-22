@@ -14,13 +14,13 @@ import {
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
-} from 'components/to-be-cleaned/Storage/Storage.constants'
+} from 'components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
   StorageItem,
   StorageItemMetadata,
   StorageItemWithColumn,
-} from 'components/to-be-cleaned/Storage/Storage.types'
+} from 'components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
   downloadFile,
@@ -28,8 +28,8 @@ import {
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
-} from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
-import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+} from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'
@@ -1758,14 +1758,11 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const isDifferentProject = snap.projectRef !== project?.ref
     const isDifferentResumableUploadUrl = snap.resumableUploadUrl !== resumableUploadUrl
 
-    if (
-      !isPaused &&
-      hasDataReady &&
-      (isDifferentProject || isDifferentResumableUploadUrl) &&
-      serviceKey
-    ) {
+    const serviceApiKey = serviceKey?.api_key ?? 'unknown'
+
+    if (!isPaused && hasDataReady && (isDifferentProject || isDifferentResumableUploadUrl)) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-      const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
+      const supabaseClient = createClient(clientEndpoint, serviceApiKey, {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
@@ -1785,11 +1782,11 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
           projectRef: project?.ref ?? '',
           supabaseClient,
           resumableUploadUrl,
-          serviceKey: serviceKey.api_key,
+          serviceKey: serviceApiKey,
         })
       )
     }
-  }, [project?.ref, stateRef, serviceKey, isPaused, protocol, endpoint])
+  }, [project?.ref, stateRef, serviceKey?.api_key, isPaused, protocol, endpoint])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>
