@@ -1364,6 +1364,27 @@ export interface ForeignDataWrapperCreatedEvent {
 }
 
 /**
+ * Triggered when a new storage bucket is created in a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/buckets
+ */
+export interface StorageBucketCreatedEvent {
+  action: 'storage_bucket_created'
+  properties: {
+    /**
+     * The type of the bucket created. E.g. standard or analytics iceberg.
+     */
+    bucketType?: string
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
  * Triggered when a new branch is created.
  *
  * @group Events
@@ -1381,7 +1402,7 @@ export interface BranchCreateButtonClickedEvent {
      * Whether the branch was created with a git branch association
      */
     gitlessBranching: boolean
-  }
+    }
   groups: {
     project: string
     organization: string
@@ -1604,6 +1625,7 @@ export type TelemetryEvent =
   | AiAssistantInSupportFormClickedEvent
   | OrganizationMfaEnforcementUpdated
   | ForeignDataWrapperCreatedEvent
+  | StorageBucketCreatedEvent
   | BranchCreateButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
