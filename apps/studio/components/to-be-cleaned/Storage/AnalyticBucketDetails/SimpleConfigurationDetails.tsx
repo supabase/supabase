@@ -1,6 +1,7 @@
 import Link from '@ui/components/Typography/Link'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldSectionDescription, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { Card } from 'ui'
 import { getCatalogURI, getConnectionURL } from '../StorageSettings/StorageSettings.utils'
@@ -19,12 +20,14 @@ const wrapperMeta = {
 
 export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string }) => {
   const { project } = useProjectContext()
+
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
-  const serviceApiKey =
-    (settings?.service_api_keys ?? []).find((key) => key.tags === 'service_role')?.api_key ??
-    'SUPABASE_CLIENT_SERVICE_KEY'
+
+  const { serviceKey } = getKeys(apiKeys)
+  const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
 
   const values: Record<string, string> = {
     vault_token: serviceApiKey,

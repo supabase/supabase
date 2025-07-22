@@ -227,8 +227,8 @@ export const FormContents = ({
         errors={errors}
         httpHeaders={httpHeaders}
         httpParameters={httpParameters}
-        onAddHeader={(header?: any) => {
-          if (header) setHttpHeaders(httpHeaders.concat(header))
+        onAddHeaders={(headers?: any[]) => {
+          if (headers) setHttpHeaders(httpHeaders.concat(headers))
           else setHttpHeaders(httpHeaders.concat({ id: uuidv4(), name: '', value: '' }))
         }}
         onUpdateHeader={(idx, property, value) =>

@@ -12,7 +12,6 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { OPT_IN_TAGS } from 'lib/constants'
 import type { ResponseError } from 'types'
 
@@ -34,17 +33,10 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const selectedOrganization = useSelectedOrganization()
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
-
   const [_, setUpdatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
     false
   )
-
-  // [Joshen] This is to prevent users from changing their opt in levels until the migration
-  // to clean up the existing opt in tags are completed. Once toggled on, users can then change their
-  // opt in levels again and we can clean this feature flag up
-  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
 
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
@@ -65,73 +57,52 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
     }
     const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
 
-    if (!useBedrockAssistant) {
-      const updatedOptInTags = values.aiOptInLevel === 'schema' ? [OPT_IN_TAGS.AI_SQL] : []
+    let updatedOptInTags = existingOptInTags.filter(
+      (tag: string) =>
+        tag !== OPT_IN_TAGS.AI_SQL &&
+        tag !== (OPT_IN_TAGS.AI_DATA ?? 'AI_DATA') &&
+        tag !== (OPT_IN_TAGS.AI_LOG ?? 'AI_LOG')
+    )
 
-      updateOrganization(
-        { slug: selectedOrganization.slug, opt_in_tags: updatedOptInTags },
-        {
-          onSuccess: () => {
-            invalidateOrganizationsQuery(queryClient)
-            toast.success('Successfully updated AI opt-in settings')
-            setUpdatedOptInSinceMCP(true)
-            onSuccessCallback?.() // Call optional callback on success
-          },
-          onError: (error: ResponseError) => {
-            toast.error(`Failed to update settings: ${error.message}`)
-          },
-        }
-      )
-    } else {
-      let updatedOptInTags = existingOptInTags.filter(
-        (tag: string) =>
-          tag !== OPT_IN_TAGS.AI_SQL &&
-          tag !== (OPT_IN_TAGS.AI_DATA ?? 'AI_DATA') &&
-          tag !== (OPT_IN_TAGS.AI_LOG ?? 'AI_LOG')
-      )
-
-      if (
-        values.aiOptInLevel === 'schema' ||
-        values.aiOptInLevel === 'schema_and_log' ||
-        values.aiOptInLevel === 'schema_and_log_and_data'
-      ) {
-        updatedOptInTags.push(OPT_IN_TAGS.AI_SQL)
-      }
-      if (
-        values.aiOptInLevel === 'schema_and_log' ||
-        values.aiOptInLevel === 'schema_and_log_and_data'
-      ) {
-        updatedOptInTags.push(OPT_IN_TAGS.AI_LOG)
-      }
-      if (values.aiOptInLevel === 'schema_and_log_and_data') {
-        updatedOptInTags.push(OPT_IN_TAGS.AI_DATA)
-      }
-
-      updatedOptInTags = [...new Set(updatedOptInTags)]
-
-      updateOrganization(
-        { slug: selectedOrganization.slug, opt_in_tags: updatedOptInTags },
-        {
-          onSuccess: () => {
-            invalidateOrganizationsQuery(queryClient)
-            toast.success('Successfully updated AI opt-in settings')
-            setUpdatedOptInSinceMCP(true)
-            onSuccessCallback?.() // Call optional callback on success
-          },
-          onError: (error: ResponseError) => {
-            toast.error(`Failed to update settings: ${error.message}`)
-          },
-        }
-      )
+    if (
+      values.aiOptInLevel === 'schema' ||
+      values.aiOptInLevel === 'schema_and_log' ||
+      values.aiOptInLevel === 'schema_and_log_and_data'
+    ) {
+      updatedOptInTags.push(OPT_IN_TAGS.AI_SQL)
     }
+    if (
+      values.aiOptInLevel === 'schema_and_log' ||
+      values.aiOptInLevel === 'schema_and_log_and_data'
+    ) {
+      updatedOptInTags.push(OPT_IN_TAGS.AI_LOG)
+    }
+    if (values.aiOptInLevel === 'schema_and_log_and_data') {
+      updatedOptInTags.push(OPT_IN_TAGS.AI_DATA)
+    }
+
+    updatedOptInTags = [...new Set(updatedOptInTags)]
+
+    updateOrganization(
+      { slug: selectedOrganization.slug, opt_in_tags: updatedOptInTags },
+      {
+        onSuccess: () => {
+          invalidateOrganizationsQuery(queryClient)
+          toast.success('Successfully updated AI opt-in settings')
+          setUpdatedOptInSinceMCP(true)
+          onSuccessCallback?.() // Call optional callback on success
+        },
+        onError: (error: ResponseError) => {
+          toast.error(`Failed to update settings: ${error.message}`)
+        },
+      }
+    )
   }
 
   return {
     form,
     onSubmit,
     isUpdating,
-    currentOptInLevel: !newOrgAiOptIn
-      ? 'disabled'
-      : getAiOptInLevel(selectedOrganization?.opt_in_tags),
+    currentOptInLevel: getAiOptInLevel(selectedOrganization?.opt_in_tags),
   }
 }
