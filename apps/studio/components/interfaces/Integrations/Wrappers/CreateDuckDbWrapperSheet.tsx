@@ -8,7 +8,7 @@ import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Form,
@@ -28,45 +28,71 @@ import { makeValidateRequired } from './Wrappers.utils'
 const FORM_ID = 'create-wrapper-form'
 
 const requiredFields: Record<Target, { name: string; required: boolean }[]> = {
-  S3Tables: [
-    { name: 'vault_aws_access_key_id', required: true },
-    { name: 'vault_aws_secret_access_key', required: true },
-    { name: 'region_name', required: true },
-    { name: 'vault_aws_s3table_bucket_arn', required: true },
+  s3: [
+    { name: 'vault_key_id', required: true },
+    { name: 'vault_secret', required: true },
+    { name: 'region', required: false },
+    { name: 'endpoint', required: false },
+    { name: 'session_token', required: false },
+    { name: 'url_compatibility_mode', required: false },
+    { name: 'url_style', required: false },
+    { name: 'use_ssl', required: false },
+    { name: 'kms_key_id', required: false },
   ],
-  R2Catalog: [
-    { name: 'vault_aws_access_key_id', required: true },
-    { name: 'vault_aws_secret_access_key', required: true },
+  s3_tables: [
+    { name: 'vault_key_id', required: true },
+    { name: 'vault_secret', required: true },
+    { name: 's3_tables_arn', required: true },
+    { name: 'region', required: false },
+  ],
+  r2: [
+    { name: 'vault_key_id', required: true },
+    { name: 'vault_secret', required: true },
+    { name: 'account_id', required: true },
+  ],
+  r2_catalog: [
     { name: 'vault_token', required: true },
     { name: 'warehouse', required: true },
-    { name: 's3.endpoint', required: true },
     { name: 'catalog_uri', required: true },
   ],
-  IcebergRestCatalog: [
-    { name: 'vault_aws_access_key_id', required: false },
-    { name: 'vault_aws_secret_access_key', required: false },
-    { name: 'region_name', required: false },
-    { name: 'vault_aws_s3table_bucket_arn', required: false },
+  polaris: [
+    { name: 'vault_client_id', required: true },
+    { name: 'vault_client_secret', required: true },
+    { name: 'warehouse', required: true },
+    { name: 'catalog_uri', required: true },
+  ],
+  lakekeeper: [
+    { name: 'vault_client_id', required: true },
+    { name: 'vault_client_secret', required: true },
+    { name: 'oauth2_scope', required: true },
+    { name: 'oauth2_server_uri', required: true },
+    { name: 'warehouse', required: true },
+    { name: 'catalog_uri', required: true },
+  ],
+  iceberg: [
+    { name: 'vault_client_id', required: false },
+    { name: 'vault_client_secret', required: false },
     { name: 'vault_token', required: false },
-    { name: 'warehouse', required: false },
-    { name: 's3.endpoint', required: false },
-    { name: 'catalog_uri', required: false },
+    { name: 'oauth2_scope', required: false },
+    { name: 'oauth2_server_uri', required: false },
+    { name: 'warehouse', required: true },
+    { name: 'catalog_uri', required: true },
   ],
 } as const
 
-type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
+type Target = 's3' | 's3_tables' | 'r2' | 'r2_catalog' | 'polaris' | 'lakekeeper' | 'iceberg'
 
-export const CreateIcebergWrapperSheet = ({
+export const CreateDuckDbWrapperSheet = ({
   wrapperMeta: wrapperMetaOriginal,
   isClosing,
   setIsClosing,
   onClose,
 }: CreateWrapperSheetProps) => {
   const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const [selectedTarget, setSelectedTarget] = useState<Target>('S3Tables')
+  const [selectedTarget, setSelectedTarget] = useState<Target>('s3')
 
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
@@ -118,6 +144,24 @@ export const CreateIcebergWrapperSheet = ({
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
+    if (selectedTarget === 's3') {
+      if (
+        values.url_compatibility_mode &&
+        values.url_compatibility_mode !== 'true' &&
+        values.url_compatibility_mode !== 'false'
+      ) {
+        errors.url_compatibility_mode = 'Please set it true or false'
+      }
+
+      if (values.url_style && values.url_style !== 'vhost' && values.url_style !== 'path') {
+        errors.url_style = 'Please set it vhost or path'
+      }
+
+      if (values.use_ssl && values.use_ssl !== 'true' && values.use_ssl !== 'false') {
+        errors.use_ssl = 'Please set it true or false'
+      }
+    }
+
     if (values.source_schema.length === 0) {
       errors.source_schema = 'Please provide a namespace name'
     }
@@ -149,7 +193,11 @@ export const CreateIcebergWrapperSheet = ({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         wrapperMeta,
-        formState: { ...values, server_name: `${values.wrapper_name}_server` },
+        formState: {
+          type: selectedTarget,
+          ...values,
+          server_name: `${values.wrapper_name}_server`,
+        },
         mode: 'schema',
         tables: [],
         sourceSchema: values.source_schema,
@@ -232,8 +280,22 @@ export const CreateIcebergWrapperSheet = ({
                         onValueChange={(value) => setSelectedTarget(value as Target)}
                       >
                         <RadioGroupStackedItem
-                          key="S3Tables"
-                          value="S3Tables"
+                          key="s3"
+                          value="s3"
+                          label="AWS S3"
+                          showIndicator={false}
+                        >
+                          <div className="flex gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                AWS S3 storage that's optimized for analytics workloads.
+                              </p>
+                            </div>
+                          </div>
+                        </RadioGroupStackedItem>
+                        <RadioGroupStackedItem
+                          key="s3_tables"
+                          value="s3_tables"
                           label="AWS S3 Tables"
                           showIndicator={false}
                         >
@@ -246,8 +308,22 @@ export const CreateIcebergWrapperSheet = ({
                           </div>
                         </RadioGroupStackedItem>
                         <RadioGroupStackedItem
-                          key="R2Catalog"
-                          value="R2Catalog"
+                          key="r2"
+                          value="r2"
+                          label="Cloudflare R2"
+                          showIndicator={false}
+                        >
+                          <div className="flex gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                Managed Apache Iceberg built directly into your R2 bucket.
+                              </p>
+                            </div>
+                          </div>
+                        </RadioGroupStackedItem>
+                        <RadioGroupStackedItem
+                          key="r2_catalog"
+                          value="r2_catalog"
                           label="Cloudflare R2 Catalog"
                           showIndicator={false}
                         >
@@ -260,9 +336,37 @@ export const CreateIcebergWrapperSheet = ({
                           </div>
                         </RadioGroupStackedItem>
                         <RadioGroupStackedItem
-                          key="IcebergRestCatalog"
-                          value="IcebergRestCatalog"
-                          label="Iceberg REST Catalog"
+                          key="polaris"
+                          value="polaris"
+                          label="Polaris"
+                          showIndicator={false}
+                        >
+                          <div className="flex gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                Something about Polaris.
+                              </p>
+                            </div>
+                          </div>
+                        </RadioGroupStackedItem>
+                        <RadioGroupStackedItem
+                          key="lakekeeper"
+                          value="lakekeeper"
+                          label="Lakekeeper"
+                          showIndicator={false}
+                        >
+                          <div className="flex gap-x-5">
+                            <div className="flex flex-col">
+                              <p className="text-foreground-light text-left">
+                                Can be used with any S3-compatible storage.
+                              </p>
+                            </div>
+                          </div>
+                        </RadioGroupStackedItem>
+                        <RadioGroupStackedItem
+                          key="iceberg"
+                          value="iceberg"
+                          label="Iceberg"
                           showIndicator={false}
                         >
                           <div className="flex gap-x-5">

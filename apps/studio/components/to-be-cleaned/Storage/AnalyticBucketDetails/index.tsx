@@ -127,7 +127,6 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
       }
     })
   }, [wrapperTables, namespacesData])
-  const excludedSchemas = uniq(namespaces.map((n) => n.schema))
 
   const wrappersExtension = extensionsData?.find((ext) => ext.name === 'wrappers')
 
@@ -209,7 +208,6 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                           bucketName={bucket.name}
                           namespace={namespace}
                           schema={schema}
-                          excludedSchemas={excludedSchemas}
                           tables={tables as any}
                           token={token!}
                           wrapperInstance={wrapperInstance}
