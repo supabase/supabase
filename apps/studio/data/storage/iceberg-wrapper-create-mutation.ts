@@ -21,13 +21,13 @@ export const useIcebergWrapperCreateMutation = () => {
   const { project } = useProjectContext()
 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
-  const { serviceKey } = getKeys(apiKeys)
+  const { secretKey, serviceKey } = getKeys(apiKeys)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
 
-  const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
+  const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY'
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
@@ -61,7 +61,7 @@ export const useIcebergWrapperCreateMutation = () => {
         server_name: `${wrapperName}_server`,
         vault_aws_access_key_id: createS3KeyData?.access_key,
         vault_aws_secret_access_key: createS3KeyData?.secret_key,
-        vault_token: serviceApiKey,
+        vault_token: apiKey,
         warehouse: bucketName,
         's3.endpoint': getConnectionURL(project?.ref ?? '', protocol, endpoint),
         catalog_uri: getCatalogURI(project?.ref ?? '', protocol, endpoint),
