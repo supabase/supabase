@@ -66,25 +66,10 @@ export const OutOfDateNotice = ({
     return 'Update this branch to get the latest changes from the production branch.'
   }
 
-  const handleUpdateClick = () => {
-    // Track branch update
-    sendEvent({
-      action: 'branch_updated',
-      properties: {
-        modifiedEdgeFunctions: hasEdgeFunctionModifications,
-        source: 'out_of_date_notice',
-      },
-      groups: {
-        project: parentProjectRef ?? 'Unknown',
-        organization: selectedOrg?.slug ?? 'Unknown',
-      },
-    })
-
-    onPush()
-  }
-
-  const handleConfirmUpdate = () => {
-    setIsDialogOpen(false)
+  const handleUpdate = (shouldCloseDialog = false) => {
+    if (shouldCloseDialog) {
+      setIsDialogOpen(false)
+    }
 
     // Track branch update
     sendEvent({
@@ -134,7 +119,7 @@ export const OutOfDateNotice = ({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleConfirmUpdate}>Update anyway</AlertDialogAction>
+                <AlertDialogAction onClick={() => handleUpdate(true)}>Update anyway</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -142,7 +127,7 @@ export const OutOfDateNotice = ({
           <Button
             type="default"
             loading={isPushing}
-            onClick={handleUpdateClick}
+            onClick={() => handleUpdate()}
             icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
             className="shrink-0"
           >
