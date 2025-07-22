@@ -8,12 +8,12 @@ import { IS_PLATFORM } from 'common'
 import { getOrganizations } from 'data/organizations/organizations-query'
 import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { AiOptInLevel, getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
-import apiWrapper from 'lib/api/apiWrapper'
-import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { createSupabaseMCPClient } from 'lib/ai/supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from 'lib/ai/tool-filter'
+import apiWrapper from 'lib/api/apiWrapper'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 import { getTools } from './tools'
 
 export const maxDuration = 120
@@ -78,34 +78,39 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     return msg
   })
 
-  // Get organizations and compute opt in level server-side
-  const [organizations, projects] = await Promise.all([
-    getOrganizations({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
-    getProjects({
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authorization && { Authorization: authorization }),
-      },
-    }),
-  ])
+  let aiOptInLevel: AiOptInLevel = 'schema'
+  let isLimited = false
 
-  const selectedOrg = organizations.find((org) => org.slug === orgSlug)
-  const selectedProject = projects.find(
-    (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
-  )
+  if (IS_PLATFORM) {
+    // Get organizations and compute opt in level server-side
+    const [organizations, projects] = await Promise.all([
+      getOrganizations({
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+      }),
+      getProjects({
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        },
+      }),
+    ])
 
-  // If the project is not in the organization specific by the org slug, return an error
-  if (selectedProject?.organization_slug !== selectedOrg?.slug) {
-    return res.status(400).json({ error: 'Project and organization do not match' })
+    const selectedOrg = organizations.find((org) => org.slug === orgSlug)
+    const selectedProject = projects.find(
+      (project) => project.ref === projectRef || project.preview_branch_refs.includes(projectRef)
+    )
+
+    // If the project is not in the organization specific by the org slug, return an error
+    if (selectedProject?.organization_slug !== selectedOrg?.slug) {
+      return res.status(400).json({ error: 'Project and organization do not match' })
+    }
+
+    aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
+    isLimited = selectedOrg?.plan.id === 'free'
   }
-
-  const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
-  const isLimited = selectedOrg?.plan.id === 'free'
 
   const { model, error: modelError } = await getModel(projectRef, isLimited) // use project ref as routing key
 
