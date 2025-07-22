@@ -75,7 +75,7 @@ export const useProtectedSchemas = ({
 }: { excludeSchemas?: string[] } = {}) => {
   // Stabilize the excludeSchemas array to prevent unnecessary re-computations
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stableexcludeSchemas = useMemo(() => excludeSchemas, [JSON.stringify(excludeSchemas)])
+  const stableExcludeSchemas = useMemo(() => excludeSchemas, [JSON.stringify(excludeSchemas)])
 
   const result = useIcebergFdwSchemasQuery()
 
