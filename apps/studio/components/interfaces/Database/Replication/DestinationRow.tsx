@@ -2,6 +2,7 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
 import { ResponseError } from 'types'
+import { Button } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
 import PipelineStatus, { PipelineStatusRequestStatus, PipelineStatusName } from './PipelineStatus'
@@ -32,6 +33,7 @@ interface DestinationRowProps {
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
+  onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
 const DestinationRow = ({
@@ -44,6 +46,7 @@ const DestinationRow = ({
   isLoading: isPipelineLoading,
   isError: isPipelineError,
   isSuccess: isPipelineSuccess,
+  onSelectPipeline,
 }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
@@ -174,6 +177,21 @@ const DestinationRow = ({
               <ShimmeringLoader></ShimmeringLoader>
             ) : (
               pipeline.config.publication_name
+            )}
+          </Table.td>
+          <Table.td className="text-right">
+            {isPipelineLoading || !pipeline ? (
+              <div className="w-20 ml-auto">
+                <ShimmeringLoader></ShimmeringLoader>
+              </div>
+            ) : (
+              <Button 
+                type="default"
+                size="tiny"
+                onClick={() => onSelectPipeline?.(pipeline.id, destinationName)}
+              >
+                View details
+              </Button>
             )}
           </Table.td>
           <Table.td>

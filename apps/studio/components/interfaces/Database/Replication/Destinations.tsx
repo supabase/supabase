@@ -2,18 +2,23 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { Plus } from 'lucide-react'
-import { Button, cn } from 'ui'
+import { Plus, Search } from 'lucide-react'
+import { Button, cn, Input } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import DestinationRow from './DestinationRow'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
 import { useState } from 'react'
 import NewDestinationPanel from './DestinationPanel'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { noop } from 'lodash'
 
-const Destinations = () => {
+interface DestinationsProps {
+  onSelectPipeline?: (pipelineId: number, destinationName: string) => void
+}
+
+const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
+  const [filterString, setFilterString] = useState<string>('')
   const { ref: projectRef } = useParams()
 
   const {
@@ -50,15 +55,32 @@ const Destinations = () => {
 
   const anyDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
 
+  const filteredDestinations = filterString.length === 0
+    ? (destinationsData?.destinations ?? [])
+    : (destinationsData?.destinations ?? []).filter((destination) => 
+        destination.name.toLowerCase().includes(filterString.toLowerCase())
+      )
+
   return (
     <>
-      <ScaffoldSection isFullWidth>
-        <div className="flex justify-between items-center mb-4">
-          <ScaffoldSectionTitle>Destinations</ScaffoldSectionTitle>
+      <div className="mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Input
+              size="tiny"
+              icon={<Search size="14" />}
+              placeholder={'Filter destinations'}
+              value={filterString}
+              onChange={(e) => setFilterString(e.target.value)}
+            />
+          </div>
           <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
             Add destination
           </Button>
         </div>
+      </div>
+
+      <div className="w-full overflow-hidden overflow-x-auto">
         {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
 
         {(isSourcesError || isDestinationsError) && (
@@ -75,9 +97,10 @@ const Destinations = () => {
               <Table.th key="type">Type</Table.th>,
               <Table.th key="status">Status</Table.th>,
               <Table.th key="publication">Publication</Table.th>,
+              <Table.th key="details" className="text-right">Details</Table.th>,
               <Table.th key="actions"></Table.th>,
             ]}
-            body={destinationsData.destinations.map((destination) => {
+            body={filteredDestinations.map((destination) => {
               const pipeline = pipelinesData?.pipelines.find(
                 (p) => p.destination_id === destination.id
               )
@@ -93,6 +116,7 @@ const Destinations = () => {
                   isLoading={isPipelinesLoading}
                   isError={isPipelinesError}
                   isSuccess={isPipelinesSuccess}
+                  onSelectPipeline={onSelectPipeline}
                 ></DestinationRow>
               )
             })}
@@ -124,7 +148,13 @@ const Destinations = () => {
             </div>
           )
         )}
-      </ScaffoldSection>
+      </div>
+
+      {!isSourcesLoading && !isDestinationsLoading && filteredDestinations.length === 0 && anyDestinations && (
+        <div className="text-center py-8 text-foreground-light">
+          <p>No destinations match "{filterString}"</p>
+        </div>
+      )}
 
       <NewDestinationPanel
         visible={showNewDestinationPanel}

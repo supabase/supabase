@@ -2,20 +2,15 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { cn } from 'ui'
 import { ResponseError } from 'types'
-import { Loader2, ChevronDown, ChevronRight, Copy, AlertTriangle } from 'lucide-react'
+import { Loader2, AlertTriangle, ExternalLink } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
   Button,
-  Collapsible_Shadcn_ as Collapsible,
-  CollapsibleContent_Shadcn_ as CollapsibleContent,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
-import { useState, useEffect, useRef } from 'react'
-import { copyToClipboard } from 'ui'
-import { toast } from 'sonner'
+import { useParams } from 'common'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 
 export enum PipelineStatusRequestStatus {
@@ -52,33 +47,6 @@ const PipelineStatus = ({
   isSuccess,
   requestStatus,
 }: PipelineStatusProps) => {
-  const [isErrorDetailsOpen, setIsErrorDetailsOpen] = useState(false)
-  const errorDetailsRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (errorDetailsRef.current && !errorDetailsRef.current.contains(event.target as Node)) {
-        setIsErrorDetailsOpen(false)
-      }
-    }
-
-    if (isErrorDetailsOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isErrorDetailsOpen])
-
-  const handleCopyToClipboard = async (text: string) => {
-    try {
-      await copyToClipboard(text)
-      toast.success('Error details copied to clipboard')
-    } catch (error) {
-      toast.error('Failed to copy error details')
-    }
-  }
 
   const isFailedStatus = (
     status: ReplicationPipelineStatusData['status'] | undefined
@@ -102,9 +70,15 @@ const PipelineStatus = ({
   }
 
   const renderFailedStatus = (failedStatus: FailedStatus) => {
-    const hasDetails =
-      failedStatus.message || failedStatus.reason || failedStatus.exit_code !== undefined
     const isLoadingLogs = isLogLoadingState(failedStatus)
+    const { ref: projectRef } = useParams()
+
+    const handleNavigateToLogs = () => {
+      if (projectRef) {
+        const logsUrl = `/project/${projectRef}/logs/postgres-logs`
+        window.open(logsUrl, '_blank')
+      }
+    }
 
     return (
       <div className="flex items-center gap-2">
@@ -124,100 +98,20 @@ const PipelineStatus = ({
               <p>
                 {isLoadingLogs
                   ? 'Pipeline failed - logs are being retrieved from container'
-                  : 'Pipeline has failed - expand for error details'}
+                  : 'Pipeline has failed - check the logs section for detailed error information'}
               </p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        {hasDetails && (
-          <Collapsible open={isErrorDetailsOpen} onOpenChange={setIsErrorDetailsOpen}>
-            <CollapsibleTrigger asChild>
-              <Button type="text" size="tiny" className="h-auto py-0 px-1 text-xs">
-                {isErrorDetailsOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="absolute z-10 mt-1 left-0 min-w-[400px] max-w-[600px]">
-              <div
-                ref={errorDetailsRef}
-                className="rounded-lg border border-border bg-surface-100 p-3 shadow-md"
-              >
-                {isLoadingLogs ? (
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="w-4 h-4 animate-spin text-warning-600" />
-                    <div>
-                      <div className="text-sm font-medium text-foreground mb-1">
-                        Pipeline Failed - Loading logs...
-                      </div>
-                      <div className="text-xs text-foreground-light">
-                        Error logs are being retrieved from the container. This may take a few
-                        moments.
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-foreground">
-                        Pipeline Error Details
-                      </span>
-                      {(failedStatus.message || failedStatus.reason) && (
-                        <Button
-                          type="text"
-                          size="tiny"
-                          onClick={async () => {
-                            await handleCopyToClipboard(
-                              [
-                                failedStatus.exit_code !== undefined
-                                  ? `Exit Code: ${failedStatus.exit_code}`
-                                  : null,
-                                failedStatus.reason ? `Reason: ${failedStatus.reason}` : null,
-                                failedStatus.message ? `Message: ${failedStatus.message}` : null,
-                              ]
-                                .filter(Boolean)
-                                .join('\n')
-                            )
-                          }}
-                        >
-                          <Copy className="w-3 h-3" />
-                        </Button>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      {failedStatus.exit_code !== undefined && (
-                        <div>
-                          <span className="text-xs font-medium text-foreground-light">
-                            Exit Code:
-                          </span>
-                          <div className="font-mono text-sm text-foreground mt-1">
-                            {failedStatus.exit_code}
-                          </div>
-                        </div>
-                      )}
-                      {failedStatus.reason && (
-                        <div>
-                          <span className="text-xs font-medium text-foreground-light">Reason:</span>
-                          <pre className="font-mono text-sm text-foreground whitespace-pre-wrap break-words mt-1 max-h-32 overflow-y-auto">
-                            {failedStatus.reason}
-                          </pre>
-                        </div>
-                      )}
-                      {failedStatus.message && (
-                        <div>
-                          <span className="text-xs font-medium text-foreground-light">
-                            Message:
-                          </span>
-                          <pre className="font-mono text-sm text-foreground whitespace-pre-wrap break-words mt-1 max-h-32 overflow-y-auto">
-                            {failedStatus.message}
-                          </pre>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        )}
+        <Button
+          type="outline"
+          size="tiny"
+          icon={<ExternalLink className="w-3 h-3" />}
+          onClick={handleNavigateToLogs}
+          className="h-auto py-1 px-2 text-xs"
+        >
+          View Logs
+        </Button>
       </div>
     )
   }
