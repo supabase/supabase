@@ -234,7 +234,7 @@ export const BillingCustomerDataForm = ({
           render={({ field }: { field: any }) => (
             <FormItemLayout hideMessage label="City">
               <FormControl>
-                <Input {...field} placeholder="New York" disabled={disabled} />
+                <Input {...field} disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItemLayout>
@@ -246,7 +246,7 @@ export const BillingCustomerDataForm = ({
           render={({ field }: { field: any }) => (
             <FormItemLayout hideMessage label="State / Province">
               <FormControl>
-                <Input {...field} placeholder="California" disabled={disabled} />
+                <Input {...field} disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItemLayout>
