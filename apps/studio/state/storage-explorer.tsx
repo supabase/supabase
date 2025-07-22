@@ -1762,7 +1762,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
       !isPaused &&
       hasDataReady &&
       (isDifferentProject || isDifferentResumableUploadUrl) &&
-      serviceKey
+      serviceKey?.api_key
     ) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
       const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
@@ -1789,7 +1789,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
         })
       )
     }
-  }, [project?.ref, stateRef, serviceKey, isPaused, protocol, endpoint])
+  }, [project?.ref, stateRef, serviceKey?.api_key, isPaused, protocol, endpoint])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>
