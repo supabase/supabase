@@ -18,6 +18,7 @@ describe('getModel', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    vi.stubEnv('AWS_BEDROCK_PROFILE', 'test')
   })
 
   afterEach(() => {
