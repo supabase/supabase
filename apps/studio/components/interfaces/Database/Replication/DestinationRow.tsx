@@ -8,12 +8,13 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
 import PipelineStatus, { PipelineStatusName } from './PipelineStatus'
 import { PipelineStatusRequestStatus, usePipelineRequestStatus } from './PipelineRequestStatusContext'
+import { getStatusName } from './Pipeline.utils'
 import { useParams } from 'common'
 import {
   ReplicationPipelineStatusData,
   useReplicationPipelineStatusQuery,
 } from 'data/replication/pipeline-status-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
@@ -67,31 +68,19 @@ const DestinationRow = ({
     },
     { refetchInterval: refreshFrequencyMs }
   )
-  const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, setRequestStatus: setGlobalRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id ? getRequestStatus(pipeline.id) : PipelineStatusRequestStatus.None
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
-  const getStatusName = (
-    status: ReplicationPipelineStatusData['status'] | undefined
-  ): string | undefined => {
-    if (status && typeof status === 'object' && 'name' in status) {
-      return status.name
-    }
-
-    return undefined
-  }
-
   const statusName = getStatusName(pipelineStatus)
-  if (
-    pipeline?.id &&
-    ((requestStatus === PipelineStatusRequestStatus.EnableRequested &&
-      (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED)) ||
-    (requestStatus === PipelineStatusRequestStatus.DisableRequested &&
-      (statusName === PipelineStatusName.STOPPED || statusName === PipelineStatusName.FAILED)))
-  ) {
-    setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-  }
+  
+  // Update request status based on backend status using centralized logic
+  useEffect(() => {
+    if (pipeline?.id) {
+      updatePipelineStatus(pipeline.id, statusName)
+    }
+  }, [pipeline?.id, statusName, updatePipelineStatus])
 
   const onEnableClick = async () => {
     if (!projectRef) {
