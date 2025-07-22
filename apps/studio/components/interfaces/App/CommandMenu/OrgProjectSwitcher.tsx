@@ -8,7 +8,6 @@ import { IS_PLATFORM } from 'common'
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
-const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 
 export function useProjectSwitchCommand() {
   const setPage = useSetPage()
@@ -60,75 +59,61 @@ export function useConfigureOrganizationCommand() {
 
   const { data: organizations } = useOrganizationsQuery({ enabled: IS_PLATFORM })
 
+  const sectionTypes = [
+    { id: 'general', name: 'General', route: 'general' },
+    { id: 'billing', name: 'Billing', route: 'billing' },
+    { id: 'usage', name: 'Usage', route: 'usage' },
+    { id: 'integrations', name: 'Integrations', route: 'integrations' },
+    { id: 'team', name: 'Manage Team', route: 'team' },
+  ]
+
+  const SECTION_TYPES_PAGE = 'Organization Section Types'
+  const ORG_LIST_PAGE_PREFIX = 'Organization List - '
+
   useRegisterPage(
-    ORGANIZATION_SWITCHER_PAGE_NAME,
+    SECTION_TYPES_PAGE,
     {
       type: PageType.Commands,
       sections: [
         {
-          id: 'configure-organization',
+          id: 'org-section-types',
           name: 'Configure organization',
-          commands:
-            organizations?.map(({ name, slug }) => ({
-              id: `organization-${slug}`,
-              name,
-              value: `${name} (${slug})`,
-              route: `/org/${slug}/general`,
-              icon: () => <Building />,
-            })) ?? [],
-        },
-        {
-          id: 'configure-organization-billing',
-          name: 'Billing',
-          commands:
-            organizations?.map(({ name, slug }) => ({
-              id: `organization-${slug}`,
-              name,
-              value: `${name} (${slug})`,
-              route: `/org/${slug}/billing`,
-              icon: () => <Building />,
-            })) ?? [],
-        },
-        {
-          id: 'configure-organization-usage',
-          name: 'Usage',
-          commands:
-            organizations?.map(({ name, slug }) => ({
-              id: `organization-${slug}`,
-              name,
-              value: `${name} (${slug})`,
-              route: `/org/${slug}/usage`,
-              icon: () => <Building />,
-            })) ?? [],
-        },
-        {
-          id: 'configure-organization-integrations',
-          name: 'Integrations',
-          commands:
-            organizations?.map(({ name, slug }) => ({
-              id: `organization-${slug}`,
-              name,
-              value: `${name} (${slug})`,
-              route: `/org/${slug}/integrations`,
-              icon: () => <Building />,
-            })) ?? [],
-        },
-        {
-          id: 'configure-organization-team',
-          name: 'Manage Team',
-          commands:
-            organizations?.map(({ name, slug }) => ({
-              id: `organization-${slug}`,
-              name,
-              value: `${name} (${slug})`,
-              route: `/org/${slug}/team`,
-              icon: () => <Building />,
-            })) ?? [],
+          commands: sectionTypes.map(({ id, name }) => ({
+            id: `org-section-type-${id}`,
+            name,
+            value: name,
+            action: () => setPage(`${ORG_LIST_PAGE_PREFIX}${id}`),
+            icon: () => <Building />,
+          })),
         },
       ],
     },
-    { deps: [organizations], enabled: !!organizations && organizations.length > 0 }
+    { deps: [sectionTypes], enabled: true }
   )
+
+  sectionTypes.forEach(({ id, name, route }) => {
+    useRegisterPage(
+      `${ORG_LIST_PAGE_PREFIX}${id}`,
+      {
+        type: PageType.Commands,
+        sections: [
+          {
+            id: `org-list-${id}`,
+            name: `Select organization for ${name}`,
+            commands:
+              organizations?.map(({ name: orgName, slug }) => ({
+                id: `org-${slug}-${id}`,
+                name: orgName,
+                value: `${orgName} (${slug})`,
+                route: `/org/${slug}/${route}`,
+                icon: () => <Building />,
+              })) ?? [],
+          },
+        ],
+      },
+      { deps: [organizations], enabled: !!organizations && organizations.length > 0 }
+    )
+  })
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.ACTIONS,
@@ -136,11 +121,11 @@ export function useConfigureOrganizationCommand() {
       {
         id: 'configure-organization',
         name: 'Configure organization',
-        value: 'Configure organization, Change organization, Select organization',
-        action: () => setPage(ORGANIZATION_SWITCHER_PAGE_NAME),
+        value: 'Configure organization, Organization settings, Manage organization',
+        action: () => setPage(SECTION_TYPES_PAGE),
         icon: () => <Building />,
       },
     ],
-    { enabled: !!organizations && organizations.length > 0 }
+    { enabled: true }
   )
 }
