@@ -20,7 +20,7 @@ import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 export const useIcebergWrapperCreateMutation = () => {
   const { project } = useProjectContext()
 
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { secretKey, serviceKey } = getKeys(apiKeys)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
