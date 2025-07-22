@@ -16,19 +16,18 @@ import { SubscriptionTier } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { Badge, Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
+import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { PaymentIntentResult } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import type { CustomerAddress } from 'data/organizations/types'
 import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -240,19 +239,46 @@ export const SubscriptionPlanUpdateDialog = ({
       <DialogContent
         onOpenAutoFocus={(event) => event.preventDefault()}
         size="xlarge"
-        className="p-0 overflow-y-auto max-h-[1000px] md:max-w-4xl"
+        className="p-0 overflow-y-auto max-h-[1000px]"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 h-full items-stretch">
           {/* Left Column */}
           <div className="p-8 pb-8 flex flex-col xl:col-span-3">
             <div className="flex-1">
-              <h3 className="text-base mb-4">
-                {changeType === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
-                <span className="font-bold">{selectedOrganization?.name}</span> to{' '}
-                {changeType === 'downgrade'
-                  ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
-                  : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
-              </h3>
+              <div>
+                {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
+                  <div className="space-y-2 mb-4">
+                    <PaymentMethodSelection
+                      ref={paymentMethodSelectionRef}
+                      selectedPaymentMethod={selectedPaymentMethod}
+                      onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
+                      readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
+                    />
+                  </div>
+                )}
+
+                {billingViaPartner && (
+                  <div className="mb-4">
+                    <p className="text-sm">
+                      This organization is billed through our partner{' '}
+                      {billingPartnerLabel(billingPartner)}.{' '}
+                      {billingPartner === 'aws' ? (
+                        <>The organization's credit balance will be decreased accordingly.</>
+                      ) : (
+                        <>You will be charged by them directly.</>
+                      )}
+                    </p>
+                    {billingViaPartner &&
+                      billingPartner === 'fly' &&
+                      subscriptionPreview?.plan_change_type === 'downgrade' && (
+                        <p className="text-sm">
+                          Your organization will be downgraded at the end of your current billing
+                          cycle.
+                        </p>
+                      )}
+                  </div>
+                )}
+              </div>
 
               {subscriptionPreviewIsLoading && (
                 <div className="space-y-2 mb-4 mt-2">
@@ -264,48 +290,6 @@ export const SubscriptionPlanUpdateDialog = ({
               {subscriptionPreviewInitialized && (
                 <>
                   <div className="mt-2 mb-4 text-foreground-light text-sm">
-                    <div className="flex items-center justify-between gap-2 border-b border-muted">
-                      <div className="py-2 pl-0 flex items-center gap-1">
-                        <span>{subscriptionPlanMeta?.name} Plan</span>
-                        <Badge variant={'brand'} size={'small'} className="ml-1">
-                          New
-                        </Badge>
-                      </div>
-                      <div className="py-2 pr-0 text-right" translate="no">
-                        {formatCurrency(newPlanCost)}
-                      </div>
-                    </div>
-                    {subscription?.plan?.id !== 'free' && (
-                      <div className="flex items-center justify-between gap-2 border-b border-muted">
-                        <div className="py-2 pl-0 flex items-center gap-1">
-                          <span>Unused Time on {subscription?.plan?.name} Plan</span>
-                          <InfoTooltip className="max-w-sm">
-                            Your previous plan was charged upfront, so a plan change will prorate
-                            any unused time in credits. If the prorated credits exceed the new plan
-                            charge, the excessive credits are added to your organization for future
-                            use.
-                          </InfoTooltip>
-                        </div>
-                        <div className="py-2 pr-0 text-right" translate="no">
-                          -{formatCurrency(proratedCredit)}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Ignore rare case with negative balance (debt) */}
-                    {customerBalance > 0 && (
-                      <div className="flex items-center justify-between gap-2 border-b border-muted">
-                        <div className="py-2 pl-0 flex items-center gap-1">
-                          <span>Credits</span>
-                          <InfoTooltip>
-                            Credits will be used first before charging your card.
-                          </InfoTooltip>
-                        </div>
-                        <div className="py-2 pr-0 text-right" translate="no">
-                          {formatCurrency(customerBalance)}
-                        </div>
-                      </div>
-                    )}
                     <div className="flex items-center justify-between gap-2 border-b border-muted text-foreground">
                       <div className="py-2 pl-0">Charge today</div>
                       <div className="py-2 pr-0 text-right" translate="no">
@@ -324,6 +308,39 @@ export const SubscriptionPlanUpdateDialog = ({
                         )}
                       </div>
                     </div>
+
+                    {subscription?.plan?.id !== 'free' && (
+                      <div className="flex items-center justify-between gap-2 border-b border-muted text-xs">
+                        <div className="py-2 pl-0 flex items-center gap-1">
+                          <span>Unused Time on {subscription?.plan?.name} Plan</span>
+                          <InfoTooltip className="max-w-sm">
+                            Your previous plan was charged upfront, so a plan change will prorate
+                            any unused time in credits. If the prorated credits exceed the new plan
+                            charge, the excessive credits are added to your organization for future
+                            use.
+                          </InfoTooltip>
+                        </div>
+                        <div className="py-2 pr-0 text-right" translate="no">
+                          -{formatCurrency(proratedCredit)}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Ignore rare case with negative balance (debt) */}
+                    {customerBalance > 0 && (
+                      <div className="flex items-center justify-between gap-2 border-b border-muted text-xs">
+                        <div className="py-2 pl-0 flex items-center gap-1">
+                          <span>Credits</span>
+                          <InfoTooltip>
+                            Credits will be used first before charging your card.
+                          </InfoTooltip>
+                        </div>
+                        <div className="py-2 pr-0 text-right" translate="no">
+                          {formatCurrency(customerBalance)}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between gap-2 text-foreground-lighter text-xs">
                       <div className="py-2 pl-0 flex items-center gap-1">
                         <span>Monthly invoice estimate</span>
@@ -542,44 +559,11 @@ export const SubscriptionPlanUpdateDialog = ({
             </div>
 
             <div className="pt-4">
-              {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
-                <div className="space-y-2 mb-4">
-                  <PaymentMethodSelection
-                    ref={paymentMethodSelectionRef}
-                    selectedPaymentMethod={selectedPaymentMethod}
-                    onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
-                    readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
-                  />
-                </div>
-              )}
-
-              {billingViaPartner && (
-                <div className="mb-4">
-                  <p className="text-sm">
-                    This organization is billed through our partner{' '}
-                    {billingPartnerLabel(billingPartner)}.{' '}
-                    {billingPartner === 'aws' ? (
-                      <>The organization's credit balance will be decreased accordingly.</>
-                    ) : (
-                      <>You will be charged by them directly.</>
-                    )}
-                  </p>
-                  {billingViaPartner &&
-                    billingPartner === 'fly' &&
-                    subscriptionPreview?.plan_change_type === 'downgrade' && (
-                      <p className="text-sm">
-                        Your organization will be downgraded at the end of your current billing
-                        cycle.
-                      </p>
-                    )}
-                </div>
-              )}
-
               {projects.filter(
                 (it) =>
                   it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
                   it.status === PROJECT_STATUS.COMING_UP
-              ).length === 0 &&
+              ).length === 5 &&
                 subscriptionPreview?.plan_change_type !== 'downgrade' && (
                   <div className="pb-2">
                     <Admonition title="Empty organization" type="warning">
@@ -615,16 +599,13 @@ export const SubscriptionPlanUpdateDialog = ({
                 )}
 
               <div className="flex space-x-2">
-                <Button type="default" size="medium" onClick={onClose} className="flex-1">
-                  Cancel
-                </Button>
                 <Button
                   loading={isUpdating || paymentConfirmationLoading || isConfirming}
                   disabled={subscriptionPreviewIsLoading}
                   type="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
-                  size="medium"
+                  size="small"
                 >
                   Confirm {changeType === 'downgrade' ? 'downgrade' : 'upgrade'}
                 </Button>
@@ -634,6 +615,13 @@ export const SubscriptionPlanUpdateDialog = ({
 
           {/* Right Column */}
           <div className="bg-surface-100 p-8 flex flex-col border-l xl:col-span-2">
+            <h3 className="text-base mb-8">
+              {changeType === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
+              <span className="font-bold">{selectedOrganization?.name}</span> to{' '}
+              {changeType === 'downgrade'
+                ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
+                : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
+            </h3>
             {changeType === 'downgrade'
               ? featuresToLose.length > 0 && (
                   <div className="mb-4">

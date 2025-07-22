@@ -33,14 +33,7 @@ export const getStripeElementsAppearanceOptions = (
       },
       '.AccordionItem': {
         boxShadow: 'none',
-      },
-      '.Dropdown': {
-        zIndex: '999',
-        overflow: 'show',
-      },
-      '.DropdownItem': {
-        zIndex: '999',
-      },
+      }
     },
   }
 }

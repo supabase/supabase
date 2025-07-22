@@ -93,6 +93,18 @@ const NewPaymentMethodElement = forwardRef(
     const stripe = useStripe()
     const elements = useElements()
 
+    console.log({
+      currentTaxId,
+      tax_id_name: currentTaxId
+        ? TAX_IDS.find(
+            (option) =>
+              option.type === currentTaxId.type && option.countryIso2 === currentTaxId.country
+          )?.name || ''
+        : '',
+      tax_id_type: currentTaxId ? currentTaxId.type : '',
+      tax_id_value: currentTaxId ? currentTaxId.value : '',
+    })
+
     const form = useForm<BillingCustomerDataFormValues>({
       resolver: zodResolver(BillingCustomerDataSchema),
       defaultValues: {
@@ -128,13 +140,21 @@ const NewPaymentMethodElement = forwardRef(
       StripeAddressElementChangeEvent['value'] | undefined
     >(undefined)
 
+    const availableTaxIds = useMemo(() => {
+      const country = stripeAddress?.address.country || null
+
+      return TAX_IDS.filter((taxId) => country == null || taxId.countryIso2 === country).sort(
+        (a, b) => a.country.localeCompare(b.country)
+      )
+    }, [stripeAddress])
+
     const createPaymentMethod = async (): ReturnType<
       PaymentMethodElementRef['createPaymentMethod']
     > => {
       if (!stripe || !elements) return
       await form.trigger()
 
-      if (purchasingAsBusiness && !form.getValues('tax_id_value')) {
+      if (purchasingAsBusiness && availableTaxIds.length > 0 && !form.getValues('tax_id_value')) {
         return
       }
 
@@ -220,17 +240,9 @@ const NewPaymentMethodElement = forwardRef(
       [purchasingAsBusiness]
     )
 
-    const availableTaxIds = useMemo(() => {
-      const country = stripeAddress?.address.country || null
-
-      return TAX_IDS.filter((taxId) => country == null || taxId.countryIso2 === country).sort(
-        (a, b) => a.country.localeCompare(b.country)
-      )
-    }, [stripeAddress])
-
     // Preselect tax id if there is no more than 2 available tax ids (even if there are two options, first one in the list is likely to be it)
     useEffect(() => {
-      if (availableTaxIds.length && stripeAddress?.address.country) {
+      if (availableTaxIds.length && stripeAddress?.address.country && !currentTaxId) {
         const taxIdOption = availableTaxIds[0]
         form.setValue('tax_id_type', taxIdOption.type)
         form.setValue('tax_id_value', '')

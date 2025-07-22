@@ -105,7 +105,11 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
 
       if (isPrimaryBillingAddress) {
         try {
-          if (result.address && !isEqual(result.address, customerProfile?.address)) {
+          if (
+            result.address &&
+            (!isEqual(result.address, customerProfile?.address) ||
+              customerProfile?.billing_name !== result.customerName)
+          ) {
             await updateCustomerProfile({
               slug: selectedOrganization?.slug,
               billing_name: result.customerName,
