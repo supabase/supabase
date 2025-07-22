@@ -8,24 +8,17 @@ import PipelineStatus from './PipelineStatus'
 import { usePipelineRequestStatus } from './PipelineRequestStatusContext'
 import { getStatusName } from './Pipeline.utils'
 import { useState, useEffect } from 'react'
-import { 
+import {
   Button,
   Badge,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  Input,
+  Input_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { 
-  Copy, 
-  ExternalLink,
-  ChevronLeft,
-  Search,
-  AlertTriangle,
-  Activity,
-} from 'lucide-react'
+import { Copy, ExternalLink, ChevronLeft, Search, AlertTriangle, Activity } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
@@ -33,7 +26,7 @@ import { copyToClipboard } from 'ui'
 type TableState = {
   table_id: number
   table_name: string
-  state: 
+  state:
     | { name: 'queued' }
     | { name: 'copying_table' }
     | { name: 'copied_table' }
@@ -47,10 +40,10 @@ interface ReplicationPipelineStatusProps {
   onSelectBack: () => void
 }
 
-const ReplicationPipelineStatus = ({ 
-  pipelineId, 
+const ReplicationPipelineStatus = ({
+  pipelineId,
   destinationName,
-  onSelectBack 
+  onSelectBack,
 }: ReplicationPipelineStatusProps) => {
   const { ref: projectRef } = useParams()
   const [filterString, setFilterString] = useState<string>('')
@@ -75,9 +68,9 @@ const ReplicationPipelineStatus = ({
     isSuccess: isPipelineStatusSuccess,
   } = useReplicationPipelineStatusQuery(
     { projectRef, pipelineId },
-    { 
+    {
       enabled: !!pipelineId,
-      refetchInterval: 2000 // Poll every 2 seconds
+      refetchInterval: 2000, // Poll every 2 seconds
     }
   )
 
@@ -88,27 +81,24 @@ const ReplicationPipelineStatus = ({
     isError: isStatusError,
   } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId },
-    { 
+    {
       enabled: !!pipelineId,
-      refetchInterval: 2000 // Poll every 2 seconds
+      refetchInterval: 2000, // Poll every 2 seconds
     }
   )
 
   // Update request status based on backend status using centralized logic
   const statusName = getStatusName(pipelineStatusData?.status)
-  
+
   useEffect(() => {
     updatePipelineStatus(pipelineId, statusName)
   }, [pipelineId, statusName, updatePipelineStatus])
 
-
   const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
     const statusText = `Table: ${tableName}\nStatus: ${state.name}${
       'message' in state ? `\nError: ${state.message}` : ''
-    }${
-      'lag' in state ? `\nLag: ${state.lag}ms` : ''
-    }`
-    
+    }${'lag' in state ? `\nLag: ${state.lag}ms` : ''}`
+
     try {
       await copyToClipboard(statusText)
       toast.success('Table status copied to clipboard')
@@ -123,37 +113,37 @@ const ReplicationPipelineStatus = ({
         return {
           badge: <Badge variant="warning">Queued</Badge>,
           description: 'Waiting to start replication',
-          color: 'text-warning-600'
+          color: 'text-warning-600',
         }
       case 'copying_table':
         return {
           badge: <Badge variant="brand">Copying</Badge>,
           description: 'Initial data copy in progress',
-          color: 'text-brand-600'
+          color: 'text-brand-600',
         }
       case 'copied_table':
         return {
           badge: <Badge variant="success">Copied</Badge>,
           description: 'Initial copy completed',
-          color: 'text-success-600'
+          color: 'text-success-600',
         }
       case 'following_wal':
         return {
           badge: <Badge variant="success">Live</Badge>,
           description: `Replicating live changes (${state.lag}ms lag)`,
-          color: 'text-success-600'
+          color: 'text-success-600',
         }
       case 'error':
         return {
           badge: <Badge variant="destructive">Error</Badge>,
           description: state.message,
-          color: 'text-destructive-600'
+          color: 'text-destructive-600',
         }
       default:
         return {
           badge: <Badge variant="warning">Unknown</Badge>,
           description: 'Unknown status',
-          color: 'text-warning-600'
+          color: 'text-warning-600',
         }
     }
   }
@@ -167,44 +157,55 @@ const ReplicationPipelineStatus = ({
 
   const getDisabledStateTitle = (status: string | undefined) => {
     switch (status) {
-      case 'failed': return 'Pipeline Failed'
-      case 'stopped': return 'Pipeline Stopped'
-      case 'starting': return 'Pipeline Starting'
-      default: return 'Pipeline Not Running'
+      case 'failed':
+        return 'Pipeline Failed'
+      case 'stopped':
+        return 'Pipeline Stopped'
+      case 'starting':
+        return 'Pipeline Starting'
+      default:
+        return 'Pipeline Not Running'
     }
   }
 
   const getDisabledStateMessage = (status: string | undefined) => {
     switch (status) {
-      case 'failed': return 'Replication has failed. Check the logs for details. Table status is disabled.'
-      case 'stopped': return 'Replication is paused. Enable the pipeline to resume data synchronization.'
-      case 'starting': return 'Pipeline is initializing. Table status will be available once started.'
-      default: return 'Pipeline is not actively running. Table status information is disabled.'
+      case 'failed':
+        return 'Replication has failed. Check the logs for details. Table status is disabled.'
+      case 'stopped':
+        return 'Replication is paused. Enable the pipeline to resume data synchronization.'
+      case 'starting':
+        return 'Pipeline is initializing. Table status will be available once started.'
+      default:
+        return 'Pipeline is not actively running. Table status information is disabled.'
     }
   }
 
   const getDisabledStateBadge = (status: string | undefined) => {
     switch (status) {
-      case 'failed': return 'Failed'
-      case 'stopped': return 'Stopped'
-      case 'starting': return 'Starting'
-      default: return 'Disabled'
+      case 'failed':
+        return 'Failed'
+      case 'stopped':
+        return 'Stopped'
+      case 'starting':
+        return 'Starting'
+      default:
+        return 'Disabled'
     }
   }
 
   const tableStatuses = replicationStatusData?.table_statuses || []
-  const filteredTableStatuses = filterString.length === 0
-    ? tableStatuses
-    : tableStatuses.filter((table: TableState) => 
-        table.table_name.toLowerCase().includes(filterString.toLowerCase())
-      )
+  const filteredTableStatuses =
+    filterString.length === 0
+      ? tableStatuses
+      : tableStatuses.filter((table: TableState) =>
+          table.table_name.toLowerCase().includes(filterString.toLowerCase())
+        )
 
   const errorTables = tableStatuses.filter((table: TableState) => table.state.name === 'error')
   const hasErrors = errorTables.length > 0
   const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0 // Any state other than 'started' is not running
-  
-  
 
   if (isPipelineError) {
     return (
@@ -220,10 +221,7 @@ const ReplicationPipelineStatus = ({
             <h3 className="text-xl font-semibold">Pipeline Status</h3>
           </div>
         </div>
-        <AlertError 
-          error={pipelineError} 
-          subject="Failed to retrieve pipeline details"
-        />
+        <AlertError error={pipelineError} subject="Failed to retrieve pipeline details" />
       </div>
     )
   }
@@ -251,31 +249,30 @@ const ReplicationPipelineStatus = ({
                 requestStatus={requestStatus}
               />
             </div>
-            <p className="text-sm text-foreground-light">
-              Table replication status
-            </p>
+            <p className="text-sm text-foreground-light">Table replication status</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Input
-            size="small"
-            placeholder="Filter tables"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search size="14" />}
-          />
+          <div className="relative">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
+              size={14}
+            />
+            <Input_Shadcn_
+              className="pl-9 h-8"
+              placeholder="Filter tables"
+              value={filterString}
+              onChange={(e) => setFilterString(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
       {(isPipelineLoading || isStatusLoading) && <GenericSkeletonLoader />}
 
       {isStatusError && (
-        <AlertError 
-          error={statusError} 
-          subject="Failed to retrieve table replication status"
-        />
+        <AlertError error={statusError} subject="Failed to retrieve table replication status" />
       )}
-
 
       {/* Error alert */}
       {hasErrors && (
@@ -287,7 +284,8 @@ const ReplicationPipelineStatus = ({
                 {errorTables.length} table{errorTables.length > 1 ? 's' : ''} failed
               </h4>
               <p className="text-sm text-destructive-700 mb-3">
-                Some tables encountered replication errors. Check the logs for detailed error information.
+                Some tables encountered replication errors. Check the logs for detailed error
+                information.
               </p>
               <Button
                 type="outline"
@@ -321,20 +319,22 @@ const ReplicationPipelineStatus = ({
               </div>
             </div>
           </div>
-          
+
           <div className="w-full overflow-hidden overflow-x-auto">
             <Table
               head={[
                 <Table.th key="table">Table</Table.th>,
                 <Table.th key="status">Status</Table.th>,
                 <Table.th key="details">Details</Table.th>,
-                <Table.th key="actions" className="w-16 text-center">Actions</Table.th>,
+                <Table.th key="actions" className="w-16 text-center">
+                  Actions
+                </Table.th>,
               ]}
               body={filteredTableStatuses.map((table: TableState, index: number) => {
                 return (
                   <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
                     <Table.td>
-                      <Link 
+                      <Link
                         href={`/project/${projectRef}/editor/${table.table_id}`}
                         className="font-mono text-sm font-medium text-foreground-lighter hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
                       >
@@ -342,7 +342,10 @@ const ReplicationPipelineStatus = ({
                       </Link>
                     </Table.td>
                     <Table.td>
-                      <Badge variant="secondary" className="text-foreground-lighter bg-surface-100 border-border-muted">
+                      <Badge
+                        variant="secondary"
+                        className="text-foreground-lighter bg-surface-100 border-border-muted"
+                      >
                         {getDisabledStateBadge(statusName)}
                       </Badge>
                     </Table.td>
@@ -385,28 +388,29 @@ const ReplicationPipelineStatus = ({
               <Table.th key="table">Table</Table.th>,
               <Table.th key="status">Status</Table.th>,
               <Table.th key="details">Details</Table.th>,
-              <Table.th key="actions" className="w-16 text-center">Actions</Table.th>,
+              <Table.th key="actions" className="w-16 text-center">
+                Actions
+              </Table.th>,
             ]}
             body={filteredTableStatuses.map((table: TableState, index: number) => {
               const statusConfig = getStatusConfig(table.state)
               return (
-                <Table.tr key={`${table.table_name}-${index}`} className="border-t hover:bg-surface-100">
+                <Table.tr
+                  key={`${table.table_name}-${index}`}
+                  className="border-t hover:bg-surface-100"
+                >
                   <Table.td>
-                    <Link 
+                    <Link
                       href={`/project/${projectRef}/editor/${table.table_id}`}
                       className="font-mono text-sm font-medium text-foreground hover:text-foreground-light transition-colors cursor-pointer underline underline-offset-2"
                     >
                       {table.table_name}
                     </Link>
                   </Table.td>
-                  <Table.td>
-                    {statusConfig.badge}
-                  </Table.td>
+                  <Table.td>{statusConfig.badge}</Table.td>
                   <Table.td>
                     <div className="space-y-1">
-                      <div className="text-sm text-foreground">
-                        {statusConfig.description}
-                      </div>
+                      <div className="text-sm text-foreground">{statusConfig.description}</div>
                       {'lag' in table.state && (
                         <div className="text-xs text-foreground-light">
                           Lag: {table.state.lag}ms
@@ -439,20 +443,25 @@ const ReplicationPipelineStatus = ({
         </div>
       )}
 
-
       {/* No results - running pipeline */}
-      {isPipelineRunning && !isStatusLoading && filteredTableStatuses.length === 0 && hasTableData && (
-        <div className="text-center py-8 text-foreground-light">
-          <p>No tables match "{filterString}"</p>
-        </div>
-      )}
-      
+      {isPipelineRunning &&
+        !isStatusLoading &&
+        filteredTableStatuses.length === 0 &&
+        hasTableData && (
+          <div className="text-center py-8 text-foreground-light">
+            <p>No tables match "{filterString}"</p>
+          </div>
+        )}
+
       {/* No results - not running pipeline */}
-      {!isPipelineRunning && !isStatusLoading && filteredTableStatuses.length === 0 && hasTableData && (
-        <div className="text-center py-8 text-foreground-light">
-          <p>No tables match "{filterString}"</p>
-        </div>
-      )}
+      {!isPipelineRunning &&
+        !isStatusLoading &&
+        filteredTableStatuses.length === 0 &&
+        hasTableData && (
+          <div className="text-center py-8 text-foreground-light">
+            <p>No tables match "{filterString}"</p>
+          </div>
+        )}
 
       {/* Empty state - running pipeline */}
       {isPipelineRunning && !isStatusLoading && tableStatuses.length === 0 && (
@@ -464,8 +473,8 @@ const ReplicationPipelineStatus = ({
             <div className="space-y-2">
               <h4 className="text-lg font-semibold text-foreground">No table status information</h4>
               <p className="text-sm text-foreground-light leading-relaxed">
-                This pipeline doesn't have any table replication status data available yet. 
-                The status will appear here once replication begins.
+                This pipeline doesn't have any table replication status data available yet. The
+                status will appear here once replication begins.
               </p>
             </div>
             <p className="text-xs text-foreground-lighter">
@@ -474,7 +483,7 @@ const ReplicationPipelineStatus = ({
           </div>
         </div>
       )}
-      
+
       {/* Empty state - not running pipeline */}
       {!isPipelineRunning && !isStatusLoading && tableStatuses.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -485,8 +494,8 @@ const ReplicationPipelineStatus = ({
             <div className="space-y-2">
               <h4 className="text-lg font-semibold text-foreground-light">Pipeline Not Running</h4>
               <p className="text-sm text-foreground-light leading-relaxed">
-                The replication pipeline is currently {statusName || 'not active'}. 
-                Table status information is not available while the pipeline is in this state.
+                The replication pipeline is currently {statusName || 'not active'}. Table status
+                information is not available while the pipeline is in this state.
               </p>
             </div>
           </div>

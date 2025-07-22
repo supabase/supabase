@@ -4,10 +4,7 @@ import ReplicationPipelineStatus from 'components/interfaces/Database/Replicatio
 import { PipelineRequestStatusProvider } from 'components/interfaces/Database/Replication/PipelineRequestStatusContext'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-} from 'components/layouts/Scaffold'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useState } from 'react'

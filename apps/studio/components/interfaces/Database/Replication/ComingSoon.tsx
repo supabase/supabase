@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
-import { Button, Input } from 'ui'
+import { Button, Input_Shadcn_ } from 'ui'
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const STATIC_NODES = [
@@ -254,13 +254,13 @@ const StaticDestinations = () => {
       <div className="flex flex-col bg-surface-100  px-6 pt-6 border-t relative h-full">
         <div className="bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30"></div>
         <div className="flex items-center justify-between">
-          <Input
-            size="small"
-            className="w-52 bg-transparent"
-            iconContainerClassName="pl-2"
-            icon={<Search size={14} className="text-foreground-lighter" />}
-            placeholder="Search..."
-          />
+          <div className="relative w-52">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter" size={14} />
+            <Input_Shadcn_
+              className="pl-9 bg-transparent h-8"
+              placeholder="Search..."
+            />
+          </div>
           <Button
             icon={<Plus size={16} />}
             type="primary"

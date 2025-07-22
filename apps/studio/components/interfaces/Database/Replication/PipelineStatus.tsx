@@ -3,12 +3,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { cn } from 'ui'
 import { ResponseError } from 'types'
 import { Loader2, AlertTriangle } from 'lucide-react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from 'ui'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { useParams } from 'common'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from './PipelineRequestStatusContext'
@@ -41,7 +36,6 @@ const PipelineStatus = ({
   isSuccess,
   requestStatus,
 }: PipelineStatusProps) => {
-
   const isFailedStatus = (
     status: ReplicationPipelineStatusData['status'] | undefined
   ): status is FailedStatus => {
@@ -52,7 +46,6 @@ const PipelineStatus = ({
       status.name === PipelineStatusName.FAILED
     )
   }
-
 
   const renderFailedStatus = () => {
     return (

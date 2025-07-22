@@ -13,10 +13,13 @@ async function fetchReplicationPipelineReplicationStatus(
   if (!projectRef) throw new Error('projectRef is required')
   if (!pipelineId) throw new Error('pipelineId is required')
 
-  const { data, error } = await get('/platform/replication/{ref}/pipelines/{pipeline_id}/replication-status', {
-    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
-    signal,
-  })
+  const { data, error } = await get(
+    '/platform/replication/{ref}/pipelines/{pipeline_id}/replication-status',
+    {
+      params: { path: { ref: projectRef, pipeline_id: pipelineId } },
+      signal,
+    }
+  )
   if (error) {
     handleError(error)
   }
@@ -28,7 +31,9 @@ export type ReplicationPipelineReplicationStatusData = Awaited<
   ReturnType<typeof fetchReplicationPipelineReplicationStatus>
 >
 
-export const useReplicationPipelineReplicationStatusQuery = <TData = ReplicationPipelineReplicationStatusData>(
+export const useReplicationPipelineReplicationStatusQuery = <
+  TData = ReplicationPipelineReplicationStatusData,
+>(
   { projectRef, pipelineId }: ReplicationPipelineReplicationStatusParams,
   {
     enabled = true,

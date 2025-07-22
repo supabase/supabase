@@ -3,7 +3,7 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
 import { Plus, Search } from 'lucide-react'
-import { Button, cn, Input } from 'ui'
+import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import DestinationRow from './DestinationRow'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
@@ -55,24 +55,30 @@ const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
 
   const anyDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
 
-  const filteredDestinations = filterString.length === 0
-    ? (destinationsData?.destinations ?? [])
-    : (destinationsData?.destinations ?? []).filter((destination) => 
-        destination.name.toLowerCase().includes(filterString.toLowerCase())
-      )
+  const filteredDestinations =
+    filterString.length === 0
+      ? destinationsData?.destinations ?? []
+      : (destinationsData?.destinations ?? []).filter((destination) =>
+          destination.name.toLowerCase().includes(filterString.toLowerCase())
+        )
 
   return (
     <>
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Input
-              size="tiny"
-              icon={<Search size="14" />}
-              placeholder={'Filter destinations'}
-              value={filterString}
-              onChange={(e) => setFilterString(e.target.value)}
-            />
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
+                size={14}
+              />
+              <Input_Shadcn_
+                className="pl-9 h-7"
+                placeholder={'Filter destinations'}
+                value={filterString}
+                onChange={(e) => setFilterString(e.target.value)}
+              />
+            </div>
           </div>
           <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
             Add destination
@@ -149,11 +155,14 @@ const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
         )}
       </div>
 
-      {!isSourcesLoading && !isDestinationsLoading && filteredDestinations.length === 0 && anyDestinations && (
-        <div className="text-center py-8 text-foreground-light">
-          <p>No destinations match "{filterString}"</p>
-        </div>
-      )}
+      {!isSourcesLoading &&
+        !isDestinationsLoading &&
+        filteredDestinations.length === 0 &&
+        anyDestinations && (
+          <div className="text-center py-8 text-foreground-light">
+            <p>No destinations match "{filterString}"</p>
+          </div>
+        )}
 
       <NewDestinationPanel
         visible={showNewDestinationPanel}
