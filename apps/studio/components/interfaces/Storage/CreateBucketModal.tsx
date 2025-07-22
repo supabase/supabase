@@ -76,7 +76,10 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ref } = useParams()
   const router = useRouter()
 
-  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation()
+  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+    // [Joshen] Silencing the error here as it's being handled in onSubmit
+    onError: () => {},
+  })
   const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
@@ -143,7 +146,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       onClose()
     } catch (error) {
       console.error(error)
-      toast.error('Failed to create bucket')
+      toast.error(`Failed to create bucket: ${error.message}`)
     }
   }
 
