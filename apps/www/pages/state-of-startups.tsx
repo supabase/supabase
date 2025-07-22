@@ -36,6 +36,7 @@ import { PricingChart } from '~/components/SurveyResults/PricingChart'
 import { IndustryChart } from '~/components/SurveyResults/IndustryChart'
 import { DatabasesChart } from '~/components/SurveyResults/DatabasesChart'
 import { DataWarehousesChart } from '~/components/SurveyResults/DataWarehousesChart'
+import { VectorDatabasesChart } from '~/components/SurveyResults/VectorDatabasesChart'
 
 interface FormData {
   email: string
@@ -247,6 +248,7 @@ function StateOfStartupsPage() {
             <DatabasesChart />
             <DataWarehousesChart />
             <CloudProviderChart />
+            <VectorDatabasesChart />
           </div>
         </SectionContainer>
 

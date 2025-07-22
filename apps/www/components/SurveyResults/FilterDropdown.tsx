@@ -15,7 +15,10 @@ export function FilterDropdown({
   setFilterValue,
 }: {
   filterKey: string
-  filterConfig: { options: { value: string }[] }
+  filterConfig: {
+    label: string
+    options: { value: string; label: string }[]
+  }
   selectedValue: string
   setFilterValue: (filterKey: string, value: string) => void
 }) {
@@ -50,7 +53,7 @@ export function FilterDropdown({
               onClick={() => setFilterValue(filterKey, option.value)}
               className={selectedValue === option.value ? 'text-brand-600' : ''}
             >
-              {option.value}
+              {option.label}
             </DropdownMenuItem>
           ))}
       </DropdownMenuContent>

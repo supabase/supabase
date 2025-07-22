@@ -16,6 +16,8 @@ function generateDataWarehousesSQL(activeFilters: Record<string, string>) {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
+  // TODO: Returns actual row values (e.g. "Weweb,Svelte,React") instead of just "Svelte"
+  // FilterDropdown should be able to handle these as separate, unique values
   if (activeFilters.frontend_stack !== 'unset') {
     whereClauses.push(`'${activeFilters.frontend_stack}' = ANY(frontend_stack)`)
   }

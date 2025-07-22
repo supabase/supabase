@@ -65,8 +65,43 @@ function useFilterOptions(filterColumns: string[]) {
 
           console.log(`Raw data for ${column}:`, data)
 
+          // Extract all individual values from comma-separated strings or arrays
+          const allValues = data.flatMap((row) => {
+            const value = row[column]
+            console.log(
+              `Processing value for ${column}:`,
+              value,
+              typeof value,
+              Array.isArray(value)
+            )
+
+            if (Array.isArray(value)) {
+              // Handle PostgreSQL arrays
+              return value.filter((item) => item && item.length > 0)
+            } else if (typeof value === 'string' && value.includes(',')) {
+              // Handle comma-separated strings
+              return value
+                .split(',')
+                .map((item) => item.trim())
+                .filter((item) => item.length > 0)
+            } else if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
+              // Handle PostgreSQL array format like {Firebase,MongoDB,MySQL}
+              const innerContent = value.slice(1, -1) // Remove { and }
+              if (innerContent.trim() === '') {
+                return []
+              }
+              return innerContent
+                .split(',')
+                .map((item) => item.trim())
+                .filter((item) => item.length > 0)
+            }
+            return [value]
+          })
+
+          console.log(`All values for ${column}:`, allValues)
+
           // Get unique values and sort them
-          const uniqueValues = [...new Set(data.map((row) => row[column]))].sort()
+          const uniqueValues = [...new Set(allValues)].sort()
 
           console.log(`Unique values for ${column}:`, uniqueValues)
 
@@ -85,7 +120,7 @@ function useFilterOptions(filterColumns: string[]) {
           }
         }
 
-        console.log('Filter options:', filterOptions)
+        console.log('Final filter options:', filterOptions)
         setFilters(filterOptions)
       } catch (err) {
         console.error('Error fetching filter options:', err)

@@ -18,8 +18,7 @@ function generateFrontendStackSQL(activeFilters: Record<string, string>) {
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
-  return `
-  SELECT 
+  return `SELECT 
   unnest(frontend_stack) AS technology,
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
@@ -31,7 +30,6 @@ ORDER BY total DESC;
 export function FrontendStackChart() {
   return (
     <GenericChartWithQuery
-      // title="What is your startup's backend stack?'"
       title="What frontend technologies are your startup using?"
       targetColumn="frontend_stack"
       filterColumns={['headquarters', 'industry_normalized', 'person_age']}
