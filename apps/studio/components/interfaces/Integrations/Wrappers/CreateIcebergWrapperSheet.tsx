@@ -149,7 +149,11 @@ export const CreateIcebergWrapperSheet = ({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         wrapperMeta,
-        formState: { ...values, server_name: `${values.wrapper_name}_server` },
+        formState: {
+          ...values,
+          server_name: `${values.wrapper_name}_server`,
+          supabase_target_schema: values.target_schema,
+        },
         mode: 'schema',
         tables: [],
         sourceSchema: values.source_schema,

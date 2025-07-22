@@ -159,7 +159,11 @@ export const CreateWrapperSheet = ({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         wrapperMeta,
-        formState: { ...values, server_name: `${values.wrapper_name}_server` },
+        formState: {
+          ...values,
+          server_name: `${values.wrapper_name}_server`,
+          supabase_target_schema: selectedMode === 'schema' ? values.target_schema : undefined,
+        },
         mode: selectedMode,
         tables: newTables,
         sourceSchema: values.source_schema,
