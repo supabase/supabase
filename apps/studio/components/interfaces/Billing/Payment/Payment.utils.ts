@@ -33,7 +33,7 @@ export const getStripeElementsAppearanceOptions = (
       },
       '.AccordionItem': {
         boxShadow: 'none',
-      }
+      },
     },
   }
 }
