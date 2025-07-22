@@ -20,7 +20,7 @@ import {
   StorageItem,
   StorageItemMetadata,
   StorageItemWithColumn,
-} from 'components/to-be-cleaned/Storage/Storage.types'
+} from 'components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
   downloadFile,
