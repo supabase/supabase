@@ -1,7 +1,7 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
 // Generate SQL query for funding stage chart
-function generateFrontendStackSQL(activeFilters: Record<string, string>) {
+function generateDataWarehousesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.headquarters !== 'unset') {
@@ -16,26 +16,34 @@ function generateFrontendStackSQL(activeFilters: Record<string, string>) {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
+  if (activeFilters.frontend_stack !== 'unset') {
+    whereClauses.push(`'${activeFilters.frontend_stack}' = ANY(frontend_stack)`)
+  }
+
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
   return `
-  SELECT 
-  unnest(frontend_stack) AS technology,
-  COUNT(*) AS total
+WITH expanded AS (
+  SELECT unnest(data_warehouses) AS technology
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+)
+SELECT 
+  technology,
+  COUNT(*) AS total
+FROM expanded
+WHERE technology NOT IN ('We don''t use a data warehouse', 'Not sure')
 GROUP BY technology
 ORDER BY total DESC;
 `
 }
 
-export function FrontendStackChart() {
+export function DataWarehousesChart() {
   return (
     <GenericChartWithQuery
-      // title="What is your startup's backend stack?'"
-      title="What frontend technologies are your startup using?"
-      targetColumn="frontend_stack"
-      filterColumns={['headquarters', 'industry_normalized', 'person_age']}
-      generateSQLQuery={generateFrontendStackSQL}
+      title="Which data warehouse(s) is your startup using? (Filtered)"
+      targetColumn="data_warehouses"
+      filterColumns={['headquarters', 'industry_normalized', 'person_age', 'frontend_stack']}
+      generateSQLQuery={generateDataWarehousesSQL}
     />
   )
 }

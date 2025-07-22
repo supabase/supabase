@@ -33,6 +33,9 @@ import { BackendStackChart } from '~/components/SurveyResults/BackendStackChart'
 import { CloudProviderChart } from '~/components/SurveyResults/CloudProviderChart'
 import { SalesToolsChart } from '~/components/SurveyResults/SalesToolsChart'
 import { PricingChart } from '~/components/SurveyResults/PricingChart'
+import { IndustryChart } from '~/components/SurveyResults/IndustryChart'
+import { DatabasesChart } from '~/components/SurveyResults/DatabasesChart'
+import { DataWarehousesChart } from '~/components/SurveyResults/DataWarehousesChart'
 
 interface FormData {
   email: string
@@ -227,6 +230,7 @@ function StateOfStartupsPage() {
             <MonetizationChart />
             <AcceleratorParticipationChart />
             <PivotFreqChart />
+            <IndustryChart />
           </div>
         </SectionContainer>
 
@@ -240,6 +244,8 @@ function StateOfStartupsPage() {
 
             <FrontendStackChart />
             <BackendStackChart />
+            <DatabasesChart />
+            <DataWarehousesChart />
             <CloudProviderChart />
           </div>
         </SectionContainer>

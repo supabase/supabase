@@ -1,7 +1,7 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
 // Generate SQL query for funding stage chart
-function generateBackendStackSQL(activeFilters: Record<string, string>) {
+function generateDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.headquarters !== 'unset') {
@@ -12,15 +12,15 @@ function generateBackendStackSQL(activeFilters: Record<string, string>) {
     whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'unset') {
-    whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
   return `
   SELECT 
-  unnest(backend_stack) AS technology,
+  unnest(databases) AS technology,
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
@@ -28,13 +28,13 @@ ORDER BY total DESC;
 `
 }
 
-export function BackendStackChart() {
+export function DatabasesChart() {
   return (
     <GenericChartWithQuery
-      title="What is your startup's backend stack?"
-      targetColumn="backend_stack"
-      filterColumns={['headquarters', 'industry_normalized', 'currently_monetizing']}
-      generateSQLQuery={generateBackendStackSQL}
+      title="Which database(s) is your startup using?"
+      targetColumn="databases"
+      filterColumns={['headquarters', 'industry_normalized', 'person_age']}
+      generateSQLQuery={generateDatabasesSQL}
     />
   )
 }

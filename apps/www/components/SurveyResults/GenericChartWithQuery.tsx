@@ -55,15 +55,20 @@ function useFilterOptions(filterColumns: string[]) {
             .from('responses_2025')
             .select(column)
             .not(column, 'is', null)
-            .not(column, 'eq', '')
+          // Remove this line for boolean columns - it excludes false values
+          // .not(column, 'eq', '')
 
           if (fetchError) {
             console.error(`Error fetching ${column} options:`, fetchError)
             continue
           }
 
+          console.log(`Raw data for ${column}:`, data)
+
           // Get unique values and sort them
           const uniqueValues = [...new Set(data.map((row) => row[column]))].sort()
+
+          console.log(`Unique values for ${column}:`, uniqueValues)
 
           filterOptions[column] = {
             label: column.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -72,7 +77,10 @@ function useFilterOptions(filterColumns: string[]) {
                 value: 'unset',
                 label: `All ${column.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}s`,
               },
-              ...uniqueValues.map((value) => ({ value, label: value })),
+              ...uniqueValues.map((value) => ({
+                value: String(value), // Convert to string for React
+                label: String(value), // Convert to string for display
+              })),
             ],
           }
         }

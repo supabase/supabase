@@ -15,6 +15,10 @@ function generateAcceleratorParticipationSQL(activeFilters: Record<string, strin
     whereClauses.push(`role = '${activeFilters.role}'`)
   }
 
+  if (activeFilters.money_raised !== 'unset') {
+    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
+  }
+
   const whereClause = `WHERE ${whereClauses.join('\n  AND ')}`
 
   return `SELECT
@@ -31,7 +35,7 @@ export function AcceleratorParticipationChart() {
     <GenericChartWithQuery
       title="If your startup has participated in an accelerator, which one?"
       targetColumn="accelerator_participation_normalized"
-      filterColumns={['headquarters', 'role']}
+      filterColumns={['headquarters', 'role', 'money_raised']}
       generateSQLQuery={generateAcceleratorParticipationSQL}
     />
   )
