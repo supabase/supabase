@@ -14,7 +14,7 @@ import {
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
-} from 'components/to-be-cleaned/Storage/Storage.constants'
+} from 'components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
   StorageItem,
@@ -28,8 +28,8 @@ import {
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
-} from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
-import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+} from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'

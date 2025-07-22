@@ -1,6 +1,6 @@
 import { groupBy, difference } from 'lodash'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
-import type { StoragePolicyFormField } from 'components/interfaces/Storage/Storage.types'
+import type { StoragePolicyFormField } from './Storage.types'
 
 const shortHash = (str: string) => {
   let hash = 0
