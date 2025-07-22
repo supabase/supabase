@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { ProtectedSchemaDialog } from 'components/interfaces/Database/ProtectedSchemaWarning'
+import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -19,14 +19,8 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Checkbox_Shadcn_,
-  Dialog,
-  DialogContent,
-  DialogTrigger,
   Label_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -150,37 +144,7 @@ const TableEditorMenu = () => {
                 New table
               </ButtonTooltip>
             ) : (
-              <Alert_Shadcn_>
-                <AlertTitle_Shadcn_ className="text-sm">
-                  Viewing protected schema
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="text-xs">
-                  {reason === 'fdw' ? (
-                    <p>
-                      {' '}
-                      The <code className="text-xs">{selectedSchema}</code> schema is used by
-                      Supabase to connect to analytics buckets and is read-only through the
-                      dashboard.
-                    </p>
-                  ) : (
-                    <>
-                      <p className="mb-2">
-                        This schema is managed by Supabase and is read-only through the table editor
-                      </p>
-                      <Dialog open={showModal} onOpenChange={setShowModal}>
-                        <DialogTrigger asChild>
-                          <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                            Learn more
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <ProtectedSchemaDialog onClose={() => setShowModal(false)} />
-                        </DialogContent>
-                      </Dialog>
-                    </>
-                  )}{' '}
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+              <ProtectedSchemaWarning size="sm" schema={selectedSchema} entity="table" />
             )}
           </div>
         </div>
