@@ -16,6 +16,7 @@ const PageLayout: NextPageWithLayout = () => {
   const { projectRef } = useStorageExplorerStateSnapshot()
   const { bucket, error, isSuccess, isError } = useSelectedBucket()
 
+  // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
   if (!project || !projectRef) return null
 
   return (

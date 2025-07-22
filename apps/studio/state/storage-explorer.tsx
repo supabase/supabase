@@ -1758,14 +1758,11 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     const isDifferentProject = snap.projectRef !== project?.ref
     const isDifferentResumableUploadUrl = snap.resumableUploadUrl !== resumableUploadUrl
 
-    if (
-      !isPaused &&
-      hasDataReady &&
-      (isDifferentProject || isDifferentResumableUploadUrl) &&
-      serviceKey
-    ) {
+    const serviceApiKey = serviceKey?.api_key ?? 'unknown'
+
+    if (!isPaused && hasDataReady && (isDifferentProject || isDifferentResumableUploadUrl)) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-      const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
+      const supabaseClient = createClient(clientEndpoint, serviceApiKey, {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
@@ -1785,11 +1782,11 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
           projectRef: project?.ref ?? '',
           supabaseClient,
           resumableUploadUrl,
-          serviceKey: serviceKey.api_key,
+          serviceKey: serviceApiKey,
         })
       )
     }
-  }, [project?.ref, stateRef, serviceKey, isPaused, protocol, endpoint])
+  }, [project?.ref, stateRef, serviceKey?.api_key, isPaused, protocol, endpoint])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>
