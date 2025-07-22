@@ -2,7 +2,8 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
 import { ResponseError } from 'types'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+import { Info } from 'lucide-react'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
 import PipelineStatus, { PipelineStatusRequestStatus, PipelineStatusName } from './PipelineStatus'
@@ -21,7 +22,7 @@ import DestinationPanel from './DestinationPanel'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
-const refreshFrequencyMs: number = 5000
+const refreshFrequencyMs: number = 2000
 
 interface DestinationRowProps {
   sourceId: number | undefined
@@ -179,32 +180,37 @@ const DestinationRow = ({
               pipeline.config.publication_name
             )}
           </Table.td>
-          <Table.td className="text-right">
-            {isPipelineLoading || !pipeline ? (
-              <div className="w-20 ml-auto">
-                <ShimmeringLoader></ShimmeringLoader>
-              </div>
-            ) : (
-              <Button 
-                type="default"
-                size="tiny"
-                onClick={() => onSelectPipeline?.(pipeline.id, destinationName)}
-              >
-                View details
-              </Button>
-            )}
-          </Table.td>
           <Table.td>
-            <RowMenu
-              pipelineStatus={pipelineStatusData?.status}
-              error={pipelineStatusError}
-              isLoading={isPipelineStatusLoading}
-              isError={isPipelineStatusError}
-              onEnableClick={onEnableClick}
-              onDisableClick={onDisableClick}
-              onDeleteClick={() => setShowDeleteDestinationForm(true)}
-              onEditClick={() => setShowEditDestinationPanel(true)}
-            ></RowMenu>
+            <div className="flex items-center justify-end gap-1">
+              {pipeline && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="text"
+                        size="tiny"
+                        icon={<Info className="w-3 h-3" />}
+                        onClick={() => onSelectPipeline?.(pipeline.id, destinationName)}
+                        className="h-auto p-1.5 hover:bg-surface-200"
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>View table replication status</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              <RowMenu
+                pipelineStatus={pipelineStatusData?.status}
+                error={pipelineStatusError}
+                isLoading={isPipelineStatusLoading}
+                isError={isPipelineStatusError}
+                onEnableClick={onEnableClick}
+                onDisableClick={onDisableClick}
+                onDeleteClick={() => setShowDeleteDestinationForm(true)}
+                onEditClick={() => setShowEditDestinationPanel(true)}
+              />
+            </div>
           </Table.td>
         </Table.tr>
       )}

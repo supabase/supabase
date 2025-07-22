@@ -6,38 +6,27 @@ import { replicationKeys } from './keys'
 
 type ReplicationPipelineReplicationStatusParams = { projectRef?: string; pipelineId?: number }
 
-export type ReplicationPipelineReplicationStatusData = {
-  pipeline_id: number
-  table_statuses: Array<{
-    table_name: string
-    state: 
-      | { name: 'queued' }
-      | { name: 'copying_table' }
-      | { name: 'copied_table' }
-      | { name: 'following_wal'; lag: number }
-      | { name: 'error'; message: string }
-  }>
-}
-
 async function fetchReplicationPipelineReplicationStatus(
   { projectRef, pipelineId }: ReplicationPipelineReplicationStatusParams,
   signal?: AbortSignal
-): Promise<ReplicationPipelineReplicationStatusData> {
+) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!pipelineId) throw new Error('pipelineId is required')
 
-  // Temporary implementation - in real usage, this would call the actual API endpoint
-  const response = await fetch(`/platform/replication/${projectRef}/pipelines/${pipelineId}/replication-status`, {
+  const { data, error } = await get('/platform/replication/{ref}/pipelines/{pipeline_id}/replication-status', {
+    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
     signal,
   })
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch replication status')
+  if (error) {
+    handleError(error)
   }
-  
-  const data = await response.json()
-  return data as ReplicationPipelineReplicationStatusData
+
+  return data
 }
+
+export type ReplicationPipelineReplicationStatusData = Awaited<
+  ReturnType<typeof fetchReplicationPipelineReplicationStatus>
+>
 
 export const useReplicationPipelineReplicationStatusQuery = <TData = ReplicationPipelineReplicationStatusData>(
   { projectRef, pipelineId }: ReplicationPipelineReplicationStatusParams,

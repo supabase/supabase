@@ -97,7 +97,6 @@ const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
               <Table.th key="type">Type</Table.th>,
               <Table.th key="status">Status</Table.th>,
               <Table.th key="publication">Publication</Table.th>,
-              <Table.th key="details" className="text-right">Details</Table.th>,
               <Table.th key="actions"></Table.th>,
             ]}
             body={filteredDestinations.map((destination) => {

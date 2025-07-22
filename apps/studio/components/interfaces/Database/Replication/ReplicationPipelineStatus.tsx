@@ -3,6 +3,8 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
+import PipelineStatus, { PipelineStatusRequestStatus } from './PipelineStatus'
 import { useState } from 'react'
 import { 
   Button,
@@ -15,16 +17,12 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { 
-  CheckCircle2, 
-  Clock, 
   Copy, 
-  AlertTriangle, 
-  Loader2, 
-  Activity,
   ExternalLink,
-  RefreshCw,
   ChevronLeft,
   Search,
+  AlertTriangle,
+  Activity,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
@@ -52,7 +50,6 @@ const ReplicationPipelineStatus = ({
 }: ReplicationPipelineStatusProps) => {
   const { ref: projectRef } = useParams()
   const [filterString, setFilterString] = useState<string>('')
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const {
     data: pipelineData,
@@ -65,24 +62,32 @@ const ReplicationPipelineStatus = ({
   })
 
   const {
+    data: pipelineStatusData,
+    error: pipelineStatusError,
+    isLoading: isPipelineStatusLoading,
+    isError: isPipelineStatusError,
+    isSuccess: isPipelineStatusSuccess,
+  } = useReplicationPipelineStatusQuery(
+    { projectRef, pipelineId },
+    { 
+      enabled: !!pipelineId,
+      refetchInterval: 2000 // Poll every 2 seconds
+    }
+  )
+
+  const {
     data: replicationStatusData,
     error: statusError,
     isLoading: isStatusLoading,
     isError: isStatusError,
-    refetch: refetchStatus,
   } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId },
     { 
       enabled: !!pipelineId,
-      refetchInterval: 5000 // Poll every 5 seconds
+      refetchInterval: 2000 // Poll every 2 seconds
     }
   )
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true)
-    await refetchStatus()
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
 
   const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
     const statusText = `Table: ${tableName}\nStatus: ${state.name}${
@@ -103,42 +108,36 @@ const ReplicationPipelineStatus = ({
     switch (state.name) {
       case 'queued':
         return {
-          icon: <Clock className="w-4 h-4 text-warning-600" />,
           badge: <Badge variant="warning">Queued</Badge>,
           description: 'Waiting to start replication',
           color: 'text-warning-600'
         }
       case 'copying_table':
         return {
-          icon: <Loader2 className="w-4 h-4 text-brand-600 animate-spin" />,
           badge: <Badge variant="brand">Copying</Badge>,
           description: 'Initial data copy in progress',
           color: 'text-brand-600'
         }
       case 'copied_table':
         return {
-          icon: <CheckCircle2 className="w-4 h-4 text-success-600" />,
           badge: <Badge variant="success">Copied</Badge>,
           description: 'Initial copy completed',
           color: 'text-success-600'
         }
       case 'following_wal':
         return {
-          icon: <Activity className="w-4 h-4 text-success-600" />,
           badge: <Badge variant="success">Live</Badge>,
           description: `Replicating live changes (${state.lag}ms lag)`,
           color: 'text-success-600'
         }
       case 'error':
         return {
-          icon: <AlertTriangle className="w-4 h-4 text-destructive-600" />,
           badge: <Badge variant="destructive">Error</Badge>,
           description: state.message,
           color: 'text-destructive-600'
         }
       default:
         return {
-          icon: <AlertTriangle className="w-4 h-4 text-warning-600" />,
           badge: <Badge variant="warning">Unknown</Badge>,
           description: 'Unknown status',
           color: 'text-warning-600'
@@ -161,11 +160,6 @@ const ReplicationPipelineStatus = ({
       )
 
   const errorTables = tableStatuses.filter((table: TableState) => table.state.name === 'error')
-  const queuedTables = tableStatuses.filter((table: TableState) => table.state.name === 'queued')
-  const copyingTables = tableStatuses.filter((table: TableState) => table.state.name === 'copying_table')
-  const liveTables = tableStatuses.filter((table: TableState) => table.state.name === 'following_wal')
-  const completedTables = tableStatuses.filter((table: TableState) => table.state.name === 'copied_table')
-  
   const hasErrors = errorTables.length > 0
 
   if (isPipelineError) {
@@ -202,9 +196,19 @@ const ReplicationPipelineStatus = ({
             style={{ padding: '5px' }}
           />
           <div>
-            <h3 className="text-xl font-semibold">{destinationName || 'Pipeline Status'}</h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-xl font-semibold">{destinationName || 'Pipeline'}</h3>
+              <PipelineStatus
+                pipelineStatus={pipelineStatusData?.status}
+                error={pipelineStatusError}
+                isLoading={isPipelineStatusLoading}
+                isError={isPipelineStatusError}
+                isSuccess={isPipelineStatusSuccess}
+                requestStatus={PipelineStatusRequestStatus.None}
+              />
+            </div>
             <p className="text-sm text-foreground-light">
-              Table replication status • Pipeline {pipelineId}
+              Table replication status
             </p>
           </div>
         </div>
@@ -216,14 +220,6 @@ const ReplicationPipelineStatus = ({
             onChange={(e) => setFilterString(e.target.value)}
             icon={<Search size="14" />}
           />
-          <Button
-            type="default"
-            icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-            onClick={handleRefresh}
-            loading={isRefreshing}
-          >
-            Refresh
-          </Button>
         </div>
       </div>
 
@@ -236,55 +232,6 @@ const ReplicationPipelineStatus = ({
         />
       )}
 
-      {/* Summary cards */}
-      {!isStatusLoading && tableStatuses.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {liveTables.length > 0 && (
-            <div className="p-4 border border-success-300 bg-success-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Activity className="w-5 h-5 text-success-600" />
-                <div>
-                  <div className="text-lg font-semibold text-success-900">{liveTables.length}</div>
-                  <div className="text-sm text-success-700">Live replication</div>
-                </div>
-              </div>
-            </div>
-          )}
-          {copyingTables.length > 0 && (
-            <div className="p-4 border border-brand-300 bg-brand-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 text-brand-600 animate-spin" />
-                <div>
-                  <div className="text-lg font-semibold text-brand-900">{copyingTables.length}</div>
-                  <div className="text-sm text-brand-700">Copying data</div>
-                </div>
-              </div>
-            </div>
-          )}
-          {queuedTables.length > 0 && (
-            <div className="p-4 border border-warning-300 bg-warning-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-warning-600" />
-                <div>
-                  <div className="text-lg font-semibold text-warning-900">{queuedTables.length}</div>
-                  <div className="text-sm text-warning-700">Queued</div>
-                </div>
-              </div>
-            </div>
-          )}
-          {errorTables.length > 0 && (
-            <div className="p-4 border border-destructive-300 bg-destructive-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-destructive-600" />
-                <div>
-                  <div className="text-lg font-semibold text-destructive-900">{errorTables.length}</div>
-                  <div className="text-sm text-destructive-700">Failed</div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Error alert */}
       {hasErrors && (
@@ -332,10 +279,7 @@ const ReplicationPipelineStatus = ({
                     </div>
                   </Table.td>
                   <Table.td>
-                    <div className="flex items-center gap-2">
-                      {statusConfig.icon}
-                      {statusConfig.badge}
-                    </div>
+                    {statusConfig.badge}
                   </Table.td>
                   <Table.td>
                     <div className="space-y-1">
@@ -395,9 +339,9 @@ const ReplicationPipelineStatus = ({
                 The status will appear here once replication begins.
               </p>
             </div>
-            <Button type="default" onClick={handleRefresh} loading={isRefreshing}>
-              Refresh Status
-            </Button>
+            <p className="text-xs text-foreground-lighter">
+              Data refreshes automatically every 2 seconds
+            </p>
           </div>
         </div>
       )}
