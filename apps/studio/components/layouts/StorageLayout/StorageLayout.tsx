@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import StorageMenu from './StorageMenu'
+import StorageMenu from '../../interfaces/Storage/StorageMenu'
 
 export interface StorageLayoutProps {
   title: string

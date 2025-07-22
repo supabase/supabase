@@ -1,13 +1,14 @@
 import { AlertCircle, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import { useInterval } from 'hooks/misc/useInterval'
 import {
@@ -20,15 +21,16 @@ import {
 import DNSRecord from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
 
-export type CustomDomainVerifyProps = {
-  customDomain: CustomDomainResponse
-}
-
-const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
+const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
+
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const customDomain = customDomainData?.customDomain
+  const isSSLCertificateDeploying =
+    customDomain?.ssl.status !== undefined && customDomain.ssl.txt_name === undefined
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
     useCustomDomainReverifyMutation({
@@ -37,13 +39,19 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
       },
     })
 
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      toast.success(
+        'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
+      )
+    },
+  })
 
-  const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
+  const hasCAAErrors = customDomain?.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
     false
   )
-  const isValidating = (customDomain.ssl.txt_name ?? '') === ''
+  const isValidating = (customDomain?.ssl.txt_name ?? '') === ''
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -53,7 +61,7 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
   useInterval(
     onReverifyCustomDomain,
     // Poll every 5 seconds if the SSL certificate is being deployed
-    customDomain.ssl.status !== undefined && customDomain.ssl.txt_name === undefined ? 5000 : false
+    isSSLCertificateDeploying && !isDeleting ? 5000 : false
   )
 
   const onCancelCustomDomain = async () => {
@@ -67,7 +75,7 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
         <div>
           <h4 className="text-foreground mb-2">
             Configure TXT verification for your custom domain{' '}
-            <code className="text-sm">{customDomain.hostname}</code>
+            <code className="text-sm">{customDomain?.hostname}</code>
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
@@ -102,7 +110,7 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
                       <Link
                         target="_blank"
                         rel="noreferrer"
-                        href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}
+                        href={`https://whatsmydns.net/#TXT/${customDomain?.hostname}`}
                         className="text-brand"
                       >
                         here
@@ -131,13 +139,13 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-              <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
+              <code className="text-xs">{customDomain?.hostname}</code>. For example:{' '}
               <code className="text-xs">0 issue "digicert.com"</code>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
 
-        {customDomain.ssl.status === 'validation_timed_out' ? (
+        {customDomain?.ssl.status === 'validation_timed_out' ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>Validation timed out</AlertTitle_Shadcn_>
@@ -147,27 +155,27 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
           </Alert_Shadcn_>
         ) : (
           <div className="space-y-2">
-            <DNSTableHeaders display={customDomain.ssl.txt_name ?? ''} />
+            <DNSTableHeaders display={customDomain?.ssl.txt_name ?? ''} />
 
-            {customDomain.verification_errors?.includes(
+            {customDomain?.verification_errors?.includes(
               'custom hostname does not CNAME to this zone.'
             ) && (
               <DNSRecord
                 type="CNAME"
-                name={customDomain.hostname}
+                name={customDomain?.hostname}
                 value={settings?.app_config?.endpoint ?? 'Loading...'}
               />
             )}
 
-            {!isValidating && customDomain.ssl.status === 'pending_validation' && (
+            {!isValidating && customDomain?.ssl.status === 'pending_validation' && (
               <DNSRecord
                 type="TXT"
-                name={customDomain.ssl.txt_name ?? 'Loading...'}
-                value={customDomain.ssl.txt_value ?? 'Loading...'}
+                name={customDomain?.ssl.txt_name ?? 'Loading...'}
+                value={customDomain?.ssl.txt_value ?? 'Loading...'}
               />
             )}
 
-            {customDomain.ssl.status === 'pending_deployment' && (
+            {customDomain?.ssl.status === 'pending_deployment' && (
               <div className="flex items-center justify-center space-x-2 py-8">
                 <AlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">

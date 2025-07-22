@@ -16,7 +16,7 @@ import { mswServer } from './lib/msw'
 // })
 
 beforeAll(() => {
-  mswServer.listen({ onUnhandledRequest: 'error' })
+  mswServer.listen({ onUnhandledRequest: `error` })
   vi.mock('next/router', () => require('next-router-mock'))
   vi.mock('next/navigation', async () => {
     const actual = await vi.importActual('next/navigation')
