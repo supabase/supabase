@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react'
+import { createContext, useContext, useState, ReactNode, useCallback } from 'react'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
@@ -13,19 +13,23 @@ interface PipelineRequestStatusContextType {
   updatePipelineStatus: (pipelineId: number, backendStatus: string | undefined) => void
 }
 
-const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextType | undefined>(undefined)
-
 interface PipelineRequestStatusProviderProps {
   children: ReactNode
 }
 
+const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextType | undefined>(
+  undefined
+)
+
 export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatusProviderProps) => {
-  const [requestStatus, setRequestStatusState] = useState<Record<number, PipelineStatusRequestStatus>>({})
+  const [requestStatus, setRequestStatusState] = useState<
+    Record<number, PipelineStatusRequestStatus>
+  >({})
 
   const setRequestStatus = (pipelineId: number, status: PipelineStatusRequestStatus) => {
-    setRequestStatusState(prev => ({
+    setRequestStatusState((prev) => ({
       ...prev,
-      [pipelineId]: status
+      [pipelineId]: status,
     }))
   }
 
@@ -33,19 +37,21 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
     return requestStatus[pipelineId] || PipelineStatusRequestStatus.None
   }
 
-  // Centralized logic to update request status based on backend status
-  const updatePipelineStatus = (pipelineId: number, backendStatus: string | undefined) => {
-    const currentRequestStatus = getRequestStatus(pipelineId)
-    
-    if (
-      (currentRequestStatus === PipelineStatusRequestStatus.EnableRequested &&
-        (backendStatus === 'started' || backendStatus === 'failed')) ||
-      (currentRequestStatus === PipelineStatusRequestStatus.DisableRequested &&
-        (backendStatus === 'stopped' || backendStatus === 'failed'))
-    ) {
-      setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
-    }
-  }
+  const updatePipelineStatus = useCallback(
+    (pipelineId: number, backendStatus: string | undefined) => {
+      const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
+
+      if (
+        (currentRequestStatus === PipelineStatusRequestStatus.EnableRequested &&
+          (backendStatus === 'started' || backendStatus === 'failed')) ||
+        (currentRequestStatus === PipelineStatusRequestStatus.DisableRequested &&
+          (backendStatus === 'stopped' || backendStatus === 'failed'))
+      ) {
+        setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
+      }
+    },
+    [requestStatus, setRequestStatus]
+  )
 
   return (
     <PipelineRequestStatusContext.Provider

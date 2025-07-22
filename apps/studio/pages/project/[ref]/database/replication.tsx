@@ -1,7 +1,7 @@
 import ReplicationComingSoon from 'components/interfaces/Database/Replication/ComingSoon'
 import Destinations from 'components/interfaces/Database/Replication/Destinations'
 import ReplicationPipelineStatus from 'components/interfaces/Database/Replication/ReplicationPipelineStatus'
-import { PipelineRequestStatusProvider } from 'components/interfaces/Database/Replication/PipelineRequestStatusContext'
+import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'

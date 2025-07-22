@@ -5,9 +5,9 @@ import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/p
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import PipelineStatus from './PipelineStatus'
-import { usePipelineRequestStatus } from './PipelineRequestStatusContext'
+import { usePipelineRequestStatus } from 'state/replication-pipeline-request-status'
 import { getStatusName } from './Pipeline.utils'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type FC } from 'react'
 import {
   Button,
   Badge,
@@ -40,7 +40,7 @@ interface ReplicationPipelineStatusProps {
   onSelectBack: () => void
 }
 
-const ReplicationPipelineStatus = ({
+const ReplicationPipelineStatus: FC<ReplicationPipelineStatusProps> = ({
   pipelineId,
   destinationName,
   onSelectBack,
@@ -87,7 +87,6 @@ const ReplicationPipelineStatus = ({
     }
   )
 
-  // Update request status based on backend status using centralized logic
   const statusName = getStatusName(pipelineStatusData?.status)
 
   useEffect(() => {

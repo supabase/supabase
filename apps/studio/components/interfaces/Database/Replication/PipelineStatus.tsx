@@ -4,9 +4,10 @@ import { cn } from 'ui'
 import { ResponseError } from 'types'
 import { Loader2, AlertTriangle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
+import { type FC } from 'react'
 import { useParams } from 'common'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-import { PipelineStatusRequestStatus } from './PipelineRequestStatusContext'
+import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 
 export enum PipelineStatusName {
   FAILED = 'failed',
@@ -28,7 +29,7 @@ interface PipelineStatusProps {
   requestStatus?: PipelineStatusRequestStatus
 }
 
-const PipelineStatus = ({
+const PipelineStatus: FC<PipelineStatusProps> = ({
   pipelineStatus,
   error,
   isLoading,

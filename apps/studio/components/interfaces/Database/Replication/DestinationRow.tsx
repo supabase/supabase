@@ -7,14 +7,17 @@ import { Info } from 'lucide-react'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
 import PipelineStatus, { PipelineStatusName } from './PipelineStatus'
-import { PipelineStatusRequestStatus, usePipelineRequestStatus } from './PipelineRequestStatusContext'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from 'state/replication-pipeline-request-status'
 import { getStatusName } from './Pipeline.utils'
 import { useParams } from 'common'
 import {
   ReplicationPipelineStatusData,
   useReplicationPipelineStatusQuery,
 } from 'data/replication/pipeline-status-query'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type FC } from 'react'
 import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
@@ -39,7 +42,7 @@ interface DestinationRowProps {
   onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
-const DestinationRow = ({
+const DestinationRow: FC<DestinationRowProps> = ({
   sourceId,
   destinationId,
   destinationName,
@@ -68,14 +71,19 @@ const DestinationRow = ({
     },
     { refetchInterval: refreshFrequencyMs }
   )
-  const { getRequestStatus, setRequestStatus: setGlobalRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
-  const requestStatus = pipeline?.id ? getRequestStatus(pipeline.id) : PipelineStatusRequestStatus.None
+  const {
+    getRequestStatus,
+    setRequestStatus: setGlobalRequestStatus,
+    updatePipelineStatus,
+  } = usePipelineRequestStatus()
+  const requestStatus = pipeline?.id
+    ? getRequestStatus(pipeline.id)
+    : PipelineStatusRequestStatus.None
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
-  
-  // Update request status based on backend status using centralized logic
+
   useEffect(() => {
     if (pipeline?.id) {
       updatePipelineStatus(pipeline.id, statusName)

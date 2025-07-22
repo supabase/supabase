@@ -7,7 +7,7 @@ import { Button, cn, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import DestinationRow from './DestinationRow'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useState } from 'react'
+import { useState, type FC } from 'react'
 import NewDestinationPanel from './DestinationPanel'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { noop } from 'lodash'
@@ -16,7 +16,7 @@ interface DestinationsProps {
   onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
-const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
+const Destinations: FC<DestinationsProps> = ({ onSelectPipeline = noop }) => {
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [filterString, setFilterString] = useState<string>('')
   const { ref: projectRef } = useParams()
