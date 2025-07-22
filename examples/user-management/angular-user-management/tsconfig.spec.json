@@ -1,4 +1,5 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
@@ -7,12 +8,7 @@
       "jasmine"
     ]
   },
-  "files": [
-    "src/test.ts",
-    "src/polyfills.ts"
-  ],
   "include": [
-    "src/**/*.spec.ts",
-    "src/**/*.d.ts"
+    "src/**/*.ts"
   ]
 }
