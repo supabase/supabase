@@ -12,10 +12,7 @@ import {
   isTableLike,
   isView,
 } from 'data/table-editor/table-editor-types'
-import { useGetTables } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -37,12 +34,10 @@ export const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const project = useSelectedProject()
   const appSnap = useAppStateSnapshot()
   const { ref: projectRef, id } = useParams()
 
   const tabs = useTabsStateSnapshot()
-  const { selectedSchema } = useQuerySchemaState()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
     projectRef,
@@ -56,11 +51,6 @@ export const TableGridEditor = ({
   const isReadOnly = !canEditTables && !canEditColumns
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
-
-  const getTables = useGetTables({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const onClearDashboardHistory = useCallback(() => {
     if (projectRef) appSnap.setDashboardHistory(projectRef, 'editor', undefined)
