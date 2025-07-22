@@ -27,7 +27,7 @@ interface SecretRowProps {
   onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
+const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const [modal, setModal] = useState<string | null>(null)

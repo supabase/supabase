@@ -166,7 +166,7 @@ export const SecretsManagement = () => {
       </div>
 
       <DeleteSecretModal
-        secret={selectedSecretToRemove}
+        selectedSecret={selectedSecretToRemove}
         onClose={() => setSelectedSecretToRemove(undefined)}
       />
       <AddNewSecretModal
