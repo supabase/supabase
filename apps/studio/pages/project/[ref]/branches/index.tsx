@@ -18,6 +18,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -34,6 +35,8 @@ const BranchesPage: NextPageWithLayout = () => {
   const selectedOrg = useSelectedOrganization()
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -95,6 +98,18 @@ const BranchesPage: NextPageWithLayout = () => {
           if (selectedBranchToDelete.project_ref === ref) {
             router.push(`/project/${selectedBranchToDelete.parent_project_ref}/branches`)
           }
+          // Track delete button click
+          sendEvent({
+            action: 'branch_delete_button_clicked',
+            properties: {
+              branchType: selectedBranchToDelete.persistent ? 'persistent' : 'preview',
+              origin: 'branches_page',
+            },
+            groups: {
+              project: projectRef ?? 'Unknown',
+              organization: selectedOrg?.slug ?? 'Unknown',
+            },
+          })
         },
       }
     )
