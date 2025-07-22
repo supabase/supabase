@@ -45,7 +45,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 
 const LinkAwsMarketplace: NextPageWithLayout = () => {
-  const orgsExisting = false
+  const orgsExisting = true
 
   const router = useRouter()
   const {
@@ -96,8 +96,8 @@ const LinkAwsMarketplace: NextPageWithLayout = () => {
       setTimeout(() => form.reset(), 0)
     },
     onError: (res) => {
-      toast.error(`Failed to link your organization. ${res.message}`, {
-        duration: 5_000,
+      toast.error(res.message, {
+        duration: 7_000,
       })
     },
   })
