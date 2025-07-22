@@ -260,6 +260,17 @@ const MergePage: NextPageWithLayout = () => {
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)
+      // Track delete button click
+      sendEvent({
+        action: 'branch_delete_button_clicked',
+        properties: {
+          origin: 'merge_page',
+        },
+        groups: {
+          project: parentProjectRef ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
     },
     onError: (error) => {
       toast.error(`Failed to close branch: ${error.message}`)

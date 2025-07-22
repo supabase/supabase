@@ -1402,7 +1402,32 @@ export interface BranchCreateButtonClickedEvent {
      * Whether the branch was created with a git branch association
      */
     gitlessBranching: boolean
-    }
+  }
+  groups: {
+    project: string
+    organization: string
+  }
+}
+
+/**
+ * Triggered when a branch delete button is clicked.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches
+ */
+export interface BranchDeleteButtonClickedEvent {
+  action: 'branch_delete_button_clicked'
+  properties: {
+    /**
+     * The type of branch being deleted, e.g. preview, persistent
+     */
+    branchType?: 'preview' | 'persistent'
+    /**
+     * Where the delete action was initiated from
+     */
+    origin: 'branches_page' | 'merge_page'
+  }
   groups: {
     project: string
     organization: string
@@ -1627,6 +1652,7 @@ export type TelemetryEvent =
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
   | BranchCreateButtonClickedEvent
+  | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent
   | BranchCloseMergeRequestButtonClickedEvent
   | BranchMergeSubmittedEvent
