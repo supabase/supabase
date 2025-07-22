@@ -65,7 +65,7 @@ function useFilterOptions(filterColumns: string[]) {
 
           console.log(`Raw data for ${column}:`, data)
 
-          // Extract all individual values from comma-separated strings or arrays
+          // Extract all individual values from PostgreSQL arrays
           const allValues = data.flatMap((row) => {
             const value = row[column]
             console.log(
@@ -78,12 +78,6 @@ function useFilterOptions(filterColumns: string[]) {
             if (Array.isArray(value)) {
               // Handle PostgreSQL arrays
               return value.filter((item) => item && item.length > 0)
-            } else if (typeof value === 'string' && value.includes(',')) {
-              // Handle comma-separated strings
-              return value
-                .split(',')
-                .map((item) => item.trim())
-                .filter((item) => item.length > 0)
             } else if (typeof value === 'string' && value.startsWith('{') && value.endsWith('}')) {
               // Handle PostgreSQL array format like {Firebase,MongoDB,MySQL}
               const innerContent = value.slice(1, -1) // Remove { and }

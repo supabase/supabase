@@ -4,8 +4,12 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.headquarters !== 'unset') {
-    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  if (activeFilters.frontend_stack !== 'unset') {
+    whereClauses.push(`'${activeFilters.frontend_stack}' = ANY(frontend_stack)`)
+  }
+
+  if (activeFilters.backend_stack !== 'unset') {
+    whereClauses.push(`'${activeFilters.backend_stack}' = ANY(backend_stack)`)
   }
 
   if (activeFilters.industry_normalized !== 'unset') {
@@ -33,7 +37,7 @@ export function DatabasesChart() {
     <GenericChartWithQuery
       title="Which database(s) is your startup using?"
       targetColumn="databases"
-      filterColumns={['headquarters', 'industry_normalized', 'person_age']}
+      filterColumns={['frontend_stack', 'backend_stack', 'industry_normalized', 'person_age']}
       generateSQLQuery={generateDatabasesSQL}
     />
   )
