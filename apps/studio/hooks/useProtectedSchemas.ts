@@ -84,8 +84,8 @@ export const useProtectedSchemas = ({
     const fdwSchemas = result.data?.map((s) => ({ name: s, type: 'fdw' as const }))
 
     const schemas = uniq([...internalSchemas, ...fdwSchemas])
-    return schemas.filter((schema) => !stableexcludeSchemas.includes(schema.name))
-  }, [result.data, stableexcludeSchemas])
+    return schemas.filter((schema) => !stableExcludeSchemas.includes(schema.name))
+  }, [result.data, stableExcludeSchemas])
 
   return { ...result, data: schemas }
 }
