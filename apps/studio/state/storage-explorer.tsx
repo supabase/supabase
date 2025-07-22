@@ -31,8 +31,9 @@ import {
 } from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
@@ -917,6 +918,20 @@ function createStorageExplorerState({
       columnIndex: number
       isDrop?: boolean
     }) => {
+      if (!state.serviceKey) {
+        toast(
+          <p>
+            Uploading files to Storage through the dashboard is currently unavailable with the new
+            API keys. Please re-enable{' '}
+            <InlineLink href={`/project/${state.projectRef}/settings/api-keys`}>
+              legacy JWT keys
+            </InlineLink>{' '}
+            if you'd like to upload files to Storage through the dashboard.
+          </p>
+        )
+        return
+      }
+
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
@@ -1115,6 +1130,7 @@ function createStorageExplorerState({
               headers: {
                 authorization: `Bearer ${state.serviceKey}`,
                 'x-source': 'supabase-dashboard',
+                ...(state.serviceKey.includes('secret') ? { apikey: state.serviceKey } : {}),
               },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
@@ -1722,11 +1738,12 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
-  const { serviceKey } = getAPIKeys(settings)
+
+  const { serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
-  const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1736,9 +1753,17 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   useEffect(() => {
     const snap = snapshot(stateRef.current)
     const hasDataReady = !!project?.ref
-    const isDifferentProject = snap.projectRef !== project?.ref
+    const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
 
-    if (!isPaused && hasDataReady && isDifferentProject && serviceKey) {
+    const isDifferentProject = snap.projectRef !== project?.ref
+    const isDifferentResumableUploadUrl = snap.resumableUploadUrl !== resumableUploadUrl
+
+    if (
+      !isPaused &&
+      hasDataReady &&
+      (isDifferentProject || isDifferentResumableUploadUrl) &&
+      serviceKey
+    ) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
       const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
         auth: {
@@ -1764,7 +1789,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
         })
       )
     }
-  }, [project?.ref, stateRef, serviceKey, isPaused])
+  }, [project?.ref, stateRef, serviceKey, isPaused, protocol, endpoint])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>

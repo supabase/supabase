@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@supabase/auth-js':
-      specifier: 2.71.0-rc.8
-      version: 2.71.0-rc.8
+      specifier: 2.71.1-rc.1
+      version: 2.71.1-rc.1
     '@supabase/realtime-js':
       specifier: ^2.11.3
       version: 2.11.3
@@ -41,7 +41,7 @@ catalogs:
       version: 6.3.5
 
 overrides:
-  '@supabase/supabase-js>@supabase/auth-js': 2.71.0-rc.8
+  '@supabase/supabase-js>@supabase/auth-js': 2.71.1-rc.1
   '@tanstack/directive-functions-plugin>vite': ^6.2.7
   '@tanstack/react-start-plugin>vite': ^6.2.7
   esbuild: ^0.25.2
@@ -652,7 +652,7 @@ importers:
   apps/studio:
     dependencies:
       '@ai-sdk/amazon-bedrock':
-        specifier: ^2.2.9
+        specifier: ^2.2.10
         version: 2.2.10(zod@3.23.8)
       '@ai-sdk/openai':
         specifier: ^1.3.22
@@ -694,8 +694,8 @@ importers:
         specifier: ^0.82.0-dev.2
         version: 0.82.0-dev.2(encoding@0.1.13)(supports-color@8.1.1)
       '@hcaptcha/react-hcaptcha':
-        specifier: ^1.11.1
-        version: 1.11.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^1.12.0
+        version: 1.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@headlessui/react':
         specifier: ^1.7.17
         version: 1.7.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -737,7 +737,7 @@ importers:
         version: 5.5.0
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.71.0-rc.8
+        version: 2.71.1-rc.1
       '@supabase/mcp-server-supabase':
         specifier: ^0.4.4
         version: 0.4.4(supports-color@8.1.1)
@@ -1464,8 +1464,8 @@ importers:
         specifier: ^2.20.0
         version: 2.20.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@hcaptcha/react-hcaptcha':
-        specifier: ^1.11.1
-        version: 1.11.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^1.12.0
+        version: 1.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@heroicons/react':
         specifier: ^1.0.6
         version: 1.0.6(react@18.3.1)
@@ -1812,7 +1812,7 @@ importers:
     dependencies:
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.71.0-rc.8
+        version: 2.71.1-rc.1
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.49.3
@@ -4030,11 +4030,11 @@ packages:
   '@har-sdk/openapi-sampler@2.2.0':
     resolution: {integrity: sha512-WcuGKCsFQzMlJOaeKFxMUx89EULvTvZ5GvPAeAhC4yUKz7khhN34YkuLsbn4z2BLLtrJ0oxduF5+Wa2kB3tw8w==}
 
-  '@hcaptcha/loader@1.2.4':
-    resolution: {integrity: sha512-3MNrIy/nWBfyVVvMPBKdKrX7BeadgiimW0AL/a/8TohNtJqxoySKgTJEXOQvYwlHemQpUzFrIsK74ody7JiMYw==}
+  '@hcaptcha/loader@2.0.0':
+    resolution: {integrity: sha512-fFQH6ApU/zCCl6Y1bnbsxsp1Er/lKX+qlgljrpWDeFcenpEtoP68hExlKSXECospzKLeSWcr06cbTjlR/x3IJA==}
 
-  '@hcaptcha/react-hcaptcha@1.11.1':
-    resolution: {integrity: sha512-g6TwatNIzBtOR3RM4mxzvTUQGs5T9HMN+4fcNGHn7wUVThvmazThUs0vImI836bSkGpJS8n0rOYvv1UZ47q8Vw==}
+  '@hcaptcha/react-hcaptcha@1.12.0':
+    resolution: {integrity: sha512-QiHnQQ52k8SJJSHkc3cq4TlYzag7oPd4f5ZqnjVSe4fJDSlZaOQFtu5F5AYisVslwaitdDELPVLRsRJxiiI0Aw==}
     peerDependencies:
       react: '>= 16.3.0'
       react-dom: '>= 16.3.0'
@@ -8054,8 +8054,8 @@ packages:
     resolution: {integrity: sha512-lkfjyAd34aeMpTKKcEVfy8IUyEsjuAT3t9EXr5yZDtdIUncnZpedl/xLV16Dkd4z+fQwixScsCCDxSMNtBOgpQ==}
     engines: {node: '>=12.16'}
 
-  '@supabase/auth-js@2.71.0-rc.8':
-    resolution: {integrity: sha512-GX4UDxkhzk9Es8dGSJIcxVrgOPm9pUoEubNavShylpcCfDm5DELzTsc09GRUFaItfmnh5rWXDhV97PfLz1J6zA==}
+  '@supabase/auth-js@2.71.1-rc.1':
+    resolution: {integrity: sha512-tgSFLO19e8Ig7eQON6c02DoyfV3OLEG709UqinbFExvRKB4z1yHBwwaMbkZtoKcu395AFVtekcHtoM9TEmixoQ==}
 
   '@supabase/functions-js@2.4.4':
     resolution: {integrity: sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==}
@@ -11307,6 +11307,7 @@ packages:
     resolution: {integrity: sha512-t0q23FIpvHDTtnORW+bDJziGsal5uh9RJTJ1fyH8drd4lICOoXhJ5pLMUZ5C0VQei6dNmwTzzoTRgMkO9JgHEQ==}
     peerDependencies:
       eslint: '>= 5'
+    bundledDependencies: []
 
   eslint-plugin-import@2.31.0:
     resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}
@@ -21876,12 +21877,12 @@ snapshots:
       randexp: 0.5.3
       tslib: 2.6.2
 
-  '@hcaptcha/loader@1.2.4': {}
+  '@hcaptcha/loader@2.0.0': {}
 
-  '@hcaptcha/react-hcaptcha@1.11.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@hcaptcha/react-hcaptcha@1.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.26.10
-      '@hcaptcha/loader': 1.2.4
+      '@hcaptcha/loader': 2.0.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -26883,7 +26884,7 @@ snapshots:
 
   '@stripe/stripe-js@5.5.0': {}
 
-  '@supabase/auth-js@2.71.0-rc.8':
+  '@supabase/auth-js@2.71.1-rc.1':
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
@@ -27040,7 +27041,7 @@ snapshots:
 
   '@supabase/supabase-js@2.49.3':
     dependencies:
-      '@supabase/auth-js': 2.71.0-rc.8
+      '@supabase/auth-js': 2.71.1-rc.1
       '@supabase/functions-js': 2.4.4
       '@supabase/node-fetch': 2.6.15
       '@supabase/postgrest-js': 1.19.2

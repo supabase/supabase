@@ -1,9 +1,5 @@
-// see apps/www/components/LaunchWeek/13/Releases/data/lw13_build_stage.tsx for reference
-
-import { ReactNode } from 'react'
-import { type ClassValue } from 'clsx'
-import { PRODUCT_MODULES } from 'shared-data/products'
-import { AppWindow, Database, Globe } from 'lucide-react'
+import type { ClassValue } from 'clsx'
+import type { ReactNode } from 'react'
 
 export interface BuildDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -27,7 +23,6 @@ export interface BuildDayLink {
 export const days: BuildDay[] = [
   {
     title: 'Supabase UI: Platform Kit',
-    description: '',
     id: 'platform-kit',
     is_shipped: true,
     links: [
@@ -39,52 +34,60 @@ export const days: BuildDay[] = [
     ],
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
+    title: 'Create a Supabase backend using Figma Make',
+    id: 'figma',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/figma-make-support-for-supabase',
         label: 'Blog post',
         target: '_blank',
       },
     ],
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
+    title: 'Introducing stripe-sync-engine npm package',
+    id: 'stripe-engine',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/stripe-engine-as-sync-library',
         label: 'Blog post',
         target: '_blank',
       },
     ],
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
+    title: 'Improved Security Controls and A New Home for Security',
+    id: 'security-homepage',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/improved-security-controls',
         label: 'Blog post',
         target: '_blank',
       },
     ],
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
+    title: 'Algolia Connector for Supabase',
+    id: 'algolia-connector',
+    is_shipped: true,
     links: [
       {
-        url: '/blog/',
+        url: '/blog/algolia-connector-for-supabase',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+  },
+  {
+    title: 'Storage: 10x Larger Uploads, 3x Cheaper Cached Egress & 2x Egress Quota',
+    id: 'cheaper-egress',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/storage-500gb-uploads-cheaper-egress-pricing',
         label: 'Blog post',
         target: '_blank',
       },

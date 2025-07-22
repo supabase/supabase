@@ -10,8 +10,10 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BranchingPITRNotice } from 'components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
@@ -20,9 +22,9 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -43,6 +45,8 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -50,7 +54,7 @@ export const CreateBranchModal = () => {
   const queryClient = useQueryClient()
   const projectDetails = useSelectedProject()
   const selectedOrg = useSelectedOrganization()
-  const gitlessBranching = useFlag('gitlessBranching')
+  const gitlessBranching = useIsBranching2Enabled()
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
 
   const organization = useSelectedOrganization()
@@ -80,12 +84,26 @@ export const CreateBranchModal = () => {
       onError: () => {},
     })
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
         await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
       }
+      sendEvent({
+        action: 'branch_create_button_clicked',
+        properties: {
+          branchType: data.persistent ? 'persistent' : 'preview',
+          gitlessBranching,
+        },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
+
       setShowCreateBranchModal(false)
       router.push(`/project/${data.project_ref}`)
     },
@@ -93,6 +111,8 @@ export const CreateBranchModal = () => {
       toast.error(`Failed to create branch: ${error.message}`)
     },
   })
+
+  const canCreateBranch = useCheckPermissions(PermissionAction.CREATE, 'preview_branches')
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
 
@@ -148,6 +168,14 @@ export const CreateBranchModal = () => {
   })
 
   const canSubmit = !isCreating && !isChecking
+  const isDisabled =
+    !isSuccessConnections ||
+    isCreating ||
+    !canSubmit ||
+    isChecking ||
+    (!gitlessBranching && !githubConnection) ||
+    promptProPlanUpgrade ||
+    !canCreateBranch
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -197,6 +225,7 @@ export const CreateBranchModal = () => {
                 <DialogSectionSeparator />
               </>
             )}
+
             <DialogSection
               padding="medium"
               className={cn('space-y-4', promptProPlanUpgrade && 'opacity-25 pointer-events-none')}
@@ -347,9 +376,7 @@ export const CreateBranchModal = () => {
                   </figure>
                 </div>
                 <div className="flex flex-col gap-y-1">
-                  <p className="text-sm text-foreground">
-                    Preview branches are billed $0.01344 per hour
-                  </p>
+                  <p className="text-sm text-foreground">Branches are billed $0.01344 per hour</p>
                   <p className="text-sm text-foreground-light">
                     This cost will continue for as long as the branch has not been removed.
                   </p>
@@ -367,22 +394,24 @@ export const CreateBranchModal = () => {
               >
                 Cancel
               </Button>
-              <Button
+              <ButtonTooltip
                 form={formId}
-                disabled={
-                  !isSuccessConnections ||
-                  isCreating ||
-                  !canSubmit ||
-                  isChecking ||
-                  (!gitlessBranching && !githubConnection) ||
-                  promptProPlanUpgrade
-                }
+                disabled={isDisabled}
                 loading={isCreating}
                 type="primary"
                 htmlType="submit"
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      !gitlessBranching && !githubConnection
+                        ? 'Set up a GitHub connection first to create branches'
+                        : undefined,
+                  },
+                }}
               >
                 Create branch
-              </Button>
+              </ButtonTooltip>
             </DialogFooter>
           </form>
         </Form_Shadcn_>
