@@ -19,6 +19,8 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -75,6 +77,8 @@ export type CreateBucketForm = z.infer<typeof FormSchema>
 
 const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
+  const { mutate: sendEvent } = useSendEventMutation()
   const router = useRouter()
 
   const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
@@ -137,6 +141,11 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
         isPublic: values.public,
         file_size_limit: fileSizeLimit,
         allowed_mime_types: allowedMimeTypes,
+      })
+      sendEvent({
+        action: 'storage_bucket_created',
+        properties: { bucketType: values.type },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
 
       if (values.type === 'ANALYTICS' && icebergWrapperExtensionState === 'installed') {

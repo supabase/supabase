@@ -9,6 +9,7 @@ import {
   getCatalogURI,
   getConnectionURL,
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { FDWCreateVariables, useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
@@ -18,13 +19,15 @@ import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 
 export const useIcebergWrapperCreateMutation = () => {
   const { project } = useProjectContext()
+
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
+  const { serviceKey } = getKeys(apiKeys)
+
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
 
-  const serviceApiKey =
-    (settings?.service_api_keys ?? []).find((key) => key.tags === 'service_role')?.api_key ??
-    'SUPABASE_CLIENT_SERVICE_KEY'
+  const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
