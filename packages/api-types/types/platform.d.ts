@@ -5264,10 +5264,6 @@ export interface components {
       file_url: string
       fileUrl: string
     }
-    GetAvailableRegionsBody: {
-      cloud_provider: string
-      organization_slug: string
-    }
     GetContentCountResponse: {
       count: number
     }
@@ -6536,6 +6532,7 @@ export interface components {
           last4: string
         }
         created: number
+        has_address: boolean
         id: string
         is_default: boolean
         type: string
@@ -8584,7 +8581,21 @@ export interface components {
       fileSizeLimit?: number
     }
     UpdateSubscriptionBody: {
+      address?: {
+        city?: string
+        country: string
+        line1: string
+        line2?: string
+        postal_code?: string
+        state?: string
+      }
+      billing_name?: string
       payment_method?: string
+      tax_id?: {
+        country: string
+        type: string
+        value: string
+      }
       /** @enum {string} */
       tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | 'tier_enterprise'
     }
@@ -12635,7 +12646,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12673,7 +12685,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12715,7 +12728,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12760,7 +12774,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12798,7 +12813,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12844,7 +12860,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12884,7 +12901,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12926,7 +12944,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -12964,7 +12983,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13008,7 +13028,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13051,7 +13072,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13092,7 +13114,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13130,7 +13153,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13174,7 +13198,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13214,7 +13239,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13264,7 +13290,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13305,7 +13332,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13343,7 +13371,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13387,7 +13416,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13427,7 +13457,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13469,7 +13500,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13507,7 +13539,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13551,7 +13584,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13591,7 +13625,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13633,7 +13668,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13737,7 +13773,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13775,7 +13812,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13819,7 +13857,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13859,7 +13898,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13909,7 +13949,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13947,7 +13988,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -13993,7 +14035,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14033,7 +14076,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14078,7 +14122,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14116,7 +14161,8 @@ export interface operations {
       query?: never
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14160,7 +14206,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14200,7 +14247,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14245,7 +14293,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -14291,7 +14340,8 @@ export interface operations {
       }
       header: {
         'x-connection-encrypted': string
-        'x-pg-application-name': string
+        /** @description PostgreSQL connection application name */
+        'x-pg-application-name'?: string
       }
       path: {
         /** @description Project ref */
@@ -16539,6 +16589,12 @@ export interface operations {
           'application/json': components['schemas']['GetUserContentResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's content */
       500: {
         headers: {
@@ -16565,6 +16621,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16603,6 +16665,12 @@ export interface operations {
           'application/json': components['schemas']['UserContentObject']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create project's content */
       500: {
         headers: {
@@ -16633,6 +16701,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['BulkDeleteUserContentResponse'][]
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to delete project's contents */
       500: {
@@ -16665,6 +16739,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetContentCountV2Response']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve user's content counts */
       500: {
@@ -16703,6 +16783,12 @@ export interface operations {
           'application/json': components['schemas']['GetUserContentFolderResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's content root folder */
       500: {
         headers: {
@@ -16736,6 +16822,12 @@ export interface operations {
           'application/json': components['schemas']['CreateUserContentFolderResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to create project's content folder */
       500: {
         headers: {
@@ -16757,6 +16849,12 @@ export interface operations {
     requestBody?: never
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16799,6 +16897,12 @@ export interface operations {
           'application/json': components['schemas']['GetUserContentFolderResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to retrieve project's content folder */
       500: {
         headers: {
@@ -16827,6 +16931,12 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16861,6 +16971,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetUserContentByIdResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to retrieve project's content by the given id */
       500: {
@@ -18067,16 +18183,15 @@ export interface operations {
   }
   ProjectsController_getRegions: {
     parameters: {
-      query?: never
+      query: {
+        cloud_provider: string
+        organization_slug: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetAvailableRegionsBody']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {

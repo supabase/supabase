@@ -35,7 +35,6 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -89,6 +88,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 
 const sizes: DesiredInstanceSize[] = [
   'micro',
@@ -219,18 +219,22 @@ const Wizard: NextPageWithLayout = () => {
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-  const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
-    {
-      cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
-    },
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchInterval: false,
-      refetchOnReconnect: false,
-      retry: false,
-    }
-  )
+
+  const { data: availableRegionsData, error: defaultRegionError } =
+    useOrganizationAvailableRegionsQuery(
+      {
+        slug: slug,
+        cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
+      },
+      {
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchInterval: false,
+        refetchOnReconnect: false,
+      }
+    )
+
+  const defaultRegion = availableRegionsData?.recommendations.specific[0]?.name
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
 
@@ -847,6 +851,7 @@ const Wizard: NextPageWithLayout = () => {
                             field={field}
                             form={form}
                             cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                            organizationSlug={slug}
                           />
                         )}
                       />
