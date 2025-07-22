@@ -9,10 +9,12 @@ import { formatBytes } from 'lib/helpers'
 
 export interface ReportAttributes {
   id?: string
+  titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
+  availableIn?: string[]
   hideChartType?: boolean
   format?: string
   className?: string
@@ -31,13 +33,19 @@ export interface ReportAttributes {
   hideHighlightedValue?: boolean
 }
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line' | 'combine'
+export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
 
 export type MultiAttribute = {
   attribute: string
   provider: Provider
   label?: string
-  color?: string
+  color?: {
+    light: string
+    dark: string
+  }
+  statusCode?: string
+  grantType?: string
+  providerType?: string
   stackId?: string
   format?: string
   description?: string
@@ -47,6 +55,7 @@ export type MultiAttribute = {
   omitFromTotal?: boolean
   tooltip?: string
   customValue?: number
+  [key: string]: any
   /**
    * Manipulate the value of the attribute before it is displayed on the chart.
    * @param value - The value of the attribute.
@@ -65,6 +74,7 @@ export type MultiAttribute = {
   strokeDasharray?: string
   className?: string
   hide?: boolean
+  enabled?: boolean
 }
 
 interface CustomIconProps {
@@ -97,6 +107,7 @@ interface TooltipProps {
   label?: string | number
   attributes?: MultiAttribute[]
   isPercentage?: boolean
+  format?: string | ((value: unknown) => string)
   valuePrecision?: number
   showMaxValue?: boolean
   showTotal?: boolean
@@ -121,8 +132,10 @@ export const calculateTotalChartAggregate = (
 const CustomTooltip = ({
   active,
   payload,
+  label,
   attributes,
   isPercentage,
+  format,
   valuePrecision,
   showTotal,
   isActiveHoveredChart,
@@ -133,13 +146,14 @@ const CustomTooltip = ({
     const maxValueData =
       maxValueAttribute && payload?.find((p: any) => p.dataKey === maxValueAttribute.attribute)
     const maxValue = maxValueData?.value
-    const isRamChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
-    const isDiskSpaceChart = payload?.some((p: any) =>
-      p.dataKey.toLowerCase().includes('disk_space_')
-    )
-    const isDBSizeChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_'))
+    const isRamChart =
+      !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isDBSizeChart =
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
+      payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
-    const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
+    const shouldFormatBytes = isRamChart || isDBSizeChart || isNetworkChart
 
     const attributesToIgnore =
       attributes?.filter((a) => a.omitFromTotal)?.map((a) => a.attribute) ?? []
@@ -161,13 +175,13 @@ const CustomTooltip = ({
 
     const LabelItem = ({ entry }: { entry: any }) => {
       const attribute = attributes?.find((a: MultiAttribute) => a?.attribute === entry.name)
-      const percentage = ((entry.value / maxValue) * 100).toFixed(1)
+      const percentage = ((entry.value / maxValue) * 100).toFixed(valuePrecision)
       const isMax = entry.dataKey === maxValueAttribute?.attribute
 
       return (
         <div key={entry.name} className="flex items-center w-full">
           {getIcon(entry.color, isMax)}
-          <span className="text-foreground-lighter ml-1 flex-grow">
+          <span className="text-foreground-lighter ml-1 flex-grow cursor-default select-none">
             {attribute?.label || entry.name}
           </span>
           <span className="ml-3.5 flex items-end gap-1">
@@ -175,6 +189,7 @@ const CustomTooltip = ({
               ? formatBytes(isNetworkChart ? Math.abs(entry.value) : entry.value, valuePrecision)
               : numberFormatter(entry.value, valuePrecision)}
             {isPercentage ? '%' : ''}
+            {format === 'ms' ? 'ms' : ''}
 
             {/* Show percentage if max value is set */}
             {!!maxValueData && !isMax && !isPercentage && (
@@ -194,21 +209,22 @@ const CustomTooltip = ({
       >
         <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
-          {payload.reverse().map((entry: any, index: number) => (
-            <LabelItem key={`${entry.name}-${index}`} entry={entry} />
-          ))}
+          {payload
+            .reverse()
+            .filter((entry: any) => entry.value !== 0)
+            .map((entry: any, index: number) => (
+              <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+            ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
               <span className="flex-grow text-foreground-lighter">Total</span>
               <div className="flex items-end gap-1">
                 <span className="text-base">
                   {shouldFormatBytes
-                    ? formatBytes(
-                        isDBSizeChart ? (total as number) * 1024 * 1024 : (total as number),
-                        valuePrecision
-                      )
+                    ? formatBytes(total as number, valuePrecision)
                     : numberFormatter(total as number, valuePrecision)}
                   {isPercentage ? '%' : ''}
+                  {format === 'ms' ? 'ms' : ''}
                 </span>
                 {maxValueAttribute &&
                   !isPercentage &&
@@ -270,7 +286,7 @@ const CustomLabel = ({ payload, attributes, showMaxValue, onLabelHover }: Custom
         {getIcon(entry.name, entry.color)}
         <span
           className={cn(
-            'text-nowrap text-foreground-lighter',
+            'text-nowrap text-foreground-lighter cursor-default select-none',
             hoveredLabel && !isHovered && 'opacity-50'
           )}
         >

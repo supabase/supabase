@@ -15,8 +15,10 @@ export type SqlTitleGenerateVariables = {
 }
 
 export async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
+  const url = `${BASE_PATH}/api/ai/sql/title-v2`
+
   const headers = await constructHeaders({ 'Content-Type': 'application/json' })
-  const response = await fetchHandler(`${BASE_PATH}/api/ai/sql/title`, {
+  const response = await fetchHandler(url, {
     headers,
     method: 'POST',
     body: JSON.stringify({

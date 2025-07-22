@@ -239,7 +239,7 @@ export const DatabaseConnectionString = () => {
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </div>
-        <DatabaseSelector buttonProps={{ size: 'small' }} />
+        <DatabaseSelector portal={false} buttonProps={{ size: 'small' }} />
       </div>
 
       {isLoading && (
