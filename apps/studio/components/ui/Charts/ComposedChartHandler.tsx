@@ -200,9 +200,10 @@ const ComposedChartHandler = ({
           point[attr] = value
         })
 
-        const formattedDataPoint: DataPoint = !('period_start' in point)
-          ? { ...point, period_start: dayjs.utc(point.timestamp).unix() * 1000 }
-          : point
+        const formattedDataPoint: DataPoint =
+          !('period_start' in point) && 'timestamp' in point
+            ? { ...point, period_start: dayjs.utc(point.timestamp).unix() * 1000 }
+            : point
 
         return formattedDataPoint
       })
