@@ -7,7 +7,7 @@ import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-sta
 import PipelineStatus from './PipelineStatus'
 import { usePipelineRequestStatus } from 'state/replication-pipeline-request-status'
 import { getStatusName } from './Pipeline.utils'
-import { useState, useEffect, type FC } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Button,
   Badge,
@@ -40,7 +40,7 @@ interface ReplicationPipelineStatusProps {
   onSelectBack: () => void
 }
 
-const ReplicationPipelineStatus: FC<ReplicationPipelineStatusProps> = ({
+const ReplicationPipelineStatus = ({
   pipelineId,
   destinationName,
   onSelectBack,

@@ -17,7 +17,7 @@ import {
   ReplicationPipelineStatusData,
   useReplicationPipelineStatusQuery,
 } from 'data/replication/pipeline-status-query'
-import { useState, useEffect, type FC } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
@@ -42,7 +42,7 @@ interface DestinationRowProps {
   onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
-const DestinationRow: FC<DestinationRowProps> = ({
+const DestinationRow = ({
   sourceId,
   destinationId,
   destinationName,
