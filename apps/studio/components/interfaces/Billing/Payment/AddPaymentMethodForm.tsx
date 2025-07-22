@@ -1,4 +1,3 @@
-import type { SetupIntent } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   NewPaymentMethodElement,
@@ -9,6 +8,7 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { isEqual } from 'lodash'
 import { useRef, useState } from 'react'
@@ -35,12 +35,13 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
     })
 
   const [isSaving, setIsSaving] = useState(false)
-  const [isDefault, setIsDefault] = useState(true)
+  const [isDefaultPaymentMethod, setIsDefaultPaymentMethod] = useState(true)
   const [isPrimaryBillingAddress, setIsPrimaryBillingAddress] = useState(true)
 
   const queryClient = useQueryClient()
   const { mutateAsync: markAsDefault } = useOrganizationPaymentMethodMarkAsDefaultMutation()
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
+  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
   const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({
     slug: selectedOrganization?.slug,
   })
@@ -63,7 +64,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
       setIsSaving(false)
     } else {
       if (
-        isDefault &&
+        isDefaultPaymentMethod &&
         selectedOrganization &&
         typeof result.setupIntent?.payment_method === 'string'
       ) {
@@ -111,6 +112,10 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
               address: result.address,
             })
           }
+
+          if (result.taxId && !isEqual(result.taxId, taxId)) {
+            await updateTaxId({ taxId: result.taxId, slug: selectedOrganization?.slug })
+          }
         } catch (error) {
           toast.error('Failed to update billing address')
         }
@@ -125,7 +130,7 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
     }
   }
 
-  if (customerProfileLoading) {
+  if (customerProfileLoading || isCustomerTaxIdLoading) {
     return (
       <Modal.Content>
         <div className="space-y-2">
@@ -148,7 +153,6 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         <NewPaymentMethodElement
           readOnly={isSaving}
           email={selectedOrganization?.billing_email}
-          taxIdConfigurable={true}
           currentAddress={customerProfile?.address}
           customerName={customerProfile?.billing_name}
           currentTaxId={taxId}
@@ -158,10 +162,10 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
         <div className="flex items-center gap-x-2 mt-4 mb-2">
           <Checkbox_Shadcn_
             id="save-as-default"
-            checked={isDefault}
+            checked={isDefaultPaymentMethod}
             onCheckedChange={(checked) => {
               if (typeof checked === 'boolean') {
-                setIsDefault(checked)
+                setIsDefaultPaymentMethod(checked)
               }
             }}
           />

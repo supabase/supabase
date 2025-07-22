@@ -1,12 +1,12 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
 import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 import { castOrganizationResponseToOrganization } from './organizations-query'
+import type { CustomerAddress, CustomerTaxId } from './types'
 
 export type OrganizationCreateVariables = {
   name: string
@@ -15,8 +15,8 @@ export type OrganizationCreateVariables = {
   tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
   payment_method?: string
   billing_name?: string
-  address?: components['schemas']['CreateOrganizationBody']['address']
-  tax_id?: components['schemas']['CreateOrganizationBody']['tax_id']
+  address?: CustomerAddress
+  tax_id?: CustomerTaxId
 }
 
 export async function createOrganization({
@@ -38,7 +38,7 @@ export async function createOrganization({
       payment_method,
       address,
       billing_name,
-      tax_id,
+      tax_id: tax_id ?? undefined,
     },
   })
 

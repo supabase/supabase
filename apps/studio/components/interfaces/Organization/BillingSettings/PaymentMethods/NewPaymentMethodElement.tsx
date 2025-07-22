@@ -58,6 +58,7 @@ export type PaymentMethodElementRef = {
         setupIntent: SetupIntent
         address: CustomerAddress
         customerName: string
+        taxId: CustomerTaxId | null
       }
     | undefined
   >
@@ -66,11 +67,7 @@ export type PaymentMethodElementRef = {
         paymentMethod: PaymentMethod
         address: CustomerAddress
         customerName: string
-        taxId: {
-          country: string
-          type: string
-          value: string
-        } | null
+        taxId: CustomerTaxId | null
       }
     | undefined
   >
@@ -81,14 +78,12 @@ const NewPaymentMethodElement = forwardRef(
     {
       email,
       readOnly,
-      taxIdConfigurable,
       currentAddress,
       currentTaxId,
       customerName,
     }: {
       email?: string | null | undefined
       readOnly: boolean
-      taxIdConfigurable: boolean
       currentAddress?: CustomerAddress | undefined
       currentTaxId?: CustomerTaxId | undefined
       customerName?: string | undefined
@@ -154,15 +149,6 @@ const NewPaymentMethodElement = forwardRef(
         return
       }
 
-      const taxId =
-        taxIdConfigurable && purchasingAsBusiness && selectedTaxId
-          ? {
-              country: selectedTaxId.countryIso2,
-              type: selectedTaxId.type,
-              value: form.getValues('tax_id_value'),
-            }
-          : null
-
       const addressElement = await elements.getElement('address')!.getValue()
       return {
         paymentMethod,
@@ -171,8 +157,18 @@ const NewPaymentMethodElement = forwardRef(
           line2: addressElement.value.address.line2 || undefined,
         },
         customerName: addressElement.value.name,
-        taxId,
+        taxId: getConfiguredTaxId(),
       }
+    }
+
+    function getConfiguredTaxId(): CustomerTaxId | null {
+      return purchasingAsBusiness && selectedTaxId
+        ? {
+            country: selectedTaxId.countryIso2,
+            type: selectedTaxId.type,
+            value: form.getValues('tax_id_value'),
+          }
+        : null
     }
 
     const confirmSetup = async (): ReturnType<PaymentMethodElementRef['confirmSetup']> => {
@@ -199,6 +195,7 @@ const NewPaymentMethodElement = forwardRef(
           line2: addressElement.value.address.line2 || undefined,
         },
         customerName: addressElement.value.name,
+        taxId: getConfiguredTaxId(),
       }
     }
 
@@ -247,7 +244,7 @@ const NewPaymentMethodElement = forwardRef(
           options={{ defaultValues: { billingDetails: { email: email ?? undefined } }, readOnly }}
         />
 
-        {fullyLoaded && taxIdConfigurable && (
+        {fullyLoaded && (
           <div className="flex items-center space-x-2">
             <Checkbox_Shadcn_
               id="business"
@@ -271,7 +268,7 @@ const NewPaymentMethodElement = forwardRef(
           onReady={() => setFullyLoaded(true)}
         />
 
-        {purchasingAsBusiness && taxIdConfigurable && availableTaxIds.length > 0 && (
+        {purchasingAsBusiness && availableTaxIds.length > 0 && (
           <Form {...form}>
             <div className="grid grid-cols-2 gap-x-2 w-full">
               <FormField

@@ -44,7 +44,7 @@ import {
   type PaymentMethodElementRef,
 } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
 import { components } from 'api-types'
-import type { CustomerAddress } from 'data/organizations/types'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -250,9 +250,9 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
   async function createOrg(
     paymentMethodId?: string,
     customerData?: {
-      address: components['schemas']['CreateOrganizationBody']['address']
+      address: CustomerAddress
       billing_name: string
-      tax_id: components['schemas']['CreateOrganizationBody']['tax_id'] | null
+      tax_id: CustomerTaxId | null
     }
   ) {
     const dbTier = formState.plan === 'PRO' && !formState.spend_cap ? 'PAYG' : formState.plan
@@ -557,7 +557,6 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
                   ref={paymentRef}
                   email={user.profile?.primary_email}
                   readOnly={newOrgLoading || paymentConfirmationLoading}
-                  taxIdConfigurable={true}
                 />
               </Panel.Content>
             </Elements>

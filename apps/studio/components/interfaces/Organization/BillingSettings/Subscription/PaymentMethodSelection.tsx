@@ -268,7 +268,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               ref={paymentRef}
               email={selectedOrganization?.billing_email ?? undefined}
               readOnly={readOnly}
-              taxIdConfigurable={true}
               customerName={customerProfile?.billing_name}
               currentAddress={customerProfile?.address}
               currentTaxId={taxId}
