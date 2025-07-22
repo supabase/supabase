@@ -59,6 +59,7 @@ type InsertPayload = {
   schema: string
   record: TableRecord<T>
   old_record: null
+  user_id: string | null
 }
 type UpdatePayload = {
   type: 'UPDATE'
@@ -66,6 +67,7 @@ type UpdatePayload = {
   schema: string
   record: TableRecord<T>
   old_record: TableRecord<T>
+  user_id: string | null
 }
 type DeletePayload = {
   type: 'DELETE'
@@ -73,6 +75,7 @@ type DeletePayload = {
   schema: string
   record: null
   old_record: TableRecord<T>
+  user_id: string | null
 }
 ```
 
