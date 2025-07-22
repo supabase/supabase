@@ -59,60 +59,22 @@ const PipelineStatus = ({
     )
   }
 
-  const isLogLoadingState = (failedStatus: FailedStatus): boolean => {
-    // Right now we hardcode the error message which is returned when k8s is not able to find logs, which seems
-    // to be a transient error. In case we find a way to properly handle this in the backend, this hack will not
-    // be needed anymore.
+
+  const renderFailedStatus = () => {
     return (
-      failedStatus.message?.startsWith('unable to retrieve container logs for containerd://') ===
-      true
-    )
-  }
-
-  const renderFailedStatus = (failedStatus: FailedStatus) => {
-    const isLoadingLogs = isLogLoadingState(failedStatus)
-    const { ref: projectRef } = useParams()
-
-    const handleNavigateToLogs = () => {
-      if (projectRef) {
-        const logsUrl = `/project/${projectRef}/logs/postgres-logs`
-        window.open(logsUrl, '_blank')
-      }
-    }
-
-    return (
-      <div className="flex items-center gap-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 text-sm text-destructive">
-                {isLoadingLogs ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                ) : (
-                  <AlertTriangle className="w-3 h-3" />
-                )}
-                <span>Failed</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                {isLoadingLogs
-                  ? 'Pipeline failed - logs are being retrieved from container'
-                  : 'Pipeline has failed - check the logs section for detailed error information'}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <Button
-          type="outline"
-          size="tiny"
-          icon={<ExternalLink className="w-3 h-3" />}
-          onClick={handleNavigateToLogs}
-          className="h-auto py-1 px-2 text-xs"
-        >
-          View Logs
-        </Button>
-      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center gap-2 text-sm text-destructive">
+              <AlertTriangle className="w-3 h-3" />
+              <span>Failed</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Pipeline has failed - check the logs section for detailed error information</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     )
   }
   // Map backend statuses to UX-friendly display
@@ -200,7 +162,7 @@ const PipelineStatus = ({
       {isSuccess && (
         <>
           {statusConfig.isFailedStatus ? (
-            <div className="relative">{renderFailedStatus(pipelineStatus as FailedStatus)}</div>
+            <div className="relative">{renderFailedStatus()}</div>
           ) : (
             <TooltipProvider>
               <Tooltip>

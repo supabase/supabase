@@ -7385,6 +7385,8 @@ export interface components {
               /** @enum {string} */
               name: 'error'
             }
+        /** @description Table id (internal Postgres OID) */
+        table_id: number
         /** @description Table name */
         table_name: string
       }[]

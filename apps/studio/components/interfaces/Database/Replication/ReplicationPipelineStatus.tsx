@@ -24,10 +24,12 @@ import {
   AlertTriangle,
   Activity,
 } from 'lucide-react'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
 type TableState = {
+  table_id: number
   table_name: string
   state: 
     | { name: 'queued' }
@@ -161,6 +163,50 @@ const ReplicationPipelineStatus = ({
 
   const errorTables = tableStatuses.filter((table: TableState) => table.state.name === 'error')
   const hasErrors = errorTables.length > 0
+  const isPipelineRunning = pipelineStatusData?.status?.name === 'started'
+  const isPipelineNotRunning = !isPipelineRunning // Any state other than 'started' is not running
+  
+  
+  const getPipelineStateWarning = () => {
+    if (!pipelineStatusData?.status) return null
+    
+    const status = pipelineStatusData.status
+    switch (status.name) {
+      case 'starting':
+        return {
+          type: 'warning' as const,
+          title: 'Pipeline Starting',
+          message: 'The replication pipeline is initializing. Table status will be available once started.',
+          color: 'warning'
+        }
+      case 'stopped':
+        return {
+          type: 'info' as const,
+          title: 'Pipeline Stopped',
+          message: 'Replication is currently paused. Enable the pipeline to resume data synchronization.',
+          color: 'muted'
+        }
+      case 'unknown':
+        return {
+          type: 'warning' as const,
+          title: 'Pipeline Status Unknown',
+          message: 'Unable to determine pipeline status. Check the logs for more information.',
+          color: 'warning'
+        }
+      default:
+        if (status.name !== 'started' && status.name !== 'failed') {
+          return {
+            type: 'warning' as const,
+            title: 'Pipeline Not Running',
+            message: 'The replication pipeline is not in a running state. Table status may be limited.',
+            color: 'warning'
+          }
+        }
+        return null
+    }
+  }
+  
+  const pipelineWarning = getPipelineStateWarning()
 
   if (isPipelineError) {
     return (
@@ -233,6 +279,39 @@ const ReplicationPipelineStatus = ({
       )}
 
 
+      {/* Pipeline state warning */}
+      {pipelineWarning && (
+        <div className={`p-4 border rounded-lg ${
+          pipelineWarning.color === 'warning' 
+            ? 'border-warning-300 bg-warning-100' 
+            : 'border-border-muted bg-surface-100'
+        }`}>
+          <div className="flex items-start gap-3">
+            <AlertTriangle className={`w-5 h-5 mt-0.5 shrink-0 ${
+              pipelineWarning.color === 'warning' 
+                ? 'text-warning-600' 
+                : 'text-foreground-light'
+            }`} />
+            <div className="flex-1 min-w-0">
+              <h4 className={`font-medium mb-1 ${
+                pipelineWarning.color === 'warning' 
+                  ? 'text-warning-900' 
+                  : 'text-foreground'
+              }`}>
+                {pipelineWarning.title}
+              </h4>
+              <p className={`text-sm ${
+                pipelineWarning.color === 'warning' 
+                  ? 'text-warning-700' 
+                  : 'text-foreground-light'
+              }`}>
+                {pipelineWarning.message}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Error alert */}
       {hasErrors && (
         <div className="p-4 border border-destructive-300 bg-destructive-100 rounded-lg">
@@ -259,8 +338,91 @@ const ReplicationPipelineStatus = ({
         </div>
       )}
 
-      {/* Tables list */}
-      {!isStatusLoading && tableStatuses.length > 0 && (
+      {/* Pipeline not running state - generic disabled state */}
+      {isPipelineNotRunning && tableStatuses.length > 0 && (
+        <div className="space-y-4">
+          <div className="p-6 border border-border-muted bg-surface-50 rounded-lg">
+            <div className="text-center space-y-3">
+              <div className="w-12 h-12 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
+                <Activity className="w-6 h-6 text-foreground-lighter" />
+              </div>
+              <div className="space-y-2">
+                <h4 className="text-base font-medium text-foreground-light">
+                  {pipelineStatusData?.status?.name === 'failed' ? 'Pipeline Failed' :
+                   pipelineStatusData?.status?.name === 'stopped' ? 'Pipeline Stopped' :
+                   pipelineStatusData?.status?.name === 'starting' ? 'Pipeline Starting' :
+                   'Pipeline Not Running'}
+                </h4>
+                <p className="text-sm text-foreground-light max-w-md mx-auto">
+                  {pipelineStatusData?.status?.name === 'failed' ? 'Replication has failed. Check the logs for details. Table status is disabled.' :
+                   pipelineStatusData?.status?.name === 'stopped' ? 'Replication is paused. Enable the pipeline to resume data synchronization.' :
+                   pipelineStatusData?.status?.name === 'starting' ? 'Pipeline is initializing. Table status will be available once started.' :
+                   'Pipeline is not actively running. Table status information is disabled.'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="w-full overflow-hidden overflow-x-auto">
+            <Table
+              head={[
+                <Table.th key="table">Table</Table.th>,
+                <Table.th key="status">Status</Table.th>,
+                <Table.th key="details">Details</Table.th>,
+                <Table.th key="actions" className="w-16 text-center">Actions</Table.th>,
+              ]}
+              body={filteredTableStatuses.map((table: TableState, index: number) => {
+                return (
+                  <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
+                    <Table.td>
+                      <Link 
+                        href={`/project/${projectRef}/editor/${table.table_id}`}
+                        className="font-mono text-sm font-medium text-foreground-lighter hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
+                      >
+                        {table.table_name}
+                      </Link>
+                    </Table.td>
+                    <Table.td>
+                      <Badge variant="secondary" className="text-foreground-lighter bg-surface-100 border-border-muted">
+                        {pipelineStatusData?.status?.name === 'failed' ? 'Failed' :
+                         pipelineStatusData?.status?.name === 'stopped' ? 'Stopped' :
+                         pipelineStatusData?.status?.name === 'starting' ? 'Starting' :
+                         'Disabled'}
+                      </Badge>
+                    </Table.td>
+                    <Table.td>
+                      <div className="text-sm text-foreground-lighter">
+                        Status unavailable while pipeline is {pipelineStatusData?.status?.name || 'not running'}
+                      </div>
+                    </Table.td>
+                    <Table.td className="text-center">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="text"
+                              size="tiny"
+                              icon={<Copy className="w-3 h-3" />}
+                              disabled={true}
+                              className="h-auto p-2 opacity-40 cursor-not-allowed"
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Copy unavailable while pipeline is not running</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Table.td>
+                  </Table.tr>
+                )
+              })}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Tables list - active/running pipeline */}
+      {isPipelineRunning && !isStatusLoading && tableStatuses.length > 0 && (
         <div className="w-full overflow-hidden overflow-x-auto">
           <Table
             head={[
@@ -274,9 +436,12 @@ const ReplicationPipelineStatus = ({
               return (
                 <Table.tr key={`${table.table_name}-${index}`} className="border-t hover:bg-surface-100">
                   <Table.td>
-                    <div className="font-mono text-sm font-medium text-foreground">
+                    <Link 
+                      href={`/project/${projectRef}/editor/${table.table_id}`}
+                      className="font-mono text-sm font-medium text-foreground hover:text-foreground-light transition-colors cursor-pointer underline underline-offset-2"
+                    >
                       {table.table_name}
-                    </div>
+                    </Link>
                   </Table.td>
                   <Table.td>
                     {statusConfig.badge}
@@ -318,15 +483,23 @@ const ReplicationPipelineStatus = ({
         </div>
       )}
 
-      {/* No results */}
-      {!isStatusLoading && filteredTableStatuses.length === 0 && tableStatuses.length > 0 && (
+
+      {/* No results - running pipeline */}
+      {isPipelineRunning && !isStatusLoading && filteredTableStatuses.length === 0 && tableStatuses.length > 0 && (
+        <div className="text-center py-8 text-foreground-light">
+          <p>No tables match "{filterString}"</p>
+        </div>
+      )}
+      
+      {/* No results - not running pipeline */}
+      {isPipelineNotRunning && !isStatusLoading && filteredTableStatuses.length === 0 && tableStatuses.length > 0 && (
         <div className="text-center py-8 text-foreground-light">
           <p>No tables match "{filterString}"</p>
         </div>
       )}
 
-      {/* Empty state */}
-      {!isStatusLoading && tableStatuses.length === 0 && (
+      {/* Empty state - running pipeline */}
+      {isPipelineRunning && !isStatusLoading && tableStatuses.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-full max-w-sm mx-auto text-center space-y-4">
             <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
@@ -342,6 +515,24 @@ const ReplicationPipelineStatus = ({
             <p className="text-xs text-foreground-lighter">
               Data refreshes automatically every 2 seconds
             </p>
+          </div>
+        </div>
+      )}
+      
+      {/* Empty state - not running pipeline */}
+      {isPipelineNotRunning && !isStatusLoading && tableStatuses.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="w-full max-w-sm mx-auto text-center space-y-4">
+            <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
+              <Activity className="w-8 h-8 text-foreground-lighter" />
+            </div>
+            <div className="space-y-2">
+              <h4 className="text-lg font-semibold text-foreground-light">Pipeline Not Running</h4>
+              <p className="text-sm text-foreground-light leading-relaxed">
+                The replication pipeline is currently {pipelineStatusData?.status?.name || 'not active'}. 
+                Table status information is not available while the pipeline is in this state.
+              </p>
+            </div>
           </div>
         </div>
       )}
