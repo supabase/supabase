@@ -9,10 +9,12 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 type SuggestionsType = {
   title: string
-  prompts?: string[]
+  prompts?: { label: string; description: string }[]
 }
 
-type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+export type AssistantMessageType = MessageType & { results?: { [id: string]: any[] } }
+
+export type SqlSnippet = string | { label: string; content: string }
 
 type ChatSession = {
   id: string
@@ -25,7 +27,7 @@ type ChatSession = {
 type AiAssistantData = {
   open: boolean
   initialInput: string
-  sqlSnippets?: string[]
+  sqlSnippets?: SqlSnippet[]
   suggestions?: SuggestionsType
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
@@ -286,6 +288,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       if (chat) {
         chat.messages = []
         chat.updatedAt = new Date()
+        state.suggestions = undefined
         state.sqlSnippets = []
         state.initialInput = ''
       }
@@ -334,7 +337,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
-    setSqlSnippets: (snippets: string[]) => {
+    setSqlSnippets: (snippets: SqlSnippet[]) => {
       state.sqlSnippets = snippets
     },
 
@@ -405,7 +408,7 @@ export type AiAssistantState = AiAssistantData & {
   clearMessages: () => void
   saveMessage: (message: MessageType | MessageType[]) => void
   updateMessage: (args: { id: string; resultId?: string; results: any[] }) => void
-  setSqlSnippets: (snippets: string[]) => void
+  setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
   getCachedSQLResults: (args: { messageId: string; snippetId?: string }) => any[] | undefined
   loadPersistedState: (persistedState: StoredAiAssistantState) => void

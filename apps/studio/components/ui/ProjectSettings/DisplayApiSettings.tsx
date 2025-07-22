@@ -10,6 +10,7 @@ import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
+import Link from 'next/link'
 import { Input } from 'ui'
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
 import { ToggleLegacyApiKeysPanel } from './ToggleLegacyApiKeys'
@@ -48,6 +49,7 @@ export const DisplayApiSettings = ({
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
+
   const apiKeys = useMemo(() => settings?.service_api_keys ?? [], [settings])
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
@@ -165,11 +167,41 @@ export const DisplayApiSettings = ({
                 }
                 onChange={() => {}}
                 descriptionText={
-                  x.tags === 'service_role'
-                    ? 'This key has the ability to bypass Row Level Security. Never share it publicly. If leaked, generate a new JWT secret immediately. ' +
-                      (showLegacyText ? 'Prefer using Publishable API keys instead.' : '')
-                    : 'This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies. ' +
-                      (showLegacyText ? 'Prefer using Secret API keys instead.' : '')
+                  x.tags === 'service_role' ? (
+                    <>
+                      This key has the ability to bypass Row Level Security. Never share it
+                      publicly. If leaked, generate a new JWT secret immediately.{' '}
+                      {showLegacyText && (
+                        <span>
+                          Prefer using{' '}
+                          <Link
+                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            className="text-link underline"
+                          >
+                            Secret API keys
+                          </Link>{' '}
+                          instead.
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      This key is safe to use in a browser if you have enabled Row Level Security
+                      for your tables and configured policies.{' '}
+                      {showLegacyText && (
+                        <span>
+                          Prefer using{' '}
+                          <Link
+                            href={`/project/${projectRef}/settings/api-keys/new`}
+                            className="text-link underline"
+                          >
+                            Publishable API keys
+                          </Link>{' '}
+                          instead.
+                        </span>
+                      )}
+                    </>
+                  )
                 }
               />
 

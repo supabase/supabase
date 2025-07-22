@@ -12,7 +12,7 @@ export const INVOCATION_TABS: InvocationTab[] = [
     label: 'cURL',
     language: 'bash',
     code: (functionUrl, _, apiKey) => `curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${apiKey}' \\
+  -H 'Authorization: Bearer ${apiKey}' \\ ${apiKey.includes('publishable') ? `\n  -H 'apikey: ${apiKey}' \\` : ''}
   -H 'Content-Type: application/json' \\
   --data '{"name":"Functions"}'`,
   },

@@ -1,8 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { Check, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
-import tweets from 'shared-data/tweets'
 import { toast } from 'sonner'
 
 import {
@@ -11,7 +9,6 @@ import {
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { organizationKeys } from 'data/organizations/keys'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
 import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
@@ -34,12 +31,6 @@ import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billin
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
-
-const getRandomTweet = () => {
-  const filteredTweets = tweets.filter((it) => it.text.length < 180)
-  const randomIndex = Math.floor(Math.random() * filteredTweets.length)
-  return filteredTweets[randomIndex]
-}
 
 const PLAN_HEADINGS = {
   tier_pro:
@@ -103,8 +94,6 @@ export const SubscriptionPlanUpdateDialog = ({
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
-  const testimonialTweet = useMemo(() => getRandomTweet(), [])
-
   const changeType = useMemo(() => {
     return getPlanChangeType(subscription?.plan?.id, planMeta?.id)
   }, [planMeta, subscription])
@@ -115,6 +104,7 @@ export const SubscriptionPlanUpdateDialog = ({
   )
 
   const onSuccessfulPlanChange = () => {
+    setPaymentConfirmationLoading(false)
     toast.success(
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )
@@ -133,6 +123,7 @@ export const SubscriptionPlanUpdateDialog = ({
         onSuccessfulPlanChange()
       },
       onError: (error) => {
+        setPaymentConfirmationLoading(false)
         toast.error(`Unable to update subscription: ${error.message}`)
       },
     }
@@ -168,9 +159,13 @@ export const SubscriptionPlanUpdateDialog = ({
     if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
 
+    setPaymentConfirmationLoading(true)
+
     const paymentMethod = await paymentMethodSelection.current?.createPaymentMethod()
     if (paymentMethod) {
       setSelectedPaymentMethod(paymentMethod.id)
+    } else {
+      setPaymentConfirmationLoading(false)
     }
 
     if (
@@ -336,8 +331,8 @@ export const SubscriptionPlanUpdateDialog = ({
                           <div className="w-[520px] p-6">
                             <h3 className="text-base font-medium mb-2">Your new monthly invoice</h3>
                             <p className="prose text-xs mb-2">
-                              Each paid project runs on a dedicated 24/7 server. First project uses
-                              Compute Credits; additional ones cost <span translate="no">$10+</span>
+                              Paid projects run 24/7 without pausing. First project uses Compute
+                              Credits; additional projects start at <span translate="no">$10</span>
                               /month regardless of usage.{' '}
                               <Link
                                 href={'/docs/guides/platform/manage-your-usage/compute'}
@@ -555,9 +550,7 @@ export const SubscriptionPlanUpdateDialog = ({
                     ref={paymentMethodSelection}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
-                    createPaymentMethodInline={
-                      subscriptionPreview.pending_subscription_flow === true
-                    }
+                    createPaymentMethodInline={true}
                     readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                   />
                 </div>
@@ -595,6 +588,31 @@ export const SubscriptionPlanUpdateDialog = ({
                     <Admonition title="Empty organization" type="warning">
                       This organization has no active projects. Did you select the correct
                       organization?
+                    </Admonition>
+                  </div>
+                )}
+
+              {projects.filter(
+                (it) =>
+                  it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+                  it.status === PROJECT_STATUS.COMING_UP
+              ).length === 1 &&
+                subscriptionPlanMeta?.planId === 'pro' &&
+                changeType === 'upgrade' && (
+                  <div className="pb-2">
+                    <Admonition type="note">
+                      <div className="text-sm prose">
+                        Paid projects run 24/7 without pausing. First project uses Compute Credits;
+                        additional projects cost <span translate="no">$10+</span>
+                        /month regardless of usage.{' '}
+                      </div>
+                      <Link
+                        href={'/docs/guides/platform/manage-your-usage/compute'}
+                        target="_blank"
+                        className="underline"
+                      >
+                        Learn more
+                      </Link>
                     </Admonition>
                   </div>
                 )}
@@ -667,14 +685,6 @@ export const SubscriptionPlanUpdateDialog = ({
                     </div>
                   </div>
                 )}
-            {changeType !== 'downgrade' && (
-              <div className="border-t pt-6">
-                <blockquote className="text-sm text-foreground-light italic">
-                  {testimonialTweet.text}
-                  <div className="mt-2 text-foreground">— @{testimonialTweet.handle}</div>
-                </blockquote>
-              </div>
-            )}
           </div>
         </div>
 

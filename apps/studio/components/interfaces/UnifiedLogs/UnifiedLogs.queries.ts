@@ -35,7 +35,11 @@ const buildQueryConditions = (search: QuerySearchParamsType) => {
 
     // Handle scalar values
     if (value !== null && value !== undefined) {
-      whereConditions.push(`${key} = '${value}'`)
+      if (['host', 'pathname'].includes(key)) {
+        whereConditions.push(`${key} LIKE '%${value}%'`)
+      } else {
+        whereConditions.push(`${key} = '${value}'`)
+      }
     }
   })
 
@@ -234,25 +238,19 @@ const getEdgeLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
-      edge_logs_request.host as host,
+      edge_logs_request.path as pathname,
       null as event_message,
       edge_logs_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    left join unnest(edge_logs_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
 
     -- ONLY include logs where the path does not include /rest/
     WHERE edge_logs_request.path NOT LIKE '%/rest/%'
+    AND edge_logs_request.path NOT LIKE '%/storage/%'
     
   `
 }
@@ -273,22 +271,15 @@ const getPostgrestLogsQuery = () => {
           WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      edge_logs_request.path as path,
-      edge_logs_request.host as host,
+      edge_logs_request.path as pathname,
       null as event_message,
       edge_logs_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
-    left join unnest(edge_logs_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
 
     -- ONLY include logs where the path includes /rest/
     WHERE edge_logs_request.path LIKE '%/rest/%'
@@ -304,19 +295,17 @@ const getPostgresLogsQuery = () => {
       id,
       pgl.timestamp as timestamp,
       'postgres' as log_type,
-      pgl_parsed.sql_state_code as status,
+      CAST(pgl_parsed.sql_state_code AS STRING) as status,
       CASE
           WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
           ELSE null
       END as level,
-      null as path,
-      null as host,
+      null as pathname,
       event_message as event_message,
       null as method,
-      'api_role' as api_role,
-      null as auth_user,
       null as log_count,
       null as logs
     from postgres_logs as pgl
@@ -341,22 +330,15 @@ const getEdgeFunctionLogsQuery = () => {
           WHEN fel_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      fel_request.url as path,
-      fel_request.host as host,
+      fel_request.pathname as pathname,
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       function_logs_agg.function_log_count as log_count,
       function_logs_agg.logs as logs
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
     cross join unnest(fel_metadata.request) as fel_request
-    left join unnest(fel_request.sb) as sb
-    left join unnest(sb.jwt) as jwt
-    left join unnest(jwt.authorization) as auth
-    left join unnest(auth.payload) as authorization_payload
     left join (
     SELECT
         fl_metadata.execution_id,
@@ -387,12 +369,9 @@ const getAuthLogsQuery = () => {
           WHEN el_in_al_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      el_in_al_request.path as path,
-      el_in_al_request.host as host,
+      el_in_al_request.path as pathname,
       null as event_message,
       el_in_al_request.method as method,
-      authorization_payload.role as api_role,
-      COALESCE(sb.auth_user, null) as auth_user,
       null as log_count,
       null as logs
     from auth_logs as al
@@ -403,10 +382,6 @@ const getAuthLogsQuery = () => {
         cross join unnest (el_in_al_metadata.response) as el_in_al_response 
         cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
         cross join unnest (el_in_al_metadata.request) as el_in_al_request
-        left join unnest(el_in_al_request.sb) as sb
-        left join unnest(sb.jwt) as jwt
-        left join unnest(jwt.authorization) as auth
-        left join unnest(auth.payload) as authorization_payload
     )
     on al_metadata.request_id = el_in_al_response_headers.cf_ray
     WHERE al_metadata.request_id is not null
@@ -414,41 +389,41 @@ const getAuthLogsQuery = () => {
 }
 
 /**
- * Supavisor logs query fragment
+ * Supabase storage logs query fragment
  */
-const getSupavisorLogsQuery = () => {
+const getSupabaseStorageLogsQuery = () => {
   return `
     select 
-      id, 
-      svl.timestamp as timestamp, 
-      'supavisor' as log_type,
-      'undefined' as status,
+      id,
+      el.timestamp as timestamp,
+      'storage' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
       CASE
-          WHEN LOWER(svl_metadata.level) = 'error' THEN 'error'
-          WHEN LOWER(svl_metadata.level) = 'warn' OR LOWER(svl_metadata.level) = 'warning' THEN 'warning'
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
           ELSE 'success'
       END as level,
-      null as path,
-      null as host,
+      edge_logs_request.path as pathname,
       null as event_message,
-      null as method,
-      'api_role' as api_role,
-      null as auth_user,
+      edge_logs_request.method as method,
       null as log_count,
       null as logs
-    from supavisor_logs as svl
-    cross join unnest(metadata) as svl_metadata
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    -- ONLY include logs where the path includes /storage/
+    WHERE edge_logs_request.path LIKE '%/storage/%'
   `
 }
 
 /**
  * Combine all log sources to create the unified logs CTE
  */
-const getUnifiedLogsCTE = () => {
+export const getUnifiedLogsCTE = () => {
   return `
 WITH unified_logs AS (
-    ${getEdgeLogsQuery()}
-    union all
     ${getPostgrestLogsQuery()}
     union all
     ${getPostgresLogsQuery()}
@@ -457,7 +432,7 @@ WITH unified_logs AS (
     union all
     ${getAuthLogsQuery()}
     union all
-    ${getSupavisorLogsQuery()}
+    ${getSupabaseStorageLogsQuery()}
 )
   `
 }
@@ -478,12 +453,9 @@ SELECT
     log_type,
     status,
     level,
-    path,
-    host,
+    pathname,
     event_message,
     method,
-    api_role,
-    auth_user,
     log_count,
     logs
 FROM unified_logs
@@ -495,15 +467,207 @@ ${finalWhere}
 
 /**
  * Get a count query for the total logs within the timeframe
- * Also returns facets for all filter dimensions
+ * Uses proper faceted search behavior where facets show "what would I get if I selected ONLY this option"
  */
+
+// Helper function to build WHERE clause excluding a specific field
+const buildFacetWhere = (search: QuerySearchParamsType, excludeField: string): string => {
+  const conditions: string[] = []
+
+  Object.entries(search).forEach(([key, value]) => {
+    if (key === excludeField) return // Skip the field we're getting facets for
+    if (EXCLUDED_QUERY_PARAMS.includes(key as any)) return // Skip pagination and special params
+
+    // Handle array filters (IN clause)
+    if (Array.isArray(value) && value.length > 0) {
+      conditions.push(`${key} IN (${value.map((v) => `'${v}'`).join(',')})`)
+      return
+    }
+
+    // Handle scalar values
+    if (value !== null && value !== undefined) {
+      if (['host', 'pathname'].includes(key)) {
+        conditions.push(`${key} LIKE '%${value}%'`)
+      } else {
+        conditions.push(`${key} = '${value}'`)
+      }
+    }
+  })
+
+  return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+}
+
+export const getFacetCountCTE = ({
+  search,
+  facet,
+  facetSearch,
+}: {
+  search: QuerySearchParamsType
+  facet: string
+  facetSearch?: string
+}) => {
+  const MAX_FACETS_QUANTITY = 20
+
+  return `
+${facet}_count AS (
+  SELECT '${facet}' as dimension, ${facet} as value, COUNT(*) as count
+  FROM unified_logs
+  ${buildFacetWhere(search, `${facet}`) || `WHERE ${facet} IS NOT NULL`}
+  ${buildFacetWhere(search, `${facet}`) ? ` AND ${facet} IS NOT NULL` : ''}
+  ${!!facetSearch ? `AND ${facet} LIKE '%${facetSearch}%'` : ''}
+  GROUP BY ${facet}
+  LIMIT ${MAX_FACETS_QUANTITY}
+)
+`.trim()
+}
+
+export const getUnifiedLogsCountCTE = () => {
+  return `
+WITH unified_logs AS (
+    -- Edge logs (non-rest, non-storage)
+    select 
+      id,
+      'edge' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
+      CASE
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      edge_logs_request.path as pathname,
+      edge_logs_request.method as method
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    WHERE edge_logs_request.path NOT LIKE '%/rest/%'
+    AND edge_logs_request.path NOT LIKE '%/storage/%'
+    
+    union all
+    
+    -- Postgrest logs
+    select 
+      id,
+      'postgrest' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
+      CASE
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      edge_logs_request.path as pathname,
+      edge_logs_request.method as method
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    WHERE edge_logs_request.path LIKE '%/rest/%'
+    
+    union all
+    
+    -- Postgres logs
+    select 
+      id,
+      'postgres' as log_type,
+      CAST(pgl_parsed.sql_state_code AS STRING) as status,
+      CASE
+          WHEN pgl_parsed.error_severity = 'LOG' THEN 'success'
+          WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
+          WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
+          WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+          ELSE null
+      END as level,
+      null as pathname,
+      null as method
+    from postgres_logs as pgl
+    cross join unnest(pgl.metadata) as pgl_metadata
+    cross join unnest(pgl_metadata.parsed) as pgl_parsed
+    
+    union all
+    
+    -- Edge function logs
+    select 
+      id,
+      'edge function' as log_type,
+      CAST(fel_response.status_code AS STRING) as status,
+      CASE
+          WHEN fel_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN fel_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN fel_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      fel_request.pathname as pathname,
+      fel_request.method as method
+    from function_edge_logs as fel
+    cross join unnest(metadata) as fel_metadata
+    cross join unnest(fel_metadata.response) as fel_response
+    cross join unnest(fel_metadata.request) as fel_request
+    
+    union all
+    
+    -- Auth logs
+    select
+      al.id as id,
+      'auth' as log_type,
+      CAST(el_in_al_response.status_code AS STRING) as status,
+      CASE
+          WHEN el_in_al_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN el_in_al_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN el_in_al_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      el_in_al_request.path as pathname,
+      el_in_al_request.method as method
+    from auth_logs as al
+    cross join unnest(metadata) as al_metadata 
+    left join (
+    edge_logs as el_in_al
+        cross join unnest (metadata) as el_in_al_metadata 
+        cross join unnest (el_in_al_metadata.response) as el_in_al_response 
+        cross join unnest (el_in_al_response.headers) as el_in_al_response_headers 
+        cross join unnest (el_in_al_metadata.request) as el_in_al_request
+    )
+    on al_metadata.request_id = el_in_al_response_headers.cf_ray
+    WHERE al_metadata.request_id is not null
+    
+    union all
+    
+    -- Storage logs
+    select 
+      id,
+      'storage' as log_type,
+      CAST(edge_logs_response.status_code AS STRING) as status,
+      CASE
+          WHEN edge_logs_response.status_code BETWEEN 200 AND 299 THEN 'success'
+          WHEN edge_logs_response.status_code BETWEEN 400 AND 499 THEN 'warning'
+          WHEN edge_logs_response.status_code >= 500 THEN 'error'
+          ELSE 'success'
+      END as level,
+      edge_logs_request.path as pathname,
+      edge_logs_request.method as method
+    from edge_logs as el
+    cross join unnest(metadata) as edge_logs_metadata
+    cross join unnest(edge_logs_metadata.request) as edge_logs_request
+    cross join unnest(edge_logs_metadata.response) as edge_logs_response
+    WHERE edge_logs_request.path LIKE '%/storage/%'
+)
+  `
+}
+
 export const getLogsCountQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
 
   // Create a count query using the same unified logs CTE
   const sql = `
-${getUnifiedLogsCTE()}
+${getUnifiedLogsCountCTE()},
+${getFacetCountCTE({ search, facet: 'log_type' })},
+${getFacetCountCTE({ search, facet: 'method' })},
+${getFacetCountCTE({ search, facet: 'level' })},
+${getFacetCountCTE({ search, facet: 'status' })},
+${getFacetCountCTE({ search, facet: 'pathname' })}
+
 -- Get total count
 SELECT 'total' as dimension, 'all' as value, COUNT(*) as count
 FROM unified_logs
@@ -511,28 +675,29 @@ ${finalWhere}
 
 UNION ALL
 
--- Get counts by level
-SELECT 'level' as dimension, level as value, COUNT(*) as count
-FROM unified_logs
-${finalWhere}
-GROUP BY level
+-- Get counts by log_type (exclude log_type filter to avoid self-filtering)
+SELECT dimension, value, count from log_type_count
 
 UNION ALL
 
--- Get counts by log_type
-SELECT 'log_type' as dimension, log_type as value, COUNT(*) as count
-FROM unified_logs
-${finalWhere}
-GROUP BY log_type
+-- Get counts by method (exclude method filter to avoid self-filtering)  
+SELECT dimension, value, count from method_count
 
 UNION ALL
 
--- Get counts by method
-SELECT 'method' as dimension, method as value, COUNT(*) as count
-FROM unified_logs
-${finalWhere}
-WHERE method IS NOT NULL
-GROUP BY method
+-- Get counts by level (exclude level filter to avoid self-filtering)
+SELECT dimension, value, count from level_count
+
+UNION ALL
+
+-- Get counts by status (exclude status filter to avoid self-filtering)
+SELECT dimension, value, count from status_count
+
+UNION ALL
+
+-- Get counts by pathname (exclude pathname filter to avoid self-filtering)
+SELECT dimension, value, count from pathname_count
+
 `
 
   return sql

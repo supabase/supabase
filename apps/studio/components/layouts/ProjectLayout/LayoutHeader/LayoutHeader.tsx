@@ -3,12 +3,12 @@ import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
 import { useParams } from 'common'
+import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Connect } from 'components/interfaces/Connect/Connect'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
 import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
 import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
-import { EnableBranchingButton } from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
 import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
 import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
@@ -24,6 +24,7 @@ import { FeedbackDropdown } from './FeedbackDropdown'
 import { HelpPopover } from './HelpPopover'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
+import MergeRequestButton from './MergeRequestButton'
 import { NotificationsPopoverV2 } from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
@@ -61,7 +62,7 @@ const LayoutHeader = ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const { setMobileMenuOpen } = useAppStateSnapshot()
-  const isBranchingEnabled = selectedProject?.is_branch_enabled === true
+  const gitlessBranching = useIsBranching2Enabled()
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(
@@ -135,10 +136,10 @@ const LayoutHeader = ({
                     </div>
                   )}
 
-                  {selectedProject && isBranchingEnabled && (
+                  {selectedProject && (
                     <>
                       <LayoutHeaderDivider />
-                      <BranchDropdown />
+                      {IS_PLATFORM && <BranchDropdown />}
                     </>
                   )}
                 </motion.div>
@@ -167,7 +168,7 @@ const LayoutHeader = ({
           <AnimatePresence>
             {projectRef && (
               <motion.div
-                className="ml-3 items-center gap-x-3 flex"
+                className="ml-3 items-center gap-x-2 flex"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -176,8 +177,8 @@ const LayoutHeader = ({
                   ease: 'easeOut',
                 }}
               >
-                {<Connect />}
-                {!isBranchingEnabled && IS_PLATFORM && <EnableBranchingButton />}
+                {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
+                <Connect />
               </motion.div>
             )}
           </AnimatePresence>

@@ -50,7 +50,7 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   }
 }
 
-interface FormattedWrapperTable {
+export interface FormattedWrapperTable {
   index: number
   columns: { name: string }[]
   is_new_schema: boolean
@@ -109,7 +109,7 @@ export const formatWrapperTables = (
   })
 }
 
-export const convertKVStringArrayToJson = (values: string[]) => {
+export const convertKVStringArrayToJson = (values: string[]): Record<string, string> => {
   return Object.fromEntries(values.map((value) => value.split('=')))
 }
 

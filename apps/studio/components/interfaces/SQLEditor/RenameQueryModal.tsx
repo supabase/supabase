@@ -68,9 +68,7 @@ const RenameQueryModal = ({
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        if ('sql' in content) {
-          titleSql({ sql: content.sql })
-        }
+        if ('sql' in content) titleSql({ sql: content.sql })
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }

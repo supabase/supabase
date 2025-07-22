@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertCircle, BarChart2, ChevronRight } from 'lucide-react'
+import { BarChart2 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
@@ -13,15 +13,11 @@ import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProjectByRef } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   Form,
   Input,
   WarningIcon,
@@ -125,7 +121,7 @@ const General = () => {
           <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex flex-col px-8 py-4">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm">Restart project</p>
                     <div className="max-w-[420px]">

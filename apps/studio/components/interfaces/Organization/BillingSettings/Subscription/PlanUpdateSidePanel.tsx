@@ -5,7 +5,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
+import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
@@ -23,12 +25,10 @@ import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Button, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
-import ExitSurveyModal from './ExitSurveyModal'
+import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
