@@ -2,22 +2,16 @@ import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { cn } from 'ui'
 import { ResponseError } from 'types'
-import { Loader2, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Loader2, AlertTriangle } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  Button,
 } from 'ui'
 import { useParams } from 'common'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-
-export enum PipelineStatusRequestStatus {
-  None = 'None',
-  EnableRequested = 'EnableRequested',
-  DisableRequested = 'DisableRequested',
-}
+import { PipelineStatusRequestStatus } from './PipelineRequestStatusContext'
 
 export enum PipelineStatusName {
   FAILED = 'failed',
@@ -36,7 +30,7 @@ interface PipelineStatusProps {
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
-  requestStatus: PipelineStatusRequestStatus
+  requestStatus?: PipelineStatusRequestStatus
 }
 
 const PipelineStatus = ({

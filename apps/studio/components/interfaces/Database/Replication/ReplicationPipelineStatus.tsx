@@ -4,7 +4,8 @@ import AlertError from 'components/ui/AlertError'
 import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import PipelineStatus, { PipelineStatusRequestStatus } from './PipelineStatus'
+import PipelineStatus, { PipelineStatusName } from './PipelineStatus'
+import { PipelineStatusRequestStatus, usePipelineRequestStatus } from './PipelineRequestStatusContext'
 import { useState } from 'react'
 import { 
   Button,
@@ -52,6 +53,8 @@ const ReplicationPipelineStatus = ({
 }: ReplicationPipelineStatusProps) => {
   const { ref: projectRef } = useParams()
   const [filterString, setFilterString] = useState<string>('')
+  const { getRequestStatus, setRequestStatus } = usePipelineRequestStatus()
+  const requestStatus = getRequestStatus(pipelineId)
 
   const {
     data: pipelineData,
@@ -89,6 +92,26 @@ const ReplicationPipelineStatus = ({
       refetchInterval: 2000 // Poll every 2 seconds
     }
   )
+
+  // Reset request status when backend status changes appropriately
+  const getStatusName = (
+    status: typeof pipelineStatusData.status | undefined
+  ): string | undefined => {
+    if (status && typeof status === 'object' && 'name' in status) {
+      return status.name
+    }
+    return undefined
+  }
+
+  const statusName = getStatusName(pipelineStatusData?.status)
+  if (
+    (requestStatus === PipelineStatusRequestStatus.EnableRequested &&
+      (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED)) ||
+    (requestStatus === PipelineStatusRequestStatus.DisableRequested &&
+      (statusName === PipelineStatusName.STOPPED || statusName === PipelineStatusName.FAILED))
+  ) {
+    setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
+  }
 
 
   const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
@@ -210,7 +233,7 @@ const ReplicationPipelineStatus = ({
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
-                requestStatus={PipelineStatusRequestStatus.None}
+                requestStatus={requestStatus}
               />
             </div>
             <p className="text-sm text-foreground-light">

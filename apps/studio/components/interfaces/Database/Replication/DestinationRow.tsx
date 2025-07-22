@@ -6,7 +6,8 @@ import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from
 import { Info } from 'lucide-react'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import RowMenu from './RowMenu'
-import PipelineStatus, { PipelineStatusRequestStatus, PipelineStatusName } from './PipelineStatus'
+import PipelineStatus, { PipelineStatusName } from './PipelineStatus'
+import { PipelineStatusRequestStatus, usePipelineRequestStatus } from './PipelineRequestStatusContext'
 import { useParams } from 'common'
 import {
   ReplicationPipelineStatusData,
@@ -66,9 +67,8 @@ const DestinationRow = ({
     },
     { refetchInterval: refreshFrequencyMs }
   )
-  const [requestStatus, setRequestStatus] = useState<PipelineStatusRequestStatus>(
-    PipelineStatusRequestStatus.None
-  )
+  const { getRequestStatus, setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
+  const requestStatus = pipeline?.id ? getRequestStatus(pipeline.id) : PipelineStatusRequestStatus.None
   const { mutateAsync: startPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const pipelineStatus = pipelineStatusData?.status
@@ -84,12 +84,13 @@ const DestinationRow = ({
 
   const statusName = getStatusName(pipelineStatus)
   if (
-    (requestStatus === PipelineStatusRequestStatus.EnableRequested &&
+    pipeline?.id &&
+    ((requestStatus === PipelineStatusRequestStatus.EnableRequested &&
       (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED)) ||
     (requestStatus === PipelineStatusRequestStatus.DisableRequested &&
-      (statusName === PipelineStatusName.STOPPED || statusName === PipelineStatusName.FAILED))
+      (statusName === PipelineStatusName.STOPPED || statusName === PipelineStatusName.FAILED)))
   ) {
-    setRequestStatus(PipelineStatusRequestStatus.None)
+    setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
   }
 
   const onEnableClick = async () => {
@@ -107,7 +108,7 @@ const DestinationRow = ({
     } catch (error) {
       toast.error('Failed to enable destination')
     }
-    setRequestStatus(PipelineStatusRequestStatus.EnableRequested)
+    setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
   }
   const onDisableClick = async () => {
     if (!projectRef) {
@@ -124,7 +125,7 @@ const DestinationRow = ({
     } catch (error) {
       toast.error('Failed to disable destination')
     }
-    setRequestStatus(PipelineStatusRequestStatus.DisableRequested)
+    setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
   }
   const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
 

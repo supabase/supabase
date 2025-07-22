@@ -1,6 +1,7 @@
 import ReplicationComingSoon from 'components/interfaces/Database/Replication/ComingSoon'
 import Destinations from 'components/interfaces/Database/Replication/Destinations'
 import ReplicationPipelineStatus from 'components/interfaces/Database/Replication/ReplicationPipelineStatus'
+import { PipelineRequestStatusProvider } from 'components/interfaces/Database/Replication/PipelineRequestStatusContext'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import {
@@ -30,22 +31,24 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
   return (
     <>
       {enablePgReplicate ? (
-        <ScaffoldContainer>
-          <ScaffoldSection>
-            <div className="col-span-12">
-              <FormHeader title="Replication" />
-              {selectedPipelineId === undefined ? (
-                <Destinations onSelectPipeline={handleSelectPipeline} />
-              ) : (
-                <ReplicationPipelineStatus
-                  pipelineId={selectedPipelineId}
-                  destinationName={selectedDestinationName}
-                  onSelectBack={handleSelectBack}
-                />
-              )}
-            </div>
-          </ScaffoldSection>
-        </ScaffoldContainer>
+        <PipelineRequestStatusProvider>
+          <ScaffoldContainer>
+            <ScaffoldSection>
+              <div className="col-span-12">
+                <FormHeader title="Replication" />
+                {selectedPipelineId === undefined ? (
+                  <Destinations onSelectPipeline={handleSelectPipeline} />
+                ) : (
+                  <ReplicationPipelineStatus
+                    pipelineId={selectedPipelineId}
+                    destinationName={selectedDestinationName}
+                    onSelectBack={handleSelectBack}
+                  />
+                )}
+              </div>
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        </PipelineRequestStatusProvider>
       ) : (
         <ScaffoldContainer>
           <ScaffoldSection>
