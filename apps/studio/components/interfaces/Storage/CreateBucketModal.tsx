@@ -15,6 +15,7 @@ import {
   convertFromBytes,
   convertToBytes,
 } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
@@ -144,8 +145,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
       onClose()
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
       toast.error(`Failed to create bucket: ${error.message}`)
     }
   }
@@ -229,20 +229,16 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                                 </p>
                               </div>
                             </div>
-                            {icebergCatalogEnabled ? null : (
+                            {!icebergCatalogEnabled && (
                               <div className="w-full flex gap-x-2 py-2 items-center">
                                 <WarningIcon />
-                                <span className="text-xs text-left">
-                                  This feature is currently in alpha and not yet enabled for your
-                                  project. Sign up{' '}
-                                  <a
-                                    className="underline"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    href="https://forms.supabase.com/analytics-buckets"
-                                  >
+                                <span className="text-xs text-left text-foreground-lighter">
+                                  This is currently in alpha and not enabled for your project. Sign
+                                  up{' '}
+                                  <InlineLink href="https://forms.supabase.com/analytics-buckets">
                                     here
-                                  </a>
+                                  </InlineLink>
+                                  .
                                 </span>
                               </div>
                             )}
