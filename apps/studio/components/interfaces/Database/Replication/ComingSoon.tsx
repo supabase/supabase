@@ -255,11 +255,11 @@ const StaticDestinations = () => {
         <div className="bg-surface-300 w-full h-full absolute top-0 left-0 opacity-30"></div>
         <div className="flex items-center justify-between">
           <div className="relative w-52">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter" size={14} />
-            <Input_Shadcn_
-              className="pl-9 bg-transparent h-8"
-              placeholder="Search..."
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
+              size={14}
             />
+            <Input_Shadcn_ className="pl-9 bg-transparent h-8" placeholder="Search..." />
           </div>
           <Button
             icon={<Plus size={16} />}
