@@ -167,46 +167,6 @@ const ReplicationPipelineStatus = ({
   const isPipelineNotRunning = !isPipelineRunning // Any state other than 'started' is not running
   
   
-  const getPipelineStateWarning = () => {
-    if (!pipelineStatusData?.status) return null
-    
-    const status = pipelineStatusData.status
-    switch (status.name) {
-      case 'starting':
-        return {
-          type: 'warning' as const,
-          title: 'Pipeline Starting',
-          message: 'The replication pipeline is initializing. Table status will be available once started.',
-          color: 'warning'
-        }
-      case 'stopped':
-        return {
-          type: 'info' as const,
-          title: 'Pipeline Stopped',
-          message: 'Replication is currently paused. Enable the pipeline to resume data synchronization.',
-          color: 'muted'
-        }
-      case 'unknown':
-        return {
-          type: 'warning' as const,
-          title: 'Pipeline Status Unknown',
-          message: 'Unable to determine pipeline status. Check the logs for more information.',
-          color: 'warning'
-        }
-      default:
-        if (status.name !== 'started' && status.name !== 'failed') {
-          return {
-            type: 'warning' as const,
-            title: 'Pipeline Not Running',
-            message: 'The replication pipeline is not in a running state. Table status may be limited.',
-            color: 'warning'
-          }
-        }
-        return null
-    }
-  }
-  
-  const pipelineWarning = getPipelineStateWarning()
 
   if (isPipelineError) {
     return (
@@ -279,39 +239,6 @@ const ReplicationPipelineStatus = ({
       )}
 
 
-      {/* Pipeline state warning */}
-      {pipelineWarning && (
-        <div className={`p-4 border rounded-lg ${
-          pipelineWarning.color === 'warning' 
-            ? 'border-warning-300 bg-warning-100' 
-            : 'border-border-muted bg-surface-100'
-        }`}>
-          <div className="flex items-start gap-3">
-            <AlertTriangle className={`w-5 h-5 mt-0.5 shrink-0 ${
-              pipelineWarning.color === 'warning' 
-                ? 'text-warning-600' 
-                : 'text-foreground-light'
-            }`} />
-            <div className="flex-1 min-w-0">
-              <h4 className={`font-medium mb-1 ${
-                pipelineWarning.color === 'warning' 
-                  ? 'text-warning-900' 
-                  : 'text-foreground'
-              }`}>
-                {pipelineWarning.title}
-              </h4>
-              <p className={`text-sm ${
-                pipelineWarning.color === 'warning' 
-                  ? 'text-warning-700' 
-                  : 'text-foreground-light'
-              }`}>
-                {pipelineWarning.message}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Error alert */}
       {hasErrors && (
         <div className="p-4 border border-destructive-300 bg-destructive-100 rounded-lg">
@@ -341,7 +268,7 @@ const ReplicationPipelineStatus = ({
       {/* Pipeline not running state - generic disabled state */}
       {isPipelineNotRunning && tableStatuses.length > 0 && (
         <div className="space-y-4">
-          <div className="p-6 border border-border-muted bg-surface-50 rounded-lg">
+          <div className="p-6 border border-border-muted bg-surface-75 rounded-lg">
             <div className="text-center space-y-3">
               <div className="w-12 h-12 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
                 <Activity className="w-6 h-6 text-foreground-lighter" />
