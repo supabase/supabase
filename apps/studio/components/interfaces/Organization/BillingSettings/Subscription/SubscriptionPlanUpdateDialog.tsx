@@ -81,7 +81,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
-  const paymentMethodSelection = useRef<{
+  const paymentMethodSelectionRef = useRef<{
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
   }>(null)
 
@@ -162,7 +162,7 @@ export const SubscriptionPlanUpdateDialog = ({
 
     setPaymentConfirmationLoading(true)
 
-    const result = await paymentMethodSelection.current?.createPaymentMethod()
+    const result = await paymentMethodSelectionRef.current?.createPaymentMethod()
     if (result) {
       setSelectedPaymentMethod(result.paymentMethod.id)
     } else {
@@ -183,6 +183,9 @@ export const SubscriptionPlanUpdateDialog = ({
       slug: selectedOrganization?.slug,
       tier,
       paymentMethod: result?.paymentMethod?.id,
+      address: result?.address,
+      tax_id: result?.taxId ?? undefined,
+      billing_name: result?.customerName,
     })
   }
 
@@ -542,7 +545,7 @@ export const SubscriptionPlanUpdateDialog = ({
               {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
                 <div className="space-y-2 mb-4">
                   <PaymentMethodSelection
-                    ref={paymentMethodSelection}
+                    ref={paymentMethodSelectionRef}
                     selectedPaymentMethod={selectedPaymentMethod}
                     onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
                     readOnly={paymentConfirmationLoading || isConfirming || isUpdating}

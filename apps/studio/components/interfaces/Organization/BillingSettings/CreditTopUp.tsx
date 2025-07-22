@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AlertCircle, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -39,6 +39,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import type { PaymentMethodElementRef } from './PaymentMethods/NewPaymentMethodElement'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -58,6 +59,9 @@ type CreditTopUpForm = z.infer<typeof FormSchema>
 export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const { resolvedTheme } = useTheme()
   const queryClient = useQueryClient()
+  const paymentMethodSelectionRef = useRef<{
+    createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+  }>(null)
 
   const canTopUpCredits = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -124,12 +128,20 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
     const token = await initHcaptcha()
 
+    const paymentMethodResult = await paymentMethodSelectionRef.current?.createPaymentMethod()
+    if (!paymentMethodResult) {
+      return
+    }
+
     await topUpCredits(
       {
         slug,
         amount,
-        payment_method_id: paymentMethod,
+        payment_method_id: paymentMethodResult.paymentMethod.id,
         hcaptchaToken: token,
+        address: paymentMethodResult.address,
+        tax_id: paymentMethodResult.taxId ?? undefined,
+        billing_name: paymentMethodResult.customerName,
       },
       {
         onSuccess: (data) => {
@@ -261,6 +273,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   name="paymentMethod"
                   render={() => (
                     <PaymentMethodSelection
+                      ref={paymentMethodSelectionRef}
                       onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
                       selectedPaymentMethod={form.getValues('paymentMethod')}
                       readOnly={executingTopUp || paymentConfirmationLoading}

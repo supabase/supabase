@@ -178,8 +178,8 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       return {
         paymentMethod: { id: selectedPaymentMethod } as PaymentMethod,
         customerName: customerProfile?.billing_name || '',
-        address: customerProfile?.address,
-        taxId: taxId || null,
+        address: customerProfile?.address ?? null,
+        taxId: taxId ?? null,
       }
     }
   }

@@ -65,7 +65,7 @@ export type PaymentMethodElementRef = {
   createPaymentMethod: () => Promise<
     | {
         paymentMethod: PaymentMethod
-        address: CustomerAddress
+        address: CustomerAddress | null
         customerName: string
         taxId: CustomerTaxId | null
       }
@@ -84,8 +84,8 @@ const NewPaymentMethodElement = forwardRef(
     }: {
       email?: string | null | undefined
       readOnly: boolean
-      currentAddress?: CustomerAddress | undefined
-      currentTaxId?: CustomerTaxId | undefined
+      currentAddress?: CustomerAddress | null
+      currentTaxId?: CustomerTaxId | null
       customerName?: string | undefined
     },
     ref

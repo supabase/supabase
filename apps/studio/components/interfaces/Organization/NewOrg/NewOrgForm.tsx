@@ -250,7 +250,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
   async function createOrg(
     paymentMethodId?: string,
     customerData?: {
-      address: CustomerAddress
+      address: CustomerAddress | null
       billing_name: string
       tax_id: CustomerTaxId | null
     }
@@ -268,7 +268,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
       ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
-      address: dbTier === 'FREE' ? undefined : customerData?.address,
+      address: dbTier === 'FREE' ? null : customerData?.address,
       tax_id: dbTier === 'FREE' ? undefined : customerData?.tax_id ?? undefined,
     })
   }
