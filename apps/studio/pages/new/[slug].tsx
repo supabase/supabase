@@ -148,7 +148,11 @@ const Wizard: NextPageWithLayout = () => {
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
   if (slug === 'last-visited-org') {
-    router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+    if (lastVisitedOrganization) {
+      router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+    } else {
+      router.replace(`/new/_`, undefined, { shallow: true })
+    }
   }
 
   const { mutate: sendEvent } = useSendEventMutation()
