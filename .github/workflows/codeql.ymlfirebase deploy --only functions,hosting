@@ -1,0 +1,128 @@
+/**
+ * @fileoverview BrainPay Ecosystem - Automated Transaction Monitoring & Alert System
+ *
+ * This script establishes a WebSocket connection to monitor live transaction
+ * data, logs transactions, and triggers Slack notifications when high-risk
+ * transactions are detected. It is designed for seamless forking and deployment,
+ * integrating payment gateway monitoring, tax automation reporting, and
+ * real-time dashboard alerts.
+ *
+ * Dependencies:
+ *   - ws: For WebSocket connections (install via `npm install ws`)
+ *   - node-fetch: For sending webhook notifications (install via `npm install node-fetch`)
+ *
+ * Environment Variables:
+ *   - SOCKET_URL: URL of the WebSocket server (default: ws://localhost:8765)
+ *   - SLACK_WEBHOOK_URL: Slack Incoming Webhook URL for notifications.
+ *   - ALERT_THRESHOLD: Risk level that triggers an alert (default: "HIGH RISK")
+ *
+ * Usage:
+ *   1. Configure the environment variables as needed.
+ *   2. Install dependencies:
+ *        npm install ws node-fetch
+ *   3. Run the script:
+ *        node <script_name.js>
+ *
+ * This script is designed to be easily integrated into a CI/CD pipeline or
+ * as part of a larger deployment. Contributions and improvements are welcome.
+ */
+
+// Import required modules
+const WebSocket = require('ws');
+const fetch = require('node-fetch');
+
+// Configuration
+const SOCKET_URL = process.env.SOCKET_URL || 'ws://localhost:8765'; // WebSocket server URL
+const SLACK_WEBHOOK_URL =
+  process.env.SLACK_WEBHOOK_URL || 'https://hooks.slack.com/services/your/webhook/url'; // Slack Webhook URL
+const ALERT_THRESHOLD = process.env.ALERT_THRESHOLD || 'HIGH RISK'; // Risk level to trigger alerts
+
+let transactionHistory = []; // Store transaction logs
+
+// Initialize WebSocket Connection
+const socket = new WebSocket(SOCKET_URL);
+
+socket.onopen = () => {
+  console.log('🚀 WebSocket connection established.');
+};
+
+socket.onerror = (error) => {
+  console.error('❌ WebSocket error:', error.message);
+};
+
+socket.onclose = () => {
+  console.log('🔌 WebSocket connection closed.');
+};
+
+// Handle Incoming Messages from the WebSocket
+socket.onmessage = (event) => {
+  try {
+    const transaction = JSON.parse(event.data);
+
+    // Log transaction for debugging or storage
+    transactionHistory.push({
+      timestamp: new Date().toISOString(),
+      txid: transaction.txid,
+      amount: transaction.amount,
+      risk: transaction.risk,
+    });
+
+    console.log('📥 New Transaction:', transaction);
+
+    // Check if the transaction meets the alert threshold
+    if (transaction.risk.includes(ALERT_THRESHOLD)) {
+      console.log('🚨 High-Risk Transaction Detected:', transaction);
+
+      // Trigger Slack Notification
+      sendSlackNotification(transaction);
+
+      // Optional: Trigger additional user notification or front-end alert
+      alertUser(transaction);
+    }
+  } catch (error) {
+    console.error('⚠️ Error processing message:', error.message);
+  }
+};
+
+/**
+ * Sends a Slack notification when a high-risk transaction is detected.
+ * @param {Object} transaction - The transaction object containing txid, amount, and risk fields.
+ */
+function sendSlackNotification(transaction) {
+  const payload = {
+    text: `🚨 *High-Risk Transaction Detected!*\n*TXID:* ${transaction.txid}\n*Amount:* ${transaction.amount} BTC\n*Risk Level:* ${transaction.risk}`,
+  };
+
+  fetch(SLACK_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log('✅ Slack notification sent successfully.');
+      } else {
+        console.error('❌ Failed to send Slack notification:', response.statusText);
+      }
+    })
+    .catch((error) => console.error('⚠️ Error sending Slack notification:', error.message));
+}
+
+/**
+ * Optional: Alerts end users through the UI or dashboard.
+ * This function can be expanded to integrate browser notifications or UI updates.
+ * @param {Object} transaction - The transaction details triggering the alert.
+ */
+function alertUser(transaction) {
+  console.log(
+    `🔔 Alert User: High-Risk Transaction Detected!\nTXID: ${transaction.txid}\nAmount: ${transaction.amount} BTC`
+  );
+  // Add further logic to update the UI or notify users directly
+}
+
+// Export functions for testing or integration if required
+module.exports = {
+  sendSlackNotification,
+  alertUser,
+  transactionHistory,
+};
