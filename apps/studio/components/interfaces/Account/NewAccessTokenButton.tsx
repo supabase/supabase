@@ -100,7 +100,13 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
         </DropdownMenu>
       </div>
 
-      <Dialog open={visible} onOpenChange={setVisible}>
+      <Dialog
+        open={visible}
+        onOpenChange={(open) => {
+          if (!open) form.reset()
+          setVisible(open)
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
