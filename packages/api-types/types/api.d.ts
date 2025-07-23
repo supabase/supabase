@@ -1603,7 +1603,7 @@ export interface components {
         role: string
       } | null
       /** @enum {string|null} */
-      type?: 'publishable' | 'secret' | 'legacy' | null
+      type?: 'legacy' | 'publishable' | 'secret' | null
       /** Format: date-time */
       updated_at?: string | null
     }
@@ -1984,6 +1984,7 @@ export interface components {
       secrets?: {
         [key: string]: string
       }
+      with_data?: boolean
     }
     CreateOrganizationV1: {
       name: string
