@@ -421,8 +421,8 @@ export const pricing: Pricing = {
         title: 'Max file upload size',
         plans: {
           free: '50 MB',
-          pro: '50 GB',
-          team: '50 GB',
+          pro: '500 GB',
+          team: '500 GB',
           enterprise: 'Custom',
         },
         usage_based: false,
