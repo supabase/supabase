@@ -1,4 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import z from 'zod'
+
 import {
   ScaffoldContainer,
   ScaffoldDescription,
@@ -16,23 +19,32 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { AttributeMapping } from './AttributeMapping'
+import { Domains } from './Domains'
+import { JoinOrganizationOnSignup } from './JoinOrganizationOnSignup'
+import { Metadata } from './Metadata'
 
-import { SubmitHandler, useForm } from 'react-hook-form'
-import z from 'zod'
-import Domains from './Domains'
-import Metadata from './Metadata'
-import AttributeMapping from './AttributeMapping'
-import Join from './Join'
-
-const attrValueArraySchema = z.array(z.object({ value: z.string() }))
+const attrValueArraySchema = z.array(
+  z.object({ value: z.string().trim().min(1, 'This field is required') })
+)
 
 const FormSchema = z
   .object({
     enabled: z.boolean(),
-    domains: z.array(z.object({ value: z.string().trim().min(1, 'Please provide a domain') })),
+    domains: z
+      .array(
+        z.object({
+          value: z
+            .string()
+            .trim()
+            .min(1, 'Please provide a domain')
+            .url('Please provide a valid URL'),
+        })
+      )
+      .min(1, 'At least one domain is required'),
     metadataXmlUrl: z.string().trim().url('Please provide a valid URL').optional(),
     metadataXmlFile: z.string().trim().optional(),
-    emailMapping: attrValueArraySchema,
+    emailMapping: attrValueArraySchema.min(1, 'Email mapping is required'),
     userNameMapping: attrValueArraySchema,
     firstNameMapping: attrValueArraySchema,
     lastNameMapping: attrValueArraySchema,
@@ -43,27 +55,17 @@ const FormSchema = z
     message: 'Please provide either a metadata XML URL or upload a metadata XML file',
     path: ['metadataXmlUrl'],
   })
-  .refine(
-    (data) =>
-      Array.isArray(data.emailMapping) &&
-      data.emailMapping.length > 0 &&
-      data.emailMapping[0].value.trim() !== '',
-    {
-      message: 'Email mapping is required',
-      path: ['emailMapping'],
-    }
-  )
 
-export type SSOConfigForm = z.infer<typeof FormSchema>
+export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 
 const FORM_ID = 'sso-config-form'
 
-const SSOConfig = () => {
-  const form = useForm<SSOConfigForm>({
+export const SSOConfig = () => {
+  const form = useForm<SSOConfigFormSchema>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      enabled: true, // TODO: set to false before merging
-      domains: [],
+      enabled: false,
+      domains: [{ value: '' }],
       metadataXmlUrl: '',
       metadataXmlFile: '',
       emailMapping: [{ value: '' }],
@@ -75,7 +77,7 @@ const SSOConfig = () => {
     },
   })
 
-  const onSubmit: SubmitHandler<SSOConfigForm> = ({
+  const onSubmit: SubmitHandler<SSOConfigFormSchema> = ({
     enabled,
     domains,
     metadataXmlUrl,
@@ -106,23 +108,22 @@ const SSOConfig = () => {
     )
   }
 
+  const isSSOEnabled = form.watch('enabled')
+
   return (
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth>
-        {/* maybe don't need these at all*/}
-        {/* <ScaffoldSectionTitle className="mb-2">Configure Single Sign-On</ScaffoldSectionTitle>
-        <ScaffoldDescription className="mb-4">
-          Configure Single Sign-On (SSO) for your organization.
-        </ScaffoldDescription> */}
-
+        <ScaffoldSectionTitle>Single Sign-On</ScaffoldSectionTitle>
+        <ScaffoldDescription>
+          Enable Single Sign-On (SSO) to allow users to authenticate using their existing accounts
+          from identity providers like Google, Okta, or custom SAML providers.
+        </ScaffoldDescription>
+      </ScaffoldSection>
+      <ScaffoldSection isFullWidth>
         <Form_Shadcn_ {...form}>
-          <form
-            id={FORM_ID}
-            className="flex-grow overflow-auto"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
+          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <Card>
-              <CardContent>
+              <CardContent className="py-8">
                 <FormField_Shadcn_
                   control={form.control}
                   name="enabled"
@@ -130,18 +131,21 @@ const SSOConfig = () => {
                     <FormItemLayout
                       label="Enable Single Sign-On"
                       description="Enable and configure SSO for your application."
-                      layout="flex-row-reverse"
-                      className="gap-1 relative flex items-center justify-between pb-4"
+                      layout="flex"
                     >
-                      <FormControl_Shadcn_ className="flex items-center gap-2">
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <FormControl_Shadcn_>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          size="large"
+                        />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
 
-              {form.watch('enabled') && (
+              {isSSOEnabled && (
                 <>
                   <CardContent>
                     <Domains form={form} />
@@ -162,12 +166,12 @@ const SSOConfig = () => {
                   </CardContent>
 
                   <CardContent>
-                    <Join form={form} />
+                    <JoinOrganizationOnSignup form={form} />
                   </CardContent>
                 </>
               )}
 
-              <CardFooter className="justify-end space-x-2 border-t">
+              <CardFooter className="justify-end space-x-2">
                 {form.formState.isDirty && (
                   <Button type="default" onClick={() => form.reset()}>
                     Cancel
@@ -188,5 +192,3 @@ const SSOConfig = () => {
     </ScaffoldContainer>
   )
 }
-
-export default SSOConfig

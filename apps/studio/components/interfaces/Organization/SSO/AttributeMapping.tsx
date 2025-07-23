@@ -1,12 +1,29 @@
 import { MinusCircle, Plus } from 'lucide-react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { Button, FormControl_Shadcn_, Input_Shadcn_, Separator } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { UseFormReturn, useFieldArray } from 'react-hook-form'
 
-const PROVIDER_PRESETS = [
+import { Button, FormControl_Shadcn_, FormMessage_Shadcn_, Input_Shadcn_, Separator } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import type { SSOConfigFormSchema } from './SSOConfig'
+
+type ProviderAttribute = 'emailMapping' | 'userNameMapping' | 'firstNameMapping' | 'lastNameMapping'
+
+type ProviderPreset = {
+  name: string
+  attributeMapping: {
+    keys: {
+      email?: { name: string }
+      user_name?: { name: string }
+      first_name?: { name: string }
+      last_name?: { name: string }
+      name_identifier?: { name: string }
+    }
+  }
+}
+
+const PROVIDER_PRESETS: ProviderPreset[] = [
   {
     name: 'GSuite',
-    attributeMapping: JSON.stringify({
+    attributeMapping: {
       keys: {
         email: {
           name: 'email',
@@ -21,11 +38,11 @@ const PROVIDER_PRESETS = [
           name: 'last_name',
         },
       },
-    }),
+    },
   },
   {
     name: 'Azure',
-    attributeMapping: JSON.stringify({
+    attributeMapping: {
       keys: {
         email: {
           name: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
@@ -40,62 +57,41 @@ const PROVIDER_PRESETS = [
           name: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
         },
       },
-    }),
+    },
   },
   {
     name: 'Okta',
-    attributeMapping: JSON.stringify({
+    attributeMapping: {
       keys: {
         email: {
           name: 'email',
         },
       },
-    }),
+    },
   },
-]
+] as const
 
-const AttributeMapping = ({
+export const AttributeMapping = ({
   form,
   emailField,
   userNameField,
   firstNameField,
   lastNameField,
 }: {
-  form: ReturnType<typeof useForm<any>>
-  emailField: string
-  userNameField: string
-  firstNameField: string
-  lastNameField: string
+  form: UseFormReturn<SSOConfigFormSchema>
+  emailField: ProviderAttribute
+  userNameField: ProviderAttribute
+  firstNameField: ProviderAttribute
+  lastNameField: ProviderAttribute
 }) => {
   // Helper to apply a preset
-  function applyPreset(preset: any) {
-    const keys = JSON.parse(preset.attributeMapping).keys
+  function applyPreset(preset: ProviderPreset) {
+    const keys = preset.attributeMapping.keys
     // Set each field if present in the preset, otherwise clear
-    form.setValue(emailField, keys.email?.name ? [{ value: keys.email.name }] : [])
-    form.setValue(
-      userNameField,
-      keys.user_name?.name
-        ? [{ value: keys.user_name.name }]
-        : keys.user_name?.names
-          ? keys.user_name.names.map((v: string) => ({ value: v }))
-          : []
-    )
-    form.setValue(
-      firstNameField,
-      keys.first_name?.name
-        ? [{ value: keys.first_name.name }]
-        : keys.first_name?.names
-          ? keys.first_name.names.map((v: string) => ({ value: v }))
-          : []
-    )
-    form.setValue(
-      lastNameField,
-      keys.last_name?.name
-        ? [{ value: keys.last_name.name }]
-        : keys.last_name?.names
-          ? keys.last_name.names.map((v: string) => ({ value: v }))
-          : []
-    )
+    form.setValue(emailField, [{ value: keys.email?.name ?? '' }])
+    form.setValue(userNameField, [{ value: keys.user_name?.name ?? '' }])
+    form.setValue(firstNameField, [{ value: keys.first_name?.name ?? '' }])
+    form.setValue(lastNameField, [{ value: keys.last_name?.name ?? '' }])
   }
 
   return (
@@ -160,8 +156,8 @@ const MappingFieldArray = ({
   required,
   placeholder,
 }: {
-  form: ReturnType<typeof useForm<any>>
-  fieldName: string
+  form: UseFormReturn<SSOConfigFormSchema>
+  fieldName: ProviderAttribute
   label: string
   required: boolean
   placeholder: string
@@ -183,11 +179,11 @@ const MappingFieldArray = ({
         {required && <span className="text-red-600">*</span>}
       </div>
       <div className="grid gap-2 w-full">
-        {fields.length === 0 ? (
-          <div className="flex gap-2 items-center">
+        {fields.map((field, idx) => (
+          <div key={field.id} className="flex gap-2 items-center justify-start">
             <FormControl_Shadcn_>
               <Input_Shadcn_
-                {...form.register(`${fieldName}.0.value` as const)}
+                {...form.register(`${fieldName}.${idx}.value` as const)}
                 placeholder={placeholder}
                 autoComplete="off"
               />
@@ -196,34 +192,13 @@ const MappingFieldArray = ({
             <Button
               type="text"
               size="small"
-              className="w-4 h-4"
-              disabled
-              icon={<MinusCircle className="w-4 h-4" />}
-              onClick={() => remove(0)}
+              className="h-[34px] p-1"
+              disabled={fields.length === 1}
+              icon={<MinusCircle />}
+              onClick={() => remove(idx)}
             />
           </div>
-        ) : (
-          fields.map((field, idx) => (
-            <div key={field.id} className="flex gap-2 items-center justify-start">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
-                  {...form.register(`${fieldName}.${idx}.value` as const)}
-                  placeholder={placeholder}
-                  autoComplete="off"
-                />
-              </FormControl_Shadcn_>
-
-              <Button
-                type="text"
-                size="small"
-                className="h-[34px] p-1"
-                disabled={fields.length === 1}
-                icon={<MinusCircle />}
-                onClick={() => remove(idx)}
-              />
-            </div>
-          ))
-        )}
+        ))}
 
         <Button
           type="text"
@@ -236,14 +211,8 @@ const MappingFieldArray = ({
         </Button>
 
         <Separator className="my-4" />
-        {form.formState.errors[fieldName] && (
-          <span className="text-red-600 text-xs mt-1">
-            {form.formState.errors[fieldName].message as string}
-          </span>
-        )}
+        <FormMessage_Shadcn_ />
       </div>
     </div>
   )
 }
-
-export default AttributeMapping

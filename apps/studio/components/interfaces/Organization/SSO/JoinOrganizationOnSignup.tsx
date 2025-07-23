@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form'
+
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -12,9 +13,13 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { SSOConfigForm } from './SSOConfig'
+import { SSOConfigFormSchema } from './SSOConfig'
 
-const Domains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> }) => {
+export const JoinOrganizationOnSignup = ({
+  form,
+}: {
+  form: ReturnType<typeof useForm<SSOConfigFormSchema>>
+}) => {
   return (
     <>
       <FormField_Shadcn_
@@ -66,4 +71,3 @@ const Domains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> }) 
     </>
   )
 }
-export default Domains

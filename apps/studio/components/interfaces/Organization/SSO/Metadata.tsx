@@ -1,8 +1,13 @@
 import { Upload } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+
 import {
   Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
@@ -10,9 +15,9 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { SSOConfigForm } from './SSOConfig'
+import { SSOConfigFormSchema } from './SSOConfig'
 
-const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> }) => {
+export const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
@@ -62,20 +67,21 @@ const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> })
             </TabsTrigger_Shadcn_>
           </TabsList_Shadcn_>
           <TabsContent_Shadcn_ value="url">
-            <div className="flex flex-col gap-2 max-w-md">
-              <Input_Shadcn_
-                {...form.register('metadataXmlUrl')}
-                placeholder="https://example.com/metadata.xml"
-                autoComplete="off"
-                className="mb-2"
-              />
-
-              {form.formState.errors.metadataXmlUrl && (
-                <span className="text-red-600 text-xs mt-1">
-                  {form.formState.errors.metadataXmlUrl.message as string}
-                </span>
+            <FormField_Shadcn_
+              name="metadataXmlUrl"
+              render={({ field }) => (
+                <FormItem_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_
+                      {...field}
+                      placeholder="https://example.com/metadata.xml"
+                      autoComplete="off"
+                    />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
               )}
-            </div>
+            />
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_ value="file">
             <div className="flex flex-col gap-2 max-w-md">
@@ -98,11 +104,7 @@ const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> })
                 {fileName && <span className="text-xs text-foreground-light">{fileName}</span>}
               </div>
               {uploadError && <span className="text-red-600 text-xs mt-1">{uploadError}</span>}
-              {form.formState.errors.metadataXmlFile && (
-                <span className="text-red-600 text-xs mt-1">
-                  {form.formState.errors.metadataXmlFile.message as string}
-                </span>
-              )}
+              <FormMessage_Shadcn_ />
             </div>
           </TabsContent_Shadcn_>
         </Tabs_Shadcn_>
@@ -110,4 +112,3 @@ const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> })
     </FormItemLayout>
   )
 }
-export default Metadata

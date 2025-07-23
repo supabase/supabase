@@ -1,4 +1,4 @@
-import SSOConfig from 'components/interfaces/Organization/SSO/SSOConfig'
+import { SSOConfig } from 'components/interfaces/Organization/SSO/SSOConfig'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'

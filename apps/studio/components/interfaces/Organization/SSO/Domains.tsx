@@ -1,10 +1,18 @@
-import { MinusCircle, Plus } from 'lucide-react'
+import { Plus, Trash } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { Button, FormControl_Shadcn_, Input_Shadcn_, Separator } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { SSOConfigForm } from './SSOConfig'
 
-const Domains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> }) => {
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
+  Input_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SSOConfigFormSchema } from './SSOConfig'
+
+export const Domains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'domains',
@@ -16,47 +24,31 @@ const Domains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> }) 
         label="Domains"
         layout="flex-row-reverse"
         description="Add one or more domains"
-        className="gap-1 catz"
       >
         <div className="grid gap-2 w-96">
-          {fields.length === 0 ? (
-            <div className="flex gap-2 items-center">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
-                  {...form.register(`domains.0.value` as const)}
-                  placeholder="example.com"
-                  autoComplete="off"
-                />
-              </FormControl_Shadcn_>
+          {fields.map((field, idx) => (
+            <div key={field.id} className="flex gap-2 items-top">
+              <FormField_Shadcn_
+                name={`domains.${idx}.value`}
+                render={({ field }) => (
+                  <FormItem_Shadcn_ className="flex-1">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_ {...field} placeholder="example.com" autoComplete="off" />
+                    </FormControl_Shadcn_>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
+                )}
+              />
+
               <Button
-                type="text"
-                className="h-[34px]"
-                icon={<MinusCircle />}
-                size="small"
-                disabled
+                type="default"
+                icon={<Trash size={12} />}
+                className="h-[34px] w-[34px]"
+                disabled={fields.length <= 1}
+                onClick={() => remove(idx)}
               />
             </div>
-          ) : (
-            fields.map((field, idx) => (
-              <div key={field.id} className="flex gap-2 items-center">
-                <FormControl_Shadcn_>
-                  <Input_Shadcn_
-                    {...form.register(`domains.${idx}.value` as const)}
-                    placeholder="example.com"
-                    autoComplete="off"
-                  />
-                </FormControl_Shadcn_>
-
-                <Button
-                  type="text"
-                  className="h-[34px]"
-                  icon={<MinusCircle />}
-                  size="small"
-                  onClick={() => remove(idx)}
-                />
-              </div>
-            ))
-          )}
+          ))}
           <div>
             <Button
               type="text"
@@ -68,13 +60,7 @@ const Domains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigForm>> }) 
             </Button>
           </div>
         </div>
-        {form.formState.errors.domains && (
-          <span className="text-red-600 text-xs mt-1">
-            {form.formState.errors.domains.message as string}
-          </span>
-        )}
       </FormItemLayout>
     </>
   )
 }
-export default Domains
