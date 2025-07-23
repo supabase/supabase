@@ -1,25 +1,18 @@
-import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
-import Image from 'next/legacy/image'
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
+import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import type { PostgresTrigger } from '@supabase/postgres-meta'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
-import {
-  EdgeFunctionsResponse,
-  useEdgeFunctionsQuery,
-} from 'data/edge-functions/edge-functions-query'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
-import { Button, Checkbox, Form, Input, Listbox, Radio, SidePanel } from 'ui'
+import { Button, Form, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import HTTPRequestFields from './HTTPRequestFields'
-import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
-import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
+import { FormContents } from './FormContents'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -29,7 +22,19 @@ export interface EditHookPanelProps {
 
 export type HTTPArgument = { id: string; name: string; value: string }
 
-const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
+export const isEdgeFunction = ({
+  ref,
+  restUrlTld,
+  url,
+}: {
+  ref?: string
+  restUrlTld?: string
+  url: string
+}) =>
+  url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
+  url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
+
+export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
   const { ref } = useParams()
   const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
@@ -49,7 +54,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutate: createDatabaseTrigger } = useDatabaseTriggerCreateMutation({
     onSuccess: (res) => {
@@ -81,16 +85,12 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
-  const isEdgeFunction = (url: string) =>
-    url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
-    url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
-
   const initialValues = {
     name: selectedHook?.name ?? '',
     table_id: selectedHook?.table_id ?? '',
     http_url: selectedHook?.function_args?.[0] ?? '',
     http_method: selectedHook?.function_args?.[1] ?? 'POST',
-    function_type: isEdgeFunction(selectedHook?.function_args?.[0] ?? '')
+    function_type: isEdgeFunction({ ref, restUrlTld, url: selectedHook?.function_args?.[0] ?? '' })
       ? 'supabase_function'
       : 'http_request',
     timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -104,7 +104,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       if (selectedHook !== undefined) {
         setEvents(selectedHook.events)
 
-        const [url, method, headers, parameters] = selectedHook.function_args
+        const [_, __, headers, parameters] = selectedHook.function_args
 
         let parsedParameters: Record<string, string> = {}
 
@@ -314,10 +314,6 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
                 values={values}
                 resetForm={resetForm}
                 errors={errors}
-                projectRef={ref}
-                restUrlTld={restUrlTld}
-                functions={functions}
-                isEdgeFunction={isEdgeFunction}
                 tables={tables}
                 events={events}
                 eventsError={eventsError}
@@ -350,213 +346,5 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
         </p>
       </ConfirmationModal>
     </>
-  )
-}
-
-export default EditHookPanel
-
-interface FormContentsProps {
-  values: any
-  resetForm: any
-  errors: any
-  projectRef?: string
-  restUrlTld?: string
-  selectedHook?: PostgresTrigger
-  functions: EdgeFunctionsResponse[] | undefined
-  isEdgeFunction: (url: string) => boolean
-  tables: PostgresTable[]
-  events: string[]
-  eventsError?: string
-  onUpdateSelectedEvents: (event: string) => void
-  httpHeaders: HTTPArgument[]
-  httpParameters: HTTPArgument[]
-  setHttpHeaders: (arr: HTTPArgument[]) => void
-  setHttpParameters: (arr: HTTPArgument[]) => void
-  submitRef: MutableRefObject<any>
-}
-
-const FormContents = ({
-  values,
-  resetForm,
-  errors,
-  projectRef,
-  restUrlTld,
-  selectedHook,
-  functions,
-  isEdgeFunction,
-  tables,
-  events,
-  eventsError,
-  onUpdateSelectedEvents,
-  httpHeaders,
-  httpParameters,
-  setHttpHeaders,
-  setHttpParameters,
-  submitRef,
-}: FormContentsProps) => {
-  useEffect(() => {
-    if (values.function_type === 'http_request') {
-      if (selectedHook !== undefined) {
-        const [url, method] = selectedHook.function_args
-        const updatedValues = { ...values, http_url: url, http_method: method }
-        resetForm({ values: updatedValues, initialValues: updatedValues })
-      } else {
-        const updatedValues = { ...values, http_url: '' }
-        resetForm({ values: updatedValues, initialValues: updatedValues })
-      }
-    } else if (values.function_type === 'supabase_function') {
-      const fnSlug = (functions ?? [])[0]?.slug
-      const defaultFunctionUrl = `https://${projectRef}.supabase.${restUrlTld}/functions/v1/${fnSlug}`
-      const updatedValues = {
-        ...values,
-        http_url: isEdgeFunction(values.http_url) ? values.http_url : defaultFunctionUrl,
-      }
-      resetForm({ values: updatedValues, initialValues: updatedValues })
-    }
-  }, [values.function_type])
-
-  return (
-    <div>
-      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <Input
-            id="name"
-            name="name"
-            label="Name"
-            descriptionText="Do not use spaces/whitespaces"
-          />
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={
-          <FormSectionLabel
-            className="lg:!col-span-4"
-            description={
-              <p className="text-sm text-foreground-light">
-                Select which table and events will trigger your webhook
-              </p>
-            }
-          >
-            Conditions to fire webhook
-          </FormSectionLabel>
-        }
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <Listbox
-            size="medium"
-            id="table_id"
-            name="table_id"
-            label="Table"
-            descriptionText="This is the table the trigger will watch for changes. You can only select 1 table for a trigger."
-          >
-            <Listbox.Option
-              key={'table-no-selection'}
-              id={'table-no-selection'}
-              label={'---'}
-              value={'no-selection'}
-            >
-              ---
-            </Listbox.Option>
-            {tables.map((table) => (
-              <Listbox.Option
-                key={table.id}
-                id={table.id.toString()}
-                value={table.id}
-                label={table.name}
-              >
-                <div className="flex items-center space-x-2">
-                  <p className="text-foreground-light">{table.schema}</p>
-                  <p className="text-foreground">{table.name}</p>
-                </div>
-              </Listbox.Option>
-            ))}
-          </Listbox>
-          <Checkbox.Group
-            id="events"
-            name="events"
-            label="Events"
-            error={eventsError}
-            descriptionText="These are the events that are watched by the webhook, only the events selected above will fire the webhook on the table you've selected."
-          >
-            {HOOK_EVENTS.map((event) => (
-              <Checkbox
-                key={event.value}
-                value={event.value}
-                label={event.label}
-                description={event.description}
-                checked={events.includes(event.value)}
-                onChange={() => onUpdateSelectedEvents(event.value)}
-              />
-            ))}
-          </Checkbox.Group>
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-      <FormSection
-        header={
-          <FormSectionLabel className="lg:!col-span-4">Webhook configuration</FormSectionLabel>
-        }
-      >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <Radio.Group id="function_type" name="function_type" label="Type of webhook" type="cards">
-            {AVAILABLE_WEBHOOK_TYPES.map((webhook) => (
-              <Radio
-                key={webhook.value}
-                id={webhook.value}
-                value={webhook.value}
-                label=""
-                beforeLabel={
-                  <div className="flex items-center space-x-5">
-                    <Image src={webhook.icon} layout="fixed" width="32" height="32" />
-                    <div className="flex-col space-y-0">
-                      <div className="flex space-x-2">
-                        <p className="text-foreground">{webhook.label}</p>
-                      </div>
-                      <p className="text-foreground-light">{webhook.description}</p>
-                    </div>
-                  </div>
-                }
-              />
-            ))}
-          </Radio.Group>
-        </FormSectionContent>
-      </FormSection>
-      <SidePanel.Separator />
-
-      <HTTPRequestFields
-        type={values.function_type}
-        errors={errors}
-        httpHeaders={httpHeaders}
-        httpParameters={httpParameters}
-        onAddHeader={(header?: any) => {
-          if (header) setHttpHeaders(httpHeaders.concat(header))
-          else setHttpHeaders(httpHeaders.concat({ id: uuidv4(), name: '', value: '' }))
-        }}
-        onUpdateHeader={(idx, property, value) =>
-          setHttpHeaders(
-            httpHeaders.map((header, i) => {
-              if (idx === i) return { ...header, [property]: value }
-              else return header
-            })
-          )
-        }
-        onRemoveHeader={(idx) => setHttpHeaders(httpHeaders.filter((_, i) => idx !== i))}
-        onAddParameter={() =>
-          setHttpParameters(httpParameters.concat({ id: uuidv4(), name: '', value: '' }))
-        }
-        onUpdateParameter={(idx, property, value) =>
-          setHttpParameters(
-            httpParameters.map((param, i) => {
-              if (idx === i) return { ...param, [property]: value }
-              else return param
-            })
-          )
-        }
-        onRemoveParameter={(idx) => setHttpParameters(httpParameters.filter((_, i) => idx !== i))}
-      />
-
-      <button ref={submitRef} type="submit" className="hidden" />
-    </div>
   )
 }

@@ -1,8 +1,8 @@
-import react from '@vitejs/plugin-react'
-import path, { resolve } from 'path'
-import { fileURLToPath } from 'url'
-import tsconfigPaths from 'vite-tsconfig-paths'
+import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 // Some tools like Vitest VSCode extensions, have trouble with resolving relative paths,
 // as they use the directory of the test file as `cwd`, which makes them believe that
@@ -18,14 +18,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@ui': path.resolve(__dirname, './../../packages/ui/src'),
+      '@ui': resolve(__dirname, './../../packages/ui/src'),
     },
   },
   test: {
     globals: true,
     environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
-    include: [resolve(dirname, './**/*.test.{ts,tsx}')],
-    restoreMocks: true,
     setupFiles: [
       resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/polyfills.js'),
@@ -34,12 +32,7 @@ export default defineConfig({
     reporters: [['default']],
     coverage: {
       reporter: ['lcov'],
-      exclude: [
-        '**/*.test.ts',
-        '**/*.test.tsx',
-        // 👇 Excluded because it will be deprecated.
-        'lib/common/fetch/**',
-      ],
+      exclude: ['**/*.test.ts', '**/*.test.tsx'],
       include: ['lib/**/*.ts'],
     },
   },
