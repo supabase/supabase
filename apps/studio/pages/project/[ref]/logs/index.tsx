@@ -20,8 +20,6 @@ export const LogPage: NextPageWithLayout = () => {
   const org = useSelectedOrganization()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
-  console.log({ isUnifiedLogsEnabled })
-
   const [lastVisitedLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
     'explorer'
