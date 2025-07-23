@@ -166,30 +166,45 @@ const ReplicationPipelineStatus = ({
   }
 
   const getDisabledStateConfig = () => {
-    if (isEnablingDisabling) {
-      const isEnabling = requestStatus === PipelineStatusRequestStatus.EnableRequested
+    // Always prioritize request status (enabling/disabling) over pipeline status
+    if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
       return {
-        title: isEnabling ? 'Pipeline Enabling' : 'Pipeline Disabling',
-        message: isEnabling
-          ? 'Pipeline is being enabled and will start shortly.'
-          : 'Pipeline is being disabled and will stop shortly.',
-        badge: isEnabling ? 'Enabling' : 'Disabling',
+        title: 'Pipeline Enabling',
+        message: 'Starting the pipeline. Table replication will resume once enabled.',
+        badge: 'Enabling',
         icon: <Loader2 className="w-6 h-6 animate-spin" />,
         colors: {
-          bg: isEnabling ? 'bg-brand-50' : 'bg-warning-50',
-          text: isEnabling ? 'text-brand-900' : 'text-warning-900',
-          subtext: isEnabling ? 'text-brand-700' : 'text-warning-700',
-          iconBg: isEnabling ? 'bg-brand-600' : 'bg-warning-600',
+          bg: 'bg-brand-50',
+          text: 'text-brand-900',
+          subtext: 'text-brand-700',
+          iconBg: 'bg-brand-600',
           icon: 'text-white dark:text-black',
         },
       }
     }
 
+    if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
+      return {
+        title: 'Pipeline Disabling',
+        message: 'Stopping the pipeline. Table replication will be paused once disabled.',
+        badge: 'Disabling',
+        icon: <Loader2 className="w-6 h-6 animate-spin" />,
+        colors: {
+          bg: 'bg-warning-50',
+          text: 'text-warning-900',
+          subtext: 'text-warning-700',
+          iconBg: 'bg-warning-600',
+          icon: 'text-white dark:text-black',
+        },
+      }
+    }
+
+    // Only check pipeline status if no request is in progress
     switch (statusName) {
       case 'failed':
         return {
           title: 'Pipeline Failed',
-          message: 'Replication has failed. Check the logs for details.',
+          message: 'Replication has encountered an error. Check the logs for details.',
           badge: 'Failed',
           icon: <XCircle className="w-6 h-6" />,
           colors: {
@@ -203,7 +218,7 @@ const ReplicationPipelineStatus = ({
       case 'stopped':
         return {
           title: 'Pipeline Stopped',
-          message: 'Enable the pipeline to resume data synchronization.',
+          message: 'Replication is paused. Enable the pipeline to resume data synchronization.',
           badge: 'Stopped',
           icon: <Activity className="w-6 h-6" />,
           colors: {
@@ -217,7 +232,7 @@ const ReplicationPipelineStatus = ({
       case 'starting':
         return {
           title: 'Pipeline Starting',
-          message: 'Pipeline is initializing. Table status will be available once started.',
+          message: 'Initializing replication. Table status will be available once running.',
           badge: 'Starting',
           icon: <Clock className="w-6 h-6" />,
           colors: {
@@ -231,7 +246,7 @@ const ReplicationPipelineStatus = ({
       case 'unknown':
         return {
           title: 'Pipeline Status Unknown',
-          message: 'Unable to determine pipeline status. Check the logs for more information.',
+          message: 'Unable to determine replication status. Check the logs for more information.',
           badge: 'Unknown',
           icon: <HelpCircle className="w-6 h-6" />,
           colors: {
@@ -245,7 +260,7 @@ const ReplicationPipelineStatus = ({
       default:
         return {
           title: 'Pipeline Not Running',
-          message: 'Pipeline is not actively running.',
+          message: 'Replication is not active. Enable the pipeline to start data synchronization.',
           badge: 'Disabled',
           icon: <Activity className="w-6 h-6" />,
           colors: {
@@ -420,7 +435,7 @@ const ReplicationPipelineStatus = ({
                     </Table.td>
                     <Table.td>
                       <div className="text-sm text-foreground-lighter">
-                        Status unavailable while pipeline is {statusName || 'not running'}
+                        Status unavailable while pipeline is {config.badge.toLowerCase()}
                       </div>
                     </Table.td>
                     <Table.td className="text-center">
