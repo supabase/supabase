@@ -1,6 +1,6 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
-function generateBackendStackSQL(activeFilters: Record<string, string>) {
+function generateSubscriptionsSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.headquarters !== 'unset') {
@@ -18,22 +18,28 @@ function generateBackendStackSQL(activeFilters: Record<string, string>) {
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
   return `
-SELECT 
-  unnest(backend_stack) AS technology,
+SELECT
+  unnest(subscriptions) AS technology,
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
+UNION ALL
+SELECT 
+  'None of the above' AS technology,
+  COUNT(*) AS total
+FROM responses_2025
+WHERE subscriptions = '{}'
 ORDER BY total DESC;
 `
 }
 
-export function BackendStackChart() {
+export function SubscriptionsChart() {
   return (
     <GenericChartWithQuery
-      title="What is your startup's backend stack?"
-      targetColumn="backend_stack"
+      title="Which of the following subscriptions does your startup pay for your team?"
+      targetColumn="subscriptions"
       filterColumns={['headquarters', 'industry_normalized', 'currently_monetizing']}
-      generateSQLQuery={generateBackendStackSQL}
+      generateSQLQuery={generateSubscriptionsSQL}
     />
   )
 }

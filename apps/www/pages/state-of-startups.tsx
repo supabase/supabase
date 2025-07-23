@@ -24,19 +24,28 @@ import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
 import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
 import { SectionIntro } from '~/components/SurveyResults/SectionIntro'
 import { RoleChart } from '~/components/SurveyResults/RoleChart'
+import { ProblemBeingSolvedChart } from '~/components/SurveyResults/ProblemBeingSolvedChart'
 import { PersonAgeChart } from '~/components/SurveyResults/AgeChart'
 import { MonetizationChart } from '~/components/SurveyResults/MonetizationChart'
 import { AcceleratorParticipationChart } from '~/components/SurveyResults/AcceleratorParticipationChart'
 import { PivotFreqChart } from '~/components/SurveyResults/PivotFreqChart'
 import { FrontendStackChart } from '~/components/SurveyResults/FrontendStackChart'
 import { BackendStackChart } from '~/components/SurveyResults/BackendStackChart'
-import { CloudProviderChart } from '~/components/SurveyResults/CloudProviderChart'
 import { SalesToolsChart } from '~/components/SurveyResults/SalesToolsChart'
 import { PricingChart } from '~/components/SurveyResults/PricingChart'
 import { IndustryChart } from '~/components/SurveyResults/IndustryChart'
 import { DatabasesChart } from '~/components/SurveyResults/DatabasesChart'
 import { DataWarehousesChart } from '~/components/SurveyResults/DataWarehousesChart'
 import { VectorDatabasesChart } from '~/components/SurveyResults/VectorDatabasesChart'
+import { OpenTelemetryChart } from '~/components/SurveyResults/OpenTelemetryChart'
+import { ObservabilityChart } from '~/components/SurveyResults/ObservabilityChart'
+import { CloudProvidersChart } from '~/components/SurveyResults/CloudProvidersChart'
+import { MustHaveDevToolsChart } from '~/components/SurveyResults/MustHaveDevToolsChart'
+import { AICodingToolsChart } from '~/components/SurveyResults/AICodingToolsChart'
+import { SubscriptionsChart } from '~/components/SurveyResults/SubscriptionsChart'
+import { NewslettersPaidForChart } from '~/components/SurveyResults/NewslettersPaidForChart'
+import { PodcastsListenedToChart } from '~/components/SurveyResults/PodcastsListenedToChart'
+import { RegularSocialMediaUseChart } from '~/components/SurveyResults/RegularSocialMediaUseChart'
 
 interface FormData {
   email: string
@@ -232,6 +241,7 @@ function StateOfStartupsPage() {
             <AcceleratorParticipationChart />
             <PivotFreqChart />
             <IndustryChart />
+            <ProblemBeingSolvedChart />
           </div>
         </SectionContainer>
 
@@ -247,8 +257,13 @@ function StateOfStartupsPage() {
             <BackendStackChart />
             <DatabasesChart />
             <DataWarehousesChart />
-            <CloudProviderChart />
             <VectorDatabasesChart />
+            <OpenTelemetryChart />
+            <ObservabilityChart />
+            <CloudProvidersChart />
+            <MustHaveDevToolsChart />
+            <AICodingToolsChart />
+            <SubscriptionsChart />
           </div>
         </SectionContainer>
 
@@ -262,6 +277,20 @@ function StateOfStartupsPage() {
 
             <SalesToolsChart />
             <PricingChart />
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Community and Influence"
+              description="Communities are the learning engine behind every early-stage startup."
+              text="Founders follow newsletters like Lenny’s and TLDR, listen to Acquired and The AI Breakdown, and post selectively on X/Twitter and GitHub. Tool discovery happens through peer recommendations and hands-on testing—not ads."
+            />
+
+            <NewslettersPaidForChart />
+            <PodcastsListenedToChart />
+            <RegularSocialMediaUseChart />
           </div>
         </SectionContainer>
       </DefaultLayout>

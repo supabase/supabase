@@ -217,11 +217,15 @@ export function GenericChartWithQuery({
   const isLoading = filtersLoading || dataLoading
   const error = filtersError || dataError
 
+  // Two different color arrays
+  // One for gradation (e.g. "Yes", "Maybe", "No")
   const COLORS = [
     'hsl(var(--brand-default))',
-    'hsl(var(--foreground-light))',
     'hsl(var(--brand-500))',
+    'hsl(var(--foreground-light))',
   ]
+  // One for a clear binary answer (e.g. "Yes", "No")
+  const COLORS_BINARY = ['hsl(var(--brand-default))', 'hsl(var(--foreground-light))']
 
   return (
     <div className="w-full flex flex-row gap-4">
@@ -293,7 +297,14 @@ export function GenericChartWithQuery({
                     // label={renderCustomizedLabel}
                   >
                     {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          chartData.length === 2
+                            ? COLORS_BINARY[index % COLORS_BINARY.length]
+                            : COLORS[index % COLORS.length]
+                        }
+                      />
                     ))}
                   </Pie>
                 </PieChart>

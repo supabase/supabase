@@ -143,3 +143,7 @@ gcloud.json
 **/.sentryclirc
 
 keys.json
+
+# Local development
+.cursorrules
+.cursor/mcp.json

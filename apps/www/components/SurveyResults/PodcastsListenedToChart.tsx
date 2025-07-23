@@ -1,6 +1,6 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
-function generateBackendStackSQL(activeFilters: Record<string, string>) {
+function generatePodcastsListenedToSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.headquarters !== 'unset') {
@@ -17,23 +17,30 @@ function generateBackendStackSQL(activeFilters: Record<string, string>) {
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
-  return `
-SELECT 
-  unnest(backend_stack) AS technology,
-  COUNT(*) AS total
-FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+  return `SELECT technology, COUNT(*) AS total
+FROM (
+  SELECT 
+    CASE 
+      WHEN podcasts_listened_to = '{}' THEN 'None'
+      WHEN podcast = 'I don''t listen to podcasts regularly' THEN 'None'
+      ELSE podcast
+    END AS technology
+  FROM responses_2025
+  CROSS JOIN LATERAL unnest(
+    CASE WHEN podcasts_listened_to = '{}' THEN ARRAY['None'] ELSE podcasts_listened_to END
+  ) AS podcast${whereClause ? '\n' + whereClause : ''}
+) t
 GROUP BY technology
-ORDER BY total DESC;
-`
+ORDER BY total DESC;`
 }
 
-export function BackendStackChart() {
+export function PodcastsListenedToChart() {
   return (
     <GenericChartWithQuery
-      title="What is your startup's backend stack?"
-      targetColumn="backend_stack"
+      title="Which of these podcasts do you listen to regularly?"
+      targetColumn="podcasts_listened_to"
       filterColumns={['headquarters', 'industry_normalized', 'currently_monetizing']}
-      generateSQLQuery={generateBackendStackSQL}
+      generateSQLQuery={generatePodcastsListenedToSQL}
     />
   )
 }

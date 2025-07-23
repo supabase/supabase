@@ -1,11 +1,14 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
-// Generate SQL query for funding stage chart
-function generateCloudProviderSQL(activeFilters: Record<string, string>) {
+function generateAICodingToolsSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  }
+
+  if (activeFilters.industry_normalized !== 'unset') {
+    whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
   }
 
   if (activeFilters.currently_monetizing !== 'unset') {
@@ -15,8 +18,8 @@ function generateCloudProviderSQL(activeFilters: Record<string, string>) {
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
   return `
-  SELECT 
-  unnest(cloud_providers) AS technology,
+SELECT 
+  unnest(ai_coding_tools) AS technology,
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
@@ -24,14 +27,13 @@ ORDER BY total DESC;
 `
 }
 
-export function CloudProviderChart() {
+export function AICodingToolsChart() {
   return (
     <GenericChartWithQuery
-      // title="What is your startup's backend stack?'"
-      title="Which cloud provider(s) are your startup using?"
-      targetColumn="cloud_providers"
-      filterColumns={['headquarters', 'currently_monetizing']}
-      generateSQLQuery={generateCloudProviderSQL}
+      title="Which AI coding tools do you use?"
+      targetColumn="ai_coding_tools"
+      filterColumns={['headquarters', 'industry_normalized', 'currently_monetizing']}
+      generateSQLQuery={generateAICodingToolsSQL}
     />
   )
 }

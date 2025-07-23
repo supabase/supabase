@@ -1,6 +1,5 @@
 import { GenericChartWithQuery } from './GenericChartWithQuery'
 
-// Generate SQL query for funding stage chart
 function generateVectorDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
