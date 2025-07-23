@@ -14,7 +14,7 @@ export type OrganizationCreateVariables = {
   size?: string
   tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
   payment_method?: string
-  billing_name?: string
+  billing_name?: string | null
   address?: CustomerAddress | null
   tax_id?: CustomerTaxId | null
 }
@@ -36,7 +36,7 @@ export async function createOrganization({
       size,
       tier,
       payment_method,
-      billing_name,
+      billing_name: billing_name ?? undefined,
       tax_id: tax_id ?? undefined,
       address: address ?? undefined,
     },

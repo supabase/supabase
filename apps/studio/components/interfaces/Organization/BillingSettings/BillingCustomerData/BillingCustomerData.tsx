@@ -20,7 +20,7 @@ import {
   useAsyncCheckProjectPermissions,
   useCheckPermissions,
 } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import {
   BillingCustomerDataForm,
@@ -31,7 +31,7 @@ import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 
 export const BillingCustomerData = () => {
   const { slug } = useParams()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { isSuccess: isPermissionsLoaded, can: canReadBillingCustomerData } =
     useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.customer')

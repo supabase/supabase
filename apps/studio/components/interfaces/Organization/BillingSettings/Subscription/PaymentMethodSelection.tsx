@@ -9,10 +9,13 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import {
+  useSelectedOrganization,
+  useSelectedOrganizationQuery,
+} from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Loader, Plus } from 'lucide-react'
-import { Listbox } from 'ui'
+import { Checkbox_Shadcn_, Listbox } from 'ui'
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
 import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
@@ -28,6 +31,7 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { useParams } from 'common'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -47,11 +51,12 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   }: PaymentMethodSelectionProps,
   ref
 ) {
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug
+  const { slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
+  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
@@ -173,13 +178,22 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     PaymentMethodElementRef['createPaymentMethod']
   > => {
     if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
-      return paymentRef.current?.createPaymentMethod()
+      const paymentResult = await paymentRef.current?.createPaymentMethod()
+
+      if (!paymentResult) return paymentResult
+
+      return {
+        paymentMethod: paymentResult.paymentMethod,
+        customerName: useAsDefaultBillingAddress ? paymentResult.customerName : null,
+        address: useAsDefaultBillingAddress ? paymentResult.address : null,
+        taxId: useAsDefaultBillingAddress ? paymentResult.taxId : null,
+      }
     } else {
       return {
         paymentMethod: { id: selectedPaymentMethod } as PaymentMethod,
-        customerName: customerProfile?.billing_name || '',
-        address: customerProfile?.address ?? null,
-        taxId: taxId ?? null,
+        customerName: useAsDefaultBillingAddress ? customerProfile?.billing_name || '' : null,
+        address: useAsDefaultBillingAddress ? customerProfile?.address ?? null : null,
+        taxId: useAsDefaultBillingAddress ? taxId ?? null : null,
       }
     }
   }
@@ -262,17 +276,36 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
           </Listbox>
         ) : null}
 
-        {stripePromise && setupIntent && (
-          <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
-            <NewPaymentMethodElement
-              ref={paymentRef}
-              email={selectedOrganization?.billing_email ?? undefined}
-              readOnly={readOnly}
-              customerName={customerProfile?.billing_name}
-              currentAddress={customerProfile?.address}
-              currentTaxId={taxId}
-            />
-          </Elements>
+        {stripePromise && setupIntent && customerProfile && (
+          <>
+            <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
+              <NewPaymentMethodElement
+                ref={paymentRef}
+                email={selectedOrganization?.billing_email ?? undefined}
+                readOnly={readOnly}
+                customerName={customerProfile?.billing_name}
+                currentAddress={customerProfile?.address}
+                currentTaxId={taxId}
+              />
+            </Elements>
+
+            {/* If the customer already has a billing address, optionally allow overwriting it - if they have no address, we use that as a default */}
+            {customerProfile?.address != null && (
+              <div className="flex items-center space-x-2 mt-4">
+                <Checkbox_Shadcn_
+                  id="defaultBillingAddress"
+                  checked={useAsDefaultBillingAddress}
+                  onCheckedChange={() => setUseAsDefaultBillingAddress(!useAsDefaultBillingAddress)}
+                />
+                <label
+                  htmlFor="defaultBillingAddress"
+                  className="text-sm leading-none text-foreground-light"
+                >
+                  Use billing address as my org's primary address
+                </label>
+              </div>
+            )}
+          </>
         )}
 
         {(setupIntentLoading || isCustomerProfileLoading || isCustomerTaxIdLoading) && (

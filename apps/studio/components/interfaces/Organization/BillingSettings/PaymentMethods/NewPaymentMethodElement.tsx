@@ -66,7 +66,7 @@ export type PaymentMethodElementRef = {
     | {
         paymentMethod: PaymentMethod
         address: CustomerAddress | null
-        customerName: string
+        customerName: string | null
         taxId: CustomerTaxId | null
       }
     | undefined
@@ -92,18 +92,6 @@ const NewPaymentMethodElement = forwardRef(
   ) => {
     const stripe = useStripe()
     const elements = useElements()
-
-    console.log({
-      currentTaxId,
-      tax_id_name: currentTaxId
-        ? TAX_IDS.find(
-            (option) =>
-              option.type === currentTaxId.type && option.countryIso2 === currentTaxId.country
-          )?.name || ''
-        : '',
-      tax_id_type: currentTaxId ? currentTaxId.type : '',
-      tax_id_value: currentTaxId ? currentTaxId.value : '',
-    })
 
     const form = useForm<BillingCustomerDataFormValues>({
       resolver: zodResolver(BillingCustomerDataSchema),
@@ -252,8 +240,16 @@ const NewPaymentMethodElement = forwardRef(
 
     return (
       <div className="space-y-4">
+        <p className="text-sm text-foreground-light mb-2">
+          Please ensure CVC and postal codes match what is on file for your card.
+        </p>
+
         <PaymentElement
-          options={{ defaultValues: { billingDetails: { email: email ?? undefined } }, readOnly }}
+          options={{
+            layout: 'tabs',
+            defaultValues: { billingDetails: { email: email ?? undefined } },
+            readOnly,
+          }}
         />
 
         {fullyLoaded && (
@@ -265,7 +261,7 @@ const NewPaymentMethodElement = forwardRef(
             />
             <label
               htmlFor="business"
-              className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="text-foreground-light text-sm leading-none"
             >
               I'm purchasing as a business
             </label>

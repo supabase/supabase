@@ -12,7 +12,7 @@ export type OrganizationCreditTopUpVariables = {
   hcaptchaToken?: string | null
   address?: CustomerAddress | null
   tax_id?: CustomerTaxId | null
-  billing_name?: string
+  billing_name?: string | null
 }
 
 export async function topUpCredits({
@@ -48,7 +48,7 @@ export async function topUpCredits({
       hcaptcha_token: hcaptchaToken,
       address: address ?? undefined,
       tax_id: tax_id ?? undefined,
-      billing_name,
+      billing_name: billing_name ?? undefined,
     },
   })
 

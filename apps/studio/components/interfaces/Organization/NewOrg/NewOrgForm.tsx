@@ -251,7 +251,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     paymentMethodId?: string,
     customerData?: {
       address: CustomerAddress | null
-      billing_name: string
+      billing_name: string | null
       tax_id: CustomerTaxId | null
     }
   ) {

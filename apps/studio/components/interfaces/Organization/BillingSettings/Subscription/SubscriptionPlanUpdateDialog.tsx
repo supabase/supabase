@@ -13,7 +13,6 @@ import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizatio
 import { ProjectInfo } from 'data/projects/projects-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { SubscriptionTier } from 'data/subscriptions/types'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
@@ -29,6 +28,8 @@ import { PaymentIntentResult } from '@stripe/stripe-js'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
+import { useParams } from 'common'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -76,7 +77,7 @@ export const SubscriptionPlanUpdateDialog = ({
   projects,
 }: Props) => {
   const { resolvedTheme } = useTheme()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
@@ -184,7 +185,7 @@ export const SubscriptionPlanUpdateDialog = ({
       paymentMethod: result?.paymentMethod?.id,
       address: result?.address,
       tax_id: result?.taxId ?? undefined,
-      billing_name: result?.customerName,
+      billing_name: result?.customerName ?? undefined,
     })
   }
 
