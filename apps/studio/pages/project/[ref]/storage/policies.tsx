@@ -1,6 +1,6 @@
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { StoragePolicies } from 'components/to-be-cleaned/Storage'
+import { StoragePolicies } from 'components/interfaces/Storage'
 import type { NextPageWithLayout } from 'types'
 
 const StoragePoliciesPage: NextPageWithLayout = () => {

@@ -22,6 +22,7 @@ import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-ch
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { projectKeys } from 'data/projects/keys'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
@@ -83,12 +84,26 @@ export const CreateBranchModal = () => {
       onError: () => {},
     })
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
         await Promise.all([queryClient.invalidateQueries(projectKeys.detail(projectRef))])
       }
+      sendEvent({
+        action: 'branch_create_button_clicked',
+        properties: {
+          branchType: data.persistent ? 'persistent' : 'preview',
+          gitlessBranching,
+        },
+        groups: {
+          project: ref ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
+
       setShowCreateBranchModal(false)
       router.push(`/project/${data.project_ref}`)
     },

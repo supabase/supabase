@@ -4299,12 +4299,12 @@ export interface components {
     BillingCustomerUpdateBody: {
       additional_emails?: string[]
       address?: {
-        city?: string
+        city?: string | null
         country: string
         line1: string
-        line2?: string
-        postal_code?: string
-        state?: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
       }
       billing_name?: string
     }
@@ -4638,12 +4638,12 @@ export interface components {
     }
     CreateOrganizationBody: {
       address?: {
-        city?: string
+        city?: string | null
         country: string
         line1: string
-        line2?: string
-        postal_code?: string
-        state?: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
       }
       billing_name?: string
       kind?: string
@@ -5044,9 +5044,23 @@ export interface components {
       teamId?: string
     }
     CreditsTopUpRequest: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
       amount: number
+      billing_name?: string
       hcaptcha_token?: string
       payment_method_id: string
+      tax_id?: {
+        country: string
+        type: string
+        value: string
+      }
     }
     CreditsTopUpResponse: {
       payment_intent_secret?: string
@@ -5063,12 +5077,12 @@ export interface components {
     CustomerResponse: {
       additional_emails: string[] | null
       address?: {
-        city?: string
+        city?: string | null
         country: string
         line1: string
-        line2?: string
-        postal_code?: string
-        state?: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
       }
       balance: number
       billing_name?: string
@@ -8638,12 +8652,12 @@ export interface components {
     }
     UpdateSubscriptionBody: {
       address?: {
-        city?: string
+        city?: string | null
         country: string
         line1: string
-        line2?: string
-        postal_code?: string
-        state?: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
       }
       billing_name?: string
       payment_method?: string
