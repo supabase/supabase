@@ -146,6 +146,7 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@radix-ui/react-use-escape-keydown": "^1.0.3",
