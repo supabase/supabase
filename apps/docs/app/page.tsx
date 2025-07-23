@@ -149,6 +149,12 @@ const clientLibraries = [
 
 const additionalResources = [
   {
+    title: 'Interactive Walkthrough',
+    description: 'A step-by-step guide to building with Supabase.',
+    icon: 'compass',
+    href: '/walkthrough',
+  },
+  {
     title: 'Management API',
     description: 'Manage your Supabase projects and organizations.',
     icon: 'reference-api',
