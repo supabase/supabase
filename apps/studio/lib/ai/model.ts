@@ -33,10 +33,10 @@ export const ModelErrorMessage =
 export async function getModel(routingKey?: string, isLimited?: boolean): Promise<ModelResponse> {
   const hasAwsCredentials = await checkAwsCredentials()
 
-  const hasAwsBedrockprofile = !!process.env.AWS_BEDROCK_PROFILE
+  const hasAwsBedrockRoleArn = !!process.env.AWS_BEDROCK_ROLE_ARN
   const hasOpenAIKey = !!process.env.OPENAI_API_KEY
 
-  if (hasAwsBedrockprofile && hasAwsCredentials) {
+  if (hasAwsBedrockRoleArn && hasAwsCredentials) {
     const bedrockModel = IS_THROTTLED || isLimited ? BEDROCK_NORMAL_MODEL : BEDROCK_PRO_MODEL
     const bedrock = createRoutedBedrock(routingKey)
 
@@ -45,6 +45,7 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
     }
   }
 
+  // [Joshen] Only for local/self-hosted, hosted should always only use bedrock
   if (hasOpenAIKey) {
     return {
       model: openai(OPENAI_MODEL),
