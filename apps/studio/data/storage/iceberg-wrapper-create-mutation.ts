@@ -2,13 +2,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { WRAPPERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
+  getCatalogURI,
+  getConnectionURL,
+} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  getCatalogURI,
-  getConnectionURL,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'

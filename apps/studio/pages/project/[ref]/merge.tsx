@@ -22,9 +22,11 @@ import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
 import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
@@ -43,6 +45,7 @@ const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
   const project = useSelectedProject()
+  const selectedOrg = useSelectedOrganization()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<string | null>(null)
@@ -192,11 +195,25 @@ const MergePage: NextPageWithLayout = () => {
       if (data?.workflow_run_id) {
         addWorkflowRun(data.workflow_run_id)
       }
+
+      // Track branch update
+      sendEvent({
+        action: 'branch_updated',
+        properties: {
+          source: 'merge_page',
+        },
+        groups: {
+          project: parentProjectRef ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
     },
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
     },
   })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: mergeBranch, isLoading: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
@@ -204,6 +221,18 @@ const MergePage: NextPageWithLayout = () => {
       if (data.workflowRunId) {
         toast.success('Branch merge initiated!')
         addWorkflowRun(data.workflowRunId)
+
+        // Track successful merge
+        sendEvent({
+          action: 'branch_merge_succeeded',
+          properties: {
+            branchType: currentBranch?.persistent ? 'persistent' : 'preview',
+          },
+          groups: {
+            project: parentProjectRef ?? 'Unknown',
+            organization: selectedOrg?.slug ?? 'Unknown',
+          },
+        })
       } else {
         toast.info('No changes to merge')
       }
@@ -211,6 +240,19 @@ const MergePage: NextPageWithLayout = () => {
     onError: (error) => {
       setIsSubmitting(false)
       toast.error(`Failed to merge branch: ${error.message}`)
+
+      // Track failed merge
+      sendEvent({
+        action: 'branch_merge_failed',
+        properties: {
+          branchType: currentBranch?.persistent ? 'persistent' : 'preview',
+          error: error.message,
+        },
+        groups: {
+          project: parentProjectRef ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
     },
   })
 
@@ -218,6 +260,17 @@ const MergePage: NextPageWithLayout = () => {
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)
+      // Track delete button click
+      sendEvent({
+        action: 'branch_delete_button_clicked',
+        properties: {
+          origin: 'merge_page',
+        },
+        groups: {
+          project: parentProjectRef ?? 'Unknown',
+          organization: selectedOrg?.slug ?? 'Unknown',
+        },
+      })
     },
     onError: (error) => {
       toast.error(`Failed to close branch: ${error.message}`)
@@ -243,6 +296,16 @@ const MergePage: NextPageWithLayout = () => {
   const handleMerge = () => {
     if (!currentBranch?.id || !parentProjectRef || !ref) return
     setIsSubmitting(true)
+
+    // Track merge attempt
+    sendEvent({
+      action: 'branch_merge_submitted',
+      groups: {
+        project: parentProjectRef ?? 'Unknown',
+        organization: selectedOrg?.slug ?? 'Unknown',
+      },
+    })
+
     mergeBranch({
       id: currentBranch.id,
       branchProjectRef: ref,
@@ -381,6 +444,13 @@ const MergePage: NextPageWithLayout = () => {
                   onSuccess: () => {
                     toast.success('Successfully closed merge request')
                     router.push(`/project/${project?.ref}/branches?tab=prs`)
+                    sendEvent({
+                      action: 'branch_close_merge_request_button_clicked',
+                      groups: {
+                        project: parentProjectRef ?? 'Unknown',
+                        organization: selectedOrg?.slug ?? 'Unknown',
+                      },
+                    })
                   },
                 }
               )

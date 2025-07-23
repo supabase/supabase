@@ -9,12 +9,8 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
-import { useIcebergWrapperExtension } from 'components/to-be-cleaned/Storage/AnalyticBucketDetails/useIcebergWrapper'
-import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
+import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
@@ -43,6 +39,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 export interface CreateBucketModalProps {
   visible: boolean
