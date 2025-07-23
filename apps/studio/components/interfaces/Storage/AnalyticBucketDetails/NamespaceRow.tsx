@@ -10,7 +10,7 @@ import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-s
 import { FDW } from 'data/fdw/fdws-query'
 import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
 import { BASE_PATH } from 'lib/constants'
-import { Badge, Button, TableCell, TableRow } from 'ui'
+import { Button, cn, TableCell, TableRow } from 'ui'
 
 type NamespaceRowProps = {
   bucketName: string
@@ -75,11 +75,11 @@ export const NamespaceRow = ({
 
   return (
     <TableRow key={namespace}>
-      <TableCell>
-        <Badge variant="brand">{namespace}</Badge>
+      <TableCell>{namespace}</TableCell>
+      <TableCell className={cn(!schema ? 'text-foreground-lighter' : '')}>
+        {schema ?? 'No schema'}
       </TableCell>
-      <TableCell className="text-foreground-light">{schema && <Badge>{schema}</Badge>}</TableCell>
-      <TableCell className="text-foreground-light text-center">
+      <TableCell>
         {tablesData ? `${tables.length}/${tablesData.length} connected tables` : ``}
       </TableCell>
       <TableCell className="text-right">
@@ -95,15 +95,15 @@ export const NamespaceRow = ({
             Sync
           </ButtonTooltip>
           {schema ? (
-            <a
-              href={`${BASE_PATH}/project/${project?.ref}/editor?schema=${schema}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Button type="default" icon={<SquareArrowOutUpRight />}>
-                Table Editor
-              </Button>
-            </a>
+            <Button asChild type="default" icon={<SquareArrowOutUpRight />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`${BASE_PATH}/project/${project?.ref}/editor?schema=${schema}`}
+              >
+                Open in Table Editor
+              </a>
+            </Button>
           ) : (
             <ButtonTooltip
               type="default"
@@ -113,7 +113,7 @@ export const NamespaceRow = ({
                 content: { text: 'There are no tables connected.' },
               }}
             >
-              Table Editor
+              Open in Table Editor
             </ButtonTooltip>
           )}
         </div>

@@ -22,11 +22,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
-import {
-  convertKVStringArrayToJson,
-  formatWrapperTables,
-} from '../Integrations/Wrappers/Wrappers.utils'
+import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
 import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
+import { getDecryptedParameters } from './ImportForeignSchemaDialog.utils'
 
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
@@ -88,6 +86,7 @@ export const ImportForeignSchemaDialog = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     const serverName = `${snakeCase(values.bucketName)}_fdw_server`
+
     if (!ref) return console.error('Project ref is required')
     setLoading(true)
 
@@ -112,10 +111,16 @@ export const ImportForeignSchemaDialog = ({
         throw new Error(`Foreign data wrapper with server name ${serverName} not found`)
       }
 
+      const serverOptions = await getDecryptedParameters({
+        ref: project?.ref,
+        connectionString: project?.connectionString ?? undefined,
+        serverName,
+      })
+
       const formValues: Record<string, string> = {
         wrapper_name: wrapper.name,
         server_name: wrapper.server_name,
-        ...convertKVStringArrayToJson(wrapper.server_options ?? []),
+        ...serverOptions,
       }
 
       const targetSchemas = (formValues['supabase_target_schema'] || '')

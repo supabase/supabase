@@ -195,10 +195,10 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-center">Namespace</TableHead>
-                        <TableHead className="text-center">Schema</TableHead>
-                        <TableHead className="text-center">Tables</TableHead>
-                        <TableHead className="text-center">Actions</TableHead>
+                        <TableHead>Namespace</TableHead>
+                        <TableHead>Schema</TableHead>
+                        <TableHead>Tables</TableHead>
+                        <TableHead />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
