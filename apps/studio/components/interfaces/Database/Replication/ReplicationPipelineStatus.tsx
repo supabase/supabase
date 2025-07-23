@@ -5,8 +5,11 @@ import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/p
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import PipelineStatus from './PipelineStatus'
-import { usePipelineRequestStatus, PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-import { getStatusName } from './Pipeline.utils'
+import {
+  usePipelineRequestStatus,
+  PipelineStatusRequestStatus,
+} from 'state/replication-pipeline-request-status'
+import { getStatusName, getPipelineStateMessages } from './Pipeline.utils'
 import { useState, useEffect } from 'react'
 import {
   Button,
@@ -166,112 +169,58 @@ const ReplicationPipelineStatus = ({
   }
 
   const getDisabledStateConfig = () => {
-    // Always prioritize request status (enabling/disabling) over pipeline status
-    if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
-      return {
-        title: 'Pipeline Enabling',
-        message: 'Starting the pipeline. Table replication will resume once enabled.',
-        badge: 'Enabling',
-        icon: <Loader2 className="w-6 h-6 animate-spin" />,
-        colors: {
+    const { title, message, badge } = getPipelineStateMessages(requestStatus, statusName)
+
+    // Get icon and colors based on current state
+    const isEnabling = requestStatus === PipelineStatusRequestStatus.EnableRequested
+    const isDisabling = requestStatus === PipelineStatusRequestStatus.DisableRequested
+    const isTransitioning = isEnabling || isDisabling
+
+    const icon = isTransitioning ? (
+      <Loader2 className="w-6 h-6 animate-spin" />
+    ) : statusName === 'failed' ? (
+      <XCircle className="w-6 h-6" />
+    ) : statusName === 'starting' ? (
+      <Clock className="w-6 h-6" />
+    ) : statusName === 'unknown' ? (
+      <HelpCircle className="w-6 h-6" />
+    ) : (
+      <Activity className="w-6 h-6" />
+    )
+
+    const colors = isEnabling
+      ? {
           bg: 'bg-brand-50',
           text: 'text-brand-900',
           subtext: 'text-brand-700',
           iconBg: 'bg-brand-600',
           icon: 'text-white dark:text-black',
-        },
-      }
-    }
-
-    if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
-      return {
-        title: 'Pipeline Disabling',
-        message: 'Stopping the pipeline. Table replication will be paused once disabled.',
-        badge: 'Disabling',
-        icon: <Loader2 className="w-6 h-6 animate-spin" />,
-        colors: {
-          bg: 'bg-warning-50',
-          text: 'text-warning-900',
-          subtext: 'text-warning-700',
-          iconBg: 'bg-warning-600',
-          icon: 'text-white dark:text-black',
-        },
-      }
-    }
-
-    // Only check pipeline status if no request is in progress
-    switch (statusName) {
-      case 'failed':
-        return {
-          title: 'Pipeline Failed',
-          message: 'Replication has encountered an error. Check the logs for details.',
-          badge: 'Failed',
-          icon: <XCircle className="w-6 h-6" />,
-          colors: {
-            bg: 'bg-destructive-50',
-            text: 'text-destructive-900',
-            subtext: 'text-destructive-700',
-            iconBg: 'bg-destructive-600',
-            icon: 'text-white dark:text-black',
-          },
         }
-      case 'stopped':
-        return {
-          title: 'Pipeline Stopped',
-          message: 'Replication is paused. Enable the pipeline to resume data synchronization.',
-          badge: 'Stopped',
-          icon: <Activity className="w-6 h-6" />,
-          colors: {
-            bg: 'bg-surface-100',
-            text: 'text-foreground',
-            subtext: 'text-foreground-light',
-            iconBg: 'bg-foreground-lighter',
-            icon: 'text-white dark:text-black',
-          },
-        }
-      case 'starting':
-        return {
-          title: 'Pipeline Starting',
-          message: 'Initializing replication. Table status will be available once running.',
-          badge: 'Starting',
-          icon: <Clock className="w-6 h-6" />,
-          colors: {
+      : isDisabling || statusName === 'starting' || statusName === 'unknown'
+        ? {
             bg: 'bg-warning-50',
             text: 'text-warning-900',
             subtext: 'text-warning-700',
             iconBg: 'bg-warning-600',
             icon: 'text-white dark:text-black',
-          },
-        }
-      case 'unknown':
-        return {
-          title: 'Pipeline Status Unknown',
-          message: 'Unable to determine replication status. Check the logs for more information.',
-          badge: 'Unknown',
-          icon: <HelpCircle className="w-6 h-6" />,
-          colors: {
-            bg: 'bg-warning-50',
-            text: 'text-warning-900',
-            subtext: 'text-warning-700',
-            iconBg: 'bg-warning-600',
-            icon: 'text-white dark:text-black',
-          },
-        }
-      default:
-        return {
-          title: 'Pipeline Not Running',
-          message: 'Replication is not active. Enable the pipeline to start data synchronization.',
-          badge: 'Disabled',
-          icon: <Activity className="w-6 h-6" />,
-          colors: {
-            bg: 'bg-surface-100',
-            text: 'text-foreground',
-            subtext: 'text-foreground-light',
-            iconBg: 'bg-foreground-lighter',
-            icon: 'text-white dark:text-black',
-          },
-        }
-    }
+          }
+        : statusName === 'failed'
+          ? {
+              bg: 'bg-destructive-50',
+              text: 'text-destructive-900',
+              subtext: 'text-destructive-700',
+              iconBg: 'bg-destructive-600',
+              icon: 'text-white dark:text-black',
+            }
+          : {
+              bg: 'bg-surface-100',
+              text: 'text-foreground',
+              subtext: 'text-foreground-light',
+              iconBg: 'bg-foreground-lighter',
+              icon: 'text-white dark:text-black',
+            }
+
+    return { title, message, badge, icon, colors }
   }
 
   const tableStatuses = replicationStatusData?.table_statuses || []
@@ -387,82 +336,84 @@ const ReplicationPipelineStatus = ({
       )}
 
       {/* Pipeline not running state */}
-      {showDisabledState && hasTableData && (() => {
-        const config = getDisabledStateConfig()
-        return (
-          <div className="space-y-4">
-            <div className={`p-4 border border-default rounded-lg ${config.colors.bg}`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${config.colors.iconBg}`}>
-                  <div className={config.colors.icon}>{config.icon}</div>
-                </div>
-                <div className="flex-1">
-                  <h4 className={`text-sm font-medium ${config.colors.text}`}>
-                    {config.title}
-                  </h4>
-                  <p className={`text-sm ${config.colors.subtext}`}>
-                    {config.message}
-                  </p>
+      {showDisabledState &&
+        hasTableData &&
+        (() => {
+          const config = getDisabledStateConfig()
+          return (
+            <div className="space-y-4">
+              <div className={`p-4 border border-default rounded-lg ${config.colors.bg}`}>
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center ${config.colors.iconBg}`}
+                  >
+                    <div className={config.colors.icon}>{config.icon}</div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
+                    <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="w-full overflow-hidden overflow-x-auto">
-              <Table
-                head={[
-                  <Table.th key="table">Table</Table.th>,
-                  <Table.th key="status">Status</Table.th>,
-                  <Table.th key="details">Details</Table.th>,
-                  <Table.th key="actions" className="w-16 text-center">Actions</Table.th>,
-                ]}
-                body={filteredTableStatuses.map((table: TableState, index: number) => (
-                  <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
-                    <Table.td>
-                      <Link
-                        href={`/project/${projectRef}/editor/${table.table_id}`}
-                        className="font-mono text-sm font-medium text-foreground-lighter hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
-                      >
-                        {table.table_name}
-                      </Link>
-                    </Table.td>
-                    <Table.td>
-                      <Badge
-                        variant="secondary"
-                        className="text-foreground-lighter bg-surface-100 border-border-muted"
-                      >
-                        Not Available
-                      </Badge>
-                    </Table.td>
-                    <Table.td>
-                      <div className="text-sm text-foreground-lighter">
-                        Status unavailable while pipeline is {config.badge.toLowerCase()}
-                      </div>
-                    </Table.td>
-                    <Table.td className="text-center">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="text"
-                              size="tiny"
-                              icon={<Copy className="w-3 h-3" />}
-                              disabled
-                              className="h-auto p-2 opacity-40 cursor-not-allowed"
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Copy unavailable while pipeline is {config.badge.toLowerCase()}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </Table.td>
-                  </Table.tr>
-                ))}
-              />
+              <div className="w-full overflow-hidden overflow-x-auto">
+                <Table
+                  head={[
+                    <Table.th key="table">Table</Table.th>,
+                    <Table.th key="status">Status</Table.th>,
+                    <Table.th key="details">Details</Table.th>,
+                    <Table.th key="actions" className="w-16 text-center">
+                      Actions
+                    </Table.th>,
+                  ]}
+                  body={filteredTableStatuses.map((table: TableState, index: number) => (
+                    <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
+                      <Table.td>
+                        <Link
+                          href={`/project/${projectRef}/editor/${table.table_id}`}
+                          className="font-mono text-sm font-medium text-foreground-lighter hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
+                        >
+                          {table.table_name}
+                        </Link>
+                      </Table.td>
+                      <Table.td>
+                        <Badge
+                          variant="secondary"
+                          className="text-foreground-lighter bg-surface-100 border-border-muted"
+                        >
+                          Not Available
+                        </Badge>
+                      </Table.td>
+                      <Table.td>
+                        <div className="text-sm text-foreground-lighter">
+                          Status unavailable while pipeline is {config.badge.toLowerCase()}
+                        </div>
+                      </Table.td>
+                      <Table.td className="text-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="text"
+                                size="tiny"
+                                icon={<Copy className="w-3 h-3" />}
+                                disabled
+                                className="h-auto p-2 opacity-40 cursor-not-allowed"
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Copy unavailable while pipeline is {config.badge.toLowerCase()}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </Table.td>
+                    </Table.tr>
+                  ))}
+                />
+              </div>
             </div>
-          </div>
-        )
-      })()}
+          )
+        })()}
 
       {/* Tables list - active/running pipeline */}
       {showActiveTable && !isStatusLoading && hasTableData && (
