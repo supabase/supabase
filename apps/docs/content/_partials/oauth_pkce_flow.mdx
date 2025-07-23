@@ -150,7 +150,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
   if (code) {
     const supabase = createServerClient(
       import.meta.env.PUBLIC_SUPABASE_URL,
-      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
       {
         cookies: {
           getAll() {
@@ -194,18 +194,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const headers = new Headers()
 
   if (code) {
-    const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-      cookies: {
-        getAll() {
-          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+    const supabase = createServerClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return parseCookieHeader(request.headers.get('Cookie') ?? '')
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+            )
+          },
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
-          )
-        },
-      },
-    })
+      }
+    )
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
@@ -233,7 +237,7 @@ app.get("/auth/callback", async function (req, res) {
   if (code) {
     const supabase = createServerClient(
       process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY, {
+      process.env.SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {
         return parseCookieHeader(context.req.headers.cookie ?? '')

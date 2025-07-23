@@ -90,7 +90,7 @@ functions:
           Future<void> main() async {
             await Supabase.initialize(
               url: 'https://xyzcompany.supabase.co',
-              anonKey: 'public-anon-key',
+              anonKey: 'publishable-or-anon-key',
             );
 
             runApp(MyApp());
@@ -105,7 +105,7 @@ functions:
           ```dart
           final supabase = SupabaseClient(
             'https://xyzcompany.supabase.co',
-            'public-anon-key',
+            'publishable-or-anon-key',
           );
           ```
 

@@ -36,7 +36,7 @@ npm install @supabase/supabase-js @supabase/ssr
 
 Create a `.env.local` file in your project root directory.
 
-Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`:
+Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`:
 
 <ProjectConfigVariables variable="url" />
 <ProjectConfigVariables variable="anonKey" />
@@ -49,7 +49,7 @@ Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`:
 
 ```txt name=.env.local
 NEXT_PUBLIC_SUPABASE_URL=<your_supabase_project_url>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your_SUPABASE_PUBLISHABLE_KEY>
 ```
 
 </$CodeTabs>
@@ -120,7 +120,7 @@ import { createBrowserClient } from '@supabase/ssr'
 export function createClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
   )
 }
 ```
@@ -134,7 +134,7 @@ export async function createClient() {
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -232,7 +232,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -556,7 +556,7 @@ npm install @supabase/supabase-js @supabase/ssr
 
 Create a `.env.local` file in your project root directory.
 
-Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`:
+Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`:
 
 <ProjectConfigVariables variable="url" />
 <ProjectConfigVariables variable="anonKey" />
@@ -567,7 +567,7 @@ Fill in your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`:
 
 ```txt name=.env.local
 NEXT_PUBLIC_SUPABASE_URL=<your_supabase_project_url>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your_SUPABASE_PUBLISHABLE_KEY>
 ```
 
 </StepHikeCompact.Code>
@@ -639,7 +639,7 @@ import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 export function createClient({ req, res }: GetServerSidePropsContext) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -667,7 +667,7 @@ import { createClient as createClientPrimitive } from '@supabase/supabase-js'
 export function createClient() {
   const supabase = createClientPrimitive(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
   )
 
   return supabase
@@ -680,7 +680,7 @@ import { createBrowserClient } from '@supabase/ssr'
 export function createClient() {
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
   )
 
   return supabase
@@ -694,7 +694,7 @@ import { type NextApiRequest, type NextApiResponse } from 'next'
 export default function createClient(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {

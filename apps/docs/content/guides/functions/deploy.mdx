@@ -103,7 +103,7 @@ curl --request POST 'https://<project_id>.supabase.co/functions/v1/hello-world' 
 import { createClient } from '@supabase/supabase-js'
 
 // Create a single supabase client for interacting with your database
-const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
 
 const { data, error } = await supabase.functions.invoke('hello-world', {
   body: { name: 'Functions' },
@@ -114,7 +114,7 @@ const { data, error } = await supabase.functions.invoke('hello-world', {
 
 <Admonition type="note">
 
-Note that the `SUPABASE_ANON_KEY` is different in development and production. To get your production anon key, you can find it in your Supabase dashboard under Settings > API.
+Note that the `SUPABASE_PUBLISHABLE_KEY` is different in development and production. To get your production anon key, you can find it in your Supabase dashboard under Settings > API.
 
 </Admonition>
 

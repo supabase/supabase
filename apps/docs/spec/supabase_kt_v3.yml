@@ -127,7 +127,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Auth)
               install(Postgrest)
@@ -140,7 +140,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Auth) {
                   alwaysAutoRefresh = false // default: true
@@ -197,7 +197,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Postgrest) {
                   defaultSchema = "schema" // default: "public"
@@ -219,7 +219,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Storage) {
                   transferTimeout = 90.seconds // Default: 120 seconds
@@ -246,7 +246,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Realtime) {
                   reconnectDelay = 5.seconds // Default: 7 seconds
@@ -273,7 +273,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(Functions) {
                   //no custom settings
@@ -290,7 +290,7 @@ functions:
           ```kotlin
           val supabase = createSupabaseClient(
               supabaseUrl = "https://xyzcompany.supabase.co",
-              supabaseKey = "public-anon-key"
+              supabaseKey = "publishable-or-anon-key"
           ) {
               install(GraphQL) {
                   apolloConfiguration {
@@ -2883,7 +2883,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co'", supabaseKey = "public-anon-key") { ... }
+          val supabase = createSupabaseClient(supabaseUrl = "https://xyzcompany.supabase.co'", supabaseKey = "publishable-or-anon-key") { ... }
           val auth = supabase.auth
           ```
   - id: sign-up

@@ -283,7 +283,7 @@ With our database set up, we need to process and store all `.mdx` files in the `
 
       ```bash
       NEXT_PUBLIC_SUPABASE_URL=
-      NEXT_PUBLIC_SUPABASE_ANON_KEY=
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
       SUPABASE_SERVICE_ROLE_KEY=
 
       # Get your key at https://platform.openai.com/account/api-keys
@@ -470,8 +470,8 @@ const handleConfirm = React.useCallback(
 
     const eventSource = new SSE(`api/vector-search`, {
       headers: {
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}`,
         'Content-Type': 'application/json',
       },
       payload: JSON.stringify({ query }),

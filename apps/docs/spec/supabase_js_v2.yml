@@ -32,7 +32,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
 
           // Create a single supabase client for interacting with your database
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+          const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
           ```
       - id: with-custom-domain
         name: With a custom domain
@@ -41,7 +41,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
 
           // Use a custom domain as the supabase URL
-          const supabase = createClient('https://my-custom-domain.com', 'public-anon-key')
+          const supabase = createClient('https://my-custom-domain.com', 'publishable-or-anon-key')
           ```
       - id: with-additional-parameters
         name: With additional parameters
@@ -62,7 +62,7 @@ functions:
               headers: { 'x-my-custom-header': 'my-app-name' },
             },
           }
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", options)
+          const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", options)
           ```
       - id: api-schemas
         name: With custom schemas
@@ -70,7 +70,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+          const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
             // Provide a custom schema. Defaults to "public".
             db: { schema: 'other_schema' }
           })
@@ -86,7 +86,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key', {
+          const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
             global: { fetch: fetch.bind(globalThis) }
           })
           ```
@@ -102,7 +102,7 @@ functions:
           import { createClient } from '@supabase/supabase-js'
           import AsyncStorage from "@react-native-async-storage/async-storage";
 
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+          const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", {
             auth: {
               storage: AsyncStorage,
               autoRefreshToken: true,
@@ -170,7 +170,7 @@ functions:
             }
           }
 
-          const supabase = createClient("https://xyzcompany.supabase.co", "public-anon-key", {
+          const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", {
             auth: {
               storage: new LargeSecureStore(),
               autoRefreshToken: true,

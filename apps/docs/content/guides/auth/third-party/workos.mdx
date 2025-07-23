@@ -26,11 +26,15 @@ const authkit = await createAuthKitClient('WORKOS_CLIENT_ID', {
   apiHostname: '<WORKOS_AUTH_DOMAIN>',
 })
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    return authkit.getAccessToken()
-  },
-})
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return authkit.getAccessToken()
+    },
+  }
+)
 ```
 
 </TabPanel>
