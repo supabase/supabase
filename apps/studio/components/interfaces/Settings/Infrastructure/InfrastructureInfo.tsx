@@ -66,7 +66,8 @@ const InfrastructureInfo = () => {
     .split('supabase-postgres-')[1]
     ?.replace('-orioledb', '')
   const isVisibleReleaseChannel =
-    current_app_version_release_channel && !['ga', 'withdrawn'].includes(current_app_version_release_channel) 
+    current_app_version_release_channel &&
+    !['ga', 'withdrawn'].includes(current_app_version_release_channel)
       ? current_app_version_release_channel
       : undefined
   const isOrioleDb = useIsOrioleDb()
@@ -152,8 +153,8 @@ const InfrastructureInfo = () => {
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isVisibleReleaseChannel}{' '}
-                                  database version release
+                                  This project uses a {isVisibleReleaseChannel} database version
+                                  release
                                 </TooltipContent>
                               </Tooltip>
                             ),
