@@ -165,7 +165,10 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: isFreePlan }
   )
 
-  const { data: approvedOAuthApps } = useAuthorizedAppsQuery({ slug }, { enabled: !isFreePlan })
+  const { data: approvedOAuthApps } = useAuthorizedAppsQuery(
+    { slug },
+    { enabled: !isFreePlan && slug !== '_' }
+  )
 
   const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
 
@@ -632,7 +635,9 @@ const Wizard: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
+                  {isOrganizationsSuccess && !isAdmin && !orgNotFound && (
+                    <NotOrganizationOwnerWarning slug={slug} />
+                  )}
                   {orgNotFound && <OrgNotFound slug={slug} />}
                 </Panel.Content>
 
