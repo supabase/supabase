@@ -9,6 +9,7 @@ import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
@@ -18,6 +19,8 @@ export const LogPage: NextPageWithLayout = () => {
 
   const org = useSelectedOrganization()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+
+  console.log({ isUnifiedLogsEnabled })
 
   const [lastVisitedLogsPage] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
@@ -33,9 +36,9 @@ export const LogPage: NextPageWithLayout = () => {
   // Handle redirects when unified logs preview flag changes
   useEffect(() => {
     // Only handle redirects if we're currently on a logs page
-    if (!router.asPath.includes('/logs') || !hasLoaded) return
+    if (!router.asPath.includes('/logs') || (IS_PLATFORM && !hasLoaded)) return
 
-    if (isUnifiedLogsEnabled) {
+    if (IS_PLATFORM && isUnifiedLogsEnabled) {
       // If unified logs preview is enabled and we're not already on the main logs page
       if (router.asPath !== `/project/${ref}/logs` && router.asPath.includes('/logs/')) {
         router.push(`/project/${ref}/logs`)
