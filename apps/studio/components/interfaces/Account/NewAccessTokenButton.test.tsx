@@ -1,10 +1,11 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { faker } from '@faker-js/faker'
 import { screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import { faker } from '@faker-js/faker'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { render } from 'tests/helpers'
-import NewAccessTokenButton from '../NewAccessTokenButton'
 import { addAPIMock } from 'tests/lib/msw'
+import NewAccessTokenButton from './NewAccessTokenButton'
 
 describe(`NewAccessTokenButton`, () => {
   beforeEach(() => {
