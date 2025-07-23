@@ -258,9 +258,6 @@ const RowHeader = () => {
 
   const allRows = data?.rows ?? []
   const totalRows = countData?.count ?? 0
-  const tableHasPrimaryKeys = snap.table.columns.some((x) => x.isPrimaryKey)
-  const showExportViaCLIOption =
-    snap.allRowsSelected && (filters.length === 0 || (filters.length > 0 && tableHasPrimaryKeys))
 
   const onSelectAllRows = () => {
     snap.setSelectedRows(new Set(allRows.map((row) => row.idx)), true)
@@ -484,12 +481,10 @@ const RowHeader = () => {
               Export
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className={showExportViaCLIOption ? 'w-52' : 'w-40'}>
+          <DropdownMenuContent align="start" className={snap.allRowsSelected ? 'w-52' : 'w-40'}>
             <DropdownMenuItem onClick={onRowsExportCSV}>Export as CSV</DropdownMenuItem>
             <DropdownMenuItem onClick={onRowsExportSQL}>Export as SQL</DropdownMenuItem>
-            {/* [Joshen] Should make this available for all cases, but that'll involve updating
-            the Dialog's SQL output to be dynamic based on any filters applied */}
-            {showExportViaCLIOption && (
+            {snap.allRowsSelected && (
               <DropdownMenuItem className="group" onClick={() => setShowExportModal(true)}>
                 <div>
                   <p className="group-hover:text-foreground">Export via CLI</p>
