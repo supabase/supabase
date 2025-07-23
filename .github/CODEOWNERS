@@ -1,7 +1,7 @@
 /packages/ui/  @supabase/design
 /packages/shared-data/pricing.ts @roryw10 @supabase/billing
 /packages/shared-data/plans.ts @roryw10 @supabase/billing
-/packages/common/telemetry-constants.ts @4L3k51 @supabase/growth-eng
+/packages/common/telemetry-constants.ts @supabase/growth-eng
 
 /apps/studio/ @supabase/Dashboard
 
