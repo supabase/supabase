@@ -301,7 +301,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                   htmlFor="defaultBillingAddress"
                   className="text-sm leading-none text-foreground-light"
                 >
-                  Use billing address as my org's primary address
+                  Use address as my org's billing address
                 </label>
               </div>
             )}
