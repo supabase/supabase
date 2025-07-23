@@ -5,7 +5,7 @@ import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/p
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import PipelineStatus from './PipelineStatus'
-import { usePipelineRequestStatus } from 'state/replication-pipeline-request-status'
+import { usePipelineRequestStatus, PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { getStatusName } from './Pipeline.utils'
 import { useState, useEffect } from 'react'
 import {
@@ -18,7 +18,18 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { Copy, ExternalLink, ChevronLeft, Search, AlertTriangle, Activity } from 'lucide-react'
+import {
+  Copy,
+  ExternalLink,
+  ChevronLeft,
+  Search,
+  AlertTriangle,
+  Activity,
+  Loader2,
+  Clock,
+  XCircle,
+  HelpCircle,
+} from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
@@ -129,7 +140,7 @@ const ReplicationPipelineStatus = ({
       case 'following_wal':
         return {
           badge: <Badge variant="success">Live</Badge>,
-          description: `Replicating live changes (${state.lag}ms lag)`,
+          description: `Replicating live changes`,
           color: 'text-success-600',
         }
       case 'error':
@@ -154,42 +165,91 @@ const ReplicationPipelineStatus = ({
     }
   }
 
-  const getDisabledStateTitle = (status: string | undefined) => {
-    switch (status) {
-      case 'failed':
-        return 'Pipeline Failed'
-      case 'stopped':
-        return 'Pipeline Stopped'
-      case 'starting':
-        return 'Pipeline Starting'
-      default:
-        return 'Pipeline Not Running'
+  const getDisabledStateConfig = () => {
+    if (isEnablingDisabling) {
+      const isEnabling = requestStatus === PipelineStatusRequestStatus.EnableRequested
+      return {
+        title: isEnabling ? 'Pipeline Enabling' : 'Pipeline Disabling',
+        message: isEnabling
+          ? 'Pipeline is being enabled and will start shortly.'
+          : 'Pipeline is being disabled and will stop shortly.',
+        badge: isEnabling ? 'Enabling' : 'Disabling',
+        icon: <Loader2 className="w-6 h-6 animate-spin" />,
+        colors: {
+          bg: isEnabling ? 'bg-brand-50 border-brand-200' : 'bg-warning-50 border-warning-200',
+          text: isEnabling ? 'text-brand-900' : 'text-warning-900',
+          subtext: isEnabling ? 'text-brand-700' : 'text-warning-700',
+          icon: isEnabling ? 'text-brand-600' : 'text-warning-600',
+        },
+      }
     }
-  }
 
-  const getDisabledStateMessage = (status: string | undefined) => {
-    switch (status) {
+    switch (statusName) {
       case 'failed':
-        return 'Replication has failed. Check the logs for details. Table status is disabled.'
+        return {
+          title: 'Pipeline Failed',
+          message: 'Replication has failed. Check the logs for details.',
+          badge: 'Failed',
+          icon: <XCircle className="w-6 h-6" />,
+          colors: {
+            bg: 'bg-destructive-50 border-destructive-200',
+            text: 'text-destructive-900',
+            subtext: 'text-destructive-700',
+            icon: 'text-destructive-600',
+          },
+        }
       case 'stopped':
-        return 'Replication is paused. Enable the pipeline to resume data synchronization.'
+        return {
+          title: 'Pipeline Stopped',
+          message: 'Enable the pipeline to resume data synchronization.',
+          badge: 'Stopped',
+          icon: <Activity className="w-6 h-6" />,
+          colors: {
+            bg: 'bg-surface-100 border-border-muted',
+            text: 'text-foreground',
+            subtext: 'text-foreground-light',
+            icon: 'text-foreground-lighter',
+          },
+        }
       case 'starting':
-        return 'Pipeline is initializing. Table status will be available once started.'
+        return {
+          title: 'Pipeline Starting',
+          message: 'Pipeline is initializing. Table status will be available once started.',
+          badge: 'Starting',
+          icon: <Clock className="w-6 h-6" />,
+          colors: {
+            bg: 'bg-warning-50 border-warning-200',
+            text: 'text-warning-900',
+            subtext: 'text-warning-700',
+            icon: 'text-warning-600',
+          },
+        }
+      case 'unknown':
+        return {
+          title: 'Pipeline Status Unknown',
+          message: 'Unable to determine pipeline status. Check the logs for more information.',
+          badge: 'Unknown',
+          icon: <HelpCircle className="w-6 h-6" />,
+          colors: {
+            bg: 'bg-warning-50 border-warning-200',
+            text: 'text-warning-900',
+            subtext: 'text-warning-700',
+            icon: 'text-warning-600',
+          },
+        }
       default:
-        return 'Pipeline is not actively running. Table status information is disabled.'
-    }
-  }
-
-  const getDisabledStateBadge = (status: string | undefined) => {
-    switch (status) {
-      case 'failed':
-        return 'Failed'
-      case 'stopped':
-        return 'Stopped'
-      case 'starting':
-        return 'Starting'
-      default:
-        return 'Disabled'
+        return {
+          title: 'Pipeline Not Running',
+          message: 'Pipeline is not actively running.',
+          badge: 'Disabled',
+          icon: <Activity className="w-6 h-6" />,
+          colors: {
+            bg: 'bg-surface-100 border-border-muted',
+            text: 'text-foreground',
+            subtext: 'text-foreground-light',
+            icon: 'text-foreground-lighter',
+          },
+        }
     }
   }
 
@@ -204,7 +264,12 @@ const ReplicationPipelineStatus = ({
   const errorTables = tableStatuses.filter((table: TableState) => table.state.name === 'error')
   const hasErrors = errorTables.length > 0
   const isPipelineRunning = statusName === 'started'
-  const hasTableData = tableStatuses.length > 0 // Any state other than 'started' is not running
+  const hasTableData = tableStatuses.length > 0
+  const isEnablingDisabling =
+    requestStatus === PipelineStatusRequestStatus.EnableRequested ||
+    requestStatus === PipelineStatusRequestStatus.DisableRequested
+  const showDisabledState = !isPipelineRunning || isEnablingDisabling
+  const showActiveTable = isPipelineRunning && !isEnablingDisabling
 
   if (isPipelineError) {
     return (
@@ -300,37 +365,36 @@ const ReplicationPipelineStatus = ({
         </div>
       )}
 
-      {/* Pipeline not running state - generic disabled state */}
-      {!isPipelineRunning && hasTableData && (
-        <div className="space-y-4">
-          <div className="p-6 border border-border-muted bg-surface-75 rounded-lg">
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
-                <Activity className="w-6 h-6 text-foreground-lighter" />
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-base font-medium text-foreground-light">
-                  {getDisabledStateTitle(statusName)}
-                </h4>
-                <p className="text-sm text-foreground-light max-w-md mx-auto">
-                  {getDisabledStateMessage(statusName)}
-                </p>
+      {/* Pipeline not running state */}
+      {showDisabledState && hasTableData && (() => {
+        const config = getDisabledStateConfig()
+        return (
+          <div className="space-y-4">
+            <div className={`p-4 border rounded-lg ${config.colors.bg}`}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <div className={config.colors.icon}>{config.icon}</div>
+                </div>
+                <div className="flex-1">
+                  <h4 className={`text-sm font-medium ${config.colors.text}`}>
+                    {config.title}
+                  </h4>
+                  <p className={`text-sm ${config.colors.subtext}`}>
+                    {config.message}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="w-full overflow-hidden overflow-x-auto">
-            <Table
-              head={[
-                <Table.th key="table">Table</Table.th>,
-                <Table.th key="status">Status</Table.th>,
-                <Table.th key="details">Details</Table.th>,
-                <Table.th key="actions" className="w-16 text-center">
-                  Actions
-                </Table.th>,
-              ]}
-              body={filteredTableStatuses.map((table: TableState, index: number) => {
-                return (
+            <div className="w-full overflow-hidden overflow-x-auto">
+              <Table
+                head={[
+                  <Table.th key="table">Table</Table.th>,
+                  <Table.th key="status">Status</Table.th>,
+                  <Table.th key="details">Details</Table.th>,
+                  <Table.th key="actions" className="w-16 text-center">Actions</Table.th>,
+                ]}
+                body={filteredTableStatuses.map((table: TableState, index: number) => (
                   <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
                     <Table.td>
                       <Link
@@ -345,7 +409,7 @@ const ReplicationPipelineStatus = ({
                         variant="secondary"
                         className="text-foreground-lighter bg-surface-100 border-border-muted"
                       >
-                        {getDisabledStateBadge(statusName)}
+                        Not Available
                       </Badge>
                     </Table.td>
                     <Table.td>
@@ -361,7 +425,7 @@ const ReplicationPipelineStatus = ({
                               type="text"
                               size="tiny"
                               icon={<Copy className="w-3 h-3" />}
-                              disabled={true}
+                              disabled
                               className="h-auto p-2 opacity-40 cursor-not-allowed"
                             />
                           </TooltipTrigger>
@@ -372,15 +436,15 @@ const ReplicationPipelineStatus = ({
                       </TooltipProvider>
                     </Table.td>
                   </Table.tr>
-                )
-              })}
-            />
+                ))}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Tables list - active/running pipeline */}
-      {isPipelineRunning && !isStatusLoading && hasTableData && (
+      {showActiveTable && !isStatusLoading && hasTableData && (
         <div className="w-full overflow-hidden overflow-x-auto">
           <Table
             head={[
@@ -443,7 +507,7 @@ const ReplicationPipelineStatus = ({
       )}
 
       {/* No results - running pipeline */}
-      {isPipelineRunning &&
+      {showActiveTable &&
         !isStatusLoading &&
         filteredTableStatuses.length === 0 &&
         hasTableData && (
@@ -453,7 +517,7 @@ const ReplicationPipelineStatus = ({
         )}
 
       {/* No results - not running pipeline */}
-      {!isPipelineRunning &&
+      {showDisabledState &&
         !isStatusLoading &&
         filteredTableStatuses.length === 0 &&
         hasTableData && (
@@ -463,7 +527,7 @@ const ReplicationPipelineStatus = ({
         )}
 
       {/* Empty state - running pipeline */}
-      {isPipelineRunning && !isStatusLoading && tableStatuses.length === 0 && (
+      {showActiveTable && !isStatusLoading && tableStatuses.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-full max-w-sm mx-auto text-center space-y-4">
             <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
@@ -484,7 +548,7 @@ const ReplicationPipelineStatus = ({
       )}
 
       {/* Empty state - not running pipeline */}
-      {!isPipelineRunning && !isStatusLoading && tableStatuses.length === 0 && (
+      {showDisabledState && !isStatusLoading && tableStatuses.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-full max-w-sm mx-auto text-center space-y-4">
             <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
