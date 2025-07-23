@@ -6,10 +6,7 @@ import { Loader2, AlertTriangle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-import {
-  getPipelineStateMessages,
-  PIPELINE_ERROR_MESSAGES,
-} from './Pipeline.utils'
+import { getPipelineStateMessages, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 export enum PipelineStatusName {
   FAILED = 'failed',
