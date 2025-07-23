@@ -45,6 +45,7 @@ export async function getModel(routingKey?: string, isLimited?: boolean): Promis
     }
   }
 
+  // [Joshen] Only for local/self-hosted, hosted should always only use bedrock
   if (hasOpenAIKey) {
     return {
       model: openai(OPENAI_MODEL),
