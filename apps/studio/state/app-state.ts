@@ -15,6 +15,7 @@ type EditorPanelType = {
   label?: string
   saveLabel?: string
   onSave?: (value: string) => void
+  onRun?: (value: string) => void
   functionName?: string
   templates?: Template[]
   initialPrompt?: string

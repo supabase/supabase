@@ -101,8 +101,8 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
       }
     }
 
-    if (editorPanel.onSave) {
-      editorPanel.onSave(currentValue)
+    if (editorPanel.onRun) {
+      editorPanel.onRun(currentValue)
     }
 
     executeSql({
@@ -371,6 +371,11 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
         )}
 
         <div className="bg-surface-100 flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
+          {editorPanel.onSave && (
+            <Button type="default" onClick={() => editorPanel.onSave(currentValue)}>
+              Save
+            </Button>
+          )}
           <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
         </div>
       </div>

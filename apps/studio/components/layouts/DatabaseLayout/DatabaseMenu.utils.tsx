@@ -40,6 +40,12 @@ export const generateDatabaseMenu = (
           items: [],
         },
         {
+          name: 'Tests',
+          key: 'tests',
+          url: `/project/${ref}/database/tests`,
+          items: [],
+        },
+        {
           name: 'Enumerated Types',
           key: 'types',
           url: `/project/${ref}/database/types`,

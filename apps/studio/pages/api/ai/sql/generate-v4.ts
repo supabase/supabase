@@ -8,6 +8,7 @@ import { IS_PLATFORM } from 'common'
 import { getOrganizations } from 'data/organizations/organizations-query'
 import { getProjects } from 'data/projects/projects-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -168,6 +169,56 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         }),
         execute: async () => {
           return { status: 'Chat request sent to client' }
+        },
+      }),
+      get_policies: tool({
+        description: 'Get existing RLS policies for one or more schemas.',
+        parameters: z.object({
+          schemas: z.array(z.string()).describe('The schema names to get the policies for.'),
+        }),
+        execute: async ({ schemas }) => {
+          const includeSchemaMetadata = aiOptInLevel !== 'disabled'
+          if (!includeSchemaMetadata) {
+            return 'You have disabled AI features that can read your schema. Please re-enable them to use this tool.'
+          }
+
+          const headers = {
+            'Content-Type': 'application/json',
+            ...(authorization && { Authorization: authorization }),
+          }
+
+          try {
+            const data = await getDatabasePolicies(
+              {
+                projectRef,
+                connectionString,
+                schema: schemas?.join(','),
+              },
+              undefined,
+              headers
+            )
+
+            if (data.length === 0) {
+              return `No policies found for the specified schemas: ${schemas.join(', ')}.`
+            }
+
+            const formattedPolicies = data
+              .map(
+                (policy) => `
+- Policy Name: "${policy.name}"
+Table: ${policy.schema}.${policy.table}
+Action: ${policy.action}
+Roles: ${policy.roles.join(', ')}
+Command: ${policy.command}
+Definition: ${policy.definition}
+${policy.check ? `Check: ${policy.check}` : ''}`
+              )
+              .join('\n')
+
+            return `Here are the existing policies for schemas ${schemas.join(', ')}:\n${formattedPolicies}`
+          } catch (error: any) {
+            return `Failed to fetch policies: ${error.message}`
+          }
         },
       }),
     }
@@ -752,6 +803,84 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       CREATE INDEX idx_orders_tenant ON orders(tenant_id);
       CREATE INDEX idx_products_tenant ON products(tenant_id);
       \`\`\`
+
+      # Database testing with pgTAP
+      - You can also help the user write tests for their database.
+      - Supabase uses pgTAP to run database tests.
+      - Assume that the pgTAP extension is already installed, as well as the \`database.dev\` and \`basejump-supabase_test_helpers\` extensions.
+      - Tests you create can be saved for running periodically
+      - Always get schema information using \`list_tables\`
+      - If writing tests for RLS policies, first get RLS information using \`list_policies\`
+
+      ## Writing tests
+      - Always wrap tests in a transaction (\`BEGIN;\` and \`ROLLBACK;\`) to isolate them from other tests.
+      - Use \`SELECT plan(N);\` where N is the number of tests you are running.
+      - Use test helpers to simplify the tests:
+        - \`tests.create_supabase_user('user_id')\`: Creates a test user.
+        - \`tests.authenticate_as('user_id')\`: Switches the context to the created user.
+        - \`tests.rls_enabled('schema_name')\`: Verifies that RLS is enabled on all tables in a schema.
+      - Here is an example of a test:
+      \`\`\`sql
+      begin;
+      -- Assuming 000-setup-tests-hooks.sql file is present to use tests helpers
+      select plan(4);
+      -- Set up test data
+      -- Create test supabase users
+      select tests.create_supabase_user('user1@test.com');
+      select tests.create_supabase_user('user2@test.com');
+      -- Create test data
+      insert into public.todos (task, user_id) values
+        ('User 1 Task 1', tests.get_supabase_uid('user1@test.com')),
+        ('User 1 Task 2', tests.get_supabase_uid('user1@test.com')),
+        ('User 2 Task 1', tests.get_supabase_uid('user2@test.com'));
+      -- Test as User 1
+      select tests.authenticate_as('user1@test.com');
+      -- Test 1: User 1 should only see their own todos
+      select results_eq(
+        'select count(*) from todos',
+        ARRAY[2::bigint],
+        'User 1 should only see their 2 todos'
+      );
+      -- Test 2: User 1 can create their own todo
+      select lives_ok(
+        $$insert into todos (task, user_id) values ('New Task', tests.get_supabase_uid('user1@test.com'))$$,
+        'User 1 can create their own todo'
+      );
+      -- Test as User 2
+      select tests.authenticate_as('user2@test.com');
+      -- Test 3: User 2 should only see their own todos
+      select results_eq(
+        'select count(*) from todos',
+        ARRAY[1::bigint],
+        'User 2 should only see their 1 todo'
+      );
+      -- Test 4: User 2 cannot modify User 1's todo
+      SELECT results_ne(
+          $$ update todos set task = 'Hacked!' where user_id = tests.get_supabase_uid('user1@test.com') returning 1 $$,
+          $$ values(1) $$,
+          'User 2 cannot modify User 1 todos'
+      );
+      select * from finish();
+      rollback;
+      \`\`\`
+
+      For checking row updates, first return the updated row and then check if the result is not equal or equal to the expected result.
+      e.g. SELECT results_ne(
+          $$ update todos set task = 'Hacked!' where user_id = tests.get_supabase_uid('user1@test.com') returning 1 $$,
+          $$ values(1) $$,
+          'User 2 cannot modify User 1 todos'
+
+          SELECT results_eq(
+          $$ 
+            UPDATE public.messages 
+            SET message = 'Hacked by user 1' 
+            WHERE user_id = tests.get_supabase_uid('user1@test.com')
+            RETURNING 1 
+          $$,
+          $$ VALUES(1) $$,
+          'User 1 can update their own messages'
+        );
+      );
 
       # Edge Functions
       - Use the \`display_edge_function\` tool to generate complete, high-quality Edge Functions in TypeScript for the Deno runtime.

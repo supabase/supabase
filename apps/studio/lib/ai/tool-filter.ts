@@ -27,6 +27,7 @@ export const toolSetValidationSchema = z.record(
     'get_advisors',
 
     // Local tools
+    'get_policies',
     'display_query',
     'display_edge_function',
     'rename_chat',
@@ -89,11 +90,12 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   rename_chat: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
 
-  // Schema tools - MCP
+  // Schema tools - MCP and local
   list_tables: TOOL_CATEGORIES.SCHEMA,
   list_extensions: TOOL_CATEGORIES.SCHEMA,
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
+  get_policies: TOOL_CATEGORIES.SCHEMA,
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
