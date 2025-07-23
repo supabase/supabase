@@ -18,7 +18,10 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import type { OrgPlan } from 'data/subscriptions/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import {
+  useSelectedOrganization,
+  useSelectedOrganizationQuery,
+} from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
@@ -26,14 +29,15 @@ import { Button, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
 import { ExitSurveyModal } from './ExitSurveyModal'
+import { useParams } from 'common'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug
+  const { slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
