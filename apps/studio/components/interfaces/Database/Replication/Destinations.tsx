@@ -11,6 +11,7 @@ import { useState } from 'react'
 import NewDestinationPanel from './DestinationPanel'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { noop } from 'lodash'
+import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 interface DestinationsProps {
   onSelectPipeline?: (pipelineId: number, destinationName: string) => void
@@ -92,7 +93,7 @@ const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
         {(isSourcesError || isDestinationsError) && (
           <AlertError
             error={sourcesError || destinationsError}
-            subject="Failed to retrieve destinations"
+            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
           />
         )}
 

@@ -6,7 +6,11 @@ import { Loader2, AlertTriangle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-import { PIPELINE_STATE_MESSAGES } from './Pipeline.utils'
+import {
+  getPipelineStateMessages,
+  PIPELINE_STATE_MESSAGES,
+  PIPELINE_ERROR_MESSAGES,
+} from './Pipeline.utils'
 
 export enum PipelineStatusName {
   FAILED = 'failed',
@@ -58,7 +62,7 @@ const PipelineStatus = ({
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{PIPELINE_STATE_MESSAGES.failed.message}</p>
+            <p>{getPipelineStateMessages(requestStatus, 'failed').message}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -66,12 +70,20 @@ const PipelineStatus = ({
   }
   // Map backend statuses to UX-friendly display
   const getStatusConfig = () => {
+    const statusName =
+      pipelineStatus && typeof pipelineStatus === 'object' && 'name' in pipelineStatus
+        ? pipelineStatus.name
+        : undefined
+
+    // Get consistent tooltip message using the same logic as other components
+    const stateMessages = getPipelineStateMessages(requestStatus, statusName)
+
     if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
       return {
         label: 'Enabling...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
         color: 'text-brand-600',
-        tooltip: PIPELINE_STATE_MESSAGES.enabling.message,
+        tooltip: stateMessages.message,
       }
     }
 
@@ -80,7 +92,7 @@ const PipelineStatus = ({
         label: 'Disabling...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
         color: 'text-warning-600',
-        tooltip: PIPELINE_STATE_MESSAGES.disabling.message,
+        tooltip: stateMessages.message,
       }
     }
 
@@ -98,35 +110,35 @@ const PipelineStatus = ({
             label: 'Starting',
             dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
             color: 'text-warning-600',
-            tooltip: PIPELINE_STATE_MESSAGES.starting.message,
+            tooltip: stateMessages.message,
           }
         case PipelineStatusName.STARTED:
           return {
             label: 'Running',
             dot: <div className="w-2 h-2 bg-brand-600 rounded-full" />,
             color: 'text-brand-600',
-            tooltip: 'Replication is active and processing data',
+            tooltip: stateMessages.message,
           }
         case PipelineStatusName.STOPPED:
           return {
             label: 'Stopped',
             dot: <div className="w-2 h-2 bg-foreground-lighter rounded-full" />,
             color: 'text-foreground-light',
-            tooltip: PIPELINE_STATE_MESSAGES.stopped.message,
+            tooltip: stateMessages.message,
           }
         case PipelineStatusName.UNKNOWN:
           return {
             label: 'Unknown',
             dot: <div className="w-2 h-2 bg-warning-600 rounded-full" />,
             color: 'text-warning-600',
-            tooltip: PIPELINE_STATE_MESSAGES.unknown.message,
+            tooltip: stateMessages.message,
           }
         default:
           return {
             label: 'Unknown',
             dot: <div className="w-2 h-2 bg-destructive-600 rounded-full" />,
             color: 'text-destructive-600',
-            tooltip: PIPELINE_STATE_MESSAGES.unknown.message,
+            tooltip: stateMessages.message,
           }
       }
     }
@@ -145,7 +157,9 @@ const PipelineStatus = ({
   return (
     <>
       {isLoading && <ShimmeringLoader></ShimmeringLoader>}
-      {isError && <AlertError error={error} subject="Failed to retrieve pipeline status" />}
+      {isError && (
+        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
+      )}
       {isSuccess && (
         <>
           {statusConfig.isFailedStatus ? (

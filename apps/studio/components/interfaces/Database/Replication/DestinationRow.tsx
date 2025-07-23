@@ -11,12 +11,9 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { getStatusName } from './Pipeline.utils'
+import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { useParams } from 'common'
-import {
-  ReplicationPipelineStatusData,
-  useReplicationPipelineStatusQuery,
-} from 'data/replication/pipeline-status-query'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
@@ -96,14 +93,14 @@ const DestinationRow = ({
       return
     }
     if (!pipeline) {
-      toast.error('No pipeline found')
+      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
       return
     }
 
     try {
       await startPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
-      toast.error('Failed to enable destination')
+      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
     }
     setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
   }
@@ -113,14 +110,14 @@ const DestinationRow = ({
       return
     }
     if (!pipeline) {
-      toast.error('No pipeline found')
+      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
       return
     }
 
     try {
       await stopPipeline({ projectRef, pipelineId: pipeline.id })
     } catch (error) {
-      toast.error('Failed to disable destination')
+      toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
     }
     setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
   }
@@ -132,7 +129,7 @@ const DestinationRow = ({
       return
     }
     if (!pipeline) {
-      toast.error('No pipeline found')
+      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
       return
     }
 
@@ -142,14 +139,14 @@ const DestinationRow = ({
       // so we don't need to call deletePipeline explicitly
       await deleteDestination({ projectRef, destinationId: destinationId })
     } catch (error) {
-      toast.error('Failed to delete destination')
+      toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
     }
   }
 
   return (
     <>
       {isPipelineError && (
-        <AlertError error={pipelineError} subject="Failed to retrieve pipeline" />
+        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
       )}
       {isPipelineSuccess && (
         <Table.tr>

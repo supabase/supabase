@@ -1,6 +1,19 @@
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 
+// Shared error messages for consistency
+export const PIPELINE_ERROR_MESSAGES = {
+  RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',
+  RETRIEVE_PIPELINE_STATUS: 'Failed to retrieve pipeline status',
+  RETRIEVE_REPLICATION_STATUS: 'Failed to retrieve table replication status',
+  RETRIEVE_DESTINATIONS: 'Failed to retrieve destinations',
+  ENABLE_DESTINATION: 'Failed to enable destination',
+  DISABLE_DESTINATION: 'Failed to disable destination',
+  DELETE_DESTINATION: 'Failed to delete destination',
+  NO_PIPELINE_FOUND: 'No pipeline found',
+  COPY_TABLE_STATUS: 'Failed to copy table status',
+} as const
+
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined
 ): string | undefined => {
@@ -37,6 +50,11 @@ export const PIPELINE_STATE_MESSAGES = {
     message: 'Initializing replication. Table status will be available once running.',
     badge: 'Starting',
   },
+  running: {
+    title: 'Pipeline Running',
+    message: 'Replication is active and processing data',
+    badge: 'Running',
+  },
   unknown: {
     title: 'Pipeline Status Unknown',
     message: 'Unable to determine replication status. Check the logs for more information.',
@@ -49,7 +67,6 @@ export const PIPELINE_STATE_MESSAGES = {
   },
 } as const
 
-// Helper to get consistent state messages based on request status and pipeline status
 export const getPipelineStateMessages = (
   requestStatus: PipelineStatusRequestStatus | undefined,
   statusName: string | undefined
@@ -71,6 +88,8 @@ export const getPipelineStateMessages = (
       return PIPELINE_STATE_MESSAGES.stopped
     case 'starting':
       return PIPELINE_STATE_MESSAGES.starting
+    case 'started':
+      return PIPELINE_STATE_MESSAGES.running
     case 'unknown':
       return PIPELINE_STATE_MESSAGES.unknown
     default:

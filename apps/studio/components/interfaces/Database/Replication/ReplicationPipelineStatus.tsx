@@ -9,7 +9,7 @@ import {
   usePipelineRequestStatus,
   PipelineStatusRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { getStatusName, getPipelineStateMessages } from './Pipeline.utils'
+import { getStatusName, getPipelineStateMessages, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { useState, useEffect } from 'react'
 import {
   Button,
@@ -116,7 +116,7 @@ const ReplicationPipelineStatus = ({
       await copyToClipboard(statusText)
       toast.success('Table status copied to clipboard')
     } catch {
-      toast.error('Failed to copy table status')
+      toast.error(PIPELINE_ERROR_MESSAGES.COPY_TABLE_STATUS)
     }
   }
 
@@ -255,7 +255,7 @@ const ReplicationPipelineStatus = ({
             <h3 className="text-xl font-semibold">Pipeline Status</h3>
           </div>
         </div>
-        <AlertError error={pipelineError} subject="Failed to retrieve pipeline details" />
+        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
       </div>
     )
   }
@@ -305,7 +305,10 @@ const ReplicationPipelineStatus = ({
       {(isPipelineLoading || isStatusLoading) && <GenericSkeletonLoader />}
 
       {isStatusError && (
-        <AlertError error={statusError} subject="Failed to retrieve table replication status" />
+        <AlertError
+          error={statusError}
+          subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_REPLICATION_STATUS}
+        />
       )}
 
       {/* Error alert */}

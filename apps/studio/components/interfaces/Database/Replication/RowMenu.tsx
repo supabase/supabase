@@ -1,4 +1,5 @@
 import AlertError from 'components/ui/AlertError'
+import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { Edit, MoreVertical, Pause, Play, Trash } from 'lucide-react'
 import { ResponseError } from 'types'
 import {
@@ -46,7 +47,9 @@ const RowMenu = ({
   return (
     <div className="flex justify-end items-center space-x-2">
       {isLoading && <ShimmeringLoader></ShimmeringLoader>}
-      {isError && <AlertError error={error} subject="Failed to retrieve pipeline status" />}
+      {isError && (
+        <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
+      )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
