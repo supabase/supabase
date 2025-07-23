@@ -1,6 +1,7 @@
 import { RefreshCw, SquareArrowOutUpRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { FormattedWrapperTable } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { ImportForeignSchemaDialog } from 'components/interfaces/Storage/ImportForeignSchemaDialog'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -19,7 +20,7 @@ type NamespaceRowProps = {
   token: string
   wrapperInstance: FDW
   wrapperValues: Record<string, string>
-  wrapperMeta: Record<string, any>
+  wrapperMeta: WrapperMeta
 }
 
 export const NamespaceRow = ({
