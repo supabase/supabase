@@ -40,10 +40,11 @@ beforeAll(() => {
   routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
 })
 
-afterAll(() => mswServer.close())
-
-afterEach(() => mswServer.resetHandlers())
-
 afterEach(() => {
+  mswServer.resetHandlers()
   cleanup()
+})
+
+afterAll(() => {
+  mswServer.close()
 })
