@@ -65,8 +65,8 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '')
     .split('supabase-postgres-')[1]
     ?.replace('-orioledb', '')
-  const isOnNonGenerallyAvailableReleaseChannel =
-    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+  const isVisibleReleaseChannel =
+    current_app_version_release_channel && !['ga', 'withdrawn'].includes(current_app_version_release_channel) 
       ? current_app_version_release_channel
       : undefined
   const isOrioleDb = useIsOrioleDb()
@@ -144,15 +144,15 @@ const InfrastructureInfo = () => {
                           value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
                           label="Postgres version"
                           actions={[
-                            isOnNonGenerallyAvailableReleaseChannel && (
+                            isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1 capitalize">
-                                    {isOnNonGenerallyAvailableReleaseChannel}
+                                    {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
+                                  This project uses a {isVisibleReleaseChannel}{' '}
                                   database version release
                                 </TooltipContent>
                               </Tooltip>
