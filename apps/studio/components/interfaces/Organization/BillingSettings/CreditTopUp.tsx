@@ -227,8 +227,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
             <DialogTitle>Top Up Credits</DialogTitle>
             <DialogDescription>
               On successful payment, an invoice will be issued and you'll be granted credits.
-              Credits will be applied to future invoices only and are not refundable. The topped up
-              credits do not expire.
+              Credits will be applied to outstanding and future invoices and are not refundable. The
+              topped up credits do not expire.
             </DialogDescription>
           </DialogHeader>
 
