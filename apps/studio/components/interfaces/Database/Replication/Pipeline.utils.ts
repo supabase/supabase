@@ -1,7 +1,6 @@
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 
-// Shared error messages for consistency
 export const PIPELINE_ERROR_MESSAGES = {
   RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',
   RETRIEVE_PIPELINE_STATUS: 'Failed to retrieve pipeline status',
@@ -23,7 +22,6 @@ export const getStatusName = (
   return undefined
 }
 
-// Shared state messages to avoid duplication
 export const PIPELINE_STATE_MESSAGES = {
   enabling: {
     title: 'Pipeline Enabling',

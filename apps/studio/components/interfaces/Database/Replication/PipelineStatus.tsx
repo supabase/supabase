@@ -8,7 +8,6 @@ import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import {
   getPipelineStateMessages,
-  PIPELINE_STATE_MESSAGES,
   PIPELINE_ERROR_MESSAGES,
 } from './Pipeline.utils'
 
