@@ -1,8 +1,13 @@
 import { useParams } from 'common'
+import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import { getConnectionStrings } from 'components/interfaces/Connect/DatabaseSettings.utils'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { getAllTableRowsSql } from 'data/table-rows/table-rows-query'
 import { pluckObjectFields } from 'lib/helpers'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { useState } from 'react'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -30,6 +35,10 @@ interface ExportDialogProps {
 export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
   const { ref: projectRef } = useParams()
   const snap = useTableEditorTableStateSnapshot()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
+
+  const { filters } = useTableFilter()
+  const { sorts } = useTableSort()
   const [selectedTab, setSelectedTab] = useState<string>('csv')
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
@@ -48,9 +57,14 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
   })
 
   const outputName = `${snap.table.name}_rows`
+  const queryChains = getAllTableRowsSql({ table: snap.table, sorts, filters })
+  const query = wrapWithRoleImpersonation(
+    queryChains.toSql(),
+    roleImpersonationState as RoleImpersonationState
+  )
 
   const csvExportCommand = `
-${connectionStrings.direct.psql} -c "COPY (SELECT * FROM "${snap.table.schema}"."${snap.table.name}") TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv
+${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv
 `.trim()
 
   const sqlExportCommand = `
@@ -95,6 +109,12 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.
                 value={sqlExportCommand}
                 className="[&_code]:text-[12px] [&_code]:text-foreground"
               />
+              <Admonition
+                type="note"
+                className="mt-2"
+                title="Filters are not supported when exporting as SQL via pg_dump"
+                description="If you'd like to export as SQL, we recommend creating a view first then exporting the data from there via pg_dump instead"
+              />
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
 
@@ -107,15 +127,11 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.
           </p>
 
           {selectedTab === 'sql' && (
-            <Admonition
-              type="note"
-              title="The pg_dump version needs to match your Postgres version"
-            >
-              <p className="!leading-normal">
-                If you run into a server version mismatch error, you will need to update{' '}
-                <code>pg_dump</code> before running the command.
-              </p>
-            </Admonition>
+            <p className="text-sm text-foreground-light">
+              Note: <code>pg_dump</code> needs to match your project's Postgres version. If you run
+              into a server version mismatch error, you will need to update <code>pg_dump</code>{' '}
+              before running the command.
+            </p>
           )}
         </DialogSection>
         <DialogFooter>
