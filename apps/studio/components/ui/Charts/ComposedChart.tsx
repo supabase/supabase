@@ -1,12 +1,14 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useState } from 'react'
 import {
   Area,
   Bar,
   CartesianGrid,
+  Label,
   Line,
   ComposedChart as RechartComposedChart,
   ReferenceArea,
@@ -14,7 +16,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Label,
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
@@ -28,11 +29,14 @@ import {
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
-import { calculateTotalChartAggregate, CustomLabel, CustomTooltip } from './ComposedChart.utils'
+import {
+  calculateTotalChartAggregate,
+  CustomLabel,
+  CustomTooltip,
+  MultiAttribute,
+} from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { MultiAttribute } from './ComposedChart.utils'
 import { ChartHighlight } from './useChartHighlight'
-import { formatBytes } from 'lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
