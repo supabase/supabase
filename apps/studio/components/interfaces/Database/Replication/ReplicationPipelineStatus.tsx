@@ -176,10 +176,11 @@ const ReplicationPipelineStatus = ({
         badge: isEnabling ? 'Enabling' : 'Disabling',
         icon: <Loader2 className="w-6 h-6 animate-spin" />,
         colors: {
-          bg: isEnabling ? 'bg-brand-50 border-brand-200' : 'bg-warning-50 border-warning-200',
+          bg: isEnabling ? 'bg-brand-50' : 'bg-warning-50',
           text: isEnabling ? 'text-brand-900' : 'text-warning-900',
           subtext: isEnabling ? 'text-brand-700' : 'text-warning-700',
-          icon: isEnabling ? 'text-brand-600' : 'text-warning-600',
+          iconBg: isEnabling ? 'bg-brand-600' : 'bg-warning-600',
+          icon: 'text-white dark:text-black',
         },
       }
     }
@@ -192,10 +193,11 @@ const ReplicationPipelineStatus = ({
           badge: 'Failed',
           icon: <XCircle className="w-6 h-6" />,
           colors: {
-            bg: 'bg-destructive-50 border-destructive-200',
+            bg: 'bg-destructive-50',
             text: 'text-destructive-900',
             subtext: 'text-destructive-700',
-            icon: 'text-destructive-600',
+            iconBg: 'bg-destructive-600',
+            icon: 'text-white dark:text-black',
           },
         }
       case 'stopped':
@@ -205,10 +207,11 @@ const ReplicationPipelineStatus = ({
           badge: 'Stopped',
           icon: <Activity className="w-6 h-6" />,
           colors: {
-            bg: 'bg-surface-100 border-border-muted',
+            bg: 'bg-surface-100',
             text: 'text-foreground',
             subtext: 'text-foreground-light',
-            icon: 'text-foreground-lighter',
+            iconBg: 'bg-foreground-lighter',
+            icon: 'text-white dark:text-black',
           },
         }
       case 'starting':
@@ -218,10 +221,11 @@ const ReplicationPipelineStatus = ({
           badge: 'Starting',
           icon: <Clock className="w-6 h-6" />,
           colors: {
-            bg: 'bg-warning-50 border-warning-200',
+            bg: 'bg-warning-50',
             text: 'text-warning-900',
             subtext: 'text-warning-700',
-            icon: 'text-warning-600',
+            iconBg: 'bg-warning-600',
+            icon: 'text-white dark:text-black',
           },
         }
       case 'unknown':
@@ -231,10 +235,11 @@ const ReplicationPipelineStatus = ({
           badge: 'Unknown',
           icon: <HelpCircle className="w-6 h-6" />,
           colors: {
-            bg: 'bg-warning-50 border-warning-200',
+            bg: 'bg-warning-50',
             text: 'text-warning-900',
             subtext: 'text-warning-700',
-            icon: 'text-warning-600',
+            iconBg: 'bg-warning-600',
+            icon: 'text-white dark:text-black',
           },
         }
       default:
@@ -244,10 +249,11 @@ const ReplicationPipelineStatus = ({
           badge: 'Disabled',
           icon: <Activity className="w-6 h-6" />,
           colors: {
-            bg: 'bg-surface-100 border-border-muted',
+            bg: 'bg-surface-100',
             text: 'text-foreground',
             subtext: 'text-foreground-light',
-            icon: 'text-foreground-lighter',
+            iconBg: 'bg-foreground-lighter',
+            icon: 'text-white dark:text-black',
           },
         }
     }
@@ -370,9 +376,9 @@ const ReplicationPipelineStatus = ({
         const config = getDisabledStateConfig()
         return (
           <div className="space-y-4">
-            <div className={`p-4 border rounded-lg ${config.colors.bg}`}>
+            <div className={`p-4 border border-default rounded-lg ${config.colors.bg}`}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${config.colors.iconBg}`}>
                   <div className={config.colors.icon}>{config.icon}</div>
                 </div>
                 <div className="flex-1">
