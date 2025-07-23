@@ -212,6 +212,7 @@ export const AnalyticBucketDetails = ({ bucket }: { bucket: Bucket }) => {
                           token={token!}
                           wrapperInstance={wrapperInstance}
                           wrapperValues={wrapperValues}
+                          wrapperMeta={wrapperMeta}
                         />
                       ))}
                     </TableBody>

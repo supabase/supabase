@@ -10,6 +10,8 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
+import { getFDWs } from 'data/fdw/fdws-query'
 import {
   Button,
   Form_Shadcn_,
@@ -19,11 +21,17 @@ import {
   Modal,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
+import {
+  convertKVStringArrayToJson,
+  formatWrapperTables,
+} from '../Integrations/Wrappers/Wrappers.utils'
 import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
   namespace: string
+  wrapperMeta: WrapperMeta
   visible: boolean
   onClose: () => void
 }
@@ -31,6 +39,7 @@ export interface ImportForeignSchemaDialogProps {
 export const ImportForeignSchemaDialog = ({
   bucketName,
   namespace,
+  wrapperMeta,
   visible,
   onClose,
 }: ImportForeignSchemaDialogProps) => {
@@ -39,7 +48,8 @@ export const ImportForeignSchemaDialog = ({
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
-  const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({
+  const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({})
+  const { mutateAsync: updateFDW } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully connected ${bucketName} to the database.`)
       onClose()
@@ -77,6 +87,7 @@ export const ImportForeignSchemaDialog = ({
   const { mutateAsync: createSchema } = useSchemaCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    const serverName = `${snakeCase(values.bucketName)}_fdw_server`
     if (!ref) return console.error('Project ref is required')
     setLoading(true)
 
@@ -90,9 +101,40 @@ export const ImportForeignSchemaDialog = ({
       await importForeignSchema({
         projectRef: ref,
         connectionString: project?.connectionString,
-        serverName: `${snakeCase(values.bucketName)}_fdw_server`,
+        serverName: serverName,
         sourceSchema: values.sourceNamespace,
         targetSchema: values.targetSchema,
+      })
+
+      const FDWs = await getFDWs({ projectRef: ref, connectionString: project?.connectionString })
+      const wrapper = FDWs.find((fdw) => fdw.server_name === serverName)
+      if (!wrapper) {
+        throw new Error(`Foreign data wrapper with server name ${serverName} not found`)
+      }
+
+      const formValues: Record<string, string> = {
+        wrapper_name: wrapper.name,
+        server_name: wrapper.server_name,
+        ...convertKVStringArrayToJson(wrapper.server_options ?? []),
+      }
+
+      const targetSchemas = (formValues['supabase_target_schema'] || '')
+        .split(',')
+        .map((s) => s.trim())
+
+      const wrapperTables = formatWrapperTables(wrapper, wrapperMeta)
+
+      await updateFDW({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        wrapper: wrapper,
+        wrapperMeta: wrapperMeta,
+        formState: {
+          ...formValues,
+          server_name: serverName,
+          supabase_target_schema: [...targetSchemas, values.targetSchema].join(','),
+        },
+        tables: wrapperTables,
       })
     } catch (error: any) {
       // error will be handled by the mutation onError callback

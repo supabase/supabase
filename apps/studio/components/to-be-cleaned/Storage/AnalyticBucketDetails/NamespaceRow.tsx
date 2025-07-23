@@ -19,6 +19,7 @@ type NamespaceRowProps = {
   token: string
   wrapperInstance: FDW
   wrapperValues: Record<string, string>
+  wrapperMeta: Record<string, any>
 }
 
 export const NamespaceRow = ({
@@ -29,11 +30,10 @@ export const NamespaceRow = ({
   token,
   wrapperInstance,
   wrapperValues,
+  wrapperMeta,
 }: NamespaceRowProps) => {
   const { project } = useProjectContext()
   const [importForeignSchemaShown, setImportForeignSchemaShown] = useState(false)
-
-  const targetSchema = tables[0]?.schema_name ?? ''
 
   const { data: tablesData, isLoading: isLoadingNamespaceTables } = useIcebergNamespaceTablesQuery(
     {
@@ -54,7 +54,7 @@ export const NamespaceRow = ({
       connectionString: project?.connectionString,
       serverName: wrapperInstance.server_name,
       sourceSchema: namespace,
-      targetSchema: targetSchema,
+      targetSchema: schema,
     })
   }
 
@@ -120,6 +120,7 @@ export const NamespaceRow = ({
       <ImportForeignSchemaDialog
         bucketName={bucketName}
         namespace={namespace}
+        wrapperMeta={wrapperMeta}
         visible={importForeignSchemaShown}
         onClose={() => setImportForeignSchemaShown(false)}
       />
