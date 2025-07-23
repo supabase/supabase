@@ -259,10 +259,7 @@ const NewPaymentMethodElement = forwardRef(
               checked={purchasingAsBusiness}
               onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
             />
-            <label
-              htmlFor="business"
-              className="text-foreground-light text-sm leading-none"
-            >
+            <label htmlFor="business" className="text-foreground-light text-sm leading-none">
               I'm purchasing as a business
             </label>
           </div>
