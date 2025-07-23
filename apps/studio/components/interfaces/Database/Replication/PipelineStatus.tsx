@@ -57,7 +57,7 @@ const PipelineStatus = ({
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Pipeline has failed - check the logs section for detailed error information</p>
+            <p>Replication has encountered an error. Check the logs for details.</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -70,7 +70,7 @@ const PipelineStatus = ({
         label: 'Enabling...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-brand-600" />,
         color: 'text-brand-600',
-        tooltip: 'Pipeline is being enabled and will start shortly',
+        tooltip: 'Starting the pipeline. Table replication will resume once enabled.',
       }
     }
 
@@ -79,7 +79,7 @@ const PipelineStatus = ({
         label: 'Disabling...',
         dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
         color: 'text-warning-600',
-        tooltip: 'Pipeline is being disabled and will stop shortly',
+        tooltip: 'Stopping the pipeline. Table replication will be paused once disabled.',
       }
     }
 
@@ -97,35 +97,35 @@ const PipelineStatus = ({
             label: 'Starting',
             dot: <Loader2 className="animate-spin w-3 h-3 text-warning-600" />,
             color: 'text-warning-600',
-            tooltip: 'Pipeline is initializing and will be ready soon',
+            tooltip: 'Initializing replication. Table status will be available once running.',
           }
         case PipelineStatusName.STARTED:
           return {
             label: 'Running',
             dot: <div className="w-2 h-2 bg-brand-600 rounded-full" />,
             color: 'text-brand-600',
-            tooltip: 'Pipeline is active and processing data',
+            tooltip: 'Replication is active and processing data',
           }
         case PipelineStatusName.STOPPED:
           return {
             label: 'Stopped',
             dot: <div className="w-2 h-2 bg-foreground-lighter rounded-full" />,
             color: 'text-foreground-light',
-            tooltip: 'Pipeline is not running - enable to start processing',
+            tooltip: 'Replication is paused. Enable the pipeline to resume data synchronization.',
           }
         case PipelineStatusName.UNKNOWN:
           return {
             label: 'Unknown',
             dot: <div className="w-2 h-2 bg-warning-600 rounded-full" />,
             color: 'text-warning-600',
-            tooltip: 'Pipeline status could not be determined',
+            tooltip: 'Unable to determine replication status. Check the logs for more information.',
           }
         default:
           return {
             label: 'Unknown',
             dot: <div className="w-2 h-2 bg-destructive-600 rounded-full" />,
             color: 'text-destructive-600',
-            tooltip: 'Pipeline status is unclear - check logs for details',
+            tooltip: 'Unable to determine replication status. Check the logs for more information.',
           }
       }
     }

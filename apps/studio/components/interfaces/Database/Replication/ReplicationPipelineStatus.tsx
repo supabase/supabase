@@ -451,7 +451,7 @@ const ReplicationPipelineStatus = ({
                             />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Copy unavailable while pipeline is not running</p>
+                            <p>Copy unavailable while pipeline is {config.badge.toLowerCase()}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
