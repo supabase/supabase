@@ -70,6 +70,8 @@ export const useVaultSecretDecryptedValueQuery = <TData = string>(
   )
 
 // [Joshen] Considering to consolidate fetching single and multiple decrypted values by just passing in a string array
+// This is currently used in ImportForeignSchemaDialog, but reckon EditWrapperSheet can use this too to replace the useEffect on L153
+// which fetches all the decrypted secrets
 export const getDecryptedValues = async (
   {
     projectRef,
