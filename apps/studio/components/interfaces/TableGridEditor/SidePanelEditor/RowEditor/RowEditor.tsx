@@ -21,8 +21,7 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { AlertTriangle } from 'lucide-react'
+import { TransactionBanner } from 'components/layouts/TransactionBanner'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -45,7 +44,6 @@ const RowEditor = ({
 }: RowEditorProps) => {
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [rowFields, setRowFields] = useState<RowField[]>([])
-  const { hasTransaction } = useRoleImpersonationStateSnapshot()
 
   const [selectedValueForTextEdit, setSelectedValueForTextEdit] = useState<EditValue>()
   const [selectedValueForJsonEdit, setSelectedValueForJsonEdit] = useState<EditValue>()
@@ -170,11 +168,7 @@ const RowEditor = ({
       }`}
       onCancel={closePanel}
     >
-      {hasTransaction && (
-        <div className="flex items-center gap-x-2 bg-warning py-2 px-6 text-black sticky top-0 z-10">
-          <p className="text-xs">You are in test mode. Any changes you make will be rolled back.</p>
-        </div>
-      )}
+      <TransactionBanner sticky />
       <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
           <div className="flex flex-grow flex-col">

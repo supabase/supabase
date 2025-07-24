@@ -8,8 +8,8 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
+import { TransactionBanner } from '../TransactionBanner'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { AlertTriangle } from 'lucide-react'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -38,13 +38,7 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
           hasTransaction && 'border-2 border-t-0 border-warning'
         )}
       >
-        {hasTransaction && (
-          <div className="flex items-center gap-x-2 bg-warning py-2 px-3 text-warning-foreground">
-            <p className="text-xs text-warning-100">
-              You are in test mode. Any changes to database records will be rolled back.
-            </p>
-          </div>
-        )}
+        <TransactionBanner />
         <div
           className={cn(
             'h-10 flex items-center',
