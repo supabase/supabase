@@ -182,6 +182,7 @@ export const CreateBranchModal = () => {
     createBranch({
       projectRef,
       branchName: data.branchName,
+      is_default: false,
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
     })
   }
