@@ -63,8 +63,10 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
         updateTest({
           projectRef: project?.ref!,
           id: test.id,
+          name: test.name,
           query,
         })
+        setEditorPanel({ open: false })
       },
     })
   }
@@ -84,6 +86,7 @@ ROLLBACK;
       onSave: (query) => {
         createTest({
           projectRef: project?.ref!,
+          name: 'New test',
           connectionString: project?.connectionString,
           query,
         })

@@ -31,6 +31,7 @@ interface TestRowProps {
   prependQuery?: DatabaseTest | null
   canRun?: boolean
   onSelectTest: (test: DatabaseTest) => void
+  index: number
 }
 
 // Utility function to validate test query format
@@ -40,7 +41,7 @@ const isValidTestQuery = (query: string): boolean => {
 }
 
 const TestRow = forwardRef<TestRowHandle, TestRowProps>(
-  ({ test, prependQuery, canRun = false, onSelectTest }, ref) => {
+  ({ test, prependQuery, canRun = false, onSelectTest, index }, ref) => {
     const project = useSelectedProject()
     const [isRunning, setIsRunning] = useState(false)
     const [status, setStatus] = useState<'queued' | 'passed' | 'failed' | undefined>()
@@ -126,52 +127,58 @@ const TestRow = forwardRef<TestRowHandle, TestRowProps>(
       if (status === 'failed') {
         return <Badge variant="destructive">Failed</Badge>
       }
-      return <Badge variant="outline">Not run</Badge>
+      return null
     }
 
     return (
       <>
-        <TableRow key={test.id}>
-          <TableCell>
-            <p className="text-sm cursor-pointer" onClick={() => onSelectTest(test)}>
-              {test.name}
-            </p>
-          </TableCell>
-          <TableCell>{getStatusBadge()}</TableCell>
-          <TableCell>{lastRun ? dayjs(lastRun).fromNow() : 'Never'}</TableCell>
-          <TableCell className="text-right">
-            <div className="flex items-center justify-end gap-2">
-              {canRun && (
-                <ButtonTooltip
-                  type="default"
-                  icon={<Play />}
-                  loading={isRunning}
-                  disabled={isRunning || status === 'queued' || !isTestQueryValid}
-                  onClick={handleRunTest}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !isTestQueryValid
-                        ? 'Test query must start with BEGIN; and end with ROLLBACK;'
-                        : undefined,
-                    },
-                  }}
-                />
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button type="text" icon={<MoreVertical />} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setIsDeleteModalOpen(true)}>
-                    <Trash size={14} />
-                    <span className="ml-2">Remove test</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+        <div
+          key={test.id}
+          className="flex text-sm items-center gap-3 border-b px-4 py-3 last:border-b-0"
+        >
+          <span className="flex items-center justify-center w-5 h-5 text-xs rounded bg border border-default text-foreground-lighter">
+            {index + 1}
+          </span>
+          <p className="cursor-pointer flex-1" onClick={() => onSelectTest(test)}>
+            {test.name}
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="text-foreground-light text-xs">
+              {lastRun ? dayjs(lastRun).fromNow() : null}
             </div>
-          </TableCell>
-        </TableRow>
+            {getStatusBadge()}
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            {canRun && (
+              <ButtonTooltip
+                type="default"
+                icon={<Play />}
+                loading={isRunning}
+                disabled={isRunning || status === 'queued' || !isTestQueryValid}
+                onClick={handleRunTest}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !isTestQueryValid
+                      ? 'Test query must start with BEGIN; and end with ROLLBACK;'
+                      : undefined,
+                  },
+                }}
+              />
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="text" icon={<MoreVertical />} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setIsDeleteModalOpen(true)}>
+                  <Trash size={14} />
+                  <span className="ml-2">Remove test</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
         <ConfirmationModal
           visible={isDeleteModalOpen}
           title="Delete test"

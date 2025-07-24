@@ -1,7 +1,7 @@
 import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { Search, MoreVertical, Trash } from 'lucide-react'
+import { Search, MoreVertical, Trash, Settings2, FlaskConical } from 'lucide-react'
 import {
   Alert,
   Button,
@@ -39,10 +39,11 @@ const isValidTestQuery = (query: string): boolean => {
 // Simple component for setup test rows - just name and actions
 interface SetupTestRowProps {
   test: DatabaseTest
+  index: number
   onSelectTest: (test: DatabaseTest) => void
 }
 
-const SetupTestRow = ({ test, onSelectTest }: SetupTestRowProps) => {
+const SetupTestRow = ({ test, index, onSelectTest }: SetupTestRowProps) => {
   const project = useSelectedProject()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
@@ -58,7 +59,10 @@ const SetupTestRow = ({ test, onSelectTest }: SetupTestRowProps) => {
   }
 
   return (
-    <div className="w-full flex justify-between items-center p-4">
+    <div className="w-full flex justify-between items-center p-4 gap-3 border-b last:border-b-0">
+      <span className="flex items-center justify-center w-5 h-5 text-xs rounded bg border border-default text-foreground-lighter">
+        {index + 1}
+      </span>
       <p className="text-sm cursor-pointer w-full" onClick={() => onSelectTest(test)}>
         {test.name}
       </p>
@@ -230,8 +234,8 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
                 environment.
               </p>
             ) : (
-              tests.map((test) => (
-                <SetupTestRow key={test.id} test={test} onSelectTest={onSelectTest} />
+              tests.map((test, index) => (
+                <SetupTestRow key={test.id} index={index} test={test} onSelectTest={onSelectTest} />
               ))
             )}
           </div>
@@ -240,28 +244,19 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
 
       // Regular tests view with full TestRow component
       return (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Last Run</TableHead>
-              <TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tests.map((test) => (
-              <TestRow
-                ref={(el) => (testRowRefs.current[test.id] = el)}
-                key={test.id}
-                test={test}
-                prependQuery={setupTest}
-                canRun={true}
-                onSelectTest={onSelectTest}
-              />
-            ))}
-          </TableBody>
-        </Table>
+        <div>
+          {tests.map((test, index) => (
+            <TestRow
+              ref={(el) => (testRowRefs.current[test.id] = el)}
+              key={test.id}
+              index={index}
+              test={test}
+              prependQuery={setupTest}
+              canRun={true}
+              onSelectTest={onSelectTest}
+            />
+          ))}
+        </div>
       )
     }
 
@@ -286,7 +281,10 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
             {/* Setup Tests Group - Always show */}
             <Card>
               <CardHeader className="px-4">
-                <CardTitle className="text-sm font-medium">Before Tests</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Settings2 strokeWidth={1.5} size={16} className="text-foreground-lighter" />
+                  <CardTitle>Before Tests</CardTitle>
+                </div>
               </CardHeader>
               {renderTestTable(filteredSetupTests, true)}
             </Card>
@@ -295,7 +293,10 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
             {filteredRegularTests.length > 0 && (
               <Card>
                 <CardHeader className="px-4">
-                  <CardTitle className="text-sm font-medium">Tests</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <FlaskConical strokeWidth={1.5} size={16} className="text-foreground-lighter" />
+                    <CardTitle>Tests</CardTitle>
+                  </div>
                 </CardHeader>
                 {renderTestTable(filteredRegularTests, false)}
               </Card>
