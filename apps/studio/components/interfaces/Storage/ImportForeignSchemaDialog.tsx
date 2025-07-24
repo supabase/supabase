@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { snakeCase } from 'lodash'
+import { snakeCase, uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -137,7 +137,9 @@ export const ImportForeignSchemaDialog = ({
         formState: {
           ...formValues,
           server_name: serverName,
-          supabase_target_schema: [...targetSchemas, values.targetSchema].join(','),
+          supabase_target_schema: uniq([...targetSchemas, values.targetSchema])
+            .filter(Boolean)
+            .join(','),
         },
         tables: wrapperTables,
       })
