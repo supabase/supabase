@@ -135,7 +135,7 @@ const GitHubIntegrationConnectionForm = ({
   const GitHubSettingsSchema = z
     .object({
       repositoryId: z.string().min(1, 'Please select a repository'),
-      enableProductionSync: z.boolean().default(true),
+      // Removed enableProductionSync toggle; production branch is always required
       branchName: z.string().default('main'),
       new_branch_per_pr: z.boolean().default(true),
       supabaseDirectory: z.string().default('.'),
@@ -143,24 +143,32 @@ const GitHubIntegrationConnectionForm = ({
       branchLimit: z.string().default('50'),
     })
     .superRefine(async (val, ctx) => {
-      if (val.enableProductionSync && val.branchName && val.branchName.length > 0) {
-        const repositoryId = val.repositoryId || connection?.repository.id.toString()
-        if (repositoryId) {
-          try {
-            await checkGithubBranchValidity({
-              repositoryId: Number(repositoryId),
-              branchName: val.branchName,
-            })
-          } catch (error) {
-            const selectedRepo = githubRepos.find((repo) => repo.id === repositoryId)
-            const repoName =
-              selectedRepo?.name || connection?.repository.name || 'selected repository'
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Branch "${val.branchName}" not found in ${repoName}`,
-              path: ['branchName'],
-            })
-          }
+      if (!val.branchName || val.branchName.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please enter a branch name',
+          path: ['branchName'],
+        })
+        return
+      }
+
+      // Validate that the provided branch exists in the selected repository
+      const repositoryId = val.repositoryId || connection?.repository.id.toString()
+      if (repositoryId) {
+        try {
+          await checkGithubBranchValidity({
+            repositoryId: Number(repositoryId),
+            branchName: val.branchName,
+          })
+        } catch (error) {
+          const selectedRepo = githubRepos.find((repo) => repo.id === repositoryId)
+          const repoName =
+            selectedRepo?.name || connection?.repository.name || 'selected repository'
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Branch "${val.branchName}" not found in ${repoName}`,
+            path: ['branchName'],
+          })
         }
       }
     })
@@ -171,7 +179,7 @@ const GitHubIntegrationConnectionForm = ({
     reValidateMode: 'onBlur',
     defaultValues: {
       repositoryId: connection?.repository.id.toString() || '',
-      enableProductionSync: true,
+      // enableProductionSync removed
       branchName: 'main',
       new_branch_per_pr: true,
       supabaseDirectory: '.',
@@ -180,7 +188,6 @@ const GitHubIntegrationConnectionForm = ({
     },
   })
 
-  const enableProductionSync = githubSettingsForm.watch('enableProductionSync')
   const newBranchPerPr = githubSettingsForm.watch('new_branch_per_pr')
   const currentRepositoryId = githubSettingsForm.watch('repositoryId')
 
@@ -257,7 +264,7 @@ const GitHubIntegrationConnectionForm = ({
 
     const originalBranchName = prodBranch?.git_branch
 
-    if (originalBranchName && data.branchName !== originalBranchName && data.enableProductionSync) {
+    if (originalBranchName && data.branchName !== originalBranchName) {
       setIsConfirmingBranchChange(true)
       return
     }
@@ -286,7 +293,7 @@ const GitHubIntegrationConnectionForm = ({
       updateBranch({
         id: prodBranch.id,
         projectRef: selectedProject.ref,
-        gitBranch: data.enableProductionSync ? data.branchName : '',
+        gitBranch: data.branchName,
       })
     }
 
@@ -311,7 +318,6 @@ const GitHubIntegrationConnectionForm = ({
 
       githubSettingsForm.reset({
         repositoryId: '',
-        enableProductionSync: true,
         branchName: 'main',
         new_branch_per_pr: true,
         supabaseDirectory: '.',
@@ -360,7 +366,6 @@ const GitHubIntegrationConnectionForm = ({
 
       githubSettingsForm.reset({
         repositoryId: connection.repository.id.toString(),
-        enableProductionSync: hasGitBranch,
         branchName: prodBranch?.git_branch || 'main',
         new_branch_per_pr: connection.new_branch_per_pr,
         supabaseDirectory: connection.workdir || '',
@@ -369,15 +374,6 @@ const GitHubIntegrationConnectionForm = ({
       })
     }
   }, [connection, prodBranch, githubSettingsForm])
-
-  // Handle clearing branch name when production sync is disabled
-  useEffect(() => {
-    if (!enableProductionSync) {
-      githubSettingsForm.setValue('branchName', '')
-    } else if (enableProductionSync && !githubSettingsForm.getValues().branchName) {
-      githubSettingsForm.setValue('branchName', 'main')
-    }
-  }, [enableProductionSync, githubSettingsForm])
 
   // Show authorization prompt if not authorized
   if (gitHubAuthorization === null) {
@@ -450,7 +446,12 @@ const GitHubIntegrationConnectionForm = ({
                           </Button>
                         </FormControl_Shadcn_>
                       </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
+                      <PopoverContent_Shadcn_
+                        portal
+                        className="p-0 w-80"
+                        side="bottom"
+                        align="start"
+                      >
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Search repositories..." />
                           <CommandList_Shadcn_ className="!max-h-[200px]">
@@ -501,6 +502,7 @@ const GitHubIntegrationConnectionForm = ({
                     layout="flex-row-reverse"
                     label="Supabase directory"
                     description="Relative path to your supabase folder"
+                    className="mb-4"
                   >
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
@@ -513,64 +515,30 @@ const GitHubIntegrationConnectionForm = ({
                   </FormItemLayout>
                 )}
               />
-            </CardContent>
-            <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
-              {/* Production Branch Sync Section */}
-              <div className="space-y-4">
-                <FormField_Shadcn_
-                  control={githubSettingsForm.control}
-                  name="enableProductionSync"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Deploy to production"
-                      description="Deploy changes to production on push including PR merges"
-                    >
+              <FormField_Shadcn_
+                control={githubSettingsForm.control}
+                name="branchName"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Production branch name"
+                    description="The GitHub branch to sync with your production database (e.g., main, master)"
+                  >
+                    <div className="relative w-full">
                       <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
+                        <Input_Shadcn_
+                          {...field}
+                          autoComplete="off"
                           disabled={disabled || !canUpdateGitHubConnection}
                         />
                       </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
-                <div
-                  className={cn(
-                    'space-y-4 pl-6 border-l',
-                    (!enableProductionSync || disabled) && 'opacity-25 pointer-events-none'
-                  )}
-                >
-                  <FormField_Shadcn_
-                    control={githubSettingsForm.control}
-                    name="branchName"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Production branch name"
-                        description="The GitHub branch to sync with your production database (e.g., main, master)"
-                      >
-                        <div className="relative w-full">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
-                              {...field}
-                              autoComplete="off"
-                              disabled={
-                                disabled || !canUpdateGitHubConnection || !enableProductionSync
-                              }
-                            />
-                          </FormControl_Shadcn_>
-                          <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                            {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
-                          </div>
-                        </div>
-                      </FormItemLayout>
-                    )}
-                  />
-                </div>
-              </div>
+                      <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                        {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
+                      </div>
+                    </div>
+                  </FormItemLayout>
+                )}
+              />
             </CardContent>
             <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
               {/* Automatic Branching Section */}
