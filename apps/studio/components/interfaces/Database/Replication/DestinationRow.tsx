@@ -18,7 +18,7 @@ import DeleteDestination from './DeleteDestination'
 import DestinationPanel from './DestinationPanel'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
-import RowMenu from './RowMenu'
+import { RowMenu } from './RowMenu'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 

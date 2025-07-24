@@ -33,7 +33,7 @@ interface RowMenuProps {
   onDeleteClick: () => void
 }
 
-const RowMenu = ({
+export const RowMenu = ({
   pipeline,
   pipelineStatus,
   error,
@@ -96,14 +96,19 @@ const RowMenu = ({
 
   return (
     <div className="flex justify-end items-center space-x-2">
-      {isLoading && <ShimmeringLoader></ShimmeringLoader>}
+      {isLoading && <ShimmeringLoader />}
       {isError && (
         <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
       )}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+          <Button
+            type="default"
+            className="px-1.5"
+            icon={<MoreVertical />}
+            onClick={(e) => e.stopPropagation()}
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           {pipelineEnabled ? (
@@ -131,5 +136,3 @@ const RowMenu = ({
     </div>
   )
 }
-
-export default RowMenu
