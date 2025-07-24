@@ -229,7 +229,7 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
         return (
           <div className="w-full">
             {tests.length === 0 ? (
-              <p>
+              <p className="text-sm text-foreground-light p-4">
                 No setup tests found. Create tests with names starting with "000" to set up test
                 environment.
               </p>
@@ -245,17 +245,21 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
       // Regular tests view with full TestRow component
       return (
         <div>
-          {tests.map((test, index) => (
-            <TestRow
-              ref={(el) => (testRowRefs.current[test.id] = el)}
-              key={test.id}
-              index={index}
-              test={test}
-              prependQuery={setupTest}
-              canRun={true}
-              onSelectTest={onSelectTest}
-            />
-          ))}
+          {tests.length === 0 ? (
+            <p className="text-sm text-foreground-light p-4">No tests found.</p>
+          ) : (
+            tests.map((test, index) => (
+              <TestRow
+                ref={(el) => (testRowRefs.current[test.id] = el)}
+                key={test.id}
+                index={index}
+                test={test}
+                prependQuery={setupTest}
+                canRun={true}
+                onSelectTest={onSelectTest}
+              />
+            ))
+          )}
         </div>
       )
     }
@@ -272,13 +276,6 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
         )}
         {isSuccess && (
           <>
-            {filteredSetupTests.length === 0 &&
-              filteredRegularTests.length === 0 &&
-              setupTests.length === 0 && (
-                <div className="p-4 text-center text-sm text-foreground-light">No tests found.</div>
-              )}
-
-            {/* Setup Tests Group - Always show */}
             <Card>
               <CardHeader className="px-4">
                 <div className="flex items-center gap-2">
@@ -289,18 +286,15 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
               {renderTestTable(filteredSetupTests, true)}
             </Card>
 
-            {/* Regular Tests Group */}
-            {filteredRegularTests.length > 0 && (
-              <Card>
-                <CardHeader className="px-4">
-                  <div className="flex items-center gap-2">
-                    <FlaskConical strokeWidth={1.5} size={16} className="text-foreground-lighter" />
-                    <CardTitle>Tests</CardTitle>
-                  </div>
-                </CardHeader>
-                {renderTestTable(filteredRegularTests, false)}
-              </Card>
-            )}
+            <Card>
+              <CardHeader className="px-4">
+                <div className="flex items-center gap-2">
+                  <FlaskConical strokeWidth={1.5} size={16} className="text-foreground-lighter" />
+                  <CardTitle>Tests</CardTitle>
+                </div>
+              </CardHeader>
+              {renderTestTable(filteredRegularTests, false)}
+            </Card>
           </>
         )}
       </div>

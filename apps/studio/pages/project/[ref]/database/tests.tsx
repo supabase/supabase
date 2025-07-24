@@ -19,6 +19,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
 import { toast } from 'sonner'
+import { useProfile } from 'lib/profile'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabaseTestCreateMutation } from 'data/database-tests/database-test-create-mutation'
 import { useDatabaseTestUpdateMutation } from 'data/database-tests/database-test-update-mutation'
@@ -26,6 +27,7 @@ import { useDatabaseTestUpdateMutation } from 'data/database-tests/database-test
 const DatabaseTestsPage: NextPageWithLayout = () => {
   const { setEditorPanel } = useAppStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const { profile } = useProfile()
   const project = useSelectedProject()
   const [showRunAllTestsModal, setShowRunAllTestsModal] = useState(false)
   const testsListRef = useRef<TestsListHandle>(null)
@@ -65,6 +67,7 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
           id: test.id,
           name: test.name,
           query,
+          ownerId: profile?.id,
         })
         setEditorPanel({ open: false })
       },

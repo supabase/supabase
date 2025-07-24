@@ -1,5 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { databaseTestsKeys } from './database-tests-key'
+import { getSQLSnippetFolders } from 'data/content/sql-folders-query'
+import { getSQLSnippetFolderContents } from 'data/content/sql-folder-contents-query'
+import { DATABASE_TESTS_FOLDER_NAME } from './database-tests.constants'
+import { getContentById } from 'data/content/content-id-query'
 
 export type DatabaseTest = {
   id: string
@@ -12,110 +16,63 @@ export type DatabaseTestsVariables = {
   connectionString?: string
 }
 
-// This is a placeholder. Replace with your actual data fetching logic.
-const MOCK_TESTS: DatabaseTest[] = [
-  {
-    id: '0',
-    name: '000-setup-tests-hooks',
-    query: `
--- install tests utilities
--- install pgtap extension for testing
-create extension if not exists pgtap with schema extensions;
 /*
----------------------
----- install dbdev ----
-----------------------
-Requires:
-- pg_tle: https://github.com/aws/pg_tle
-- pgsql-http: https://github.com/pramsey/pgsql-http
-*/
-create extension if not exists http with schema extensions;
-create extension if not exists pg_tle;
-drop extension if exists "supabase-dbdev";
-select pgtle.uninstall_extension_if_exists('supabase-dbdev');
-select
-    pgtle.install_extension(
-        'supabase-dbdev',
-        resp.contents ->> 'version',
-        'PostgreSQL package manager',
-        resp.contents ->> 'sql'
-    )
-from http(
-    (
-        'GET',
-        'https://api.database.dev/rest/v1/'
-        || 'package_versions?select=sql,version'
-        || '&package_name=eq.supabase-dbdev'
-        || '&order=version.desc'
-        || '&limit=1',
-        array[
-            ('apiKey', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtdXB0cHBsZnZpaWZyYndtbXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODAxMDczNzIsImV4cCI6MTk5NTY4MzM3Mn0.z2CN0mvO2No8wSi46Gw59DFGCTJrzM0AQKsu_5k134s')::http_header
-        ],
-        null,
-        null
-    )
-) x,
-lateral (
-    select
-        ((row_to_json(x) -> 'content') #>> '{}')::json -> 0
-) resp(contents);
-create extension "supabase-dbdev";
-select dbdev.install('supabase-dbdev');
-drop extension if exists "supabase-dbdev";
-create extension "supabase-dbdev";
--- Install test helpers
-select dbdev.install('basejump-supabase_test_helpers');
-create extension if not exists "basejump-supabase_test_helpers" version '0.0.6';
-        `,
-  },
-  {
-    id: '1',
-    name: '01_test_users_table',
-    query: `
-BEGIN;
-SELECT plan(1);
-SELECT has_table('users');
-SELECT * FROM finish();
-ROLLBACK;
-    `.trim(),
-  },
-  {
-    id: '2',
-    name: '02_test_rls_policy',
-    query: `
-BEGIN;
-SELECT plan(1);
-SELECT policies_are('public', 'profiles', ARRAY['Profiles are public']);
-SELECT * FROM finish();
-ROLLBACK;
-    `.trim(),
-  },
-  {
-    id: '3',
-    name: '03_test_rls_public',
-    query: `
-begin;
-select plan(1);
--- Verify RLS is enabled on all tables in the public schema
-select tests.rls_enabled('public');
-select * from finish();
-rollback;
-    `,
-  },
-]
-
+ * Fetches SQL snippets that live inside a folder named "test".
+ * These snippets are considered database tests for a project.
+ * The function first retrieves (or verifies the existence of) the
+ * "test" folder via the `/content/folders` endpoint, then fetches
+ * the snippets that belong to that folder, and finally resolves each
+ * snippet's SQL text via `getContentById` so that callers receive the
+ * full `query` string required to run the tests.
+ */
 export async function getDatabaseTests(
-  { projectRef, connectionString }: DatabaseTestsVariables,
+  { projectRef }: DatabaseTestsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  // In a real implementation, you would fetch this from a database or file system.
-  // For now, we return mock data.
-  // The timeout is to simulate network latency.
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  /*
+   * 1. Locate the folder named "test" (case-insensitive)
+   */
+  const folderResp = await getSQLSnippetFolders(
+    { projectRef, name: DATABASE_TESTS_FOLDER_NAME },
+    signal
+  )
 
-  return MOCK_TESTS
+  const testFolder = folderResp.folders.find(
+    (f) => f.name.toLowerCase() === DATABASE_TESTS_FOLDER_NAME.toLowerCase()
+  )
+  if (!testFolder) return []
+
+  /*
+   * 2. Fetch list of contents within that folder via folder contents endpoint
+   */
+  const folderContentsResp = await getSQLSnippetFolderContents(
+    { projectRef, folderId: testFolder.id, sort: 'name' },
+    signal
+  )
+
+  const contents = (folderContentsResp.contents ?? []) as Array<{
+    id: string
+    name: string
+  }>
+
+  /*
+   * 3. Resolve SQL text for each snippet in parallel
+   */
+  const tests: DatabaseTest[] = await Promise.all(
+    contents.map(async (item) => {
+      const { content } = await getContentById({ projectRef, id: item.id })
+      const sql = (content as any)?.sql ?? ''
+      return {
+        id: item.id,
+        name: item.name,
+        query: sql,
+      }
+    })
+  )
+
+  return tests
 }
 
 export type DatabaseTestsData = Awaited<ReturnType<typeof getDatabaseTests>>

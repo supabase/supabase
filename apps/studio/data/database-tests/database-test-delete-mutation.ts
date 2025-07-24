@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { deleteContents } from 'data/content/content-delete-mutation'
 import { databaseTestsKeys } from './database-tests-key'
-import { DatabaseTest } from './database-tests-query'
 
 type DatabaseTestDeleteVariables = {
   projectRef: string
@@ -18,12 +18,11 @@ export const useDatabaseTestDeleteMutation = ({
 
   return useMutation({
     mutationFn: async ({ projectRef, id }: DatabaseTestDeleteVariables) => {
-      // This is a mock implementation.
-      // In a real scenario, you would delete the test file or remove it from a database table.
-      const key = databaseTestsKeys.list(projectRef)
-      const currentTests = queryClient.getQueryData<DatabaseTest[]>(key) ?? []
-      const updatedTests = currentTests.filter((test) => test.id !== id)
-      queryClient.setQueryData(key, updatedTests)
+      await deleteContents({ projectRef, ids: [id] })
+
+      // Invalidate test list cache
+      await queryClient.invalidateQueries(databaseTestsKeys.list(projectRef))
+
       return id
     },
     onSuccess: (id) => {
