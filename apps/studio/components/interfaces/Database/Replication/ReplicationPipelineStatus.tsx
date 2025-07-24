@@ -136,7 +136,7 @@ export const ReplicationPipelineStatus = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-3">
           <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
-            <a href={`/project/${projectRef}/database/replication`} />
+            <Link href={`/project/${projectRef}/database/replication`} />
           </Button>
           <div>
             <div className="flex items-center gap-x-3">
