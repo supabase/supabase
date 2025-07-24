@@ -12,14 +12,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { getFDWs } from 'data/fdw/fdws-query'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
-} from 'ui'
+import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
@@ -175,18 +168,6 @@ export const ImportForeignSchemaDialog = ({
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-4">
-            <FormField_Shadcn_
-              control={form.control}
-              name="sourceNamespace"
-              render={({ field }) => (
-                <FormItemLayout label="Namespace" layout="vertical">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} placeholder="Enter namespace name" disabled />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-
             <FormField_Shadcn_
               control={form.control}
               name="targetSchema"

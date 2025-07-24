@@ -302,7 +302,8 @@ export const CreateIcebergWrapperSheet = ({
                       <FormSectionLabel>
                         <p>Foreign Schema</p>
                         <p className="text-foreground-light mt-2 w-[90%]">
-                          All wrapper tables will be created in the specified target schema.
+                          You can query your data from the foreign tables in the specified schema
+                          after the wrapper is created.
                         </p>
                       </FormSectionLabel>
                     }
@@ -326,7 +327,7 @@ export const CreateIcebergWrapperSheet = ({
                           key="target_schema"
                           option={{
                             name: 'target_schema',
-                            label: 'Target Schema',
+                            label: 'Specify a new schema to create all wrapper tables in',
                             required: true,
                             encrypted: false,
                             secureEntry: false,
@@ -335,8 +336,8 @@ export const CreateIcebergWrapperSheet = ({
                           error={formErrors['target_schema']}
                         />
                         <p className="text-foreground-lighter text-sm">
-                          A new schema will be created. All wrapper tables will be created in the
-                          specified target schema.
+                          A new schema will be created. For security purposes, the wrapper tables
+                          from the foreign schema cannot be created within an existing schema
                         </p>
                       </div>
                     </FormSectionContent>

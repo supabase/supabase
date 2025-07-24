@@ -272,7 +272,7 @@ export const CreateWrapperSheet = ({
                           <div className="flex  gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Define tables where the wrapper data will be shown.
+                                Create foreign tables to query data from {wrapperMeta.label}.
                               </p>
                             </div>
                           </div>
@@ -297,7 +297,8 @@ export const CreateWrapperSheet = ({
                           <div className="flex  gap-x-5">
                             <div className="flex flex-col">
                               <p className="text-foreground-light text-left">
-                                Specify schema in which the wrapper will create tables.
+                                Create all foreign tables from {wrapperMeta.label} in a specified
+                                schema.
                               </p>
                             </div>
                           </div>
@@ -402,31 +403,34 @@ export const CreateWrapperSheet = ({
                         <FormSectionLabel>
                           <p>Foreign Schema</p>
                           <p className="text-foreground-light mt-2 w-[90%]">
-                            All wrapper tables will be created in the specified target schema.
+                            You can query your data from the foreign tables in the specified schema
+                            after the wrapper is created.
                           </p>
                         </FormSectionLabel>
                       }
                     >
                       <FormSectionContent loading={false}>
-                        {wrapperMeta.sourceSchemaOption && (
-                          <div>
-                            <InputField
-                              key="source_schema"
-                              option={wrapperMeta.sourceSchemaOption}
-                              loading={false}
-                              error={formErrors['source_schema']}
-                            />
-                            <p className="text-foreground-lighter text-sm">
-                              {wrapperMeta.sourceSchemaOption.description}
-                            </p>
-                          </div>
-                        )}
+                        {wrapperMeta.sourceSchemaOption &&
+                          !wrapperMeta.sourceSchemaOption?.readOnly && (
+                            // Hide the field if the source schema is read-only
+                            <div>
+                              <InputField
+                                key="source_schema"
+                                option={wrapperMeta.sourceSchemaOption}
+                                loading={false}
+                                error={formErrors['source_schema']}
+                              />
+                              <p className="text-foreground-lighter text-sm">
+                                {wrapperMeta.sourceSchemaOption.description}
+                              </p>
+                            </div>
+                          )}
                         <div className="flex flex-col gap-2">
                           <InputField
                             key="target_schema"
                             option={{
                               name: 'target_schema',
-                              label: 'Target Schema',
+                              label: 'Specify a new schema to create all wrapper tables in',
                               required: true,
                               encrypted: false,
                               secureEntry: false,
@@ -435,8 +439,8 @@ export const CreateWrapperSheet = ({
                             error={formErrors['target_schema']}
                           />
                           <p className="text-foreground-lighter text-sm">
-                            A new schema will be created. All wrapper tables will be created in the
-                            specified target schema.
+                            A new schema will be created. For security purposes, the wrapper tables
+                            from the foreign schema cannot be created within an existing schema
                           </p>
                         </div>
                       </FormSectionContent>
