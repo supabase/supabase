@@ -1,3 +1,4 @@
+import { metadata as mainMetadata } from '@/app/layout'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
 import { SourcePanel } from '@/components/source-panel'
@@ -38,16 +39,19 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
     return {}
   }
 
-  return {
+  const metadata: Metadata = {
+    ...mainMetadata,
     title: doc.title,
     description: doc.description,
     openGraph: {
+      ...mainMetadata.openGraph,
       title: doc.title,
       description: doc.description,
       type: 'article',
       url: absoluteUrl(doc.slug),
     },
   }
+  return metadata
 }
 
 export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
