@@ -1,13 +1,14 @@
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import { motion } from 'framer-motion'
-import { BASE_PATH } from 'lib/constants'
 import { ArrowUpRight, Circle, Database, MoreVertical, Plus, Search } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import ReactFlow, { Background, Handle, Position, ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
+
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import Table from 'components/to-be-cleaned/Table'
+import { BASE_PATH } from 'lib/constants'
 import { Button, Input_Shadcn_ } from 'ui'
 import { NODE_WIDTH } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 

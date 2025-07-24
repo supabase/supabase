@@ -1,9 +1,10 @@
+import { Edit, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
-import { Edit, MoreVertical, Pause, Play, Trash } from 'lucide-react'
-import { toast } from 'sonner'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
