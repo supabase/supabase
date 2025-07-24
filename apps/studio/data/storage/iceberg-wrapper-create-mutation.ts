@@ -5,10 +5,7 @@ import {
   getCatalogURI,
   getConnectionURL,
 } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
@@ -31,13 +28,9 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
-  const isProjectActive = useIsProjectActive()
-
   const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef: project?.ref })
-  const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
-  const disableCreation = !isProjectActive || !canCreateCredentials || !isS3ConnectionEnabled
 
   const { mutateAsync: createS3AccessKey, isLoading: isCreatingS3AccessKey } =
     useS3AccessKeyCreateMutation()
