@@ -149,7 +149,7 @@ export const PipelineStatus = ({
 
   return (
     <>
-      {isLoading && <ShimmeringLoader></ShimmeringLoader>}
+      {isLoading && <ShimmeringLoader />}
       {isError && (
         <AlertError error={error} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE_STATUS} />
       )}
@@ -160,7 +160,7 @@ export const PipelineStatus = ({
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className={cn('flex items-center gap-2 text-sm', statusConfig.color)}>
+                <div className={cn('flex items-center gap-2 text-sm w-min', statusConfig.color)}>
                   {statusConfig.dot}
                   <span>{statusConfig.label}</span>
                 </div>

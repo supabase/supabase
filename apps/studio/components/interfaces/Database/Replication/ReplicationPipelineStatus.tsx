@@ -185,12 +185,12 @@ export const ReplicationPipelineStatus = ({
         <div className="flex items-center gap-x-2">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
               size={14}
             />
             <Input_Shadcn_
-              className="pl-9 h-8"
-              placeholder="Filter tables"
+              className="pl-7 h-[26px] text-xs"
+              placeholder="Search for tables"
               value={filterString}
               onChange={(e) => setFilterString(e.target.value)}
             />
@@ -199,7 +199,7 @@ export const ReplicationPipelineStatus = ({
             type={statusName === 'stopped' ? 'primary' : 'default'}
             onClick={() => onTogglePipeline()}
             loading={isStartingPipeline || isStoppingPipeline}
-            disabled={!['started', 'stopped'].includes(statusName ?? '')}
+            disabled={!['failed', 'started', 'stopped'].includes(statusName ?? '')}
           >
             {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
           </Button>

@@ -1,11 +1,9 @@
-import { Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
@@ -109,7 +107,12 @@ export const DestinationRow = ({
         <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
       )}
       {isPipelineSuccess && (
-        <Table.tr>
+        <Table.tr
+          className="hover:!bg-surface-200 transition"
+          onClick={() => {
+            if (pipeline) onSelectPipeline?.(pipeline.id, destinationName)
+          }}
+        >
           <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : destinationName}</Table.td>
           <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
           <Table.td>
@@ -135,16 +138,6 @@ export const DestinationRow = ({
           </Table.td>
           <Table.td>
             <div className="flex items-center justify-end gap-x-2">
-              {pipeline && (
-                <ButtonTooltip
-                  size="tiny"
-                  type="default"
-                  icon={<Info className="w-3 h-3" />}
-                  onClick={() => onSelectPipeline?.(pipeline.id, destinationName)}
-                  className="px-1.5"
-                  tooltip={{ content: { side: 'bottom', text: 'View table replication status' } }}
-                />
-              )}
               <RowMenu
                 pipeline={pipeline}
                 pipelineStatus={pipelineStatusData?.status}
