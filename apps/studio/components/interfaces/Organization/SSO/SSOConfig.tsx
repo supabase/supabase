@@ -1,8 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import z from 'zod'
 
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
+import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Card,
@@ -57,6 +63,16 @@ export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 const FORM_ID = 'sso-config-form'
 
 export const SSOConfig = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
+
+  const {
+    data: ssoConfig,
+    isLoading,
+    isSuccess,
+    isError,
+    error: configError,
+  } = useOrgSSOConfigQuery({ orgSlug: organization?.slug }, { enabled: !!organization })
+
   const form = useForm<SSOConfigFormSchema>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -73,35 +89,55 @@ export const SSOConfig = () => {
     },
   })
 
-  const onSubmit: SubmitHandler<SSOConfigFormSchema> = ({
-    enabled,
-    domains,
-    metadataXmlUrl,
-    metadataXmlFile,
-    emailMapping,
-    userNameMapping,
-    firstNameMapping,
-    lastNameMapping,
-    joinOrgOnSignup,
-    roleOnJoin,
-  }) => {
-    const attributeMapping = {
-      keys: {
-        email: emailMapping,
-        user_name: userNameMapping.filter(Boolean),
-        first_name: firstNameMapping.filter(Boolean),
-        last_name: lastNameMapping.filter(Boolean),
-      },
+  useEffect(() => {
+    if (ssoConfig) {
+      form.reset({
+        enabled: ssoConfig.enabled,
+        domains: ssoConfig.domains.map((domain) => ({ value: domain })),
+        metadataXmlUrl: ssoConfig.metadata_xml_url,
+        metadataXmlFile: ssoConfig.metadata_xml_file,
+        emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),
+        userNameMapping: ssoConfig.user_name_mapping.map((userName) => ({ value: userName })),
+        firstNameMapping: ssoConfig.first_name_mapping.map((firstName) => ({ value: firstName })),
+        lastNameMapping: ssoConfig.last_name_mapping.map((lastName) => ({ value: lastName })),
+        joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
+        roleOnJoin: ssoConfig.join_org_on_signup_role,
+      })
     }
-    console.log(
-      enabled,
-      domains,
-      metadataXmlUrl,
-      metadataXmlFile,
-      attributeMapping,
-      joinOrgOnSignup,
-      roleOnJoin
-    )
+  }, [ssoConfig, form])
+
+  const { mutate: createSSOConfig } = useSSOConfigCreateMutation({
+    onError: (error) => {
+      form.setError('root', { type: 'manual', message: error.message })
+    },
+    onSuccess: () => {
+      form.reset()
+    },
+  })
+
+  const onSubmit: SubmitHandler<SSOConfigFormSchema> = (values) => {
+    const roleOnJoin = (values.roleOnJoin || 'Developer') as
+      | 'Administrator'
+      | 'Developer'
+      | 'Owner'
+      | 'Read-only'
+      | undefined
+
+    createSSOConfig({
+      slug: organization!.slug,
+      config: {
+        enabled: values.enabled,
+        domains: values.domains.map((d) => d.value),
+        metadata_xml_file: values.metadataXmlFile!,
+        metadata_xml_url: values.metadataXmlUrl!,
+        email_mapping: values.emailMapping.map((item) => item.value).filter(Boolean),
+        first_name_mapping: values.firstNameMapping.map((item) => item.value).filter(Boolean),
+        last_name_mapping: values.lastNameMapping.map((item) => item.value).filter(Boolean),
+        user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
+        join_org_on_signup_enabled: values.joinOrgOnSignup,
+        join_org_on_signup_role: roleOnJoin,
+      },
+    })
   }
 
   const isSSOEnabled = form.watch('enabled')
@@ -109,74 +145,86 @@ export const SSOConfig = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection isFullWidth className="!pt-8">
-        <Form_Shadcn_ {...form}>
-          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            <Card>
-              <CardContent className="py-8">
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="enabled"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Enable Single Sign-On"
-                      description="Enable and configure SSO for your application."
-                      layout="flex"
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          size="large"
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+        {isLoading && (
+          <Card>
+            <CardContent>
+              <GenericSkeletonLoader />
+            </CardContent>
+          </Card>
+        )}
+        {isError && (
+          <AlertError error={configError} subject="Failed to retrieve SSO configuration" />
+        )}
+        {isSuccess && (
+          <Form_Shadcn_ {...form}>
+            <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+              <Card>
+                <CardContent className="py-8">
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="enabled"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Enable Single Sign-On"
+                        description="Enable and configure SSO for your application."
+                        layout="flex"
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            size="large"
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              {isSSOEnabled && (
-                <>
-                  <CardContent>
-                    <SSODomains form={form} />
-                  </CardContent>
+                {isSSOEnabled && (
+                  <>
+                    <CardContent>
+                      <SSODomains form={form} />
+                    </CardContent>
 
-                  <CardContent>
-                    <SSOMetadata form={form} />
-                  </CardContent>
+                    <CardContent>
+                      <SSOMetadata form={form} />
+                    </CardContent>
 
-                  <CardContent>
-                    <AttributeMapping
-                      form={form}
-                      emailField="emailMapping"
-                      userNameField="userNameMapping"
-                      firstNameField="firstNameMapping"
-                      lastNameField="lastNameMapping"
-                    />
-                  </CardContent>
+                    <CardContent>
+                      <AttributeMapping
+                        form={form}
+                        emailField="emailMapping"
+                        userNameField="userNameMapping"
+                        firstNameField="firstNameMapping"
+                        lastNameField="lastNameMapping"
+                      />
+                    </CardContent>
 
-                  <CardContent>
-                    <JoinOrganizationOnSignup form={form} />
-                  </CardContent>
-                </>
-              )}
-
-              <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
-                    Cancel
-                  </Button>
+                    <CardContent>
+                      <JoinOrganizationOnSignup form={form} />
+                    </CardContent>
+                  </>
                 )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={!form.formState.isDirty || form.formState.isSubmitting}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
+
+                <CardFooter className="justify-end space-x-2">
+                  {form.formState.isDirty && (
+                    <Button type="default" onClick={() => form.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={!form.formState.isDirty || form.formState.isSubmitting}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        )}
       </ScaffoldSection>
     </ScaffoldContainer>
   )
