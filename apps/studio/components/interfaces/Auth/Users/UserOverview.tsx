@@ -96,10 +96,11 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
-      toast.success(`Sent magic link to ${vars.user.email}`)
+      const isConfirmed = vars.user.confirmed_at
+      toast.success(`Sent ${isConfirmed ? 'magic link' : 'confirmation link'} to ${vars.user.email}`)
     },
     onError: (err) => {
-      toast.error(`Failed to send magic link: ${err.message}`)
+      toast.error(`Failed to send ${user.confirmed_at ? 'magic link' : 'confirmation link'}: ${err.message}`)
     },
   })
   const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
@@ -278,11 +279,11 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title="Send magic link"
-                description="Passwordless login via email for the user"
+                title={user.confirmed_at ? "Send magic link" : "Send confirmation link"}
+                description={user.confirmed_at ? "Passwordless login via email for the user" : "Send email confirmation link for user signup"}
                 button={{
                   icon: <Mail />,
-                  text: 'Send magic link',
+                  text: user.confirmed_at ? 'Send magic link' : 'Confirm sign up link',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
                   onClick: () => {
@@ -292,7 +293,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                        title: 'Magic link sent',
+                        title: user.confirmed_at ? 'Magic link sent' : 'Confirmation link sent',
                         description: `The link in the email is valid for ${formattedExpiry}`,
                       }
                     : undefined
