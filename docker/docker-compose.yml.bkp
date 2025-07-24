@@ -8,32 +8,7 @@
 name: supabase
 
 services:
-  authelia:
-    container_name: authelia
-    image: authelia/authelia
-    restart: unless-stopped
-    expose:
-      - 9091
-    volumes:
-      - ./authelia/config:/config
-    environment:
-      TZ: 'America/New_York'
-    
-  nginx:
-    image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
-    ports:
-      # These ports are in format <host-port>:<container-port>
-      - '80:80' # Public HTTP Port
-      - '443:443' # Public HTTPS Port
-      - '81:81' # Admin Web Port
-    volumes:
-      - ./nginx-data:/data
-      - ./nginx-letsencrypt:/etc/letsencrypt
-      - ./nginx-snippets:/snippets:ro
-    environment:
-      TZ: 'America/New_York'
-    
+
   studio:
     container_name: supabase-studio
     image: supabase/studio:2025.06.30-sha-6f5982d
@@ -78,6 +53,9 @@ services:
     container_name: supabase-kong
     image: kong:2.8.1
     restart: unless-stopped
+    ports:
+      - ${KONG_HTTP_PORT}:8000/tcp
+      - ${KONG_HTTPS_PORT}:8443/tcp
     volumes:
       # https://github.com/supabase/supabase/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro,z
@@ -285,22 +263,14 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
       FILE_STORAGE_BACKEND_PATH: /var/lib/storage
       TENANT_ID: stub
       # TODO: https://github.com/supabase/storage-api/issues/55
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
-      STORAGE_BACKEND: s3
-      GLOBAL_S3_BUCKET: supabase
-      GLOBAL_S3_ENDPOINT: https://storage.yourdomain.com
-      GLOBAL_S3_PROTOCOL: https
-      REGION: us-west-2
-      AWS_DEFAULT_REGION: us-west-2
-
-      #this next one seems important for minio
-      GLOBAL_S3_FORCE_PATH_STYLE: true
-      AWS_ACCESS_KEY_ID: ${AWS_S3_ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${AWS_S3_SECRET_KEY}
 
   imgproxy:
     container_name: supabase-imgproxy
