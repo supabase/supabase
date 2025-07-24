@@ -8,6 +8,8 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { AlertTriangle } from 'lucide-react'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -21,6 +23,7 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   const pathname = usePathname()
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
+  const { hasTransaction } = useRoleImpersonationStateSnapshot()
 
   const hasNoOpenTabs =
     editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
@@ -29,7 +32,19 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
 
   return (
     <ProjectLayoutWithAuth resizableSidebar title={title} product={product} {...props}>
-      <div className="flex flex-col h-full">
+      <div
+        className={cn(
+          'flex flex-col h-full',
+          hasTransaction && 'border-2 border-t-0 border-warning'
+        )}
+      >
+        {hasTransaction && (
+          <div className="flex items-center gap-x-2 bg-warning py-2 px-3 text-warning-foreground">
+            <p className="text-xs text-warning-100">
+              You are in test mode. Any changes to database records will be rolled back.
+            </p>
+          </div>
+        )}
         <div
           className={cn(
             'h-10 flex items-center',

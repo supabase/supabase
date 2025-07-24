@@ -11,16 +11,21 @@ export interface RoleImpersonationSelectorProps {
   serviceRoleLabel?: string
   padded?: boolean
   disallowAuthenticatedOption?: boolean
+  initialSelectedOption?: PostgrestRole
 }
 
 const RoleImpersonationSelector = ({
   serviceRoleLabel,
   padded = true,
   disallowAuthenticatedOption = false,
+  initialSelectedOption,
 }: RoleImpersonationSelectorProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
   const [selectedOption, setSelectedOption] = useState<PostgrestRole | undefined>(() => {
+    if (initialSelectedOption) {
+      return initialSelectedOption
+    }
     if (
       state.role?.type === 'postgrest' &&
       (state.role.role === 'anon' || state.role.role === 'authenticated')

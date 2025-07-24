@@ -44,7 +44,8 @@ export async function deleteAllTableRow({
 }: TableRowDeleteAllVariables) {
   const sql = wrapWithRoleImpersonation(
     getTableRowDeleteAllSql({ table, filters }),
-    roleImpersonationState
+    roleImpersonationState,
+    true
   )
 
   const { result } = await executeSql({

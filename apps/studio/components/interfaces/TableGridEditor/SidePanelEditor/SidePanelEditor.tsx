@@ -50,6 +50,7 @@ import {
 import SpreadsheetImport from './SpreadsheetImport/SpreadsheetImport'
 import TableEditor from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -74,7 +75,7 @@ const SidePanelEditor = ({
 
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
-
+  const { hasTransaction } = useRoleImpersonationStateSnapshot()
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
@@ -89,11 +90,7 @@ const SidePanelEditor = ({
       toast.success('Successfully created row')
     },
   })
-  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation({
-    onSuccess() {
-      toast.success('Successfully updated row')
-    },
-  })
+  const { mutateAsync: updateTableRow } = useTableRowUpdateMutation()
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -158,6 +155,11 @@ const SidePanelEditor = ({
     onComplete(saveRowError)
     if (!saveRowError) {
       setIsEdited(false)
+      if (hasTransaction) {
+        toast.success('Successfully updated row and rolled back')
+      } else {
+        toast.success('Successfully updated row')
+      }
       snap.closeSidePanel()
     }
   }

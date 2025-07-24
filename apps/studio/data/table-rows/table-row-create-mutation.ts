@@ -41,7 +41,8 @@ export async function createTableRow({
 }: TableRowCreateVariables) {
   const sql = wrapWithRoleImpersonation(
     getTableRowCreateSql({ table, payload, enumArrayColumns, returning }),
-    roleImpersonationState
+    roleImpersonationState,
+    true
   )
 
   const { result } = await executeSql({

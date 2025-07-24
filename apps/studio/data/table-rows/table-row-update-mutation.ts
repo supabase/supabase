@@ -48,7 +48,8 @@ export async function updateTableRow({
 }: TableRowUpdateVariables) {
   const sql = wrapWithRoleImpersonation(
     getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns, returning }),
-    roleImpersonationState
+    roleImpersonationState,
+    true
   )
 
   const { result } = await executeSql({

@@ -7,7 +7,17 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Badge } from 'ui'
+import {
+  AiIconAnimation,
+  Badge,
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 interface PolicyTableRowHeaderProps {
   table: {
@@ -33,6 +43,7 @@ const PolicyTableRowHeader = ({
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
+  const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
 
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
@@ -41,6 +52,10 @@ const PolicyTableRowHeader = ({
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
+
+  const handleTestItemClick = (operation: string) => {
+    router.push(`/project/${ref}/editor/${table.id}?impersonate=true&as=${operation}`)
+  }
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
@@ -91,6 +106,13 @@ const PolicyTableRowHeader = ({
                 {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
               </ButtonTooltip>
             )}
+            <Button asChild type="default">
+              <Link
+                href={`/project/${ref}/editor/${table.id}?impersonate=true&hasTransaction=true`}
+              >
+                Test
+              </Link>
+            </Button>
             <ButtonTooltip
               type="default"
               disabled={!canToggleRLS || !canCreatePolicies}

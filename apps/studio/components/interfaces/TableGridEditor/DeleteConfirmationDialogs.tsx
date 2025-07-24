@@ -74,7 +74,11 @@ const DeleteConfirmationDialogs = ({
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
       }
-      toast.success(`Successfully deleted selected row(s)`)
+      if (getImpersonatedRoleState().hasTransaction) {
+        toast.success(`Successfully deleted selected row(s) and rolled back`)
+      } else {
+        toast.success(`Successfully deleted selected row(s)`)
+      }
     },
     onSettled: () => {
       snap.closeConfirmationDialog()
@@ -86,7 +90,11 @@ const DeleteConfirmationDialogs = ({
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
       }
-      toast.success(`Successfully deleted selected rows`)
+      if (getImpersonatedRoleState().hasTransaction) {
+        toast.success(`Successfully deleted selected rows and rolled back`)
+      } else {
+        toast.success(`Successfully deleted selected rows`)
+      }
     },
     onError: (error) => {
       toast.error(`Failed to delete rows: ${error.message}`)
