@@ -55,8 +55,8 @@ export const PipelineStatus = ({
             <span>Failed</span>
           </div>
         </TooltipTrigger>
-        <TooltipContent>
-          <p>{getPipelineStateMessages(requestStatus, 'failed').message}</p>
+        <TooltipContent side="bottom">
+          {getPipelineStateMessages(requestStatus, 'failed').message}
         </TooltipContent>
       </Tooltip>
     )
@@ -165,9 +165,7 @@ export const PipelineStatus = ({
                   <span>{statusConfig.label}</span>
                 </div>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>{statusConfig.tooltip}</p>
-              </TooltipContent>
+              <TooltipContent side="bottom">{statusConfig.tooltip}</TooltipContent>
             </Tooltip>
           )}
         </>

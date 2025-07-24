@@ -136,10 +136,11 @@ export const DestinationRow = ({
             )}
           </Table.td>
           <Table.td>
-            <div className="flex items-center justify-end gap-1">
+            <div className="flex items-center justify-end gap-x-1">
               {pipeline && (
                 <ButtonTooltip
                   size="tiny"
+                  type="default"
                   icon={<Info className="w-3 h-3" />}
                   onClick={() => onSelectPipeline?.(pipeline.id, destinationName)}
                   className="px-1.5"
