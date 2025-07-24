@@ -28,7 +28,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = object({
-  GOTRUE_AUDITLOG_DISABLE_POSTGRES: boolean().required(),
+  AUDIT_LOG_DISABLE_POSTGRES: boolean().required(),
 })
 
 const AuditLogsForm = () => {
@@ -50,7 +50,7 @@ const AuditLogsForm = () => {
   const form = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      GOTRUE_AUDITLOG_DISABLE_POSTGRES: false,
+      AUDIT_LOG_DISABLE_POSTGRES: false,
     },
   })
 
@@ -58,7 +58,7 @@ const AuditLogsForm = () => {
     if (authConfig && !isUpdatingAuditLogs) {
       form.reset({
         // TODO :: gonna fix when the API is udpated.
-        GOTRUE_AUDITLOG_DISABLE_POSTGRES: authConfig?.GOTRUE_AUDITLOG_DISABLE_POSTGRES ?? false,
+        AUDIT_LOG_DISABLE_POSTGRES: authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false,
       })
     }
   }, [authConfig, isUpdatingAuditLogs])
@@ -139,7 +139,7 @@ const AuditLogsForm = () => {
                 <CardContent>
                   <FormField_Shadcn_
                     control={form.control}
-                    name="GOTRUE_AUDITLOG_DISABLE_POSTGRES"
+                    name="AUDIT_LOG_DISABLE_POSTGRES"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
