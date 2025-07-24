@@ -23,9 +23,6 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
     Accept: 'application/json',
     Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
   })
-  
-  // Use the invite endpoint to send confirmation emails with the confirmation template
-  // The invite endpoint sends the proper confirmation email for unconfirmed users
   const url = `${process.env.SUPABASE_URL}/auth/v1/invite`
   const payload = { email: req.body.email }
   const response = await post(url, payload, { headers })
