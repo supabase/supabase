@@ -12,6 +12,7 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
+import { useUserSendConfirmationMutation } from 'data/auth/user-send-confirmation-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
@@ -70,7 +71,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   )
 
   const [successAction, setSuccessAction] = useState<
-    'send_magic_link' | 'send_recovery' | 'send_otp'
+    'send_magic_link' | 'send_confirmation' | 'send_recovery' | 'send_otp'
   >()
   const [isBanModalOpen, setIsBanModalOpen] = useState(false)
   const [isUnbanModalOpen, setIsUnbanModalOpen] = useState(false)
@@ -96,11 +97,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const { mutate: sendMagicLink, isLoading: isSendingMagicLink } = useUserSendMagicLinkMutation({
     onSuccess: (_, vars) => {
       setSuccessAction('send_magic_link')
-      const isConfirmed = vars.user.confirmed_at
-      toast.success(`Sent ${isConfirmed ? 'magic link' : 'confirmation link'} to ${vars.user.email}`)
+      toast.success(`Sent magic link to ${vars.user.email}`)
     },
     onError: (err) => {
-      toast.error(`Failed to send ${user.confirmed_at ? 'magic link' : 'confirmation link'}: ${err.message}`)
+      toast.error(`Failed to send magic link: ${err.message}`)
+    },
+  })
+  const { mutate: sendConfirmation, isLoading: isSendingConfirmation } = useUserSendConfirmationMutation({
+    onSuccess: (_, vars) => {
+      setSuccessAction('send_confirmation')
+      toast.success(`Sent confirmation link to ${vars.user.email}`)
+    },
+    onError: (err) => {
+      toast.error(`Failed to send confirmation link: ${err.message}`)
     },
   })
   const { mutate: sendOTP, isLoading: isSendingOTP } = useUserSendOTPMutation({
@@ -284,14 +293,21 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 button={{
                   icon: <Mail />,
                   text: user.confirmed_at ? 'Send magic link' : 'Confirm sign up link',
-                  isLoading: isSendingMagicLink,
+                  isLoading: user.confirmed_at ? isSendingMagicLink : isSendingConfirmation,
                   disabled: !canSendMagicLink,
                   onClick: () => {
-                    if (projectRef) sendMagicLink({ projectRef, user })
+                    if (projectRef) {
+                      if (user.confirmed_at) {
+                        sendMagicLink({ projectRef, user })
+                      } else {
+                        sendConfirmation({ projectRef, user })
+                      }
+                    }
                   },
                 }}
                 success={
-                  successAction === 'send_magic_link'
+                  (successAction === 'send_magic_link' && user.confirmed_at) || 
+                  (successAction === 'send_confirmation' && !user.confirmed_at)
                     ? {
                         title: user.confirmed_at ? 'Magic link sent' : 'Confirmation link sent',
                         description: `The link in the email is valid for ${formattedExpiry}`,

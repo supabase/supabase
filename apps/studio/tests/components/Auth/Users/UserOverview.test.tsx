@@ -26,6 +26,17 @@ vi.mock('data/auth/user-send-magic-link-mutation', () => ({
   })),
 }))
 
+vi.mock('data/auth/user-send-confirmation-mutation', () => ({
+  useUserSendConfirmationMutation: vi.fn((options) => ({
+    mutate: vi.fn((vars) => {
+      if (options?.onSuccess) {
+        options.onSuccess(null, vars)
+      }
+    }),
+    isLoading: false,
+  })),
+}))
+
 vi.mock('data/auth/user-reset-password-mutation', () => ({
   useUserResetPasswordMutation: vi.fn(() => ({
     mutate: vi.fn(),
@@ -74,14 +85,14 @@ describe('UserOverview Magic Link Context-Aware Functionality', () => {
   const createMockUser = (confirmed: boolean): User => ({
     id: 'test-user-id',
     email: 'test@example.com',
-    phone: null,
+    phone: undefined,
     created_at: '2023-01-01T00:00:00Z',
     updated_at: '2023-01-01T00:00:00Z',
-    confirmed_at: confirmed ? '2023-01-01T01:00:00Z' : null,
-    last_sign_in_at: null,
-    invited_at: null,
-    confirmation_sent_at: null,
-    banned_until: null,
+    confirmed_at: confirmed ? '2023-01-01T01:00:00Z' : undefined,
+    last_sign_in_at: undefined,
+    invited_at: undefined,
+    confirmation_sent_at: undefined,
+    banned_until: undefined,
     is_sso_user: false,
     raw_app_meta_data: {
       providers: ['email'],
@@ -175,7 +186,20 @@ describe('UserOverview Magic Link Context-Aware Functionality', () => {
       vi.mocked(useUserSendMagicLinkMutation).mockReturnValue({
         mutate: mockMutate,
         isLoading: false,
-      })
+        isError: false,
+        isSuccess: false,
+        isIdle: true,
+        data: undefined,
+        error: null,
+        status: 'idle',
+        variables: undefined,
+        context: undefined,
+        failureCount: 0,
+        failureReason: null,
+        isPaused: false,
+        mutateAsync: vi.fn(),
+        reset: vi.fn(),
+      } as any)
 
       const confirmedUser = createMockUser(true)
       
@@ -190,14 +214,27 @@ describe('UserOverview Magic Link Context-Aware Functionality', () => {
       })
     })
 
-    test('calls sendMagicLink mutation when button is clicked for unconfirmed user', async () => {
+    test('calls sendConfirmation mutation when button is clicked for unconfirmed user', async () => {
       const mockMutate = vi.fn()
-      const { useUserSendMagicLinkMutation } = await import('data/auth/user-send-magic-link-mutation')
+      const { useUserSendConfirmationMutation } = await import('data/auth/user-send-confirmation-mutation')
       
-      vi.mocked(useUserSendMagicLinkMutation).mockReturnValue({
+      vi.mocked(useUserSendConfirmationMutation).mockReturnValue({
         mutate: mockMutate,
         isLoading: false,
-      })
+        isError: false,
+        isSuccess: false,
+        isIdle: true,
+        data: undefined,
+        error: null,
+        status: 'idle',
+        variables: undefined,
+        context: undefined,
+        failureCount: 0,
+        failureReason: null,
+        isPaused: false,
+        mutateAsync: vi.fn(),
+        reset: vi.fn(),
+      } as any)
 
       const unconfirmedUser = createMockUser(false)
       
