@@ -2,8 +2,8 @@
 title: 'Functions - From the database to the edge'
 description: Where to store your custom logic in Supabase and migrating between database and edge functions
 author: chris.gwilliams
-image: 
-thumb: 
+image:
+thumb:
 categories:
   - postgres
 tags:
@@ -33,11 +33,11 @@ The more customers we work with, the more we have seen that many use cases for f
 
 Deciding where to put your business logic in Supabase comes down to a few key factors:
 
-- **Proximity to data**: Database functions run inside Postgres so they are great for operations that occur solely within your database. 
+- **Proximity to data**: Database functions run inside Postgres so they are great for operations that occur solely within your database.
 - **External dependencies**: If you need NPM packages, HTTP calls, or filesystem access, edge functions are a better fit.
 - **Scalability**: Database functions run on your database instance and are subject to the same limits as your database. Edge functions run on separate compute resources and can scale automatically.
 - **Security & roles**: Database functions run with the caller's or definer's privileges inside a transaction. Edge functions run with your service role, anon key (or user) on separate compute resources.
-- **Maintainability**: Edge functions live in your `supabase/functions` directory within your repository whereas database functions are in your `supabase/schema` or `supabase/migrations` directories. 
+- **Maintainability**: Edge functions live in your `supabase/functions` directory within your repository whereas database functions are in your `supabase/schema` or `supabase/migrations` directories.
 
 Put another way, this could be shown as a decision tree:
 
@@ -62,6 +62,7 @@ Using this information, let's go through 2 example PLV8 functions to determine w
 You may have a function to calculate a rolling average on your user's scores. This is performing operations on your data exclusively and does not use external services. This is a perfect candidate for a database function.
 
 ### PLV8 database function
+
 ```sql
 create or replace function avg_recent_score(
   user_id bigint,
@@ -78,6 +79,7 @@ $$ language plv8;
 ```
 
 ### SQL database function
+
 ```sql
 create or replace function avg_recent_score(user_id bigint, days integer)
 returns numeric as
@@ -89,12 +91,12 @@ $$
 $$ language sql;
 ```
 
-
 ## Example 2: Removing PII from user data
 
 Here we have a PLV8 function that scans rows in our `profiles` table, strips PII, and returns cleaned JSONB records based on filter or limit.
 
 ### PLV8 database function
+
 ```sql
 create or replace function clean_profiles(
   limit_count integer default 10,
@@ -122,54 +124,58 @@ $$ language plv8;
 ### Edge function
 
 1. Scaffold with Supabase CLI:
+
 ```bash
 supabase functions new clean-profiles
 ```
 
 2. Implement in `supabase/functions/clean-profiles/index.ts`:
+
 ```ts
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
-import { createClient } from '@supabase/supabase-js';
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-);
+)
 
 serve(async (req) => {
-  const { limit, search } = await req.json();
-  let query = supabase.from('profiles').select('data');
-  if (search) query = query.ilike('data->>name', `%${search}%`);
-  if (limit) query = query.limit(limit);
+  const { limit, search } = await req.json()
+  let query = supabase.from('profiles').select('data')
+  if (search) query = query.ilike('data->>name', `%${search}%`)
+  if (limit) query = query.limit(limit)
 
-  const { data, error } = await query;
-  if (error) return new Response(error.message, { status: 400 });
+  const { data, error } = await query
+  if (error) return new Response(error.message, { status: 400 })
 
-  const cleaned = data.map(r => {
-    const obj = { ...r.data };
-    delete obj.ssn;
-    delete obj.credit_card;
-    if (obj.phone) obj.phone = obj.phone.replace(/\D/g, '');
-    return obj;
-  });
+  const cleaned = data.map((r) => {
+    const obj = { ...r.data }
+    delete obj.ssn
+    delete obj.credit_card
+    if (obj.phone) obj.phone = obj.phone.replace(/\D/g, '')
+    return obj
+  })
 
   return new Response(JSON.stringify(cleaned), {
     headers: { 'Content-Type': 'application/json' },
-  });
-});
+  })
+})
 ```
 
 3. Deploy:
+
 ```bash
 supabase functions deploy clean-profiles
 ```
 
 4. Invoke with filter/limit:
+
 ```js
 const { data, error } = await supabase.functions.invoke('clean-profiles', {
-  body: { limit: 5, search: 'Alice' }
-});
-```  
+  body: { limit: 5, search: 'Alice' },
+})
+```
 
 ### Summary
 
