@@ -12,7 +12,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SSOConfigFormSchema } from './SSOConfig'
 
-export const Domains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {
+export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'domains',

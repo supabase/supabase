@@ -1,5 +1,5 @@
 import { Upload } from 'lucide-react'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import {
@@ -17,23 +17,32 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SSOConfigFormSchema } from './SSOConfig'
 
-export const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {
+export const SSOMetadata = ({
+  form,
+}: {
+  form: ReturnType<typeof useForm<SSOConfigFormSchema>>
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState<string | null>(null)
-  const [uploadError, setUploadError] = useState<string | null>(null)
   const [tab, setTab] = useState<'url' | 'file'>('url')
 
   useEffect(() => {
-    if (form.getValues('metadataXmlFile')) setTab('file')
-    else if (form.getValues('metadataXmlUrl')) setTab('url')
+    if (form.getValues('metadataXmlFile')) {
+      setTab('file')
+    } else if (form.getValues('metadataXmlUrl')) {
+      setTab('url')
+    }
   }, [form])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUploadError(null)
+    form.clearErrors('metadataXmlFile')
     const file = e.target.files?.[0]
     if (!file) return
     if (!file.name.endsWith('.xml')) {
-      setUploadError('Please upload a valid .xml file')
+      form.setError('metadataXmlFile', {
+        type: 'manual',
+        message: 'Please upload a valid .xml file',
+      })
       return
     }
     try {
@@ -41,7 +50,10 @@ export const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFo
       form.setValue('metadataXmlFile', text, { shouldDirty: true })
       setFileName(file.name)
     } catch (err) {
-      setUploadError('Failed to read file')
+      form.setError('metadataXmlFile', {
+        type: 'manual',
+        message: 'Failed to read file',
+      })
     }
   }
 
@@ -84,28 +96,32 @@ export const Metadata = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFo
             />
           </TabsContent_Shadcn_>
           <TabsContent_Shadcn_ value="file">
-            <div className="flex flex-col gap-2 max-w-md">
-              <div className="flex items-center gap-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".xml"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-                <Button
-                  type="default"
-                  size="small"
-                  icon={<Upload className="w-4 h-4" />}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Upload XML
-                </Button>
-                {fileName && <span className="text-xs text-foreground-light">{fileName}</span>}
-              </div>
-              {uploadError && <span className="text-red-600 text-xs mt-1">{uploadError}</span>}
-              <FormMessage_Shadcn_ />
-            </div>
+            <FormField_Shadcn_
+              name="metadataXmlUrl"
+              render={({ fieldState }) => (
+                <div className="flex flex-col gap-2 max-w-md">
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".xml"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                    <Button
+                      type="default"
+                      size="small"
+                      icon={<Upload className="w-4 h-4" />}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      Upload XML
+                    </Button>
+                    {fileName && <span className="text-xs text-foreground-light">{fileName}</span>}
+                  </div>
+                  <FormMessage_Shadcn_ />
+                </div>
+              )}
+            />
           </TabsContent_Shadcn_>
         </Tabs_Shadcn_>
       </div>

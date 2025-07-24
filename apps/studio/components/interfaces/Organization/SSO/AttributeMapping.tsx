@@ -1,7 +1,14 @@
-import { MinusCircle, Plus } from 'lucide-react'
+import { Plus, Trash } from 'lucide-react'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 
-import { Button, FormControl_Shadcn_, FormMessage_Shadcn_, Input_Shadcn_, Separator } from 'ui'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormMessage_Shadcn_,
+  Input_Shadcn_,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { SSOConfigFormSchema } from './SSOConfig'
 
@@ -167,34 +174,31 @@ const MappingFieldArray = ({
     name: fieldName,
   })
 
-  // Get the value of the last input in the array
-  const values = form.watch(fieldName) || []
-  const lastValue = values.length > 0 ? values[values.length - 1]?.value : ''
-  const isAddDisabled = !lastValue || lastValue.trim() === ''
-
   return (
-    <div className="w-96">
-      <div className="mb-1">
-        {label}
-        {required && <span className="text-red-600">*</span>}
+    <div className="w-96 space-y-1">
+      <div className="flex justify-between items-center">
+        <span className="text-foreground-light">{label}</span>
+        {required ? <></> : <span className="text-foreground-muted">Optional</span>}
       </div>
       <div className="grid gap-2 w-full">
         {fields.map((field, idx) => (
-          <div key={field.id} className="flex gap-2 items-center justify-start">
-            <FormControl_Shadcn_>
-              <Input_Shadcn_
-                {...form.register(`${fieldName}.${idx}.value` as const)}
-                placeholder={placeholder}
-                autoComplete="off"
-              />
-            </FormControl_Shadcn_>
-
+          <div key={field.id} className="flex gap-2 items-start">
+            <FormField_Shadcn_
+              name={`${fieldName}.${idx}.value`}
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="flex-1">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} placeholder={placeholder} autoComplete="off" />
+                  </FormControl_Shadcn_>
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
             <Button
-              type="text"
-              size="small"
-              className="h-[34px] p-1"
-              disabled={fields.length === 1}
-              icon={<MinusCircle />}
+              type="default"
+              icon={<Trash size={12} />}
+              className="h-[34px] w-[34px]"
+              disabled={fields.length <= 1}
               onClick={() => remove(idx)}
             />
           </div>
@@ -205,13 +209,9 @@ const MappingFieldArray = ({
           icon={<Plus className="w-4 h-4" />}
           onClick={() => append({ value: '' })}
           className="w-auto self-start justify-self-start"
-          disabled={isAddDisabled}
         >
           Add another
         </Button>
-
-        <Separator className="my-4" />
-        <FormMessage_Shadcn_ />
       </div>
     </div>
   )
