@@ -15,7 +15,7 @@ export const PIPELINE_ERROR_MESSAGES = {
 
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined
-): string | undefined => {
+): ReplicationPipelineStatusData['status']['name'] | undefined => {
   if (status && typeof status === 'object' && 'name' in status) {
     return status.name
   }

@@ -1,6 +1,13 @@
+import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { Edit, MoreVertical, Pause, Play, Trash } from 'lucide-react'
+import { toast } from 'sonner'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
 import {
   Button,
@@ -11,29 +18,31 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { Pipeline } from './DestinationRow'
+import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatusName } from './PipelineStatus'
 
 interface RowMenuProps {
+  pipeline: Pipeline | undefined
   pipelineStatus: any
   error: ResponseError | null
   isLoading: boolean
   isError: boolean
-  onEnableClick: () => void
-  onDisableClick: () => void
   onEditClick: () => void
   onDeleteClick: () => void
 }
 
 const RowMenu = ({
+  pipeline,
   pipelineStatus,
   error,
   isLoading,
   isError,
-  onEnableClick,
-  onDisableClick,
   onEditClick,
   onDeleteClick,
 }: RowMenuProps) => {
+  const { ref: projectRef } = useParams()
+
   const getStatusName = (status: any) => {
     if (status && typeof status === 'object' && 'name' in status) {
       return status.name
@@ -43,6 +52,44 @@ const RowMenu = ({
 
   const statusName = getStatusName(pipelineStatus)
   const pipelineEnabled = statusName !== PipelineStatusName.STOPPED
+
+  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
+  const { setRequestStatus: setGlobalRequestStatus } = usePipelineRequestStatus()
+
+  const onEnablePipeline = async () => {
+    if (!projectRef) {
+      return console.error('Project ref is required')
+    }
+    if (!pipeline) {
+      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    }
+
+    try {
+      await startPipeline({ projectRef, pipelineId: pipeline.id })
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
+    } catch (error) {
+      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+    }
+  }
+
+  const onDisablePipeline = async () => {
+    if (!projectRef) {
+      console.error('Project ref is required')
+      return
+    }
+    if (!pipeline) {
+      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+      return
+    }
+
+    try {
+      await stopPipeline({ projectRef, pipelineId: pipeline.id })
+      setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
+    } catch (error) {
+      toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
+    }
+  }
 
   return (
     <div className="flex justify-end items-center space-x-2">
@@ -57,14 +104,14 @@ const RowMenu = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           {pipelineEnabled ? (
-            <DropdownMenuItem className="space-x-2" onClick={onDisableClick}>
+            <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
               <Pause size={14} />
-              <p>Disable</p>
+              <p>Disable pipeline</p>
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem className="space-x-2" onClick={onEnableClick}>
+            <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
               <Play size={14} />
-              <p>Enable</p>
+              <p>Enable pipeline</p>
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />

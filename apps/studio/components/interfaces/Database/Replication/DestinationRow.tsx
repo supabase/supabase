@@ -1,26 +1,26 @@
+import { Info } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
+import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
 import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
-import { ResponseError } from 'types'
-import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
-import { Info } from 'lucide-react'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import RowMenu from './RowMenu'
-import PipelineStatus, { PipelineStatusName } from './PipelineStatus'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
-import { useParams } from 'common'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useState, useEffect } from 'react'
-import { toast } from 'sonner'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
-import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
+import { ResponseError } from 'types'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import DeleteDestination from './DeleteDestination'
 import DestinationPanel from './DestinationPanel'
+import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
+import RowMenu from './RowMenu'
 
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
@@ -39,7 +39,7 @@ interface DestinationRowProps {
   onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
-const DestinationRow = ({
+export const DestinationRow = ({
   sourceId,
   destinationId,
   destinationName,
@@ -68,69 +68,23 @@ const DestinationRow = ({
     },
     { refetchInterval: refreshFrequencyMs }
   )
-  const {
-    getRequestStatus,
-    setRequestStatus: setGlobalRequestStatus,
-    updatePipelineStatus,
-  } = usePipelineRequestStatus()
+  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
+  const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
+
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
 
-  useEffect(() => {
-    if (pipeline?.id) {
-      updatePipelineStatus(pipeline.id, statusName)
-    }
-  }, [pipeline?.id, statusName, updatePipelineStatus])
-
-  const onEnableClick = async () => {
-    if (!projectRef) {
-      console.error('Project ref is required')
-      return
-    }
-    if (!pipeline) {
-      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-      return
-    }
-
-    try {
-      await startPipeline({ projectRef, pipelineId: pipeline.id })
-    } catch (error) {
-      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
-    }
-    setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
-  }
-  const onDisableClick = async () => {
-    if (!projectRef) {
-      console.error('Project ref is required')
-      return
-    }
-    if (!pipeline) {
-      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-      return
-    }
-
-    try {
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
-    } catch (error) {
-      toast.error(PIPELINE_ERROR_MESSAGES.DISABLE_DESTINATION)
-    }
-    setGlobalRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
-  }
-  const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
-
   const onDeleteClick = async () => {
     if (!projectRef) {
-      console.error('Project ref is required')
-      return
+      return console.error('Project ref is required')
     }
     if (!pipeline) {
-      toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
-      return
+      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
     }
 
     try {
@@ -142,6 +96,12 @@ const DestinationRow = ({
       toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
     }
   }
+
+  useEffect(() => {
+    if (pipeline?.id) {
+      updatePipelineStatus(pipeline.id, statusName)
+    }
+  }, [pipeline?.id, statusName, updatePipelineStatus])
 
   return (
     <>
@@ -165,12 +125,12 @@ const DestinationRow = ({
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
                 requestStatus={requestStatus}
-              ></PipelineStatus>
+              />
             )}
           </Table.td>
           <Table.td>
             {isPipelineLoading || !pipeline ? (
-              <ShimmeringLoader></ShimmeringLoader>
+              <ShimmeringLoader />
             ) : (
               pipeline.config.publication_name
             )}
@@ -178,30 +138,20 @@ const DestinationRow = ({
           <Table.td>
             <div className="flex items-center justify-end gap-1">
               {pipeline && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="text"
-                        size="tiny"
-                        icon={<Info className="w-3 h-3" />}
-                        onClick={() => onSelectPipeline?.(pipeline.id, destinationName)}
-                        className="h-auto p-1.5 hover:bg-surface-200"
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View table replication status</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <ButtonTooltip
+                  size="tiny"
+                  icon={<Info className="w-3 h-3" />}
+                  onClick={() => onSelectPipeline?.(pipeline.id, destinationName)}
+                  className="px-1.5"
+                  tooltip={{ content: { side: 'bottom', text: 'View table replication status' } }}
+                />
               )}
               <RowMenu
+                pipeline={pipeline}
                 pipelineStatus={pipelineStatusData?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
-                onEnableClick={onEnableClick}
-                onDisableClick={onDisableClick}
                 onDeleteClick={() => setShowDeleteDestinationForm(true)}
                 onEditClick={() => setShowEditDestinationPanel(true)}
               />
@@ -230,5 +180,3 @@ const DestinationRow = ({
     </>
   )
 }
-
-export default DestinationRow

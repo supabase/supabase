@@ -1,11 +1,10 @@
 import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { cn } from 'ui'
-import { ResponseError } from 'types'
-import { Loader2, AlertTriangle } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
+import { AlertTriangle, Loader2 } from 'lucide-react'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
+import { ResponseError } from 'types'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { getPipelineStateMessages, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 export enum PipelineStatusName {
@@ -28,7 +27,7 @@ interface PipelineStatusProps {
   requestStatus?: PipelineStatusRequestStatus
 }
 
-const PipelineStatus = ({
+export const PipelineStatus = ({
   pipelineStatus,
   error,
   isLoading,
@@ -49,19 +48,17 @@ const PipelineStatus = ({
 
   const renderFailedStatus = () => {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex items-center gap-2 text-sm text-destructive">
-              <AlertTriangle className="w-3 h-3" />
-              <span>Failed</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{getPipelineStateMessages(requestStatus, 'failed').message}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center gap-2 text-sm text-destructive">
+            <AlertTriangle className="w-3 h-3" />
+            <span>Failed</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{getPipelineStateMessages(requestStatus, 'failed').message}</p>
+        </TooltipContent>
+      </Tooltip>
     )
   }
   // Map backend statuses to UX-friendly display
@@ -161,24 +158,20 @@ const PipelineStatus = ({
           {statusConfig.isFailedStatus ? (
             <div className="relative">{renderFailedStatus()}</div>
           ) : (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className={cn('flex items-center gap-2 text-sm', statusConfig.color)}>
-                    {statusConfig.dot}
-                    <span>{statusConfig.label}</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{statusConfig.tooltip}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className={cn('flex items-center gap-2 text-sm', statusConfig.color)}>
+                  {statusConfig.dot}
+                  <span>{statusConfig.label}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{statusConfig.tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </>
       )}
     </>
   )
 }
-
-export default PipelineStatus

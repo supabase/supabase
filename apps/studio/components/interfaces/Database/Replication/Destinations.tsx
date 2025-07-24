@@ -2,22 +2,22 @@ import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { Plus, Search } from 'lucide-react'
-import { Button, cn, Input_Shadcn_ } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import DestinationRow from './DestinationRow'
 import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useState } from 'react'
-import NewDestinationPanel from './DestinationPanel'
 import { useReplicationSourcesQuery } from 'data/replication/sources-query'
 import { noop } from 'lodash'
+import { Plus, Search } from 'lucide-react'
+import { useState } from 'react'
+import { Button, cn, Input_Shadcn_ } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import NewDestinationPanel from './DestinationPanel'
+import { DestinationRow } from './DestinationRow'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
 interface DestinationsProps {
   onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
-const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
+export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [filterString, setFilterString] = useState<string>('')
   const { ref: projectRef } = useParams()
@@ -27,12 +27,11 @@ const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
     error: sourcesError,
     isLoading: isSourcesLoading,
     isError: isSourcesError,
-    isSuccess: isSourcesSuccess,
   } = useReplicationSourcesQuery({
     projectRef,
   })
 
-  let sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
   const {
     data: destinationsData,
@@ -123,7 +122,7 @@ const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
                   isError={isPipelinesError}
                   isSuccess={isPipelinesSuccess}
                   onSelectPipeline={onSelectPipeline}
-                ></DestinationRow>
+                />
               )
             })}
           ></Table>
@@ -169,9 +168,7 @@ const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
         visible={showNewDestinationPanel}
         sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}
-      ></NewDestinationPanel>
+      />
     </>
   )
 }
-
-export default Destinations

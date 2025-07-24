@@ -1,41 +1,37 @@
+import {
+  Activity,
+  AlertTriangle,
+  ChevronLeft,
+  Clock,
+  Copy,
+  ExternalLink,
+  HelpCircle,
+  Loader2,
+  Search,
+  XCircle,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useReplicationPipelineByIdQuery } from 'data/replication/pipeline-by-id-query'
+import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import PipelineStatus from './PipelineStatus'
+import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
+import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
-  usePipelineRequestStatus,
   PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import { getStatusName, getPipelineStateMessages, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
-import { useState, useEffect } from 'react'
-import {
-  Button,
-  Badge,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-  Input_Shadcn_,
-} from 'ui'
+import { Badge, Button, cn, copyToClipboard, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import {
-  Copy,
-  ExternalLink,
-  ChevronLeft,
-  Search,
-  AlertTriangle,
-  Activity,
-  Loader2,
-  Clock,
-  XCircle,
-  HelpCircle,
-} from 'lucide-react'
-import Link from 'next/link'
-import { toast } from 'sonner'
-import { copyToClipboard } from 'ui'
+import { getPipelineStateMessages, getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { PipelineStatus } from './PipelineStatus'
 
 type TableState = {
   table_id: number
@@ -54,18 +50,19 @@ interface ReplicationPipelineStatusProps {
   onSelectBack: () => void
 }
 
-const ReplicationPipelineStatus = ({
+export const ReplicationPipelineStatus = ({
   pipelineId,
   destinationName,
   onSelectBack,
 }: ReplicationPipelineStatusProps) => {
   const { ref: projectRef } = useParams()
   const [filterString, setFilterString] = useState<string>('')
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+
+  const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
 
   const {
-    data: pipelineData,
+    data: pipeline,
     error: pipelineError,
     isLoading: isPipelineLoading,
     isError: isPipelineError,
@@ -101,11 +98,10 @@ const ReplicationPipelineStatus = ({
     }
   )
 
-  const statusName = getStatusName(pipelineStatusData?.status)
+  const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: stopPipeline, isLoading: isStoppingPipeline } = useStopPipelineMutation()
 
-  useEffect(() => {
-    updatePipelineStatus(pipelineId, statusName)
-  }, [pipelineId, statusName, updatePipelineStatus])
+  const statusName = getStatusName(pipelineStatusData?.status)
 
   const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
     const statusText = `Table: ${tableName}\nStatus: ${state.name}${
@@ -158,13 +154,6 @@ const ReplicationPipelineStatus = ({
           description: 'Unknown status',
           color: 'text-warning-600',
         }
-    }
-  }
-
-  const handleNavigateToLogs = () => {
-    if (projectRef) {
-      const logsUrl = `/project/${projectRef}/logs/postgres-logs`
-      window.open(logsUrl, '_blank')
     }
   }
 
@@ -223,6 +212,7 @@ const ReplicationPipelineStatus = ({
     return { title, message, badge, icon, colors }
   }
 
+  const config = getDisabledStateConfig()
   const tableStatuses = replicationStatusData?.table_statuses || []
   const filteredTableStatuses =
     filterString.length === 0
@@ -241,11 +231,36 @@ const ReplicationPipelineStatus = ({
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
   const showActiveTable = isPipelineRunning && !isEnablingDisabling
 
+  const onTogglePipeline = async () => {
+    if (!projectRef) {
+      return console.error('Project ref is required')
+    }
+    if (!pipeline) {
+      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+    }
+
+    try {
+      if (statusName === 'stopped') {
+        await startPipeline({ projectRef, pipelineId: pipeline.id })
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.EnableRequested)
+      } else if (statusName === 'started') {
+        await stopPipeline({ projectRef, pipelineId: pipeline.id })
+        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.DisableRequested)
+      }
+    } catch (error) {
+      toast.error(PIPELINE_ERROR_MESSAGES.ENABLE_DESTINATION)
+    }
+  }
+
+  useEffect(() => {
+    updatePipelineStatus(pipelineId, statusName)
+  }, [pipelineId, statusName, updatePipelineStatus])
+
   if (isPipelineError) {
     return (
-      <div className="space-y-4">
+      <div className="flex flex-col gap-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-x-3">
             <Button
               type="outline"
               onClick={onSelectBack}
@@ -264,7 +279,7 @@ const ReplicationPipelineStatus = ({
     <div className="space-y-4">
       {/* Header with back button and filters */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-x-3">
           <Button
             type="outline"
             onClick={onSelectBack}
@@ -272,7 +287,7 @@ const ReplicationPipelineStatus = ({
             style={{ padding: '5px' }}
           />
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-x-3">
               <h3 className="text-xl font-semibold">{destinationName || 'Pipeline'}</h3>
               <PipelineStatus
                 pipelineStatus={pipelineStatusData?.status}
@@ -286,7 +301,7 @@ const ReplicationPipelineStatus = ({
             <p className="text-sm text-foreground-light">Table replication status</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-x-2">
           <div className="relative">
             <Search
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
@@ -311,7 +326,6 @@ const ReplicationPipelineStatus = ({
         />
       )}
 
-      {/* Error alert */}
       {hasErrors && (
         <div className="p-4 border border-destructive-300 bg-destructive-100 rounded-lg">
           <div className="flex items-start gap-3">
@@ -325,13 +339,19 @@ const ReplicationPipelineStatus = ({
                 information.
               </p>
               <Button
+                asChild
                 type="outline"
                 size="tiny"
                 icon={<ExternalLink className="w-3 h-3" />}
-                onClick={handleNavigateToLogs}
                 className="text-destructive-600 border-destructive-300 hover:bg-destructive-50"
               >
-                View Logs
+                <Link
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  href={`/project/${projectRef}/logs/postgres-logs`}
+                >
+                  View Logs
+                </Link>
               </Button>
             </div>
           </div>
@@ -339,84 +359,90 @@ const ReplicationPipelineStatus = ({
       )}
 
       {/* Pipeline not running state */}
-      {showDisabledState &&
-        hasTableData &&
-        (() => {
-          const config = getDisabledStateConfig()
-          return (
-            <div className="space-y-4">
-              <div className={`p-4 border border-default rounded-lg ${config.colors.bg}`}>
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center ${config.colors.iconBg}`}
-                  >
-                    <div className={config.colors.icon}>{config.icon}</div>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
-                    <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
-                  </div>
-                </div>
+      {showDisabledState && hasTableData && (
+        <div className="space-y-4">
+          <div
+            className={cn(
+              'p-4 border border-default rounded-lg flex items-center justify-between',
+              config.colors.bg
+            )}
+          >
+            <div className="flex items-center gap-x-3">
+              <div
+                className={cn(
+                  'w-10 h-10 rounded-full flex items-center justify-center',
+                  config.colors.iconBg
+                )}
+              >
+                <div className={config.colors.icon}>{config.icon}</div>
               </div>
-
-              <div className="w-full overflow-hidden overflow-x-auto">
-                <Table
-                  head={[
-                    <Table.th key="table">Table</Table.th>,
-                    <Table.th key="status">Status</Table.th>,
-                    <Table.th key="details">Details</Table.th>,
-                    <Table.th key="actions" className="w-16 text-center">
-                      Actions
-                    </Table.th>,
-                  ]}
-                  body={filteredTableStatuses.map((table: TableState, index: number) => (
-                    <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
-                      <Table.td>
-                        <Link
-                          href={`/project/${projectRef}/editor/${table.table_id}`}
-                          className="font-mono text-sm font-medium text-foreground-lighter hover:text-foreground transition-colors cursor-pointer underline underline-offset-2"
-                        >
-                          {table.table_name}
-                        </Link>
-                      </Table.td>
-                      <Table.td>
-                        <Badge
-                          variant="secondary"
-                          className="text-foreground-lighter bg-surface-100 border-border-muted"
-                        >
-                          Not Available
-                        </Badge>
-                      </Table.td>
-                      <Table.td>
-                        <div className="text-sm text-foreground-lighter">
-                          Status unavailable while pipeline is {config.badge.toLowerCase()}
-                        </div>
-                      </Table.td>
-                      <Table.td className="text-center">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                type="text"
-                                size="tiny"
-                                icon={<Copy className="w-3 h-3" />}
-                                disabled
-                                className="h-auto p-2 opacity-40 cursor-not-allowed"
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Copy unavailable while pipeline is {config.badge.toLowerCase()}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </Table.td>
-                    </Table.tr>
-                  ))}
-                />
+              <div className="flex-1">
+                <h4 className={`text-sm font-medium ${config.colors.text}`}>{config.title}</h4>
+                <p className={`text-sm ${config.colors.subtext}`}>{config.message}</p>
               </div>
             </div>
-          )
-        })()}
+            {['stopped', 'started'].includes(statusName ?? '') && (
+              <Button
+                type={statusName === 'stopped' ? 'primary' : 'default'}
+                onClick={() => onTogglePipeline()}
+                loading={isStartingPipeline || isStoppingPipeline}
+              >
+                {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
+              </Button>
+            )}
+          </div>
+
+          <div className="w-full overflow-hidden overflow-x-auto">
+            <Table
+              head={[
+                <Table.th key="table">Table</Table.th>,
+                <Table.th key="status">Status</Table.th>,
+                <Table.th key="details">Details</Table.th>,
+                <Table.th key="actions" className="w-16 text-center">
+                  Actions
+                </Table.th>,
+              ]}
+              body={filteredTableStatuses.map((table: TableState, index: number) => (
+                <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
+                  <Table.td>
+                    <InlineLink href={`/project/${projectRef}/editor/${table.table_id}`}>
+                      {table.table_name}
+                    </InlineLink>
+                  </Table.td>
+                  <Table.td>
+                    <Badge
+                      variant="default"
+                      className="text-foreground-lighter bg-surface-100 border-border-muted"
+                    >
+                      Not Available
+                    </Badge>
+                  </Table.td>
+                  <Table.td>
+                    <div className="text-sm text-foreground-lighter">
+                      Status unavailable while pipeline is {config.badge.toLowerCase()}
+                    </div>
+                  </Table.td>
+                  <Table.td className="text-center">
+                    <ButtonTooltip
+                      type="text"
+                      size="tiny"
+                      icon={<Copy className="w-3 h-3" />}
+                      className="px-1.5"
+                      disabled
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: `Copy unavailable while pipeline is ${config.badge.toLowerCase()}`,
+                        },
+                      }}
+                    />
+                  </Table.td>
+                </Table.tr>
+              ))}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Tables list - active/running pipeline */}
       {showActiveTable && !isStatusLoading && hasTableData && (
@@ -457,22 +483,19 @@ const ReplicationPipelineStatus = ({
                     </div>
                   </Table.td>
                   <Table.td className="text-center">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="text"
-                            size="tiny"
-                            icon={<Copy className="w-3 h-3" />}
-                            onClick={() => handleCopyTableStatus(table.table_name, table.state)}
-                            className="h-auto p-2 hover:bg-surface-200"
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Copy status details</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <ButtonTooltip
+                      type="text"
+                      size="tiny"
+                      icon={<Copy className="w-3 h-3" />}
+                      className="px-1.5"
+                      onClick={() => handleCopyTableStatus(table.table_name, table.state)}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: 'Copy status details',
+                        },
+                      }}
+                    />
                   </Table.td>
                 </Table.tr>
               )
@@ -542,5 +565,3 @@ const ReplicationPipelineStatus = ({
     </div>
   )
 }
-
-export default ReplicationPipelineStatus
