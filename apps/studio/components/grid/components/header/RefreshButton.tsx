@@ -4,6 +4,7 @@ import { RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { Button } from 'ui'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type RefreshButtonProps = {
   tableId?: number
@@ -20,14 +21,19 @@ const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => {
   }
 
   return (
-    <Button
-      type="text"
+    <ButtonTooltip
+      type="outline"
       loading={isRefetching}
-      icon={<RefreshCw className="text-foreground-muted" strokeWidth={1.5} />}
+      icon={<RefreshCw strokeWidth={1.5} />}
       onClick={() => onClick()}
-    >
-      Refresh
-    </Button>
+      className="w-7 h-7 p-0"
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: 'Refresh the table data',
+        },
+      }}
+    />
   )
 }
 export default RefreshButton

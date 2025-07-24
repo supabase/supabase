@@ -22,7 +22,6 @@ import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
-import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -158,24 +157,7 @@ export const TableGridEditor = ({
         table={selectedTable}
         editable={editable}
       >
-        <SupabaseGrid
-          key={gridKey}
-          gridProps={{ height: '100%' }}
-          customHeader={
-            (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-              <div className="flex items-center space-x-2">
-                <p>
-                  SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
-                </p>
-                <p className="text-foreground-light text-sm">(Read only)</p>
-              </div>
-            ) : null
-          }
-        >
-          {(isViewSelected || isTableSelected) && selectedView === 'definition' && (
-            <TableDefinition entity={selectedTable} />
-          )}
-        </SupabaseGrid>
+        <SupabaseGrid key={gridKey} gridProps={{ height: '100%' }} />
 
         <SidePanelEditor
           editable={editable}

@@ -32,12 +32,14 @@ interface ColumnListProps {
   onAddColumn: () => void
   onEditColumn: (column: any) => void
   onDeleteColumn: (column: any) => void
+  showControls?: boolean
 }
 
 const ColumnList = ({
   onAddColumn = noop,
   onEditColumn = noop,
   onDeleteColumn = noop,
+  showControls = true,
 }: ColumnListProps) => {
   const { id: _id, ref } = useParams()
   const id = _id ? Number(_id) : undefined
@@ -68,37 +70,39 @@ const ColumnList = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
-            <Link href={`/project/${ref}/database/tables`} />
-          </Button>
-          <Input
-            size="small"
-            placeholder="Filter columns"
-            value={filterString}
-            onChange={(e: any) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
-          />
+      {showControls && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
+              <Link href={`/project/${ref}/database/tables`} />
+            </Button>
+            <Input
+              size="small"
+              placeholder="Filter columns"
+              value={filterString}
+              onChange={(e: any) => setFilterString(e.target.value)}
+              icon={<Search size={12} />}
+            />
+          </div>
+          {!isLocked && isTableEntity && (
+            <ButtonTooltip
+              icon={<Plus />}
+              disabled={!canUpdateColumns}
+              onClick={() => onAddColumn()}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdateColumns
+                    ? 'You need additional permissions to create columns'
+                    : undefined,
+                },
+              }}
+            >
+              New column
+            </ButtonTooltip>
+          )}
         </div>
-        {!isLocked && isTableEntity && (
-          <ButtonTooltip
-            icon={<Plus />}
-            disabled={!canUpdateColumns}
-            onClick={() => onAddColumn()}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateColumns
-                  ? 'You need additional permissions to create columns'
-                  : undefined,
-              },
-            }}
-          >
-            New column
-          </ButtonTooltip>
-        )}
-      </div>
+      )}
 
       {isLocked && <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />}
 

@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -20,8 +20,12 @@ import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { GridProps } from './types'
 
+import Editor from '@monaco-editor/react'
+import { formatSql } from 'lib/formatSql'
+import { useTheme } from 'next-themes'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
+import { cn } from 'ui'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -36,12 +40,14 @@ export const SupabaseGrid = ({
   const tableId = _id ? Number(_id) : undefined
 
   const { project } = useProjectContext()
+  const { resolvedTheme } = useTheme()
 
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
+  const [view, setView] = useState<'list' | 'definition'>('list')
 
   const { filters, onApplyFilters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
@@ -81,25 +87,55 @@ export const SupabaseGrid = ({
   }, [])
 
   const rows = data?.rows ?? EMPTY_ARR
+  const query = data?.query ?? ''
+  const formattedQuery = useMemo(() => (query ? formatSql(query) : ''), [query])
 
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header customHeader={customHeader} />
+        <Header
+          customHeader={customHeader}
+          isRefetching={isRefetching}
+          view={view}
+          setView={setView}
+        />
 
         {children || (
           <>
-            <Grid
-              ref={gridRef}
-              {...gridProps}
-              rows={rows}
-              error={error}
-              isLoading={isLoading}
-              isSuccess={isSuccess}
-              isError={isError}
-              filters={filters}
-              onApplyFilters={onApplyFilters}
-            />
+            {view === 'list' ? (
+              <Grid
+                ref={gridRef}
+                {...gridProps}
+                rows={rows}
+                error={error}
+                isLoading={isLoading}
+                isSuccess={isSuccess}
+                isError={isError}
+                filters={filters}
+                onApplyFilters={onApplyFilters}
+              />
+            ) : (
+              <div className="h-full w-full border-t overflow-hidden">
+                <Editor
+                  className={cn('monaco-editor', (isLoading || isRefetching) && 'opacity-50')}
+                  theme={resolvedTheme?.includes('dark') ? 'vs-dark' : 'vs'}
+                  defaultLanguage="pgsql"
+                  value={formattedQuery}
+                  path={''}
+                  options={{
+                    domReadOnly: true,
+                    readOnly: true,
+                    padding: {
+                      top: 16,
+                    },
+                    tabSize: 2,
+                    fontSize: 13,
+                    minimap: { enabled: false },
+                    wordWrap: 'on',
+                  }}
+                />
+              </div>
+            )}
             <Footer isRefetching={isRefetching} />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>

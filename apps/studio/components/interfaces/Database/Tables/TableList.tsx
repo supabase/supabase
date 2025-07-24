@@ -413,13 +413,23 @@ const TableList = ({
                               asChild
                               className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
                             >
-                              <p>{x.name}</p>
+                              <Link
+                                href={`/project/${ref}/database/tables/${x.id}`}
+                                className="text-foreground"
+                              >
+                                {x.name}
+                              </Link>
                             </TooltipTrigger>
 
                             <TooltipContent side="bottom">{x.name}</TooltipContent>
                           </Tooltip>
                         ) : (
-                          <p>{x.name}</p>
+                          <Link
+                            href={`/project/${ref}/database/tables/${x.id}`}
+                            className="text-foreground"
+                          >
+                            {x.name}
+                          </Link>
                         )}
                       </Table.td>
                       <Table.td className="hidden lg:table-cell ">
