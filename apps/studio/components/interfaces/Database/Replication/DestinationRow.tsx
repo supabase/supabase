@@ -110,13 +110,11 @@ export const DestinationRow = ({
       )}
       {isPipelineSuccess && (
         <Table.tr>
-          <Table.td>
-            {isPipelineLoading ? <ShimmeringLoader></ShimmeringLoader> : destinationName}
-          </Table.td>
-          <Table.td>{isPipelineLoading ? <ShimmeringLoader></ShimmeringLoader> : type}</Table.td>
+          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : destinationName}</Table.td>
+          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
           <Table.td>
             {isPipelineLoading || !pipeline ? (
-              <ShimmeringLoader></ShimmeringLoader>
+              <ShimmeringLoader />
             ) : (
               <PipelineStatus
                 pipelineStatus={pipelineStatusData?.status}
@@ -136,7 +134,7 @@ export const DestinationRow = ({
             )}
           </Table.td>
           <Table.td>
-            <div className="flex items-center justify-end gap-x-1">
+            <div className="flex items-center justify-end gap-x-2">
               {pipeline && (
                 <ButtonTooltip
                   size="tiny"

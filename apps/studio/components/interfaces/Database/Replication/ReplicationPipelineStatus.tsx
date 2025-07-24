@@ -1,15 +1,4 @@
-import {
-  Activity,
-  AlertTriangle,
-  ChevronLeft,
-  Clock,
-  Copy,
-  ExternalLink,
-  HelpCircle,
-  Loader2,
-  Search,
-  XCircle,
-} from 'lucide-react'
+import { Activity, AlertTriangle, ChevronLeft, Copy, ExternalLink, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -27,30 +16,12 @@ import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
-import {
-  Badge,
-  Button,
-  cn,
-  copyToClipboard,
-  Input_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, Button, cn, copyToClipboard, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { getPipelineStateMessages, getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
-
-type TableState = {
-  table_id: number
-  table_name: string
-  state:
-    | { name: 'queued' }
-    | { name: 'copying_table' }
-    | { name: 'copied_table' }
-    | { name: 'following_wal'; lag: number }
-    | { name: 'error'; message: string }
-}
+import { TableState } from './ReplicationPipelineStatus.types'
+import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 
 interface ReplicationPipelineStatusProps {
   pipelineId: number
@@ -110,117 +81,8 @@ export const ReplicationPipelineStatus = ({
   const { mutateAsync: stopPipeline, isLoading: isStoppingPipeline } = useStopPipelineMutation()
 
   const statusName = getStatusName(pipelineStatusData?.status)
+  const config = getDisabledStateConfig({ requestStatus, statusName })
 
-  const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
-    const statusText = `Table: ${tableName}\nStatus: ${state.name}${
-      'message' in state ? `\nError: ${state.message}` : ''
-    }${'lag' in state ? `\nLag: ${state.lag}ms` : ''}`
-
-    try {
-      await copyToClipboard(statusText)
-      toast.success('Table status copied to clipboard')
-    } catch {
-      toast.error(PIPELINE_ERROR_MESSAGES.COPY_TABLE_STATUS)
-    }
-  }
-
-  const getStatusConfig = (state: TableState['state']) => {
-    switch (state.name) {
-      case 'queued':
-        return {
-          badge: <Badge variant="warning">Queued</Badge>,
-          description: 'Waiting to start replication',
-          color: 'text-warning-600',
-        }
-      case 'copying_table':
-        return {
-          badge: <Badge variant="brand">Copying</Badge>,
-          description: 'Initial data copy in progress',
-          color: 'text-brand-600',
-        }
-      case 'copied_table':
-        return {
-          badge: <Badge variant="success">Copied</Badge>,
-          description: 'Initial copy completed',
-          color: 'text-success-600',
-        }
-      case 'following_wal':
-        return {
-          badge: <Badge variant="success">Live</Badge>,
-          description: `Replicating live changes`,
-          color: 'text-success-600',
-        }
-      case 'error':
-        return {
-          badge: <Badge variant="destructive">Error</Badge>,
-          description: state.message,
-          color: 'text-destructive-600',
-        }
-      default:
-        return {
-          badge: <Badge variant="warning">Unknown</Badge>,
-          description: 'Unknown status',
-          color: 'text-warning-600',
-        }
-    }
-  }
-
-  const getDisabledStateConfig = () => {
-    const { title, message, badge } = getPipelineStateMessages(requestStatus, statusName)
-
-    // Get icon and colors based on current state
-    const isEnabling = requestStatus === PipelineStatusRequestStatus.EnableRequested
-    const isDisabling = requestStatus === PipelineStatusRequestStatus.DisableRequested
-    const isTransitioning = isEnabling || isDisabling
-
-    const icon = isTransitioning ? (
-      <Loader2 className="w-6 h-6 animate-spin" />
-    ) : statusName === 'failed' ? (
-      <XCircle className="w-6 h-6" />
-    ) : statusName === 'starting' ? (
-      <Clock className="w-6 h-6" />
-    ) : statusName === 'unknown' ? (
-      <HelpCircle className="w-6 h-6" />
-    ) : (
-      <Activity className="w-6 h-6" />
-    )
-
-    const colors = isEnabling
-      ? {
-          bg: 'bg-brand-50',
-          text: 'text-brand-900',
-          subtext: 'text-brand-700',
-          iconBg: 'bg-brand-600',
-          icon: 'text-white dark:text-black',
-        }
-      : isDisabling || statusName === 'starting' || statusName === 'unknown'
-        ? {
-            bg: 'bg-warning-50',
-            text: 'text-warning-900',
-            subtext: 'text-warning-700',
-            iconBg: 'bg-warning-600',
-            icon: 'text-white dark:text-black',
-          }
-        : statusName === 'failed'
-          ? {
-              bg: 'bg-destructive-50',
-              text: 'text-destructive-900',
-              subtext: 'text-destructive-700',
-              iconBg: 'bg-destructive-600',
-              icon: 'text-white dark:text-black',
-            }
-          : {
-              bg: 'bg-surface-100',
-              text: 'text-foreground',
-              subtext: 'text-foreground-light',
-              iconBg: 'bg-foreground-lighter',
-              icon: 'text-white dark:text-black',
-            }
-
-    return { title, message, badge, icon, colors }
-  }
-
-  const config = getDisabledStateConfig()
   const tableStatuses = replicationStatusData?.table_statuses || []
   const filteredTableStatuses =
     filterString.length === 0
@@ -237,7 +99,19 @@ export const ReplicationPipelineStatus = ({
     requestStatus === PipelineStatusRequestStatus.EnableRequested ||
     requestStatus === PipelineStatusRequestStatus.DisableRequested
   const showDisabledState = !isPipelineRunning || isEnablingDisabling
-  const showActiveTable = isPipelineRunning && !isEnablingDisabling
+
+  const handleCopyTableStatus = async (tableName: string, state: TableState['state']) => {
+    const statusText = `Table: ${tableName}\nStatus: ${state.name}${
+      'message' in state ? `\nError: ${state.message}` : ''
+    }${'lag' in state ? `\nLag: ${state.lag}ms` : ''}`
+
+    try {
+      await copyToClipboard(statusText)
+      toast.success('Table status copied to clipboard')
+    } catch {
+      toast.error(PIPELINE_ERROR_MESSAGES.COPY_TABLE_STATUS)
+    }
+  }
 
   const onTogglePipeline = async () => {
     if (!projectRef) {
@@ -412,22 +286,24 @@ export const ReplicationPipelineStatus = ({
               body={filteredTableStatuses.map((table: TableState, index: number) => {
                 const statusConfig = getStatusConfig(table.state)
                 return (
-                  <Table.tr key={`${table.table_name}-${index}`} className="border-t opacity-50">
+                  <Table.tr key={`${table.table_name}-${index}`} className="border-t">
                     <Table.td>
                       <div className="flex items-center gap-x-2">
                         <p>{table.table_name}</p>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <a
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              href={`/project/${projectRef}/editor/${table.table_id}`}
-                            >
-                              <ExternalLink size={14} />
-                            </a>
-                          </TooltipTrigger>
-                          <TooltipContent>Open in Table Editor</TooltipContent>
-                        </Tooltip>
+
+                        <ButtonTooltip
+                          asChild
+                          type="text"
+                          className="px-1.5"
+                          icon={<ExternalLink />}
+                          tooltip={{ content: { side: 'bottom', text: 'Open in Table Editor' } }}
+                        >
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`/project/${projectRef}/editor/${table.table_id}`}
+                          />
+                        </ButtonTooltip>
                       </div>
                     </Table.td>
                     <Table.td>
@@ -479,61 +355,39 @@ export const ReplicationPipelineStatus = ({
         </div>
       )}
 
-      {/* No results - running pipeline */}
-      {showActiveTable &&
-        !isStatusLoading &&
-        filteredTableStatuses.length === 0 &&
-        hasTableData && (
-          <div className="text-center py-8 text-foreground-light">
-            <p>No tables match "{filterString}"</p>
-          </div>
-        )}
+      {filteredTableStatuses.length === 0 && hasTableData && (
+        <Table.tr>
+          <Table.td colSpan={4}>
+            <div className="space-y-1">
+              <p className="text-sm text-foreground">No results found</p>
+              <p className="text-sm text-foreground-light">
+                Your search for "{filterString}" did not return any results
+              </p>
+            </div>
+          </Table.td>
+        </Table.tr>
+      )}
 
-      {/* No results - not running pipeline */}
-      {showDisabledState &&
-        !isStatusLoading &&
-        filteredTableStatuses.length === 0 &&
-        hasTableData && (
-          <div className="text-center py-8 text-foreground-light">
-            <p>No tables match "{filterString}"</p>
-          </div>
-        )}
-
-      {/* Empty state - running pipeline */}
-      {showActiveTable && !isStatusLoading && tableStatuses.length === 0 && (
+      {!isStatusLoading && tableStatuses.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 px-4">
           <div className="w-full max-w-sm mx-auto text-center space-y-4">
             <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
               <Activity className="w-8 h-8 text-foreground-lighter" />
             </div>
             <div className="space-y-2">
-              <h4 className="text-lg font-semibold text-foreground">No table status information</h4>
+              <h4 className="text-lg font-semibold text-foreground">
+                {showDisabledState ? 'Pipeline Not Running' : 'No table status information'}
+              </h4>
               <p className="text-sm text-foreground-light leading-relaxed">
-                This pipeline doesn't have any table replication status data available yet. The
-                status will appear here once replication begins.
+                {showDisabledState
+                  ? `The replication pipeline is currently ${statusName || 'not active'}. Table status
+                information is not available while the pipeline is in this state.`
+                  : `This pipeline doesn't have any table replication status data available yet. The status will appear here once replication begins.`}
               </p>
             </div>
             <p className="text-xs text-foreground-lighter">
               Data refreshes automatically every 2 seconds
             </p>
-          </div>
-        </div>
-      )}
-
-      {/* Empty state - not running pipeline */}
-      {showDisabledState && !isStatusLoading && tableStatuses.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 px-4">
-          <div className="w-full max-w-sm mx-auto text-center space-y-4">
-            <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
-              <Activity className="w-8 h-8 text-foreground-lighter" />
-            </div>
-            <div className="space-y-2">
-              <h4 className="text-lg font-semibold text-foreground-light">Pipeline Not Running</h4>
-              <p className="text-sm text-foreground-light leading-relaxed">
-                The replication pipeline is currently {statusName || 'not active'}. Table status
-                information is not available while the pipeline is in this state.
-              </p>
-            </div>
           </div>
         </div>
       )}
