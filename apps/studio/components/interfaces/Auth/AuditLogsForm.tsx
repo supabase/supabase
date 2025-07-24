@@ -104,20 +104,22 @@ const AuditLogsForm = () => {
           <div>
             <h3 className="text-lg font-medium text-foreground">About Audit Logs</h3>
             <p className="text-sm text-foreground-light mt-2">
-              Audit logs provide comprehensive tracking of auth events in your project.
-              By default, all auth-related actions such as user sign-ups, sign-ins, password changes, and administrative actions are logged to both
-              your PostgreSQL database and your project's logs dashboard (since{' '}
-              <strong>August 1, 2025</strong>, audit logs are being written to the logs dashboard).
+              Audit logs provide comprehensive tracking of auth events in your project. By default,
+              all auth-related actions such as user sign-ups, sign-ins, password changes, and
+              administrative actions are logged to both your PostgreSQL database and your project's
+              logs dashboard (since <strong>August 1, 2025</strong>, audit logs are being written to
+              the logs dashboard).
             </p>
             <p className="text-sm text-foreground-light mt-2">
-              <strong>Note:</strong> This feature is currently in beta. If you disable PostgreSQL 
+              <strong>Note:</strong> This feature is currently in beta. If you disable PostgreSQL
               storage, you can access audit logs through the{' '}
-              <a 
+              <a
                 href={`/project/${projectRef}/logs/auth-logs?s=auth_audit_event`}
                 className="text-brand underline hover:no-underline"
               >
                 Auth logs section
-              </a>.
+              </a>
+              .
             </p>
             <p className="text-sm text-foreground-light mt-2">
               For detailed information about audit logs, including what events are tracked and how
@@ -144,12 +146,22 @@ const AuditLogsForm = () => {
                         label="Disable PostgreSQL audit logs"
                         description={
                           <>
-                            When enabled, audit logs will only be written to your project's logs dashboard and not to the{' '}
-                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">audit_log_entries</code>{' '}
-                            table in your PostgreSQL database. This can help reduce database storage usage while maintaining audit trail visibility in your logs.
-                            <br /><br />
-                            <strong>Important:</strong> Disabling PostgreSQL storage will not automatically migrate or transfer existing audit log data. Any future audit logs will only appear in your logs dashboard. You are responsible for backing up, copying, or migrating existing data from the{' '}
-                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">audit_log_entries</code>{' '}
+                            When enabled, audit logs will only be written to your project's logs
+                            dashboard and not to the{' '}
+                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
+                              audit_log_entries
+                            </code>{' '}
+                            table in your PostgreSQL database. This can help reduce database storage
+                            usage while maintaining audit trail visibility in your logs.
+                            <br />
+                            <br />
+                            <strong>Important:</strong> Disabling PostgreSQL storage will not
+                            automatically migrate or transfer existing audit log data. Any future
+                            audit logs will only appear in your logs dashboard. You are responsible
+                            for backing up, copying, or migrating existing data from the{' '}
+                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
+                              audit_log_entries
+                            </code>{' '}
                             table if needed.
                           </>
                         }

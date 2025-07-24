@@ -34,10 +34,7 @@ const AuditLogsPage: NextPageWithLayout = () => {
 AuditLogsPage.getLayout = (page) => (
   <DefaultLayout>
     <AuthLayout>
-      <PageLayout
-        title="Audit Logs"
-        subtitle="Track and monitor auth events in your project"
-      >
+      <PageLayout title="Audit Logs" subtitle="Track and monitor auth events in your project">
         {page}
       </PageLayout>
     </AuthLayout>
