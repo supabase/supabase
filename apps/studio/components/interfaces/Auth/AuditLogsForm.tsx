@@ -1,16 +1,19 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { boolean, object } from 'yup'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -25,63 +28,58 @@ import {
   Switch,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 const schema = object({
   AUDIT_LOG_DISABLE_POSTGRES: boolean().required(),
 })
 
-const AuditLogsForm = () => {
+const AUDIT_LOG_ENTRIES_TABLE = 'audit_log_entries'
+
+export const AuditLogsForm = () => {
   const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const canReadConfig = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const [isUpdatingAuditLogs, setIsUpdatingAuditLogs] = useState(false)
+  const { data: tables = [] } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    includeColumns: false,
+    schema: 'auth',
+  })
+  const auditLogTable = tables.find((x) => x.name === AUDIT_LOG_ENTRIES_TABLE)
 
-  const {
-    data: authConfig,
-    error: authConfigError,
-    isLoading,
-    isError,
-  } = useAuthConfigQuery({ projectRef })
+  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-
-  const form = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      AUDIT_LOG_DISABLE_POSTGRES: false,
+  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update audit logs: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated audit logs settings')
     },
   })
 
-  useEffect(() => {
-    if (authConfig && !isUpdatingAuditLogs) {
-      form.reset({
-        // TODO :: gonna fix when the API is udpated.
-        AUDIT_LOG_DISABLE_POSTGRES: authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false,
-      })
-    }
-  }, [authConfig, isUpdatingAuditLogs])
+  const form = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: { AUDIT_LOG_DISABLE_POSTGRES: false },
+  })
+  const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = form.watch()
+  const currentlyDisabled = authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false
+  const isDisabling = !currentlyDisabled && formValueDisablePostgres
 
   const onSubmitAuditLogs = (values: any) => {
     if (!projectRef) return console.error('Project ref is required')
-
-    setIsUpdatingAuditLogs(true)
-
-    updateAuthConfig(
-      { projectRef: projectRef, config: values },
-      {
-        onError: (error) => {
-          toast.error(`Failed to update audit logs settings: ${error?.message}`)
-          setIsUpdatingAuditLogs(false)
-        },
-        onSuccess: () => {
-          toast.success('Successfully updated audit logs settings')
-          setIsUpdatingAuditLogs(false)
-        },
-      }
-    )
+    updateAuthConfig({ projectRef: projectRef, config: values })
   }
+
+  useEffect(() => {
+    if (authConfig) {
+      form.reset({ AUDIT_LOG_DISABLE_POSTGRES: authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false })
+    }
+  }, [authConfig])
 
   if (isError) {
     return (
@@ -98,108 +96,119 @@ const AuditLogsForm = () => {
   }
 
   return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-medium text-foreground">About Audit Logs</h3>
-            <p className="text-sm text-foreground-light mt-2">
-              Audit logs provide comprehensive tracking of auth events in your project. By default,
-              all auth-related actions such as user sign-ups, sign-ins, password changes, and
-              administrative actions are logged to both your PostgreSQL database and your project's
-              logs dashboard (since <strong>August 1, 2025</strong>, audit logs are being written to
-              the logs dashboard).
-            </p>
-            <p className="text-sm text-foreground-light mt-2">
-              <strong>Note:</strong> This feature is currently in beta. If you disable PostgreSQL
-              storage, you can access audit logs through the{' '}
-              <a
-                href={`/project/${projectRef}/logs/auth-logs?s=auth_audit_event`}
-                className="text-brand underline hover:no-underline"
-              >
-                Auth logs section
-              </a>
-              .
-            </p>
-            <p className="text-sm text-foreground-light mt-2">
-              For detailed information about audit logs, including what events are tracked and how
-              to query them, please refer to our{' '}
-              <a href="#" className="text-brand underline hover:no-underline">
-                audit logs documentation
-              </a>
-              .
-            </p>
-          </div>
+    <ScaffoldSection isFullWidth>
+      <div className="space-y-4">
+        {/* <div>
+          <h3 className="text-lg font-medium text-foreground">About Audit Logs</h3>
+          <p className="text-sm text-foreground-light mt-2">
+            Audit logs provide comprehensive tracking of auth events in your project. By default,
+            all auth-related actions such as user sign-ups, sign-ins, password changes, and
+            administrative actions are logged to both your PostgreSQL database and your project's
+            logs dashboard (since <strong>August 1, 2025</strong>, audit logs are being written to
+            the logs dashboard).
+          </p>
+          <p className="text-sm text-foreground-light mt-2">
+            <strong>Note:</strong> This feature is currently in beta. If you disable PostgreSQL
+            storage, you can access audit logs through the{' '}
+            <a
+              href={`/project/${projectRef}/logs/auth-logs?s=auth_audit_event`}
+              className="text-brand underline hover:no-underline"
+            >
+              Auth logs section
+            </a>
+            .
+          </p>
+        </div> */}
 
-          <ScaffoldSectionTitle className="mb-4">Settings</ScaffoldSectionTitle>
+        <ScaffoldSectionTitle className="mb-4">Settings</ScaffoldSectionTitle>
 
-          <Form_Shadcn_ {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitAuditLogs)} className="space-y-4">
-              <Card>
-                <CardContent>
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="AUDIT_LOG_DISABLE_POSTGRES"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Disable PostgreSQL audit logs"
-                        description={
-                          <>
-                            When enabled, audit logs will only be written to your project's logs
-                            dashboard and not to the{' '}
+        <Form_Shadcn_ {...form}>
+          <form onSubmit={form.handleSubmit(onSubmitAuditLogs)} className="space-y-4">
+            <Card>
+              <CardContent>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="AUDIT_LOG_DISABLE_POSTGRES"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Disable writing auth audit logs to project database"
+                      description={
+                        <p className="text-sm prose text-foreground-lighter max-w-full">
+                          Audit logs will no longer be stored in the{' '}
+                          <InlineLink
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
+                          >
                             <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
-                              audit_log_entries
-                            </code>{' '}
-                            table in your PostgreSQL database. This can help reduce database storage
-                            usage while maintaining audit trail visibility in your logs.
-                            <br />
-                            <br />
-                            <strong>Important:</strong> Disabling PostgreSQL storage will not
-                            automatically migrate or transfer existing audit log data. Any future
-                            audit logs will only appear in your logs dashboard. You are responsible
-                            for backing up, copying, or migrating existing data from the{' '}
-                            <code className="text-xs bg-surface-200 px-1 py-0.5 rounded">
-                              audit_log_entries
-                            </code>{' '}
-                            table if needed.
-                          </>
-                        }
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!canUpdateConfig}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-
-                <CardFooter className="justify-end space-x-2">
-                  {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
-                      Cancel
-                    </Button>
+                              {AUDIT_LOG_ENTRIES_TABLE}
+                            </code>
+                          </InlineLink>{' '}
+                          table in your project's database, which will reduce database storage
+                          usage. Audit logs will subsequently still be available in the{' '}
+                          <InlineLink
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`/project/${projectRef}/logs/auth-logs?s=auth_audit_event`}
+                          >
+                            auth logs
+                          </InlineLink>
+                          .
+                        </p>
+                      }
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={!canUpdateConfig}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
                   )}
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    disabled={!canUpdateConfig || isUpdatingAuditLogs || !form.formState.isDirty}
-                    loading={isUpdatingAuditLogs}
+                />
+                {isDisabling && (
+                  <Admonition
+                    type="warning"
+                    className="mt-4"
+                    title="Disabling PostgreSQL storage will not automatically migrate or transfer existing audit log data"
                   >
-                    Save changes
+                    <p className="!mb-0 !leading-normal prose text-foreground-light text-sm max-w-full">
+                      Future audit logs will only appear in the project's{' '}
+                      <InlineLink
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={`/project/${projectRef}/logs/auth-logs?s=auth_audit_event`}
+                      >
+                        auth logs
+                      </InlineLink>
+                      . You are responsible for backing up, copying, or migrating existing data from
+                      the <code>{AUDIT_LOG_ENTRIES_TABLE}</code> table if needed.
+                    </p>
+                  </Admonition>
+                )}
+              </CardContent>
+
+              <CardFooter className="justify-end space-x-2">
+                {form.formState.isDirty && (
+                  <Button type="default" onClick={() => form.reset()}>
+                    Cancel
                   </Button>
-                </CardFooter>
-              </Card>
-            </form>
-          </Form_Shadcn_>
-        </div>
-      </ScaffoldSection>
-    </>
+                )}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                  loading={isUpdatingConfig}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form_Shadcn_>
+      </div>
+    </ScaffoldSection>
   )
 }
-
-export default AuditLogsForm

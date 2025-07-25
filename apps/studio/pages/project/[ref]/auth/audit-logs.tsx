@@ -1,17 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { AuditLogsForm } from 'components/interfaces/Auth'
+import { useParams } from 'common'
+import { AuditLogsForm } from 'components/interfaces/Auth/AuditLogsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const AuditLogsPage: NextPageWithLayout = () => {
+  const { ref: projectRef } = useParams()
   const isPermissionsLoaded = usePermissionsLoaded()
+  const { isLoading: isLoadingConfig } = useAuthConfigQuery({ projectRef })
   const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
@@ -20,7 +25,7 @@ const AuditLogsPage: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer>
-      {!isPermissionsLoaded ? (
+      {!isPermissionsLoaded || isLoadingConfig ? (
         <div className="mt-12">
           <GenericSkeletonLoader />
         </div>
@@ -31,10 +36,18 @@ const AuditLogsPage: NextPageWithLayout = () => {
   )
 }
 
+const secondaryActions = [
+  <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+]
+
 AuditLogsPage.getLayout = (page) => (
   <DefaultLayout>
     <AuthLayout>
-      <PageLayout title="Audit Logs" subtitle="Track and monitor auth events in your project">
+      <PageLayout
+        title="Audit Logs"
+        subtitle="Track and monitor auth events in your project"
+        secondaryActions={secondaryActions}
+      >
         {page}
       </PageLayout>
     </AuthLayout>

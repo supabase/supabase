@@ -1,5 +1,4 @@
 export { AdvancedAuthSettingsForm } from './AdvancedAuthSettingsForm'
-export { default as AuditLogsForm } from './AuditLogsForm'
 export { AuthProvidersForm } from './AuthProvidersForm/AuthProvidersForm'
 export { default as BasicAuthSettingsForm } from './BasicAuthSettingsForm/BasicAuthSettingsForm'
 export { default as EmailTemplates } from './EmailTemplates/EmailTemplates'
