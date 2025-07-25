@@ -1,7 +1,7 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { useDebounce } from 'use-debounce'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
@@ -36,7 +36,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
   const { project } = useProjectContext()
 
   const [inputValue, setInputValue] = useState('')
-  const [debouncedValue] = useDebounce(inputValue, 750)
+  const debouncedValue = useDebounce(inputValue, 750)
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
 
   const PRESETS = [

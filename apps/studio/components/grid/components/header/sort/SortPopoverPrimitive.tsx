@@ -1,8 +1,9 @@
-import { isEqual } from 'lodash'
+import { useDebounce } from '@uidotdev/usehooks'
 import { ChevronDown, List } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { Sort } from 'components/grid/types'
+import useLatest from 'hooks/misc/useLatest'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
@@ -24,11 +25,8 @@ export interface SortPopoverPrimitiveProps {
 /**
  * SortPopoverPrimitive - A component for sorting table columns
  *
- * This component maintains a draft state of sorts while editing, then applies
- * them to the parent component when "Apply" is clicked.
- *
- * To avoid issues with drag-and-drop reconciliation, we use a special sync mechanism
- * that properly detects external vs. internal updates.
+ * This component maintains a draft state of sorts that are automatically applied
+ * with debouncing as changes are made.
  */
 export const SortPopoverPrimitive = ({
   buttonText,
@@ -39,31 +37,15 @@ export const SortPopoverPrimitive = ({
   const [open, setOpen] = useState(false)
   const snap = useTableEditorTableStateSnapshot()
 
-  // Local state for draft sorts
-  const [localSorts, setLocalSorts] = useState<Sort[]>(sorts)
+  const [localSorts, setLocalSorts] = useState(sorts)
 
-  // Track the last props we received for comparison
-  const lastSortsRef = useRef<Sort[]>(sorts)
-  // Track if we're in the middle of applying our own changes
-  const isApplyingRef = useRef(false)
-
-  // Sync with props when they change, but in a smarter way
+  const debouncedSorts = useDebounce(localSorts, 500)
+  const onApplySortsRef = useLatest(onApplySorts)
   useEffect(() => {
-    // If we're in the middle of applying changes, don't sync from props
-    if (isApplyingRef.current) {
-      isApplyingRef.current = false
-      return
-    }
+    onApplySortsRef.current(debouncedSorts)
+  }, [debouncedSorts, onApplySortsRef])
 
-    // If the props changed unexpectedly (not due to our own actions)
-    // then we should update our local state
-    if (!isEqual(sorts, lastSortsRef.current)) {
-      setLocalSorts(sorts)
-      lastSortsRef.current = sorts
-    }
-  }, [sorts])
-
-  // Fix: Use localSorts for button text, not sorts
+  // Display button text based on local state
   const displayButtonText =
     buttonText ??
     (localSorts.length > 0
@@ -89,81 +71,66 @@ export const SortPopoverPrimitive = ({
   const onAddSort = (columnName: string | number) => {
     const currentTableName = snap.table?.name
     if (currentTableName) {
-      setLocalSorts([
+      const newSorts: Sort[] = [
         ...localSorts,
         { table: currentTableName, column: columnName as string, ascending: true },
-      ])
+      ]
+      setLocalSorts(newSorts)
     }
   }
 
   // Remove a sort by column name
-  const onDeleteSort = useCallback((column: string) => {
-    setLocalSorts((currentSorts) => currentSorts.filter((sort) => sort.column !== column))
-  }, [])
+  const onDeleteSort = useCallback(
+    (column: string) => {
+      const newSorts = localSorts.filter((sort) => sort.column !== column)
+      setLocalSorts(newSorts)
+    },
+    [localSorts, setLocalSorts]
+  )
 
   // Toggle ascending/descending for a column
-  const onToggleSort = useCallback((column: string, ascending: boolean) => {
-    setLocalSorts((currentSorts) => {
-      const index = currentSorts.findIndex((x) => x.column === column)
-      if (index === -1) return currentSorts
-      const updatedSort = { ...currentSorts[index], ascending }
-      return [...currentSorts.slice(0, index), updatedSort, ...currentSorts.slice(index + 1)]
-    })
-  }, [])
+  const onToggleSort = useCallback(
+    (column: string, ascending: boolean) => {
+      const index = localSorts.findIndex((x) => x.column === column)
+      if (index === -1) return
+
+      const updatedSort = { ...localSorts[index], ascending }
+      const newSorts: Sort[] = [
+        ...localSorts.slice(0, index),
+        updatedSort,
+        ...localSorts.slice(index + 1),
+      ]
+
+      setLocalSorts(newSorts)
+    },
+    [localSorts, setLocalSorts]
+  )
 
   // Handle drag-and-drop reordering
-  const onDragSort = useCallback((dragIndex: number, hoverIndex: number) => {
-    setLocalSorts((currentSort) => {
+  const onDragSort = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
       if (
         dragIndex < 0 ||
-        dragIndex >= currentSort.length ||
+        dragIndex >= localSorts.length ||
         hoverIndex < 0 ||
-        hoverIndex >= currentSort.length
+        hoverIndex >= localSorts.length
       ) {
-        return currentSort
+        return
       }
-      const itemToMove = currentSort[dragIndex]
-      const remainingItems = [
-        ...currentSort.slice(0, dragIndex),
-        ...currentSort.slice(dragIndex + 1),
-      ]
-      return [
+
+      const itemToMove = localSorts[dragIndex]
+      const remainingItems = [...localSorts.slice(0, dragIndex), ...localSorts.slice(dragIndex + 1)]
+
+      const newSorts: Sort[] = [
         ...remainingItems.slice(0, hoverIndex),
         itemToMove,
         ...remainingItems.slice(hoverIndex),
       ]
-    })
-  }, [])
 
-  // Fix: Compare for meaningful changes (only column order and ascending)
-  const hasChanges = useMemo(() => {
-    if (localSorts.length !== sorts.length) return true
-
-    // Compare each sort by relevant properties
-    return localSorts.some((localSort, index) => {
-      const propSort = sorts[index]
-      return (
-        !propSort ||
-        localSort.column !== propSort.column ||
-        localSort.ascending !== propSort.ascending
-      )
-    })
-  }, [localSorts, sorts])
-
-  // Apply the sorts to the parent component
-  const onSelectApplySorts = () => {
-    // Mark that we're applying our changes to prevent re-syncing
-    isApplyingRef.current = true
-
-    // Update our last sorts ref to the current local state
-    lastSortsRef.current = [...localSorts]
-
-    // Create deep copies to avoid reference issues
-    const sortsCopy = localSorts.map((sort) => ({ ...sort }))
-
-    // Apply the sorts
-    onApplySorts(sortsCopy)
-  }
+      setLocalSorts(newSorts)
+    },
+    [localSorts, setLocalSorts]
+  )
 
   // Generate stable keys for SortRow components to avoid reconciliation issues
   const getSortRowKey = (sort: Sort, index: number) => {
@@ -212,11 +179,6 @@ export const SortPopoverPrimitive = ({
         ) : (
           <p className="text-sm text-foreground-light">All columns have been added</p>
         )}
-        <div className="flex items-center">
-          <Button disabled={!hasChanges} type="default" onClick={onSelectApplySorts}>
-            Apply sorting
-          </Button>
-        </div>
       </div>
     </div>
   )

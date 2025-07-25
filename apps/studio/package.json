@@ -137,7 +137,6 @@
     "tus-js-client": "^4.1.0",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
-    "use-debounce": "^7.0.1",
     "uuid": "^9.0.1",
     "valtio": "catalog:",
     "yup": "^1.4.0",

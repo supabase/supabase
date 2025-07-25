@@ -39,7 +39,7 @@ export function useTableSort() {
 
       saveSortsAndTriggerSideEffects(newUrlSorts)
     },
-    [snap, setParams, saveSortsAndTriggerSideEffects]
+    [tableName, setParams, saveSortsAndTriggerSideEffects]
   )
 
   /**

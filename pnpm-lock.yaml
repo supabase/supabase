@@ -990,9 +990,6 @@ importers:
       ui-patterns:
         specifier: workspace:*
         version: link:../../packages/ui-patterns
-      use-debounce:
-        specifier: ^7.0.1
-        version: 7.0.1(react@18.3.1)
       uuid:
         specifier: ^9.0.1
         version: 9.0.1

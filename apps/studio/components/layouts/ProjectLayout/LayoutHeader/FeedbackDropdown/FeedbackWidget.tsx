@@ -1,3 +1,4 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
 import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
@@ -5,7 +6,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useDebounce } from 'use-debounce'
 
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -53,7 +53,7 @@ export const FeedbackWidget = ({
   const [isSending, setSending] = useState(false)
   const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
   const [isFeedbackSent, setIsFeedbackSent] = useState(false)
-  const [debouncedFeedback] = useDebounce(feedback, 450)
+  const debouncedFeedback = useDebounce(feedback, 450)
 
   const { data: category } = useFeedbackCategoryQuery({
     prompt: debouncedFeedback,
