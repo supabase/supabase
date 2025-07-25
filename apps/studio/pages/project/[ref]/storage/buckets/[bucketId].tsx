@@ -2,11 +2,11 @@ import { useParams } from 'common'
 
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
+import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { StorageExplorer } from 'components/to-be-cleaned/Storage'
-import { AnalyticBucketDetails } from 'components/to-be-cleaned/Storage/AnalyticBucketDetails'
-import { useSelectedBucket } from 'components/to-be-cleaned/Storage/StorageExplorer/useSelectedBucket'
+import { StorageExplorer } from 'components/interfaces/Storage'
+import { AnalyticBucketDetails } from 'components/interfaces/Storage/AnalyticBucketDetails'
+import { useSelectedBucket } from 'components/interfaces/Storage/StorageExplorer/useSelectedBucket'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import type { NextPageWithLayout } from 'types'
 
@@ -16,6 +16,7 @@ const PageLayout: NextPageWithLayout = () => {
   const { projectRef } = useStorageExplorerStateSnapshot()
   const { bucket, error, isSuccess, isError } = useSelectedBucket()
 
+  // [Joshen] Checking against projectRef from storage explorer to check if the store has initialized
   if (!project || !projectRef) return null
 
   return (

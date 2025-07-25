@@ -5,7 +5,6 @@ import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 
 export const aiOptInLevelSchema = z.enum([
@@ -54,12 +53,11 @@ export function useOrgAiOptInLevel(): {
 } {
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
 
   // [Joshen] Default to disabled until migration to clean up existing opt in tags are completed
   // Once toggled on, then we can default to their set opt in level and clean up feature flag
   const optInTags = selectedOrganization?.opt_in_tags
-  const level = !newOrgAiOptIn ? 'disabled' : getAiOptInLevel(optInTags)
+  const level = getAiOptInLevel(optInTags)
   const isOptedIntoAI = level !== 'disabled'
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
