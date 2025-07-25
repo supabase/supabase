@@ -27,10 +27,10 @@ const CustomDomainConfig = () => {
   const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
 
   const {
+    data: customDomainData,
     isLoading: isCustomDomainsLoading,
     isError,
     isSuccess,
-    data,
   } = useCustomDomainsQuery(
     { projectRef: ref },
     {
@@ -44,6 +44,8 @@ const CustomDomainConfig = () => {
       },
     }
   )
+
+  const { status, customDomain } = customDomainData || {}
 
   return (
     <section id="custom-domains">
@@ -94,24 +96,25 @@ const CustomDomainConfig = () => {
             </div>
           </Panel.Content>
         </Panel>
-      ) : data?.status === '0_no_hostname_configured' ? (
+      ) : status === '0_no_hostname_configured' ? (
         <CustomDomainsConfigureHostname />
       ) : (
         <Panel>
           {isSuccess && (
             <div className="flex flex-col">
-              {(data.status === '1_not_started' ||
-                data.status === '2_initiated' ||
-                data.status === '3_challenge_verified') && (
-                <CustomDomainVerify customDomain={data.customDomain} />
+              {(status === '1_not_started' ||
+                status === '2_initiated' ||
+                status === '3_challenge_verified') && <CustomDomainVerify />}
+
+              {customDomainData.status === '4_origin_setup_completed' && (
+                <CustomDomainActivate
+                  projectRef={ref}
+                  customDomain={customDomainData.customDomain}
+                />
               )}
 
-              {data.status === '4_origin_setup_completed' && (
-                <CustomDomainActivate projectRef={ref} customDomain={data.customDomain} />
-              )}
-
-              {data.status === '5_services_reconfigured' && (
-                <CustomDomainDelete projectRef={ref} customDomain={data.customDomain} />
+              {customDomainData.status === '5_services_reconfigured' && (
+                <CustomDomainDelete projectRef={ref} customDomain={customDomainData.customDomain} />
               )}
             </div>
           )}
