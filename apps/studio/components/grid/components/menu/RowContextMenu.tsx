@@ -54,7 +54,7 @@ const RowContextMenu = ({ rows, isReferenceView = false }: RowContextMenuProps) 
 
       copyToClipboard(text)
     },
-    [rows, snap.gridColumns, snap.selectedCellPosition, isReferenceView]
+    [rows, snap.gridColumns, snap.selectedCellPosition, isReferenceView, tableEditorSnap]
   )
 
   return (
