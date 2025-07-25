@@ -19,6 +19,7 @@ export default defineConfig({
     video: 'retain-on-failure',
     headless: IS_CI,
     trace: 'retain-on-failure',
+    permissions: ['clipboard-read', 'clipboard-write'],
   },
   projects: [
     {
