@@ -1,7 +1,11 @@
+import { createClient } from '@supabase/supabase-js'
 import { NextApiRequest, NextApiResponse } from 'next'
-import apiWrapper from 'lib/api/apiWrapper'
+
+import { fetchPost } from 'data/fetchers'
 import { constructHeaders } from 'lib/api/apiHelpers'
-import { post } from 'lib/common/fetch'
+import apiWrapper from 'lib/api/apiWrapper'
+
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -25,6 +29,12 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   })
   const url = `${process.env.SUPABASE_URL}/auth/v1/invite`
   const payload = { email: req.body.email }
-  const response = await post(url, payload, { headers })
-  return res.status(200).json(response)
+
+  const response = await fetchPost(url, payload, { headers })
+  if (response.error) {
+    const { code, message } = response.error
+    return res.status(code).json({ message })
+  } else {
+    return res.status(200).json(response)
+  }
 }

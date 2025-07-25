@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common/hooks'
@@ -11,9 +12,10 @@ import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
+  lastSeen?: { timestamp: string }
 }
 
-export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
+export const APIKeyDeleteDialog = ({ apiKey, lastSeen }: APIKeyDeleteDialogProps) => {
   const { ref: projectRef } = useParams()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -42,22 +44,23 @@ export const APIKeyDeleteDialog = ({ apiKey }: APIKeyDeleteDialogProps) => {
           }
         }}
       >
-        Delete API key
+        <Trash2 className="size-4 text-destructive" strokeWidth={1.5} /> Delete API key
       </DropdownMenuItem>
       <TextConfirmModal
         visible={isOpen}
         onCancel={() => setIsOpen(false)}
         onConfirm={onDeleteAPIKey}
-        title={`Delete ${apiKey.description ?? ''} API secret key`}
-        confirmString={apiKey.description || 'Delete API secret key'}
-        confirmLabel="Delete API secret key"
-        confirmPlaceholder="Type API key description to confirm"
+        title={`Delete ${apiKey.type} API key: ${apiKey.name}`}
+        confirmString={apiKey.name}
+        confirmLabel="Yes, irreversibly delete this API key"
+        confirmPlaceholder="Type the name of the API key to confirm"
         loading={isDeletingAPIKey}
         variant="destructive"
         alert={{
           title: 'This cannot be undone',
-          description:
-            'Deleting this API key will invalidate it immediately. Any applications using this key will no longer be able to access this project.',
+          description: lastSeen
+            ? `This API key was used ${lastSeen.timestamp}. Make sure all backend components using it have been updated. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.`
+            : `This API key has not been used in the past 24 hours. Make sure you've updated all backend components using it before deletion.`,
         }}
       />
     </>

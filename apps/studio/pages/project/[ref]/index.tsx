@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
@@ -17,7 +18,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
@@ -33,13 +34,15 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { useBranchesQuery } from 'data/branches/branches-query'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const project = useSelectedProject()
+  const parentProject = useProjectByRef(project?.parent_project_ref)
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
-  const { enableBranching } = useParams()
+  const { ref, enableBranching } = useParams()
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -48,15 +51,10 @@ const Home: NextPageWithLayout = () => {
   useEffect(() => {
     if (enableBranching && !hasShownEnableBranchingModalRef.current) {
       hasShownEnableBranchingModalRef.current = true
-      snap.setShowEnableBranchingModal(true)
+      snap.setShowCreateBranchModal(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableBranching])
-
-  const projectName =
-    project?.ref !== 'default' && project?.name !== undefined
-      ? project?.name
-      : 'Welcome to your project'
 
   const { data: tablesData, isLoading: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -70,82 +68,121 @@ const Home: NextPageWithLayout = () => {
     projectRef: project?.ref,
   })
 
-  const tablesCount = tablesData?.length ?? 0
-  const functionsCount = functionsData?.length ?? 0
-  const replicasCount = (replicasData?.length ?? 1) - 1
+  const { data: branches } = useBranchesQuery({
+    projectRef: project?.parent_project_ref ?? project?.ref,
+  })
+
+  const mainBranch = branches?.find((branch) => branch.is_default)
+  const currentBranch = branches?.find((branch) => branch.project_ref === project?.ref)
+  const isMainBranch = currentBranch?.name === mainBranch?.name
+  let projectName = 'Welcome to your project'
+
+  if (currentBranch && !isMainBranch) {
+    projectName = currentBranch?.name
+  } else if (project?.name) {
+    projectName = project?.name
+  }
+
+  const tablesCount = Math.max(0, tablesData?.length ?? 0)
+  const functionsCount = Math.max(0, functionsData?.length ?? 0)
+  // [Joshen] JFYI minus 1 as the replicas endpoint returns the primary DB minimally
+  const replicasCount = Math.max(0, (replicasData?.length ?? 1) - 1)
 
   return (
     <div className="w-full">
       <div className={cn('py-16 px-8', !isPaused && 'border-b border-muted ')}>
         <div className="mx-auto max-w-7xl flex flex-col gap-y-4">
           <div className="flex flex-col md:flex-row md:items-center gap-6 justify-between w-full">
-            <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
-              <h1 className="text-3xl">{projectName}</h1>
-              {isOrioleDb && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge variant="warning">OrioleDB</Badge>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
-                    This project is using Postgres with OrioleDB which is currently in preview and
-                    not suitable for production workloads. View our{' '}
-                    <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
-                      documentation
-                    </InlineLink>{' '}
-                    for all limitations.
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              <ComputeBadgeWrapper
-                project={{
-                  ref: project?.ref,
-                  organization_slug: organization?.slug,
-                  cloud_provider: project?.cloud_provider,
-                  infra_compute_size: project?.infra_compute_size,
-                }}
-              />
+            <div className="flex flex-col md:flex-row md:items-end gap-3 w-full">
+              <div>
+                {!isMainBranch && (
+                  <Link
+                    href={`/project/${parentProject?.ref}`}
+                    className="text-sm text-foreground-light"
+                  >
+                    {parentProject?.name}
+                  </Link>
+                )}
+                <h1 className="text-3xl">{projectName}</h1>
+              </div>
+              <div className="flex items-center gap-x-2 mb-1">
+                {isOrioleDb && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge variant="warning">OrioleDB</Badge>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
+                      This project is using Postgres with OrioleDB which is currently in preview and
+                      not suitable for production workloads. View our{' '}
+                      <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
+                        documentation
+                      </InlineLink>{' '}
+                      for all limitations.
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                <ComputeBadgeWrapper
+                  project={{
+                    ref: project?.ref,
+                    organization_slug: organization?.slug,
+                    cloud_provider: project?.cloud_provider,
+                    infra_compute_size: project?.infra_compute_size,
+                  }}
+                />
+              </div>
             </div>
             <div className="flex items-center">
               {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && (
                 <div className="flex items-center gap-x-6">
-                  <div>
-                    <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
+                  <div className="flex flex-col gap-y-1">
+                    <Link
+                      href={`/project/${ref}/editor`}
+                      className="transition text-foreground-light hover:text-foreground text-sm"
+                    >
                       Tables
-                    </div>
-                    <span className="text-2xl tabular-nums">
+                    </Link>
+                    <p className="text-2xl tabular-nums">
                       {isLoadingTables ? (
                         <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                       ) : (
                         tablesCount
                       )}
-                    </span>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
-                      Functions
-                    </div>
-                    <span className="text-2xl tabular-nums">
-                      {isLoadingFunctions ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        functionsCount
-                      )}
-                    </span>
+                    </p>
                   </div>
 
                   {IS_PLATFORM && (
-                    <div>
-                      <div className="flex items-center gap-1.5 text-foreground-light text-sm mb-1">
+                    <div className="flex flex-col gap-y-1">
+                      <Link
+                        href={`/project/${ref}/functions`}
+                        className="transition text-foreground-light hover:text-foreground text-sm"
+                      >
+                        Functions
+                      </Link>
+                      <p className="text-2xl tabular-nums">
+                        {isLoadingFunctions ? (
+                          <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                        ) : (
+                          functionsCount
+                        )}
+                      </p>
+                    </div>
+                  )}
+
+                  {IS_PLATFORM && (
+                    <div className="flex flex-col gap-y-1">
+                      <Link
+                        href={`/project/${ref}/settings/infrastructure`}
+                        className="transition text-foreground-light hover:text-foreground text-sm"
+                      >
                         Replicas
-                      </div>
-                      <span className="text-2xl tabular-nums">
+                      </Link>
+                      <p className="text-2xl tabular-nums">
                         {isLoadingReplicas ? (
                           <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
                         ) : (
                           replicasCount
                         )}
-                      </span>
+                      </p>
                     </div>
                   )}
                 </div>

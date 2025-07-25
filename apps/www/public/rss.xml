@@ -5,9 +5,121 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 26 May 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 18 Jul 2025 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/launch-week-15-top-10</guid>
+  <title>Top 10 Launches of Launch Week 15</title>
+  <link>https://supabase.com/blog/launch-week-15-top-10</link>
+  <description>Highlights from Launch Week 15</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/lw15-hackathon</guid>
+  <title>Supabase Launch Week 15 Hackathon</title>
+  <link>https://supabase.com/blog/lw15-hackathon</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</guid>
+  <title>Storage: 10x Larger Uploads, 3x Cheaper Cached Egress, and 2x Egress Quota</title>
+  <link>https://supabase.com/blog/storage-500gb-uploads-cheaper-egress-pricing</link>
+  <description>Upload files up to 500 GB with significant egress cost reductions.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</guid>
+  <title>Persistent Storage and 97% Faster Cold Starts for Edge Functions</title>
+  <link>https://supabase.com/blog/persistent-storage-for-faster-edge-functions</link>
+  <description>Mount S3-compatible buckets as persistent file storage in Edge Functions with up to 97% faster cold start times.</description>
+  <pubDate>Fri, 18 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/algolia-connector-for-supabase</guid>
+  <title>Algolia Connector for Supabase</title>
+  <link>https://supabase.com/blog/algolia-connector-for-supabase</link>
+  <description>Bring lightning-fast search to your Supabase apps, with no code required.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/new-observability-features-in-supabase</guid>
+  <title>New Observability Features in Supabase</title>
+  <link>https://supabase.com/blog/new-observability-features-in-supabase</link>
+  <description>New unified logging, advanced reports, and AI debugging capabilities.</description>
+  <pubDate>Thu, 17 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/improved-security-controls</guid>
+  <title>Improved Security Controls and A New Home for Security</title>
+  <link>https://supabase.com/blog/improved-security-controls</link>
+  <description>Access to a new central security page and launch of additional controls.</description>
+  <pubDate>Wed, 16 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/branching-2-0</guid>
+  <title>Introducing Branching 2.0</title>
+  <link>https://supabase.com/blog/branching-2-0</link>
+  <description>Create, review and merge Supabase branches all within the dashboard.</description>
+  <pubDate>Wed, 16 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/stripe-engine-as-sync-library</guid>
+  <title>Stripe-To-Postgres Sync Engine as standalone Library</title>
+  <link>https://supabase.com/blog/stripe-engine-as-sync-library</link>
+  <description>Sync Stripe webhook data directly to Postgres using standalone TypeScript library.</description>
+  <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/analytics-buckets</guid>
+  <title>Supabase Analytics Buckets with Iceberg Support</title>
+  <link>https://supabase.com/blog/analytics-buckets</link>
+  <description>Analytics buckets optimized for large-scale data analysis with Apache Iceberg support.</description>
+  <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/figma-make-support-for-supabase</guid>
+  <title>Create a Supabase backend using Figma Make</title>
+  <link>https://supabase.com/blog/figma-make-support-for-supabase</link>
+  <description>Build functional web apps with Supabase backend directly in Figma Make, with no backend expertise required.</description>
+  <pubDate>Tue, 15 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/jwt-signing-keys</guid>
+  <title>Introducing JWT Signing Keys</title>
+  <link>https://supabase.com/blog/jwt-signing-keys</link>
+  <description>A new JWT signing keys system based on public key cryptography to improve your project&apos;s security and performance.</description>
+  <pubDate>Mon, 14 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-ui-platform-kit</guid>
+  <title>Supabase UI: Platform Kit</title>
+  <link>https://supabase.com/blog/supabase-ui-platform-kit</link>
+  <description>We are launching new components in the Supabase UI Library that makes it incredibly easy to build platforms on top of Supabase.</description>
+  <pubDate>Mon, 14 Jul 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/natural-db</guid>
+  <title>Build a Personalized AI Assistant with Postgres</title>
+  <link>https://supabase.com/blog/natural-db</link>
+  <description>Learn how to build a Supabase powered AI assistant that combines PostgreSQL with scheduling and external tools for long-term memory, structured data management and autonomous actions.</description>
+  <pubDate>Wed, 25 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/multigres-vitess-for-postgres</guid>
+  <title>Announcing Multigres: Vitess for Postgres</title>
+  <link>https://supabase.com/blog/multigres-vitess-for-postgres</link>
+  <description>Today we are welcoming Sugu, the co-creator of Vitess, to the Supabase team. He is joining Supabase to build Multigres: Vitess for Postgres.</description>
+  <pubDate>Tue, 10 Jun 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/building-on-open-table-formats</guid>
+  <title>Building on open table formats</title>
+  <link>https://supabase.com/blog/building-on-open-table-formats</link>
+  <description>Open table formats like Apache Iceberg, Delta Lake, and Apache Hudi are transforming how developers manage large-scale data on object storage systems.</description>
+  <pubDate>Thu, 29 May 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</guid>
   <title>Open Data Standards: Postgres, OTel, and Iceberg</title>
   <link>https://supabase.com/blog/open-data-standards-postgres-otel-iceberg</link>

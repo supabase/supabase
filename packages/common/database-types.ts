@@ -9,7 +9,9 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           http_status_code: number | null
+          id: string
           message: string | null
+          metadata: Json | null
           service: string
           updated_at: string | null
         }
@@ -18,7 +20,9 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           http_status_code?: number | null
+          id?: string
           message?: string | null
+          metadata?: Json | null
           service: string
           updated_at?: string | null
         }
@@ -27,7 +31,9 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           http_status_code?: number | null
+          id?: string
           message?: string | null
+          metadata?: Json | null
           service?: string
           updated_at?: string | null
         }
@@ -74,7 +80,7 @@ export type Database = {
         Args: {
           skip_codes: Json
         }
-        Returns: undefined
+        Returns: number
       }
       update_error_code: {
         Args: {
@@ -82,6 +88,7 @@ export type Database = {
           service: string
           http_status_code?: number
           message?: string
+          metadata?: Json
         }
         Returns: boolean
       }
@@ -637,6 +644,27 @@ export type Database = {
           include_full_content?: boolean
           match_threshold?: number
           max_result?: number
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
+        }[]
+      }
+      search_content_hybrid: {
+        Args: {
+          query_text: string
+          query_embedding: string
+          max_result?: number
+          full_text_weight?: number
+          semantic_weight?: number
+          rrf_k?: number
+          match_threshold?: number
+          include_full_content?: boolean
         }
         Returns: {
           id: number

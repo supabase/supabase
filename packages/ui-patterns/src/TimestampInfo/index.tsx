@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui/src/components/shadcn/ui/tooltip'
-import { cn } from 'ui/src/lib/utils'
+import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -103,12 +102,12 @@ export const TimestampInfo = ({
         onClick={(e) => {
           e.stopPropagation()
           e.preventDefault()
-          navigator.clipboard.writeText(value)
-          setCopied(true)
-
-          setTimeout(() => {
-            setCopied(false)
-          }, 1000)
+          copyToClipboard(value, () => {
+            setCopied(true)
+            setTimeout(() => {
+              setCopied(false)
+            }, 1000)
+          })
         }}
         className={cn(
           'relative cursor-pointer flex gap-y-2 gap-x-0.5 hover:bg-surface-100 px-2 py-1 group',

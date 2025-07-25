@@ -11,20 +11,20 @@ import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import { getInvoice } from 'data/invoices/invoice-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react'
 import { Button } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import InvoicePayButton from './InvoicePayButton'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
 const PAGE_LIMIT = 5
 
 const InvoicesSettings = () => {
   const [page, setPage] = useState(1)
 
-  const selectedOrganization = useSelectedOrganization()
-  const { slug } = selectedOrganization ?? {}
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const slug = selectedOrganization?.slug
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
@@ -33,7 +33,7 @@ const InvoicesSettings = () => {
     },
     { enabled: selectedOrganization?.managed_by === 'supabase' }
   )
-  const { data, error, isLoading, isError, isSuccess } = useInvoicesQuery(
+  const { data, error, isLoading, isError } = useInvoicesQuery(
     {
       slug,
       offset,

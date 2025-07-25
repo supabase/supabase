@@ -1,18 +1,17 @@
+import dayjs from 'dayjs'
+import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
 
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { IS_PLATFORM } from 'common'
 import Table from 'components/to-be-cleaned/Table'
-import dayjs from 'dayjs'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { copyToClipboard } from 'lib/helpers'
-import { BookOpen, Check, ChevronDown, Clipboard, ExternalLink, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -234,31 +233,32 @@ const LogsQueryPanel = ({
               />
             )}
 
-            <div className="overflow-hidden">
-              <div
-                data-testid="log-explorer-warnings"
-                className={` transition-all duration-300 ${
-                  warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
-                }`}
-              >
-                <Popover>
-                  <PopoverTrigger>
-                    <Badge variant="warning">
-                      {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
-                    </Badge>
-                    <PopoverContent className="p-0 divide-y">
-                      {warnings.map((warning, index) => (
-                        <p key={index} className="p-3 text-xs text-foreground-light text-left">
-                          {warning.text}{' '}
-                          {warning.link && (
-                            <Link href={warning.link}>{warning.linkText || 'View'}</Link>
-                          )}
-                        </p>
-                      ))}
-                    </PopoverContent>
-                  </PopoverTrigger>
-                </Popover>
-              </div>
+            <div
+              data-testid="log-explorer-warnings"
+              className={`transition-all duration-300 h-full ${
+                warnings.length > 0 ? 'opacity-100' : 'invisible h-0 w-0 opacity-0'
+              }`}
+            >
+              <Tooltip>
+                <TooltipTrigger className="flex items-start">
+                  <Badge variant="warning">
+                    {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
+                  </Badge>
+                  <TooltipContent className="p-0 divide-y max-w-xs" side="bottom">
+                    {warnings.map((warning, index) => (
+                      <p
+                        key={index}
+                        className="px-3 py-1.5 text-xs text-foreground-light text-left"
+                      >
+                        {warning.text}{' '}
+                        {warning.link && (
+                          <Link href={warning.link}>{warning.linkText || 'View'}</Link>
+                        )}
+                      </p>
+                    ))}
+                  </TooltipContent>
+                </TooltipTrigger>
+              </Tooltip>
             </div>
           </div>
           {dataSource === 'logs' && (
