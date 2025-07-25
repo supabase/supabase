@@ -69,8 +69,7 @@ export const useAPIKeyCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef, true))
-        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef, false))
+        await queryClient.invalidateQueries(apiKeysKeys.list(projectRef))
 
         await onSuccess?.(data, variables, context)
       },
