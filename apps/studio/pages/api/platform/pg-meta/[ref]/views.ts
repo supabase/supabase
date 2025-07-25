@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { fetchGet } from 'data/fetchers'
-import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
+import { get } from 'lib/common/fetch'
+import { constructHeaders } from 'lib/api/apiHelpers'
+import { PG_META_URL } from 'lib/constants'
 import { getPgMetaRedirectUrl } from './tables'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
@@ -13,6 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
+      if (req.query.id) return handleGetOne(req, res)
       return handleGetAll(req, res)
     default:
       res.setHeader('Allow', ['GET'])
@@ -22,12 +24,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
-  const response = await fetchGet(getPgMetaRedirectUrl(req, 'views'), { headers })
-
+  let response = await get(getPgMetaRedirectUrl(req, 'views'), {
+    headers,
+  })
   if (response.error) {
-    const { code, message } = response.error
-    return res.status(code).json({ message })
-  } else {
-    return res.status(200).json(response)
+    return res.status(400).json({ error: response.error })
   }
+
+  return res.status(200).json(response)
+}
+
+const handleGetOne = async (req: NextApiRequest, res: NextApiResponse) => {
+  const headers = constructHeaders(req.headers)
+  let response = await get(`${PG_META_URL}/views/${req.query.id}`, {
+    headers,
+  })
+  if (response.error) {
+    return res.status(400).json({ error: response.error })
+  }
+  return res.status(200).json(response)
 }

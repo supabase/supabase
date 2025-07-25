@@ -1,7 +1,16 @@
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo } from 'react'
 
-import { Button, cn, Separator, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  cn,
+  Separator,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from 'ui'
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
 
@@ -70,41 +79,44 @@ export function DataTableSheetDetails({
           {isLoading && !selectedRowKey ? <Skeleton className="h-7 w-36" /> : title}
         </h5>
         <div className="flex h-7 items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="text"
-                disabled={!prevId}
-                onClick={onPrev}
-                className="px-1"
-                icon={<ChevronUp />}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                Navigate <Kbd>↑</Kbd>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="tiny"
-                type="text"
-                disabled={!nextId}
-                onClick={onNext}
-                className="px-1"
-                icon={<ChevronDown />}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>
-                Navigate <Kbd>↓</Kbd>
-              </p>
-            </TooltipContent>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="tiny"
+                  type="text"
+                  disabled={!prevId}
+                  onClick={onPrev}
+                  className="px-1"
+                  icon={<ChevronUp />}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Navigate <Kbd>↑</Kbd>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="tiny"
+                  type="text"
+                  disabled={!nextId}
+                  onClick={onNext}
+                  className="px-1"
+                  icon={<ChevronDown />}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Navigate <Kbd>↓</Kbd>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <Separator orientation="vertical" className="mx-1" />
 
           <Button

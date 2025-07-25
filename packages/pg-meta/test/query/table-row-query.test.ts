@@ -1,8 +1,8 @@
-import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { expect, test, describe, afterAll, beforeAll } from 'vitest'
+import { createTestDatabase, cleanupRoot } from '../db/utils'
 import pgMeta from '../../src/index'
-import { Filter, Sort } from '../../src/query'
 import { getDefaultOrderByColumns, getTableRowsSql } from '../../src/query/table-row-query'
-import { cleanupRoot, createTestDatabase } from '../db/utils'
+import { Sort, Filter } from '../../src/query'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -1098,7 +1098,7 @@ describe('Table Row Query', () => {
       // Verify SQL generation with snapshot
       expect(sql).toMatchInlineSnapshot(
         `
-        "with _base_query as (select * from public.test_sql_filter where name::text ~~ 'Test%' and category = 'A' order by test_sql_filter.id asc nulls last limit 10 offset 0)
+        "with _base_query as (select * from public.test_sql_filter where name ~~ 'Test%' and category = 'A' order by test_sql_filter.id asc nulls last limit 10 offset 0)
           select id,case
                 when octet_length(name::text) > 10240 
                 then left(name::text, 10240) || '...'

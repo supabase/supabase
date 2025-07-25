@@ -14,6 +14,7 @@ import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -56,6 +57,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { includeSchemaMetadata } = useOrgAiOptInLevel()
+  const useBedrockAssistant = useFlag('useBedrockAssistant')
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
@@ -237,6 +239,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
                 setIsSaving(true)
                 const { title: name } = await generateSqlTitle({
                   sql: currentValue,
+                  useBedrockAssistant,
                 })
                 const snippet = createSqlSnippetSkeletonV2({
                   id: uuidv4(),
@@ -277,7 +280,11 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
             language="pgsql"
             value={currentValue}
             onChange={handleChange}
-            aiEndpoint={`${BASE_PATH}/api/ai/sql/complete-v2`}
+            aiEndpoint={
+              useBedrockAssistant
+                ? `${BASE_PATH}/api/ai/sql/complete-v2`
+                : `${BASE_PATH}/api/ai/sql/complete`
+            }
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,

@@ -1,5 +1,5 @@
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, Modal } from 'ui'
 
 export interface MembersExceedLimitModalProps {
@@ -8,7 +8,7 @@ export interface MembersExceedLimitModalProps {
 }
 
 const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalProps) => {
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
     { slug },

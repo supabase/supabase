@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import SqlString from 'sqlstring'
 
-import { fetchPost } from 'data/fetchers'
-import { constructHeaders } from 'lib/api/apiHelpers'
 import apiWrapper from 'lib/api/apiWrapper'
+import { constructHeaders } from 'lib/api/apiHelpers'
+import { post } from 'lib/common/fetch'
+import { tryParseInt } from 'lib/helpers'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -26,12 +28,6 @@ const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
   })
   const url = `${process.env.SUPABASE_URL}/auth/v1/otp`
   const payload = { phone: req.body.phone }
-
-  const response = await fetchPost(url, payload, { headers })
-  if (response.error) {
-    const { code, message } = response.error
-    return res.status(code).json({ message })
-  } else {
-    return res.status(200).json(response)
-  }
+  const response = await post(url, payload, { headers })
+  return res.status(200).json(response)
 }

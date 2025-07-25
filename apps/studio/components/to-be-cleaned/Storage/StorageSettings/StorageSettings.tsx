@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useMemo, useState } from 'react'
+import { Clock } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
@@ -15,7 +16,6 @@ import { useProjectStorageConfigQuery } from 'data/config/project-storage-config
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { formatBytes } from 'lib/helpers'
 import {
   Button,
   FormControl_Shadcn_,
@@ -32,12 +32,7 @@ import {
   Select_Shadcn_,
   Switch,
 } from 'ui'
-import {
-  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
-  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN,
-  STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
-  StorageSizeUnits,
-} from './StorageSettings.constants'
+import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 interface StorageSettingsState {
@@ -61,8 +56,6 @@ const StorageSettings = () => {
 
   const organization = useSelectedOrganization()
   const isFreeTier = organization?.plan.id === 'free'
-  const isSpendCapOn =
-    organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
 
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
@@ -91,17 +84,9 @@ const StorageSettings = () => {
     }
   }, [isSuccess, config])
 
-  const maxBytes = useMemo(() => {
-    if (organization?.plan.id === 'free') {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_FREE_PLAN
-    } else if (organization?.usage_billing_enabled) {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-    } else {
-      return STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED
-    }
-  }, [organization])
-
-  const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(maxBytes)} bytes`
+  const formattedMaxSizeBytes = `${new Intl.NumberFormat('en-US').format(
+    STORAGE_FILE_SIZE_LIMIT_MAX_BYTES
+  )} bytes`
 
   const FormSchema = z
     .object({
@@ -111,7 +96,7 @@ const StorageSettings = () => {
     })
     .superRefine((data, ctx) => {
       const { unit, fileSizeLimit } = data
-      const { value: formattedMaxLimit } = convertFromBytes(maxBytes, unit)
+      const { value: formattedMaxLimit } = convertFromBytes(STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, unit)
 
       if (fileSizeLimit > formattedMaxLimit) {
         ctx.addIssue({
@@ -171,7 +156,7 @@ const StorageSettings = () => {
                 </div>
 
                 <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
-                  <div className="grid grid-cols-12 col-span-12 gap-2 items-start">
+                  <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
                     <div className="col-span-8">
                       <FormField_Shadcn_
                         control={form.control}
@@ -237,7 +222,8 @@ const StorageSettings = () => {
                         limit,
                         storageUnit
                       ).toLocaleString()} bytes. `}
-                    Maximum upload file size is {formatBytes(maxBytes)}.
+                    Maximum size in bytes of a file that can be uploaded is 50 GB (
+                    {formattedMaxSizeBytes}).
                   </p>
                 </div>
               </div>
@@ -275,18 +261,9 @@ const StorageSettings = () => {
             {isFreeTier && (
               <div className="px-6 pb-6">
                 <UpgradeToPro
+                  icon={<Clock size={14} className="text-foreground-muted" />}
                   primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                  secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED)} and unlock image transformations.`}
-                  source="storageSizeLimit"
-                />
-              </div>
-            )}
-            {isSpendCapOn && (
-              <div className="px-6 pb-6">
-                <UpgradeToPro
-                  buttonText="Disable Spend Cap"
-                  primaryText="Reduced max upload file size limit due to Spend Cap"
-                  secondaryText={`Disable your Spend Cap to allow file uploads of up to ${formatBytes(STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED)}.`}
+                  secondaryText="Upgrade to the Pro Plan for a configurable upload file size limit of up to 50 GB."
                   source="storageSizeLimit"
                 />
               </div>

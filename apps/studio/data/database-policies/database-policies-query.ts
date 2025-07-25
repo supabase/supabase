@@ -5,7 +5,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type DatabasePoliciesVariables = {
   projectRef?: string
@@ -25,10 +24,7 @@ export async function getDatabasePolicies(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/policies', {
     params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
+      header: { 'x-connection-encrypted': connectionString! },
       path: { ref: projectRef },
       query: {
         included_schemas: schema || '',

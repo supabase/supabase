@@ -146,15 +146,6 @@ const Wizard: NextPageWithLayout = () => {
     ''
   )
 
-  // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
-  if (slug === 'last-visited-org') {
-    if (lastVisitedOrganization) {
-      router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
-    } else {
-      router.replace(`/new/_`, undefined, { shallow: true })
-    }
-  }
-
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -165,10 +156,7 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: isFreePlan }
   )
 
-  const { data: approvedOAuthApps } = useAuthorizedAppsQuery(
-    { slug },
-    { enabled: !isFreePlan && slug !== '_' }
-  )
+  const { data: approvedOAuthApps } = useAuthorizedAppsQuery({ slug }, { enabled: !isFreePlan })
 
   const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
 
@@ -635,9 +623,7 @@ const Wizard: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {isOrganizationsSuccess && !isAdmin && !orgNotFound && (
-                    <NotOrganizationOwnerWarning slug={slug} />
-                  )}
+                  {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
                   {orgNotFound && <OrgNotFound slug={slug} />}
                 </Panel.Content>
 

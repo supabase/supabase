@@ -4,7 +4,6 @@ import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type ColumnPrivilegesVariables = {
   projectRef?: string
@@ -26,10 +25,7 @@ export async function getColumnPrivileges(
     params: {
       path: { ref: projectRef },
       // this is needed to satisfy the typescript, but it doesn't pass the actual header
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
+      header: { 'x-connection-encrypted': connectionString! },
     },
     signal,
     headers,

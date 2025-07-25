@@ -30,7 +30,7 @@ import {
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { auth_id, organization_slug } = useParams()
+  const { auth_id } = useParams()
   const [isApproving, setIsApproving] = useState(false)
   const [isDeclining, setIsDeclining] = useState(false)
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
@@ -58,11 +58,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (isSuccessOrganizations && organizations.length > 0) {
-      if (organization_slug) {
-        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
-      } else {
-        setSelectedOrgSlug(organizations[0].slug)
-      }
+      setSelectedOrgSlug(organizations[0].slug)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessOrganizations])
@@ -172,9 +168,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             <Button
               type="default"
               loading={isDeclining}
-              disabled={
-                isApproving || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
-              }
+              disabled={isApproving || isExpired}
               onClick={onDeclineRequest}
             >
               Decline
@@ -188,9 +182,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             ) : (
               <Button
                 loading={isApproving}
-                disabled={
-                  isDeclining || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
-                }
+                disabled={isDeclining || isExpired}
                 onClick={onApproveRequest}
               >
                 Authorize {requester?.name}
@@ -234,27 +226,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
               first.
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-        ) : organization_slug && !selectedOrgSlug ? (
-          <Alert_Shadcn_ variant="warning">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle_Shadcn_>
-              Organization is needed for installing an integration
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
-              Your account is not a member of the pre-selected organization. To use this
-              integration, it must be installed within an organization your account is associated
-              with.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
         ) : (
           <Listbox
-            label={
-              organization_slug
-                ? 'API access will be granted to pre-selected organization:'
-                : 'Select an organization to grant API access to:'
-            }
+            label="Select an organization to grant API access to"
             value={selectedOrgSlug}
-            disabled={isExpired || Boolean(organization_slug)}
+            disabled={isExpired}
             onChange={setSelectedOrgSlug}
           >
             {(organizations ?? []).map((organization) => (

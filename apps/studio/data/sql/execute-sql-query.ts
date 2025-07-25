@@ -9,7 +9,6 @@ import {
 } from 'lib/role-impersonation'
 import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -74,12 +73,7 @@ export async function executeSql<T = any>(
     const result = await post('/platform/pg-meta/{ref}/query', {
       signal,
       params: {
-        header: {
-          'x-connection-encrypted': connectionString ?? '',
-          'x-pg-application-name': isStatementTimeoutDisabled
-            ? 'supabase/dashboard-query-editor'
-            : DEFAULT_PLATFORM_APPLICATION_NAME,
-        },
+        header: { 'x-connection-encrypted': connectionString ?? '' },
         path: { ref: projectRef },
         // @ts-expect-error: This is just a client side thing to identify queries better
         query: {

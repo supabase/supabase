@@ -1,5 +1,5 @@
-import { format, ident, literal } from '../pg-format'
-import type { Dictionary, Filter, QueryPagination, QueryTable, Sort } from './types'
+import { ident, literal, format } from '../pg-format'
+import type { Filter, QueryPagination, QueryTable, Sort, Dictionary } from './types'
 
 export function countQuery(
   table: QueryTable,
@@ -171,11 +171,6 @@ function applyFilters(query: string, filters: Filter[]) {
           return inFilterSql(filter)
         case 'is':
           return isFilterSql(filter)
-        case '~~':
-        case '~~*':
-        case '!~~':
-        case '!~~*':
-          return castColumnToText(filter)
         default:
           return `${ident(filter.column)} ${filter.operator} ${filterLiteral(filter.value)}`
       }
@@ -206,10 +201,6 @@ function isFilterSql(filter: Filter) {
     default:
       return `${ident(filter.column)} ${filter.operator} ${filterLiteral(filter.value)}`
   }
-}
-
-function castColumnToText(filter: Filter) {
-  return `${ident(filter.column)}::text ${filter.operator} ${filterLiteral(filter.value)}`
 }
 
 function filterLiteral(value: any) {

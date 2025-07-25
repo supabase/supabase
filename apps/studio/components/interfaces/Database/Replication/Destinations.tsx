@@ -1,26 +1,19 @@
-import { noop } from 'lodash'
-import { Plus, Search } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { Button, cn, Input_Shadcn_ } from 'ui'
+import { Plus } from 'lucide-react'
+import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import DestinationRow from './DestinationRow'
+import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
+import { useState } from 'react'
 import NewDestinationPanel from './DestinationPanel'
-import { DestinationRow } from './DestinationRow'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { useReplicationSourcesQuery } from 'data/replication/sources-query'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 
-interface DestinationsProps {
-  onSelectPipeline?: (pipelineId: number, destinationName: string) => void
-}
-
-export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
+const Destinations = () => {
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
-  const [filterString, setFilterString] = useState<string>('')
   const { ref: projectRef } = useParams()
 
   const {
@@ -28,11 +21,12 @@ export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => 
     error: sourcesError,
     isLoading: isSourcesLoading,
     isError: isSourcesError,
+    isSuccess: isSourcesSuccess,
   } = useReplicationSourcesQuery({
     projectRef,
   })
 
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  let sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
   const {
     data: destinationsData,
@@ -56,44 +50,21 @@ export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => 
 
   const anyDestinations = isDestinationsSuccess && destinationsData.destinations.length > 0
 
-  const filteredDestinations =
-    filterString.length === 0
-      ? destinationsData?.destinations ?? []
-      : (destinationsData?.destinations ?? []).filter((destination) =>
-          destination.name.toLowerCase().includes(filterString.toLowerCase())
-        )
-
   return (
     <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground-lighter"
-                size={14}
-              />
-              <Input_Shadcn_
-                className="pl-9 h-7"
-                placeholder={'Filter destinations'}
-                value={filterString}
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
-          </div>
+      <ScaffoldSection isFullWidth>
+        <div className="flex justify-between items-center mb-4">
+          <ScaffoldSectionTitle>Destinations</ScaffoldSectionTitle>
           <Button type="default" icon={<Plus />} onClick={() => setShowNewDestinationPanel(true)}>
             Add destination
           </Button>
         </div>
-      </div>
-
-      <div className="w-full overflow-hidden overflow-x-auto">
         {(isSourcesLoading || isDestinationsLoading) && <GenericSkeletonLoader />}
 
         {(isSourcesError || isDestinationsError) && (
           <AlertError
             error={sourcesError || destinationsError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
+            subject="Failed to retrieve destinations"
           />
         )}
 
@@ -106,7 +77,7 @@ export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => 
               <Table.th key="publication">Publication</Table.th>,
               <Table.th key="actions"></Table.th>,
             ]}
-            body={filteredDestinations.map((destination) => {
+            body={destinationsData.destinations.map((destination) => {
               const pipeline = pipelinesData?.pipelines.find(
                 (p) => p.destination_id === destination.id
               )
@@ -122,8 +93,7 @@ export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => 
                   isLoading={isPipelinesLoading}
                   isError={isPipelinesError}
                   isSuccess={isPipelinesSuccess}
-                  onSelectPipeline={onSelectPipeline}
-                />
+                ></DestinationRow>
               )
             })}
           ></Table>
@@ -154,22 +124,15 @@ export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => 
             </div>
           )
         )}
-      </div>
-
-      {!isSourcesLoading &&
-        !isDestinationsLoading &&
-        filteredDestinations.length === 0 &&
-        anyDestinations && (
-          <div className="text-center py-8 text-foreground-light">
-            <p>No destinations match "{filterString}"</p>
-          </div>
-        )}
+      </ScaffoldSection>
 
       <NewDestinationPanel
         visible={showNewDestinationPanel}
         sourceId={sourceId}
         onClose={() => setShowNewDestinationPanel(false)}
-      />
+      ></NewDestinationPanel>
     </>
   )
 }
+
+export default Destinations

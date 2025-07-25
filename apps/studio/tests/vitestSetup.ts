@@ -5,6 +5,22 @@ import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { routerMock } from './lib/route-mock'
 import { mswServer } from './lib/msw'
 
+mswServer.listen({ onUnhandledRequest: 'error' })
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})
+
 // Uncomment this if HTML in errors are being annoying.
 //
 // configure({
@@ -16,7 +32,6 @@ import { mswServer } from './lib/msw'
 // })
 
 beforeAll(() => {
-  mswServer.listen({ onUnhandledRequest: `error` })
   vi.mock('next/router', () => require('next-router-mock'))
   vi.mock('next/navigation', async () => {
     const actual = await vi.importActual('next/navigation')
@@ -40,11 +55,10 @@ beforeAll(() => {
   routerMock.useParser(createDynamicRouteParser(['/projects/[ref]']))
 })
 
-afterEach(() => {
-  mswServer.resetHandlers()
-  cleanup()
-})
+afterAll(() => mswServer.close())
 
-afterAll(() => {
-  mswServer.close()
+afterEach(() => mswServer.resetHandlers())
+
+afterEach(() => {
+  cleanup()
 })

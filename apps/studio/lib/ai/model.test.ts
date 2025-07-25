@@ -18,7 +18,6 @@ describe('getModel', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.stubEnv('AWS_BEDROCK_ROLE_ARN', 'test')
   })
 
   afterEach(() => {

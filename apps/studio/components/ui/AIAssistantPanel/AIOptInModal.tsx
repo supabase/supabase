@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   cn,
@@ -23,6 +24,7 @@ interface AIOptInModalProps {
 }
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
+  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
 
@@ -52,7 +54,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
             <DialogSection className="space-y-4 pb-0" padding="small">
               <AIOptInLevelSelector
                 control={form.control}
-                disabled={!canUpdateOrganization || isUpdating}
+                disabled={!canUpdateOrganization || !newOrgAiOptIn || isUpdating}
               />
             </DialogSection>
 

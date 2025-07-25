@@ -10,10 +10,10 @@ import { useProjectByRef, useProjectByRefQuery } from './useSelectedProject'
  * Example migration:
  * ```
  * // Old:
- * const organization = useSelectedOrganization()
+ * const organization = useSelectedOrganization(ref)
  *
  * // New:
- * const { data: organization } = useSelectedOrganizationQuery()
+ * const { data: organization } = useSelectedOrganizationQuery(ref)
  * ```
  */
 export function useSelectedOrganization({ enabled = true } = {}) {

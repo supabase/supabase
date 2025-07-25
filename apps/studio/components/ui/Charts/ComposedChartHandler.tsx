@@ -1,22 +1,21 @@
-import { Loader2 } from 'lucide-react'
+import React, { PropsWithChildren, useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
-import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { Loader2 } from 'lucide-react'
 import { cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import ComposedChart from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
 import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
-import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
+import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
 import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
+import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
 
-import dayjs from 'dayjs'
-import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import type { ChartData } from './Charts.types'
+import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
 import { MultiAttribute } from './ComposedChart.utils'
 
 export interface ComposedChartHandlerProps {
@@ -200,12 +199,7 @@ const ComposedChartHandler = ({
           point[attr] = value
         })
 
-        const formattedDataPoint: DataPoint =
-          !('period_start' in point) && 'timestamp' in point
-            ? { ...point, period_start: dayjs.utc(point.timestamp).unix() * 1000 }
-            : point
-
-        return formattedDataPoint
+        return point as DataPoint
       })
 
     return combined as DataPoint[]
@@ -281,7 +275,6 @@ const ComposedChartHandler = ({
           attributes={attributes}
           data={combinedData as DataPoint[]}
           format={format}
-          // [Joshen] This is where it's messing up
           xAxisKey="period_start"
           yAxisKey={attributes[0].attribute}
           highlightedValue={_highlightedValue}

@@ -90,11 +90,10 @@ export const UpdateRolesConfirmationModal = ({
         })
         toast.success(`Successfully updated role for ${member.username}`)
         onClose(true)
-      } catch (error: any) {
-        toast.error(`Failed to update role: ${error.message}`)
-      } finally {
-        setSaving(false)
         return
+      } catch (error: any) {
+        setSaving(false)
+        return toast.error(`Failed to update role: ${error.message}`)
       }
     }
 
@@ -131,10 +130,8 @@ export const UpdateRolesConfirmationModal = ({
       toast.success(`Successfully updated role for ${member.username}`)
       onClose(true)
     } catch (error: any) {
-      toast.error(`Failed to update role: ${error.message}`)
-    } finally {
       setSaving(false)
-      return
+      return toast.error(`Failed to update role: ${error.message}`)
     }
   }
 

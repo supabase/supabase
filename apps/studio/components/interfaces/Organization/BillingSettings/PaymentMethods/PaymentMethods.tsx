@@ -176,6 +176,7 @@ const PaymentMethods = () => {
           setShowAddPaymentMethodModal(false)
           toast.success('Successfully added new payment method')
         }}
+        showSetDefaultCheckbox={true}
       />
 
       <ChangePaymentMethodModal
