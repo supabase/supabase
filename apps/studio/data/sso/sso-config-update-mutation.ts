@@ -45,7 +45,11 @@ export const useSSOConfigUpdateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to update SSO configuration: ${data.message}`)
+          if (data.message === "") {
+            toast.error(`Failed to update SSO configuration.`)
+          } else {
+            toast.error(`${data.message}`)
+          }
         } else {
           onError(data, variables, context)
         }

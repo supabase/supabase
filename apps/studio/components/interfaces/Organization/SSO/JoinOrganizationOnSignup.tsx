@@ -58,9 +58,10 @@ export const JoinOrganizationOnSignup = ({
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="owner">Owner</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="administrator">Administrator</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="developer">Developer</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="Owner">Owner</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="Administrator">Administrator</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="Developer">Developer</SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="Read-only">Read-only</SelectItem_Shadcn_>
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>

@@ -7,6 +7,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
+import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
 import { useOrgSSOConfigQuery } from 'data/sso/sso-config-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -35,7 +36,6 @@ const FormSchema = z
             .string()
             .trim()
             .min(1, 'Please provide a domain')
-            .url('Please provide a valid URL'),
         })
       )
       .min(1, 'At least one domain is required'),
@@ -73,6 +73,8 @@ export const SSOConfig = () => {
     error: configError,
   } = useOrgSSOConfigQuery({ orgSlug: organization?.slug }, { enabled: !!organization })
 
+  const isSSOProviderNotFound = configError?.code === 404
+
   const form = useForm<SSOConfigFormSchema>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -85,7 +87,7 @@ export const SSOConfig = () => {
       firstNameMapping: [{ value: '' }],
       lastNameMapping: [{ value: '' }],
       joinOrgOnSignup: false,
-      roleOnJoin: 'developer',
+      roleOnJoin: 'Developer',
     },
   })
 
@@ -115,6 +117,15 @@ export const SSOConfig = () => {
     },
   })
 
+  const { mutate: updateSSOConfig } = useSSOConfigUpdateMutation({
+    onError: (error) => {
+      form.setError('root', { type: 'manual', message: error.message })
+    },
+    onSuccess: () => {
+      form.reset()
+    },
+  })
+
   const onSubmit: SubmitHandler<SSOConfigFormSchema> = (values) => {
     const roleOnJoin = (values.roleOnJoin || 'Developer') as
       | 'Administrator'
@@ -123,7 +134,7 @@ export const SSOConfig = () => {
       | 'Read-only'
       | undefined
 
-    createSSOConfig({
+    const payload = {
       slug: organization!.slug,
       config: {
         enabled: values.enabled,
@@ -137,7 +148,12 @@ export const SSOConfig = () => {
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
       },
-    })
+    }
+    if(ssoConfig) {
+      updateSSOConfig(payload)
+    } else {
+      createSSOConfig(payload)
+    }
   }
 
   const isSSOEnabled = form.watch('enabled')
@@ -152,10 +168,10 @@ export const SSOConfig = () => {
             </CardContent>
           </Card>
         )}
-        {isError && (
+        {(isError && !isSSOProviderNotFound) && (
           <AlertError error={configError} subject="Failed to retrieve SSO configuration" />
         )}
-        {isSuccess && (
+        {(isSuccess || isSSOProviderNotFound) && (
           <Form_Shadcn_ {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
@@ -181,7 +197,7 @@ export const SSOConfig = () => {
                   />
                 </CardContent>
 
-                {isSSOEnabled && (
+                {(isSSOEnabled || ssoConfig) && (
                   <>
                     <CardContent>
                       <SSODomains form={form} />
