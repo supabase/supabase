@@ -1,12 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { uuidv4 } from 'lib/helpers'
 // Content helpers
-import { insertContent, InsertContentPayload } from 'data/content/content-insert-mutation'
-import { getSQLSnippetFolders } from 'data/content/sql-folders-query'
-import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
-import { DATABASE_TESTS_FOLDER_NAME } from './database-tests.constants'
+import { post } from 'data/fetchers'
+// Folder logic removed
 import { databaseTestsKeys } from './database-tests-key'
 
 type DatabaseTestCreateVariables = {
@@ -25,32 +22,17 @@ export const useDatabaseTestCreateMutation = ({
 
   return useMutation({
     mutationFn: async ({ projectRef, query, name }: DatabaseTestCreateVariables) => {
-      // 1. Ensure "test" folder exists
-      const folderResp = await getSQLSnippetFolders({
-        projectRef,
-        name: DATABASE_TESTS_FOLDER_NAME,
+      // Insert the content as a test snippet
+      const data: any = await post('/v1/projects/{ref}/snippets', {
+        params: { path: { ref: projectRef } },
+        body: {
+          name,
+          description: '',
+          type: 'test',
+          visibility: 'project',
+          content: { sql: query },
+        },
       })
-      let testFolder = folderResp.folders.find(
-        (f) => f.name.toLowerCase() === DATABASE_TESTS_FOLDER_NAME.toLowerCase()
-      )
-
-      if (!testFolder) {
-        // create the folder if it doesn't exist
-        testFolder = await createSQLSnippetFolder({ projectRef, name: DATABASE_TESTS_FOLDER_NAME })
-      }
-
-      // 2. Insert the content as a SQL snippet under the test folder
-      const payload: InsertContentPayload = {
-        id: uuidv4(),
-        name,
-        description: '',
-        type: 'sql',
-        visibility: 'user',
-        folder_id: testFolder.id,
-        content: { sql: query },
-      }
-
-      const data = await insertContent({ projectRef, payload })
 
       // Invalidate cached lists so UI refreshes
       await queryClient.invalidateQueries(databaseTestsKeys.list(projectRef))

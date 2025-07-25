@@ -61,11 +61,11 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
       initialValue: test.query,
       label: `Edit test: ${test.name}`,
       saveLabel: 'Save test',
-      onSave: (query) => {
+      onSave: (query, name) => {
         updateTest({
           projectRef: project?.ref!,
           id: test.id,
-          name: test.name,
+          name: name || test.name,
           query,
           ownerId: profile?.id,
         })
@@ -78,18 +78,19 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
     setEditorPanel({
       open: true,
       initialValue: `
-BEGIN;
-SELECT plan(1);
--- Your test here
-SELECT * FROM finish();
-ROLLBACK;
+begin;
+select plan(1);
+-- Verify RLS is enabled on all tables in the public schema
+select tests.rls_enabled('public');
+select * from finish();
+rollback;
       `.trim(),
       label: 'Create new test',
       saveLabel: 'Save test',
-      onSave: (query) => {
+      onSave: (query, name) => {
         createTest({
           projectRef: project?.ref!,
-          name: 'New test',
+          name: name || 'New test',
           connectionString: project?.connectionString,
           query,
         })

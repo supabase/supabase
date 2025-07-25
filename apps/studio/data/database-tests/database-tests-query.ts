@@ -1,9 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { databaseTestsKeys } from './database-tests-key'
-import { getSQLSnippetFolders } from 'data/content/sql-folders-query'
-import { getSQLSnippetFolderContents } from 'data/content/sql-folder-contents-query'
-import { DATABASE_TESTS_FOLDER_NAME } from './database-tests.constants'
-import { getContentById } from 'data/content/content-id-query'
+import { get } from 'data/fetchers'
 
 export type DatabaseTest = {
   id: string
@@ -31,46 +28,34 @@ export async function getDatabaseTests(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  /*
-   * 1. Locate the folder named "test" (case-insensitive)
-   */
-  const folderResp = await getSQLSnippetFolders(
-    { projectRef, name: DATABASE_TESTS_FOLDER_NAME },
-    signal
-  )
+  // Fetch all content items with type "test"
+  const { data, error } = await get('/v1/projects/{ref}/snippets', {
+    params: {
+      path: { ref: projectRef },
+      query: {
+        type: 'test',
+        sort_by: 'name',
+        visibility: 'project',
+        sort_order: 'asc',
+        limit: '100',
+      },
+    },
+    signal,
+  })
 
-  const testFolder = folderResp.folders.find(
-    (f) => f.name.toLowerCase() === DATABASE_TESTS_FOLDER_NAME.toLowerCase()
-  )
-  if (!testFolder) return []
+  if (error) throw error
 
-  /*
-   * 2. Fetch list of contents within that folder via folder contents endpoint
-   */
-  const folderContentsResp = await getSQLSnippetFolderContents(
-    { projectRef, folderId: testFolder.id, sort: 'name' },
-    signal
-  )
-
-  const contents = (folderContentsResp.contents ?? []) as Array<{
+  const contents = (data.data ?? []) as Array<{
     id: string
     name: string
+    content: { sql: string }
   }>
 
-  /*
-   * 3. Resolve SQL text for each snippet in parallel
-   */
-  const tests: DatabaseTest[] = await Promise.all(
-    contents.map(async (item) => {
-      const { content } = await getContentById({ projectRef, id: item.id })
-      const sql = (content as any)?.sql ?? ''
-      return {
-        id: item.id,
-        name: item.name,
-        query: sql,
-      }
-    })
-  )
+  const tests: DatabaseTest[] = contents.map((item) => ({
+    id: item.id,
+    name: item.name,
+    query: item.content?.sql ?? '',
+  }))
 
   return tests
 }

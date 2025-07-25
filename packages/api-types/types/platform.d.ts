@@ -4450,12 +4450,12 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
+      folder_id?: string | null
       id?: string
       name: string
       owner_id?: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
@@ -4702,7 +4702,8 @@ export interface components {
     }
     CreateProjectBody: {
       auth_site_url?: string
-      cloud_provider: string
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
       custom_supabase_internal_requests?: {
         ami: {
           search_tags?: {
@@ -5091,7 +5092,7 @@ export interface components {
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
       /** @default null */
       connection_string_read_only?: string | null
       /** @default null */
@@ -5294,10 +5295,6 @@ export interface components {
       archive_empty: boolean
       file_url: string
       fileUrl: string
-    }
-    GetAvailableRegionsBody: {
-      cloud_provider: string
-      organization_slug: string
     }
     GetContentCountResponse: {
       count: number
@@ -5659,7 +5656,7 @@ export interface components {
       owner_id: number
       project_id: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
@@ -5678,7 +5675,7 @@ export interface components {
           owner_id: number
           project_id: number
           /** @enum {string} */
-          type: 'sql' | 'report' | 'log_sql'
+          type: 'sql' | 'report' | 'log_sql' | 'test'
           updated_at: string
           /** @enum {string} */
           visibility: 'user' | 'project' | 'org' | 'public'
@@ -5712,7 +5709,7 @@ export interface components {
         owner_id: number
         project_id: number
         /** @enum {string} */
-        type: 'sql' | 'report' | 'log_sql'
+        type: 'sql' | 'report' | 'log_sql' | 'test'
         updated_at: string
         updated_by: {
           id: number
@@ -6390,7 +6387,8 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
-      provider: string
+      /** @enum {string} */
+      provider: 'AWS' | 'FLY' | 'AWS_K8S'
       region: string
     }
     OrganizationSlugAvailableVersionsResponse: {
@@ -7290,7 +7288,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -7309,7 +7307,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -8768,13 +8766,13 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
+      folder_id?: string | null
       id: string
       name: string
       owner_id: number
       project_id?: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
@@ -8839,7 +8837,7 @@ export interface components {
       owner_id: number
       project_id: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
@@ -11775,6 +11773,12 @@ export interface operations {
           'application/json': components['schemas']['InvitationResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get organization invitations */
       500: {
         headers: {
@@ -11801,6 +11805,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -16639,7 +16649,7 @@ export interface operations {
         name?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'test'
         visibility?: string
       }
       header?: never
@@ -16791,7 +16801,7 @@ export interface operations {
     parameters: {
       query?: {
         name?: string
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'test'
       }
       header?: never
       path: {
@@ -16833,7 +16843,7 @@ export interface operations {
         name?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'test'
         visibility?: string
       }
       header?: never
@@ -18180,6 +18190,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project's status */
       500: {
         headers: {
@@ -18253,16 +18269,15 @@ export interface operations {
   }
   ProjectsController_getRegions: {
     parameters: {
-      query?: never
+      query: {
+        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+        organization_slug: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetAvailableRegionsBody']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
@@ -18292,6 +18307,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

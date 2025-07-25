@@ -32,6 +32,7 @@ import {
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
+  Input_Shadcn_ as Input,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -62,6 +63,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const [results, setResults] = useState<undefined | any[]>(undefined)
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [currentValue, setCurrentValue] = useState(editorPanel.initialValue || '')
+  const [name, setName] = useState('')
   const [savedCode, setSavedCode] = useState<string>('')
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [showResults, setShowResults] = useState(true)
@@ -83,6 +85,15 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
       setResults([])
     },
   })
+
+  useEffect(() => {
+    // A bit hacky, but avoids changing app-state
+    if (editorPanel.label?.startsWith('Edit test: ')) {
+      setName(editorPanel.label.substring('Edit test: '.length))
+    } else {
+      setName('New test') // Default for create
+    }
+  }, [editorPanel.label])
 
   const onExecuteSql = (skipValidation = false) => {
     setError(undefined)
@@ -157,7 +168,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   return (
     <div className="flex flex-col h-full bg-surface-100">
       <div className="border-b flex shrink-0 items-center gap-x-3 px-4 h-[46px]">
-        <span className="text-sm flex-1">SQL Editor</span>
+        <span className="text-sm flex-1">{editorPanel.label}</span>
         <div className="flex gap-2 items-center">
           <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
             <PopoverTrigger_Shadcn_ asChild>
@@ -363,11 +374,23 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
           </div>
         )}
 
-        <div className="bg-surface-100 flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
+        <div className="bg-surface-100 flex items-center gap-2 px-5 py-4 w-full border-t shrink-0 justify-end">
           {editorPanel.onSave && (
-            <Button type="default" onClick={() => editorPanel.onSave(currentValue)}>
-              Save
-            </Button>
+            <div className="flex items-center gap-2 justify-end">
+              <Input
+                size="tiny"
+                className="flex-1"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Test name"
+              />
+              <Button
+                type="default"
+                onClick={() => (editorPanel.onSave as any)(currentValue, name)}
+              >
+                {editorPanel.saveLabel || 'Save'}
+              </Button>
+            </div>
           )}
           <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
         </div>

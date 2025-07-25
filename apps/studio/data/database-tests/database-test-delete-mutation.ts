@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { deleteContents } from 'data/content/content-delete-mutation'
+import { del, handleError } from 'data/fetchers'
 import { databaseTestsKeys } from './database-tests-key'
 
 type DatabaseTestDeleteVariables = {
@@ -18,12 +18,16 @@ export const useDatabaseTestDeleteMutation = ({
 
   return useMutation({
     mutationFn: async ({ projectRef, id }: DatabaseTestDeleteVariables) => {
-      await deleteContents({ projectRef, ids: [id] })
+      const { data, error } = await del('/v1/projects/{ref}/snippets/{id}', {
+        params: { path: { ref: projectRef, id } },
+      })
+
+      if (error) handleError(error)
 
       // Invalidate test list cache
       await queryClient.invalidateQueries(databaseTestsKeys.list(projectRef))
 
-      return id
+      return data ?? id
     },
     onSuccess: (id) => {
       toast.success(`Test successfully deleted.`)

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { upsertContent } from 'data/content/content-upsert-mutation'
+import { put, handleError } from 'data/fetchers'
 import { databaseTestsKeys } from './database-tests-key'
 
 type DatabaseTestUpdateVariables = {
@@ -30,18 +30,24 @@ export const useDatabaseTestUpdateMutation = ({
       ownerId,
     }: DatabaseTestUpdateVariables) => {
       // Prepare payload for upsert
-      const payload = {
+      const payload: any = {
         id,
         name,
         description: '',
-        type: 'sql' as const,
-        visibility: 'user' as const,
-        folder_id: folderId ?? undefined,
+        type: 'test' as any,
+        visibility: 'project' as const,
+        // folder_id no longer used for tests
+        folder_id: undefined,
         owner_id: ownerId,
         content: { sql: query },
       }
 
-      await upsertContent({ projectRef, payload })
+      const { data, error } = await put('/v1/projects/{ref}/snippets/{id}', {
+        params: { path: { ref: projectRef, id } },
+        body: payload,
+      })
+
+      if (error) handleError(error)
 
       // Invalidate cache so that refetch happens
       await queryClient.invalidateQueries(databaseTestsKeys.list(projectRef))

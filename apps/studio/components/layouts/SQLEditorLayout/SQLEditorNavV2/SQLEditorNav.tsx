@@ -31,7 +31,6 @@ import {
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { SqlSnippets } from 'types'
 import { Separator, TreeView } from 'ui'
-import { DATABASE_TESTS_FOLDER_NAME } from 'data/database-tests/database-tests.constants'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -142,27 +141,18 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     return snippetInfo
   }, [privateSnippetsPages?.pages, subResults, isLoading, isPreviousData, isFetching, snippet])
 
-  // Exclude special tests folder from SQL Editor view
-  const allFolders = useSnippetFolders(projectRef as string)
-  const hiddenFolderIds = allFolders
-    .filter((f) => f.name?.toLowerCase() === DATABASE_TESTS_FOLDER_NAME.toLowerCase())
-    .map((f) => f.id)
-
-  const folders = allFolders.filter((f) => !hiddenFolderIds.includes(f.id))
+  // Folders (no longer excluding test folders)
+  const folders = useSnippetFolders(projectRef as string)
 
   const privateSnippets = useMemo(
     () =>
       filteredSnippets.snippets
-        ?.filter(
-          (snippet) =>
-            snippet.visibility === 'user' &&
-            !(snippet.folder_id && hiddenFolderIds.includes(snippet.folder_id))
-        )
+        ?.filter((snippet) => snippet.visibility === 'user')
         .sort((a, b) => {
           if (sort === 'name') return a.name.localeCompare(b.name)
           else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
         }) ?? [],
-    [filteredSnippets.snippets, sort, hiddenFolderIds]
+    [filteredSnippets.snippets, sort]
   )
 
   const { data: snippetCountData } = useContentCountQuery({

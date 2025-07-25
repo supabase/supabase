@@ -1,20 +1,12 @@
-import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { Search, MoreVertical, Trash, Settings2, FlaskConical } from 'lucide-react'
+import { MoreVertical, Trash, Settings2, FlaskConical } from 'lucide-react'
 import {
   Alert,
   Button,
   Card,
   CardHeader,
   CardTitle,
-  Input,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableCell,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -103,9 +95,14 @@ interface DatabaseTestsListProps {
 
 const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
   ({ onSelectTest }, ref) => {
+    // Removed moving circle animation state and refs
     const router = useRouter()
     const [search, setSearch] = useState('')
     const testRowRefs = useRef<{ [key: string]: TestRowHandle | null }>({})
+    const project = useSelectedProject()
+    const handleSelectTest = (test: DatabaseTest) => {
+      onSelectTest(test)
+    }
 
     const {
       data: tests,
@@ -155,65 +152,37 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
       return regularTests.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
     }, [regularTests, search])
 
+    // Removed circle position calculations and resize listeners
+
+    const runSingleTest = async (index: number): Promise<void> => {
+      const test = filteredRegularTests[index]
+      if (!test) return
+
+      const testRef = testRowRefs.current[test.id]
+      let result = null
+      if (testRef) {
+        testRef.setStatus(undefined)
+        result = await testRef.runTest()
+      }
+
+      if (!result?.error && index < filteredRegularTests.length - 1) {
+        await runSingleTest(index + 1)
+      }
+    }
+
     const runAllTests = async () => {
-      const allTests = [...filteredSetupTests, ...filteredRegularTests]
-      if (allTests.length === 0) {
+      if (filteredRegularTests.length === 0) {
         toast.error('No tests to run.')
         return
       }
 
-      // Filter out invalid tests
-      const validTests = allTests.filter((test) => isValidTestQuery(test.query))
-      const invalidTests = allTests.filter((test) => !isValidTestQuery(test.query))
-
-      if (invalidTests.length > 0) {
-        toast.error(
-          `${invalidTests.length} test(s) skipped - must start with BEGIN; and end with ROLLBACK;`
-        )
-      }
-
-      if (validTests.length === 0) {
-        toast.error('No valid tests to run.')
-        return
-      }
-
-      // Always run setup test first, then regular tests alphabetically
-      const validSetupTests = validTests.filter((test) => test.name.startsWith('000'))
-      const validRegularTests = validTests.filter((test) => !test.name.startsWith('000'))
-
-      const sortedRegularTests = [...validRegularTests].sort((a, b) => a.name.localeCompare(b.name))
-      const sortedTests = [...validSetupTests, ...sortedRegularTests]
-
       // Set all tests to queued status initially
-      sortedTests.forEach((test) => {
+      filteredRegularTests.forEach((test) => {
         testRowRefs.current[test.id]?.setStatus('queued')
       })
 
-      let passedCount = 0
-      let failedCount = 0
-
-      // Run tests sequentially
-      for (const test of sortedTests) {
-        const testRef = testRowRefs.current[test.id]
-        if (testRef) {
-          // Clear queued status and run the test
-          testRef.setStatus(undefined)
-          const result = await testRef.runTest()
-
-          if (result?.error) {
-            failedCount++
-          } else {
-            passedCount++
-          }
-        }
-      }
-
-      // Show final results
-      if (failedCount > 0) {
-        toast.error(`${failedCount} out of ${validTests.length} tests failed.`)
-      } else {
-        toast.success(`All ${validTests.length} tests passed!`)
-      }
+      // Start from first test
+      await runSingleTest(0)
     }
 
     useImperativeHandle(ref, () => ({
@@ -235,7 +204,12 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
               </p>
             ) : (
               tests.map((test, index) => (
-                <SetupTestRow key={test.id} index={index} test={test} onSelectTest={onSelectTest} />
+                <SetupTestRow
+                  key={test.id}
+                  index={index}
+                  test={test}
+                  onSelectTest={handleSelectTest}
+                />
               ))
             )}
           </div>
@@ -244,7 +218,7 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
 
       // Regular tests view with full TestRow component
       return (
-        <div>
+        <div className="relative">
           {tests.length === 0 ? (
             <p className="text-sm text-foreground-light p-4">No tests found.</p>
           ) : (
@@ -253,10 +227,11 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
                 ref={(el) => (testRowRefs.current[test.id] = el)}
                 key={test.id}
                 index={index}
+                isLast={index === tests.length - 1}
                 test={test}
                 prependQuery={setupTest}
                 canRun={true}
-                onSelectTest={onSelectTest}
+                onSelectTest={handleSelectTest}
               />
             ))
           )}

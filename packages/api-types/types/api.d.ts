@@ -1374,6 +1374,43 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/snippets': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Lists SQL snippets for a project */
+    get: operations['v1-project-list-snippets']
+    put?: never
+    /** Creates a new SQL snippet for the project */
+    post: operations['v1-project-create-snippet']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/snippets/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets a specific SQL snippet within a project */
+    get: operations['v1-project-get-snippet']
+    /** Updates an existing SQL snippet in the project */
+    put: operations['v1-project-upsert-snippet']
+    post?: never
+    /** Deletes an SQL snippet from the project */
+    delete: operations['v1-project-delete-snippet']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/ssl-enforcement': {
     parameters: {
       query?: never
@@ -1986,6 +2023,21 @@ export interface components {
       }
       with_data?: boolean
     }
+    CreateContentBody: {
+      content?: {
+        [key: string]: unknown
+      }
+      description?: string
+      /** Format: uuid */
+      folder_id?: string | null
+      id?: string
+      name: string
+      owner_id?: number
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql' | 'test'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+    }
     CreateOrganizationV1: {
       name: string
     }
@@ -2450,6 +2502,11 @@ export interface components {
       grant_type?: 'authorization_code' | 'refresh_token'
       redirect_uri?: string
       refresh_token?: string
+      /**
+       * @description Resource indicator for MCP (Model Context Protocol) clients
+       * @enum {string}
+       */
+      resource?: 'http://localhost:8080/mcp'
     }
     OAuthTokenResponse: {
       access_token: string
@@ -2656,7 +2713,7 @@ export interface components {
           name: string
         }
         /** @enum {string} */
-        type: 'sql'
+        type: 'sql' | 'test'
         updated_at: string
         updated_by: {
           id: number
@@ -2668,9 +2725,9 @@ export interface components {
     }
     SnippetResponse: {
       content: {
-        favorite: boolean
-        schema_version: string
-        sql: string
+        favorite?: boolean
+        schema_version?: string
+        sql?: string
       }
       description: string | null
       id: string
@@ -2685,7 +2742,7 @@ export interface components {
         name: string
       }
       /** @enum {string} */
-      type: 'sql'
+      type: 'sql' | 'test'
       updated_at: string
       updated_by: {
         id: number
@@ -3115,6 +3172,22 @@ export interface components {
       /** @enum {string} */
       release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       target_version: string
+    }
+    UpsertContentBody: {
+      content?: {
+        [key: string]: unknown
+      }
+      description?: string
+      /** Format: uuid */
+      folder_id?: string | null
+      id: string
+      name: string
+      owner_id: number
+      project_id?: number
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql' | 'test'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
     }
     V1BackupsResponse: {
       backups: {
@@ -3697,7 +3770,11 @@ export interface operations {
         client_id: string
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
+        /** @description Organization slug */
+        organization_slug?: string
         redirect_uri: string
+        /** @description Resource indicator for MCP (Model Context Protocol) clients */
+        resource?: 'http://localhost:8080/mcp'
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
@@ -7210,6 +7287,196 @@ export interface operations {
       }
     }
   }
+  'v1-project-list-snippets': {
+    parameters: {
+      query?: {
+        cursor?: string
+        limit?: string
+        /** @description Project ref */
+        project_ref?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        type?: 'sql' | 'test'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SnippetList']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to list project's SQL snippets */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-project-create-snippet': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateContentBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SnippetResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to create SQL snippet */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-project-get-snippet': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SnippetResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve SQL snippet */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-project-upsert-snippet': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpsertContentBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update SQL snippet */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-project-delete-snippet': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to delete SQL snippet */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-ssl-enforcement-config': {
     parameters: {
       query?: never
@@ -7622,6 +7889,7 @@ export interface operations {
         project_ref?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
+        type?: 'sql' | 'test'
       }
       header?: never
       path?: never
