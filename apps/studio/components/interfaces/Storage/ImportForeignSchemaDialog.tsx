@@ -107,7 +107,7 @@ export const ImportForeignSchemaDialog = ({
       const serverOptions = await getDecryptedParameters({
         ref: project?.ref,
         connectionString: project?.connectionString ?? undefined,
-        serverName,
+        wrapper,
       })
 
       const formValues: Record<string, string> = {
