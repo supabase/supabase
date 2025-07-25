@@ -1,12 +1,9 @@
 import { uniq } from 'lodash'
 import { useMemo } from 'react'
 
+import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
-  WRAPPER_HANDLERS,
-  WRAPPERS,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import {
-  formatWrapperTables,
+  convertKVStringArrayToJson,
   wrapperMetaComparator,
 } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -47,21 +44,20 @@ const useIcebergFdwSchemasQuery = () => {
   })
 
   const schemas = useMemo(() => {
-    const icebergFDWs = result.data
-      ?.filter((wrapper) =>
-        wrapperMetaComparator(
-          { handlerName: WRAPPER_HANDLERS.ICEBERG, server: { options: [] } },
-          wrapper
-        )
+    const icebergFDWs = result.data?.filter((wrapper) =>
+      wrapperMetaComparator(
+        { handlerName: WRAPPER_HANDLERS.ICEBERG, server: { options: [] } },
+        wrapper
       )
-      .filter((fdw) => fdw.name.endsWith('_fdw'))
+    )
 
-    const icebergWrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
+    const fdwSchemas = icebergFDWs
+      ?.map((fdw) => convertKVStringArrayToJson(fdw.server_options))
+      .map((options) => options['supabase_target_schema'])
+      .flatMap((s) => s?.split(','))
+      .filter(Boolean)
 
-    const wrapperTables =
-      icebergFDWs?.map((fdw) => formatWrapperTables(fdw, icebergWrapperMeta)).flat() ?? []
-
-    return uniq([...wrapperTables?.map((t) => t.schema_name)])
+    return uniq(fdwSchemas)
   }, [result.data])
 
   return { ...result, data: schemas }
