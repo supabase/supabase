@@ -72,7 +72,7 @@ export const TableGridEditor = ({
     }
   }, [onClearDashboardHistory, router, selectedTable, tabs])
 
-  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {

@@ -45,7 +45,6 @@ const TableEditorMenu = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const isMobile = useBreakpoint()
 
-  const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
