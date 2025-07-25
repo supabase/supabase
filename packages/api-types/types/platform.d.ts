@@ -1114,6 +1114,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/cloud-marketplace/link': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Makes an existing organization being billed by AWS Marketplace */
+    put: operations['ClazarController_link']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/customer': {
     parameters: {
       query?: never
@@ -1561,6 +1578,40 @@ export interface paths {
     }
     /** Gets usage stats */
     get: operations['OrgUsageController_getOrgUsage']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/cloud-marketplace': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates organization billed by AWS Marketplace */
+    post: operations['OrganizationsController_createAwsBilledOrganization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/cloud-marketplace/check-eligibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Check whether given organizations are eligible for AWS billing */
+    get: operations['OrganizationsController_checkCloudMarketplaceEligibility']
     put?: never
     post?: never
     delete?: never
@@ -4315,6 +4366,11 @@ export interface components {
     ChangeMFAEnforcementStateRequest: {
       enforced: boolean
     }
+    CheckCloudMarketplaceEligibilityResponse: {
+      is_eligible: boolean
+      reasons: string[]
+      slug: string
+    }[]
     CloneBackupsResponse: {
       backups: {
         id: number
@@ -4372,6 +4428,12 @@ export interface components {
       scope?: 'V0'
       token: string
       token_alias: string
+    }
+    CreateAwsBilledOrganizationBody: {
+      buyer_id: string
+      kind?: string
+      name: string
+      size?: string
     }
     CreateBackendParamsOpenapi: {
       config:
@@ -4702,7 +4764,8 @@ export interface components {
     }
     CreateProjectBody: {
       auth_site_url?: string
-      cloud_provider: string
+      /** @enum {string} */
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
       custom_supabase_internal_requests?: {
         ami: {
           search_tags?: {
@@ -5091,7 +5154,7 @@ export interface components {
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
-      cloud_provider: 'AWS' | 'AWS_K8S' | 'FLY'
+      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
       /** @default null */
       connection_string_read_only?: string | null
       /** @default null */
@@ -5294,10 +5357,6 @@ export interface components {
       archive_empty: boolean
       file_url: string
       fileUrl: string
-    }
-    GetAvailableRegionsBody: {
-      cloud_provider: string
-      organization_slug: string
     }
     GetContentCountResponse: {
       count: number
@@ -5784,6 +5843,7 @@ export interface components {
     }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
+      AUDIT_LOG_DISABLE_POSTGRES: boolean | null
       DB_MAX_POOL_SIZE: number | null
       DISABLE_SIGNUP: boolean
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
@@ -6099,6 +6159,9 @@ export interface components {
       phone: string | null
       token: string
     }
+    LinkClazarBuyerBody: {
+      buyer_id: string
+    }
     ListGitHubConnectionsResponse: {
       connections: {
         branch_limit: number
@@ -6390,7 +6453,8 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
-      provider: string
+      /** @enum {string} */
+      provider: 'AWS' | 'FLY' | 'AWS_K8S'
       region: string
     }
     OrganizationSlugAvailableVersionsResponse: {
@@ -7290,7 +7354,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -7309,7 +7373,7 @@ export interface components {
           code: string
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'AWS_K8S' | 'FLY'
+          provider: 'AWS' | 'FLY' | 'AWS_K8S'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -8176,6 +8240,7 @@ export interface components {
     }
     UpdateGoTrueConfigBody: {
       API_MAX_REQUEST_DURATION?: number | null
+      AUDIT_LOG_DISABLE_POSTGRES?: boolean | null
       DB_MAX_POOL_SIZE?: number | null
       DISABLE_SIGNUP?: boolean | null
       EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean | null
@@ -11368,6 +11433,43 @@ export interface operations {
       }
     }
   }
+  ClazarController_link: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkClazarBuyerBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to make organization being billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   CustomerController_getCustomer: {
     parameters: {
       query?: never
@@ -11775,6 +11877,12 @@ export interface operations {
           'application/json': components['schemas']['InvitationResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get organization invitations */
       500: {
         headers: {
@@ -11801,6 +11909,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -12652,6 +12766,62 @@ export interface operations {
         content?: never
       }
       /** @description Failed to get usage stats */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_createAwsBilledOrganization: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAwsBilledOrganizationBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateOrganizationResponse']
+        }
+      }
+      /** @description Failed to create organization billed by AWS Marketplace */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrganizationsController_checkCloudMarketplaceEligibility: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CheckCloudMarketplaceEligibilityResponse']
+        }
+      }
+      /** @description Failed to check whether organizations are eligible for AWS billing */
       500: {
         headers: {
           [name: string]: unknown
@@ -18180,6 +18350,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project's status */
       500: {
         headers: {
@@ -18253,16 +18429,15 @@ export interface operations {
   }
   ProjectsController_getRegions: {
     parameters: {
-      query?: never
+      query: {
+        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+        organization_slug: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetAvailableRegionsBody']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
@@ -18292,6 +18467,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
