@@ -1,18 +1,51 @@
 import { useEffect, useRef, useState } from 'react'
+// Dynamically import charts to improve page load
+import dynamic from 'next/dynamic'
+
 import { animate, createSpring, createTimeline, stagger } from 'animejs'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 
-import { Button, Checkbox, cn } from 'ui'
-import { PopupFrame } from 'ui-patterns'
+import { Button, Checkbox, cn, Card, CardHeader, CardTitle, CardContent } from 'ui'
 import { Input } from 'ui/src/components/shadcn/ui/input'
 import { Label } from 'ui/src/components/shadcn/ui/label'
+import ChartPieStacked from '../../design-system/registry/default/block/chart-pie-stacked'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import data from '~/data/surveys/state-of-startups-2025'
+
+import { TeamCountChart } from '~/components/SurveyResults/TeamCountChart'
+import { TechnicalFoundersChart } from '~/components/SurveyResults/TechnicalFoundersChart'
+import { PreviousCompanyChart } from '~/components/SurveyResults/PreviousCompanyChart'
+import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
+import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
+import { SectionIntro } from '~/components/SurveyResults/SectionIntro'
+import { RoleChart } from '~/components/SurveyResults/RoleChart'
+import { ProblemBeingSolvedChart } from '~/components/SurveyResults/ProblemBeingSolvedChart'
+import { PersonAgeChart } from '~/components/SurveyResults/AgeChart'
+import { MonetizationChart } from '~/components/SurveyResults/MonetizationChart'
+import { AcceleratorParticipationChart } from '~/components/SurveyResults/AcceleratorParticipationChart'
+import { PivotFreqChart } from '~/components/SurveyResults/PivotFreqChart'
+import { FrontendStackChart } from '~/components/SurveyResults/FrontendStackChart'
+import { BackendStackChart } from '~/components/SurveyResults/BackendStackChart'
+import { SalesToolsChart } from '~/components/SurveyResults/SalesToolsChart'
+import { PricingChart } from '~/components/SurveyResults/PricingChart'
+import { IndustryChart } from '~/components/SurveyResults/IndustryChart'
+import { DatabasesChart } from '~/components/SurveyResults/DatabasesChart'
+import { DataWarehousesChart } from '~/components/SurveyResults/DataWarehousesChart'
+import { VectorDatabasesChart } from '~/components/SurveyResults/VectorDatabasesChart'
+import { OpenTelemetryChart } from '~/components/SurveyResults/OpenTelemetryChart'
+import { ObservabilityChart } from '~/components/SurveyResults/ObservabilityChart'
+import { CloudProvidersChart } from '~/components/SurveyResults/CloudProvidersChart'
+import { MustHaveDevToolsChart } from '~/components/SurveyResults/MustHaveDevToolsChart'
+import { AICodingToolsChart } from '~/components/SurveyResults/AICodingToolsChart'
+import { SubscriptionsChart } from '~/components/SurveyResults/SubscriptionsChart'
+import { NewslettersPaidForChart } from '~/components/SurveyResults/NewslettersPaidForChart'
+import { PodcastsListenedToChart } from '~/components/SurveyResults/PodcastsListenedToChart'
+import { RegularSocialMediaUseChart } from '~/components/SurveyResults/RegularSocialMediaUseChart'
 
 interface FormData {
   email: string
@@ -179,86 +212,85 @@ function StateOfStartupsPage() {
       <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
         <Hero {...pageData.heroSection} />
         <SectionContainer>
-          <div className="flex flex-col text-center gap-4 py-8 items-center justify-center">
-            <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">Stay in touch</h2>
-            <p className="mx-auto text-foreground-lighter w-full">
-              Sign up for our newsletter to be notified when the survey results are available.
-            </p>
-            <div className="w-full mt-4 flex items-center justify-center text-center gap-4">
-              {success ? (
-                <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
-                  <p className="text-center text-sm">{success}</p>
-                  <Button onClick={handleReset}>Reset</Button>
-                </div>
-              ) : (
-                <form
-                  noValidate
-                  id="state-of-startups-form"
-                  onSubmit={handleSubmit}
-                  className="w-full max-w-md flex flex-col gap-4 items-center"
-                >
-                  <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2">
-                    {/* Spam prevention */}
-                    <input
-                      type="text"
-                      name="honeypot"
-                      value={honeypot}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setHoneypot(e.target.value)
-                      }
-                      style={{ display: 'none' }}
-                      aria-hidden="true"
-                    />
-                    <Input
-                      required
-                      onChange={handleChange}
-                      value={formData['email']}
-                      name="email"
-                      type="email"
-                      placeholder="Email"
-                    />
-                    <Button
-                      htmlType="submit"
-                      disabled={isSubmitting}
-                      size="small"
-                      onClick={() =>
-                        sendTelemetryEvent({
-                          action: 'register_for_state_of_startups_newsletter_clicked',
-                          properties: { buttonLocation: 'State of Startups 2025 Newsletter Form' },
-                        })
-                      }
-                    >
-                      Register
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-2 text-left">
-                    <Checkbox
-                      required
-                      name="terms"
-                      id="terms"
-                      onChange={handleChange}
-                      className="[&>input]:m-0"
-                    />
-                    <Label htmlFor="terms" className="text-foreground-lighter leading-5">
-                      We process your information in accordance with our{' '}
-                      <Link href="/privacy" className="text-foreground-light hover:underline">
-                        Privacy Policy
-                      </Link>
-                      .
-                    </Label>
-                  </div>
-                  <div
-                    className={cn(
-                      'flex flex-nowrap text-right gap-1 items-center text-xs leading-none transition-opacity opacity-0 text-foreground-lighter',
-                      errors['email'] && 'opacity-100 animate-fade-in',
-                      errors['terms'] && 'opacity-100 animate-fade-in'
-                    )}
-                  >
-                    {errors['email'] ? errors['email'] : errors['terms']}
-                  </div>
-                </form>
-              )}
-            </div>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Founder and Company Basics"
+              description="Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams."
+              text="Most survey respondents identified as founders (76%), with engineers as the next-largest group (18%). Age-wise, 82% of participants are under 40, with the largest cohort in the 22–29 age range (36.4%). These are early-career founders starting small: 91% of companies have 10 or fewer employees, and 66% were founded within the last year. Two-thirds are bootstrapped, with fewer than 6% reaching Series A or beyond."
+            />
+
+            <RoleChart />
+            <PersonAgeChart />
+            <TechnicalFoundersChart />
+            <PreviousCompanyChart />
+            <TeamCountChart />
+            <FundingStageChart />
+            <HeadquartersChart />
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Product and Market"
+              description="Startups are building a diverse mix of software products, iterating quickly, and pursuing monetization selectively."
+              text="TBA"
+            />
+
+            <MonetizationChart />
+            <AcceleratorParticipationChart />
+            <PivotFreqChart />
+            <IndustryChart />
+            <ProblemBeingSolvedChart />
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Tech Stack"
+              description="The modern stack centers around open tools, modular infrastructure, and cautious spending."
+              text="Postgres is the default database. Supabase is the most widely used hosted option (62.1%), often paired with pgvector for AI workloads. React remains the dominant frontend, while Node.js and Python top the backend. Developer tools like GitHub, Stripe, and Postman round out the stack. Cloud usage reveals a clear split: Supabase leads for managed backends (62%), followed by Vercel (37%) and AWS (27%). Cloudflare (21%) and GCP (13%) are used tactically."
+            />
+
+            <FrontendStackChart />
+            <BackendStackChart />
+            <DatabasesChart />
+            <DataWarehousesChart />
+            <VectorDatabasesChart />
+            <OpenTelemetryChart />
+            <ObservabilityChart />
+            <CloudProvidersChart />
+            <MustHaveDevToolsChart />
+            <AICodingToolsChart />
+            <SubscriptionsChart />
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Go-To-Market"
+              description="Startups start selling through networks and dev communities, then layer in more structured growth."
+              text="The first users come from dev communities, Product Hunt, Hacker News, and personal networks. Most teams use product-led growth and only layer in sales after demand picks up. CRM use is lightweight—Google Sheets and Notion still dominate."
+            />
+
+            <SalesToolsChart />
+            <PricingChart />
+          </div>
+        </SectionContainer>
+
+        <SectionContainer>
+          <div className="flex flex-col gap-4 py-8 items-center justify-center">
+            <SectionIntro
+              title="Community and Influence"
+              description="Communities are the learning engine behind every early-stage startup."
+              text="Founders follow newsletters like Lenny’s and TLDR, listen to Acquired and The AI Breakdown, and post selectively on X/Twitter and GitHub. Tool discovery happens through peer recommendations and hands-on testing—not ads."
+            />
+
+            <NewslettersPaidForChart />
+            <PodcastsListenedToChart />
+            <RegularSocialMediaUseChart />
           </div>
         </SectionContainer>
       </DefaultLayout>
@@ -503,26 +535,6 @@ const Hero = (props: any) => {
                 </div>
               </div>
               <p className="p !text-foreground-light max-w-lg">{props.subheader}</p>
-            </div>
-            <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
-              <PopupFrame
-                trigger={
-                  <Button size="small" asChild>
-                    <span>Take the survey</span>
-                  </Button>
-                }
-                className="[&_.modal-content]:min-h-[650px] [&_.modal-content]:!h-[75vh] [&_.modal-content]:flex [&_.modal-content]:flex-col"
-              >
-                <div className="w-full !h-full flex-1 flex flex-col">
-                  <iframe
-                    src={`https://form.typeform.com/to/si6Z7XlW?embedded=true`}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    className="w-full !min-h-full flex-1"
-                  />
-                </div>
-              </PopupFrame>
             </div>
           </div>
         </div>
