@@ -1984,6 +1984,7 @@ export interface components {
       secrets?: {
         [key: string]: string
       }
+      with_data?: boolean
     }
     CreateOrganizationV1: {
       name: string

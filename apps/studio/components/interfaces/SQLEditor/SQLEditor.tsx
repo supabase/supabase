@@ -23,7 +23,6 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
 import { detectOS, uuidv4 } from 'lib/helpers'
@@ -81,7 +80,6 @@ export const SQLEditor = () => {
   const os = detectOS()
   const router = useRouter()
   const { ref, id: urlId } = useParams()
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
 
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -209,7 +207,7 @@ export const SQLEditor = () => {
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       try {
-        const { title: name } = await generateSqlTitle({ sql, useBedrockAssistant })
+        const { title: name } = await generateSqlTitle({ sql })
         snapV2.renameSnippet({ id, name })
         const tabId = createTabId('sql', { id })
         tabs.updateTab(tabId, { label: name })
@@ -217,7 +215,7 @@ export const SQLEditor = () => {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
     },
-    [generateSqlTitle, useBedrockAssistant, snapV2]
+    [generateSqlTitle, snapV2]
   )
 
   const prettifyQuery = useCallback(async () => {
@@ -461,9 +459,7 @@ export const SQLEditor = () => {
     completion,
     isLoading: isCompletionLoading,
   } = useCompletion({
-    api: useBedrockAssistant
-      ? `${BASE_PATH}/api/ai/sql/complete-v2`
-      : `${BASE_PATH}/api/ai/sql/complete`,
+    api: `${BASE_PATH}/api/ai/sql/complete-v2`,
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
