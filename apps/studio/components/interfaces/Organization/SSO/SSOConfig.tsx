@@ -32,10 +32,7 @@ const FormSchema = z
     domains: z
       .array(
         z.object({
-          value: z
-            .string()
-            .trim()
-            .min(1, 'Please provide a domain')
+          value: z.string().trim().min(1, 'Please provide a domain'),
         })
       )
       .min(1, 'At least one domain is required'),
@@ -149,7 +146,7 @@ export const SSOConfig = () => {
         join_org_on_signup_role: roleOnJoin,
       },
     }
-    if(ssoConfig) {
+    if (ssoConfig) {
       updateSSOConfig(payload)
     } else {
       createSSOConfig(payload)
@@ -168,7 +165,7 @@ export const SSOConfig = () => {
             </CardContent>
           </Card>
         )}
-        {(isError && !isSSOProviderNotFound) && (
+        {isError && !isSSOProviderNotFound && (
           <AlertError error={configError} subject="Failed to retrieve SSO configuration" />
         )}
         {(isSuccess || isSSOProviderNotFound) && (
