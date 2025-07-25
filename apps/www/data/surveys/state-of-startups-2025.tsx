@@ -8,9 +8,10 @@ export default (isMobile?: boolean) => ({
     title: 'State of Startups 2025',
     subheader: (
       <>
-        There's never been a better time to build.
+        We surveyed over 1,800 startup founders and builders to uncover what’s powering modern
+        startups: their stacks, their go-to-market motion, and their approach to AI.
         <br />
-        Here’s how you told us you’re building.
+        This report is built for builders.
       </>
     ),
     className: '[&_h1]:max-w-2xl',

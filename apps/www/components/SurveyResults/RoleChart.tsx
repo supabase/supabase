@@ -7,23 +7,30 @@ function generateRoleSQL(activeFilters) {
   if (activeFilters.person_age !== 'unset') {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
+  if (activeFilters.funding_stage !== 'unset') {
+    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  }
+  if (activeFilters.headquarters !== 'unset') {
+    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
   return `SELECT
-  role,
+  person_role_normalized,
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
-GROUP BY role
-ORDER BY total DESC`
+GROUP BY person_role_normalized
+ORDER BY total DESC
+`
 }
 
 export function RoleChart() {
   return (
     <GenericChartWithQuery
       title="What is your functional role at your startup?"
-      targetColumn="role"
-      filterColumns={['person_age']}
+      targetColumn="person_role_normalized"
+      filterColumns={['person_age', 'funding_stage', 'headquarters']}
       generateSQLQuery={generateRoleSQL}
     />
   )

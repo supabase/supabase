@@ -22,7 +22,10 @@ import { TechnicalFoundersChart } from '~/components/SurveyResults/TechnicalFoun
 import { PreviousCompanyChart } from '~/components/SurveyResults/PreviousCompanyChart'
 import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
 import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
-import { SectionIntro } from '~/components/SurveyResults/SectionIntro'
+import { SurveySection } from '~/components/SurveyResults/SurveySection'
+import { SurveySubSection } from '~/components/SurveyResults/SurveySubSection'
+import { SurveyPullQuote } from '~/components/SurveyResults/SurveyPullQuote'
+import { SurveyStatCard } from '~/components/SurveyResults/SurveyStatCard'
 import { RoleChart } from '~/components/SurveyResults/RoleChart'
 import { ProblemBeingSolvedChart } from '~/components/SurveyResults/ProblemBeingSolvedChart'
 import { PersonAgeChart } from '~/components/SurveyResults/AgeChart'
@@ -46,6 +49,7 @@ import { SubscriptionsChart } from '~/components/SurveyResults/SubscriptionsChar
 import { NewslettersPaidForChart } from '~/components/SurveyResults/NewslettersPaidForChart'
 import { PodcastsListenedToChart } from '~/components/SurveyResults/PodcastsListenedToChart'
 import { RegularSocialMediaUseChart } from '~/components/SurveyResults/RegularSocialMediaUseChart'
+import { SurveyStatWrapper } from '~/components/SurveyResults/SurveyStatWrapper'
 
 interface FormData {
   email: string
@@ -211,88 +215,103 @@ function StateOfStartupsPage() {
       />
       <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
         <Hero {...pageData.heroSection} />
-        <SectionContainer>
-          <div className="flex flex-col gap-4 py-8 items-center justify-center">
-            <SectionIntro
-              title="Founder and Company Basics"
-              description="Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams."
-              text="Most survey respondents identified as founders (76%), with engineers as the next-largest group (18%). Age-wise, 82% of participants are under 40, with the largest cohort in the 22–29 age range (36.4%). These are early-career founders starting small: 91% of companies have 10 or fewer employees, and 66% were founded within the last year. Two-thirds are bootstrapped, with fewer than 6% reaching Series A or beyond."
+
+        <SurveySection
+          number={1}
+          title="Who’s Building Startups"
+          description="Today’s startup ecosystem is dominated by young, technical builders shipping fast with lean teams. They’ve done this before."
+        >
+          <SurveySubSection
+            number={1.1}
+            title="Roles and Experience"
+            description="Most builders are young, technical founders. Many are on their second or third company."
+          >
+            <div className="flex flex-col md:flex-row gap-4">
+              <RoleChart />
+              <SurveyStatWrapper>
+                <SurveyStatCard number={83} unit="%" label="Technical founders" />
+                <SurveyStatCard number={82} unit="%" label="Under age 40" />
+                <SurveyStatCard number={33} unit="%" label="Repeat founders" />
+              </SurveyStatWrapper>
+            </div>
+            <SurveyPullQuote
+              quote="We’re a two-person team, both technical. It’s not our first rodeo, and that experience helped us move way faster this time."
+              author="John Doe"
+              authorPosition="Founder"
+              authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
             />
+          </SurveySubSection>
 
-            <RoleChart />
-            <PersonAgeChart />
-            <TechnicalFoundersChart />
-            <PreviousCompanyChart />
-            <TeamCountChart />
-            <FundingStageChart />
-            <HeadquartersChart />
-          </div>
-        </SectionContainer>
-
-        <SectionContainer>
-          <div className="flex flex-col gap-4 py-8 items-center justify-center">
-            <SectionIntro
-              title="Product and Market"
-              description="Startups are building a diverse mix of software products, iterating quickly, and pursuing monetization selectively."
-              text="TBA"
+          <SurveySubSection
+            number={1.2}
+            title="Team Size and Funding"
+            description="Startups are mostly bootstrapped or at early stages of funding. They are small teams, and usually less than a year old."
+          >
+            <div className="flex flex-col md:flex-row gap-4">
+              <SurveyStatWrapper>
+                <SurveyStatCard number={91} unit="%" label="Under 10 employees" />
+                <SurveyStatCard number={65} unit="%" label="Under one year old" />
+                <SurveyStatCard number={6} unit="%" label="Over 5 years old" />
+              </SurveyStatWrapper>
+              <FundingStageChart />
+            </div>
+            <SurveyPullQuote
+              quote="We’re bootstrapped and under a year old… just three of us wearing every hat imaginable."
+              author="John Doe"
+              authorPosition="Founder"
+              authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
             />
+          </SurveySubSection>
+        </SurveySection>
 
-            <MonetizationChart />
-            <AcceleratorParticipationChart />
-            <PivotFreqChart />
-            <IndustryChart />
-            <ProblemBeingSolvedChart />
-          </div>
-        </SectionContainer>
+        <SurveySection
+          number={2}
+          title="Product and Market"
+          description="Startups are building a diverse mix of software products, iterating quickly, and pursuing monetization selectively."
+        >
+          <MonetizationChart />
+          <AcceleratorParticipationChart />
+          <PivotFreqChart />
+          <IndustryChart />
+          <ProblemBeingSolvedChart />
+        </SurveySection>
 
-        <SectionContainer>
-          <div className="flex flex-col gap-4 py-8 items-center justify-center">
-            <SectionIntro
-              title="Tech Stack"
-              description="The modern stack centers around open tools, modular infrastructure, and cautious spending."
-              text="Postgres is the default database. Supabase is the most widely used hosted option (62.1%), often paired with pgvector for AI workloads. React remains the dominant frontend, while Node.js and Python top the backend. Developer tools like GitHub, Stripe, and Postman round out the stack. Cloud usage reveals a clear split: Supabase leads for managed backends (62%), followed by Vercel (37%) and AWS (27%). Cloudflare (21%) and GCP (13%) are used tactically."
-            />
+        <SurveySection
+          number={3}
+          title="Tech Stack"
+          description="The modern stack centers around open tools, modular infrastructure, and cautious spending."
+        >
+          <FrontendStackChart />
+          <BackendStackChart />
+          <DatabasesChart />
+          <DataWarehousesChart />
+          <VectorDatabasesChart />
+          <OpenTelemetryChart />
+          <ObservabilityChart />
+          <CloudProvidersChart />
+          <MustHaveDevToolsChart />
+          <AICodingToolsChart />
+          <SubscriptionsChart />
+        </SurveySection>
 
-            <FrontendStackChart />
-            <BackendStackChart />
-            <DatabasesChart />
-            <DataWarehousesChart />
-            <VectorDatabasesChart />
-            <OpenTelemetryChart />
-            <ObservabilityChart />
-            <CloudProvidersChart />
-            <MustHaveDevToolsChart />
-            <AICodingToolsChart />
-            <SubscriptionsChart />
-          </div>
-        </SectionContainer>
+        <SurveySection
+          number={4}
+          title="Go-To-Market"
+          description="Startups start selling through networks and dev communities, then layer in more structured growth."
+        >
+          <SalesToolsChart />
+          <PricingChart />
+        </SurveySection>
 
-        <SectionContainer>
-          <div className="flex flex-col gap-4 py-8 items-center justify-center">
-            <SectionIntro
-              title="Go-To-Market"
-              description="Startups start selling through networks and dev communities, then layer in more structured growth."
-              text="The first users come from dev communities, Product Hunt, Hacker News, and personal networks. Most teams use product-led growth and only layer in sales after demand picks up. CRM use is lightweight—Google Sheets and Notion still dominate."
-            />
-
-            <SalesToolsChart />
-            <PricingChart />
-          </div>
-        </SectionContainer>
-
-        <SectionContainer>
-          <div className="flex flex-col gap-4 py-8 items-center justify-center">
-            <SectionIntro
-              title="Community and Influence"
-              description="Communities are the learning engine behind every early-stage startup."
-              text="Founders follow newsletters like Lenny’s and TLDR, listen to Acquired and The AI Breakdown, and post selectively on X/Twitter and GitHub. Tool discovery happens through peer recommendations and hands-on testing—not ads."
-            />
-
-            <NewslettersPaidForChart />
-            <PodcastsListenedToChart />
-            <RegularSocialMediaUseChart />
-          </div>
-        </SectionContainer>
+        <SurveySection
+          number={5}
+          title="Community and Influence"
+          description="Communities are the learning engine behind every early-stage startup."
+        >
+          <NewslettersPaidForChart />
+          <PodcastsListenedToChart />
+          <RegularSocialMediaUseChart />
+        </SurveySection>
       </DefaultLayout>
     </>
   )
@@ -305,12 +324,12 @@ const Hero = (props: any) => {
     if (!animRef.current) return
 
     const strings = [
-      "What's your tech stack?",
-      "What's your favorite AI developer tool?",
-      'Which vector database are you using?',
-      'Are you building AI Agents?',
-      'Do you use OpenTelemetry?',
-      'Where do you go to learn?',
+      'What’s in a modern tech stack?',
+      'Where is AI delivering real product value?',
+      'Which dev tools do builders swear by?',
+      'How do technical founders think about growth in 2025?',
+      'Where are early users really coming from?',
+      'Which tools save founders the most time?',
     ]
 
     let currentIndex = 0

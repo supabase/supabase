@@ -15,8 +15,11 @@ import {
 } from 'recharts'
 
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import type { LANG } from '~/components/CodeBlock/CodeBlock'
 import { ChartConfig, ChartContainer } from 'ui'
 import { SurveyCodeWindow } from './SurveyCodeWindow'
+import { FilterDropdown } from './FilterDropdown'
 
 const chartConfig = {
   value: {
@@ -225,102 +228,121 @@ export function GenericChartWithQuery({
     'hsl(var(--foreground-light))',
   ]
   // One for a clear binary answer (e.g. "Yes", "No")
-  const COLORS_BINARY = ['hsl(var(--brand-default))', 'hsl(var(--foreground-light))']
+  const COLORS_BINARY = ['hsl(var(--brand-default))', 'hsl(var(--foreground-muted))']
 
   return (
-    <div className="w-full flex flex-row gap-4">
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-foreground-lighter">Loading data...</div>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="text-red-500">Error: {error}</div>
-            </div>
-          ) : (
-            <ChartContainer config={chartConfig}>
-              {chartType === 'bar' && (
-                <BarChart
-                  accessibilityLayer
-                  data={chartData}
-                  layout="vertical"
-                  margin={{
-                    right: 0,
+    <Card className="w-full overflow-hidden">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-foreground-lighter">Loading data...</div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-red-500">Error: {error}</div>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            {chartType === 'bar' && (
+              <BarChart
+                accessibilityLayer
+                data={chartData}
+                layout="vertical"
+                margin={{
+                  right: 0,
+                }}
+              >
+                <CartesianGrid horizontal={false} />
+                <YAxis
+                  dataKey="label"
+                  type="category"
+                  tickLine={false}
+                  tickMargin={64}
+                  axisLine={false}
+                  hide={false}
+                  width={64}
+                  tick={{
+                    className: 'text-foreground-lighter',
+                    fontSize: 12,
+                    textAnchor: 'start',
+                    dx: 0,
                   }}
-                >
-                  <CartesianGrid horizontal={false} />
-                  <YAxis
-                    dataKey="label"
-                    type="category"
-                    tickLine={false}
-                    tickMargin={64}
-                    axisLine={false}
-                    hide={false}
-                    width={64}
-                    tick={{
-                      className: 'text-foreground-lighter',
-                      fontSize: 12,
-                      textAnchor: 'start',
-                      dx: 0,
-                    }}
-                  />
-                  <XAxis dataKey="value" type="number" hide />
-                  <Bar dataKey="value" layout="vertical" radius={4}>
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill="hsl(var(--brand-default))" />
-                    ))}
-                    <LabelList
-                      dataKey="value"
-                      position="right"
-                      offset={8}
-                      className="fill-foreground"
-                      fontSize={12}
-                      formatter={(value: number) => `${value}%`}
+                />
+                <XAxis dataKey="value" type="number" hide />
+                <Bar dataKey="value" layout="vertical" radius={4}>
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={index === 0 ? COLORS_BINARY[0] : COLORS_BINARY[1]}
                     />
-                  </Bar>
-                </BarChart>
-              )}
-              {chartType === 'pie' && (
-                <PieChart>
-                  <Pie
-                    data={chartData}
+                  ))}
+                  <LabelList
                     dataKey="value"
-                    innerRadius={60}
-                    outerRadius={100}
-                    // startAngle={15}
-                    paddingAngle={2}
-                    // label={renderCustomizedLabel}
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          chartData.length === 2
-                            ? COLORS_BINARY[index % COLORS_BINARY.length]
-                            : COLORS[index % COLORS.length]
-                        }
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              )}
-            </ChartContainer>
-          )}
-        </CardContent>
-      </Card>
-      <SurveyCodeWindow
+                    position="right"
+                    offset={8}
+                    className="fill-foreground"
+                    fontSize={12}
+                    formatter={(value: number) => `${value}%`}
+                  />
+                </Bar>
+              </BarChart>
+            )}
+            {chartType === 'pie' && (
+              <PieChart>
+                <Pie
+                  data={chartData}
+                  dataKey="value"
+                  innerRadius={60}
+                  outerRadius={100}
+                  // startAngle={15}
+                  paddingAngle={2}
+                  // label={renderCustomizedLabel}
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        chartData.length === 2
+                          ? COLORS_BINARY[index % COLORS_BINARY.length]
+                          : COLORS[index % COLORS.length]
+                      }
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            )}
+          </ChartContainer>
+        )}
+      </CardContent>
+      {/* <SurveyCodeWindow
         code={sqlQuery}
         lang="sql"
         className="w-full"
         filters={filters}
         activeFilters={activeFilters}
         setFilterValue={setFilterValue}
-      />
-    </div>
+      /> */}
+      <div className="flex flex-col">
+        {filters && activeFilters && setFilterValue && (
+          <div className="flex flex-wrap gap-4 p-4 border-b border-border">
+            {Object.entries(filters).map(([filterKey, filterConfig]) => (
+              <FilterDropdown
+                filterKey={filterKey}
+                filterConfig={filterConfig}
+                selectedValue={activeFilters[filterKey]}
+                setFilterValue={setFilterValue}
+              />
+            ))}
+          </div>
+        )}
+
+        <CodeBlock lang="sql" size="small" showLineNumbers={true} rounded={false}>
+          {sqlQuery}
+        </CodeBlock>
+      </div>
+    </Card>
   )
 }

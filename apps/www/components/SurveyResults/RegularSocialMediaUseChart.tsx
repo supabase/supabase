@@ -23,8 +23,8 @@ function generateRegularSocialMediaUseSQL(activeFilters: Record<string, string>)
   WHERE role = 'Founder / Co-founder'
 )
 SELECT
-  platform AS social_media,
-  COUNT(*)::float / (SELECT COUNT(*) FROM founders) * 100 AS total
+  platform AS label,
+  COUNT(*) AS total
 FROM (
   SELECT id, unnest(regular_social_media_use) AS platform
   FROM founders
