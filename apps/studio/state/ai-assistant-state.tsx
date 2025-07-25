@@ -2,6 +2,7 @@ import type { Message as MessageType } from 'ai/react'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -234,7 +235,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
-      const chatId = crypto.randomUUID()
+      const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
         name: options?.name ?? 'Untitled',

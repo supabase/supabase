@@ -61,6 +61,7 @@
         "NEXT_PUBLIC_NODE_ENV",
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
+        "NEXT_PUBLIC_GOOGLE_MAPS_KEY",
         "NODE_ENV",
         "SUPABASE_URL",
         // These envs are used in the packages
