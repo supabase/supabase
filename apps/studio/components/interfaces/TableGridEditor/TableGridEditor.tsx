@@ -13,7 +13,6 @@ import {
   isView,
 } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -39,7 +38,6 @@ export const TableGridEditor = ({
   const { ref: projectRef, id } = useParams()
 
   const tabs = useTabsStateSnapshot()
-  const { selectedSchema } = useQuerySchemaState()
 
   useLoadTableEditorStateFromLocalStorageIntoUrl({
     projectRef,

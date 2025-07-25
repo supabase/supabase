@@ -32,8 +32,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { BillingCustomerDataNewOrgDialog } from '../BillingSettings/BillingCustomerData/BillingCustomerDataNewOrgDialog'
-import { FormCustomerData } from '../BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import { useConfirmPendingSubscriptionCreateMutation } from 'data/subscriptions/org-subscription-confirm-pending-create'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
@@ -41,7 +39,12 @@ import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
 import { useProfile } from 'lib/profile'
 import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
 import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import { NewPaymentMethodElement } from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from '../BillingSettings/PaymentMethods/NewPaymentMethodElement'
+import { components } from 'api-types'
+import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -68,11 +71,13 @@ interface NewOrgFormProps {
   onPlanSelected: (plan: string) => void
 }
 
+const plans = ['FREE', 'PRO', 'TEAM'] as const
+
 const formSchema = z.object({
   plan: z
     .string()
     .transform((val) => val.toUpperCase())
-    .pipe(z.enum(['FREE', 'PRO', 'TEAM', 'ENTERPRISE'] as const)),
+    .pipe(z.enum(plans)),
   name: z.string().min(1),
   kind: z
     .string()
@@ -87,6 +92,8 @@ const formSchema = z.object({
 type FormState = z.infer<typeof formSchema>
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
+
+const newMandatoryAddressInput = true
 
 /**
  * No org selected yet, create a new one
@@ -112,8 +119,6 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 
   const [isOrgCreationConfirmationModalVisible, setIsOrgCreationConfirmationModalVisible] =
     useState(false)
-
-  const [customerData, setCustomerData] = useState<FormCustomerData | null>(null)
 
   const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
     () =>
@@ -149,9 +154,10 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
 
     if (typeof name === 'string') updateForm('name', name)
     if (typeof kind === 'string') updateForm('kind', kind)
-    if (typeof plan === 'string') {
-      updateForm('plan', plan)
-      onPlanSelected(plan)
+    if (typeof plan === 'string' && plans.includes(plan.toUpperCase() as (typeof plans)[number])) {
+      const uppercasedPlan = plan.toUpperCase() as (typeof plans)[number]
+      updateForm('plan', uppercasedPlan)
+      onPlanSelected(uppercasedPlan)
     }
     if (typeof size === 'string') updateForm('size', size)
     if (typeof spend_cap === 'string') updateForm('spend_cap', spend_cap === 'true')
@@ -241,7 +247,14 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
-  async function createOrg(paymentMethodId?: string) {
+  async function createOrg(
+    paymentMethodId?: string,
+    customerData?: {
+      address: CustomerAddress | null
+      billing_name: string | null
+      tax_id: CustomerTaxId | null
+    }
+  ) {
     const dbTier = formState.plan === 'PRO' && !formState.spend_cap ? 'PAYG' : formState.plan
 
     createOrganization({
@@ -251,17 +264,16 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
         | 'tier_payg'
         | 'tier_pro'
         | 'tier_free'
-        | 'tier_team'
-        | 'tier_enterprise',
+        | 'tier_team',
       ...(formState.kind == 'COMPANY' ? { size: formState.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
-      address: dbTier === 'FREE' ? undefined : customerData?.address,
+      address: dbTier === 'FREE' ? null : customerData?.address,
       tax_id: dbTier === 'FREE' ? undefined : customerData?.tax_id ?? undefined,
     })
   }
 
-  const paymentRef = useRef<{ createPaymentMethod: () => Promise<any> }>(null)
+  const paymentRef = useRef<PaymentMethodElementRef | null>(null)
 
   const handleSubmit = async () => {
     setNewOrgLoading(true)
@@ -269,10 +281,16 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
     if (formState.plan === 'FREE') {
       await createOrg()
     } else if (!paymentMethod) {
-      const paymentMethod = await paymentRef.current?.createPaymentMethod()
-      if (paymentMethod) {
-        setPaymentMethod(paymentMethod)
-        createOrg(paymentMethod.id)
+      const result = await paymentRef.current?.createPaymentMethod()
+      if (result) {
+        setPaymentMethod(result.paymentMethod)
+        const customerData = {
+          address: result.address,
+          billing_name: result.customerName,
+          tax_id: result.taxId,
+        }
+
+        createOrg(result.paymentMethod.id, customerData)
       } else {
         setNewOrgLoading(false)
       }
@@ -338,6 +356,7 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
             </div>
           </div>
         }
+        className="overflow-visible"
       >
         <Panel.Content>
           <p className="text-sm">This is your organization within Supabase.</p>
@@ -528,21 +547,6 @@ const NewOrgForm = ({ onPaymentMethodReset, setupIntent, onPlanSelected }: NewOr
               onHide={() => setShowSpendCapHelperModal(false)}
             />
           </>
-        )}
-
-        {formState.plan !== 'FREE' && (
-          <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
-            <div className="grid grid-cols-3">
-              <div className="col-span-1 flex space-x-2 text-sm items-center">
-                <Label_Shadcn_ htmlFor="spend-cap" className=" leading-normal">
-                  Billing Address
-                </Label_Shadcn_>
-              </div>
-              <div className="col-span-2">
-                <BillingCustomerDataNewOrgDialog onCustomerDataChange={setCustomerData} />
-              </div>
-            </div>
-          </Panel.Content>
         )}
 
         {setupIntent && formState.plan !== 'FREE' && (

@@ -1,7 +1,7 @@
 import type { Message as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, FileText, Info, RefreshCw, Settings, X } from 'lucide-react'
+import { ArrowDown, Info, RefreshCw, Settings, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -19,21 +19,21 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
+import type { AssistantMessageType } from 'state/ai-assistant-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, cn } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary'
+import { type SqlSnippet } from './AIAssistant.types'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOnboarding } from './AIOnboarding'
 import { AIOptInModal } from './AIOptInModal'
 import { AssistantChatForm } from './AssistantChatForm'
-import { type SqlSnippet } from './AIAssistant.types'
 import { Message } from './Message'
 import { useAutoScroll } from './hooks'
-import type { AssistantMessageType } from 'state/ai-assistant-state'
 
 const MemoizedMessage = memo(
   ({
@@ -80,9 +80,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { ref, id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
 
-  const newOrgAiOptIn = useFlag('newOrgAiOptIn')
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const useBedrockAssistant = useFlag('useBedrockAssistant')
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
 
@@ -98,8 +96,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const showMetadataWarning =
     IS_PLATFORM &&
     !!selectedOrganization &&
-    ((!useBedrockAssistant && aiOptInLevel === 'disabled') ||
-      (useBedrockAssistant && (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')))
+    (aiOptInLevel === 'disabled' || aiOptInLevel === 'schema')
 
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
@@ -154,9 +151,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     reload,
   } = useChat({
     id: snap.activeChatId,
-    api: useBedrockAssistant
-      ? `${BASE_PATH}/api/ai/sql/generate-v4`
-      : `${BASE_PATH}/api/ai/sql/generate-v3`,
+    api: `${BASE_PATH}/api/ai/sql/generate-v4`,
     maxSteps: 5,
     // [Alaister] typecast is needed here because valtio returns readonly arrays
     // and useChat expects a mutable array
@@ -196,9 +191,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         schema: currentSchema,
         table: currentTable?.name,
         chatName: currentChat,
-        includeSchemaMetadata: !useBedrockAssistant
-          ? !IS_PLATFORM || aiOptInLevel !== 'disabled'
-          : undefined,
         orgSlug: selectedOrganization?.slug,
       })
     },
@@ -392,7 +384,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               <Admonition
                 type="default"
                 title={
-                  newOrgAiOptIn && !updatedOptInSinceMCP
+                  !updatedOptInSinceMCP
                     ? 'The Assistant has just been updated to help you better!'
                     : isHipaaProjectDisallowed
                       ? 'Project metadata is not shared due to HIPAA'
@@ -401,7 +393,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                         : 'Limited metadata is shared to the Assistant'
                 }
                 description={
-                  newOrgAiOptIn && !updatedOptInSinceMCP
+                  !updatedOptInSinceMCP
                     ? 'You may now opt-in to share schema metadata and even logs for better results'
                     : isHipaaProjectDisallowed
                       ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
