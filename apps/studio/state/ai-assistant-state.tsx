@@ -2,6 +2,7 @@ import type { Message as MessageType } from 'ai/react'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -234,7 +235,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         Pick<AiAssistantData, 'open' | 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
       >
     ) => {
-      const chatId = crypto.randomUUID()
+      const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
         name: options?.name ?? 'Untitled',
@@ -301,9 +302,9 @@ export const createAiAssistantState = (): AiAssistantState => {
       const existingMessages = chat.messages
       const messagesToAdd = Array.isArray(message)
         ? message.filter(
-            (msg) =>
-              !existingMessages.some((existing: AssistantMessageType) => existing.id === msg.id)
-          )
+          (msg) =>
+            !existingMessages.some((existing: AssistantMessageType) => existing.id === msg.id)
+        )
         : !existingMessages.some((existing: AssistantMessageType) => existing.id === message.id)
           ? [message]
           : []
@@ -476,15 +477,15 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
           activeChatId: snap.activeChatId,
           chats: snap.chats
             ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
-                // Limit messages before saving
-                return {
-                  ...acc,
-                  [chatId]: {
-                    ...chat,
-                    messages: chat.messages?.slice(-20) || [],
-                  },
-                }
-              }, {})
+              // Limit messages before saving
+              return {
+                ...acc,
+                [chatId]: {
+                  ...chat,
+                  messages: chat.messages?.slice(-20) || [],
+                },
+              }
+            }, {})
             : {},
         }
         debouncedSaveAiState(stateToSave)
