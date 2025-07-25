@@ -77,7 +77,7 @@ export const useProtectedSchemas = ({
 
   const schemas = useMemo<{ name: string; type: 'fdw' | 'internal' }[]>(() => {
     const internalSchemas = INTERNAL_SCHEMAS.map((s) => ({ name: s, type: 'internal' as const }))
-    const fdwSchemas = result.data?.map((s) => ({ name: s, type: 'fdw' as const }))
+    const icebergFdwSchemas = result.data?.map((s) => ({ name: s, type: 'fdw' as const }))
 
     const schemas = uniq([...internalSchemas, ...fdwSchemas])
     return schemas.filter((schema) => !stableExcludeSchemas.includes(schema.name))
