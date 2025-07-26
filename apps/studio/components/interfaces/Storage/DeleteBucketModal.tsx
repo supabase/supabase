@@ -25,7 +25,7 @@ import {
 import { Admonition } from 'ui-patterns'
 
 export interface DeleteBucketModalProps {
-  bucket?: Bucket
+  bucket: Bucket
   onClose: () => void
 }
 
@@ -54,7 +54,7 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
         storageObjectsPolicies
       )
       const bucketPolicies = _get(
-        find(formattedStorageObjectPolicies, { name: bucket!.name }),
+        find(formattedStorageObjectPolicies, { name: bucket.name }),
         ['policies'],
         []
       )
@@ -70,12 +70,12 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
           )
         )
 
-        toast.success(`Successfully deleted bucket ${bucket?.name}`)
+        toast.success(`Successfully deleted bucket ${bucket.name}`)
         router.push(`/project/${projectRef}/storage/buckets`)
         onClose()
       } catch (error) {
         toast.success(
-          `Successfully deleted bucket ${bucket?.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
+          `Successfully deleted bucket ${bucket.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
         )
       }
     },
@@ -100,7 +100,7 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{`Confirm deletion of ${bucket?.name}`}</DialogTitle>
+          <DialogTitle>{`Confirm deletion of ${bucket.name}`}</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-4">
@@ -110,14 +110,14 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
             description="All bucket data will be lost."
           />
           <p>
-            Your bucket <span className="font-bold text-foreground">{bucket?.name}</span> and all
-            its contents will be permanently deleted.
+            Your bucket <span className="font-bold text-foreground">{bucket.name}</span> and all its
+            contents will be permanently deleted.
           </p>
         </DialogSection>
         <DialogSectionSeparator />
         <DialogSection>
           <Label_Shadcn_ htmlFor="confirm">
-            Type <span className="font-bold text-foreground">{bucket?.name ?? ''}</span> to confirm.
+            Type <span className="font-bold text-foreground">{bucket.name}</span> to confirm.
           </Label_Shadcn_>
           <Input_Shadcn_
             id="confirm"
@@ -133,7 +133,7 @@ export const DeleteBucketModal = ({ bucket, onClose }: DeleteBucketModalProps) =
           </Button>
           <Button
             type="danger"
-            disabled={value !== bucket?.name ?? ``}
+            disabled={value !== bucket.name}
             loading={isLoading}
             onClick={onDeleteBucket}
           >

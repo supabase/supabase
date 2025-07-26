@@ -93,10 +93,12 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
     mode: 'onSubmit',
   })
 
-  const { public: isPublic, has_file_size_limit, formatted_size_limit } = form.getValues()
-  const isChangingBucketVisibility = bucket?.public !== isPublic
-  const isMakingBucketPrivate = bucket?.public && !isPublic
-  const isMakingBucketPublic = !bucket?.public && isPublic
+  const isPublicBucket = form.watch('public')
+  const hasFileSizeLimit = form.watch('has_file_size_limit')
+  const formattedSizeLimit = form.watch('formatted_size_limit')
+  const isChangingBucketVisibility = bucket?.public !== isPublicBucket
+  const isMakingBucketPrivate = bucket?.public && !isPublicBucket
+  const isMakingBucketPublic = !bucket?.public && isPublicBucket
 
   const onSubmit: SubmitHandler<z.infer<typeof BucketSchema>> = async (values) => {
     if (bucket === undefined) return console.error('Bucket is required')
@@ -259,7 +261,7 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
                         </FormItemLayout>
                       )}
                     />
-                    {has_file_size_limit && (
+                    {hasFileSizeLimit && (
                       <div className="grid grid-cols-12 col-span-12 gap-x-2 gap-y-1">
                         <div className="col-span-8">
                           <FormField_Shadcn_
@@ -270,7 +272,7 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
                               <FormItemLayout
                                 name="formatted_size_limit"
                                 description={`Equivalent to ${convertToBytes(
-                                  formatted_size_limit,
+                                  formattedSizeLimit,
                                   selectedUnit as StorageSizeUnits
                                 ).toLocaleString()} bytes.`}
                               >
