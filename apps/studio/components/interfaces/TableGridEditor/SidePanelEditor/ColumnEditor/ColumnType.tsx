@@ -274,7 +274,11 @@ const ColumnType = ({
       </Popover_Shadcn_>
 
       {/* This line displays the error message */}
-      {error && <p className="text-red-900 transition-all data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm">{error}</p>}
+      {error && (
+        <p className="text-red-900 transition-all data-show:mt-2 data-show:animate-slide-down-normal data-hide:animate-slide-up-normal text-sm">
+          {error}
+        </p>
+      )}
 
       {showRecommendation && recommendation !== undefined && (
         <Alert_Shadcn_ variant="warning" className="mt-2">
