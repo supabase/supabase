@@ -5,6 +5,7 @@ import { databaseExtensionsKeys } from './keys'
 import { components } from 'api-types'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension']
 
@@ -15,17 +16,19 @@ export type DatabaseExtensionsVariables = {
 
 export async function getDatabaseExtensions(
   { projectRef, connectionString }: DatabaseExtensionsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
+  let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/extensions', {
     params: {
       header: {
         'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
       },
       path: {
         ref: projectRef,

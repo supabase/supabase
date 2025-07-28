@@ -1,12 +1,14 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useState } from 'react'
 import {
   Area,
   Bar,
   CartesianGrid,
+  Label,
   Line,
   ComposedChart as RechartComposedChart,
   ReferenceArea,
@@ -14,7 +16,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Label,
 } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
@@ -32,11 +33,10 @@ import {
   calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
-  type MultiAttribute,
+  MultiAttribute,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
-import { formatBytes } from 'lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   attributes: MultiAttribute[]
@@ -58,6 +58,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartStyle?: string
   onChartStyleChange?: (style: string) => void
   updateDateRange: any
+  titleTooltip?: string
   hideYAxis?: boolean
   hideHighlightedValue?: boolean
   syncId?: string
@@ -114,6 +115,22 @@ export default function ComposedChart({
 
   const { Container } = useChartSize(size)
 
+  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+
+  const formatTimestamp = (ts: unknown) => {
+    if (typeof ts !== 'number' && typeof ts !== 'string') {
+      return ''
+    }
+
+    // Timestamps from auth logs can be in microseconds
+    if (typeof ts === 'number' && ts > 1e14) {
+      return day(ts / 1000).format(customDateFormat)
+    }
+
+    // dayjs can handle ISO strings and millisecond numbers
+    return day(ts).format(customDateFormat)
+  }
+
   // Default props
   const _XAxisProps = XAxisProps || {
     interval: data.length - 2,
@@ -127,18 +144,19 @@ export default function ComposedChart({
     width: 0,
   }
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
-
   function getHeaderLabel() {
     if (!xAxisIsDate) {
       if (!focusDataIndex) return highlightedLabel
-      return data[focusDataIndex]?.timestamp
+      return data[focusDataIndex]?.[xAxisKey]
     }
     return (
       (focusDataIndex !== null &&
         data &&
         data[focusDataIndex] !== undefined &&
-        day(data[focusDataIndex].timestamp).format(customDateFormat)) ||
+        (() => {
+          const ts = data[focusDataIndex][xAxisKey]
+          return formatTimestamp(ts)
+        })()) ||
       highlightedLabel
     )
   }
@@ -155,7 +173,12 @@ export default function ComposedChart({
           dataKey: key,
           value: value as number,
         }))
-        .filter((entry) => entry.dataKey !== 'timestamp')
+        .filter(
+          (entry) =>
+            entry.dataKey !== 'timestamp' &&
+            entry.dataKey !== 'period_start' &&
+            attributes.some((attr) => attr.attribute === entry.dataKey && attr.enabled !== false)
+        )
     : undefined
   const referenceLines = attributes.filter((attribute) => attribute?.provider === 'reference-line')
 
@@ -187,29 +210,44 @@ export default function ComposedChart({
   const chartData =
     data && !!data[0]
       ? Object.entries(data[0])
-          ?.map(([key, value], index) => ({
+          ?.map(([key, value]) => ({
             name: key,
             value: value,
-            color: STACKED_CHART_COLORS[index - (1 % STACKED_CHART_COLORS.length)],
           }))
           .filter(
             (att) =>
               att.name !== 'timestamp' &&
+              att.name !== 'period_start' &&
               att.name !== maxAttribute?.attribute &&
-              !referenceLines.map((a) => a.attribute).includes(att.name)
+              !referenceLines.map((a) => a.attribute).includes(att.name) &&
+              attributes.some((attr) => attr.attribute === att.name && attr.enabled !== false)
           )
+          .map((att, index) => {
+            const attribute = attributes.find((attr) => attr.attribute === att.name)
+            return {
+              ...att,
+              color: attribute?.color
+                ? resolvedTheme?.includes('dark')
+                  ? attribute.color.dark
+                  : attribute.color.light
+                : STACKED_CHART_COLORS[index % STACKED_CHART_COLORS.length],
+            }
+          })
       : []
 
   const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
   const isPercentage = format === '%'
-  const isRamChart = chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
+  const isRamChart =
+    !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
+    chartData?.some((att: any) => att.name.toLowerCase().includes('ram_'))
   const isDiskSpaceChart = chartData?.some((att: any) =>
     att.name.toLowerCase().includes('disk_space_')
   )
-  const isDiskSizeChart = chartData?.some((att: any) => att.name.toLowerCase().includes('disk_fs_'))
+  const isDBSizeChart = chartData?.some((att: any) =>
+    att.name.toLowerCase().includes('pg_database_size')
+  )
   const isNetworkChart = chartData?.some((att: any) => att.name.toLowerCase().includes('network_'))
-  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDiskSizeChart || isNetworkChart
-
+  const shouldFormatBytes = isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
   //*
   // Set the y-axis domain
   // to the highest value in the chart data for percentage charts
@@ -315,6 +353,7 @@ export default function ComposedChart({
               showTooltip ? (
                 <CustomTooltip
                   {...props}
+                  format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}
                   attributes={attributes}
@@ -387,6 +426,7 @@ export default function ComposedChart({
                 y={line.value}
                 strokeWidth={1}
                 {...line}
+                color={line.color?.dark}
                 strokeDasharray={line.strokeDasharray ?? '3 3'}
                 label={undefined}
               >
@@ -418,13 +458,11 @@ export default function ComposedChart({
           className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"
           style={{ marginLeft: YAxisProps?.width }}
         >
-          <span>
-            {xAxisIsDate ? day(data[0]?.timestamp).format(customDateFormat) : data[0]?.timestamp}
-          </span>
+          <span>{xAxisIsDate ? formatTimestamp(data[0]?.[xAxisKey]) : data[0]?.[xAxisKey]}</span>
           <span>
             {xAxisIsDate
-              ? day(data[data?.length - 1]?.timestamp).format(customDateFormat)
-              : data[data?.length - 1]?.timestamp}
+              ? formatTimestamp(data[data.length - 1]?.[xAxisKey])
+              : data[data.length - 1]?.[xAxisKey]}
           </span>
         </div>
       )}

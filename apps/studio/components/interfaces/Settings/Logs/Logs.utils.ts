@@ -474,8 +474,12 @@ export const fillTimeseries = (
   defaultValue: number,
   min?: string,
   max?: string,
-  minPointsToFill: number = 20
+  minPointsToFill: number = 20,
+  interval?: string
 ) => {
+  if (timeseriesData.length === 0 && !(min && max)) {
+    return []
+  }
   // If we have more points than minPointsToFill, just normalize timestamps and return
   if (timeseriesData.length > minPointsToFill) {
     return timeseriesData.map((datum) => {
@@ -493,41 +497,61 @@ export const fillTimeseries = (
 
   // const truncationSample = timeseriesData.length > 0 ? timeseriesData[0][timestampKey] : min || max
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
-  const truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+  let truncation: 'second' | 'minute' | 'hour' | 'day'
+  let step = 1
+
+  if (interval) {
+    const match = interval.match(/^(\d+)(m|h|d|s)$/)
+    if (match) {
+      step = parseInt(match[1], 10)
+      const unitChar = match[2] as 'm' | 'h' | 'd' | 's'
+      const unitMap = { s: 'second', m: 'minute', h: 'hour', d: 'day' } as const
+      truncation = unitMap[unitChar]
+    } else {
+      // Fallback for invalid format
+      truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+    }
+  } else {
+    truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+  }
 
   const newData = timeseriesData.map((datum) => {
-    const iso = dayjs.utc(datum[timestampKey]).toISOString()
+    const timestamp = datum[timestampKey]
+    const iso = isUnixMicro(timestamp)
+      ? unixMicroToIsoTimestamp(timestamp)
+      : dayjs.utc(timestamp).toISOString()
     datum[timestampKey] = iso
     return datum
   })
 
-  const diff = maxDate.diff(minDate, truncation as dayjs.UnitType)
-  // Intentional throwing of error here to be caught by Sentry, as this would indicate a bug since charts shouldn't be rendering more than 10k data points
-  if (diff > 10000) {
-    throw new Error(
-      'The selected date range will render more than 10,000 data points within the charts, which will degrade browser performance. Please select a smaller date range.'
-    )
-  }
+  let currentDate = minDate
+  while (currentDate.isBefore(maxDate) || currentDate.isSame(maxDate)) {
+    const found = dates.find((d) => {
+      const d_date = d as Dayjs
+      return (
+        d_date.year() === currentDate.year() &&
+        d_date.month() === currentDate.month() &&
+        d_date.date() === currentDate.date() &&
+        d_date.hour() === currentDate.hour() &&
+        d_date.minute() === currentDate.minute()
+      )
+    })
+    if (!found) {
+      const keys = typeof valueKey === 'string' ? [valueKey] : valueKey
 
-  for (let i = 0; i <= diff; i++) {
-    const dateToMaybeAdd = minDate.add(i, truncation as dayjs.ManipulateType)
-
-    const keys = typeof valueKey === 'string' ? [valueKey] : valueKey
-
-    const toMerge = keys.reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: defaultValue,
-      }),
-      {}
-    )
-
-    if (!dates.find((d) => isEqual(d, dateToMaybeAdd))) {
+      const toMerge = keys.reduce(
+        (acc, key) => ({
+          ...acc,
+          [key]: defaultValue,
+        }),
+        {}
+      )
       newData.push({
-        [timestampKey]: dateToMaybeAdd.toISOString(),
+        [timestampKey]: currentDate.toISOString(),
         ...toMerge,
       })
     }
+    currentDate = currentDate.add(step, truncation)
   }
 
   return newData

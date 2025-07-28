@@ -61,7 +61,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns,
   },
   async headers() {

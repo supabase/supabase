@@ -12,6 +12,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
+import { TermsUpdateBanner } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const org = useSelectedOrganization()
@@ -38,6 +39,7 @@ const ProjectsPage: NextPageWithLayout = () => {
         </Admonition>
       ) : (
         <div>
+          <TermsUpdateBanner />
           <HomePageActions
             search={search}
             setSearch={setSearch}

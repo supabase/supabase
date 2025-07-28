@@ -7,8 +7,9 @@ import type {
   Table,
   VisibilityState,
 } from '@tanstack/react-table'
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, ReactNode, useContext, useMemo } from 'react'
 
+import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { DataTableFilterField } from '../DataTable.types'
 import { ControlsProvider } from './ControlsProvider'
 
@@ -23,13 +24,16 @@ interface DataTableStateContextType {
   columnVisibility: VisibilityState
   pagination: PaginationState
   enableColumnOrdering: boolean
+  searchParameters: QuerySearchParamsType
 }
 
 interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
   table: Table<TData>
   filterFields: DataTableFilterField<TData>[]
   columns: ColumnDef<TData, TValue>[]
+  isFetching?: boolean
   isLoading?: boolean
+  isLoadingCounts?: boolean
   getFacetedUniqueValues?: (table: Table<TData>, columnId: string) => Map<string, number>
   getFacetedMinMaxValues?: (table: Table<TData>, columnId: string) => undefined | [number, number]
 }
@@ -45,7 +49,7 @@ export function DataTableProvider<TData, TValue>({
   ...props
 }: Partial<DataTableStateContextType> &
   DataTableBaseContextType<TData, TValue> & {
-    children: React.ReactNode
+    children: ReactNode
   }) {
   const value = useMemo(
     () => ({
@@ -57,6 +61,7 @@ export function DataTableProvider<TData, TValue>({
       columnVisibility: props.columnVisibility ?? {},
       pagination: props.pagination ?? { pageIndex: 0, pageSize: 10 },
       enableColumnOrdering: props.enableColumnOrdering ?? false,
+      searchParameters: props.searchParameters ?? ({} as any),
     }),
     [props]
   )

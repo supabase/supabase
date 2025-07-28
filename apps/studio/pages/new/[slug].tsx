@@ -146,6 +146,15 @@ const Wizard: NextPageWithLayout = () => {
     ''
   )
 
+  // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
+  if (slug === 'last-visited-org') {
+    if (lastVisitedOrganization) {
+      router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+    } else {
+      router.replace(`/new/_`, undefined, { shallow: true })
+    }
+  }
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -156,7 +165,10 @@ const Wizard: NextPageWithLayout = () => {
     { enabled: isFreePlan }
   )
 
-  const { data: approvedOAuthApps } = useAuthorizedAppsQuery({ slug }, { enabled: !isFreePlan })
+  const { data: approvedOAuthApps } = useAuthorizedAppsQuery(
+    { slug },
+    { enabled: !isFreePlan && slug !== '_' }
+  )
 
   const hasOAuthApps = approvedOAuthApps && approvedOAuthApps.length > 0
 
@@ -368,7 +380,7 @@ const Wizard: NextPageWithLayout = () => {
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
-      organizationId: currentOrg.id,
+      organizationSlug: currentOrg.slug,
       name: projectName,
       dbPass: dbPass,
       dbRegion: dbRegion,
@@ -623,7 +635,9 @@ const Wizard: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isAdmin && !orgNotFound && <NotOrganizationOwnerWarning slug={slug} />}
+                  {isOrganizationsSuccess && !isAdmin && !orgNotFound && (
+                    <NotOrganizationOwnerWarning slug={slug} />
+                  )}
                   {orgNotFound && <OrgNotFound slug={slug} />}
                 </Panel.Content>
 
@@ -951,8 +965,8 @@ const Wizard: NextPageWithLayout = () => {
           size="large"
           loading={false}
           visible={isComputeCostsConfirmationModalVisible}
-          title={<>Confirm compute costs</>}
-          confirmLabel="Confirm"
+          title="Confirm compute costs"
+          confirmLabel="I understand"
           onCancel={() => setIsComputeCostsConfirmationModalVisible(false)}
           onConfirm={async () => {
             const values = form.getValues()
@@ -965,7 +979,7 @@ const Wizard: NextPageWithLayout = () => {
             <p>
               Launching a project on compute size "{instanceLabel(instanceSize)}" increases your
               monthly costs by ${additionalMonthlySpend}, independent of how actively you use it. By
-              clicking "Confirm", you agree to the additional costs.{' '}
+              clicking "I understand", you agree to the additional costs.{' '}
               <Link
                 href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                 target="_blank"

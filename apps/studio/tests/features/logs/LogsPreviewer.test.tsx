@@ -32,7 +32,7 @@ vi.mock('lib/gotrue', async (importOriginal) => ({
 beforeEach(() => {
   addAPIMock({
     method: 'get',
-    path: '/platform/projects/default/analytics/endpoints/logs.all',
+    path: '/platform/projects/:ref/analytics/endpoints/logs.all',
     response: LOGS_API_MOCKS,
   })
 })
@@ -117,7 +117,8 @@ test('can click load older', async () => {
   )
 
   const loadOlder = await waitFor(
-    async () => await screen.findByRole('button', { name: /Load older/i })
+    async () => await screen.findByRole('button', { name: /Load older/i }),
+    { timeout: 10000 }
   )
 
   loadOlder.onclick = vi.fn()

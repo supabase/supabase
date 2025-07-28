@@ -19,11 +19,11 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { isError } from 'data/utils/error-check'
-import { useOrgOptedIntoAiAndHippaProject } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { formatSql } from 'lib/formatSql'
 import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -51,7 +51,6 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
@@ -92,10 +91,8 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { isOptedInToAI, isHipaaProjectDisallowed } = useOrgOptedIntoAiAndHippaProject()
+  const { includeSchemaMetadata, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
-  const includeSchemaMetadata = (isOptedInToAI && !isHipaaProjectDisallowed) || !IS_PLATFORM
-  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
 
   const {
     sourceSqlDiff,
@@ -212,10 +209,8 @@ export const SQLEditor = () => {
       try {
         const { title: name } = await generateSqlTitle({ sql })
         snapV2.renameSnippet({ id, name })
-        if (isSQLEditorTabsEnabled && ref) {
-          const tabId = createTabId('sql', { id })
-          tabs.updateTab(tabId, { label: name })
-        }
+        const tabId = createTabId('sql', { id })
+        tabs.updateTab(tabId, { label: name })
       } catch (error) {
         // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
       }
@@ -464,7 +459,7 @@ export const SQLEditor = () => {
     completion,
     isLoading: isCompletionLoading,
   } = useCompletion({
-    api: `${BASE_PATH}/api/ai/sql/complete`,
+    api: `${BASE_PATH}/api/ai/sql/complete-v2`,
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,

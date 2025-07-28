@@ -1,8 +1,8 @@
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
@@ -21,14 +21,11 @@ export function useApiKeysCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { data: settings } = useProjectSettingsV2Query(
-    { projectRef: project?.ref },
-    { enabled: !!project }
-  )
-  const { anonKey, serviceKey } = getAPIKeys(settings)
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
+  const { anonKey, serviceKey, publishableKey, allSecretKeys } = getKeys(apiKeys)
 
   const commands = useMemo(
     () =>
@@ -42,9 +39,10 @@ export function useApiKeysCommands() {
               setIsOpen(false)
             },
             badge: () => (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
                 <Badge>Public</Badge>
+                <Badge className="capitalize">{anonKey.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
@@ -58,13 +56,47 @@ export function useApiKeysCommands() {
               setIsOpen(false)
             },
             badge: () => (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
                 <Badge variant="destructive">Secret</Badge>
+                <Badge className="capitalize">{serviceKey.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
           },
+        project &&
+          publishableKey && {
+            id: 'publishable-key',
+            name: `Copy publishable key`,
+            action: () => {
+              copyToClipboard(publishableKey.api_key ?? '')
+              setIsOpen(false)
+            },
+            badge: () => (
+              <span className="flex items-center gap-x-1">
+                <Badge>Project: {project?.name}</Badge>
+                <Badge className="capitalize">{publishableKey.type}</Badge>
+              </span>
+            ),
+            icon: () => <Key />,
+          },
+        ...(project && allSecretKeys
+          ? allSecretKeys.map((key) => ({
+              id: key.id,
+              name: `Copy secret key (${key.name})`,
+              action: () => {
+                copyToClipboard(key.api_key ?? '')
+                setIsOpen(false)
+              },
+              badge: () => (
+                <span className="flex items-center gap-x-1">
+                  <Badge>Project: {project?.name}</Badge>
+                  <Badge className="capitalize">{key.type}</Badge>
+                </span>
+              ),
+              icon: () => <Key />,
+            }))
+          : []),
         !(anonKey || serviceKey) && {
           id: 'api-keys-project-settings',
           name: 'See API keys in Project Settings',

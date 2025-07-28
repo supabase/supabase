@@ -129,6 +129,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/oauth/authorize/project-claim': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Authorize user through oauth and claim a project
+     * @description Initiates the OAuth authorization flow for the specified provider. After successful authentication, the user can claim ownership of the specified project.
+     */
+    get: operations['v1-oauth-authorize-project-claim']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/oauth/revoke': {
     parameters: {
       query?: never
@@ -218,6 +238,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/organizations/{slug}/project-claim/{token}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project details for the specified organization and claim token */
+    get: operations['v1-get-organization-project-claim']
+    put?: never
+    /** Claims project for the specified organization */
+    post: operations['v1-claim-project-for-organization']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects': {
     parameters: {
       query?: never
@@ -269,7 +307,7 @@ export interface paths {
      * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
-    get: operations['getPerformanceAdvisors']
+    get: operations['v1-get-performance-advisors']
     put?: never
     post?: never
     delete?: never
@@ -290,7 +328,7 @@ export interface paths {
      * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
-    get: operations['getSecurityAdvisors']
+    get: operations['v1-get-security-advisors']
     put?: never
     post?: never
     delete?: never
@@ -315,7 +353,7 @@ export interface paths {
      *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
      *
      */
-    get: operations['getLogs']
+    get: operations['v1-get-project-logs']
     put?: never
     post?: never
     delete?: never
@@ -332,7 +370,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's usage api counts */
-    get: operations['getApiCounts']
+    get: operations['v1-get-project-usage-api-count']
     put?: never
     post?: never
     delete?: never
@@ -349,7 +387,7 @@ export interface paths {
       cookie?: never
     }
     /** Gets project's usage api requests count */
-    get: operations['getApiRequestsCount']
+    get: operations['v1-get-project-usage-request-count']
     put?: never
     post?: never
     delete?: never
@@ -369,7 +407,7 @@ export interface paths {
     get: operations['v1-get-project-api-keys']
     put?: never
     /** Creates a new API key for the project */
-    post: operations['createApiKey']
+    post: operations['v1-create-project-api-key']
     delete?: never
     options?: never
     head?: never
@@ -384,15 +422,15 @@ export interface paths {
       cookie?: never
     }
     /** Get API key */
-    get: operations['getApiKey']
+    get: operations['v1-get-project-api-key']
     put?: never
     post?: never
     /** Deletes an API key for the project */
-    delete: operations['deleteApiKey']
+    delete: operations['v1-delete-project-api-key']
     options?: never
     head?: never
     /** Updates an API key for the project */
-    patch: operations['updateApiKey']
+    patch: operations['v1-update-project-api-key']
     trace?: never
   }
   '/v1/projects/{ref}/api-keys/legacy': {
@@ -403,9 +441,9 @@ export interface paths {
       cookie?: never
     }
     /** Check whether JWT based legacy (anon, service_role) API keys are enabled. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
-    get: operations['checkLegacyApiKeys']
+    get: operations['v1-get-project-legacy-api-keys']
     /** Disable or re-enable JWT based legacy (anon, service_role) API keys. This API endpoint will be removed in the future, check for HTTP 404 Not Found. */
-    put: operations['updateLegacyApiKeys']
+    put: operations['v1-update-project-legacy-api-keys']
     post?: never
     delete?: never
     options?: never
@@ -476,6 +514,45 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/branches/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a database branch
+     * @description Fetches the specified database branch by its name.
+     */
+    get: operations['v1-get-a-branch']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets project claim token */
+    get: operations['v1-get-project-claim-token']
+    put?: never
+    /** Creates project claim token */
+    post: operations['v1-create-project-claim-token']
+    /** Revokes project claim token */
+    delete: operations['v1-delete-project-claim-token']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/config/auth': {
     parameters: {
       query?: never
@@ -501,11 +578,11 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] List all signing keys for the project */
-    get: operations['listSigningKeysForProject']
+    /** List all signing keys for the project */
+    get: operations['v1-get-project-signing-keys']
     put?: never
-    /** [Alpha] Create a new signing key for the project in standby status */
-    post: operations['createSigningKeyForProject']
+    /** Create a new signing key for the project in standby status */
+    post: operations['v1-create-project-signing-key']
     delete?: never
     options?: never
     head?: never
@@ -519,16 +596,34 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Alpha] Get information about a signing key */
-    get: operations['getSigningKeyForProject']
+    /** Get information about a signing key */
+    get: operations['v1-get-project-signing-key']
     put?: never
     post?: never
-    /** [Alpha] Remove a signing key from a project, where the status is previously_used */
-    delete: operations['deleteSigningKey']
+    /** Remove a signing key from a project. Only possible if the key has been in revoked status for a while. */
+    delete: operations['v1-remove-project-signing-key']
     options?: never
     head?: never
-    /** [Alpha] Update a signing key, mainly its status */
-    patch: operations['patchSigningKey']
+    /** Update a signing key, mainly its status */
+    patch: operations['v1-update-project-signing-key']
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/auth/signing-keys/legacy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get the signing key information for the JWT secret imported as signing key for this project. This endpoint will be removed in the future, check for HTTP 404 Not Found. */
+    get: operations['v1-get-legacy-signing-key']
+    put?: never
+    /** Set up the project's existing JWT secret as an in_use JWT signing key. This endpoint will be removed in the future always check for HTTP 404 Not Found. */
+    post: operations['v1-create-legacy-signing-key']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/v1/projects/{ref}/config/auth/sso/providers': {
@@ -576,10 +671,10 @@ export interface paths {
       cookie?: never
     }
     /** Lists all third-party auth integrations */
-    get: operations['listTPAForProject']
+    get: operations['v1-list-project-tpa-integrations']
     put?: never
     /** Creates a new third-party auth integration */
-    post: operations['createTPAForProject']
+    post: operations['v1-create-project-tpa-integration']
     delete?: never
     options?: never
     head?: never
@@ -594,11 +689,11 @@ export interface paths {
       cookie?: never
     }
     /** Get a third-party integration */
-    get: operations['getTPAForProject']
+    get: operations['v1-get-project-tpa-integration']
     put?: never
     post?: never
     /** Removes a third-party auth integration */
-    delete: operations['deleteTPAForProject']
+    delete: operations['v1-delete-project-tpa-integration']
     options?: never
     head?: never
     patch?: never
@@ -778,6 +873,41 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/backups/restore-point': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get restore points for project */
+    get: operations['v1-get-restore-point']
+    put?: never
+    /** Initiates a creation of a restore point for a database */
+    post: operations['v1-create-restore-point']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/backups/undo': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Initiates an undo to a given restore point */
+    post: operations['v1-undo']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/context': {
     parameters: {
       query?: never
@@ -790,7 +920,7 @@ export interface paths {
      * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
-    get: operations['getDatabaseMetadata']
+    get: operations['v1-get-database-metadata']
     put?: never
     post?: never
     delete?: never
@@ -1461,7 +1591,7 @@ export interface components {
       result?: unknown[]
     }
     ApiKeyResponse: {
-      api_key: string
+      api_key?: string | null
       description?: string | null
       hash?: string | null
       id?: string | null
@@ -1473,7 +1603,7 @@ export interface components {
         role: string
       } | null
       /** @enum {string|null} */
-      type?: 'publishable' | 'secret' | 'legacy' | null
+      type?: 'legacy' | 'publishable' | 'secret' | null
       /** Format: date-time */
       updated_at?: string | null
     }
@@ -1689,6 +1819,7 @@ export interface components {
       sms_vonage_api_key: string | null
       sms_vonage_api_secret: string | null
       sms_vonage_from: string | null
+      /** Format: email */
       smtp_admin_email: string | null
       smtp_host: string | null
       smtp_max_frequency: number | null
@@ -1734,8 +1865,10 @@ export interface components {
         | 'RESIZING'
     }
     BranchResponse: {
+      /** Format: date-time */
       created_at: string
       git_branch?: string
+      /** Format: uuid */
       id: string
       is_default: boolean
       /**
@@ -1749,6 +1882,8 @@ export interface components {
       /** Format: int32 */
       pr_number?: number
       project_ref: string
+      /** Format: date-time */
+      review_requested_at?: string
       /** @enum {string} */
       status:
         | 'CREATING_PROJECT'
@@ -1757,6 +1892,7 @@ export interface components {
         | 'MIGRATIONS_FAILED'
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
+      /** Format: date-time */
       updated_at: string
     }
     BranchUpdateResponse: {
@@ -1768,6 +1904,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -1783,6 +1920,7 @@ export interface components {
         /** Format: int64 */
         created_at: number
         entrypoint_path?: string
+        ezbr_sha256?: string
         id: string
         import_map?: boolean
         import_map_path?: string
@@ -1830,6 +1968,7 @@ export interface components {
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
       git_branch?: string
+      is_default?: boolean
       persistent?: boolean
       /**
        * @description Postgres engine version. If not provided, the latest version will be used.
@@ -1845,9 +1984,18 @@ export interface components {
       secrets?: {
         [key: string]: string
       }
+      with_data?: boolean
     }
     CreateOrganizationV1: {
       name: string
+    }
+    CreateProjectClaimTokenResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      token: string
+      token_alias: string
     }
     CreateProviderBody: {
       attribute_mapping?: {
@@ -1907,6 +2055,42 @@ export interface components {
     CreateSigningKeyBody: {
       /** @enum {string} */
       algorithm: 'EdDSA' | 'ES256' | 'RS256' | 'HS256'
+      private_jwk?:
+        | {
+            d: string
+            dp: string
+            dq: string
+            /** @enum {string} */
+            e: 'AQAB'
+            /** @enum {string} */
+            kty: 'RSA'
+            n: string
+            p: string
+            q: string
+            qi: string
+          }
+        | {
+            /** @enum {string} */
+            crv: 'P-256'
+            d: string
+            /** @enum {string} */
+            kty: 'EC'
+            x: string
+            y: string
+          }
+        | {
+            /** @enum {string} */
+            crv: 'Ed25519'
+            d: string
+            /** @enum {string} */
+            kty: 'OKP'
+            x: string
+          }
+        | {
+            k: string
+            /** @enum {string} */
+            kty: 'oct'
+          }
       /** @enum {string} */
       status?: 'in_use' | 'standby'
     }
@@ -1978,6 +2162,7 @@ export interface components {
       /** Format: int64 */
       created_at?: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2004,6 +2189,7 @@ export interface components {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2020,6 +2206,7 @@ export interface components {
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
+      ezbr_sha256?: string
       id: string
       import_map?: boolean
       import_map_path?: string
@@ -2263,6 +2450,11 @@ export interface components {
       grant_type?: 'authorization_code' | 'refresh_token'
       redirect_uri?: string
       refresh_token?: string
+      /**
+       * @description Resource indicator for MCP (Model Context Protocol) clients
+       * @enum {string}
+       */
+      resource?: 'http://localhost:8080/mcp'
     }
     OAuthTokenResponse: {
       access_token: string
@@ -2270,6 +2462,41 @@ export interface components {
       refresh_token: string
       /** @enum {string} */
       token_type: 'Bearer'
+    }
+    OrganizationProjectClaimResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      preview: {
+        errors: {
+          key: string
+          message: string
+        }[]
+        info: {
+          key: string
+          message: string
+        }[]
+        members_exceeding_free_project_limit: {
+          limit: number
+          name: string
+        }[]
+        /** @enum {string} */
+        source_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise'
+        target_organization_eligible: boolean | null
+        target_organization_has_free_project_slots: boolean | null
+        /** @enum {string|null} */
+        target_subscription_plan: 'free' | 'pro' | 'team' | 'enterprise' | null
+        valid: boolean
+        warnings: {
+          key: string
+          message: string
+        }[]
+      }
+      project: {
+        name: string
+        ref: string
+      }
     }
     OrganizationResponseV1: {
       id: string
@@ -2312,6 +2539,13 @@ export interface components {
       jwt_secret?: string
       max_rows: number
     }
+    ProjectClaimTokenResponse: {
+      created_at: string
+      /** Format: uuid */
+      created_by: string
+      expires_at: string
+      token_alias: string
+    }
     ProjectUpgradeEligibilityResponse: {
       current_app_version: string
       /** @enum {string} */
@@ -2324,10 +2558,9 @@ export interface components {
         | 'preview'
       duration_estimate_hours: number
       eligible: boolean
-      extension_dependent_objects: string[]
       latest_app_version: string
       legacy_auth_custom_roles: string[]
-      potential_breaking_changes: string[]
+      objects_to_be_dropped: string[]
       target_upgrade_versions: {
         app_version: string
         /** @enum {string} */
@@ -2335,6 +2568,8 @@ export interface components {
         /** @enum {string} */
         release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       }[]
+      unsupported_extensions: string[]
+      user_defined_objects_in_internal_schemas: string[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
@@ -2477,6 +2712,9 @@ export interface components {
     }
     StorageConfigResponse: {
       features: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -2706,6 +2944,7 @@ export interface components {
       sms_vonage_api_key?: string | null
       sms_vonage_api_secret?: string | null
       sms_vonage_from?: string | null
+      /** Format: email */
       smtp_admin_email?: string | null
       smtp_host?: string | null
       smtp_max_frequency?: number | null
@@ -2719,6 +2958,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       persistent?: boolean
+      request_review?: boolean
       /**
        * @deprecated
        * @description This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.
@@ -2851,6 +3091,9 @@ export interface components {
     }
     UpdateStorageConfigBody: {
       features?: {
+        icebergCatalog?: {
+          enabled: boolean
+        }
         imageTransformation: {
           enabled: boolean
         }
@@ -3003,6 +3246,10 @@ export interface components {
       max_client_conn?: number
       /** @enum {string} */
       pool_mode?: 'transaction' | 'session' | 'statement'
+      query_wait_timeout?: number
+      reserve_pool_size?: number
+      server_idle_timeout?: number
+      server_lifetime?: number
     }
     V1PostgrestConfigResponse: {
       db_extra_search_path: string
@@ -3153,6 +3400,14 @@ export interface components {
       /** Format: int64 */
       recovery_time_target_unix: number
     }
+    V1RestorePointPostBody: {
+      name: string
+    }
+    V1RestorePointResponse: {
+      name: string
+      /** @enum {string} */
+      status: 'AVAILABLE' | 'PENDING' | 'REMOVED'
+    }
     V1RunQueryBody: {
       query: string
       read_only?: boolean
@@ -3184,6 +3439,9 @@ export interface components {
       owner: string
       public: boolean
       updated_at: string
+    }
+    V1UndoBody: {
+      name: string
     }
     V1UpdateFunctionBody: {
       body?: string
@@ -3444,10 +3702,41 @@ export interface operations {
         client_id: string
         code_challenge?: string
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
+        /** @description Organization slug */
+        organization_slug?: string
         redirect_uri: string
+        /** @description Resource indicator for MCP (Model Context Protocol) clients */
+        resource?: 'http://localhost:8080/mcp'
         response_mode?: string
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
+        state?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-oauth-authorize-project-claim': {
+    parameters: {
+      query: {
+        client_id: string
+        code_challenge?: string
+        code_challenge_method?: 'plain' | 'sha256' | 'S256'
+        /** @description Project ref */
+        project_ref: string
+        redirect_uri: string
+        response_mode?: string
+        response_type: 'code' | 'token' | 'id_token token'
         state?: string
       }
       header?: never
@@ -3620,6 +3909,62 @@ export interface operations {
       }
     }
   }
+  'v1-get-organization-project-claim': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OrganizationProjectClaimResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-claim-project-for-organization': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-list-all-projects': {
     parameters: {
       query?: never
@@ -3725,7 +4070,7 @@ export interface operations {
       }
     }
   }
-  getPerformanceAdvisors: {
+  'v1-get-performance-advisors': {
     parameters: {
       query?: never
       header?: never
@@ -3753,9 +4098,11 @@ export interface operations {
       }
     }
   }
-  getSecurityAdvisors: {
+  'v1-get-security-advisors': {
     parameters: {
-      query?: never
+      query?: {
+        lint_type?: 'sql'
+      }
       header?: never
       path: {
         /** @description Project ref */
@@ -3781,7 +4128,7 @@ export interface operations {
       }
     }
   }
-  getLogs: {
+  'v1-get-project-logs': {
     parameters: {
       query?: {
         iso_timestamp_end?: string
@@ -3813,7 +4160,7 @@ export interface operations {
       }
     }
   }
-  getApiCounts: {
+  'v1-get-project-usage-api-count': {
     parameters: {
       query?: {
         interval?: '15min' | '30min' | '1hr' | '3hr' | '1day' | '3day' | '7day'
@@ -3850,7 +4197,7 @@ export interface operations {
       }
     }
   }
-  getApiRequestsCount: {
+  'v1-get-project-usage-request-count': {
     parameters: {
       query?: never
       header?: never
@@ -3910,7 +4257,7 @@ export interface operations {
       }
     }
   }
-  createApiKey: {
+  'v1-create-project-api-key': {
     parameters: {
       query?: {
         /** @description Boolean string, true or false */
@@ -3945,7 +4292,7 @@ export interface operations {
       }
     }
   }
-  getApiKey: {
+  'v1-get-project-api-key': {
     parameters: {
       query?: {
         /** @description Boolean string, true or false */
@@ -3977,7 +4324,7 @@ export interface operations {
       }
     }
   }
-  deleteApiKey: {
+  'v1-delete-project-api-key': {
     parameters: {
       query?: {
         reason?: string
@@ -4012,7 +4359,7 @@ export interface operations {
       }
     }
   }
-  updateApiKey: {
+  'v1-update-project-api-key': {
     parameters: {
       query?: {
         /** @description Boolean string, true or false */
@@ -4048,7 +4395,7 @@ export interface operations {
       }
     }
   }
-  checkLegacyApiKeys: {
+  'v1-get-project-legacy-api-keys': {
     parameters: {
       query?: never
       header?: never
@@ -4076,7 +4423,7 @@ export interface operations {
       }
     }
   }
-  updateLegacyApiKeys: {
+  'v1-update-project-legacy-api-keys': {
     parameters: {
       query: {
         /** @description Boolean string, true or false */
@@ -4320,6 +4667,124 @@ export interface operations {
       }
     }
   }
+  'v1-get-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BranchResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectClaimTokenResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CreateProjectClaimTokenResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-project-claim-token': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-get-auth-service-config': {
     parameters: {
       query?: never
@@ -4394,7 +4859,7 @@ export interface operations {
       }
     }
   }
-  listSigningKeysForProject: {
+  'v1-get-project-signing-keys': {
     parameters: {
       query?: never
       header?: never
@@ -4422,7 +4887,7 @@ export interface operations {
       }
     }
   }
-  createSigningKeyForProject: {
+  'v1-create-project-signing-key': {
     parameters: {
       query?: never
       header?: never
@@ -4454,7 +4919,7 @@ export interface operations {
       }
     }
   }
-  getSigningKeyForProject: {
+  'v1-get-project-signing-key': {
     parameters: {
       query?: never
       header?: never
@@ -4483,7 +4948,7 @@ export interface operations {
       }
     }
   }
-  deleteSigningKey: {
+  'v1-remove-project-signing-key': {
     parameters: {
       query?: never
       header?: never
@@ -4512,7 +4977,7 @@ export interface operations {
       }
     }
   }
-  patchSigningKey: {
+  'v1-update-project-signing-key': {
     parameters: {
       query?: never
       header?: never
@@ -4530,6 +4995,62 @@ export interface operations {
     }
     responses: {
       200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-legacy-signing-key': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SigningKeyResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-legacy-signing-key': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
         headers: {
           [name: string]: unknown
         }
@@ -4731,7 +5252,7 @@ export interface operations {
       }
     }
   }
-  listTPAForProject: {
+  'v1-list-project-tpa-integrations': {
     parameters: {
       query?: never
       header?: never
@@ -4759,7 +5280,7 @@ export interface operations {
       }
     }
   }
-  createTPAForProject: {
+  'v1-create-project-tpa-integration': {
     parameters: {
       query?: never
       header?: never
@@ -4791,7 +5312,7 @@ export interface operations {
       }
     }
   }
-  getTPAForProject: {
+  'v1-get-project-tpa-integration': {
     parameters: {
       query?: never
       header?: never
@@ -4820,7 +5341,7 @@ export interface operations {
       }
     }
   }
-  deleteTPAForProject: {
+  'v1-delete-project-tpa-integration': {
     parameters: {
       query?: never
       header?: never
@@ -5340,7 +5861,100 @@ export interface operations {
       }
     }
   }
-  getDatabaseMetadata: {
+  'v1-get-restore-point': {
+    parameters: {
+      query?: {
+        name?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1RestorePointResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get requested restore points */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-create-restore-point': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1RestorePointPostBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1RestorePointResponse']
+        }
+      }
+    }
+  }
+  'v1-undo': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UndoBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-database-metadata': {
     parameters: {
       query?: never
       header?: never
@@ -5631,6 +6245,7 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        ezbr_sha256?: string
         /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string
@@ -5752,6 +6367,7 @@ export interface operations {
     parameters: {
       query?: {
         entrypoint_path?: string
+        ezbr_sha256?: string
         /** @description Boolean string, true or false */
         import_map?: boolean
         import_map_path?: string

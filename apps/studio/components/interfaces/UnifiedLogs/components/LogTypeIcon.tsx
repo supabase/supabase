@@ -17,19 +17,20 @@ export const LogTypeIcon = ({
   strokeWidth = 1.5,
   className,
 }: LogTypeIconProps) => {
-  const iconMap = {
-    edge: () => <Globe size={size} strokeWidth={strokeWidth} className={className} />,
+  // [Alaister]: commented out types coming in the future
+  const iconMap: Record<(typeof LOG_TYPES)[number], () => React.ReactNode> = {
+    // edge: () => <Globe size={size} strokeWidth={strokeWidth} className={className} />,
     postgrest: () => <BookHeart size={size} strokeWidth={strokeWidth} className={className} />,
     auth: () => <Auth size={size} strokeWidth={strokeWidth} className={className} />,
-    edge_function: () => (
+    'edge function': () => (
       <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
     ),
     postgres: () => <Database size={size} strokeWidth={strokeWidth} className={className} />,
-    function_events: () => (
-      <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
-    ),
-    supavisor: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
-    postgres_upgrade: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
+    // function_events: () => (
+    //   <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
+    // ),
+    // supavisor: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
+    // postgres_upgrade: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
     storage: () => <Storage size={size} strokeWidth={strokeWidth} className={className} />,
 
     // cron: () => <Clock size={size} strokeWidth={strokeWidth} className={className} />,
@@ -44,7 +45,7 @@ export const LogTypeIcon = ({
         <IconComponent />
       </TooltipTrigger>
       <TooltipContent side="left">
-        <div className="text-sm">{type}</div>
+        <div className="text-xs">{type}</div>
       </TooltipContent>
     </Tooltip>
   )
