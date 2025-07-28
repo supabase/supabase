@@ -1,14 +1,13 @@
+import { useState } from 'react'
+
 import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
+import { Filter, Sort, SupaTable } from 'components/grid/types'
 import { getConnectionStrings } from 'components/interfaces/Connect/DatabaseSettings.utils'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { getAllTableRowsSql } from 'data/table-rows/table-rows-query'
 import { pluckObjectFields } from 'lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { useState } from 'react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
@@ -28,17 +27,26 @@ import {
 import { Admonition } from 'ui-patterns'
 
 interface ExportDialogProps {
+  table?: SupaTable
+  filters?: Filter[]
+  sorts?: Sort[]
+  ignoreRoleImpersonation?: boolean
+
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
+export const ExportDialog = ({
+  table,
+  filters = [],
+  sorts = [],
+  ignoreRoleImpersonation = false,
+  open,
+  onOpenChange,
+}: ExportDialogProps) => {
   const { ref: projectRef } = useParams()
-  const snap = useTableEditorTableStateSnapshot()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
-  const { filters } = useTableFilter()
-  const { sorts } = useTableSort()
   const [selectedTab, setSelectedTab] = useState<string>('csv')
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
@@ -56,19 +64,22 @@ export const ExportDialog = ({ open, onOpenChange }: ExportDialogProps) => {
     poolingInfo: { connectionString: '', db_host: '', db_name: '', db_port: 0, db_user: '' },
   })
 
-  const outputName = `${snap.table.name}_rows`
-  const queryChains = getAllTableRowsSql({ table: snap.table, sorts, filters })
-  const query = wrapWithRoleImpersonation(
-    queryChains.toSql(),
-    roleImpersonationState as RoleImpersonationState
-  )
+  const outputName = `${table?.name}_rows`
+  const queryChains = !table ? undefined : getAllTableRowsSql({ table, sorts, filters })
+  const query = !!queryChains
+    ? ignoreRoleImpersonation
+      ? queryChains.toSql()
+      : wrapWithRoleImpersonation(
+          queryChains.toSql(),
+          roleImpersonationState as RoleImpersonationState
+        )
+    : ''
 
   const csvExportCommand = `
-${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv
-`.trim()
+${connectionStrings.direct.psql} -c "COPY (${query}) TO STDOUT WITH CSV HEADER DELIMITER ',';" > ${outputName}.csv`.trim()
 
   const sqlExportCommand = `
-pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${snap.table.schema}.${snap.table.name}" --data-only --column-inserts > ${outputName}.sql
+pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table?.schema}.${table?.name}" --data-only --column-inserts > ${outputName}.sql
   `.trim()
 
   return (

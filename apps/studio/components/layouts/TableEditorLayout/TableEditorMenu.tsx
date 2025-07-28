@@ -5,6 +5,9 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { ExportDialog } from 'components/grid/components/header/ExportDialog'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { SupaTable } from 'components/grid/types'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -14,7 +17,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { getTableEditor, useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -44,7 +47,7 @@ import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
-  const { id: _id } = useParams()
+  const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -52,6 +55,7 @@ const TableEditorMenu = () => {
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [tableToExport, setTableToExport] = useState<SupaTable>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -107,13 +111,24 @@ const TableEditorMenu = () => {
     id,
   })
 
+  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
+
+  const onSelectExportCLI = async (id: number) => {
+    const table = await getTableEditor({
+      id: id,
+      projectRef,
+      connectionString: project?.connectionString,
+    })
+    const supaTable = table && parseSupaTable(table)
+    setTableToExport(supaTable)
+  }
+
   useEffect(() => {
     if (selectedTable?.schema) {
       setSelectedSchema(selectedTable.schema)
     }
   }, [selectedTable?.schema])
 
-  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
     if (entityTypes && !searchText) {
@@ -281,6 +296,7 @@ const TableEditorMenu = () => {
                       projectRef: project?.ref!,
                       id: Number(id),
                       isLocked,
+                      onExportCLI: () => onSelectExportCLI(Number(id)),
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -294,6 +310,14 @@ const TableEditorMenu = () => {
         </div>
       </div>
 
+      <ExportDialog
+        ignoreRoleImpersonation
+        table={tableToExport}
+        open={!!tableToExport}
+        onOpenChange={(open) => {
+          if (!open) setTableToExport(undefined)
+        }}
+      />
       <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
     </>
   )

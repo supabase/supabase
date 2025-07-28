@@ -1,5 +1,3 @@
-import { siteConfig } from '@/config/site'
-
 export function SiteFooter() {
   return (
     <footer className="py-6 px-4 md:px-8 md:py-0 mx-auto w-full max-w-site">
@@ -7,7 +5,7 @@ export function SiteFooter() {
         <p className="text-balance text-center text-sm leading-loose text-foreground-muted md:text-left">
           Built by{' '}
           <a
-            href={siteConfig.links.twitter}
+            href="https://twitter.com/supabase"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4 hover:text-foreground-lighter"
@@ -16,7 +14,7 @@ export function SiteFooter() {
           </a>
           . The source code is available on{' '}
           <a
-            href={siteConfig.links.github}
+            href="https://github.com/supabase/supabase/tree/master/apps/ui-library"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4 hover:text-foreground-lighter"
@@ -28,7 +26,7 @@ export function SiteFooter() {
         <p className="text-balance text-center text-sm leading-loose text-foreground-muted">
           Site inspired by{' '}
           <a
-            href={siteConfig.links.credits.radix}
+            href="https://www.radix-ui.com/themes/docs/overview/getting-started"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4 hover:text-foreground-lighter"
@@ -37,7 +35,7 @@ export function SiteFooter() {
           </a>
           ,{' '}
           <a
-            href={siteConfig.links.credits.shadcn}
+            href="https://ui.shadcn.com"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4 hover:text-foreground-lighter"

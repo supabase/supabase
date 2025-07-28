@@ -88,7 +88,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           />
           <div className="flex item-center gap-x-2">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
-            {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
+            {member.gotrue_id === profile?.gotrue_id && <Badge color="scale">You</Badge>}
           </div>
 
           {(member.metadata as any)?.origin && (
