@@ -16,20 +16,18 @@ import {
 } from 'ui'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from 'data/storage/buckets-query'
-import EmptyBucketModal from '../EmptyBucketModal'
 import { render } from 'tests/helpers'
 import { routerMock } from 'tests/lib/route-mock'
+import EditBucketModal from '../EditBucketModal'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
   name: `test`,
   owner: faker.string.uuid(),
-  public: faker.datatype.boolean(),
-  allowed_mime_types: faker.helpers.multiple(() => faker.system.mimeType(), {
-    count: { min: 1, max: 5 },
-  }),
-  file_size_limit: faker.number.int({ min: 0, max: 25165824 }),
-  type: faker.helpers.arrayElement(['STANDARD', 'ANALYTICS', undefined]),
+  public: false,
+  allowed_mime_types: [],
+  file_size_limit: undefined,
+  type: 'STANDARD',
   created_at: faker.date.recent().toISOString(),
   updated_at: faker.date.recent().toISOString(),
 }
@@ -38,9 +36,9 @@ const Page = ({ onClose }: { onClose: () => void }) => {
   const [modal, setModal] = useState<string | null>(null)
   const renderModal = () => {
     switch (modal) {
-      case `empty`:
+      case `edit`:
         return (
-          <EmptyBucketModal
+          <EditBucketModal
             bucket={bucket}
             onClose={() => {
               setModal(null)
@@ -59,7 +57,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
           <Button title="Manage Bucket" type="text" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => setModal(`empty`)}>Empty</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setModal(`edit`)}>Edit</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -70,7 +68,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
 
 mockAnimationsApi()
 
-describe(`EmptyBucketModal`, () => {
+describe(`EditBucketModal`, () => {
   beforeEach(() => {
     // useParams
     routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
@@ -90,36 +88,61 @@ describe(`EmptyBucketModal`, () => {
         status: 'ACTIVE_HEALTHY',
       },
     })
-    // useBucketEmptyMutation
+    // useBucketUpdateMutation
     addAPIMock({
-      method: `post`,
-      path: `/platform/storage/:ref/buckets/:id/empty`,
+      method: `patch`,
+      path: `/platform/storage/:ref/buckets/:id`,
     })
-    // Called by useStorageExplorerStateSnapshot but seems
-    // to be unnecessary for succesful test?
-    //
-    // useProjectSettingsV2Query -> ProjectSettings
-    // GET /platform/projects/:ref/settings
-    // useAPIKeysQuery -> APIKey[]
-    // GET /v1/projects/:ref/api-keys
-    // listBucketObjects -> ListBucketObjectsData
-    // POST /platform/storage/:ref/buckets/:id/objects/list
   })
 
-  it(`renders a confirmation dialog`, async () => {
+  it(`renders a dialog with a form`, async () => {
     const onClose = vi.fn()
     render(<Page onClose={onClose} />)
 
     const menuTrigger = screen.getByRole(`button`, { name: `Manage Bucket` })
     await userEvent.click(menuTrigger)
-    const deleteOption = await screen.findByRole(`menuitem`, { name: `Empty` })
+    const deleteOption = await screen.findByRole(`menuitem`, { name: `Edit` })
     await userEvent.click(deleteOption)
 
     await waitFor(() => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()
     })
 
-    const confirmButton = screen.getByRole(`button`, { name: `Empty Bucket` })
+    const nameInput = screen.getByLabelText(`Name of bucket`)
+    expect(nameInput).toHaveValue(`test`)
+    expect(nameInput).toBeDisabled()
+
+    const publicToggle = screen.getByLabelText(`Public bucket`)
+    expect(publicToggle).not.toBeChecked()
+    await userEvent.click(publicToggle)
+    expect(publicToggle).toBeChecked()
+
+    const detailsTrigger = screen.getByRole(`button`, { name: `Additional configuration` })
+    expect(detailsTrigger).toHaveAttribute(`data-state`, `closed`)
+    await userEvent.click(detailsTrigger)
+    expect(detailsTrigger).toHaveAttribute(`data-state`, `open`)
+
+    const sizeLimitToggle = screen.getByLabelText(`Restrict file upload size for bucket`)
+    expect(sizeLimitToggle).not.toBeChecked()
+    await userEvent.click(sizeLimitToggle)
+    expect(sizeLimitToggle).toBeChecked()
+
+    const sizeLimitInput = screen.getByLabelText(`File size limit`)
+    expect(sizeLimitInput).toHaveValue(0)
+    await userEvent.type(sizeLimitInput, `25`)
+
+    const sizeLimitUnitSelect = screen.getByLabelText(`File size limit unit`)
+    expect(sizeLimitUnitSelect).toHaveTextContent(`bytes`)
+    await userEvent.click(sizeLimitUnitSelect)
+    const mbOption = screen.getByRole(`option`, { name: `MB` })
+    await userEvent.click(mbOption)
+    expect(sizeLimitUnitSelect).toHaveTextContent(`MB`)
+
+    const mimeTypeInput = screen.getByLabelText(`Allowed MIME types`)
+    expect(mimeTypeInput).toHaveValue(``)
+    await userEvent.type(mimeTypeInput, `image/jpeg, image/png`)
+
+    const confirmButton = screen.getByRole(`button`, { name: `Save` })
 
     fireEvent.click(confirmButton)
 

@@ -43,6 +43,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
 import { Bucket } from 'data/storage/buckets-query'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { isNonNullable } from 'lib/isNonNullable'
 
 export interface EditBucketModalProps {
   bucket: Bucket
@@ -79,14 +80,14 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
     defaultValues: {
       name: bucket?.name ?? '',
       public: bucket?.public,
-      has_file_size_limit: bucket?.file_size_limit !== null,
+      has_file_size_limit: isNonNullable(bucket?.file_size_limit),
       formatted_size_limit: fileSizeLimit ?? 0,
       allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
     },
     values: {
       name: bucket?.name ?? '',
       public: bucket?.public,
-      has_file_size_limit: bucket?.file_size_limit !== null,
+      has_file_size_limit: isNonNullable(bucket?.file_size_limit),
       formatted_size_limit: fileSizeLimit ?? 0,
       allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
     },
@@ -103,7 +104,7 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
   const onSubmit: SubmitHandler<z.infer<typeof BucketSchema>> = async (values) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
-    console.log(`submitting`)
+
     updateBucket(
       {
         projectRef: ref,
@@ -228,14 +229,14 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
                 onOpenChange={() => setShowConfiguration(!showConfiguration)}
               >
                 <CollapsibleTrigger_Shadcn_ asChild>
-                  <div className="w-full cursor-pointer py-3 flex items-center justify-between border-t border-default">
+                  <button className="w-full cursor-pointer py-3 flex items-center justify-between border-t border-default">
                     <p className="text-sm">Additional configuration</p>
                     <ChevronDown
                       size={18}
                       strokeWidth={2}
                       className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
-                  </div>
+                  </button>
                 </CollapsibleTrigger_Shadcn_>
                 <CollapsibleContent_Shadcn_ className="py-4 space-y-4">
                   <div className="space-y-2">
@@ -279,6 +280,7 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
                                 <FormControl_Shadcn_>
                                   <Input_Shadcn_
                                     id="formatted_size_limit"
+                                    aria-label="File size limit"
                                     type="number"
                                     min={0}
                                     {...field}
@@ -289,7 +291,11 @@ export const EditBucketModal = ({ bucket, onClose }: EditBucketModalProps) => {
                           />
                         </div>
                         <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                          <SelectTrigger_Shadcn_ size="small" className="col-span-4">
+                          <SelectTrigger_Shadcn_
+                            aria-label="File size limit unit"
+                            size="small"
+                            className="col-span-4"
+                          >
                             <SelectValue_Shadcn_ asChild>
                               <>{selectedUnit}</>
                             </SelectValue_Shadcn_>

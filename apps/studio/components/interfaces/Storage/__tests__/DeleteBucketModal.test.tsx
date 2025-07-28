@@ -3,7 +3,7 @@ import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { screen, waitFor, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { Trash, MoreVertical } from 'lucide-react'
+import { MoreVertical } from 'lucide-react'
 import { faker } from '@faker-js/faker'
 
 import { addAPIMock } from 'tests/lib/msw'
@@ -56,13 +56,10 @@ const Page = ({ onClose }: { onClose: () => void }) => {
     <ProjectContextProvider projectRef="default">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button title="Manage Bucket" type="text" className="px-1" icon={<MoreVertical />} />
+          <Button title="Manage Bucket" type="text" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end" className="w-32">
-          <DropdownMenuItem className="space-x-2" onClick={() => setModal(`delete`)}>
-            <Trash stroke="red" size="14" />
-            <p className="text-foreground-light">Delete</p>
-          </DropdownMenuItem>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => setModal(`delete`)}>Delete</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
