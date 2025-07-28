@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import type { LogData, QueryType } from './Logs.types'
+import type { LogData } from './Logs.types'
 import { jwtAPIKey, apiKey, role as extractRole } from './Logs.utils'
 
 export interface LogSelectionProps {
@@ -22,7 +22,6 @@ export interface LogSelectionProps {
   onClose: () => void
   queryType?: QueryType
   projectRef: string
-  collectionName?: string
   isLoading: boolean
   error?: string | object
 }
@@ -41,8 +40,6 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
     if (!log) return <LogDetailEmptyState />
 
     switch (queryType) {
-      // case 'warehouse':
-      //   return <WarehouseSelectionRenderer log={log} />
       case 'api':
         const status = log?.metadata?.[0]?.response?.[0]?.status_code
         const method = log?.metadata?.[0]?.request?.[0]?.method
