@@ -17,7 +17,7 @@ import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { RoleImpersonationState } from 'lib/role-impersonation'
 import {
   useRoleImpersonationStateSnapshot,
@@ -80,10 +80,12 @@ export default Header
 
 const DefaultHeader = () => {
   const { ref: projectRef } = useParams()
-  const tableEditorSnap = useTableEditorStateSnapshot()
+  const { data: org } = useSelectedOrganizationQuery()
+
   const snap = useTableEditorTableStateSnapshot()
-  const org = useSelectedOrganization()
+  const tableEditorSnap = useTableEditorStateSnapshot()
   const canCreateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
+
   const { mutate: sendEvent } = useSendEventMutation()
 
   const onAddRow =
@@ -532,7 +534,11 @@ const RowHeader = () => {
         )}
       </div>
 
-      <ExportDialog open={showExportModal} onOpenChange={() => setShowExportModal(false)} />
+      <ExportDialog
+        table={{ name: snap.table.name, schema: snap.table.schema ?? '' }}
+        open={showExportModal}
+        onOpenChange={() => setShowExportModal(false)}
+      />
     </>
   )
 }
