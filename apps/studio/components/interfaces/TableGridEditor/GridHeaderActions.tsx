@@ -46,6 +46,7 @@ import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export interface GridHeaderActionsProps {
   table: Entity
@@ -57,6 +58,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const org = useSelectedOrganization()
   const router = useRouter()
   const { hasTransaction, setHasTransaction } = useRoleImpersonationStateSnapshot()
+  const enableTestMode = useFlag('enableTestMode')
 
   useEffect(() => {
     const { impersonate } = router.query
@@ -473,16 +475,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               router.query.impersonate === 'true' ? 'authenticated' : undefined
             }
           />
-          <div className="flex items-center gap-x-2 mx-2">
-            <Label htmlFor="transaction-mode-switch" className="text-foreground-lighter text-xs">
-              Test mode
-            </Label>
-            <Switch
-              id="transaction-mode-switch"
-              checked={hasTransaction}
-              onCheckedChange={setHasTransaction}
-            />
-          </div>
+          {enableTestMode && (
+            <div className="flex items-center gap-x-2 mx-2">
+              <Label htmlFor="transaction-mode-switch" className="text-foreground-lighter text-xs">
+                Test mode
+              </Label>
+              <Switch
+                id="transaction-mode-switch"
+                checked={hasTransaction}
+                onCheckedChange={setHasTransaction}
+              />
+            </div>
+          )}
         </div>
       )}
       <ConfirmationModal

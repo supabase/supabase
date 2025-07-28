@@ -18,6 +18,7 @@ import {
 } from 'ui'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface PolicyTableRowHeaderProps {
   table: {
@@ -45,6 +46,7 @@ const PolicyTableRowHeader = ({
   const { ref } = useParams()
   const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
+  const enableTestMode = useFlag('enableTestMode')
 
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
@@ -106,13 +108,15 @@ const PolicyTableRowHeader = ({
                 {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
               </ButtonTooltip>
             )}
-            <Button asChild type="default">
-              <Link
-                href={`/project/${ref}/editor/${table.id}?impersonate=true&hasTransaction=true`}
-              >
-                Test
-              </Link>
-            </Button>
+            {enableTestMode && (
+              <Button asChild type="default">
+                <Link
+                  href={`/project/${ref}/editor/${table.id}?impersonate=true&hasTransaction=true`}
+                >
+                  Test
+                </Link>
+              </Button>
+            )}
             <ButtonTooltip
               type="default"
               disabled={!canToggleRLS || !canCreatePolicies}
