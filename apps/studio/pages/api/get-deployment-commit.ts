@@ -35,6 +35,6 @@ export default async function handler(
 
   res.status(200).json({
     commitSha,
-    commitTime: new Date().toISOString(),
+    commitTime,
   })
 }
