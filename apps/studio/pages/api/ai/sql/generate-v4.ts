@@ -420,6 +420,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       maxSteps: 5,
       messages: coreMessages,
       tools,
+      experimental_telemetry: { isEnabled: true },
     })
 
     result.pipeDataStreamToResponse(res, {
