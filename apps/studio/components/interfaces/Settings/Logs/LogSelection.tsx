@@ -14,7 +14,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
-import type { LogData } from './Logs.types'
+import type { LogData, QueryType } from './Logs.types'
 import { jwtAPIKey, apiKey, role as extractRole } from './Logs.utils'
 
 export interface LogSelectionProps {
