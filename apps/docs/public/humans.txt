@@ -26,6 +26,7 @@ Chris Caruso
 Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
 Chris Stockton
 Chris Ward
 Craig Cannon
@@ -106,6 +107,7 @@ Stanislav M
 Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taryn King
 Terry Sutton
