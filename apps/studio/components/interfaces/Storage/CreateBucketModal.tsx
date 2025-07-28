@@ -164,12 +164,12 @@ const CreateBucketModal = () => {
       if (values.type === 'ANALYTICS' && icebergWrapperExtensionState === 'installed') {
         await createIcebergWrapper({ bucketName: values.name })
       }
-      toast.success(`Successfully created bucket ${values.name}`)
-      router.push(`/project/${ref}/storage/buckets/${values.name}`)
       form.reset()
       setSelectedUnit(StorageSizeUnits.BYTES)
       setShowConfiguration(false)
       setVisible(false)
+      toast.success(`Successfully created bucket ${values.name}`)
+      router.push(`/project/${ref}/storage/buckets/${values.name}`)
     } catch (error) {
       console.error(error)
       toast.error('Failed to create bucket')
@@ -225,17 +225,18 @@ const CreateBucketModal = () => {
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <FormField_Shadcn_
-                control={form.control}
+                key="name"
                 name="name"
+                control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
+                    name="name"
                     label="Name of bucket"
                     labelOptional="Buckets cannot be renamed once created."
                     description="Only lowercase letters, numbers, dots, and hyphens"
-                    layout="vertical"
                   >
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="Enter bucket name" />
+                      <Input_Shadcn_ id="name" {...field} placeholder="Enter bucket name" />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
@@ -345,14 +346,14 @@ const CreateBucketModal = () => {
                     onOpenChange={() => setShowConfiguration(!showConfiguration)}
                   >
                     <CollapsibleTrigger_Shadcn_ asChild>
-                      <div className="w-full cursor-pointer py-3 flex items-center justify-between border-t border-default">
-                        <p className="text-sm">Additional restrictions</p>
+                      <button className="w-full cursor-pointer py-3 flex items-center justify-between border-t border-default">
+                        <p className="text-sm">Additional configuration</p>
                         <ChevronDown
                           size={18}
                           strokeWidth={2}
                           className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
                         />
-                      </div>
+                      </button>
                     </CollapsibleTrigger_Shadcn_>
                     <CollapsibleContent_Shadcn_ className="py-4 space-y-4">
                       <div className="space-y-2">
@@ -396,6 +397,7 @@ const CreateBucketModal = () => {
                                     <FormControl_Shadcn_>
                                       <Input_Shadcn_
                                         id="formatted_size_limit"
+                                        aria-label="File size limit"
                                         type="number"
                                         min={0}
                                         {...field}
@@ -406,7 +408,11 @@ const CreateBucketModal = () => {
                               />
                             </div>
                             <Select_Shadcn_ value={selectedUnit} onValueChange={setSelectedUnit}>
-                              <SelectTrigger_Shadcn_ size="small" className="col-span-4">
+                              <SelectTrigger_Shadcn_
+                                aria-label="File size limit unit"
+                                size="small"
+                                className="col-span-4"
+                              >
                                 <SelectValue_Shadcn_ asChild>
                                   <>{selectedUnit}</>
                                 </SelectValue_Shadcn_>
