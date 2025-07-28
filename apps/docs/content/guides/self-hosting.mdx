@@ -10,28 +10,24 @@ There are several ways to host Supabase on your own computer, server, or cloud.
 ## Officially supported
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {official.map((x) => (
-    <div className="md:col-span-6 xl:col-span-3" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
-</div>
+  <div className="md:col-span-6 xl:col-span-3 relative" key="/guides/self-hosting/docker">
+    <span className=" absolute left-28 top-[34px] uppercase text-xs whitespace-nowrap text-foreground-lighter font-mono z-10 border rounded-full px-2 py-0.5">
+      Most common
+    </span>
+    <Link href="/guides/self-hosting/docker" passHref>
+      <GlassPanel title="Docker">
 
-export const official = [
-  {
-    name: 'Docker',
-    description: 'Deploy Supabase within your own infrastructure using Docker Compose.',
-    href: '/guides/self-hosting/docker',
-  },
-  {
-    name: 'BYO Cloud',
-    description:
-      'Contact our Enterprise sales team if you need Supabase managed in your own cloud.',
-    href: '/pricing',
-  },
-]
+      Deploy Supabase within your own infrastructure using Docker Compose.
+      </GlassPanel>
+    </Link>
+
+  </div>
+  <div className="md:col-span-6 xl:col-span-3" key="/pricing">
+    <Link href="https://supabase.com/pricing" passHref>
+      <GlassPanel title="BYO Cloud">Contact our Enterprise sales team if you need Supabase managed in your own cloud.</GlassPanel>
+    </Link>
+  </div>
+</div>
 
 Supabase is also a hosted platform. If you want to get started for free, visit [supabase.com/dashboard](https://supabase.com/dashboard).
 
@@ -87,6 +83,11 @@ The following third-party providers have shown consistent support for the self-h
       name: 'StackGres',
       description: 'Deploys using Kubernetes.',
       href: 'https://stackgres.io/blog/running-supabase-on-top-of-stackgres/',
+    },
+    {
+      name: 'Pigsty',
+      description: 'Deploys using Ansible.',
+      href: 'https://pigsty.io/blog/db/supabase/',
     },
   ].map((x) => (
     <div className="md:col-span-6" key={x.href}>

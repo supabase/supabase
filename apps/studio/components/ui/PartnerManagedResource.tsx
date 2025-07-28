@@ -34,10 +34,10 @@ function PartnerManagedResource({ partner, resource, cta }: PartnerManagedResour
   const ctaUrl = (data?.url ?? '') + (cta?.path ?? '')
 
   return (
-    <Alert_Shadcn_ className="flex flex-col items-center gap-4">
+    <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none">
       <PartnerIcon organization={{ managed_by: partner }} showTooltip={false} size="large" />
 
-      <AlertTitle_Shadcn_ className="text-lg">
+      <AlertTitle_Shadcn_ className="text-sm">
         {resource} are managed by {PARTNER_TO_NAME[partner]}.
       </AlertTitle_Shadcn_>
 

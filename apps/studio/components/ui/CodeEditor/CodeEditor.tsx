@@ -4,12 +4,12 @@ import { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
 import { cn } from 'ui'
 import { Loading } from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { formatQuery } from 'data/sql/format-sql-query'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
 const DEFAULT_ACTIONS = {
@@ -17,11 +17,12 @@ const DEFAULT_ACTIONS = {
   explainCode: { enabled: false, callback: noop },
   formatDocument: { enabled: true, callback: noop },
   placeholderFill: { enabled: true },
+  closeAssistant: { enabled: false, callback: noop },
 }
 
 interface CodeEditorProps {
   id: string
-  language: 'pgsql' | 'json' | 'html' | undefined
+  language: 'pgsql' | 'json' | 'html' | 'typescript' | undefined
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
@@ -37,6 +38,7 @@ interface CodeEditorProps {
     formatDocument: CodeEditorActions
     placeholderFill: Omit<CodeEditorActions, 'callback'>
     explainCode: CodeEditorActions
+    closeAssistant: CodeEditorActions
   }>
   editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | undefined>
   onInputChange?: (value?: string) => void
@@ -66,7 +68,7 @@ const CodeEditor = ({
   const editorRef = editorRefProps || ref
   const monacoRef = useRef<Monaco>()
 
-  const { runQuery, placeholderFill, formatDocument, explainCode } = {
+  const { runQuery, placeholderFill, formatDocument, explainCode, closeAssistant } = {
     ...DEFAULT_ACTIONS,
     ...actions,
   }
@@ -91,21 +93,6 @@ const CodeEditor = ({
     },
     options
   )
-
-  const formatPgsql = async (value: string) => {
-    try {
-      if (!project) throw new Error('No project')
-      const formatted = await formatQuery({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: value,
-      })
-      return formatted.result
-    } catch (error) {
-      console.error('formatPgsql error:', error)
-      return value
-    }
-  }
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -168,6 +155,15 @@ const CodeEditor = ({
       })
     }
 
+    if (closeAssistant.enabled) {
+      editor.addAction({
+        id: 'close-assistant',
+        label: 'Close Assistant',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
+        run: () => closeAssistant.callback(),
+      })
+    }
+
     const model = editor.getModel()
     if (model) {
       const position = model.getPositionAt((value ?? '').length)
@@ -223,7 +219,7 @@ const CodeEditor = ({
       const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
-          const formatted = await formatPgsql(value)
+          const formatted = formatSql(value)
           formatDocument.callback(formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },

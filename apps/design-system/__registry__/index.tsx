@@ -9,7 +9,7 @@ export const Index: Record<string, any> = {
       name: "ConfirmationModal",
       type: "components:fragment",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/../../packages/ui-patterns/Dialogs/ConfirmationModal")),
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/Dialogs/ConfirmationModal")),
       source: "",
       files: ["registry/default//Dialogs/ConfirmationModal.tsx"],
       category: "undefined",
@@ -20,7 +20,7 @@ export const Index: Record<string, any> = {
       name: "TextConfirmModal",
       type: "components:fragment",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/../../packages/ui-patterns/Dialogs/TextConfirmModal")),
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/Dialogs/TextConfirmModal")),
       source: "",
       files: ["registry/default//Dialogs/TextConfirmModal.tsx"],
       category: "undefined",
@@ -31,7 +31,7 @@ export const Index: Record<string, any> = {
       name: "ConfirmDialog",
       type: "components:fragment",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/../../packages/ui-patterns/Dialogs/ConfirmDialog")),
+      component: React.lazy(() => import("@/../../packages/ui-patterns/src/Dialogs/ConfirmDialog")),
       source: "",
       files: ["registry/default//Dialogs/ConfirmDialog.tsx"],
       category: "undefined",
@@ -654,6 +654,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "dialog-centered-off": {
+      name: "dialog-centered-off",
+      type: "components:example",
+      registryDependencies: ["dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/dialog-centered-off")),
+      source: "",
+      files: ["registry/default/example/dialog-centered-off.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "drawer-demo": {
       name: "drawer-demo",
       type: "components:example",
@@ -705,6 +716,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/dropdown-menu-radio-group")),
       source: "",
       files: ["registry/default/example/dropdown-menu-radio-group.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "filter-bar-demo": {
+      name: "filter-bar-demo",
+      type: "components:example",
+      registryDependencies: ["filter-bar"],
+      component: React.lazy(() => import("@/registry/default/example/filter-bar-demo")),
+      source: "",
+      files: ["registry/default/example/filter-bar-demo.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -1787,6 +1809,94 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "inner-side-menu-demo": {
+      name: "inner-side-menu-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-demo")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-static-titles": {
+      name: "inner-side-menu-static-titles",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-static-titles")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-static-titles.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-loading": {
+      name: "inner-side-menu-loading",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-loading")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-loading.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-multiple-sections": {
+      name: "inner-side-menu-multiple-sections",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-multiple-sections")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-multiple-sections.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-empty": {
+      name: "inner-side-menu-empty",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-empty")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-empty.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-with-search": {
+      name: "inner-side-menu-with-search",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-with-search")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-with-search.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "toc-demo": {
+      name: "toc-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/toc-demo")),
+      source: "",
+      files: ["registry/default/example/toc-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "toc-single-demo": {
+      name: "toc-single-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/toc-single-demo")),
+      source: "",
+      files: ["registry/default/example/toc-single-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "multi-select-demo": {
       name: "multi-select-demo",
       type: "components:example",
@@ -1798,13 +1908,79 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "multi-select-form": {
-      name: "multi-select-form",
+    "multi-select-disabled": {
+      name: "multi-select-disabled",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/multi-select-form")),
+      component: React.lazy(() => import("@/registry/default/example/multi-select-disabled")),
       source: "",
-      files: ["registry/default/example/multi-select-form.tsx"],
+      files: ["registry/default/example/multi-select-disabled.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-badge-limit-wrap": {
+      name: "multi-select-badge-limit-wrap",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-badge-limit-wrap")),
+      source: "",
+      files: ["registry/default/example/multi-select-badge-limit-wrap.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-badge-limit": {
+      name: "multi-select-badge-limit",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-badge-limit")),
+      source: "",
+      files: ["registry/default/example/multi-select-badge-limit.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-combobox": {
+      name: "multi-select-combobox",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-combobox")),
+      source: "",
+      files: ["registry/default/example/multi-select-combobox.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-combobox-creatable": {
+      name: "multi-select-combobox-creatable",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-combobox-creatable")),
+      source: "",
+      files: ["registry/default/example/multi-select-combobox-creatable.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-deletable-badge": {
+      name: "multi-select-deletable-badge",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-deletable-badge")),
+      source: "",
+      files: ["registry/default/example/multi-select-deletable-badge.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "multi-select-inline-search-input": {
+      name: "multi-select-inline-search-input",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/multi-select-inline-search-input")),
+      source: "",
+      files: ["registry/default/example/multi-select-inline-search-input.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
@@ -2025,6 +2201,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
       source: "",
       files: ["registry/default/example/expanding-textarea-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "logs-bar-chart": {
+      name: "logs-bar-chart",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/logs-bar-chart")),
+      source: "",
+      files: ["registry/default/example/logs-bar-chart.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

@@ -1,9 +1,12 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
 import { handleError, post } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export async function sendReset() {
+  if (!IS_PLATFORM) return undefined
+
   const { data, error } = await post(`/platform/telemetry/reset`, {})
   if (error) handleError(error)
   return data

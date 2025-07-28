@@ -1,4 +1,4 @@
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { ObjectExpression } from 'estree'
 import GithubSlugger from 'github-slugger'
 import matter from 'gray-matter'
@@ -45,7 +45,7 @@ function processMdx(content: string, options?: { yaml?: boolean }): ProcessedMdx
     mdastExtensions: [mdxFromMarkdown()],
   })
 
-  let meta: Record<string, unknown>
+  let meta: Record<string, unknown> | undefined
   if (options?.yaml) {
     meta = frontmatter
   } else {
@@ -83,7 +83,8 @@ function processMdx(content: string, options?: { yaml?: boolean }): ProcessedMdx
     const [firstNode] = tree.children
     const content = toMarkdown(tree)
 
-    const rawHeading: string = firstNode.type === 'heading' ? toString(firstNode) : undefined
+    const rawHeading: string | undefined =
+      firstNode.type === 'heading' ? toString(firstNode) : undefined
 
     if (!rawHeading) {
       return { content }

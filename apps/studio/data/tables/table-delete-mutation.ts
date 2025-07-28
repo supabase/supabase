@@ -1,16 +1,19 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { entityTypeKeys } from 'data/entity-types/keys'
-import { del, handleError } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { tableEditorKeys } from 'data/table-editor/keys'
 import { viewKeys } from 'data/views/keys'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
 export type TableDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
+  name: string
   schema: string
   cascade?: boolean
 }
@@ -19,22 +22,20 @@ export async function deleteTable({
   projectRef,
   connectionString,
   id,
+  name,
+  schema,
   cascade = false,
 }: TableDeleteVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.tables.remove({ name, schema }, { cascade })
 
-  const { data, error } = await del('/platform/pg-meta/{ref}/tables', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id, cascade },
-    },
-    headers,
+  const { result } = await executeSql<void>({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['table', 'delete', id],
   })
 
-  if (error) handleError(error)
-  return data
+  return result
 }
 
 type TableDeleteData = Awaited<ReturnType<typeof deleteTable>>
@@ -55,13 +56,11 @@ export const useTableDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { id, projectRef, schema } = variables
         await Promise.all([
+          queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
           queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
-          queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
           queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
           // invalidate all views from this schema
           queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, schema)),
-          // invalidate the view if there's a view with this id
-          queryClient.invalidateQueries(viewKeys.view(projectRef, id)),
         ])
 
         await onSuccess?.(data, variables, context)

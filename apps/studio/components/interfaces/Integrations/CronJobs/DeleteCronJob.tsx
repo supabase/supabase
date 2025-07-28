@@ -3,7 +3,10 @@ import { toast } from 'sonner'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteCronJobProps {
   cronJob: CronJob
@@ -11,11 +14,17 @@ interface DeleteCronJobProps {
   onClose: () => void
 }
 
-const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
+export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: deleteDatabaseCronJob, isLoading } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
+      sendEvent({
+        action: 'cron_job_deleted',
+        groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
       toast.success(`Successfully removed cron job ${cronJob.jobname}`)
       onClose()
     },
@@ -33,6 +42,22 @@ const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
 
   if (!cronJob) {
     return null
+  }
+
+  // Cron job name is optional. If the cron job has no name, show a simplified modal which doesn't require the user to input the name.
+  if (!cronJob.jobname) {
+    return (
+      <ConfirmationModal
+        variant="destructive"
+        visible={visible}
+        onCancel={() => onClose()}
+        onConfirm={handleDelete}
+        title={`Delete the cron job`}
+        loading={isLoading}
+        confirmLabel={`Delete`}
+        alert={{ title: 'You cannot recover this cron job once deleted.' }}
+      />
+    )
   }
 
   return (
@@ -56,5 +81,3 @@ const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
     />
   )
 }
-
-export default DeleteCronJob

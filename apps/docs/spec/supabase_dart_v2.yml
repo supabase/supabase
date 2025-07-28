@@ -552,7 +552,7 @@ functions:
           ```dart
           await supabase.auth.signInWithOtp(
             phone: '+13334445555',
-            channel: OtpChannel.whatsapp,  
+            channel: OtpChannel.whatsapp,
           );
           ```
   - id: sign-in-with-id-token
@@ -594,7 +594,7 @@ functions:
           - [Steps to obtain Android client ID](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project)
           - [Steps to obtain iOS client ID](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id)
 
-          Add the web client ID to the `Authentication -> Providers -> Google -> Authorized Client IDs` section in your Supabase dashboard
+          Add the web client ID to the `Authentication -> Providers -> Google -> Client IDs` section in your Supabase dashboard
         code: |
           ```dart
           import 'package:google_sign_in/google_sign_in.dart';
@@ -1314,7 +1314,7 @@ functions:
           // retrieve all identites linked to a user
           final identities = await supabase.auth.getUserIdentities();
 
-          // find the google identity 
+          // find the google identity
           final googleIdentity = identities.firstWhere(
             (element) => element.provider == 'google',
           );
@@ -1631,7 +1631,7 @@ functions:
   - id: auth-mfa-api
     title: 'Overview'
     notes: |
-      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
       Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
@@ -2446,20 +2446,6 @@ functions:
           final res = await supabase.functions.invoke('hello', body: {'foo': 'baa'});
           final data = res.data;
           ```
-      - id: specifying-response-type
-        name: Specifying response type.
-        description: |
-          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
-        isSpotlight: true
-        code: |
-          ```dart
-          final res = await supabase.functions.invoke(
-            'hello',
-            body: {'foo': 'baa'},
-            responseType: ResponseType.text,
-          );
-          final data = res.data;
-          ```
       - id: parsing-custom-headers
         name: Parsing custom headers.
         description: |
@@ -2496,36 +2482,36 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select();
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Afghanistan'
+              'name': 'violin'
             },
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'viola'
             },
             {
               'id': 3,
-              'name': 'Algeria'
+              'name': 'cello'
             },
           ]
           ```
@@ -2535,38 +2521,35 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select('''
-              name,
-              cities (
-                name
-              )
+              name
             ''');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Afghanistan'
+              'name': 'violin'
             },
             {
-              'name': 'Albania'
+              'name': 'viola'
             },
             {
-              'name': 'Algeria'
+              'name': 'cello'
             },
           ]
           ```
@@ -2576,52 +2559,51 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('products')
+            .from('orchestral_sections')
             .select('''
-              id,
-              supplier:supplier_id ( name ),
-              purchaser:purchaser_id ( name )
+              name,
+              instruments ( name )
             ''');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Germany',
-              'cities': [
+              'name': 'strings',
+              'instruments': [
                 {
-                  'name': 'Munich'
+                  'name': 'violin'
                 },
               ]
             },
             {
-              'name': 'Indonesia',
-              'cities': [
+              'name': 'woodwinds',
+              'instruments': [
                 {
-                  'name': 'Bali'
+                  'name': 'flute'
                 },
               ]
             },
@@ -2772,43 +2754,43 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, countries(*)')
-            .eq('countries.name', 'Estonia');
+            .from('instruments')
+            .select('name, orchestral_sections(*)')
+            .eq('orchestral_sections.name', 'percussion');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Bali',
-              'countries': null
+              'name': 'flute',
+              'orchestral_sections': null
             },
             {
-              'name': 'Munich',
-              'countries': null
+              'name': 'violin',
+              'orchestral_sections': null
             }
           ]
           ```
@@ -2825,7 +2807,7 @@ functions:
         code: |
           ```dart
           final res = await supabase
-              .from('cities')
+              .from('instruments')
               .select('name')
               .count(CountOption.exact);
 
@@ -2836,14 +2818,14 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
@@ -2851,15 +2833,15 @@ functions:
             data: [
               {
                 'id': 1,
-                'name': 'Afghanistan'
+                'name': 'violin'
               },
               {
                 'id': 2,
-                'name': 'Albania'
+                'name': 'viola'
               },
               {
                 'id': 3,
-                'name': 'Algeria'
+                'name': 'cello'
               }
             ],
             count: 3
@@ -2895,15 +2877,15 @@ functions:
             insert into
               users (id, name, address)
             values
-              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+              (1, 'Frodo', '{"city":"Hobbiton"}');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Avdotya',
-              'city': 'Saint Petersburg'
+              'name': 'Frodo',
+              'city': 'Hobbiton'
             }
           ]
           ```
@@ -2912,46 +2894,47 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, countries!inner(name)')
-            .eq('countries.name', 'Indonesia');
+            .from('orchestral_sections')
+            .select('name, instruments!inner(name)')
+            .eq('orchestral_sections.name', 'strings')
+            .limit(1);
           ```
         data:
           sql: |
             ```sql
-            create table countries (
+            create table orchestral_sections (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text
             );
 
-            create table cities (
+            create table instruments (
               "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
               "name" text,
-              "country_id" "uuid" references public.countries on delete cascade
+              "section_id" "uuid" references public.orchestral_sections on delete cascade
             );
 
-            with country as (
-              insert into countries (name)
-              values ('united kingdom') returning id
+            with section as (
+              insert into orchestral_sections (name)
+              values ('strings') returning id
             )
-            insert into cities (name, country_id) values
-            ('London', (select id from country)),
-            ('Manchester', (select id from country)),
-            ('Liverpool', (select id from country)),
-            ('Bristol', (select id from country));
+            insert into instruments (name, section_id) values
+            ('violin', (select id from section)),
+            ('viola', (select id from section)),
+            ('cello', (select id from section)),
+            ('double bass', (select id from section));
             ```
         response: |
           ```json
           [
             {
-              'name': 'Bali',
-              'countries': {'name': 'Indonesia'}
+              'name': 'violin',
+              'orchestral_sections': {'name': 'strings'}
             }
           ]
           ```
         description: |
           If you don't want to return the referenced table contents, you can leave the parenthesis empty.
-          Like `.select('name, countries!inner()')`.
+          Like `.select('name, books!inner()')`.
         hideCodeBlock: true
       - id: switching-schemas-per-query
         name: Switching schemas per query
@@ -3081,28 +3064,28 @@ functions:
         code: |
           ```dart
           await supabase
-            .from('countries')
-            .update({ 'name': 'Australia' })
+            .from('instruments')
+            .update({ 'name': 'piano' })
             .eq('id', 1);
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Taiwan');
+              (1, 'harpsichord');
             ```
       - id: update-a-record-and-return-it
         name: Update a record and return it
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Australia' })
+            .from('instruments')
+            .update({ 'name': 'piano' })
             .eq('id', 1)
             .select();
           ```
@@ -3110,19 +3093,19 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Taiwan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Australia'
+              'name': 'piano'
             }
           ]
           ```
@@ -3184,7 +3167,7 @@ functions:
       - name: values
         isOptional: false
         type: Map<String, dynamic> or List<Map<String, dynamic>>
-        description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
+        description: The values to upsert with. Pass a Map to upsert a single row or an array to upsert multiple rows.
       - name: onConflict
         isOptional: true
         type: String
@@ -3204,27 +3187,27 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .upsert({ 'id': 1, 'name': 'Albania' })
+            .from('instruments')
+            .upsert({ 'id': 1, 'name': 'piano' })
             .select();
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Albania'
+              'name': 'piano'
             }
           ]
           ```
@@ -3233,10 +3216,10 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .upsert([
-              { 'id': 1, 'name': 'Albania' },
-              { 'id': 2, 'name': 'Algeria' },
+              { 'id': 1, 'name': 'piano' },
+              { 'id': 2, 'name': 'harp' },
             ])
             .select();
           ```
@@ -3244,23 +3227,23 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Albania'
+              'name': 'piano'
             },
             {
               'id': 2,
-              'name': 'Algeria'
+              'name': 'harp'
             }
           ]
           ```
@@ -3334,7 +3317,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain');
+              (1, 'Mordor');
             ```
       - id: delete-multiple-records
         name: Delete multiple records
@@ -3354,7 +3337,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain'), (2, 'France'), (3, 'Germany');
+              (1, 'Mordor'), (2, 'Gondor'), (3, 'Rohan');
             ```
       - id: fetch-delete-records
         name: Fetch deleted records
@@ -3466,8 +3449,8 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'France'),
-              (2, 'United Kingdom');
+              (1, 'Mordor'),
+              (2, 'Gondor');
 
             create function list_stored_countries() returns setof countries as $$
               select * from countries;
@@ -3477,7 +3460,7 @@ functions:
           ```json
           {
             'id': 1,
-            'name': 'France'
+            'name': 'Mordor'
           }
           ```
         description: |
@@ -4538,27 +4521,27 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .upsert({ 'id': 1, 'name': 'Algeria' })
+            .from('instruments')
+            .upsert({ 'id': 1, 'name': 'piano' })
             .select();
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan');
+              (1, 'harpsichord');
             ```
         response: |
           ```json
           [
             {
               "id": 1,
-              "name": "Algeria"
+              "name": "piano"
             }
           ]
           ```
@@ -4587,12 +4570,12 @@ functions:
         description: Specify the referenced table when ordering by a column in an embedded resource.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select('id, name')
             .order('id', ascending: false);
           ```
@@ -4600,29 +4583,29 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
               'id': 3,
-              'name': 'Algeria'
+              'name': 'cello'
             },
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'viola'
             },
             {
               'id': 1,
-              'name': 'Afghanistan'
+              'name': 'viola'
             }
           ]
           ```
@@ -4631,55 +4614,105 @@ functions:
         code: |
           ```dart
           final data = await supabase
-              .from('countries')
+              .from('orchestral_sections')
               .select('''
                 name,
-                cities (
+                instruments (
                   name
                 )
               ''')
-              .order('name', referencedTable: 'cities', ascending: false);
+              .order('name', referencedTable: 'instruments', ascending: false);
             ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States'),
-              (2, 'Vanuatu');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'harp'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           [
             {
-              'name': 'United States',
-              'cities': [
+              'name': 'strings',
+              'instruments': [
                 {
-                  'name': 'New York City'
+                  'name': 'violin'
                 },
                 {
-                  'name': 'Atlanta'
+                  'name': 'harp'
                 }
               ]
             },
             {
-              'name': 'Vanuatu',
-              'cities': []
+              'name': 'woodwinds',
+              'instruments': []
+            }
+          ]
+          ```
+      - id: order-parent-table-by-a-referenced-table
+        name: Order parent table by a referenced table
+        code: |
+          ```dart
+          final data = await supabase
+              .from('instruments')
+              .select('''
+                name,
+                section:orchestral_sections (
+                  name
+                )
+              ''')
+              .order('section(name)', ascending: true)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              orchestral_sections (id int8 primary key, name text);
+            create table
+              instruments (
+                id int8 primary key,
+                section_id int8 not null references orchestral_sections,
+                name text
+              );
+
+            insert into
+              orchestral_sections (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              instruments (id, section_id, name)
+            values
+              (1, 1, 'violin'),
+              (2, 2, 'flute');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "name": "violin",
+              "orchestral_sections": { "name": "strings" }
+            },
+            {
+              "name": "flute",
+              "orchestral_sections": { "name": "woodwinds" }
             }
           ]
           ```
@@ -4698,12 +4731,12 @@ functions:
         description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
+            .from('instruments')
             .select('name')
             .limit(1);
           ```
@@ -4711,20 +4744,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Afghanistan'
+              'name': 'violin'
             }
           ]
           ```
@@ -4733,45 +4766,45 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select('''
               name,
-              cities (
+              instruments (
                 name
               )
             ''')
-            .limit(1, referencedTable: 'cities');
+            .limit(1, referencedTable: 'instruments');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'United States');
+              (1, 'strings');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 1, 'Atlanta'),
-              (2, 1, 'New York City');
+              (1, 1, 'violin'),
+              (2, 1, 'viola');
             ```
         response: |
           ```json
           [
             {
-              'name': 'United States',
-              'cities': [
+              'name': 'strings',
+              'instruments': [
                 {
-                  'name': 'Atlanta'
+                  'name': 'violin'
                 }
               ]
             }
@@ -4796,12 +4829,12 @@ functions:
         description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select('name')
             .range(0, 1);
           ```
@@ -4809,23 +4842,23 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Afghanistan'
+              'name': 'violin'
             },
             {
-              'name': 'Albania'
+              'name': 'viola'
             }
           ]
           ```
@@ -4835,12 +4868,12 @@ functions:
       Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select('name')
             .limit(1)
             .single();
@@ -4849,19 +4882,19 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           {
-            'name': 'Afghanistan'
+            'name': 'violin'
           }
           ```
   - id: maybe-single
@@ -4872,23 +4905,23 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select()
-            .eq('name', 'Singapore')
+            .eq('name', 'guzheng')
             .maybeSingle();
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
@@ -4904,7 +4937,7 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select()
             .csv();
           ```
@@ -4912,18 +4945,18 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
-          'id,name\n1,Afghanistan\n1,Albania\n1,Algeria'
+          'id,name\n1,violin\n2,viola\n3,cello'
           ```
         description: |
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
@@ -4966,7 +4999,7 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select()
             .explain();
           ```
@@ -4974,20 +5007,20 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
-                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+                  ->  Seq Scan on instruments  (cost=0.00..22.00 rows=1200 width=40)
           ```
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -4999,7 +5032,7 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select()
             .explain(analyze:true, verbose:true);
           ```
@@ -5007,23 +5040,23 @@ functions:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```
           Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
-            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            Output: NULL::bigint, count(ROW(instruments.id, instruments.name)), COALESCE(json_agg(ROW(instruments.id, instruments.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
             ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
-                  Output: countries.id, countries.name
-                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
-                        Output: countries.id, countries.name
+                  Output: instruments.id, instruments.name
+                  ->  Seq Scan on public.instruments  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: instruments.id, instruments.name
           Query Identifier: -4730654291623321173
           Planning Time: 0.407 ms
           Execution Time: 0.119 ms
@@ -5133,46 +5166,46 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select('''
               name,
-              cities!inner (
+              instruments!inner (
                 name
               )
             ''')
-            .eq('cities.name', 'Bali');
+            .eq('instruments.name', 'flute');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Indonesia',
-              'cities': [
+              'name': 'strings',
+              'instruments': [
                 {
-                  'name': 'Bali'
+                  'name': 'flute'
                 }
               ]
             },
@@ -5204,36 +5237,36 @@ functions:
         ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select('name')
-            .or('id.eq.2,name.eq.Algeria');
+            .or('id.eq.2,name.eq.cello');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Albania'
+              'name': 'viola'
             },
             {
-              'name': 'Algeria'
+              'name': 'cello'
             }
           ]
           ```
@@ -5242,28 +5275,28 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select('name')
-            .or('id.gt.3,and(id.eq.1,name.eq.Afghanistan)');
+            .or('id.gt.3,and(id.eq.1,name.eq.violin)');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         reponse: |
           ```json
           [
             {
-              'name': 'Afghanistan'
+              'name': 'violin'
             }
           ]
           ```
@@ -5272,46 +5305,46 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select('''
               name,
-              cities!inner (
+              instruments!inner (
                 name
               )
             ''')
-            .or('country_id.eq.1,name.eq.Beijing', referencedTable: 'cities' );
+            .or('section_id.eq.1,name.eq.guzheng', referencedTable: 'instruments' );
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, book_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Germany',
-              'cities': [
+              'name': 'strings',
+              'instruments': [
                 {
-                  'name': 'Munich'
+                  'name': 'violin'
                 }
               ]
             }
@@ -5327,7 +5360,7 @@ functions:
       - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
         ```dart
-        .not('name','eq','Paris')
+        .not('name','eq','violin')
         .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
         .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
         .not('id','in','(6,7)')  // Use Postgres list () and 'in' instead of `inFilter`.
@@ -5348,7 +5381,7 @@ functions:
         description: The value to filter with, following PostgREST syntax.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: false
         code: |
           ```dart
@@ -5379,31 +5412,31 @@ functions:
           ]
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
             .from('cities')
             .update({ 'name': 'Mordor' })
-            .not('name', 'eq', 'Paris');
+            .not('name', 'eq', 'Rohan');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
             .from('cities')
             .delete()
-            .not('name', 'eq', 'Paris');
+            .not('name', 'eq', 'Mordor');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
-            .not('name', 'eq', 'Paris');
+            .not('name', 'eq', 'Mordor');
           ```
 
   - id: match
@@ -5417,32 +5450,32 @@ functions:
         description: The object to filter with, with column names as keys mapped to their filter values
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select()
-            .match({ 'id': 2, 'name': 'Albania' });
+            .match({ 'id': 2, 'name': 'viola' });
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Albania'
+              'name': 'viola'
             }
           ]
           ```
@@ -5464,33 +5497,33 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('instruments')
             .select()
-            .eq('name', 'Albania');
+            .eq('name', 'viola');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'viola'
             },
           ]
           ```
@@ -5512,37 +5545,37 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .select('name, country_id')
-            .neq('name', 'Albania');
+            .from('instruments')
+            .select('id, name')
+            .neq('name', 'viola');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              instruments (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              instruments (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'violin'),
+              (2, 'viola'),
+              (3, 'cello');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Afghanistan'
+              'name': 'violin'
             },
             {
               'id': 3,
-              'name': 'Algeria'
+              'name': 'cello'
             },
           ]
           ```
@@ -5564,7 +5597,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5581,16 +5614,16 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Rohan'),
+              (2, 'The Shire'),
+              (3, 'Mordor');
             ```
         response: |
           ```json
           [
             {
               'id': 3,
-              'name': 'Algeria'
+              'name': 'Mordor'
             },
           ]
           ```
@@ -5612,7 +5645,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5629,20 +5662,20 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Rohan'),
+              (2, 'The Shire'),
+              (3, 'Mordor');
             ```
         response: |
           ```json
           [
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'The Shire'
             },
             {
               'id': 3,
-              'name': 'Algeria'
+              'name': 'Mordor'
             },
           ]
           ```
@@ -5664,7 +5697,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5681,16 +5714,16 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Rohan'),
+              (2, 'The Shire'),
+              (3, 'Mordor');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Afghanistan'
+              'name': 'Rohan'
             },
           ]
           ```
@@ -5712,7 +5745,7 @@ functions:
         description: The value to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -5729,20 +5762,20 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Rohan'),
+              (2, 'The Shire'),
+              (3, 'Mordor');
             ```
         response: |
           ```json
           [
             {
               'id': 1,
-              'name': 'Afghanistan'
+              'name': 'Rohan'
             },
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'The Shire'
             },
           ]
           ```
@@ -5764,33 +5797,33 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('planets')
             .select()
-            .like('name', '%Alba%');
+            .like('name', '%Ea%');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           [
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'Earth'
             },
           ]
           ```
@@ -5812,33 +5845,33 @@ functions:
         description: The pattern to match with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('planets')
             .select()
-            .ilike('name', '%alba%');
+            .ilike('name', '%ea%');
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              planets (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              planets (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Mercury'),
+              (2, 'Earth'),
+              (3, 'Mars');
             ```
         response: |
           ```json
           [
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'Earth'
             },
           ]
           ```
@@ -5913,37 +5946,37 @@ functions:
         description: The List to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .inFilter('name', ['Albania', 'Algeria']);
+            .inFilter('name', ['Luke', 'Leia']);
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Han'),
+              (2, 'Luke'),
+              (3, 'Leia');
             ```
         response: |
           ```json
           [
             {
               'id': 2,
-              'name': 'Albania'
+              'name': 'Luke'
             },
             {
               'id': 3,
-              'name': 'Algeria'
+              'name': 'Leia'
             },
           ]
           ```
@@ -6220,7 +6253,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6277,7 +6310,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6334,7 +6367,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6391,7 +6424,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6448,7 +6481,7 @@ functions:
         description: The range to filter with.
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         code: |
           ```dart
           final data = await supabase
@@ -6714,109 +6747,109 @@ functions:
       ```
     examples:
       - id: with-select
-        name: With `select()`
+        name: With select()
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('characters')
             .select()
-            .filter('name', 'in', '("Algeria","Japan")')
+            .filter('name', 'in', '("Ron","Dumbledore")')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              characters (id int8 primary key, name text);
 
             insert into
-              countries (id, name)
+              characters (id, name)
             values
-              (1, 'Afghanistan'),
-              (2, 'Albania'),
-              (3, 'Algeria');
+              (1, 'Harry'),
+              (2, 'Hermione'),
+              (3, 'Ron');
             ```
         response: |
           ```json
           [
             {
               'id': 3,
-              'name': 'Algeria'
+              'name': 'Ron'
             }
           ]
           ```
       - id: with-update
-        name: With `update()`
+        name: With update()
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .from('instruments')
+            .update({ 'name': 'piano' })
+            .filter('name', 'in', '("harpsichord","clavichord")');
           ```
       - id: with-delete
-        name: With `delete()`
+        name: With delete()
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
+            .from('countries')
             .delete()
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .filter('name', 'in', '("Rohan","Mordor")');
           ```
       - id: with-rpc
-        name: With `rpc()`
+        name: With rpc()
         code: |
           ```dart
           // Only valid if the Stored Procedure returns a table type.
           final data = await supabase
-            .rpc('echo_all_cities')
-            .filter('name', 'in', '("Paris","Tokyo")');
+            .rpc('echo_all_countries')
+            .filter('name', 'in', '("Rohan","Mordor")');
           ```
       - id: on-a-referenced-table
         name: On a referenced table
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
+            .from('orchestral_sections')
             .select('''
               name,
-              cities!inner (
+              instruments!inner (
                 name
               )
             ''')
-            .filter('cities.name', 'eq', 'Bali')
+            .filter('characters.name', 'eq', 'flute')
           ```
         data:
           sql: |
             ```sql
             create table
-              countries (id int8 primary key, name text);
+              orchestral_sections (id int8 primary key, name text);
             create table
-              cities (
+              instruments (
                 id int8 primary key,
-                country_id int8 not null references countries,
+                section_id int8 not null references orchestral_sections,
                 name text
               );
 
             insert into
-              countries (id, name)
+              orchestral_sections (id, name)
             values
-              (1, 'Germany'),
-              (2, 'Indonesia');
+              (1, 'strings'),
+              (2, 'woodwinds');
             insert into
-              cities (id, country_id, name)
+              instruments (id, section_id, name)
             values
-              (1, 2, 'Bali'),
-              (2, 1, 'Munich');
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
             ```
         response: |
           ```json
           [
             {
-              'name': 'Indonesia',
-              'cities': [
+              'name': 'woodwinds',
+              'instruments': [
                 {
-                  'name': 'Bali'
+                  'name': 'flute'
                 }
               ]
             }

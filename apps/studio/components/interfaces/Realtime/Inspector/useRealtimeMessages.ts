@@ -78,10 +78,10 @@ export const useRealtimeMessages = (
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
   // the default host is prod until the correct one comes through an API call.
-  const host = settings
-    ? `https://${settings.app_config?.endpoint}`
-    : `https://${projectRef}.supabase.co`
+  const host = settings ? `${protocol}://${endpoint}` : `https://${projectRef}.supabase.co`
 
   const realtimeUrl = `${host}/realtime/v1`.replace(/^http/i, 'ws')
 
@@ -101,15 +101,10 @@ export const useRealtimeMessages = (
       return
     }
 
-    const globalOptions = merge(DEFAULT_GLOBAL_OPTIONS, {
-      headers: {
-        'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
-      },
-    })
     const realtimeOptions = merge(DEFAULT_REALTIME_OPTIONS, { params: { log_level: logLevel } })
 
     const options = {
-      headers: globalOptions.headers,
+      headers: DEFAULT_GLOBAL_OPTIONS.headers,
       ...realtimeOptions,
       params: { apikey: token, ...realtimeOptions.params },
     }

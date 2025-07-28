@@ -3,6 +3,7 @@ import { GitBranch, Github } from 'lucide-react'
 import CardButton from 'components/ui/CardButton'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
@@ -73,6 +74,7 @@ const ProjectCard = ({
         footer={
           <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
         }
+        containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
       />
     </li>
   )

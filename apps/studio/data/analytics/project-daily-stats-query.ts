@@ -1,26 +1,20 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
+import { operations } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { AnalyticsData } from './constants'
+import type { AnalyticsData, AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
 
 export type ProjectDailyStatsAttribute =
-  | 'max_cpu_usage'
-  | 'avg_cpu_usage'
-  | 'disk_io_budget'
-  | 'ram_usage'
-  | 'disk_io_consumption'
-  | 'swap_usage'
-
-export type ProjectDailyStatsInterval = '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+  operations['DailyStatsController_getDailyStats']['parameters']['query']['attribute']
 
 export type ProjectDailyStatsVariables = {
   projectRef?: string
   attribute: ProjectDailyStatsAttribute
   startDate?: string
   endDate?: string
-  interval?: ProjectDailyStatsInterval
+  interval?: AnalyticsInterval
   dateFormat?: string
   databaseIdentifier?: string
   modifier?: (x: number) => number

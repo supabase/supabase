@@ -1,11 +1,10 @@
 interface ResourceWarningMessage {
-  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')
   restrictToRoutes?: string[]
 
   bannerContent: {
     warning: { title: string; description: string }
     critical: { title?: string; description?: string }
-    allowDismissable?: boolean
   }
   cardContent: {
     warning: { title: string; description: string }
@@ -43,7 +42,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View database settings',
+    buttonText: 'Learn more',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
@@ -70,8 +69,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: 'It may become unresponsive',
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-disk-io',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-disk-io',
+    buttonText: 'Learn more',
     metric: 'disk_io',
   },
   disk_space_exhaustion: {
@@ -125,8 +124,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-cpu',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/high-cpu-usage',
+    buttonText: 'Learn more',
     metric: 'cpu',
   },
   memory_and_swap_exhaustion: {
@@ -153,8 +152,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         description: `Performance is affected`,
       },
     },
-    docsUrl: 'https://supabase.com/docs/guides/platform/exhaust-ram',
-    buttonText: 'Check usage',
+    docsUrl: 'https://supabase.com/docs/guides/troubleshooting/exhaust-ram',
+    buttonText: 'Learn more',
     metric: 'ram',
   },
   auth_rate_limit_exhaustion: {
@@ -212,37 +211,5 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     docsUrl: undefined,
     buttonText: 'Check usage',
     metric: null,
-  },
-  // [Joshen] We can remove this once auth team gives the signal to
-  auth_restricted_email_sending: {
-    restrictToRoutes: ['/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
-    bannerContent: {
-      warning: {
-        title: "Authentication emails are only sent to organization members' email addresses",
-        description:
-          'Set up a custom SMTP provider to handle flows like password reset which require sending emails to any user',
-      },
-      critical: {
-        title: "Authentication emails are only sent to organization members' email addresses",
-        description:
-          'Set up a custom SMTP provider to handle flows like password reset which require sending emails to any user',
-      },
-      allowDismissable: true,
-    },
-    cardContent: {
-      warning: {
-        title: 'Auth emails are restricted',
-        description:
-          "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user",
-      },
-      critical: {
-        title: 'Auth emails are restricted',
-        description:
-          "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user.",
-      },
-    },
-    docsUrl: 'https://github.com/orgs/supabase/discussions/29370',
-    buttonText: 'Set up custom SMTP now',
-    metric: 'auth_restricted_email_sending',
   },
 }

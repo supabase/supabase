@@ -27,5 +27,6 @@ export const useDatabaseReport = () => {
     },
     largeObjectsSql: largeObjects.resolvedSql,
     isLoading,
+    refresh: () => largeObjects.runQuery,
   }
 }

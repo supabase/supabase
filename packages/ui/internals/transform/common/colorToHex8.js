@@ -7,5 +7,5 @@ module.exports = {
   },
   transformer: function ({ value }) {
     return `${new TinyColor.TinyColor(value).toHex8String()}`
-  }
+  },
 }

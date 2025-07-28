@@ -7,8 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { User } from 'data/auth/users-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { User } from 'data/auth/users-infinite-query'
 import {
   Button,
   cn,
@@ -34,7 +33,6 @@ interface BanUserModalProps {
 export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { mutate: updateUser, isLoading: isBanningUser } = useUserUpdateMutation({
     onSuccess: (_, vars) => {
       const bannedUntil = dayjs()
@@ -62,24 +60,15 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
   const bannedUntil = dayjs().add(Number(value), unit).format('DD MMM YYYY HH:mm (ZZ)')
 
   const onSubmit = (data: FormType) => {
-    if (!settings) {
-      return toast.error(`Failed to ban user: Error loading project config`)
-    } else if (user.id === undefined) {
+    if (projectRef === undefined) return console.error('Project ref is required')
+    if (user.id === undefined) {
       return toast.error(`Failed to ban user: User ID not found`)
     }
 
     const durationHours = data.unit === 'hours' ? Number(data.value) : Number(data.value) * 24
-    const endpoint = settings.app_config?.endpoint
-    const { serviceKey } = getAPIKeys(settings)
-
-    if (!endpoint) return toast.error(`Failed to ban user: Unable to retrieve API endpoint`)
-    if (!serviceKey?.api_key) return toast.error(`Failed to ban user: Unable to retrieve API key`)
 
     updateUser({
       projectRef,
-      protocol: 'https',
-      endpoint,
-      serviceApiKey: serviceKey.api_key,
       userId: user.id,
       banDuration: durationHours,
     })

@@ -1,146 +1,213 @@
-import dayjs from 'dayjs'
-import { noop } from 'lodash'
-import Image from 'next/image'
-import { PropsWithChildren, memo, useMemo } from 'react'
+import { Message as VercelMessage } from 'ai/react'
+import { Loader2, User } from 'lucide-react'
+import { createContext, PropsWithChildren, ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { Components } from 'react-markdown/lib/ast-to-react'
 import remarkGfm from 'remark-gfm'
-import { AiIconAnimation, Badge, cn, markdownComponents, WarningIcon } from 'ui'
 
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { ProfileImage } from 'components/ui/ProfileImage'
 import { useProfile } from 'lib/profile'
-import { MessagePre } from './MessagePre'
+import { cn, markdownComponents, WarningIcon } from 'ui'
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
+import { DisplayBlockRenderer } from './DisplayBlockRenderer'
+import {
+  Heading3,
+  Hyperlink,
+  InlineCode,
+  ListItem,
+  MarkdownPre,
+  OrderedList,
+} from './MessageMarkdown'
 
-interface MessageProps {
-  name?: string
-  role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
-  content?: string
-  createdAt?: number
-  isDebug?: boolean
-  isSelected?: boolean
-  action?: React.ReactNode
-  context?: { entity: string; schemas: string[]; tables: string[] }
-  onDiff?: (type: DiffType, s: string) => void
-  variant?: 'default' | 'warning'
+interface MessageContextType {
+  isLoading: boolean
+  readOnly?: boolean
+}
+export const MessageContext = createContext<MessageContextType>({ isLoading: false })
+
+const baseMarkdownComponents: Partial<Components> = {
+  ol: OrderedList,
+  li: ListItem,
+  h3: Heading3,
+  code: InlineCode,
+  a: Hyperlink,
+  img: ({ src }) => <span className="text-foreground-light font-mono">[Image: {src}]</span>,
 }
 
-export const Message = memo(function Message({
-  name,
-  role,
-  content,
-  createdAt,
-  isDebug,
-  isSelected = false,
-  context,
-  children,
+interface MessageProps {
+  id: string
+  message: VercelMessage
+  isLoading: boolean
+  readOnly?: boolean
+  action?: ReactNode
+  variant?: 'default' | 'warning'
+  onResults: ({
+    messageId,
+    resultId,
+    results,
+  }: {
+    messageId: string
+    resultId?: string
+    results: any[]
+  }) => void
+}
+
+export const Message = function Message({
+  id,
+  message,
+  isLoading,
+  readOnly,
   action = null,
   variant = 'default',
-  onDiff = noop,
+  onResults,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
+  const allMarkdownComponents: Partial<Components> = useMemo(
+    () => ({
+      ...markdownComponents,
+      ...baseMarkdownComponents,
+      pre: ({ children }) => (
+        <MarkdownPre id={id} onResults={onResults}>
+          {children}
+        </MarkdownPre>
+      ),
+    }),
+    [id, onResults]
+  )
+
+  if (!message) {
+    console.error(`Message component received undefined message prop for id: ${id}`)
+    return null
+  }
+
+  const { role, content, parts } = message
   const isUser = role === 'user'
 
-  const icon = useMemo(() => {
-    return role === 'assistant' ? (
-      <AiIconAnimation
-        loading={content === 'Thinking...'}
-        className="[&>div>div]:border-black dark:[&>div>div]:border-white"
-      />
-    ) : (
-      <div className="relative border shadow-lg w-8 h-8 rounded-full overflow-hidden">
-        <Image
-          src={`https://github.com/${profile?.username}.png` || ''}
-          width={30}
-          height={30}
-          alt="avatar"
-          className="relative"
-        />
-      </div>
-    )
-  }, [content, profile?.username, role])
+  const shouldUsePartsRendering = parts && parts.length > 0
 
-  const formattedContext =
-    context !== undefined
-      ? Object.entries(context)
-          .filter(([_, value]) => value.length > 0)
-          .map(([key, value]) => {
-            return `${key.charAt(0).toUpperCase() + key.slice(1)}: ${Array.isArray(value) ? value.join(', ') : value}`
-          })
-          .join(' • ')
-      : undefined
-
-  if (!content) return null
+  const hasTextContent = content && content.trim().length > 0
 
   return (
-    <div
-      className={cn(
-        'flex flex-col py-4 gap-4 px-5 text-foreground-light text-sm border-t first:border-0',
-        variant === 'warning' && 'bg-warning-200',
-        isUser && 'bg-default'
-      )}
-    >
-      <div className="flex justify-between items-center">
-        <div className="flex gap-x-3 items-center">
-          {variant === 'warning' ? <WarningIcon className="w-6 h-6" /> : icon}
+    <MessageContext.Provider value={{ isLoading, readOnly }}>
+      <div
+        className={cn(
+          'text-foreground-light text-sm',
+          isUser && 'text-foreground',
+          variant === 'warning' && 'bg-warning-200'
+        )}
+      >
+        {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
 
-          <div className="flex flex-col -gap-y-1">
-            <div className="flex items-center gap-x-3">
-              <span className="text-sm">{!isUser ? 'Assistant' : name ? name : 'You'}</span>
-              {createdAt && (
-                <span
-                  className={cn(
-                    'text-xs text-foreground-muted',
-                    variant === 'warning' && 'text-warning-500'
-                  )}
-                >
-                  {dayjs(createdAt).fromNow()}
-                </span>
-              )}
-            </div>
-            {role === 'user' && context !== undefined && (
-              <span className="text-xs text-foreground-lighter">{formattedContext}</span>
+        {action}
+
+        <div className="flex gap-4 w-auto overflow-hidden">
+          {isUser && (
+            <ProfileImage
+              alt={profile?.username}
+              src={profile?.profileImageUrl}
+              className="w-5 h-5 shrink-0 rounded-full"
+            />
+          )}
+
+          <div className="flex-1 min-w-0 space-y-2">
+            {shouldUsePartsRendering ? (
+              (() => {
+                const shownLoadingTools = new Set<string>()
+                return parts.map(
+                  (part: NonNullable<VercelMessage['parts']>[number], index: number) => {
+                    switch (part.type) {
+                      case 'text':
+                        return (
+                          <ReactMarkdown
+                            key={`${id}-part-${index}`}
+                            className={cn(
+                              'prose prose-sm [&>div]:my-4 prose-h1:text-xl prose-h1:mt-6 prose-h3:no-underline prose-h3:text-base prose-h3:mb-4 prose-strong:font-medium prose-strong:text-foreground break-words [&>p:not(:last-child)]:!mb-2 [&>*>p:first-child]:!mt-0 [&>*>p:last-child]:!mb-0 [&>*>*>p:first-child]:!mt-0 [&>*>*>p:last-child]:!mb-0 [&>ol>li]:!pl-4',
+                              isUser && 'text-foreground [&>p]:font-medium'
+                            )}
+                            remarkPlugins={[remarkGfm]}
+                            components={allMarkdownComponents}
+                          >
+                            {part.text}
+                          </ReactMarkdown>
+                        )
+
+                      case 'tool-invocation': {
+                        const { toolCallId, toolName, args, state } = part.toolInvocation
+                        if (state === 'call' || state === 'partial-call') {
+                          if (shownLoadingTools.has(toolName)) {
+                            return null
+                          }
+                          shownLoadingTools.add(toolName)
+                          return (
+                            <div
+                              key={`${id}-tool-loading-${toolName}`}
+                              className="rounded-lg border bg-surface-75 text-xs font-mono text-xs text-foreground-lighter py-2 px-3 flex items-center gap-2"
+                            >
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              {`Calling ${toolName}...`}
+                            </div>
+                          )
+                        }
+                        // Only render the result UI for known tools when state is 'result'
+                        switch (toolName) {
+                          case 'display_query': {
+                            return (
+                              <DisplayBlockRenderer
+                                key={`${id}-tool-${toolCallId}`}
+                                messageId={id}
+                                toolCallId={toolCallId}
+                                manualId={args.manualToolCallId}
+                                initialArgs={args}
+                                messageParts={parts}
+                                isLoading={false}
+                                onResults={onResults}
+                              />
+                            )
+                          }
+                          case 'display_edge_function': {
+                            return (
+                              <div
+                                key={`${id}-tool-${toolCallId}`}
+                                className="w-auto overflow-x-hidden"
+                              >
+                                <EdgeFunctionBlock
+                                  label={args.name || 'Edge Function'}
+                                  code={args.code}
+                                  functionName={args.name || 'my-function'}
+                                  showCode={!readOnly}
+                                />
+                              </div>
+                            )
+                          }
+                          default:
+                            // For unknown tools, just show nothing for result
+                            return null
+                        }
+                      }
+                      case 'reasoning':
+                      case 'source':
+                      case 'file':
+                        return null
+                      default:
+                        return null
+                    }
+                  }
+                )
+              })()
+            ) : hasTextContent ? (
+              <ReactMarkdown
+                className="prose prose-sm max-w-none break-words"
+                remarkPlugins={[remarkGfm]}
+                components={allMarkdownComponents}
+              >
+                {content}
+              </ReactMarkdown>
+            ) : (
+              <span className="text-foreground-lighter italic">Assistant is thinking...</span>
             )}
           </div>
-
-          {isDebug && <Badge variant="warning">Debug request</Badge>}
-        </div>{' '}
-        {action}
+        </div>
       </div>
-
-      <ReactMarkdown
-        className="gap-x-2.5 gap-y-4 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
-        remarkPlugins={[remarkGfm]}
-        components={{
-          ...markdownComponents,
-          pre: (props: any) => {
-            return (
-              <MessagePre
-                onDiff={onDiff}
-                className={cn(
-                  'transition [&>div>pre]:max-w-full',
-                  isSelected ? '[&>div>pre]:!border-stronger [&>div>pre]:!bg-surface-200' : ''
-                )}
-              >
-                {props.children[0].props.children}
-              </MessagePre>
-            )
-          },
-          ol: (props: any) => {
-            return <ol className="flex flex-col gap-y-4">{props.children}</ol>
-          },
-          li: (props: any) => {
-            return <li className="[&>pre]:mt-2">{props.children}</li>
-          },
-          h3: (props: any) => {
-            return <h3 className="underline">{props.children}</h3>
-          },
-          code: (props: any) => {
-            return <code className={cn('text-xs', props.className)}>{props.children}</code>
-          },
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-      {children}
-    </div>
+    </MessageContext.Provider>
   )
-})
+}

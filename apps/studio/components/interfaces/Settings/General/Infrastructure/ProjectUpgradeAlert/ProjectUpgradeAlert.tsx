@@ -9,15 +9,19 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { useParams } from 'common'
+import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { Markdown } from 'components/interfaces/Markdown'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import {
   ProjectUpgradeTargetVersion,
   useProjectUpgradeEligibilityQuery,
 } from 'data/config/project-upgrade-eligibility-query'
-import { ReleaseChannel, useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
+import { ReleaseChannel } from 'data/projects/new-project.constants'
+import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Admonition } from 'ui-patterns/admonition'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -34,10 +38,11 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface PostgresVersionDetails {
@@ -62,9 +67,17 @@ const ProjectUpgradeAlert = () => {
   const router = useRouter()
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const org = useSelectedOrganization()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
+
+  const planId = org?.plan.id ?? 'free'
+
+  const { data: diskAttributes } = useDiskAttributesQuery({ projectRef: ref })
+  const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
+  const includedDiskGB = includedDiskGBMeta[diskAttributes?.attributes.type ?? 'gp3']
+  const isDiskSizeUpdated = diskAttributes?.attributes.size_gb !== includedDiskGB
 
   const { data } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
@@ -125,8 +138,8 @@ const ProjectUpgradeAlert = () => {
           <p className="mb-3">
             The latest version of Postgres ({latestPgVersion}) is available for your project.
           </p>
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <Button
                 size="tiny"
                 type="primary"
@@ -135,13 +148,13 @@ const ProjectUpgradeAlert = () => {
               >
                 Upgrade project
               </Button>
-            </TooltipTrigger_Shadcn_>
+            </TooltipTrigger>
             {projectUpgradeDisabled && (
-              <TooltipContent_Shadcn_ side="bottom" align="center">
+              <TooltipContent side="bottom" align="center">
                 Project upgrade is currently disabled
-              </TooltipContent_Shadcn_>
+              </TooltipContent>
             )}
-          </Tooltip_Shadcn_>
+          </Tooltip>
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>
 
@@ -166,6 +179,15 @@ const ProjectUpgradeAlert = () => {
                   All services will be offline and you will not be able to downgrade back to
                   Postgres {currentPgVersion}.
                 </p>
+                {isDiskSizeUpdated && (
+                  <Markdown
+                    extLinks
+                    className="text-foreground"
+                    content={`Your current disk size of ${diskAttributes?.attributes.size_gb}GB will also be
+                    [right-sized](https://supabase.com/docs/guides/platform/upgrading#disk-sizing) with the upgrade.`}
+                  />
+                )}
+                {/* @ts-ignore */}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
                   <Alert_Shadcn_ variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />

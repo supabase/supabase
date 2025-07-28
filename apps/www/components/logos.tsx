@@ -54,6 +54,11 @@ const logos = [
     name: 'mozilla',
   },
   {
+    image: `/images/logos/publicity/github.svg`,
+    alt: 'github',
+    name: 'github',
+  },
+  {
     image: `/images/logos/publicity/1password.svg`,
     alt: '1password',
     name: '1password',
@@ -72,11 +77,6 @@ const logos = [
     image: `/images/logos/publicity/humata.svg`,
     alt: 'humata',
     name: 'humata',
-  },
-  {
-    image: `/images/logos/publicity/krea.svg`,
-    alt: 'krea',
-    name: 'krea',
   },
   {
     image: `/images/logos/publicity/udio.svg`,
@@ -117,6 +117,11 @@ const logos = [
     image: `/images/logos/publicity/betashares.svg`,
     alt: 'betashares',
     name: 'betashares',
+  },
+  {
+    image: `/images/logos/publicity/submagic.svg`,
+    alt: 'submagic',
+    name: 'submagic',
   },
 ]
 

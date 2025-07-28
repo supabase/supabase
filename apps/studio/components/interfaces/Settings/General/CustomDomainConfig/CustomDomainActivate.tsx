@@ -1,8 +1,8 @@
-import { AlertCircle, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
@@ -30,7 +30,13 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       },
     }
   )
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      toast.success(
+        'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
+      )
+    },
+  })
 
   const endpoint = settings?.app_config?.endpoint
 
@@ -89,22 +95,13 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/platform/custom-domains"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
+            <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
             <div className="flex items-center space-x-2">
               <Button
                 type="default"
+                className="self-end"
                 onClick={onCancelCustomDomain}
                 loading={isDeleting}
-                disabled={isDeleting}
-                className="self-end"
               >
                 Cancel
               </Button>

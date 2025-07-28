@@ -1,9 +1,9 @@
 import { Copy } from 'lucide-react'
 
 import CopyButton from 'components/ui/CopyButton'
-import { User } from 'data/auth/users-query'
+import { User } from 'data/auth/users-infinite-query'
 import { cn } from 'ui'
-import { PANEL_PADDING } from './UserPanel'
+import { PANEL_PADDING } from './Users.constants'
 import { getDisplayName } from './Users.utils'
 
 export const UserHeader = ({ user }: { user: User }) => {

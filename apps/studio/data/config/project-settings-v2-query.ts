@@ -8,7 +8,14 @@ import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectSettingsVariables = { projectRef?: string }
-export type ProjectSettings = components['schemas']['ProjectSettingsResponse']
+
+// Manually add the protocol property to the response - specifically just for the local/CLI environment
+type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
+  protocol?: string
+}
+export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
+  app_config?: ProjectAppConfig
+}
 
 export async function getProjectSettings(
   { projectRef }: ProjectSettingsVariables,
@@ -44,19 +51,14 @@ export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
     ({ signal }) => getProjectSettings({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval(data) {
-        const apiKeys = (data as ProjectSettings)?.service_api_keys ?? []
-        const interval = canReadAPIKeys && apiKeys.length === 0 ? 2000 : 0
+      refetchInterval(_data) {
+        const data = _data as ProjectSettings | undefined
+        const apiKeys = data?.service_api_keys ?? []
+        const interval =
+          canReadAPIKeys && data?.status !== 'INACTIVE' && apiKeys.length === 0 ? 2000 : 0
         return interval
       },
       ...options,
     }
   )
-}
-
-export const getAPIKeys = (settings?: ProjectSettings) => {
-  const anonKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'anon')
-  const serviceKey = (settings?.service_api_keys ?? []).find((x) => x.tags === 'service_role')
-
-  return { anonKey, serviceKey }
 }

@@ -1,16 +1,17 @@
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useIndexesQuery } from 'data/database/indexes-query'
+import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -32,6 +33,7 @@ import {
   SidePanel,
   cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -44,6 +46,8 @@ interface CreateIndexSidePanelProps {
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
   const { project } = useProjectContext()
+  const isOrioleDb = useIsOrioleDb()
+
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
@@ -51,11 +55,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const { refetch: refetchIndexes } = useIndexesQuery({
-    schema: selectedSchema,
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -78,14 +78,10 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     connectionString: project?.connectionString,
   })
 
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: async () => {
-      await refetchIndexes()
+  const { mutate: createIndex, isLoading: isExecuting } = useDatabaseIndexCreateMutation({
+    onSuccess: () => {
       onClose()
       toast.success(`Successfully created index`)
-    },
-    onError: (error) => {
-      toast.error(`Failed to create index: ${error.message}`)
     },
   })
 
@@ -98,7 +94,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     setSearchTerm(value)
   }
 
-  const columns = tableColumns?.result[0]?.columns ?? []
+  const columns = tableColumns?.[0]?.columns ?? []
   const columnOptions: MultiSelectOption[] = columns
     .filter((column): column is NonNullable<typeof column> => column !== null)
     .map((column) => ({
@@ -116,11 +112,17 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
 
   const onSaveIndex = () => {
     if (!project) return console.error('Project is required')
+    if (!selectedEntity) return console.error('Entity is required')
 
-    execute({
+    createIndex({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      sql: generatedSQL,
+      payload: {
+        schema: selectedSchema,
+        entity: selectedEntity,
+        type: selectedIndexType,
+        columns: selectedColumns,
+      },
     })
   }
 
@@ -338,6 +340,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 isReactForm={false}
               >
                 <Select_Shadcn_
+                  disabled={isOrioleDb}
                   value={selectedIndexType}
                   onValueChange={setSelectedIndexType}
                   name="selected-index-type"
@@ -349,8 +352,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
                     {INDEX_TYPES.map((index, i) => (
-                      <>
-                        <SelectItem_Shadcn_ key={index.name} value={index.value}>
+                      <Fragment key={index.name}>
+                        <SelectItem_Shadcn_ value={index.value}>
                           <div className="flex flex-col gap-0.5">
                             <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
@@ -364,11 +367,22 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           </div>
                         </SelectItem_Shadcn_>
                         {i < INDEX_TYPES.length - 1 && <SelectSeparator_Shadcn_ />}
-                      </>
+                      </Fragment>
                     ))}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
               </FormItemLayout>
+              {isOrioleDb && (
+                <Admonition
+                  type="default"
+                  className="!mt-2"
+                  title="OrioleDB currently only supports the B-tree index type"
+                  description="More index types may be supported when OrioleDB is no longer in preview"
+                >
+                  {/* [Joshen Oriole] Hook up proper docs URL */}
+                  <DocsButton className="mt-2" abbrev={false} href="https://supabase.com/docs" />
+                </Admonition>
+              )}
             </SidePanel.Content>
             <SidePanel.Separator />
             <SidePanel.Content>

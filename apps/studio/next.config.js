@@ -2,102 +2,36 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
+const { getCSP } = require('./csp')
 
 // Required for nextjs standalone build
 const path = require('path')
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-  : ''
-const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ''
-const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
-  ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
-  : ''
-const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
-const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
+function getAssetPrefix() {
+  // If not force enabled, but not production env, disable CDN
+  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
+    return undefined
+  }
 
-// construct the URL for the Websocket Local URLs
-let SUPABASE_LOCAL_PROJECTS_URL_WS = ''
-if (SUPABASE_URL) {
-  const url = new URL(SUPABASE_URL)
-  const wsUrl = `${url.hostname}:${url.port}`
-  SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
+  // Force disable CDN
+  if (process.env.FORCE_ASSET_CDN === '-1') {
+    return undefined
+  }
+
+  const SUPABASE_ASSETS_URL =
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? 'https://frontend-assets.supabase.green'
+      : 'https://frontend-assets.supabase.com'
+
+  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }
-
-// Needed to test docs search in local dev
-const SUPABASE_DOCS_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
-  : ''
-
-const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
-const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
-const SUPABASE_COM_URL = 'https://supabase.com'
-const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
-const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com'
-const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
-const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
-const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
-const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
-const STRIPE_JS_URL = 'https://js.stripe.com'
-const STRIPE_NETWORK_URL = 'https://*.stripe.network'
-const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://1.1.1.1'
-const VERCEL_URL = 'https://vercel.com'
-const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
-const GITHUB_API_URL = 'https://api.github.com'
-const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
-const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
-const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
-const VERCEL_LIVE_URL = 'https://vercel.live'
-// used by vercel live preview
-const PUSHER_URL = 'https://*.pusher.com'
-const PUSHER_URL_WS = 'wss://*.pusher.com'
-
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
-const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
-const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
-const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL}`
-const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
-const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
-
-const csp = [
-  ...(process.env.VERCEL_ENV === 'preview' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-    ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `worker-src 'self' blob: data:;`,
-      ]
-    : [
-        `default-src 'self' ${DEFAULT_SRC_URLS};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS};`,
-        `frame-src 'self' ${FRAME_SRC_URLS};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS};`,
-        `font-src 'self' ${FONT_SRC_URLS};`,
-        `worker-src 'self' blob: data:;`,
-      ]),
-  `object-src 'none';`,
-  `base-uri 'self';`,
-  `form-action 'self';`,
-  `frame-ancestors 'none';`,
-  `block-all-mixed-content;`,
-  ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? [`upgrade-insecure-requests;`]
-    : []),
-].join(' ')
 
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  assetPrefix: getAssetPrefix(),
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
@@ -106,8 +40,7 @@ const nextConfig = {
     return [
       {
         source: `/.well-known/vercel/flags`,
-        // TODO: Replace this with supabase.com/.well-known/vercel/flags once this PR is merged.
-        destination: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
+        destination: `https://supabase.com/.well-known/vercel/flags`,
         basePath: false,
       },
     ]
@@ -130,7 +63,7 @@ const nextConfig = {
             },
             {
               source: '/',
-              destination: '/projects',
+              destination: '/org',
               permanent: false,
             },
             {
@@ -202,11 +135,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/database/replication',
-        destination: '/project/:ref/database/publications',
-        permanent: true,
-      },
-      {
         source: '/project/:ref/database/graphiql',
         destination: '/project/:ref/api/graphiql',
         permanent: true,
@@ -259,7 +187,7 @@ const nextConfig = {
             value: 'computeInstance',
           },
         ],
-        destination: '/project/:ref/settings/addons?panel=computeInstance',
+        destination: '/project/:ref/settings/compute-and-disk',
         permanent: true,
       },
       {
@@ -360,11 +288,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/project/:ref/sql',
-        destination: '/project/:ref/sql/new',
-        permanent: true,
-      },
-      {
         permanent: true,
         source: '/project/:ref/reports/linter',
         destination: '/project/:ref/database/linter',
@@ -372,7 +295,12 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/reports/query-performance',
-        destination: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
       },
       {
         permanent: true,
@@ -397,17 +325,17 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/database/webhooks',
-        destination: '/project/:ref/integrations/webhooks',
+        destination: '/project/:ref/integrations/webhooks/overview',
       },
       {
         permanent: true,
         source: '/project/:ref/database/wrappers',
-        destination: '/project/:ref/integrations/wrappers',
+        destination: '/project/:ref/integrations?category=wrapper',
       },
       {
         permanent: true,
-        source: '/project/:ref/.....',
-        destination: '/project/:ref/integrations/cron-jobs',
+        source: '/project/:ref/database/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
       },
       {
         permanent: true,
@@ -424,6 +352,32 @@ const nextConfig = {
         source: '/project/:ref/settings/vault/keys',
         destination: '/project/:ref/integrations/vault/keys',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/integrations/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/warehouse',
+        destination: '/project/:ref/settings/general',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/functions',
+        destination: '/project/:ref/functions/secrets',
+      },
+      {
+        source: '/org/:slug/invoices',
+        destination: '/org/:slug/billing#invoices',
+        permanent: true,
+      },
+      {
+        source: '/projects',
+        destination: '/organizations',
+        permanent: false,
+      },
+
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
@@ -450,8 +404,16 @@ const nextConfig = {
             value: 'no-sniff',
           },
           {
+            key: 'Strict-Transport-Security',
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+                ? 'max-age=31536000; includeSubDomains; preload'
+                : '',
+          },
+          {
             key: 'Content-Security-Policy',
-            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? getCSP() : "frame-ancestors 'none';",
           },
           {
             key: 'Referrer-Policy',
@@ -470,17 +432,21 @@ const nextConfig = {
       },
       {
         source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        headers: [{ key: 'cache-control', value: 'public, max-age=2592000' }],
       },
       {
-        source: '/fonts/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        source: '/favicon/:slug*',
+        headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
+      },
+      {
+        source: '/(.*).ts',
+        headers: [{ key: 'content-type', value: 'text/typescript' }],
       },
     ]
   },
   images: {
     // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns: [
       {
         protocol: 'https',
@@ -517,6 +483,15 @@ const nextConfig = {
     'icons',
     'libpg-query',
   ],
+  turbopack: {
+    rules: {
+      '*.md': {
+        loaders: ['raw-loader'],
+        as: '*.js',
+      },
+    },
+  },
+  // Both configs for turbopack and webpack need to exist (and sync) because Nextjs still uses webpack for production building
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)
@@ -527,6 +502,12 @@ const nextConfig = {
           delete rule.issuer.and
         }
       })
+
+    // .md files to be loaded as raw text
+    config.module.rules.push({
+      test: /\.md$/,
+      type: 'asset/source',
+    })
 
     return config
   },
@@ -563,12 +544,6 @@ module.exports =
         reactComponentAnnotation: {
           enabled: true,
         },
-
-        // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-        // This can increase your server load as well as your hosting bill.
-        // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-        // side errors will fail.
-        tunnelRoute: '/monitoring',
 
         // Hides source maps from generated client bundles
         hideSourceMaps: true,

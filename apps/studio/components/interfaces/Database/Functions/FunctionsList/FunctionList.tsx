@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop, sortBy } from 'lodash'
+import { Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -7,12 +8,13 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Edit3, FileText, MoreVertical, Trash } from 'lucide-react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 
@@ -33,6 +35,7 @@ const FunctionList = ({
 }: FunctionListProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -86,7 +89,13 @@ const FunctionList = ({
         return (
           <Table.tr key={x.id}>
             <Table.td className="truncate">
-              <p title={x.name}>{x.name}</p>
+              <Button
+                type="text"
+                className="text-foreground text-sm p-0 hover:bg-transparent"
+                onClick={() => editFunction(x)}
+              >
+                {x.name}
+              </Button>
             </Table.td>
             <Table.td className="table-cell overflow-auto">
               <p title={x.argument_types} className="truncate">
@@ -105,7 +114,7 @@ const FunctionList = ({
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent side="left">
+                      <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
                             className="space-x-2"
@@ -116,11 +125,45 @@ const FunctionList = ({
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
-                          <Edit3 size={14} />
+                          <Edit2 size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={() => {
+                            aiSnap.newChat({
+                              name: `Update function ${x.name}`,
+                              open: true,
+                              initialInput: 'Update this function to do...',
+                              suggestions: {
+                                title:
+                                  'I can help you make a change to this function, here are a few example prompts to get you started:',
+                                prompts: [
+                                  {
+                                    label: 'Rename Function',
+                                    description: 'Rename this function to ...',
+                                  },
+                                  {
+                                    label: 'Modify Function',
+                                    description: 'Modify this function so that it ...',
+                                  },
+                                  {
+                                    label: 'Add Trigger',
+                                    description:
+                                      'Add a trigger for this function that calls it when ...',
+                                  },
+                                ],
+                              },
+                              sqlSnippets: [x.complete_statement],
+                            })
+                          }}
+                        >
+                          <Edit size={14} />
+                          <p>Edit function with Assistant</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
-                          <Trash stroke="red" size={14} />
+                          <Trash size={14} className="text-destructive" />
                           <p>Delete function</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

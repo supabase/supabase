@@ -78,30 +78,32 @@ const BillingMetric = ({
 
   return (
     <HoverCard openDelay={50} closeDelay={200}>
-      <HoverCardTrigger>
-        <div className="flex items-center justify-between cursor-pointer">
-          <div>
+      <HoverCardTrigger asChild>
+        <div className="flex items-center justify-between">
+          <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
             {metric.anchor ? (
-              <Link href={`/org/${slug}/usage#${metric.anchor}`}>
-                <div className="group flex items-center space-x-1">
-                  <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                    {metric.name}
-                  </p>
-                  {usageMeta.available_in_plan && (
+              <div className="group flex items-center gap-1">
+                <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                  {metric.name}
+                </p>
+                {usageMeta.available_in_plan && (
+                  <span className="transition inline-block group-hover:transform group-hover:translate-x-0.5">
                     <ChevronRight strokeWidth={1.5} size={16} className="transition" />
-                  )}
-                </div>
-              </Link>
+                  </span>
+                )}
+              </div>
             ) : (
               <p className="text-xs text-foreground-light flex space-x-1">{metric.name}</p>
             )}
             <span className="text-sm">{usageLabel}</span>&nbsp;
             {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
-              <span className="text-sm">({formatCurrency(usageMeta.cost)})</span>
+              <span className="text-sm" translate="no">
+                ({formatCurrency(usageMeta.cost)})
+              </span>
             ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
               <span className="text-sm">{percentageLabel}</span>
             ) : null}
-          </div>
+          </Link>
 
           {usageMeta.available_in_plan ? (
             <div>
@@ -143,7 +145,11 @@ const BillingMetric = ({
           ) : (
             <div>
               <Button type="default" asChild>
-                <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>Upgrade</Link>
+                <Link
+                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=billingBreakdownUsage${metric.anchor}`}
+                >
+                  Upgrade
+                </Link>
               </Button>
             </div>
           )}
@@ -152,7 +158,9 @@ const BillingMetric = ({
       {usageMeta.available_in_plan && (
         <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
           <div className="text-sm">
-            <p className="font-medium">{usageMeta.unit_price_desc}</p>
+            <p className="font-medium" translate="no">
+              {usageMeta.unit_price_desc}
+            </p>
 
             {metric.tip && (
               <div className="my-2">

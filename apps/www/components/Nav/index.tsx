@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
+import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
+import { useIsLoggedIn, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
@@ -13,37 +14,40 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+
 import ScrollProgress from '~/components/ScrollProgress'
+import { getMenu } from '~/data/nav'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
-import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
+import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import { allBlogPosts } from 'contentlayer/generated'
-import { getMenu } from '~/data/nav'
-import { sortDates } from '~/lib/helpers'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import useDropdownMenu from './useDropdownMenu'
+import { AnnouncementBanner, AuthenticatedDropdownMenu } from 'ui-patterns'
 
 interface Props {
   hideNavbar: boolean
+  stickyNavbar?: boolean
 }
 
-const Nav = (props: Props) => {
+const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
-  const latestBlogPosts = allBlogPosts.sort(sortDates).slice(0, 2)
-  const menu = getMenu(latestBlogPosts)
+  const menu = getMenu()
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const user = useUser()
+  const userMenu = useDropdownMenu(user)
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isGAWeekSection = router.pathname.startsWith('/ga-week')
-  const hasStickySubnav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage
-  const showLaunchWeekNavMode = (isLaunchWeekPage || isGAWeekSection) && !open
+  const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
+  const showLaunchWeekNavMode = !isLaunchWeekXPage && (isLaunchWeekPage || isGAWeekSection) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -59,33 +63,31 @@ const Nav = (props: Props) => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
-  if (props.hideNavbar) {
+  if (hideNavbar) {
     return null
   }
 
-  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
+  // const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
 
   return (
     <>
-      {/* <Announcement>
-        Uncomment to show announcement banner
-      </Announcement> */}
+      <AnnouncementBanner />
       <div
-        className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
+        className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            showLaunchWeekNavMode && '!bg-transparent dark:!bg-black transition-all',
             isGAWeekSection && 'dark:!bg-alternative'
           )}
         />
         <nav
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && 'border-muted border-b bg-alternative/50'
+            showLaunchWeekNavMode && 'border-muted border-b bg-transparent'
           )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
@@ -131,22 +133,42 @@ const Nav = (props: Props) => {
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
                 <GitHubButton />
-                {!isUserLoading && (
+
+                {isLoggedIn ? (
                   <>
-                    {isLoggedIn ? (
-                      <Button className="hidden lg:block" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
-                      </Button>
-                    ) : (
-                      <>
-                        <Button type="default" className="hidden lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Sign in</Link>
-                        </Button>
-                        <Button className="hidden lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Start your project</Link>
-                        </Button>
-                      </>
-                    )}
+                    <Button className="hidden lg:block" asChild>
+                      <Link href="/dashboard/projects">Dashboard</Link>
+                    </Button>
+                    <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
+                  </>
+                ) : (
+                  <>
+                    <Button type="default" className="hidden lg:block" asChild>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: 'sign_in_button_clicked',
+                            properties: { buttonLocation: 'Header Nav' },
+                          })
+                        }
+                      >
+                        Sign in
+                      </Link>
+                    </Button>
+                    <Button className="hidden lg:block" asChild>
+                      <Link
+                        href="https://supabase.com/dashboard"
+                        onClick={() =>
+                          sendTelemetryEvent({
+                            action: 'start_project_button_clicked',
+                            properties: { buttonLocation: 'Header Nav' },
+                          })
+                        }
+                      >
+                        Start your project
+                      </Link>
+                    </Button>
                   </>
                 )}
               </div>
@@ -156,7 +178,7 @@ const Nav = (props: Props) => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
-          <MobileMenu open={open} setOpen={setOpen} isDarkMode={showDarkLogo} menu={menu} />
+          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
         </nav>
 
         <ScrollProgress />

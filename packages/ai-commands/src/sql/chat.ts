@@ -43,6 +43,8 @@ export async function chatSql(
     // is definitely not optimal at all, but just to get an idea started
     const generateInstructionsBasedOnContext = () => {
       switch (context) {
+        // [Joshen] Sorry for the mess, there's duplicate logic here between this and rls.ts - i'm wondering what should be the best practice
+        // here? Do we (1) Put ALL logic into this file, or (2) we split each context into their own files? Latter might be cleaner?
         case 'rls-policies':
           return stripIndent`
           You're a Supabase Postgres expert in writing row level security policies. Your purpose is to
@@ -55,6 +57,7 @@ export async function chatSql(
           if the function returns a type of trigger. When generating functions, do the following:
           - If the function returns a trigger type, ensure that it uses security definer, otherwise default to security invoker. Include this in the create functions SQL statement.
           - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
+          - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
           Please make sure that all queries are valid Postgres SQL queries.
           `
       }
@@ -62,7 +65,7 @@ export async function chatSql(
     initMessages.push({ role: 'user', content: generateInstructionsBasedOnContext() })
   }
 
-  if (entityDefinitions) {
+  if (entityDefinitions && entityDefinitions.length > 0) {
     const definitions = codeBlock`${entityDefinitions.join('\n\n')}`
     initMessages.push({
       role: 'user',

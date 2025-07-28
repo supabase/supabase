@@ -1,0 +1,78 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Studio Unit Tests & Build Check
+
+on:
+  push:
+    branches: [master, studio]
+    paths:
+      - 'apps/studio/**'
+      - 'pnpm-lock.yaml'
+  pull_request:
+    branches: [master, studio]
+    paths:
+      - 'apps/studio/**'
+      - 'pnpm-lock.yaml'
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    # Uses larger hosted runner as it significantly decreases build times
+    runs-on:
+      group: Default Larger Runners
+    strategy:
+      matrix:
+        test_number: [1]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            apps/studio
+            packages
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm i
+        working-directory: ./
+      - name: Run Tests
+        env:
+          # Default is 2 GB, increase to have less frequent OOM errors
+          NODE_OPTIONS: '--max_old_space_size=3072'
+        run: pnpm run test:ci
+        working-directory: ./apps/studio
+
+      - name: Upload coverage results to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          parallel: true
+          flag-name: studio-tests
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./apps/studio/coverage/lcov.info
+          base-path: './apps/studio'
+
+  finish:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          parallel-finished: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}

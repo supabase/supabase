@@ -103,6 +103,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Inner Side Menu',
+          href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
@@ -110,6 +115,21 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Multi Select',
           href: '/docs/fragments/multi-select',
+          items: [],
+        },
+        {
+          title: 'Filter Bar',
+          href: '/docs/fragments/filter-bar',
+          items: [],
+        },
+        {
+          title: 'Logs Bar Chart',
+          href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
+        {
+          title: 'Table of Contents (TOC)',
+          href: '/docs/fragments/toc',
           items: [],
         },
       ],
@@ -337,6 +357,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Slider',
           href: '/docs/components/slider',
+          items: [],
+        },
+        {
+          title: 'Sidebar',
+          href: '/docs/components/sidebar',
           items: [],
         },
         {

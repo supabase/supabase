@@ -1,13 +1,10 @@
-import React from 'react'
-import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
 import { data as DevelopersData } from 'data/Developers'
-import { BlogPost } from 'contentlayer/generated'
+import staticContent from '~/.contentlayer/generated/staticContent/_index.json' with { type: 'json' }
 
-type Props = {
-  blogPosts?: BlogPost[]
-}
+const { jobsCount, latestBlogPosts } = staticContent
 
 type LinkProps = {
   text: string
@@ -17,9 +14,9 @@ type LinkProps = {
   svg?: any
 }
 
-const DevelopersDropdown = ({ blogPosts }: Props) => (
+const DevelopersDropdown = () => (
   <div className="flex flex-col xl:flex-row">
-    <div className="w-[550px] xl:w-[500px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
+    <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
       {DevelopersData['navigation'].map((column) => (
         <div key={column.label} className="p-0 flex flex-col gap-6">
           <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
@@ -34,6 +31,11 @@ const DevelopersDropdown = ({ blogPosts }: Props) => (
                 >
                   {Icon && <Icon size={16} strokeWidth={1.3} />}
                   <span>{link.text}</span>
+                  {link.text === 'Careers' && jobsCount > 0 && (
+                    <span className="text-xs flex items-center justify-center text-foreground-lighter -ml-1">
+                      ({jobsCount})
+                    </span>
+                  )}
                   <ChevronRight
                     strokeWidth={2}
                     className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
@@ -55,7 +57,7 @@ const DevelopersDropdown = ({ blogPosts }: Props) => (
           <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
         </Link>
         <ul className="flex flex-col gap-5">
-          {blogPosts?.map((post: any) => (
+          {latestBlogPosts?.map((post) => (
             <li key={post.title}>
               <Link
                 href={post.url}

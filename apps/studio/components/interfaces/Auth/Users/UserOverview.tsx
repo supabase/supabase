@@ -10,13 +10,11 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
-import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { User } from 'data/auth/users-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { User } from 'data/auth/users-infinite-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
@@ -25,8 +23,9 @@ import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
+import { DeleteUserModal } from './DeleteUserModal'
 import { UserHeader } from './UserHeader'
-import { PANEL_PADDING } from './UserPanel'
+import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
@@ -46,18 +45,21 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const isPhoneAuth = user.phone !== null
   const isBanned = user.banned_until !== null
 
-  const providers = (user.raw_app_meta_data?.providers ?? []).map((provider: string) => {
-    return {
-      name: provider.startsWith('sso') ? 'SAML' : provider,
-      icon:
-        provider === 'email'
-          ? `${BASE_PATH}/img/icons/email-icon2.svg`
-          : providerIconMap[provider]
-            ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
-            : undefined,
+  const providers = ((user.raw_app_meta_data?.providers as string[]) ?? []).map(
+    (provider: string) => {
+      return {
+        name: provider.startsWith('sso') ? 'SAML' : provider,
+        icon:
+          provider === 'email'
+            ? `${BASE_PATH}/img/icons/email-icon2.svg`
+            : providerIconMap[provider]
+              ? `${BASE_PATH}/img/icons/${providerIconMap[provider]}.svg`
+              : undefined,
+      }
     }
-  })
+  )
 
+  const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
   const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
   const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
@@ -76,7 +78,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   const { data } = useAuthConfigQuery({ projectRef })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
   const minutes = Math.floor(mailerOtpExpiry / 60)
@@ -110,13 +111,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       toast.error(`Failed to send OTP: ${err.message}`)
     },
   })
-  const { mutate: deleteUser } = useUserDeleteMutation({
-    onSuccess: () => {
-      toast.success(`Successfully deleted ${user?.email}`)
-      setIsDeleteModalOpen(false)
-      onDeleteSuccess()
-    },
-  })
   const { mutate: deleteUserMFAFactors } = useUserDeleteMFAFactorsMutation({
     onSuccess: () => {
       toast.success("Successfully deleted the user's factors")
@@ -130,12 +124,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     },
   })
 
-  const handleDelete = async () => {
-    await timeout(200)
-    if (!projectRef) return console.error('Project ref is required')
-    deleteUser({ projectRef, user })
-  }
-
   const handleDeleteFactors = async () => {
     await timeout(200)
     if (!projectRef) return console.error('Project ref is required')
@@ -143,23 +131,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   }
 
   const handleUnban = () => {
-    if (!settings) {
-      return toast.error(`Failed to ban user: Error loading project config`)
-    } else if (user.id === undefined) {
+    if (projectRef === undefined) return console.error('Project ref is required')
+    if (user.id === undefined) {
       return toast.error(`Failed to ban user: User ID not found`)
     }
 
-    const endpoint = settings.app_config?.endpoint
-    const { serviceKey } = getAPIKeys(settings)
-
-    if (!endpoint) return toast.error(`Failed to unban user: Unable to retrieve API endpoint`)
-    if (!serviceKey?.api_key) return toast.error(`Failed to unban user: Unable to retrieve API key`)
-
     updateUser({
       projectRef,
-      protocol: 'https',
-      endpoint,
-      serviceApiKey: serviceKey.api_key,
       userId: user.id,
       banDuration: 'none',
     })
@@ -187,7 +165,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <Separator />
         )}
 
-        <div className={cn('flex flex-col', PANEL_PADDING)}>
+        <div className={cn('flex flex-col gap-y-1', PANEL_PADDING)}>
           <RowData property="User UID" value={user.id} />
           <RowData
             property="Created at"
@@ -220,13 +198,16 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
-              (x) => x.title.toLowerCase() === provider.name
+              (x) =>
+                ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
-              provider.name === 'email' ? 'email' : providerMeta?.title ?? provider.name
+              provider.name === 'email'
+                ? provider.name.toLowerCase()
+                : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -240,7 +221,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   />
                 )}
                 <div className="flex-grow mt-0.5">
-                  <p className="capitalize">{provider.name}</p>
+                  <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
                     Signed in with a {providerName} account via{' '}
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
@@ -356,7 +337,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
-            description="This will log the user out of all active sessions"
+            description="Removes all MFA factors associated with the user"
             button={{
               icon: <ShieldOff />,
               text: 'Remove MFA factors',
@@ -379,7 +360,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             button={{
               icon: <Ban />,
               text: isBanned ? 'Unban user' : 'Ban user',
-              disabled: !canRemoveMFAFactors,
+              disabled: !canUpdateUser,
               onClick: () => {
                 if (isBanned) {
                   setIsUnbanModalOpen(true)
@@ -405,23 +386,15 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         </div>
       </div>
 
-      <ConfirmationModal
+      <DeleteUserModal
         visible={isDeleteModalOpen}
-        variant="destructive"
-        title="Confirm to delete user"
-        confirmLabel="Delete"
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => handleDelete()}
-        alert={{
-          title: 'Deleting a user is irreversible',
-          description: 'This will remove the user from the project and all associated data.',
+        selectedUser={user}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDeleteSuccess={() => {
+          setIsDeleteModalOpen(false)
+          onDeleteSuccess()
         }}
-      >
-        <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete the user{' '}
-          <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
-        </p>
-      </ConfirmationModal>
+      />
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
@@ -433,12 +406,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         onConfirm={() => handleDeleteFactors()}
         alert={{
           base: { variant: 'warning' },
-          title: 'Removing MFA factors is irreversible',
-          description: 'This will log the user out of all active sessions.',
+          title:
+            "Removing MFA factors will drop the user's authentication assurance level (AAL) to AAL1",
+          description: 'Note that this does not sign the user out',
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove the MFA factors for the user{' '}
+          Are you sure you want to remove the MFA factors for the user{' '}
           <span className="text-foreground">{user.email ?? user.phone ?? 'this user'}</span>?
         </p>
       </ConfirmationModal>
@@ -464,41 +438,44 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   )
 }
 
-const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
+export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
-    <div className="flex items-center gap-x-2 group">
-      <p className="w-36 text-foreground-light text-sm">{property}</p>
-      {typeof value === 'boolean' ? (
-        <div className="h-[26px] flex items-center justify-center">
-          {value ? (
-            <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-              <Check size={10} className="text-contrast" strokeWidth={4} />
-            </div>
-          ) : (
-            <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-              <X size={10} className="text-contrast" strokeWidth={4} />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex items-center gap-x-2 h-[26px]">
-          <p className="text-sm">{!value ? '-' : value}</p>
-          {!!value && (
-            <CopyButton
-              iconOnly
-              type="text"
-              icon={<Copy />}
-              className="transition opacity-0 group-hover:opacity-100 px-1"
-              text={value}
-            />
-          )}
-        </div>
-      )}
-    </div>
+    <>
+      <div className="flex items-center gap-x-2 group justify-between">
+        <p className=" text-foreground-lighter text-xs">{property}</p>
+        {typeof value === 'boolean' ? (
+          <div className="h-[26px] flex items-center justify-center min-w-[70px]">
+            {value ? (
+              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+                <Check size={10} className="text-contrast" strokeWidth={4} />
+              </div>
+            ) : (
+              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+                <X size={10} className="text-contrast" strokeWidth={4} />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-x-2 h-[26px] font-mono min-w-[40px]">
+            <p className="text-xs">{!value ? '-' : value}</p>
+            {!!value && (
+              <CopyButton
+                iconOnly
+                type="text"
+                icon={<Copy />}
+                className="transition opacity-0 group-hover:opacity-100 px-1"
+                text={value}
+              />
+            )}
+          </div>
+        )}
+      </div>
+      <Separator />
+    </>
   )
 }
 
-const RowAction = ({
+export const RowAction = ({
   title,
   description,
   button,
@@ -521,6 +498,8 @@ const RowAction = ({
   }
   className?: string
 }) => {
+  const disabled = button?.disabled ?? false
+
   return (
     <div className={cn(CONTAINER_CLASS, className)}>
       <div>
@@ -535,11 +514,13 @@ const RowAction = ({
         icon={success ? <Check className="text-brand" /> : button.icon}
         loading={button.isLoading ?? false}
         onClick={button.onClick}
-        disabled={button?.disabled ?? false}
+        disabled={disabled}
         tooltip={{
           content: {
             side: 'bottom',
-            text: `You need additional permissions to ${button.text.toLowerCase()}`,
+            text: disabled
+              ? `You need additional permissions to ${button.text.toLowerCase()}`
+              : undefined,
           },
         }}
       >

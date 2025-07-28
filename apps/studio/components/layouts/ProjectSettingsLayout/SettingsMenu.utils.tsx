@@ -1,8 +1,9 @@
+import { ArrowUpRight } from 'lucide-react'
+
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { Organization } from 'types'
-import { ArrowUpRight } from 'lucide-react'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -13,8 +14,6 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    warehouse?: boolean
-    logDrains?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -23,8 +22,6 @@ export const generateSettingsMenu = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
-  const warehouseEnabled = features?.warehouse ?? false
-  const logDrainsEnabled = features?.logDrains ?? false
 
   return [
     {
@@ -36,6 +33,16 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Compute and Disk',
+                key: 'compute-and-disk',
+                url: `/project/${ref}/settings/compute-and-disk`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Infrastructure',
           key: 'infrastructure',
@@ -50,23 +57,35 @@ export const generateSettingsMenu = (
                 url: `/project/${ref}/settings/integrations`,
                 items: [],
               },
+              {
+                name: 'API Keys',
+                key: 'api-keys',
+                url: `/project/${ref}/settings/api-keys`,
+                items: [],
+                label: 'NEW',
+              },
+              {
+                name: 'JWT Keys',
+                key: 'jwt',
+                url: `/project/${ref}/settings/jwt`,
+                items: [],
+                label: 'NEW',
+              },
             ]
           : []),
-        ...[
-          {
-            name: 'Add Ons',
-            key: 'addons',
-            url: `/project/${ref}/settings/addons`,
-            items: [],
-          },
-        ],
+        {
+          name: 'Add Ons',
+          key: 'addons',
+          url: `/project/${ref}/settings/addons`,
+          items: [],
+        },
         {
           name: 'Vault',
           key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/secrets`,
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'BETA',
+          label: 'Alpha',
         },
       ],
     },
@@ -80,7 +99,7 @@ export const generateSettingsMenu = (
           items: [],
         },
         {
-          name: 'API',
+          name: 'Data API',
           key: 'api',
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
           items: [],
@@ -110,22 +129,13 @@ export const generateSettingsMenu = (
               {
                 name: 'Edge Functions',
                 key: 'functions',
-                url: `/project/${ref}/settings/functions`,
+                url: `/project/${ref}/functions/secrets`,
                 items: [],
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
               },
             ]
           : []),
-        ...(IS_PLATFORM && warehouseEnabled
-          ? [
-              {
-                name: 'Warehouse',
-                key: 'warehouse',
-                url: `/project/${ref}/settings/warehouse`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && logDrainsEnabled
+        ...(IS_PLATFORM
           ? [
               {
                 name: `Log Drains`,

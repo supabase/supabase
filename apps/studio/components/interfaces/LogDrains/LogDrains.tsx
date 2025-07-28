@@ -27,7 +27,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export function LogDrains({
   onNewDrainClick,
@@ -40,7 +39,6 @@ export function LogDrains({
 
   const { isLoading: orgPlanLoading, plan } = useCurrentOrgPlan()
   const logDrainsEnabled = !orgPlanLoading && (plan?.id === 'team' || plan?.id === 'enterprise')
-  const lokiLogDrainsEnabled = useFlag('lokilogdrains')
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLogDrain, setSelectedLogDrain] = useState<LogDrainData | null>(null)
@@ -93,19 +91,17 @@ export function LogDrains({
   if (!isLoading && logDrains?.length === 0) {
     return (
       <div className="grid lg:grid-cols-2 gap-3">
-        {LOG_DRAIN_TYPES.map((src) =>
-          src.value === 'loki' && !lokiLogDrainsEnabled ? null : (
-            <CardButton
-              key={src.value}
-              title={src.name}
-              description={src.description}
-              icon={src.icon}
-              onClick={() => {
-                onNewDrainClick(src.value)
-              }}
-            />
-          )
-        )}
+        {LOG_DRAIN_TYPES.map((src) => (
+          <CardButton
+            key={src.value}
+            title={src.name}
+            description={src.description}
+            icon={src.icon}
+            onClick={() => {
+              onNewDrainClick(src.value)
+            }}
+          />
+        ))}
       </div>
     )
   }
@@ -131,8 +127,15 @@ export function LogDrains({
           <TableBody>
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
-                <TableCell className="font-medium">{drain.name}</TableCell>
-                <TableCell>{drain.description}</TableCell>
+                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                  {drain.name}
+                </TableCell>
+                <TableCell
+                  className="text-foreground-light truncate max-w-72"
+                  title={drain.description}
+                >
+                  {drain.description}
+                </TableCell>
                 <TableCell className="text-right font-mono">{drain.type}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -180,7 +183,7 @@ export function LogDrains({
             }}
             onCancel={() => setIsDeleteModalOpen(false)}
           >
-            <div className="text-foreground-light">
+            <div className="text-foreground-light text-sm">
               <p>
                 Are you sure you want to delete{' '}
                 <span className="text-foreground">{selectedLogDrain?.name}</span>?

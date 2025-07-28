@@ -1,13 +1,14 @@
+import pgMeta from '@supabase/pg-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
 
 export type DatabasePublicationUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   tables?: string[]
   publish_insert?: boolean
@@ -26,28 +27,22 @@ export async function updateDatabasePublication({
   publish_delete,
   publish_truncate,
 }: DatabasePublicationUpdateVariables) {
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const body = { id } as any
-  if (tables !== undefined) body.tables = tables
-  if (publish_insert !== undefined) body.publish_insert = publish_insert
-  if (publish_update !== undefined) body.publish_update = publish_update
-  if (publish_delete !== undefined) body.publish_delete = publish_delete
-  if (publish_truncate !== undefined) body.publish_truncate = publish_truncate
-
-  const { data, error } = await patch('/platform/pg-meta/{ref}/publications', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: { id },
-    },
-    body,
-    headers,
+  const { sql } = pgMeta.publications.update(id, {
+    tables,
+    publish_insert,
+    publish_update,
+    publish_delete,
+    publish_truncate,
   })
 
-  if (error) handleError(error)
-  return data
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['publication', 'update', id],
+  })
+
+  return result
 }
 
 type DatabasePublicationUpdateData = Awaited<ReturnType<typeof updateDatabasePublication>>
