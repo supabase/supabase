@@ -6,25 +6,26 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { object, string } from 'yup'
 
-import { useTelemetryProps } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
-import Telemetry from 'lib/telemetry'
 import { Button, Form, Input } from 'ui'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
 })
 
-const SignInMfaForm = () => {
+interface SignInMfaFormProps {
+  context?: 'forgot-password' | 'sign-in'
+}
+
+const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
   const router = useRouter()
   const signOut = useSignOut()
   const queryClient = useQueryClient()
-  const telemetryProps = useTelemetryProps()
   const [selectedFactor, setSelectedFactor] = useState<Factor | null>(null)
 
   const {
@@ -40,13 +41,16 @@ const SignInMfaForm = () => {
     isSuccess,
   } = useMfaChallengeAndVerifyMutation({
     onSuccess: async () => {
-      Telemetry.sendEvent(
-        { category: 'account', action: 'sign_in', label: '' },
-        telemetryProps,
-        router
-      )
       await queryClient.resetQueries()
-      router.push(getReturnToPath())
+
+      if (context === 'forgot-password') {
+        router.push({
+          pathname: '/reset-password',
+          query: router.query,
+        })
+      } else {
+        router.push(getReturnToPath())
+      }
     },
   })
 
@@ -154,6 +158,9 @@ const SignInMfaForm = () => {
               }?`}</a>
             </li>
           )}
+          <li>
+            <Link href="/logout">Force sign out and clear cookies</Link>
+          </li>
           <li>
             <Link
               target="_blank"

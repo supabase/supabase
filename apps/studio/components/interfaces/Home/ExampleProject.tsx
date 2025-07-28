@@ -1,7 +1,11 @@
-import { BASE_PATH } from 'lib/constants'
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
+
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from 'lib/constants'
 
 interface ExampleProjectProps {
   framework: string
@@ -12,9 +16,24 @@ interface ExampleProjectProps {
 
 const ExampleProject = ({ framework, title, description, url }: ExampleProjectProps) => {
   const { resolvedTheme } = useTheme()
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
-    <Link href={url} target="_blank" rel="noreferrer">
+    <Link
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      onClick={() =>
+        sendEvent({
+          action: 'example_project_card_clicked',
+          properties: { cardTitle: title },
+          groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        })
+      }
+    >
       <div
         className={[
           'group relative',

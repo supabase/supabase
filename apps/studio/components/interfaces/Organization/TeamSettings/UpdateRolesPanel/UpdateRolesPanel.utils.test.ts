@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest'
 import { deriveRoleChangeActions } from './UpdateRolesPanel.utils'
 
 // [Joshen] This is specifically testing the project scope changes

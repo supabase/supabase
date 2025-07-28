@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { BASE_PATH } from '~/lib/constants'
-import clientLibsCommon from '~/spec/common-cli.yml' assert { type: 'yml' }
+import clientLibsCommon from '~/spec/common-cli.yml' with { type: 'yml' }
 import * as NavItems from './NavigationMenu.constants'
 import { ChevronLeft } from 'lucide-react'
 

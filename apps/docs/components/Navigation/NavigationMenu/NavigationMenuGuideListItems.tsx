@@ -34,8 +34,15 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const activeItemRef = useRef<HTMLLIElement>(null)
 
   const LinkContainer = (props) => {
+    const isExternal = props.url.startsWith('https://')
+
     return (
-      <Link href={props.url} className={props.className}>
+      <Link
+        href={props.url}
+        className={props.className}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      >
         {props.children}
       </Link>
     )
@@ -162,9 +169,9 @@ const Content = (props) => {
                   )
                 })}
               </div>
-            ) : (
+            ) : x.url ? (
               <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
-            )}
+            ) : null}
           </div>
         )
       })}

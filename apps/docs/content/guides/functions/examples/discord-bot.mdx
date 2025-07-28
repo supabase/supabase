@@ -21,7 +21,7 @@ video: 'https://www.youtube.com/v/J24Bvo_m7DM'
 3. Name your application and click on **Create**.
 4. Go to **Bot** section, click on **Add Bot**, and finally on **Yes, do it!** to confirm.
 
-That's it. A new application is created which will hold our Slash Command. Don't close the tab as we need information from this application page throughout our development.
+A new application is created which will hold our Slash Command. Don't close the tab as we need information from this application page throughout our development.
 
 Before we can write some code, we need to curl a discord endpoint to register a Slash Command in our app.
 
@@ -138,7 +138,7 @@ function hexToUint8Array(hex: string) {
 }
 ```
 
-## Deploy the Slash Command handler
+## Deploy the slash command handler
 
 ```bash
 supabase functions deploy discord-bot --no-verify-jwt
@@ -154,7 +154,7 @@ Navigate to your Function details in the Supabase Dashboard to get your Endpoint
 
 The application is now ready. Let's proceed to the next section to install it.
 
-## Install the Slash Command on your Discord server
+## Install the slash command on your Discord server
 
 So to use the `hello` Slash Command, we need to install our Greeter application on our Discord server. Here are the steps:
 

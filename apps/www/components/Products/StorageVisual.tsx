@@ -1,7 +1,12 @@
 import { range } from 'lodash'
 import { File, Image, Video } from 'lucide-react'
+import { cn } from 'ui'
 
-const StorageVisual = () => {
+interface Props {
+  className?: string
+}
+
+const StorageVisual: React.FC<Props> = ({ className }) => {
   const cols = [
     <Image className="w-6 h-6 md:w-6 md:h-6" />,
     <File className="w-6 h-6 md:w-6 md:h-6" />,
@@ -10,7 +15,7 @@ const StorageVisual = () => {
 
   return (
     <figure
-      className="absolute inset-0 overflow-hidden flex nowrap"
+      className={cn('absolute inset-0 overflow-hidden flex nowrap', className)}
       role="img"
       aria-label="Supabase Storage supports images, documents and videos"
     >

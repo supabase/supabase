@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { ChevronRightIcon } from 'lucide-react'
 import { Slot } from '@radix-ui/react-slot'
+import { ChevronRightIcon } from 'lucide-react'
+import * as React from 'react'
 import { cn } from '../../../lib/utils'
 
 const Breadcrumb = React.forwardRef<
@@ -64,7 +64,7 @@ const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWit
       role="link"
       aria-disabled="true"
       aria-current="page"
-      className={cn('no-underline', className)}
+      className={cn('no-underline text-foreground', className)}
       {...props}
     />
   )
@@ -108,10 +108,10 @@ BreadcrumbEllipsis.displayName = 'BreadcrumbEllipsis'
 
 export {
   Breadcrumb,
-  BreadcrumbList,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbEllipsis,
 }

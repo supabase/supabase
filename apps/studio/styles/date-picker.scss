@@ -96,7 +96,7 @@
 }
 
 .react-datepicker__day--highlighted {
-  @apply bg-brand-600 text-foreground-light;
+  @apply bg-overlay-hover text-foreground-light;
 }
 
 .react-datepicker__aria-live {

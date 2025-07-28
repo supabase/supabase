@@ -1,18 +1,98 @@
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
-const EMPTY_DASHBOARD_HISTORY: {
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+
+export type Template = {
+  name: string
+  description: string
+  content: string
+}
+
+type EditorPanelType = {
+  open: boolean
+  initialValue?: string
+  label?: string
+  saveLabel?: string
+  onSave?: (value: string) => void
+  functionName?: string
+  templates?: Template[]
+  initialPrompt?: string
+}
+
+type DashboardHistoryType = {
   sql?: string
   editor?: string
-} = {
+}
+
+const INITIAL_EDITOR_PANEL: EditorPanelType = {
+  open: false,
+  initialValue: '',
+  label: '',
+  saveLabel: '',
+  initialPrompt: '',
+  templates: SQL_TEMPLATES.filter((template) => template.type === 'template').map((template) => ({
+    name: template.title,
+    description: template.description,
+    content: template.sql,
+  })),
+}
+
+const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
   sql: undefined,
   editor: undefined,
 }
 
+const getInitialState = () => {
+  if (typeof window === 'undefined') {
+    return {
+      editorPanel: INITIAL_EDITOR_PANEL,
+      dashboardHistory: EMPTY_DASHBOARD_HISTORY,
+      activeDocsSection: ['introduction'],
+      docsLanguage: 'js',
+      showProjectApiDocs: false,
+      showCreateBranchModal: false,
+      showAiSettingsModal: false,
+      showConnectDialog: false,
+      ongoingQueriesPanelOpen: false,
+      mobileMenuOpen: false,
+      showSidebar: true,
+      lastRouteBeforeVisitingAccountPage: '',
+    }
+  }
+
+  const storedEditor = localStorage.getItem(LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE)
+
+  let parsedEditorPanel = INITIAL_EDITOR_PANEL
+
+  try {
+    if (storedEditor) {
+      parsedEditorPanel = JSON.parse(storedEditor)
+    }
+  } catch {
+    // Ignore parsing errors
+  }
+
+  return {
+    editorPanel: parsedEditorPanel,
+    dashboardHistory: EMPTY_DASHBOARD_HISTORY,
+    activeDocsSection: ['introduction'],
+    docsLanguage: 'js',
+    showProjectApiDocs: false,
+    showCreateBranchModal: false,
+    showAiSettingsModal: false,
+    showConnectDialog: false,
+    ongoingQueriesPanelOpen: false,
+    mobileMenuOpen: false,
+    showSidebar: true,
+    lastRouteBeforeVisitingAccountPage: '',
+  }
+}
+
 export const appState = proxy({
-  // [Joshen] Last visited "entity" for any page that we wanna track
-  dashboardHistory: EMPTY_DASHBOARD_HISTORY,
-  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
+  ...getInitialState(),
+
+  setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string | undefined) => {
     if (appState.dashboardHistory[key] !== id) {
       appState.dashboardHistory[key] = id
       localStorage.setItem(
@@ -36,58 +116,78 @@ export const appState = proxy({
   },
 
   isOptedInTelemetry: false,
-  setIsOptedInTelemetry: (value: boolean) => {
-    appState.isOptedInTelemetry = value
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+  setIsOptedInTelemetry: (value: boolean | null) => {
+    appState.isOptedInTelemetry = value === null ? false : value
+    if (typeof window !== 'undefined' && value !== null) {
+      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
-  showEnableBranchingModal: false,
-  setShowEnableBranchingModal: (value: boolean) => {
-    appState.showEnableBranchingModal = value
+
+  isMfaEnforced: false,
+  setIsMfaEnforced: (value: boolean) => {
+    appState.isMfaEnforced = value
   },
-  showFeaturePreviewModal: false,
-  setShowFeaturePreviewModal: (value: boolean) => {
-    appState.showFeaturePreviewModal = value
+
+  showCreateBranchModal: false,
+  setShowCreateBranchModal: (value: boolean) => {
+    appState.showCreateBranchModal = value
   },
-  selectedFeaturePreview: '',
-  setSelectedFeaturePreview: (value: string) => {
-    appState.selectedFeaturePreview = value
-  },
+
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
   },
-  showGenerateSqlModal: false,
-  setShowGenerateSqlModal: (value: boolean) => {
-    appState.showGenerateSqlModal = value
+
+  showSidebar: true,
+  setShowSidebar: (value: boolean) => {
+    appState.showSidebar = value
   },
 
-  navigationPanelOpen: false,
-  navigationPanelJustClosed: false,
-  setNavigationPanelOpen: (value: boolean, trackJustClosed: boolean = false) => {
-    if (value === false) {
-      // If closing navigation panel by clicking on icon/button, nav bar should not open again until mouse leaves nav bar
-      if (trackJustClosed) {
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = true
-      } else {
-        // If closing navigation panel by leaving nav bar, nav bar can open again when mouse re-enter
-        appState.navigationPanelOpen = false
-        appState.navigationPanelJustClosed = false
-      }
-    } else {
-      // If opening nav panel, check if it was just closed by a nav icon/button click
-      // If yes, do not open nav panel, otherwise open as per normal
-      if (appState.navigationPanelJustClosed === false) {
-        appState.navigationPanelOpen = true
-      }
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
+  },
+
+  setEditorPanel: (value: Partial<EditorPanelType>) => {
+    // Reset templates to initial if initialValue is empty
+    if (value.initialValue === '') {
+      value.templates = INITIAL_EDITOR_PANEL.templates
+    }
+
+    if (!value.open) {
+      value.initialPrompt = INITIAL_EDITOR_PANEL.initialPrompt
+    }
+
+    appState.editorPanel = {
+      ...appState.editorPanel,
+      ...value,
     }
   },
-  setNavigationPanelJustClosed: (value: boolean) => {
-    appState.navigationPanelJustClosed = value
+
+  toggleEditorPanel: (value?: boolean) => {
+    appState.editorPanel.open = value ?? !appState.editorPanel.open
+  },
+
+  mobileMenuOpen: false,
+  setMobileMenuOpen: (value: boolean) => {
+    appState.mobileMenuOpen = value
+  },
+
+  lastRouteBeforeVisitingAccountPage: '',
+  setLastRouteBeforeVisitingAccountPage: (value: string) => {
+    appState.lastRouteBeforeVisitingAccountPage = value
   },
 })
+
+// Set up localStorage subscriptions
+if (typeof window !== 'undefined') {
+  subscribe(appState, () => {
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.EDITOR_PANEL_STATE,
+      JSON.stringify(appState.editorPanel)
+    )
+  })
+}
 
 export const getAppStateSnapshot = () => snapshot(appState)
 

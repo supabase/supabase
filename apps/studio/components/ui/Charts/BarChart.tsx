@@ -1,15 +1,14 @@
 import dayjs from 'dayjs'
-import { ComponentProps, useState } from 'react'
+import { ComponentProps, useState, useMemo } from 'react'
 import {
   Bar,
+  CartesianGrid,
   Cell,
   Legend,
   BarChart as RechartBarChart,
   Tooltip,
   XAxis,
-  Label,
   YAxis,
-  CartesianGrid,
 } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
@@ -58,6 +57,14 @@ const BarChart = ({
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
+  // Transform data to ensure yAxisKey values are numbers
+  const transformedData = useMemo(() => {
+    return data.map((item) => ({
+      ...item,
+      [yAxisKey]: typeof item[yAxisKey] === 'string' ? Number(item[yAxisKey]) : item[yAxisKey],
+    }))
+  }, [data, yAxisKey])
+
   // Default props
   const _XAxisProps = XAxisProps || {
     interval: data.length - 2,
@@ -96,7 +103,7 @@ const BarChart = ({
     return (
       <NoDataPlaceholder
         message={emptyStateMessage}
-        description="It may take up to 24 hours for data to show"
+        description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
         attribute={title}
@@ -121,7 +128,7 @@ const BarChart = ({
       />
       <Container>
         <RechartBarChart
-          data={data}
+          data={transformedData}
           className="overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {
@@ -155,7 +162,7 @@ const BarChart = ({
             dataKey={yAxisKey}
             fill={CHART_COLORS.GREEN_1}
             animationDuration={300}
-            // max bar size required to prevent bars from expanding to max width.
+            // Max bar size required to prevent bars from expanding to max width.
             maxBarSize={48}
           >
             {data?.map((_entry: Datum, index: any) => (

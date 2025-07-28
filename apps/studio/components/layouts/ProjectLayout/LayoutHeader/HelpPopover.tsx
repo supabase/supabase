@@ -1,12 +1,18 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
-import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
+  AiIconAnimation,
   Button,
+  ButtonGroup,
+  ButtonGroupItem,
   Popover,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -14,78 +20,106 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectContext'
 
-const HelpPopover = () => {
+export const HelpPopover = () => {
   const router = useRouter()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
+  const snap = useAiAssistantStateSnapshot()
+
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const projectRef = project?.parent_project_ref ?? router.query.ref
-  const supportUrl = `/support/new${projectRef ? `?ref=${projectRef}` : ''}`
+  const supportUrl = `/support/new${projectRef ? `?projectRef=${projectRef}` : ''}`
 
   return (
     <Popover_Shadcn_>
-      <Tooltip.Root delayDuration={0}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Tooltip.Trigger asChild>
-            <div className="relative flex items-center">
-              <Button
-                id="help-popover-button"
-                type="text"
-                className="px-1"
-                icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
-              />
-            </div>
-          </Tooltip.Trigger>
-        </PopoverTrigger_Shadcn_>
-        <Tooltip.Portal>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'space-y-2 border border-background',
-              ].join(' ')}
-            >
-              <p className="text-xs text-foreground">Help</p>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
+      <PopoverTrigger_Shadcn_ asChild>
+        <ButtonTooltip
+          id="help-popover-button"
+          type="text"
+          className="rounded-none w-[32px] h-[30px] group"
+          icon={
+            <HelpCircle
+              size={18}
+              strokeWidth={1.5}
+              className="!h-[18px] !w-[18px] text-foreground-light group-hover:text-foreground"
+            />
+          }
+          tooltip={{ content: { side: 'bottom', text: 'Help' } }}
+          onClick={() => {
+            sendEvent({
+              action: 'help_button_clicked',
+              groups: { project: project?.ref, organization: org?.slug },
+            })
+          }}
+        />
+      </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
-        <div className="mb-5 space-y-4 px-5">
-          <h5 className="text-foreground">Need help with your project?</h5>
+        <div className="mb-5 px-5">
+          <h5 className="text-foreground mb-2">Need help with your project?</h5>
           <p className="text-sm text-foreground-lighter">
-            For issues with your project hosted on supabase.com, or other inquiries about our hosted
-            services.
+            For issues with your project hosted on supabase.com or other hosted service inquiries.
+            Response times are based on your billing plan, with paid plans prioritized.
           </p>
-          <div className="space-x-1">
-            <Button asChild type="default" icon={<Wrench />}>
-              <Link
+        </div>
+        <div className="px-5">
+          <ButtonGroup className="w-full">
+            {projectRef && (
+              <ButtonGroupItem
+                size="tiny"
+                icon={<AiIconAnimation allowHoverEffect size={14} />}
+                onClick={() => {
+                  snap.newChat({
+                    name: 'Support',
+                    open: true,
+                    initialInput: `I need help with my project`,
+                    suggestions: {
+                      title:
+                        'I can help you with your project, here are some example prompts to get you started:',
+                      prompts: [
+                        {
+                          label: 'Database Health',
+                          description: 'Summarise my database health and performance',
+                        },
+                        {
+                          label: 'Debug Logs',
+                          description: 'View and debug my edge function logs',
+                        },
+                        {
+                          label: 'RLS Setup',
+                          description: 'Implement row level security for my tables',
+                        },
+                      ],
+                    },
+                  })
+                }}
+              >
+                Supabase Assistant
+              </ButtonGroupItem>
+            )}
+            <ButtonGroupItem size="tiny" icon={<Wrench strokeWidth={1.5} size={14} />} asChild>
+              <a
                 href="https://supabase.com/docs/guides/platform/troubleshooting"
                 target="_blank"
                 rel="noreferrer"
               >
                 Troubleshooting
-              </Link>
-            </Button>
-            <Button asChild type="text" size="tiny" icon={<BookOpen />}>
-              <Link href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
+              </a>
+            </ButtonGroupItem>
+            <ButtonGroupItem size="tiny" icon={<BookOpen strokeWidth={1.5} size={14} />} asChild>
+              <a href="https://supabase.com/docs/" target="_blank" rel="noreferrer">
                 Docs
-              </Link>
-            </Button>
-            <Button asChild type="text" size="tiny" icon={<Activity />}>
-              <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+              </a>
+            </ButtonGroupItem>
+            <ButtonGroupItem size="tiny" icon={<Activity strokeWidth={1.5} size={14} />} asChild>
+              <a href="https://status.supabase.com/" target="_blank" rel="noreferrer">
                 Supabase Status
-              </Link>
-            </Button>
-          </div>
-          <p className="text-sm text-foreground-lighter">
-            Expected response time is based on your billing plan. Projects on paid plans are
-            prioritized.
-          </p>
-          <div>
-            <Button asChild type="default" icon={<Mail />}>
+              </a>
+            </ButtonGroupItem>
+            <ButtonGroupItem size="tiny" icon={<Mail strokeWidth={1.5} size={14} />}>
               <Link href={supportUrl}>Contact Support</Link>
-            </Button>
-          </div>
+            </ButtonGroupItem>
+          </ButtonGroup>
         </div>
         <Popover.Separator />
         <div className="mb-4 space-y-2">
@@ -150,5 +184,3 @@ const HelpPopover = () => {
     </Popover_Shadcn_>
   )
 }
-
-export default HelpPopover

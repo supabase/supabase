@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Box, Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
@@ -9,7 +9,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProjectByRef, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Organization } from 'types'
 import {
@@ -25,7 +25,9 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
+import { useBranchesQuery } from 'data/branches/branches-query'
 
 // [Fran] the idea is to let users change projects without losing the current page,
 // but at the same time we need to redirect correctly between urls that might be
@@ -86,26 +88,21 @@ const ProjectLink = ({
   )
 }
 
-interface ProjectDropdownProps {
-  isNewNav?: boolean
-}
-
-const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
+export const ProjectDropdown = () => {
   const router = useRouter()
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const project = useSelectedProject()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
   const isBranch = projectDetails?.parentRef !== projectDetails?.ref
 
-  const projects = isNewNav
-    ? allProjects
-        ?.filter((x) => x.organization_id === selectedOrganization?.id)
-        .sort((a, b) => a.name.localeCompare(b.name))
-    : allProjects?.sort((a, b) => a.name.localeCompare(b.name))
+  const projects = allProjects
+    ?.filter((x) => x.organization_id === selectedOrganization?.id)
+    .sort((a, b) => a.name.localeCompare(b.name))
   const selectedProject = isBranch
     ? projects?.find((project) => project.ref === projectDetails?.parentRef)
     : projects?.find((project) => project.ref === ref)
@@ -117,14 +114,24 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   }
 
   return IS_PLATFORM ? (
-    <div className="flex items-center px-2">
+    <>
+      <Link
+        href={`/project/${project?.ref}`}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
+        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <span className="text-foreground max-w-32 lg:max-w-none truncate">
+          {selectedProject?.name}
+        </span>
+      </Link>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-            <div className="flex items-center space-x-2">
-              <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
-            </div>
-          </Button>
+          <Button
+            type="text"
+            size="tiny"
+            className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1')}
+            iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+          />
         </PopoverTrigger_Shadcn_>
         <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
           <Command_Shadcn_>
@@ -168,12 +175,10 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>
       </Popover_Shadcn_>
-    </div>
+    </>
   ) : (
     <Button type="text">
-      <span className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</span>
+      <span className="text-sm">{selectedProject?.name}</span>
     </Button>
   )
 }
-
-export default ProjectDropdown

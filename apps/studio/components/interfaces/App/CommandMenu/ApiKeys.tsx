@@ -1,10 +1,9 @@
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { copyToClipboard } from 'lib/helpers'
-import { Badge } from 'ui'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Badge, copyToClipboard } from 'ui'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
@@ -22,15 +21,11 @@ export function useApiKeysCommands() {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
 
-  const project = useSelectedProject()
-  const { data: settings } = useProjectApiQuery(
-    { projectRef: project?.ref },
-    { enabled: !!project }
-  )
+  const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const anonKey = settings?.autoApiService?.defaultApiKey ?? undefined
-  const serviceKey = settings?.autoApiService?.serviceApiKey ?? undefined
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
+  const { anonKey, serviceKey, publishableKey, allSecretKeys } = getKeys(apiKeys)
 
   const commands = useMemo(
     () =>
@@ -40,13 +35,14 @@ export function useApiKeysCommands() {
             id: 'anon-key',
             name: `Copy anonymous API key`,
             action: () => {
-              copyToClipboard(anonKey ?? '')
+              copyToClipboard(anonKey.api_key ?? '')
               setIsOpen(false)
             },
             badge: () => (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
                 <Badge>Public</Badge>
+                <Badge className="capitalize">{anonKey.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
@@ -56,17 +52,51 @@ export function useApiKeysCommands() {
             id: 'service-key',
             name: `Copy service API key`,
             action: () => {
-              copyToClipboard(serviceKey ?? '')
+              copyToClipboard(serviceKey.api_key ?? '')
               setIsOpen(false)
             },
             badge: () => (
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-x-1">
                 <Badge>Project: {project?.name}</Badge>
                 <Badge variant="destructive">Secret</Badge>
+                <Badge className="capitalize">{serviceKey.type}</Badge>
               </span>
             ),
             icon: () => <Key />,
           },
+        project &&
+          publishableKey && {
+            id: 'publishable-key',
+            name: `Copy publishable key`,
+            action: () => {
+              copyToClipboard(publishableKey.api_key ?? '')
+              setIsOpen(false)
+            },
+            badge: () => (
+              <span className="flex items-center gap-x-1">
+                <Badge>Project: {project?.name}</Badge>
+                <Badge className="capitalize">{publishableKey.type}</Badge>
+              </span>
+            ),
+            icon: () => <Key />,
+          },
+        ...(project && allSecretKeys
+          ? allSecretKeys.map((key) => ({
+              id: key.id,
+              name: `Copy secret key (${key.name})`,
+              action: () => {
+                copyToClipboard(key.api_key ?? '')
+                setIsOpen(false)
+              },
+              badge: () => (
+                <span className="flex items-center gap-x-1">
+                  <Badge>Project: {project?.name}</Badge>
+                  <Badge className="capitalize">{key.type}</Badge>
+                </span>
+              ),
+              icon: () => <Key />,
+            }))
+          : []),
         !(anonKey || serviceKey) && {
           id: 'api-keys-project-settings',
           name: 'See API keys in Project Settings',

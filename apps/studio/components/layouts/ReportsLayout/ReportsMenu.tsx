@@ -2,12 +2,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
-import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
+import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
+import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
@@ -15,23 +15,49 @@ import { Content, useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu, cn } from 'ui'
+import { Menu, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ReportMenuItem } from './ReportMenuItem'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const ReportsMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
-  const storageEnabled = useIsFeatureEnabled('project_storage:all')
+  const authEnabled = useFlag('authreportv2')
+  const edgeFnEnabled = useFlag('edgefunctionreport')
+  const realtimeEnabled = useFlag('realtimeReport')
+  const storageReportEnabled = useFlag('storagereport')
+  const postgrestReportEnabled = useFlag('postgrestreport')
+
+  // b/c fly doesn't support storage
+  const storageSupported = useIsFeatureEnabled('project_storage:all')
+  const storageEnabled = storageReportEnabled && storageSupported
 
   const canCreateCustomReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
-  const { data: content, isLoading } = useContentQuery(ref)
+  // Preserve date range query parameters when navigating
+  const preservedQueryParams = useMemo(() => {
+    const { its, ite, isHelper, helperText } = router.query
+    const params = new URLSearchParams()
+
+    if (its && typeof its === 'string') params.set('its', its)
+    if (ite && typeof ite === 'string') params.set('ite', ite)
+    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
+    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
+
+    const queryString = params.toString()
+    return queryString ? `?${queryString}` : ''
+  }, [router.query])
+
+  const { data: content, isLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
   const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
@@ -74,7 +100,7 @@ const ReportsMenu = () => {
       name: r.name,
       description: r.description || '',
       key: r.id || idx + '-report',
-      url: `/project/${ref}/reports/${r.id}`,
+      url: `/project/${ref}/reports/${r.id}${preservedQueryParams}`,
       hasDropdownActions: true,
       report: r,
     }))
@@ -90,25 +116,61 @@ const ReportsMenu = () => {
       key: 'builtin-reports',
       items: [
         {
-          name: 'API',
+          name: 'API Gateway',
           key: 'api-overview',
-          url: `/project/${ref}/reports/api-overview`,
+          url: `/project/${ref}/reports/api-overview${preservedQueryParams}`,
         },
+        ...(authEnabled
+          ? [
+              {
+                name: 'Auth',
+                key: 'auth',
+                url: `/project/${ref}/reports/auth${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        {
+          name: 'Database',
+          key: 'database',
+          url: `/project/${ref}/reports/database${preservedQueryParams}`,
+        },
+        ...(edgeFnEnabled
+          ? [
+              {
+                name: 'Edge Functions',
+                key: 'edge-functions',
+                url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        ...(postgrestReportEnabled
+          ? [
+              {
+                name: 'PostgREST',
+                key: 'postgrest',
+                url: `/project/${ref}/reports/postgrest${preservedQueryParams}`,
+              },
+            ]
+          : []),
+        ...(realtimeEnabled
+          ? [
+              {
+                name: 'Realtime',
+                key: 'realtime',
+                url: `/project/${ref}/reports/realtime${preservedQueryParams}`,
+              },
+            ]
+          : []),
+
         ...(storageEnabled
           ? [
               {
                 name: 'Storage',
                 key: 'storage',
-                url: `/project/${ref}/reports/storage`,
+                url: `/project/${ref}/reports/storage${preservedQueryParams}`,
               },
             ]
           : []),
-
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/reports/database`,
-        },
       ],
     },
   ]
@@ -136,7 +198,9 @@ const ReportsMenu = () => {
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to create custom reports',
+                  text: !canCreateCustomReport
+                    ? 'You need additional permissions to create custom reports'
+                    : undefined,
                 },
               }}
             >
@@ -152,7 +216,7 @@ const ReportsMenu = () => {
               {reportMenuItems.map((item) => (
                 <ReportMenuItem
                   key={item.id}
-                  item={item}
+                  item={item as any}
                   pageKey={pageKey}
                   onSelectEdit={() => {
                     setSelectedReportToUpdate(item.report)
@@ -193,21 +257,6 @@ const ReportsMenu = () => {
               ) : null}
             </div>
           ))}
-
-          {/* [Joshen] Temp notice while we shift some pages on 040424 - can probably remove in 3 months perhaps */}
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_ className="text-sm">
-              Query Performance and Project Linter reports have been shifted
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs">
-              <p className="mb-2">They can now be found in the menu under the database section.</p>
-              <Button asChild type="default" size="tiny">
-                <Link href={`/project/${ref}/database/query-performance`}>
-                  Head over to Database
-                </Link>
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
 
           <UpdateCustomReportModal
             onCancel={() => setSelectedReportToUpdate(undefined)}

@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
 
@@ -37,7 +38,7 @@ export const useLoadBalancersQuery = <TData = LoadBalancersData>(
     replicaKeys.loadBalancers(projectRef),
     ({ signal }) => getLoadBalancers({ projectRef }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
       ...options,
     }
   )

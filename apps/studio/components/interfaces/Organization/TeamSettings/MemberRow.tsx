@@ -1,20 +1,26 @@
-import { Check, Minus, User, X } from 'lucide-react'
-import Image from 'next/legacy/image'
-import { useState } from 'react'
+import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
+import Link from 'next/link'
 
-import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
+import PartnerIcon from 'components/ui/PartnerIcon'
+import { ProfileImage } from 'components/ui/ProfileImage'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { getGitHubProfileImgUrl } from 'lib/github'
 import { useProfile } from 'lib/profile'
-import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import {
+  Badge,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
+  ScrollArea,
+  cn,
+} from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
+import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
-import PartnerIcon from 'components/ui/PartnerIcon'
 
 interface MemberRowProps {
   member: OrganizationMember
@@ -25,21 +31,22 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 } as const
 
 export const MemberRow = ({ member }: MemberRowProps) => {
-  const { slug } = useParams()
   const { profile } = useProfile()
-  const { data: projects } = useProjectsQuery()
   const selectedOrganization = useSelectedOrganization()
-  const [hasInvalidImg, setHasInvalidImg] = useState(false)
-  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
+  const { data: projects } = useProjectsQuery()
   const { data: roles, isLoading: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
   })
 
-  const memberIsUser = member.gotrue_id == profile?.gotrue_id
+  const orgProjects = projects?.filter((p) => p.organization_id === selectedOrganization?.id)
+  const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
   const isInvitedUser = Boolean(member.invited_id)
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
+
+  const profileImageUrl =
+    isInvitedUser || isEmailUser || isFlyUser ? undefined : getGitHubProfileImgUrl(member.username)
 
   // [Joshen] From project role POV, mask any roles for other projects
   const isObfuscated =
@@ -63,32 +70,25 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   return (
     <Table.tr>
       <Table.td>
-        <div className="flex items-center space-x-4">
-          <div>
-            {isInvitedUser || isEmailUser || isFlyUser || hasInvalidImg ? (
-              <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
+        <div className="flex items-center gap-x-4">
+          <ProfileImage
+            alt={member.primary_email ?? member.username ?? ''}
+            src={profileImageUrl}
+            className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
+            placeholder={
+              <div
+                className={cn(
+                  'w-[32px] h-[32px] md:w-[40px] md:h-[40px]',
+                  'bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center'
+                )}
+              >
                 <User size={20} strokeWidth={1.5} />
               </div>
-            ) : (
-              <Image
-                alt={member.username}
-                src={`https://github.com/${member.username}.png?size=80`}
-                width="40"
-                height="40"
-                className="border rounded-full"
-                onError={() => {
-                  setHasInvalidImg(true)
-                }}
-              />
-            )}
-          </div>
+            }
+          />
           <div className="flex item-center gap-x-2">
-            {isInvitedUser === undefined ? (
-              <p className="text-foreground-light truncate">{member.primary_email}</p>
-            ) : (
-              <p className="text-foreground truncate">{getUserDisplayName(member)}</p>
-            )}
-            {member.primary_email === profile?.primary_email && <Badge color="scale">You</Badge>}
+            <p className="text-foreground-light truncate">{member.primary_email}</p>
+            {member.gotrue_id === profile?.gotrue_id && <Badge color="scale">You</Badge>}
           </div>
 
           {(member.metadata as any)?.origin && (
@@ -111,6 +111,7 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
           </Badge>
         )}
+        {member.is_sso_user && <Badge variant="default">SSO</Badge>}
       </Table.td>
 
       <Table.td>
@@ -138,17 +139,17 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             const roleName = (role?.name ?? '').split('_')[0]
             const projectsApplied =
               role?.project_ids === null
-                ? projects?.map((p) => p.name) ?? []
+                ? orgProjects?.map((p) => p.name) ?? []
                 : (role?.project_ids ?? [])
                     .map((id) => {
-                      return projects?.find((p) => p.id === id)?.name ?? ''
+                      return orgProjects?.find((p) => p.id === id)?.name ?? ''
                     })
                     .filter((x) => x.length > 0)
 
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
                 <p>{roleName}</p>
-                {isOptedIntoProjectLevelPermissions && (
+                {hasProjectScopedRoles && (
                   <>
                     <span>•</span>
                     {projectsApplied.length === 1 ? (
@@ -156,28 +157,43 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                         {projectsApplied[0]}
                       </span>
                     ) : (
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      <HoverCard_Shadcn_ openDelay={200}>
+                        <HoverCardTrigger_Shadcn_ asChild>
                           <span className="text-foreground">
                             {role?.project_ids === null
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
-                        </TooltipTrigger_Shadcn_>
-                        {role?.project_ids !== null && projectsApplied.length > 1 && (
-                          <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1">
-                            {projectsApplied
-                              ?.slice(0, 2)
-                              .map((name) => <span key={name}>{name}</span>)}
-                            {projectsApplied.length > 2 && (
-                              <span>
-                                And {projectsApplied.length - 2} other project
-                                {projectsApplied.length > 4 ? 's' : ''}
-                              </span>
-                            )}
-                          </TooltipContent_Shadcn_>
-                        )}
-                      </Tooltip_Shadcn_>
+                        </HoverCardTrigger_Shadcn_>
+                        <HoverCardContent_Shadcn_ className="p-0">
+                          <p className="p-2 text-xs">
+                            {roleName} role applies to {projectsApplied.length} project
+                            {projectsApplied.length > 1 ? 's' : ''}
+                          </p>
+                          <div className="border-t flex flex-col py-1">
+                            <ScrollArea
+                              className={cn(projectsApplied.length > 5 ? 'h-[130px]' : '')}
+                            >
+                              {projectsApplied.map((name) => {
+                                const ref = orgProjects?.find((p) => p.name === name)?.ref
+                                return (
+                                  <Link
+                                    key={name}
+                                    href={`/project/${ref}`}
+                                    className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
+                                  >
+                                    <span className="text-xs truncate max-w-[60%]">{name}</span>
+                                    <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
+                                      Go to project
+                                      <ArrowRight size={14} />
+                                    </span>
+                                  </Link>
+                                )
+                              })}
+                            </ScrollArea>
+                          </div>
+                        </HoverCardContent_Shadcn_>
+                      </HoverCard_Shadcn_>
                     )}
                   </>
                 )}
@@ -187,7 +203,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
         )}
       </Table.td>
 
-      <Table.td>{!memberIsUser && <MemberActions member={member} />}</Table.td>
+      <Table.td>
+        <MemberActions member={member} />
+      </Table.td>
     </Table.tr>
   )
 }

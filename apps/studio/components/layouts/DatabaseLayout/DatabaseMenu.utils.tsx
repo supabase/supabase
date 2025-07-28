@@ -9,15 +9,23 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
+    enablePgReplicate: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
+  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges, enablePgReplicate } =
+    flags || {}
 
   return [
     {
       title: 'Database Management',
       items: [
+        {
+          name: 'Schema Visualizer',
+          key: 'schemas',
+          url: `/project/${ref}/database/schemas`,
+          items: [],
+        },
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
         {
           name: 'Functions',
@@ -56,6 +64,24 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/publications`,
           items: [],
         },
+        ...(enablePgReplicate
+          ? [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                items: [],
+              },
+            ]
+          : [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                label: 'Coming Soon',
+                items: [],
+              },
+            ]),
       ],
     },
     {
@@ -98,15 +124,16 @@ export const generateDatabaseMenu = (
             ]
           : []),
         {
-          name: 'Wrappers',
-          key: 'wrappers',
-          url: `/project/${ref}/database/wrappers`,
-          items: [],
-        },
-        {
           name: 'Migrations',
           key: 'migrations',
           url: `/project/${ref}/database/migrations`,
+          items: [],
+        },
+        {
+          name: 'Wrappers',
+          key: 'wrappers',
+          url: `/project/${ref}/integrations?category=wrapper`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
         ...(!!pgNetExtensionExists
@@ -114,7 +141,8 @@ export const generateDatabaseMenu = (
               {
                 name: 'Webhooks',
                 key: 'hooks',
-                url: `/project/${ref}/database/hooks`,
+                url: `/project/${ref}/integrations/webhooks/overview`,
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
                 items: [],
               },
             ]
@@ -124,18 +152,6 @@ export const generateDatabaseMenu = (
     {
       title: 'Tools',
       items: [
-        {
-          name: 'Schema Visualizer',
-          key: 'schemas',
-          url: `/project/${ref}/database/schemas`,
-          items: [],
-        },
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/database/query-performance`,
-          items: [],
-        },
         {
           name: 'Security Advisor',
           key: 'security-advisor',
@@ -147,6 +163,13 @@ export const generateDatabaseMenu = (
           name: 'Performance Advisor',
           key: 'performance-advisor',
           url: `/project/${ref}/advisors/performance`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          items: [],
+        },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/advisors/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },

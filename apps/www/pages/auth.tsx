@@ -1,26 +1,35 @@
 import ApiExamples from 'data/products/auth/auth-api-examples'
 import AuthSqlRulesExamples from 'data/products/auth/auth-sql-rules-examples'
-import Solutions from 'data/Solutions'
-import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Link, Shield } from 'lucide-react'
+import { ArrowUpRight, Briefcase, Eye, Link as IconLink, Shield } from 'lucide-react'
 import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import NextImage from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PRODUCT_NAMES } from 'shared-data/products'
 import { Button, Image } from 'ui'
-import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import CTABanner from '~/components/CTABanner'
-import FeatureColumn from '~/components/FeatureColumn'
+import { useBreakpoint } from 'common'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import EventCallout from '~/components/EventCallout'
+
+import MainProducts from '~/data/MainProducts'
+import { PRODUCT_NAMES } from 'shared-data/products'
 import AuthProviders from '~/data/auth.json'
 
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
+const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
+
 function AuthPage() {
-  // base path for images
+  const isMobile = useBreakpoint(768)
   const { basePath } = useRouter()
 
   const meta_title = 'Auth | Built-in user management'
@@ -46,8 +55,14 @@ function AuthPage() {
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.AUTHENTICATION} />
         <ProductHeader
-          icon={Solutions['authentication'].icon}
-          title={Solutions['authentication'].name}
+          callout={
+            <EventCallout
+              size={isMobile ? 'tiny' : 'small'}
+              className="mb-4 lg:mb-8 -mt-8 lg:-mt-10"
+            />
+          }
+          icon={MainProducts['authentication'].icon}
+          title={MainProducts['authentication'].name}
           h1={[
             <span key={'authentication-h1'}>
               Open Source Auth
@@ -136,6 +151,27 @@ function AuthPage() {
           </div>
         </SectionContainer>
 
+        <SingleQuote
+          id="quote"
+          className="[&_q]:max-w-2xl"
+          quote={{
+            text: 'Supabase is not only super easy to get started, but also provides all the backend solutions we require as we continue to grow.',
+            author: 'Alfred Lua',
+            role: 'Cofounder of Pebblely',
+            link: '/customers/pebblely',
+            logo: (
+              <NextImage
+                draggable={false}
+                src="/images/blog/avatars/alfred-lua-pebblely.jpeg"
+                alt="Alfred Lua, Cofounder of Pebblely"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
+        />
+
         <SectionContainer>
           <APISection
             title="Simple APIs"
@@ -143,16 +179,9 @@ function AuthPage() {
             content={ApiExamples}
             size="large"
             text={[
-              <p key={0}>
-                <p className="text-base lg:text-lg">
-                  APIs that you can understand. With powerful libraries that work on client and
-                  server-side applications.
-                </p>
-                {/* I think less is more here ... */}
-                {/* <p>
-                  With powerful client libraries that work on both client and server-side
-                  applications.
-                </p> */}
+              <p key={0} className="text-base lg:text-lg">
+                APIs that you can understand. With powerful libraries that work on client and
+                server-side applications.
               </p>,
             ]}
             footer={[
@@ -205,7 +234,9 @@ function AuthPage() {
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
               <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
-                <Link href="/docs/guides/auth#policy-examples">Explore documentation</Link>
+                <Link href="/docs/guides/database/postgres/row-level-security">
+                  Explore documentation
+                </Link>
               </Button>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
@@ -216,8 +247,6 @@ function AuthPage() {
             </div>
           </div>
         </SectionContainer>
-
-        <AuthWidgetSection />
 
         <CTABanner />
       </DefaultLayout>

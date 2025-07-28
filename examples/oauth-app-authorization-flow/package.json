@@ -1,0 +1,12 @@
+{
+  "name": "supabase-oauth-example",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts"
+  },
+  "dependencies": {
+    "hono": "^4.6.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

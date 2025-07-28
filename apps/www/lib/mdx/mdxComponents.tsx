@@ -3,7 +3,6 @@ import { PropsWithChildren } from 'react'
 import { CH } from '@code-hike/mdx/components'
 import { ArrowUpRight, Triangle } from 'lucide-react'
 import {
-  Admonition,
   Badge,
   cn,
   Collapsible_Shadcn_,
@@ -12,6 +11,7 @@ import {
   Heading,
   Image,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { type ImageProps } from 'ui/src/components/Image/Image'
 import Avatar from '~/components/Avatar'
 import Chart from '~/components/Charts/PGCharts'
@@ -37,9 +37,16 @@ const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
   </a>
 )
 
-const BlogCollapsible = ({ title, ...props }: { title: string }) => {
+const BlogCollapsible = ({
+  title,
+  containerClassName,
+  ...props
+}: {
+  title: string
+  containerClassName?: string
+}) => {
   return (
-    <Collapsible_Shadcn_>
+    <Collapsible_Shadcn_ className={containerClassName}>
       <CollapsibleTrigger_Shadcn_
         className="
         data-[state=open]:text
@@ -105,12 +112,8 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
       <Image
         fill
-        className={cn(
-          'm-0 object-cover',
-          type === 'blog' ? 'rounded-md border' : '',
-          props.wide && 'wide',
-          className
-        )}
+        containerClassName={cn(props.wide && 'wide')}
+        className={cn('m-0 object-cover', type === 'blog' ? 'rounded-md border' : '', className)}
         zoomable={zoomable}
         {...props}
       />
@@ -118,6 +121,9 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     Link: LinkComponent,
     code: (props: any) => <InlineCodeTag>{props.children}</InlineCodeTag>,
     BlogCollapsible: (props: any) => <BlogCollapsible {...props} />,
+    Subtitle: (props: any) => (
+      <p className={cn('-mt-6 text-foreground-lighter text-lg', props.className)} {...props} />
+    ),
     Admonition,
   }
 

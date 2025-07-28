@@ -1,6 +1,6 @@
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
+import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
@@ -30,15 +30,21 @@ export function parseReferencePath(slug: Array<string>) {
   const isSelfHostingReference = slug[0].startsWith('self-hosting-')
 
   if (isClientSdkReference) {
-    let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
+    let sdkId: string
+    let maybeVersion: string | null
+    let maybeCrawlers: string | null
+    let path: string[]
+    ;[sdkId, maybeVersion, maybeCrawlers, ...path] = slug
     if (!/v\d+/.test(maybeVersion)) {
       maybeVersion = null
-      maybeCrawlers = maybeVersion
       path = [maybeCrawlers, ...path]
+      maybeCrawlers = maybeVersion
     }
     if (maybeCrawlers !== 'crawlers') {
+      if (typeof maybeCrawlers === 'string') {
+        path = [maybeCrawlers, ...path]
+      }
       maybeCrawlers = null
-      path = [maybeCrawlers, ...path]
     }
 
     return {
@@ -75,7 +81,7 @@ export function parseReferencePath(slug: Array<string>) {
 async function generateStaticParamsForSdkVersion(sdkId: string, version: string) {
   const flattenedSections = await getFlattenedSections(sdkId, version)
 
-  return flattenedSections
+  return (flattenedSections || [])
     .filter((section) => section.type !== 'category' && !!section.slug)
     .map((section) => ({
       slug: [
@@ -119,9 +125,10 @@ export async function generateReferenceStaticParams() {
 }
 
 export async function generateReferenceMetadata(
-  { params: { slug } }: { params: { slug: Array<string> } },
+  props: { params: Promise<{ slug: Array<string> }> },
   resolvingParent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { slug } = await props.params
   const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
 
   const parsedPath = parseReferencePath(slug)
@@ -130,7 +137,7 @@ export async function generateReferenceMetadata(
   const isApiReference = parsedPath.__type === 'api'
   const isSelfHostingReference = parsedPath.__type === 'self-hosting'
   if (isClientSdkReference) {
-    const { sdkId, maybeVersion } = parsedPath
+    const { sdkId, maybeVersion, path } = parsedPath
     const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
 
     const flattenedSections = await getFlattenedSections(sdkId, version)
@@ -138,9 +145,9 @@ export async function generateReferenceMetadata(
     const displayName = REFERENCES[sdkId].name
     const sectionTitle =
       slug.length > 0
-        ? flattenedSections.find((section) => section.slug === slug[0])?.title
+        ? flattenedSections?.find((section) => section.slug === slug[0])?.title
         : undefined
-    const url = [BASE_PATH, 'reference', sdkId, maybeVersion, slug[0]].filter(Boolean).join('/')
+    const url = [BASE_PATH, 'reference', sdkId, path[0]].filter(Boolean).join('/')
 
     const images = generateOpenGraphImageMeta({
       type: 'API Reference',
@@ -153,7 +160,6 @@ export async function generateReferenceMetadata(
       ...(slug.length > 0
         ? {
             alternates: {
-              ...parentAlternates,
               canonical: url,
             },
           }
@@ -202,17 +208,59 @@ export async function redirectNonexistentReferenceSection(
 }
 
 export function normalizeMarkdown(markdownUnescaped: string): string {
-  const markdown = markdownUnescaped.replaceAll(/(?<!\\)\{/g, '\\{').replaceAll(/(?<!\\)\}/g, '\\}')
+  /**
+   * Need to first escape the braces so that the MDX parser doesn't choke on
+   * them. Unlike the MDX parser, the regular Markdown parser handles braces
+   * gracefully, so we use it to find the positions of the code blocks, then
+   * escape all other braces before the final conversion with the MDX parser.
+   */
+  const markdownTree = fromMarkdown(markdownUnescaped)
+
+  const codeBlocks = [] as Array<{
+    type: string
+    start: number
+    end: number
+  }>
+  visit(markdownTree, ['code', 'inlineCode'], (node) => {
+    codeBlocks.push({
+      type: node.type,
+      start: node.position?.start?.offset || 0,
+      end: node.position?.end?.offset || 0,
+    })
+  })
+  // Sort code blocks by start offset in descending order
+  codeBlocks.sort((a, b) => b.start - a.start)
+
+  let markdown = markdownUnescaped
+  let lastIndex = markdown.length
+
+  // Iterate through the sorted code blocks
+  for (const block of codeBlocks) {
+    // Escape braces in the text between the current code block and the last processed position
+    const textBetween = markdown.slice(block.end, lastIndex)
+    const escapedTextBetween = textBetween.replace(/(?<!\\)([{}])/g, '\\$1')
+
+    // Replace the original text with the escaped version
+    markdown = markdown.slice(0, block.end) + escapedTextBetween + markdown.slice(lastIndex)
+
+    // Update the last processed position
+    lastIndex = block.start
+  }
+
+  // Escape braces in the remaining text before the first code block
+  if (lastIndex > 0) {
+    const remainingText = markdown.slice(0, lastIndex)
+    const escapedRemainingText = remainingText.replace(/(?<!\\)([{}])/g, '\\$1')
+    markdown = escapedRemainingText + markdown.slice(lastIndex)
+  }
 
   const mdxTree = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],
   })
-
   visit(mdxTree, 'text', (node) => {
     node.value = node.value.replace(/\n/g, ' ')
   })
-
   const content = toMarkdown(mdxTree, {
     extensions: [mdxToMarkdown()],
   })

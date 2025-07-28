@@ -1,6 +1,6 @@
 {
-    "name": "flutter_user_management",
-    "short_name": "flutter_user_management",
+    "name": "supabase_quickstart",
+    "short_name": "supabase_quickstart",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

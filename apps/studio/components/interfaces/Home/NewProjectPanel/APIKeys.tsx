@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { AlertCircle, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import { useParams } from 'common/hooks'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Input } from 'ui'
-import { AlertCircle, Loader } from 'lucide-react'
+import { Input, SimpleCodeBlock } from 'ui'
 
 const generateInitSnippet = (endpoint: string) => ({
   js: `
@@ -42,30 +42,37 @@ const APIKeys = () => {
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectApiQuery({
-    projectRef,
-  })
+  } = useProjectSettingsV2Query({ projectRef })
+
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
+  const { anonKey, serviceKey } = getKeys(apiKeys)
+
+  // API keys should not be empty. However it can be populated with a delay on project creation
+  const isApiKeysEmpty = !anonKey && !serviceKey
 
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
     isLoading: isJwtSecretUpdateStatusLoading,
-  } = useJwtSecretUpdatingStatusQuery({ projectRef })
+  } = useJwtSecretUpdatingStatusQuery(
+    { projectRef },
+    { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
+  )
+
+  // Only show JWT loading state if the query is actually enabled
+  const showJwtLoading =
+    isJwtSecretUpdateStatusLoading && !isProjectSettingsLoading && isApiKeysEmpty
+
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
   const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
-  // Get the API service
-  const apiService = settings?.autoApiService
-  const apiKeys = apiService?.service_api_keys ?? []
-
-  // API keys should not be empty. However it can be populated with a delay on project creation
-  const isApiKeysEmpty = apiKeys.length === 0
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
-  const apiUrl = `${apiService?.protocol ?? 'https'}://${apiService?.endpoint ?? '-'}`
-  const anonKey = apiKeys.find((key) => key.tags === 'anon')
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
   const clientInitSnippet: any = generateInitSnippet(apiUrl)
   const selectedLanguageSnippet = clientInitSnippet[selectedLanguage.key] ?? 'No snippet available'
@@ -90,14 +97,20 @@ const APIKeys = () => {
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
-      ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
+      ) : isProjectSettingsLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
           <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-          <p className="text-sm text-foreground-light">
-            {isProjectSettingsLoading || isApiKeysEmpty
-              ? 'Retrieving API keys'
-              : 'JWT secret is being updated'}
-          </p>
+          <p className="text-sm text-foreground-light">Retrieving API keys</p>
+        </div>
+      ) : isApiKeysEmpty ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">Retrieving API keys</p>
+        </div>
+      ) : showJwtLoading ? (
+        <div className="flex items-center justify-center py-8 space-x-2">
+          <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">JWT secret is being updated</p>
         </div>
       ) : (
         <>
@@ -128,17 +141,13 @@ const APIKeys = () => {
                 <div className="space-y-2">
                   <p className="text-sm">API Key</p>
                   <div className="flex items-center space-x-1 -ml-1">
-                    {anonKey?.tags?.split(',').map((x: any, i: number) => (
-                      <code key={`${x}${i}`} className="text-xs">
-                        {x}
-                      </code>
-                    ))}
-                    <code className="text-xs">{'public'}</code>
+                    <code className="text-xs">{anonKey?.name}</code>
+                    <code className="text-xs">public</code>
                   </div>
                 </div>
               }
               copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-              reveal={anonKey?.tags !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+              reveal={anonKey?.name !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
               value={
                 !canReadAPIKeys
                   ? 'You need additional permissions to view API keys'
@@ -146,7 +155,7 @@ const APIKeys = () => {
                     ? 'JWT secret update failed, new API key may have issues'
                     : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                       ? 'Updating JWT secret...'
-                      : apiService?.defaultApiKey
+                      : anonKey?.api_key
               }
               onChange={() => {}}
               descriptionText={

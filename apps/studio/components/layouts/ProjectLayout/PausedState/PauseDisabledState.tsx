@@ -1,4 +1,4 @@
-import { ChevronDown, Download } from 'lucide-react'
+import { ChevronDown, Download, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -8,7 +8,6 @@ import { useBackupDownloadMutation } from 'data/database/backup-download-mutatio
 import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
 import { useStorageArchiveCreateMutation } from 'data/storage/storage-archive-create-mutation'
 import { useStorageArchiveQuery } from 'data/storage/storage-archive-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Database, Storage } from 'icons'
 import { PROJECT_STATUS } from 'lib/constants'
 import {
@@ -30,14 +29,11 @@ export const PauseDisabledState = () => {
   const [toastId, setToastId] = useState<string | number>()
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
-  const enforceNinetyDayUnpauseExpiry = useFlag('enforceNinetyDayUnpauseExpiry')
-  const allowStorageObjectsDownload = useFlag('enableNinetyDayStorageDownload')
+  const dbVersion = project?.dbVersion?.replace('supabase-postgres-', '')
 
   const { data: pauseStatus } = useProjectPauseStatusQuery(
     { ref },
-    {
-      enabled: project?.status === PROJECT_STATUS.INACTIVE && enforceNinetyDayUnpauseExpiry,
-    }
+    { enabled: project?.status === PROJECT_STATUS.INACTIVE }
   )
   const latestBackup = pauseStatus?.latest_downloadable_backup_id
 
@@ -92,12 +88,6 @@ export const PauseDisabledState = () => {
         ref,
         backup: {
           id: latestBackup,
-          // [Joshen] Just FYI these params aren't required for the download backup request
-          // API types need to be updated
-          project_id: -1,
-          inserted_at: '',
-          isPhysicalBackup: false,
-          status: {},
         },
       },
       {
@@ -137,11 +127,11 @@ export const PauseDisabledState = () => {
         and cannot be restored through the dashboard. However, your data remains intact and can be
         downloaded as a backup.
       </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+      <AlertDescription_Shadcn_ className="gap-x-2 mt-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="default" icon={<Download />} iconRight={<ChevronDown />}>
-              Download backup
+              Download backups
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="start">
@@ -157,22 +147,12 @@ export const PauseDisabledState = () => {
               }}
             >
               <Database size={16} />
-              Download database backup
+              Database backup (PG: {dbVersion})
             </DropdownMenuItemTooltip>
-            <DropdownMenuItemTooltip
-              className="gap-x-2"
-              disabled={!allowStorageObjectsDownload}
-              onClick={() => onSelectDownloadStorageArchive()}
-              tooltip={{
-                content: {
-                  side: 'right',
-                  text: 'This feature is not available yet, please reach out to support for assistance',
-                },
-              }}
-            >
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
               <Storage size={16} />
-              Download storage objects
-            </DropdownMenuItemTooltip>
+              Storage objects
+            </DropdownMenuItem>
             {/* [Joshen] Once storage object download is supported, can just use the below component */}
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectDownloadStorageArchive()}>
               <Storage size={16} />
@@ -180,6 +160,24 @@ export const PauseDisabledState = () => {
             </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button asChild type="default" icon={<ExternalLink />} className="my-3">
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore"
+          >
+            Restore backup to a new Supabase project guide
+          </a>
+        </Button>
+        <Button asChild type="default" icon={<ExternalLink />} className="mb-3">
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://supabase.com/docs/guides/local-development/restoring-downloaded-backup"
+          >
+            Restore backup on your local machine guide
+          </a>
+        </Button>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )

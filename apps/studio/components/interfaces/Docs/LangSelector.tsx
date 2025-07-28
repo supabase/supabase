@@ -1,13 +1,18 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Key } from 'lucide-react'
+import { useMemo } from 'react'
+
+import { useParams } from 'common'
+import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
+import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
 
@@ -15,25 +20,30 @@ const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
 interface LangSelectorProps {
   selectedLang: string
+  selectedApiKey: showApiKey
   setSelectedLang: (selectedLang: string) => void
-  showApiKey: showApiKey
-  setShowApiKey: (showApiKey: showApiKey) => void
-  apiKey: string | undefined
-  autoApiService: any
+  setSelectedApiKey: (showApiKey: showApiKey) => void
 }
 
 const LangSelector = ({
   selectedLang,
+  selectedApiKey,
   setSelectedLang,
-  showApiKey,
-  setShowApiKey,
-  apiKey,
-  autoApiService,
+  setSelectedApiKey,
 }: LangSelectorProps) => {
-  const canReadServiceKey = useCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys.service_role_key'
+  const { ref: projectRef } = useParams()
+
+  const { data: apiKeys = [], isLoading: isLoadingAPIKeys } = useAPIKeysQuery({
+    projectRef,
+    reveal: false,
+  })
+
+  const legacyKeys = useMemo(() => apiKeys.filter(({ type }) => type === 'legacy'), [apiKeys])
+  const publishableKeys = useMemo(
+    () => apiKeys.filter(({ type }) => type === 'publishable'),
+    [apiKeys]
   )
+  const secretKeys = useMemo(() => apiKeys.filter(({ type }) => type === 'secret'), [apiKeys])
 
   return (
     <div className="p-1 w-1/2 ml-auto">
@@ -60,48 +70,93 @@ const LangSelector = ({
         >
           Bash
         </button>
-        {selectedLang == 'bash' && (
-          <div className="flex">
+        {selectedLang == 'bash' && !isLoadingAPIKeys && apiKeys && apiKeys.length > 0 && (
+          <div className="flex gap-x-1">
             <div className="flex items-center gap-2 p-1 pl-2 text-xs text-foreground-lighter">
               <Key size={12} strokeWidth={1.5} />
-              <span>Project API key :</span>
+              <span>Project API key:</span>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default">{showApiKey.name}</Button>
+                <Button type="outline">
+                  {selectedApiKey.name === 'hide' ? 'Hide keys' : selectedApiKey.name}
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom">
-                <>
-                  <DropdownMenuItem key="hide" onClick={() => setShowApiKey(DEFAULT_KEY)}>
-                    hide
-                  </DropdownMenuItem>
-                  {apiKey && (
-                    <DropdownMenuItem
-                      key="anon"
-                      onClick={() =>
-                        setShowApiKey({
-                          key: apiKey,
-                          name: 'anon (public)',
-                        })
-                      }
-                    >
-                      <p>anon (public)</p>
-                    </DropdownMenuItem>
+                <DropdownMenuRadioGroup value={selectedApiKey.key}>
+                  <DropdownMenuRadioItem
+                    key="hide"
+                    value={DEFAULT_KEY.key}
+                    onClick={() => setSelectedApiKey(DEFAULT_KEY)}
+                  >
+                    Hide keys
+                  </DropdownMenuRadioItem>
+
+                  {publishableKeys.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel>Publishable keys</DropdownMenuLabel>
+                      {publishableKeys.map((key) => {
+                        const value = key.api_key
+                        return (
+                          <DropdownMenuRadioItem
+                            key={key.id}
+                            value={value}
+                            onClick={() =>
+                              setSelectedApiKey({
+                                name: `Publishable key: ${key.name}`,
+                                key: value,
+                              })
+                            }
+                          >
+                            {key.name}
+                          </DropdownMenuRadioItem>
+                        )
+                      })}
+                    </>
                   )}
-                  {canReadServiceKey && (
-                    <DropdownMenuItem
-                      key="service"
-                      onClick={() =>
-                        setShowApiKey({
-                          key: autoApiService.serviceApiKey,
-                          name: 'service_role (secret)',
-                        })
-                      }
-                    >
-                      <p>service_role (secret)</p>
-                    </DropdownMenuItem>
+
+                  {secretKeys.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel>Secret keys</DropdownMenuLabel>
+                      {secretKeys.map((key) => {
+                        const value = key.prefix + '...'
+                        return (
+                          <DropdownMenuRadioItem
+                            key={key.id}
+                            value={value}
+                            onClick={() =>
+                              setSelectedApiKey({ name: `Secret key: ${key.name}`, key: value })
+                            }
+                          >
+                            {key.name}
+                          </DropdownMenuRadioItem>
+                        )
+                      })}
+                    </>
                   )}
-                </>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>JWT-based legacy keys</DropdownMenuLabel>
+                    {legacyKeys.map((key) => {
+                      const value = key.api_key
+                      return (
+                        <DropdownMenuRadioItem
+                          key={key.id}
+                          value={value}
+                          onClick={() =>
+                            setSelectedApiKey({ name: `Legacy key: ${key.name}`, key: value })
+                          }
+                        >
+                          {key.name}
+                        </DropdownMenuRadioItem>
+                      )
+                    })}
+                  </DropdownMenuGroup>
+                </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

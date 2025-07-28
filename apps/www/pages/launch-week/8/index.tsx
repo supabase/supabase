@@ -1,36 +1,26 @@
 import 'swiper/css'
 
 import { useState, useEffect } from 'react'
-import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { SITE_ORIGIN, LW_URL } from '~/lib/constants'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
-import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
-import AnimatedParticles from '~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas'
 
 const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
-const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
 const LWArchive = dynamic(() => import('~/components/LaunchWeek/8/LWArchive'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
 )
-const TicketBrickWall = dynamic(() => import('~/components/LaunchWeek/8/TicketBrickWall'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
-
-interface Props {
-  users?: UserData[]
-  meetups?: Meetup[]
-}
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_URL ?? 'http://localhost:54321',
@@ -38,7 +28,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function TicketHome({ users, meetups }: Props) {
+export default function TicketHome() {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week 8'
@@ -106,7 +96,7 @@ export default function TicketHome({ users, meetups }: Props) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: SITE_URL,
+          url: LW_URL,
           images: [
             {
               url: OG_IMAGE,
@@ -134,12 +124,11 @@ export default function TicketHome({ users, meetups }: Props) {
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">
-                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[500px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
+                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[200px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
                   <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4 px-6">
                     <LaunchWeekLogoHeader />
                   </div>
                   <div className="absolute inset-0 z-0 flex items-center justify-center">
-                    <AnimatedParticles />
                     <Image
                       src="/images/launchweek/8/stars.svg"
                       alt="starts background"
@@ -173,10 +162,6 @@ export default function TicketHome({ users, meetups }: Props) {
               <LW8Releases />
             </SectionContainer>
 
-            <SectionContainer id="meetups" className="!pt-0">
-              <LW8Meetups meetups={meetups} />
-            </SectionContainer>
-
             <SectionContainer id="archive">
               <LWArchive />
             </SectionContainer>
@@ -184,28 +169,10 @@ export default function TicketHome({ users, meetups }: Props) {
             <SectionContainer className="!px-4 w-full">
               <LaunchWeekPrizeSection />
             </SectionContainer>
-            {users && <TicketBrickWall users={users.slice(0, 17)} />}
           </div>
           <CTABanner className="!bg-[#020405] border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!
-    .from('lw8_tickets_golden')
-    .select('username, golden')
-    .limit(17)
-
-  const { data: meetups } = await supabaseAdmin!.from('lw8_meetups').select('*')
-
-  return {
-    props: {
-      users,
-      meetups,
-    },
-  }
 }

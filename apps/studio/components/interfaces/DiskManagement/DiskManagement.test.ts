@@ -1,9 +1,10 @@
+import { describe, test, expect } from 'vitest'
+import { DiskType } from './ui/DiskManagement.constants'
 import {
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { DiskType } from './DiskManagement.constants'
 
 describe('DiskManagement.utils.ts:calculateDiskSizePrice', () => {
   test('GP3 with 8GB to GP3 with 10GB for pro plan', () => {

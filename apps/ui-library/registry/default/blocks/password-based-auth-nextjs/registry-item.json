@@ -1,0 +1,75 @@
+{
+  "name": "password-based-auth-nextjs",
+  "type": "registry:block",
+  "title": "Password Based Auth flow for Nextjs and Supabase",
+  "description": "Password Based Auth flow for Nextjs and Supabase",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/login/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/login/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/error/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/error/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/protected/page.tsx",
+      "type": "registry:page",
+      "target": "app/protected/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/confirm/route.ts",
+      "type": "registry:page",
+      "target": "app/auth/confirm/route.ts"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/components/login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/middleware.ts",
+      "type": "registry:file",
+      "target": "middleware.ts"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/sign-up/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/sign-up-success/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/sign-up-success/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/components/sign-up-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/forgot-password/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/forgot-password/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/app/auth/update-password/page.tsx",
+      "type": "registry:page",
+      "target": "app/auth/update-password/page.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/components/forgot-password-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/components/update-password-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-nextjs/components/logout-button.tsx",
+      "type": "registry:component"
+    }
+  ]
+}

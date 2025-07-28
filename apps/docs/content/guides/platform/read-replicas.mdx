@@ -39,7 +39,6 @@ Read Replicas are available for all projects on the Pro, Team and Enterprise pla
 Projects must meet these requirements to use Read Replicas:
 
 1. Running on AWS.
-   - Support for projects on Fly.io is coming.
 1. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
    - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
 1. Running on Postgres 15+.
@@ -52,6 +51,30 @@ Projects must meet these requirements to use Read Replicas:
 
 To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard.
 
+You can also manage Read Replicas using the Management API (beta functionality):
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Create a new Read Replica
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/setup" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "region": "us-east-1"
+  }'
+
+# Delete a Read Replica
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/remove" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "database_identifier": "abcdefghijklmnopqrst"
+  }'
+```
+
 Projects on an XL compute add-on or larger can create up to five Read Replicas. Projects on compute add-ons smaller than XL can create up to two Read Replicas. All Read Replicas inherit the compute size of their Primary database.
 
 ### Deploying a Read Replica
@@ -59,6 +82,8 @@ Projects on an XL compute add-on or larger can create up to five Read Replicas. 
 A Read Replica is deployed by using a physical backup as a starting point, and a combination of WAL file archives and direct replication from the Primary database to catch up. Both components may take significant time to complete. The duration of restoring from a physical backup is roughly dependent and directly related to the database size of your project. The time taken to catch up to the primary using WAL archives and direct replication is dependent on the level of activity on the Primary database; a more active database will produce a larger number of WAL files that will need to be processed.
 
 Along with the progress of the deployment, the dashboard displays rough estimates for each component.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### What does it mean when "Init failed" is observed?
 
@@ -96,11 +121,30 @@ A connection pool through Supavisor is also available for each Read Replica. Fin
 
 A load balancer is deployed to automatically balance requests between your Primary database and Read Replicas. Find its endpoint on the [API Settings page](/dashboard/project/_/settings/api).
 
-The load balancer uses a round-robin strategy to route `GET` requests to all available API endpoints, including the Primary database. This means that `GET` requests are randomly and evenly split among databases. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
+The load balancer enables geo-routing for Data API requests so that `GET` requests will automatically be routed to the database that is closest to your user ensuring the lowest latency. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
+
+You can also interact with Supabase services (Auth, Edge Functions, Realtime, and Storage) through this load balancer so there's no need to worry about which endpoint to use and in which situations. However, geo-routing for these services are not yet available but is coming soon.
+
+<Admonition type="note">
+
+Due to the requirements of the Auth service, all Auth requests are handled by the Primary, even when sent over the load balancer endpoint. This is similar to how non-Read requests for the Data API (PostgREST) are exclusively handled by the Primary.
+
+</Admonition>
 
 To call a read-only Postgres function on Read Replicas through the REST API, use the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
 
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
+
+<Admonition type="note">
+
+Starting on April 4th, 2025, we will be changing the routing behavior for eligible Data API requests:
+
+- Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project, regardless of location
+- New behavior: Geo-routing, that directs requests to the closest available database (all read replicas + primary)
+
+The new behavior delivers a better experience for your users by minimizing the latency to your project. You can take full advantage of this by placing Read Replicas close to your major customer bases.
+
+</Admonition>
 
 <Admonition type="caution">
 
@@ -209,3 +253,7 @@ You can [consult](https://cloud.google.com/sql/docs/postgres/replication/replica
 When a project that utilizes Read Replicas is restarted, or the compute add-on size is changed, the Primary database gets restarted first. During this period, the Read Replicas remain available.
 
 Once the Primary database has completed restarting (or resizing, in case of a compute add-on change) and become available for usage, all the Read Replicas are restarted (and resized, if needed) concurrently.
+
+## Pricing
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Read Replica usage](/docs/guides/platform/manage-your-usage/read-replicas).

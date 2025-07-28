@@ -1,22 +1,21 @@
-import { PostgresTable } from '@supabase/postgres-meta'
-import { isNil } from 'lodash'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTrackedState } from 'components/grid/store/Store'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
+import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 
 const verifyJSON = (value: string) => {
   try {
@@ -53,32 +52,40 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
-  const state = useTrackedState()
+  const snap = useTableEditorTableStateSnapshot()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
 
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
-  const initialValue = row[column.key as keyof TRow] as string
-  const jsonString = prettifyJSON(!isNil(initialValue) ? tryFormatInitialValue(initialValue) : '')
-  const isTruncated =
-    typeof initialValue === 'string' &&
-    initialValue.endsWith('...') &&
-    initialValue.length > MAX_CHARACTERS
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
+  const gridColumn = snap.gridColumns.find((x) => x.name == column.key)
+
+  const rawInitialValue = row[column.key as keyof TRow] as unknown
+  const initialValue =
+    rawInitialValue === null || rawInitialValue === undefined || typeof rawInitialValue === 'string'
+      ? rawInitialValue
+      : JSON.stringify(rawInitialValue)
+
+  const jsonString = prettifyJSON(initialValue ? tryFormatInitialValue(initialValue) : '')
+
+  const isTruncated = isValueTruncated(initialValue)
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
 
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
   const loadFullValue = () => {
-    if (selectedTable === undefined || project === undefined) return
-    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+    if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
+    if (selectedTable.primary_keys.length === 0) {
       return toast('Unable to load value as table has no primary keys')
     }
 
-    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+    const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
       return { ...a, [b.name]: (row as any)[b.name] }
     }, {})
 
@@ -140,8 +147,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       onRowChange({ ...row, [column.key]: jsonValue }, true)
       setIsPopoverOpen(false)
     } else {
-      const { onError } = state
-      if (onError) onError(Error('Please enter a valid JSON'))
+      toast.error('Please enter a valid JSON')
     }
   }
 
@@ -193,8 +199,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   </div>
                 </div>
               )}
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <div
                     className={[
                       'border border-strong rounded p-1 flex items-center justify-center',
@@ -204,11 +210,11 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                   >
                     <Maximize size={12} strokeWidth={2} />
                   </div>
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" align="center">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="center">
                   <span>Expand editor</span>
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </BlockKeys>
         )

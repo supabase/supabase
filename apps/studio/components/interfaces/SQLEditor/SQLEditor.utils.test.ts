@@ -5,6 +5,7 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { describe, test, expect, it } from 'vitest'
 
 describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
   test('Should return false if limit passed is <= 0', () => {
@@ -244,5 +245,18 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     `)
 
     expect(match).toBe(true)
+  })
+
+  it('should catch potential destructive queries', () => {
+    const DESTRUCTIVE_QUERIES = [
+      `ALTER TABLE test DROP COLUMN test;`,
+      `DELETE FROM test;`,
+      `DROP TABLE test;`,
+      `TRUNCATE TABLE test;`,
+    ]
+
+    DESTRUCTIVE_QUERIES.forEach((query) => {
+      expect(checkDestructiveQuery(query), `Query ${query} should be destructive`).toBe(true)
+    })
   })
 })

@@ -1,16 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { projectKeys } from 'data/projects/keys'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { getWithTimeout } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import { PROJECT_STATUS } from 'lib/constants'
 import { Button } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
@@ -18,13 +17,30 @@ const RestoringState = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
-  const checkServerInterval = useRef<number>()
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
+  const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
+
+  useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+      },
+      onSuccess: async (res) => {
+        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+          setIsCompleted(true)
+        } else {
+          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+        }
+      },
+    }
+  )
 
   const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -41,25 +57,9 @@ const RestoringState = () => {
 
   const onClickDownloadBackup = () => {
     if (!ref) return console.error('Project ref is required')
-    if (backups.length === 0) return console.error('No available backups to download')
-    downloadBackup({ ref, backup: backups[0] })
-  }
+    if (logicalBackups.length === 0) return console.error('No available backups to download')
 
-  async function checkServer() {
-    if (!project) return
-
-    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
-      timeout: 2000,
-    })
-    if (projectStatus && !projectStatus.error) {
-      const { status } = projectStatus
-      if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-        clearInterval(checkServerInterval.current)
-        setIsCompleted(true)
-      } else {
-        queryClient.invalidateQueries(projectKeys.detail(ref))
-      }
-    }
+    downloadBackup({ ref, backup: logicalBackups[0] })
   }
 
   const onConfirm = async () => {
@@ -68,11 +68,6 @@ const RestoringState = () => {
     setLoading(true)
     if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
-
-  useEffect(() => {
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => clearInterval(checkServerInterval.current)
-  }, [])
 
   return (
     <div className="flex items-center justify-center h-full">
@@ -97,40 +92,49 @@ const RestoringState = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 py-6">
-            <div className="flex px-8 space-x-8">
-              <div className="mt-1">
-                <Loader className="animate-spin" size={18} />
-              </div>
-              <div className="space-y-1">
-                <p>Restoration in progress</p>
-                <p className="text-sm text-foreground-light">
-                  Restoration can take from a few minutes up to several hours depending on the size
-                  of your database. Your project will be offline while the restoration is running.
-                </p>
+          <>
+            <div className="space-y-6 py-6">
+              <div className="flex px-8 space-x-8">
+                <div className="mt-1">
+                  <Loader className="animate-spin" size={18} />
+                </div>
+                <div className="space-y-1">
+                  <p>Restoration in progress</p>
+                  <p className="text-sm text-foreground-light">
+                    Restoration can take from a few minutes up to several hours depending on the
+                    size of your database. Your project will be offline while the restoration is
+                    running.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+            <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
+              <Button asChild type="default">
+                <Link
+                  href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
+                >
+                  Contact support
+                </Link>
+              </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<Download />}
+                loading={isDownloading}
+                disabled={logicalBackups.length === 0}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      logicalBackups.length === 0 ? 'No available backups to download' : undefined,
+                  },
+                }}
+                onClick={onClickDownloadBackup}
+              >
+                Download latest backup
+              </ButtonTooltip>
+            </div>
+          </>
         )}
-        <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-          <Button asChild type="default">
-            <Link
-              href={`/support/new?category=Database_unresponsive&ref=${project?.ref}&subject=Restoration%20failed%20for%20project`}
-            >
-              Contact support
-            </Link>
-          </Button>
-          <ButtonTooltip
-            type="default"
-            icon={<Download />}
-            loading={isDownloading}
-            disabled={backups.length === 0}
-            tooltip={{ content: { side: 'bottom', text: 'No available backups to download' } }}
-            onClick={onClickDownloadBackup}
-          >
-            Download backup
-          </ButtonTooltip>
-        </div>
       </div>
     </div>
   )

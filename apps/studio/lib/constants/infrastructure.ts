@@ -4,7 +4,9 @@ import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import type { components } from 'data/api'
 
 export const AWS_REGIONS_DEFAULT =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.EAST_US
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+    ? AWS_REGIONS.SOUTHEAST_ASIA
+    : AWS_REGIONS.EAST_US_2
 
 // TO DO, change default to US region for prod
 export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
@@ -23,7 +25,11 @@ export const PRICING_TIER_PRODUCT_IDS = {
   ENTERPRISE: 'tier_enterprise',
 }
 
-export const DEFAULT_PROVIDER: CloudProvider = 'AWS'
+export const DEFAULT_PROVIDER: CloudProvider =
+  process.env.NEXT_PUBLIC_ENVIRONMENT &&
+  ['staging', 'preview'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT)
+    ? 'AWS_K8S'
+    : 'AWS'
 
 export const PROVIDERS = {
   FLY: {
@@ -39,10 +45,17 @@ export const PROVIDERS = {
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
   },
+  AWS_K8S: {
+    id: 'AWS_K8S',
+    name: 'AWS (Revamped)',
+    DEFAULT_SSH_KEY: 'supabase-app-instance',
+    default_region: AWS_REGIONS_DEFAULT,
+    regions: { ...AWS_REGIONS },
+  },
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ResourceWithServicesStatusResponse']['status']
+  [key: string]: components['schemas']['ProjectDetailResponse']['status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
@@ -58,6 +71,7 @@ export const PROJECT_STATUS: {
   UPGRADING: 'UPGRADING',
   PAUSING: 'PAUSING',
   PAUSE_FAILED: 'PAUSE_FAILED',
+  RESIZING: 'RESIZING',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
@@ -88,11 +102,11 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1
 
-type InstanceSpecs = {
+export type InstanceSpecs = {
   baseline_disk_io_mbs: number
   connections_direct: number
   connections_pooler: number
-  cpu_cores: number
+  cpu_cores: number | 'Shared'
   cpu_dedicated: boolean
   max_disk_io_mbs: number
   memory_gb: number
@@ -102,7 +116,7 @@ export const INSTANCE_NANO_SPECS: InstanceSpecs = {
   baseline_disk_io_mbs: 43,
   connections_direct: 30,
   connections_pooler: 200,
-  cpu_cores: 2,
+  cpu_cores: 'Shared',
   cpu_dedicated: false,
   max_disk_io_mbs: 2085,
   memory_gb: 0.5,

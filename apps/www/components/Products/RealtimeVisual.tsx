@@ -1,8 +1,12 @@
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
 import { isBrowser, useReducedMotion } from 'common'
+import { cn } from 'ui'
+interface Props {
+  className?: string
+}
 
-const RealtimeVisual = () => {
+const RealtimeVisual: React.FC<Props> = ({ className }) => {
   const cardRef = useRef<HTMLDivElement | null>(null)
   const [svgTransformSelf, setSvgTransformSelf] = useState<string>('translate(0px, 0px)')
   const [svgTransform, setSvgTransform] = useState<string>('translate(0px, 0px)')
@@ -39,7 +43,10 @@ const RealtimeVisual = () => {
   return (
     <figure
       ref={cardRef}
-      className="absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden pointer-events-auto"
+      className={cn(
+        'absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden pointer-events-auto',
+        className
+      )}
       role="img"
       aria-label="Supabase Realtime multiplayer app demo"
       onMouseMove={reduceMotion ? undefined : handleMouseMove}
@@ -83,7 +90,7 @@ const RealtimeVisual = () => {
             d="M3.58385 1.69742C2.57836 0.865603 1.05859 1.58076 1.05859 2.88572V35.6296C1.05859 37.1049 2.93111 37.7381 3.8265 36.5656L12.5863 25.0943C12.6889 24.96 12.8483 24.8812 13.0173 24.8812H27.3245C28.7697 24.8812 29.4211 23.0719 28.3076 22.1507L3.58385 1.69742Z"
             fill="hsl(var(--background-surface-200))"
             stroke="hsl(var(--foreground-lighter))"
-            stroke-linejoin="round"
+            strokeLinejoin="round"
           />
         </svg>
 
@@ -115,7 +122,7 @@ const RealtimeVisual = () => {
             d="M3.58385 1.69742C2.57836 0.865603 1.05859 1.58076 1.05859 2.88572V35.6296C1.05859 37.1049 2.93111 37.7381 3.8265 36.5656L12.5863 25.0943C12.6889 24.96 12.8483 24.8812 13.0173 24.8812H27.3245C28.7697 24.8812 29.4211 23.0719 28.3076 22.1507L3.58385 1.69742Z"
             fill="hsl(var(--background-surface-200))"
             stroke="hsl(var(--foreground-lighter))"
-            stroke-linejoin="round"
+            strokeLinejoin="round"
           />
         </svg>
 
@@ -145,6 +152,7 @@ const RealtimeVisual = () => {
       {/* Gradient to hide animation under text to maintain readability */}
       <div
         className="
+          visual-overlay
           absolute pointer-events-none
           w-full h-full max-h-[400px] lg:max-h-none
           inset-0 top-auto

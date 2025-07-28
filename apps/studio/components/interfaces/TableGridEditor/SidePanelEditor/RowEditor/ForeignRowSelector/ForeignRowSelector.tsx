@@ -1,25 +1,25 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
-import {
-  formatFilterURLParams,
-  formatSortURLParams,
-  parseSupaTable,
-} from 'components/grid/SupabaseGrid.utils'
+import { useParams } from 'common'
 import RefreshButton from 'components/grid/components/header/RefreshButton'
-import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
-import { SortPopover } from 'components/grid/components/header/sort'
+import { FilterPopoverPrimitive } from 'components/grid/components/header/filter/FilterPopoverPrimitive'
+import { SortPopoverPrimitive } from 'components/grid/components/header/sort/SortPopoverPrimitive'
+import type { Filter, Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useTableQuery } from 'data/tables/table-query'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { SidePanel } from 'ui'
+import {
+  RoleImpersonationState,
+  useRoleImpersonationStateSnapshot,
+} from 'state/role-impersonation-state'
+import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
+import { Button, SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { useEncryptedColumns } from '../../SidePanelEditor.utils'
+import { convertByteaToHex } from '../RowEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
@@ -36,35 +36,55 @@ const ForeignRowSelector = ({
   onSelect,
   closePanel,
 }: ForeignRowSelectorProps) => {
+  const { id } = useParams()
   const { project } = useProjectContext()
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id: !!id ? Number(id) : undefined,
+  })
 
   const { tableId: _tableId, schema: schemaName, table: tableName, columns } = foreignKey ?? {}
   const tableId = _tableId ? Number(_tableId) : undefined
 
-  const { data: table } = useTableQuery({
+  // [Joshen] Only show Set NULL CTA if its a 1:1 foreign key, and source column is nullable
+  // As this wouldn't be straightforward for composite foreign keys
+  const sourceColumn = (selectedTable?.columns ?? []).find((c) => c.name === columns?.[0].source)
+  const isNullable = (columns ?? []).length === 1 && sourceColumn?.is_nullable
+
+  const { data: table } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
   })
 
-  const encryptedColumns = useEncryptedColumns({ schemaName, tableName })
+  const [{ sort: sorts, filter: filters }, setFiltersAndSorts] = useState<{
+    filter: Filter[]
+    sort: Sort[]
+  }>({ filter: [], sort: [] })
 
-  const supaTable =
-    table &&
-    parseSupaTable(
-      {
-        table: table as PostgresTable,
-        columns: (table as PostgresTable).columns ?? [],
-        primaryKeys: (table as PostgresTable).primary_keys,
-        relationships: (table as PostgresTable).relationships,
-      },
-      encryptedColumns
-    )
+  const onApplyFilters = (appliedFilters: Filter[]) => {
+    // Reset page to 1 when filters change
+    if (page > 1) {
+      setPage(1)
+    }
 
-  const [params, setParams] = useState<any>({ filter: [], sort: [] })
+    setFiltersAndSorts((prevParams) => {
+      return {
+        ...prevParams,
+        filter: appliedFilters,
+      }
+    })
+  }
 
-  const sorts = formatSortURLParams(table?.name || '', params.sort ?? [])
-  const filters = formatFilterURLParams(params.filter ?? [])
+  const onApplySorts = (appliedSorts: Sort[]) => {
+    setFiltersAndSorts((prevParams) => {
+      return {
+        ...prevParams,
+        sort: appliedSorts,
+      }
+    })
+  }
 
   const rowsPerPage = 100
   const [page, setPage] = useState(1)
@@ -73,15 +93,14 @@ const ForeignRowSelector = ({
 
   const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [schemaName, tableName],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table: supaTable,
+      tableId: table?.id,
       sorts,
       filters,
       page,
       limit: rowsPerPage,
-      impersonatedRole: roleImpersonationState.role,
+      roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
       keepPreviousData: true,
@@ -124,58 +143,75 @@ const ForeignRowSelector = ({
             </div>
           )}
 
-          {isSuccess && supaTable && (
-            <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between my-2 mx-3">
-                <div className="flex items-center">
-                  <RefreshButton table={supaTable} isRefetching={isRefetching} />
-                  <FilterPopover
-                    table={supaTable}
-                    filters={params.filter ?? []}
-                    setParams={(...args) => {
-                      // Reset page to 1 when filters change
-                      if (page > 1) {
-                        setPage(1)
-                      }
+          {project?.ref && table && isSuccess && (
+            <TableEditorTableStateContextProvider
+              projectRef={project.ref}
+              table={table}
+              editable={false}
+            >
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between my-2 mx-3">
+                  <div className="flex items-center">
+                    <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
+                    <FilterPopoverPrimitive
+                      portal={false}
+                      filters={filters}
+                      onApplyFilters={onApplyFilters}
+                    />
+                    <DndProvider backend={HTML5Backend} context={window}>
+                      <SortPopoverPrimitive
+                        portal={false}
+                        sorts={sorts}
+                        onApplySorts={onApplySorts}
+                      />
+                    </DndProvider>
+                  </div>
 
-                      setParams(...args)
+                  <div className="flex items-center gap-x-3 divide-x">
+                    <Pagination
+                      page={page}
+                      setPage={setPage}
+                      rowsPerPage={rowsPerPage}
+                      currentPageRowsCount={data?.rows.length ?? 0}
+                      isLoading={isRefetching}
+                    />
+                    {isNullable && (
+                      <div className="pl-3">
+                        <Button
+                          type="default"
+                          onClick={() => {
+                            if (columns?.length === 1) onSelect({ [columns[0].source]: null })
+                          }}
+                        >
+                          Set NULL
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {data.rows.length > 0 ? (
+                  <SelectorGrid
+                    rows={data.rows}
+                    onRowSelect={(row) => {
+                      const value = columns?.reduce((a, b) => {
+                        const targetColumn = selectedTable?.columns.find((x) => x.name === b.target)
+                        const value =
+                          targetColumn?.format === 'bytea'
+                            ? convertByteaToHex(row[b.target])
+                            : row[b.target]
+                        return { ...a, [b.source]: value }
+                      }, {})
+                      onSelect(value)
                     }}
                   />
-                  <DndProvider backend={HTML5Backend} context={window}>
-                    <SortPopover
-                      table={supaTable}
-                      sorts={params.sort ?? []}
-                      setParams={setParams}
-                    />
-                  </DndProvider>
-                </div>
-
-                <Pagination
-                  page={page}
-                  setPage={setPage}
-                  rowsPerPage={rowsPerPage}
-                  currentPageRowsCount={data?.rows.length ?? 0}
-                  isLoading={isRefetching}
-                />
+                ) : (
+                  <div className="flex h-full items-center justify-center border-b border-t border-default">
+                    <span className="text-foreground-light text-sm">No Rows Found</span>
+                  </div>
+                )}
               </div>
-
-              {data.rows.length > 0 ? (
-                <SelectorGrid
-                  table={supaTable}
-                  rows={data.rows}
-                  onRowSelect={(row) => {
-                    const value = columns?.reduce((a, b) => {
-                      return { ...a, [b.source]: row[b.target] }
-                    }, {})
-                    onSelect(value)
-                  }}
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center border-b border-t border-default">
-                  <span className="text-foreground-light text-sm">No Rows Found</span>
-                </div>
-              )}
-            </div>
+            </TableEditorTableStateContextProvider>
           )}
         </div>
       </SidePanel.Content>

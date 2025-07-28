@@ -1,5 +1,6 @@
 import { MoreHorizontal } from 'lucide-react'
 
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
 import { BASE_PATH } from 'lib/constants'
 import {
@@ -11,11 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { PlanId } from 'data/subscriptions/types'
 
 interface CreditCardProps {
   paymentMethod: OrganizationPaymentMethod
   canUpdatePaymentMethods?: boolean
   paymentMethodType?: string
+  paymentMethodCount: number
+  subscriptionPlan?: PlanId
   setSelectedMethodForUse?: (paymentMethod: OrganizationPaymentMethod) => void
   setSelectedMethodToDelete?: (paymentMethod: OrganizationPaymentMethod) => void
 }
@@ -24,10 +28,14 @@ const CreditCard = ({
   paymentMethod,
   canUpdatePaymentMethods = true,
   paymentMethodType,
+  subscriptionPlan,
+  paymentMethodCount,
   setSelectedMethodForUse,
   setSelectedMethodToDelete,
 }: CreditCardProps) => {
   const isActive = paymentMethod.is_default
+  const isRemovable =
+    !paymentMethod.is_default || (subscriptionPlan === 'free' && paymentMethodCount === 1)
 
   const expiryYear = paymentMethod.card?.exp_year ?? 0
   const expiryMonth = paymentMethod.card?.exp_month ?? 0
@@ -62,7 +70,7 @@ const CreditCard = ({
         {isExpired && <Badge variant="destructive">Expired</Badge>}
         {isActive && <Badge variant="brand">Active</Badge>}
 
-        {canUpdatePaymentMethods && !isActive && (
+        {canUpdatePaymentMethods && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -72,8 +80,8 @@ const CreditCard = ({
                 aria-label="More options"
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {paymentMethodType === 'card' && (
+            <DropdownMenuContent align="end" className="w-36">
+              {paymentMethodType === 'card' && !isActive && (
                 <>
                   <DropdownMenuItem
                     key="make-default"
@@ -84,12 +92,22 @@ const CreditCard = ({
                   <DropdownMenuSeparator />
                 </>
               )}
-              <DropdownMenuItem
+              <DropdownMenuItemTooltip
                 key="delete-method"
+                disabled={!isRemovable}
+                className="!pointer-events-auto"
                 onClick={() => setSelectedMethodToDelete?.(paymentMethod)}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: !isRemovable
+                      ? 'Unable to delete a card that is currently active'
+                      : undefined,
+                  },
+                }}
               >
                 <p>Delete card</p>
-              </DropdownMenuItem>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
         )}

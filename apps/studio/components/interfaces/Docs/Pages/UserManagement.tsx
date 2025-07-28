@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import type { AutoApiService } from 'data/config/project-api-query'
+import { useParams } from 'common'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { makeRandomString } from 'lib/helpers'
 import CodeSnippet from '../CodeSnippet'
 import Snippets from '../Snippets'
@@ -9,19 +10,19 @@ import Snippets from '../Snippets'
 const randomPassword = makeRandomString(20)
 
 interface UserManagementProps {
-  autoApiService: AutoApiService
   selectedLang: 'bash' | 'js'
   showApiKey: string
 }
 
-export default function UserManagement({
-  autoApiService,
-  selectedLang,
-  showApiKey,
-}: UserManagementProps) {
+export default function UserManagement({ selectedLang, showApiKey }: UserManagementProps) {
   const router = useRouter()
-
+  const { ref: projectRef } = useParams()
   const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
+
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint ?? ''
+  const endpoint = `${protocol}://${hostEndpoint ?? ''}`
 
   return (
     <>
@@ -53,7 +54,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authSignup(autoApiService.endpoint, keyToShow, randomPassword)}
+            snippet={Snippets.authSignup(endpoint, keyToShow, randomPassword)}
           />
         </article>
       </div>
@@ -70,7 +71,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authLogin(autoApiService.endpoint, keyToShow, randomPassword)}
+            snippet={Snippets.authLogin(endpoint, keyToShow, randomPassword)}
           />
         </article>
       </div>
@@ -87,7 +88,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authMagicLink(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authMagicLink(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -111,7 +112,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authPhoneSignUp(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authPhoneSignUp(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -131,7 +132,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authMobileOTPLogin(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authMobileOTPLogin(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -151,7 +152,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authMobileOTPVerify(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authMobileOTPVerify(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -218,7 +219,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authThirdPartyLogin(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authThirdPartyLogin(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -231,7 +232,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authUser(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authUser(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -247,7 +248,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authRecover(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authRecover(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -263,7 +264,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authUpdate(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authUpdate(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -279,7 +280,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authLogout(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authLogout(endpoint, keyToShow)}
           />
         </article>
       </div>
@@ -300,7 +301,7 @@ export default function UserManagement({
         <article className="code">
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authInvite(autoApiService.endpoint, keyToShow)}
+            snippet={Snippets.authInvite(endpoint, keyToShow)}
           />
         </article>
       </div>

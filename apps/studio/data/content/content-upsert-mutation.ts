@@ -8,7 +8,7 @@ import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
-  content: Content['content']
+  content: Partial<Content['content']>
 }
 
 export type UpsertContentVariables = {
@@ -21,18 +21,9 @@ export async function upsertContent(
   signal?: AbortSignal
 ) {
   const { data, error } = await put('/platform/projects/{ref}/content', {
-    // @ts-ignore API codegen is wrong
     params: { path: { ref: projectRef } },
-    body: {
-      id: payload.id,
-      name: payload.name,
-      description: payload.description,
-      project_id: payload.project_id,
-      owner_id: payload.owner_id,
-      type: payload.type,
-      visibility: payload.visibility,
-      content: payload.content as any,
-    },
+    body: payload,
+    headers: { Version: '2' },
     signal,
   })
   if (error) handleError(error)
@@ -61,7 +52,7 @@ export const useContentUpsertMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.list(projectRef))
+          await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
         }
         await onSuccess?.(data, variables, context)
       },

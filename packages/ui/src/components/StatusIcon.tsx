@@ -1,5 +1,6 @@
 import { SVGProps, forwardRef } from 'react'
-import { cn } from 'ui'
+import { cn } from '../lib/utils'
+import { Check } from 'lucide-react'
 
 export interface StatusIconProps {
   hideBackground?: boolean
@@ -16,6 +17,8 @@ export const StatusIcon = forwardRef<
     Icon = WarningIcon
   } else if (variant === 'destructive') {
     Icon = CriticalIcon
+  } else if (variant === 'success') {
+    Icon = CheckIcon
   } else {
     Icon = InfoIcon
   }
@@ -101,4 +104,92 @@ const WarningIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
   )
 }
 
-export { WarningIcon, CriticalIcon, InfoIcon }
+const CheckIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
+  hideBackground = false,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      {...props}
+      className={cn(
+        !hideBackground
+          ? 'w-4 h-4 p-0.5 bg-foreground text-background rounded'
+          : 'w-3 h-3 text-success-600',
+        props.className
+      )}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={3}
+        d="m4.5 12.75 6 6 9-13.5"
+      />
+    </svg>
+  )
+}
+
+const EyeIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
+  hideBackground = false,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+      className={cn(
+        !hideBackground
+          ? 'w-4 h-4 p-0.5 bg-warning-600 text-warning-200 rounded'
+          : 'w-3 h-3 text-warning-600',
+        props.className
+      )}
+    >
+      <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  )
+}
+
+const EyeOffIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
+  hideBackground = false,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+      className={cn(
+        !hideBackground
+          ? 'w-4 h-4 p-0.5 bg-foreground-light text-background rounded'
+          : 'w-3 h-3 text-warning-600',
+        props.className
+      )}
+    >
+      <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" />
+      <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
+      <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" />
+      <path d="m2 2 20 20" />
+    </svg>
+  )
+}
+
+export { CriticalIcon, InfoIcon, WarningIcon, CheckIcon, EyeIcon, EyeOffIcon }

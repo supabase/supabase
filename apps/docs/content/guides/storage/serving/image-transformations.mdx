@@ -29,6 +29,10 @@ Our client libraries methods like `getPublicUrl` and `createSignedUrl` support t
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').getPublicUrl('image.jpg', {
   transform: {
     width: 500,
@@ -108,6 +112,10 @@ To share a transformed image in a private bucket for a fixed amount of time, pro
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').createSignedUrl('image.jpg', 60000, {
   transform: {
     width: 200,
@@ -173,6 +181,10 @@ To download a transformed image, pass the `transform` option to the `download` f
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     width: 800,
@@ -213,13 +225,17 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
-    size(800, 300)
+    transform {
+        size(800, 300)
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
-    size(800, 300)
+    transform {
+        size(800, 300)
+    }
 }
 ```
 
@@ -241,7 +257,7 @@ response = supabase.storage.from_('bucket').download(
 
 ## Automatic image optimization (WebP)
 
-When using the image transformation API, Storage will automatically find the best format supported by the client and return that to the client, without any code change. For instance, if you use Chrome when viewing a jpeg image and using transformation options, you'll see that images are automatically optimized as `webp` images.
+When using the image transformation API, Storage will automatically find the best format supported by the client and return that to the client, without any code change. For instance, if you use Chrome when viewing a JPEG image and using transformation options, you'll see that images are automatically optimized as `webp` images.
 
 As a result, this will lower the bandwidth that you send to your users and your application will load much faster.
 
@@ -265,6 +281,10 @@ In case you'd like to return the original format of the image and **opt-out** fr
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 await supabase.storage.from('bucket').download('image.jpeg', {
   transform: {
     width: 200,
@@ -308,15 +328,19 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
-    size(200, 200)
-	format = "origin"
+    transform {
+        size(200, 200)
+        format = ImageTransformation.Format.ORIGIN
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
-    size(200, 200)
-	format = "origin"
+    transform {
+        size(200, 200)
+        format = ImageTransformation.Format.ORIGIN
+    }
 }
 ```
 
@@ -353,7 +377,7 @@ export default function supabaseLoader({ src, width, quality }) {
 }
 ```
 
-In your `nextjs.config.js` file add the following configuration to instruct Next.js to use our custom loader
+In your `next.config.js` file add the following configuration to instruct Next.js to use our custom loader
 
 ```js
 module.exports = {
@@ -394,6 +418,10 @@ Example:
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     quality: 50,
@@ -431,13 +459,17 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage["bucket"].downloadAuthenticated("image.jpg") {
-    quality = 50
+    transform {
+        quality = 50
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage["bucket"].downloadAuthenticatedTo("image.jpg", file) {
-    quality = 50
+    transform {
+        quality = 50
+    }
 }
 ```
 
@@ -486,6 +518,10 @@ Example:
 <TabPanel id="js" label="JavaScript">
 
 ```ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
 supabase.storage.from('bucket').download('image.jpg', {
   transform: {
     width: 800,
@@ -529,15 +565,19 @@ let data = try await supabase.storage.from("bucket")
 
 ```kotlin
 val data = supabase.storage.from("bucket").downloadAuthenticated("image.jpg") {
-    size(800, 300)
-    resize = ImageTransformation.Resize.CONTAIN
+    transform {
+        size(800, 300)
+        resize = ImageTransformation.Resize.CONTAIN
+    }
 }
 
 //Or on JVM stream directly to a file
 val file = File("image.jpg")
 supabase.storage.from("bucket").downloadAuthenticatedTo("image.jpg", file) {
-    size(800, 300)
-    resize = ImageTransformation.Resize.CONTAIN
+    transform {
+        size(800, 300)
+        resize = ImageTransformation.Resize.CONTAIN
+    }
 }
 ```
 
@@ -581,13 +621,19 @@ response = supabase.storage.from_('bucket').download(
 | BMP    | `bmp`     | ☑️     | ☑️     |
 | TIFF   | `tiff`    | ☑️     | ☑️     |
 
+## Pricing
+
+<$Partial path="billing/pricing/pricing_storage_image_transformations.mdx" />
+
+For a detailed breakdown of how charges are calculated, refer to [Manage Storage Image Transformations usage](/docs/guides/platform/manage-your-usage/storage-image-transformations).
+
 ## Self hosting
 
-Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [Imgproxy](https://imgproxy.net/)
+Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/)
 
-#### Imgproxy configuration:
+#### imgproxy configuration:
 
-Simply deploy an imgproxy container with the following configuration:
+Deploy an imgproxy container with the following configuration:
 
 ```yaml
 imgproxy:
@@ -601,7 +647,7 @@ Note: make sure that this service can only be reachable within an internal netwo
 
 #### Storage API configuration:
 
-Once [Imgproxy](https://imgproxy.net/) is deployed we need to configure a couple of environment variables in your self-hosted [storage-api](https://github.com/supabase/storage-api) service as follows:
+Once [imgproxy](https://imgproxy.net/) is deployed we need to configure a couple of environment variables in your self-hosted [`storage-api`](https://github.com/supabase/storage-api) service as follows:
 
 ```shell
 ENABLE_IMAGE_TRANSFORMATION=true

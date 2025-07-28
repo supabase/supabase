@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { CircleAlert } from 'lucide-react'
 import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface FormData {
   firstName: string
@@ -68,6 +69,29 @@ const isValidEmail = (email: string): boolean => {
   return emailPattern.test(email)
 }
 
+const personalEmailDomains = [
+  '@gmail.com',
+  '@yahoo.com',
+  '@hotmail.',
+  '@outlook.com',
+  '@aol.com',
+  '@icloud.com',
+  '@live.com',
+  '@protonmail.com',
+  '@mail.com',
+  '@example.com',
+]
+
+const isCompanyEmail = (email: string): boolean => {
+  for (const domain of personalEmailDomains) {
+    if (email.includes(domain)) {
+      return false
+    }
+  }
+
+  return true
+}
+
 const defaultFormValue: FormData = {
   firstName: '',
   secondName: '',
@@ -82,6 +106,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -109,6 +134,11 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
     // Validate email
     if (formData.companyEmail && !isValidEmail(formData.companyEmail)) {
       newErrors.companyEmail = 'Invalid email address'
+    }
+
+    // Validate company email
+    if (formData.companyEmail && !isCompanyEmail(formData.companyEmail)) {
+      newErrors.companyEmail = 'Please use a company email address'
     }
 
     setErrors(newErrors)
@@ -170,7 +200,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
         className
       )}
     >
-      <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full md:max-w-lg min-h-[200px] md:min-h-[400px]">
+      <div className="border rounded-xl bg-surface-75 p-4 md:p-6 w-full lg:max-w-lg min-h-[200px] md:min-h-[400px]">
         {success ? (
           <div className="flex flex-col h-full w-full min-w-[300px] gap-4 items-center justify-center opacity-0 transition-opacity animate-fade-in scale-1">
             <p className="text-center text-sm">{success}</p>
@@ -234,6 +264,12 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
               className="col-span-full"
               disabled={isSubmitting}
               loading={isSubmitting}
+              onClick={() =>
+                sendTelemetryEvent({
+                  action: 'request_demo_button_clicked',
+                  properties: { buttonLocation: 'Enterprise Request Demo Form' },
+                })
+              }
             >
               Request a demo
             </Button>

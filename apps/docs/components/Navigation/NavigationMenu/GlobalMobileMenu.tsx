@@ -1,4 +1,5 @@
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
+import { X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -7,12 +8,11 @@ import { useKey } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Accordion, Button, cn } from 'ui'
-import { ThemeToggle } from 'ui-patterns'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
-import { X } from 'lucide-react'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -71,7 +71,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
         </Accordion.Item>
       ) : (
         <Link
-          href={section[0].href}
+          href={section[0].href || '#'}
           className={cn(activeLabel === section[0].label && '!text-foreground', itemClassName)}
         >
           {section[0].label}
@@ -163,7 +163,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                 <>
                   {isLoggedIn ? (
                     <Button block size="medium" asChild>
-                      <Link href="/dashboard/projects">Dashboard</Link>
+                      <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
                     </Button>
                   ) : (
                     <>
