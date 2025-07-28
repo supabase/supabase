@@ -14,7 +14,6 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    newApiKeys?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -62,6 +61,13 @@ export const generateSettingsMenu = (
                 name: 'API Keys',
                 key: 'api-keys',
                 url: `/project/${ref}/settings/api-keys`,
+                items: [],
+                label: 'NEW',
+              },
+              {
+                name: 'JWT Keys',
+                key: 'jwt',
+                url: `/project/${ref}/settings/jwt`,
                 items: [],
                 label: 'NEW',
               },

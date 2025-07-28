@@ -30,16 +30,9 @@ const nextConfig = {
   // swcMinify: true,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     // @ts-ignore
     remotePatterns,
-  },
-  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
-  // mdxRs: true,
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
   },
   webpack: (config) => {
     config.module.rules.push({

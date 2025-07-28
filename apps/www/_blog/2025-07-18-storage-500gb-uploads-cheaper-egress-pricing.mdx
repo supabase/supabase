@@ -1,0 +1,74 @@
+---
+title: 'Storage: 10x Larger Uploads, 3x Cheaper Cached Egress, and 2x Egress Quota'
+description: 'Upload files up to 500 GB with significant egress cost reductions.'
+categories:
+  - launch-week
+tags:
+  - launch-week
+  - algolia
+date: '2025-07-18:10:00'
+toc_depth: 2
+author: inian
+image: launch-week-15/day-5-storage-cheaper-egress/og.png
+thumb: launch-week-15/day-5-storage-cheaper-egress/thumb.png
+launchweek: '15'
+---
+
+We're very excited to announce [Supabase Storage](/storage) is getting better for everyone. We are:
+
+- Increasing the maximum file size to 500 GB, up from 50 GB
+- Reducing egress costs for requests cached by our API Gateway is charged at $0.03/GB, down from $0.09/GB
+- Free plans get 5 GB of cached egress in addition to 5 GB of uncached egress. All paid plans get 250 GB of cached egress and 250 GB of uncached egress, bundled in.
+
+The 500 GB limit for individual files is available for all paid plans starting next week. Lower cached egress pricing and increased quotas for cached egress will be rolling out gradually to all users over the next few weeks and will take effect at the end of your current billing cycle. This should be a price reduction for all users for Storage.
+
+## 10x Larger Uploads
+
+Our community has asked for better support for increasingly large files, from high resolution video platforms and media heavy applications to SaaS platforms handling user generated data, storing 3D models and data archival.
+
+We have made several optimizations to our platform infrastructure and API gateway to ensure reliable handling of very large files, allowing us to increase the limit from 50 GB to 500 GB for all paid plans.
+
+Once it's released next week, you can take advantage of this feature by setting the new upload size limit [here](/dashboard/project/_/settings/storage) and use the new storage-specific hostname for your uploads. You can do this by adding `storage` after your project ref in the standard Supabase url. Replace `project-ref.supabase.co` with `project-ref.storage.supabase.co`. The older URL format will continue to work.
+
+For uploading large files, we recommend using one of our multipart upload options:
+
+- [**Resumable uploads using TUS**](/docs/guides/storage/uploads/resumable-uploads) - Perfect for cases where network interruptions might occur, allowing uploads to resume from where they left off
+- [**S3 protocol multipart uploads**](/docs/guides/storage/uploads/s3-uploads) - Ideal for applications that need S3-compatible upload workflows
+
+Both approaches automatically handle breaking large files into manageable chunks during upload while presenting them as single objects for download.
+
+## 3x Cheaper Cached Egress
+
+All Supabase traffic flows through our API Gateway, which also functions as a content delivery network (CDN). When an asset is cached at the edge (and frequently accessed storage objects typically are), the CDN delivers it immediately. If it isn't cached, the request is forwarded to the region hosting your Supabase project before returning to the user.
+
+Initially, we leaned towards keeping our pricing model simple instead of reflecting regional and cache-status variations in egress costs. This unfortunately meant that customers with very high cached storage bandwidth couldn't benefit from our lower cached egress rates.
+
+<Img
+  src={{
+    dark: '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-cached-egress-dark.png',
+    light:
+      '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-cached-egress-light.png',
+  }}
+  alt="Cached Egress"
+/>
+
+<Img
+  src={{
+    dark: '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-uncached-egress-dark.png',
+    light:
+      '/images/blog/launch-week-15/day-5-storage-cheaper-egress/storage-uncached-egress-light.png',
+  }}
+  alt="Uncached Egress"
+/>
+
+Today, we are introducing a new pricing line item and are able to offer cached egress at a much lower rate of $0.03/GB. Combined with the [Smart CDN for storage](/docs/guides/storage/cdn/smart-cdn), which increases the cache hit rate for storage significantly, this would significantly reduce egress bill for our largest storage users.
+
+## 2x Egress Quota
+
+Paid plans previously included 250 GB of unified egress. We've now split that into 250 GB of cached egress and 250 GB of uncached egress, so customers with high cache hit rates effectively get twice the free egress. Free plans now include 5 GB of cached egress alongside 5 GB of uncached egress.
+
+## What Will You Build?
+
+Check out [Analytics Buckets](/blog/analytics-buckets), the other Storage launch this launch week, and how we built persistent file storage for edge functions with Storage here.
+
+If you have any requests for improving Supabase Storage, [let us know](https://x.com/supabase)!

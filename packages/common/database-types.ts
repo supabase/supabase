@@ -1,6 +1,105 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
+  content: {
+    Tables: {
+      error: {
+        Row: {
+          code: string
+          created_at: string | null
+          deleted_at: string | null
+          http_status_code: number | null
+          id: string
+          message: string | null
+          metadata: Json | null
+          service: string
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          deleted_at?: string | null
+          http_status_code?: number | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          service: string
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          deleted_at?: string | null
+          http_status_code?: number | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          service?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'error_service_fkey'
+            columns: ['service']
+            isOneToOne: false
+            referencedRelation: 'service'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      service: {
+        Row: {
+          created_at: string | null
+          deleted_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deleted_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      delete_error_codes_except: {
+        Args: {
+          skip_codes: Json
+        }
+        Returns: number
+      }
+      update_error_code: {
+        Args: {
+          code: string
+          service: string
+          http_status_code?: number
+          message?: string
+          metadata?: Json
+        }
+        Returns: boolean
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -545,6 +644,27 @@ export type Database = {
           include_full_content?: boolean
           match_threshold?: number
           max_result?: number
+        }
+        Returns: {
+          id: number
+          page_title: string
+          type: string
+          href: string
+          content: string
+          metadata: Json
+          subsections: Json[]
+        }[]
+      }
+      search_content_hybrid: {
+        Args: {
+          query_text: string
+          query_embedding: string
+          max_result?: number
+          full_text_weight?: number
+          semantic_weight?: number
+          rrf_k?: number
+          match_threshold?: number
+          include_full_content?: boolean
         }
         Returns: {
           id: number

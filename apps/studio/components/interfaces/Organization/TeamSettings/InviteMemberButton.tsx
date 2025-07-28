@@ -8,17 +8,15 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import {
-  doPermissionsCheck,
-  useCheckPermissions,
-  useGetPermissions,
-} from 'hooks/misc/useCheckPermissions'
+import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
@@ -50,9 +48,6 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -63,6 +58,10 @@ export const InviteMemberButton = () => {
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
+
+  const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
+    'organization_members:create',
+  ])
 
   const [isOpen, setIsOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
@@ -75,10 +74,6 @@ export const InviteMemberButton = () => {
   const orgProjects = (projects ?? [])
     .filter((project) => project.organization_id === organization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
 
   const currentPlan = organization?.plan
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
@@ -96,6 +91,7 @@ export const InviteMemberButton = () => {
 
   const canInviteMembers =
     hasOrgRole &&
+    rolesAddable.length > 0 &&
     orgScopedRoles.some(({ id: role_id }) =>
       doPermissionsCheck(
         permissions,
@@ -182,22 +178,24 @@ export const InviteMemberButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              disabled={!canInviteMembers}
-              className="pointer-events-auto flex-grow md:flex-grow-0"
-              onClick={() => setIsOpen(true)}
-            >
-              Invite
-            </Button>
-          </TooltipTrigger>
-          {!canInviteMembers && (
-            <TooltipContent side="bottom">
-              You need additional permissions to invite a member to this organization
-            </TooltipContent>
-          )}
-        </Tooltip>
+        <ButtonTooltip
+          type="primary"
+          disabled={!canInviteMembers}
+          className="pointer-events-auto flex-grow md:flex-grow-0"
+          onClick={() => setIsOpen(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !organizationMembersCreationEnabled
+                ? 'Inviting members is currently disabled'
+                : !canInviteMembers
+                  ? 'You need additional permissions to invite a member to this organization'
+                  : undefined,
+            },
+          }}
+        >
+          Invite member
+        </ButtonTooltip>
       </DialogTrigger>
       <DialogContent size="medium">
         <DialogHeader>

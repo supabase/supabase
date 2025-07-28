@@ -1,8 +1,6 @@
-import { noop } from 'lodash'
-import { toast } from 'sonner'
-
 export { default as passwordStrength } from './password-strength'
 export { default as uuidv4 } from './uuid'
+import type { TablesData } from '../data/tables/tables-query'
 
 export const tryParseJson = (jsonString: any) => {
   try {
@@ -146,42 +144,6 @@ export const snakeToCamel = (str: string) =>
     group.toUpperCase().replace('-', '').replace('_', '')
   )
 
-/**
- * Copy text content (string or Promise<string>) into Clipboard. Safari doesn't support write text into clipboard async,
- * so if you need to load text content async before coping, please use Promise<string> for the 1st arg.
- *
- * IF YOU NEED TO CHANGE THIS FUNCTION, PLEASE TEST IT IN SAFARI with a promised string. Expiring URL to a file in a
- * private bucket will do.
- *
- * Copied code from https://wolfgangrittner.dev/how-to-use-clipboard-api-in-firefox/
- */
-export const copyToClipboard = async (str: string | Promise<string>, callback = noop) => {
-  const focused = window.document.hasFocus()
-  if (focused) {
-    if (typeof ClipboardItem && navigator.clipboard?.write) {
-      // NOTE: Safari locks down the clipboard API to only work when triggered
-      // by a direct user interaction. You can't use it async in a promise.
-      // But! You can wrap the promise in a ClipboardItem, and give that to
-      // the clipboard API.
-      // Found this on https://developer.apple.com/forums/thread/691873
-      const text = new ClipboardItem({
-        'text/plain': Promise.resolve(str).then((text) => new Blob([text], { type: 'text/plain' })),
-      })
-      navigator.clipboard.write([text]).then(callback)
-    } else {
-      // NOTE: Firefox has support for ClipboardItem and navigator.clipboard.write,
-      // but those are behind `dom.events.asyncClipboard.clipboardItem` preference.
-      // Good news is that other than Safari, Firefox does not care about
-      // Clipboard API being used async in a Promise.
-      Promise.resolve(str)
-        .then((text) => navigator.clipboard?.writeText(text))
-        .then(callback)
-    }
-  } else {
-    toast.error('Unable to copy to clipboard')
-  }
-}
-
 export const detectBrowser = () => {
   if (!navigator) return undefined
 
@@ -209,6 +171,64 @@ export const detectOS = () => {
   } else {
     return undefined
   }
+}
+
+/**
+ * Convert a list of tables to SQL
+ * @param t - The list of tables
+ * @returns The SQL string
+ */
+export function tablesToSQL(t: TablesData) {
+  if (!Array.isArray(t)) return ''
+  const warning =
+    '-- WARNING: This schema is for context only and is not meant to be run.\n-- Table order and constraints may not be valid for execution.\n\n'
+  const sql = t
+    .map((table) => {
+      if (!table || !Array.isArray((table as any).columns)) return ''
+
+      const columns = (table as { columns?: any[] }).columns ?? []
+      const columnLines = columns.map((c) => {
+        let line = `  ${c.name} ${c.data_type}`
+        if (c.is_identity) {
+          line += ' GENERATED ALWAYS AS IDENTITY'
+        }
+        if (c.is_nullable === false) {
+          line += ' NOT NULL'
+        }
+        if (c.default_value !== null && c.default_value !== undefined) {
+          line += ` DEFAULT ${c.default_value}`
+        }
+        if (c.is_unique) {
+          line += ' UNIQUE'
+        }
+        if (c.check) {
+          line += ` CHECK (${c.check})`
+        }
+        return line
+      })
+
+      const constraints: string[] = []
+
+      if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
+        const pkCols = table.primary_keys.map((pk: any) => pk.name).join(', ')
+        constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
+      }
+
+      if (Array.isArray(table.relationships)) {
+        table.relationships.forEach((rel: any) => {
+          if (rel && rel.source_table_name === table.name) {
+            constraints.push(
+              `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
+            )
+          }
+        })
+      }
+
+      const allLines = [...columnLines, ...constraints]
+      return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
+    })
+    .join('\n')
+  return warning + sql
 }
 
 /**

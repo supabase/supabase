@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,
@@ -49,6 +50,8 @@ export const AddIntegrationDropdown = ({
   align = 'end',
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
+  const isWorkOSEnabled = useFlag('isWorkOSTPAEnabled')
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -62,6 +65,9 @@ export const AddIntegrationDropdown = ({
 
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
+        {isWorkOSEnabled && (
+          <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
+        )}
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>

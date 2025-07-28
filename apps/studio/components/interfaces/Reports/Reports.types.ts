@@ -49,6 +49,21 @@ export interface PathsDatum {
 export interface ReportFilterItem {
   key: string
   value: string | number
-  compare: 'matches' | 'is'
+  compare: 'matches' | 'is' | '>=' | '<=' | '>' | '<' | '!='
   query?: string
+}
+
+export interface ReportFilterProperty {
+  label: string
+  name: string
+  type: 'string' | 'number'
+  options?: Array<{ label: string; value: string }>
+  operators: string[]
+  placeholder?: string
+}
+
+export interface ReportFilter {
+  propertyName: string | number
+  operator: string | number
+  value: string | number
 }

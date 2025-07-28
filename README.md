@@ -5,7 +5,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
+[Supabase](https://supabase.com) is the Postgres development platform. We're building the features of Firebase using enterprise-grade open source tools.
 
 - [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
 - [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
@@ -244,6 +244,7 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
 - [Bangla / বাংলা](/i18n/README.bn.md)
 - [Bulgarian / Български](/i18n/README.bg.md)
 - [Catalan / Català](/i18n/README.ca.md)
+- [Croatian / Hrvatski](/i18n/README.hr.md)
 - [Czech / čeština](/i18n/README.cs.md)
 - [Danish / Dansk](/i18n/README.da.md)
 - [Dutch / Nederlands](/i18n/README.nl.md)

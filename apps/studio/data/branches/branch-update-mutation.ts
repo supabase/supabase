@@ -11,6 +11,7 @@ export type BranchUpdateVariables = {
   branchName?: string
   gitBranch?: string
   persistent?: boolean
+  requestReview?: boolean
 }
 
 export async function updateBranch({
@@ -18,6 +19,7 @@ export async function updateBranch({
   branchName,
   gitBranch,
   persistent,
+  requestReview,
 }: BranchUpdateVariables) {
   const { data, error } = await patch('/v1/branches/{branch_id}', {
     params: {
@@ -27,6 +29,7 @@ export async function updateBranch({
       branch_name: branchName,
       git_branch: gitBranch,
       persistent,
+      request_review: requestReview,
     },
   })
 

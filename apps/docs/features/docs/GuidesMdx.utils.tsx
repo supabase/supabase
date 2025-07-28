@@ -92,14 +92,14 @@ const getGuidesMarkdown = cache_fullProcess_withDevCacheBust(
 const genGuidesStaticParams = (directory?: string) => async () => {
   const promises = directory
     ? (await readdir(join(GUIDES_DIRECTORY, directory), { recursive: true }))
-        .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1).startsWith('_'))
+        .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
         .map((file) => ({ slug: file.replace(/\.mdx$/, '').split(sep) }))
         .concat(
           (await existsFile(join(GUIDES_DIRECTORY, `${directory}.mdx`))) ? [{ slug: [] }] : []
         )
     : PUBLISHED_SECTIONS.map(async (section) =>
         (await readdir(join(GUIDES_DIRECTORY, section), { recursive: true }))
-          .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1).startsWith('_'))
+          .filter((file) => extname(file) === '.mdx' && !file.split(sep).at(-1)?.startsWith('_'))
           .map((file) => ({
             slug: [section, ...file.replace(/\.mdx$/, '').split(sep)],
           }))

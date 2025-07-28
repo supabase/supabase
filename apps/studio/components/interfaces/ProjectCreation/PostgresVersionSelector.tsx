@@ -87,7 +87,7 @@ export const PostgresVersionSelector = ({
     type === 'create'
       ? createVersions?.available_versions ?? []
       : unpauseVersions?.available_versions ?? []
-  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version))
+  const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
   const { postgresVersionSelection } = form.watch()
 
   useEffect(() => {

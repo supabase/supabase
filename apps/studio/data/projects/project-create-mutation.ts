@@ -19,9 +19,12 @@ const WHITELIST_ERRORS = [
   'already exists in your organization.',
 ]
 
+type CreateProjectBody = components['schemas']['CreateProjectBody']
+type CloudProvider = CreateProjectBody['cloud_provider']
+
 export type ProjectCreateVariables = {
   name: string
-  organizationId: number
+  organizationSlug: string
   dbPass: string
   dbRegion: string
   dbSql?: string
@@ -38,7 +41,7 @@ export type ProjectCreateVariables = {
 
 export async function createProject({
   name,
-  organizationId,
+  organizationSlug,
   dbPass,
   dbRegion,
   dbSql,
@@ -51,9 +54,9 @@ export async function createProject({
   postgresEngine,
   releaseChannel,
 }: ProjectCreateVariables) {
-  const body: components['schemas']['CreateProjectBody'] = {
-    cloud_provider: cloudProvider,
-    org_id: organizationId,
+  const body: CreateProjectBody = {
+    cloud_provider: cloudProvider as CloudProvider,
+    organization_slug: organizationSlug,
     name,
     db_pass: dbPass,
     db_region: dbRegion,

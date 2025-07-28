@@ -48,6 +48,24 @@ Under `Redirect URIs`:
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "Spotify" }} />
 
+You can also configure the Spotify auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Spotify auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_spotify_enabled": true,
+    "external_spotify_client_id": "your-spotify-client-id",
+    "external_spotify_secret": "your-spotify-client-secret"
+  }'
+```
+
 ## Add login code to your client app
 
 The following outlines the steps to sign in using Spotify with Supabase Auth.

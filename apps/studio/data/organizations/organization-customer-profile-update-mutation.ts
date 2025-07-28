@@ -1,14 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
 import { handleError, put } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import type { CustomerAddress } from './types'
 
 export type OrganizationCustomerProfileUpdateVariables = {
   slug?: string
-  address?: components['schemas']['CustomerResponse']['address']
+  address?: CustomerAddress
   billing_name: string
 }
 
