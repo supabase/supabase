@@ -25,6 +25,7 @@ import { useDatabaseTestQuery, getDatabaseTest } from 'data/database-tests/datab
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQueryClient } from '@tanstack/react-query'
 import { databaseTestsKeys } from 'data/database-tests/database-tests-key'
+import { SETUP_TEST_PREFIX } from 'components/interfaces/Database/Tests/Tests.constants'
 
 const DatabaseTestsPage: NextPageWithLayout = () => {
   const { setEditorPanel } = useAppStateSnapshot()
@@ -45,6 +46,9 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
   const { data: tests } = useDatabaseTestsQuery({
     projectRef: project?.ref,
   })
+
+  // Cache IDs of setup tests (begin with 00_setup)
+  const setupTestIds = (tests ?? []).filter((t) => t.name.startsWith('00_setup')).map((t) => t.id)
 
   const currentTestId = executionQueue.length > 0 ? executionQueue[0] : undefined
 
@@ -119,7 +123,7 @@ rollback;
   const onRunAllTests = () => {
     if (!tests || tests.length === 0) return
 
-    const ids = tests.filter((t) => !t.name.startsWith('000')).map((t) => t.id)
+    const ids = tests.filter((t) => !t.name.startsWith(SETUP_TEST_PREFIX)).map((t) => t.id)
     const initialStatuses: Record<string, DatabaseTestStatus> = {}
     ids.forEach((id) => {
       initialStatuses[id] = 'queued'
@@ -146,11 +150,24 @@ rollback;
 
         if (sql.length === 0) throw new Error('Empty SQL')
 
-        // Execute (prepend setup? For simplicity skip for now)
+        // Build combined setup SQL
+        let combinedSetup = ''
+        for (const sid of setupTestIds) {
+          const sDetail = await queryClient.fetchQuery(
+            databaseTestsKeys.detail(project?.ref, sid),
+            () => getDatabaseTest({ projectRef: project?.ref, id: sid }),
+            { staleTime: 60_000 }
+          )
+          combinedSetup += (sDetail?.query ?? '') + '\n\n'
+        }
+
+        const sqlToRun = combinedSetup.length > 0 ? combinedSetup + sql : sql
+
+        // Execute
         await executeSql({
           projectRef: project.ref,
           connectionString: project.connectionString,
-          sql,
+          sql: sqlToRun,
         })
 
         setStatuses((prev) => ({ ...prev, [testId]: 'passed' }))

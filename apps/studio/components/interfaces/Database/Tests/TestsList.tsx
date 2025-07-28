@@ -3,8 +3,7 @@ import { Alert, Card, CardHeader, CardTitle } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseTest, DatabaseTestStatus } from 'data/database-tests/database-tests-query'
 import TestRow from './TestRow'
-
-const SETUP_TEST_PREFIX = '00_setup'
+import { SETUP_TEST_PREFIX } from './Tests.constants'
 
 interface DatabaseTestsListProps {
   tests: DatabaseTest[]
