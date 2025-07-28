@@ -44,7 +44,6 @@ Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
 Francesco Sansalvadore
-Francis L
 Greg P
 Greg Richardson
 Guilherme Souza
@@ -107,6 +106,7 @@ Stanislav M
 Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taryn King
 Terry Sutton
