@@ -20,7 +20,7 @@ class MyDocument extends Document {
             data-name="vs/editor/editor.main"
             href={
               IS_PLATFORM
-                ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.37.0/min/vs/editor/editor.main.css'
+                ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/editor/editor.main.css'
                 : `${BASE_PATH}/monaco-editor/editor/editor.main.css`
             }
           />

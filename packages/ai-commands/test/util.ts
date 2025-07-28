@@ -1,6 +1,6 @@
 import chalk from 'chalk'
+import type { Code } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import type { Code } from 'mdast-util-from-markdown/lib'
 import { format } from 'sql-formatter'
 
 declare global {

@@ -8,7 +8,7 @@ import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
 } & Partial<VaultSecret>
 
 export async function createVaultSecret({

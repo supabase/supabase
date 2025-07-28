@@ -13,7 +13,7 @@ import { fdwKeys } from './keys'
 
 export type FDWDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   wrapper: FDW
   wrapperMeta: WrapperMeta
 }

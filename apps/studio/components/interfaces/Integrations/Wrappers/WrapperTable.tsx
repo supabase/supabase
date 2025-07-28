@@ -60,7 +60,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               <TableHead className="w-[220px]">Name</TableHead>
               <TableHead>Tables</TableHead>
               <TableHead>Encrypted key</TableHead>
-              <TableHead className="text-right"></TableHead>
+              <TableHead className="text-right w-24"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted bg-surface-100">

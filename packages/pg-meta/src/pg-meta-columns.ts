@@ -83,13 +83,7 @@ where
   }
 }
 
-type ColumnIdentifier =
-  | Pick<PGColumn, 'id'>
-  | {
-      schema: string
-      table: string
-      name: string
-    }
+type ColumnIdentifier = Pick<PGColumn, 'id'> | Pick<PGColumn, 'name' | 'schema' | 'table'>
 
 function getIdentifierWhereClause(identifier: ColumnIdentifier) {
   if ('id' in identifier && identifier.id) {
@@ -112,7 +106,8 @@ function retrieve(identifier: ColumnIdentifier): {
 }
 
 function create({
-  table_id,
+  schema,
+  table,
   name,
   type,
   default_value,
@@ -125,7 +120,8 @@ function create({
   comment,
   check,
 }: {
-  table_id: number
+  schema: string
+  table: string
   name: string
   type: string
   default_value?: any
@@ -143,52 +139,58 @@ function create({
     if (default_value !== undefined) {
       throw new Error('Columns cannot both be identity and have a default value')
     }
+
     defaultValueClause = `GENERATED ${identity_generation} AS IDENTITY`
-  } else if (default_value !== undefined) {
-    const formattedDefault =
-      // Here we must wrap the litteral value into a String in case it receive a direct number to quote and escape
-      // for the execute(format()) call. Maybe we should change the `default_value` to only accept a string instead ?
-      default_value_format === 'expression' ? default_value : `'${literal(String(default_value))}'`
-    defaultValueClause = `DEFAULT ${formattedDefault}`
+  } else {
+    if (default_value === undefined) {
+      // skip
+    } else if (default_value_format === 'expression') {
+      defaultValueClause = `DEFAULT ${default_value}`
+    } else {
+      defaultValueClause = `DEFAULT ${literal(default_value)}`
+    }
   }
 
-  const constraints: string[] = []
-  if (is_nullable === false) constraints.push('NOT NULL')
-  if (is_primary_key) constraints.push('PRIMARY KEY')
-  if (is_unique) constraints.push('UNIQUE')
-  if (check) constraints.push(`CHECK (${check})`)
+  let isNullableClause = ''
+  if (is_nullable !== undefined) {
+    isNullableClause = is_nullable ? 'NULL' : 'NOT NULL'
+  }
+  const isPrimaryKeyClause = is_primary_key ? 'PRIMARY KEY' : ''
+  const isUniqueClause = is_unique ? 'UNIQUE' : ''
+  const checkSql = check === undefined ? '' : `CHECK (${check})`
+  const commentSql =
+    comment === undefined
+      ? ''
+      : `COMMENT ON COLUMN ${ident(schema)}.${ident(table)}.${ident(name)} IS ${literal(comment)}`
 
   const sql = `
-DO $$
-DECLARE
-  v_schema name;
-  v_table name;
-BEGIN
-  SELECT n.nspname, c.relname INTO v_schema, v_table
-  FROM pg_class c 
-  JOIN pg_namespace n ON n.oid = c.relnamespace
-  WHERE c.oid = ${literal(table_id)};
-
-  IF v_schema IS NULL THEN
-    RAISE EXCEPTION 'Table with id % not found', ${literal(table_id)};
-  END IF;
-
-  execute(format(
-    'ALTER TABLE %I.%I ADD COLUMN %I %s ${defaultValueClause} ${constraints.join(' ')}',
-    v_schema,
-    v_table,
-    ${literal(name)},
-    ${literal(type)}
-  ));
-  
-  ${comment ? `execute(format('COMMENT ON COLUMN %I.%I.%I IS %L', v_schema, v_table, ${literal(name)}, quote_ident(${literal(comment)})));` : ''}
-END $$;`
+BEGIN;
+  ALTER TABLE ${ident(schema)}.${ident(table)} ADD COLUMN ${ident(name)} ${typeIdent(type)}
+    ${defaultValueClause}
+    ${isNullableClause}
+    ${isPrimaryKeyClause}
+    ${isUniqueClause}
+    ${checkSql};
+  ${commentSql};
+COMMIT;`
 
   return { sql }
 }
 
+// TODO: make this more robust - use type_id or type_schema + type_name instead of just type.
+const typeIdent = (type: string) => {
+  return type.endsWith('[]')
+    ? `${ident(type.slice(0, -2))}[]`
+    : type.includes('.')
+      ? type
+      : ident(type)
+}
+
 function update(
-  id: string,
+  old: Pick<
+    PGColumn,
+    'name' | 'schema' | 'table' | 'table_id' | 'ordinal_position' | 'is_identity' | 'is_unique'
+  >,
   {
     name,
     type,
@@ -211,106 +213,180 @@ function update(
     identity_generation?: 'BY DEFAULT' | 'ALWAYS'
     is_nullable?: boolean
     is_unique?: boolean
-    comment?: string
+    comment?: string | null
     check?: string | null
   }
 ): { sql: string } {
-  if (is_identity) {
-    if (default_value !== undefined) {
-      throw new Error('Columns cannot both be identity and have a default value')
-    }
+  const nameSql =
+    name === undefined || name === old.name
+      ? ''
+      : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} RENAME COLUMN ${ident(
+          old.name
+        )} TO ${ident(name)};`
+  // We use USING to allow implicit conversion of incompatible types (e.g. int4 -> text).
+  const typeSql =
+    type === undefined
+      ? ''
+      : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
+          old.name
+        )} SET DATA TYPE ${typeIdent(type)} USING ${ident(old.name)}::${typeIdent(type)};`
+
+  let defaultValueSql: string
+  if (drop_default) {
+    defaultValueSql = `ALTER TABLE ${ident(old.schema)}.${ident(
+      old.table
+    )} ALTER COLUMN ${ident(old.name)} DROP DEFAULT;`
+  } else if (default_value === undefined) {
+    defaultValueSql = ''
+  } else {
+    const defaultValue =
+      default_value_format === 'expression' ? default_value : literal(default_value)
+    defaultValueSql = `ALTER TABLE ${ident(old.schema)}.${ident(
+      old.table
+    )} ALTER COLUMN ${ident(old.name)} SET DEFAULT ${defaultValue};`
   }
-  const sql = `
+  // What identitySql does vary depending on the old and new values of
+  // is_identity and identity_generation.
+  //
+  // | is_identity: old \ new | undefined          | true               | false          |
+  // |------------------------+--------------------+--------------------+----------------|
+  // | true                   | maybe set identity | maybe set identity | drop if exists |
+  // |------------------------+--------------------+--------------------+----------------|
+  // | false                  | -                  | add identity       | drop if exists |
+  let identitySql = `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
+    old.name
+  )}`
+  if (is_identity === false) {
+    identitySql += ' DROP IDENTITY IF EXISTS;'
+  } else if (old.is_identity === true) {
+    if (identity_generation === undefined) {
+      identitySql = ''
+    } else {
+      identitySql += ` SET GENERATED ${identity_generation};`
+    }
+  } else if (is_identity === undefined) {
+    identitySql = ''
+  } else {
+    identitySql += ` ADD GENERATED ${identity_generation} AS IDENTITY;`
+  }
+  let isNullableSql: string
+  if (is_nullable === undefined) {
+    isNullableSql = ''
+  } else {
+    isNullableSql = is_nullable
+      ? `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
+          old.name
+        )} DROP NOT NULL;`
+      : `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ALTER COLUMN ${ident(
+          old.name
+        )} SET NOT NULL;`
+  }
+  let isUniqueSql = ''
+  if (old.is_unique === true && is_unique === false) {
+    isUniqueSql = `
 DO $$
 DECLARE
-  v_schema name;
-  v_table name;
-  v_column name;
-  v_attnum int2;
   r record;
 BEGIN
-  WITH RECURSIVE column_info AS (
-    ${COLUMNS_SQL}
-  )
-  SELECT 
-    schema, 
-    ${ident('table')},
-    name,
-    ordinal_position::int2
-  INTO v_schema, v_table, v_column, v_attnum
-  FROM column_info 
-  WHERE ${getIdentifierWhereClause({ id })};
+  FOR r IN
+    SELECT conname FROM pg_constraint WHERE
+      contype = 'u'
+      AND cardinality(conkey) = 1
+      AND conrelid = ${literal(old.table_id)}
+      AND conkey[1] = ${literal(old.ordinal_position)}
+  LOOP
+    EXECUTE ${literal(
+      `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT `
+    )} || quote_ident(r.conname);
+  END LOOP;
+END
+$$;
+`
+  } else if (old.is_unique === false && is_unique === true) {
+    isUniqueSql = `ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD UNIQUE (${ident(
+      old.name
+    )});`
+  }
+  const commentSql =
+    comment === undefined
+      ? ''
+      : `COMMENT ON COLUMN ${ident(old.schema)}.${ident(old.table)}.${ident(
+          old.name
+        )} IS ${literal(comment)};`
 
-  IF v_schema IS NULL THEN
-    RAISE EXCEPTION 'Column with id % not found', ${literal(id)};
+  const checkSql =
+    check === undefined
+      ? ''
+      : `
+DO $$
+DECLARE
+  v_conname name;
+  v_conkey int2[];
+BEGIN
+  SELECT conname into v_conname FROM pg_constraint WHERE
+    contype = 'c'
+    AND cardinality(conkey) = 1
+    AND conrelid = ${literal(old.table_id)}
+    AND conkey[1] = ${literal(old.ordinal_position)}
+    ORDER BY oid asc
+    LIMIT 1;
+
+  IF v_conname IS NOT NULL THEN
+    EXECUTE format('ALTER TABLE ${ident(old.schema)}.${ident(
+      old.table
+    )} DROP CONSTRAINT %I', v_conname);
   END IF;
 
-  ${is_nullable !== undefined ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I ${is_nullable ? 'DROP NOT NULL' : 'SET NOT NULL'}', v_schema, v_table, v_column));` : ''}
-
-  ${type ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I TYPE %I USING %I::%I', v_schema, v_table, v_column, ${literal(type)}, v_column, ${literal(type)}));` : ''}
-
-  ${drop_default ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I DROP DEFAULT', v_schema, v_table, v_column));` : ''}
-
-  ${default_value !== undefined ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I SET DEFAULT %s', v_schema, v_table, v_column, ${default_value_format === 'expression' ? default_value : literal(default_value)}));` : ''}
-  
-  ${is_identity !== undefined ? `execute(format('ALTER TABLE %I.%I ALTER COLUMN %I ${is_identity ? `ADD GENERATED ${identity_generation} AS IDENTITY` : 'DROP IDENTITY IF EXISTS'}', v_schema, v_table, v_column));` : ''}
-  
-  ${is_unique !== undefined ? `execute(format('ALTER TABLE %I.%I ${is_unique ? 'ADD UNIQUE' : 'DROP CONSTRAINT IF EXISTS %I_key'}', v_schema, v_table, ${is_unique ? `(${literal(name || 'v_column')})` : 'v_column'}));` : ''}
-
-  ${comment !== undefined ? `execute(format('COMMENT ON COLUMN %I.%I.%I IS %L', v_schema, v_table, v_column, ${literal(comment)}));` : ''}
-
   ${
-    check !== undefined
+    check !== null
       ? `
-    -- Drop existing check constraint if any
-    FOR r IN (
-      SELECT conname 
-      FROM pg_constraint 
-      WHERE conrelid = format('%I.%I', v_schema, v_table)::regclass 
-      AND contype = 'c' 
-      AND conkey = ARRAY[v_attnum]
-    ) LOOP
-      EXECUTE format('ALTER TABLE %I.%I DROP CONSTRAINT %I', v_schema, v_table, r.conname);
-    END LOOP;
-    -- Create the new constraints if mentionned
-    ${check !== null ? `execute(format('ALTER TABLE %I.%I ADD CONSTRAINT %I CHECK (%s)', v_schema, v_table, v_column || '_check', ${literal(check)}));` : ''}
-  `
+  ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD CONSTRAINT ${ident(
+    `${old.table}_${old.name}_check`
+  )} CHECK (${check});
+
+  SELECT conkey into v_conkey FROM pg_constraint WHERE conname = ${literal(
+    `${old.table}_${old.name}_check`
+  )};
+
+  ASSERT v_conkey IS NOT NULL, 'error creating column constraint: check condition must refer to this column';
+  ASSERT cardinality(v_conkey) = 1, 'error creating column constraint: check condition cannot refer to multiple columns';
+  ASSERT v_conkey[1] = ${literal(
+    old.ordinal_position
+  )}, 'error creating column constraint: check condition cannot refer to other columns';
+`
       : ''
   }
-  ${name ? `execute(format('ALTER TABLE %I.%I RENAME COLUMN %I TO %I', v_schema, v_table, v_column, ${literal(name)}));` : ''}
-END $$;`
+END
+$$;
+`
+
+  // TODO: Can't set default if column is previously identity even if
+  // is_identity: false. Must do two separate PATCHes (once to drop identity
+  // and another to set default).
+  // NOTE: nameSql must be last. defaultValueSql must be after typeSql.
+  // identitySql must be after isNullableSql.
+  const sql = `
+BEGIN;
+  ${isNullableSql}
+  ${typeSql}
+  ${defaultValueSql}
+  ${identitySql}
+  ${isUniqueSql}
+  ${commentSql}
+  ${checkSql}
+  ${nameSql}
+COMMIT;`
 
   return { sql }
 }
 
-function remove(id: string, { cascade = false } = {}): { sql: string } {
-  const sql = `
-DO $$
-DECLARE
-  v_schema name;
-  v_table name;
-  v_column name;
-BEGIN
-  WITH RECURSIVE column_info AS (
-    ${COLUMNS_SQL}
-  )
-  SELECT schema, ${ident('table')}, name
-  INTO v_schema, v_table, v_column
-  FROM column_info 
-  WHERE id = ${literal(id)};
-
-  IF v_schema IS NULL THEN
-    RAISE EXCEPTION 'Column with id % not found', ${literal(id)};
-  END IF;
-
-  EXECUTE format(
-    'ALTER TABLE %I.%I DROP COLUMN %I ${cascade ? 'CASCADE' : 'RESTRICT'}',
-    v_schema,
-    v_table,
-    v_column
-  );
-END $$;`
-
+function remove(
+  column: Pick<PGColumn, 'name' | 'schema' | 'table'>,
+  { cascade = false } = {}
+): { sql: string } {
+  const sql = `ALTER TABLE ${ident(column.schema)}.${ident(column.table)} DROP COLUMN ${ident(
+    column.name
+  )} ${cascade ? 'CASCADE' : 'RESTRICT'};`
   return { sql }
 }
 

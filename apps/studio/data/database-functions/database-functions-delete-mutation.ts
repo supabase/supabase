@@ -10,7 +10,7 @@ import { DatabaseFunction } from './database-functions-query'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   func: DatabaseFunction
 }
 

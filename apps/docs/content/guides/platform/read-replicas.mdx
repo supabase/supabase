@@ -51,6 +51,30 @@ Projects must meet these requirements to use Read Replicas:
 
 To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard.
 
+You can also manage Read Replicas using the Management API (beta functionality):
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Create a new Read Replica
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/setup" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "region": "us-east-1"
+  }'
+
+# Delete a Read Replica
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/remove" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "database_identifier": "abcdefghijklmnopqrst"
+  }'
+```
+
 Projects on an XL compute add-on or larger can create up to five Read Replicas. Projects on compute add-ons smaller than XL can create up to two Read Replicas. All Read Replicas inherit the compute size of their Primary database.
 
 ### Deploying a Read Replica
@@ -97,7 +121,7 @@ A connection pool through Supavisor is also available for each Read Replica. Fin
 
 A load balancer is deployed to automatically balance requests between your Primary database and Read Replicas. Find its endpoint on the [API Settings page](/dashboard/project/_/settings/api).
 
-The load balancer enables geo-routing for Data API requests so that `GET` requests will automatically be routed to the Read Replica that is closest to your user ensuring the lowest latency. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
+The load balancer enables geo-routing for Data API requests so that `GET` requests will automatically be routed to the database that is closest to your user ensuring the lowest latency. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
 
 You can also interact with Supabase services (Auth, Edge Functions, Realtime, and Storage) through this load balancer so there's no need to worry about which endpoint to use and in which situations. However, geo-routing for these services are not yet available but is coming soon.
 
@@ -112,10 +136,11 @@ To call a read-only Postgres function on Read Replicas through the REST API, use
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
 
 <Admonition type="note">
+
 Starting on April 4th, 2025, we will be changing the routing behavior for eligible Data API requests:
 
-- Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project
-- New behavior: Geo-routing, that directs requests to the closest available database
+- Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project, regardless of location
+- New behavior: Geo-routing, that directs requests to the closest available database (all read replicas + primary)
 
 The new behavior delivers a better experience for your users by minimizing the latency to your project. You can take full advantage of this by placing Read Replicas close to your major customer bases.
 

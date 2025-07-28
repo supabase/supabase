@@ -14,11 +14,10 @@ import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
@@ -101,10 +100,8 @@ const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
   const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const { includeSchemaMetadata } = useOrgAiOptInLevel()
   const snap = useAiAssistantStateSnapshot()
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
   const { mutate: sendEvent } = useSendEventMutation()
   const org = useSelectedOrganization()
 
@@ -171,10 +168,22 @@ const NewFunctionPage = () => {
         title:
           'I can help you understand and improve your edge function. Here are a few example prompts to get you started:',
         prompts: [
-          'Explain what this function does...',
-          'Help me optimize this function...',
-          'Show me how to add more features...',
-          'Help me handle errors better...',
+          {
+            label: 'Explain Function',
+            description: 'Explain what this function does...',
+          },
+          {
+            label: 'Optimize Function',
+            description: 'Help me optimize this function...',
+          },
+          {
+            label: 'Add Features',
+            description: 'Show me how to add more features...',
+          },
+          {
+            label: 'Error Handling',
+            description: 'Help me handle errors better...',
+          },
         ],
       },
     })
@@ -231,13 +240,6 @@ const NewFunctionPage = () => {
     form.handleSubmit(onSubmit)()
   }
 
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate, ref, router])
-
   useEffect(() => {
     if (template) {
       const templateMeta = EDGE_FUNCTION_TEMPLATES.find((x) => x.value === template)
@@ -281,7 +283,7 @@ const NewFunctionPage = () => {
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0" align="end">
+            <PopoverContent_Shadcn_ portal className="w-[300px] p-0" align="end">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>
@@ -333,7 +335,7 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,

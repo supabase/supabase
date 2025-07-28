@@ -14,7 +14,7 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
@@ -28,10 +28,8 @@ const CostControl = ({}: CostControlProps) => {
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
 
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
+    useAsyncCheckProjectPermissions(PermissionAction.BILLING_READ, 'stripe.subscriptions')
 
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -85,7 +83,7 @@ const CostControl = ({}: CostControlProps) => {
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {!canReadSubscriptions ? (
+          {isPermissionsLoaded && !canReadSubscriptions ? (
             <NoPermission resourceText="update this organization's cost control" />
           ) : (
             <>

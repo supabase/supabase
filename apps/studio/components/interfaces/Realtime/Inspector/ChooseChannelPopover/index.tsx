@@ -81,7 +81,7 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
           </p>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-[320px]" align="start">
+      <PopoverContent_Shadcn_ portal className="p-0 w-[320px]" align="start">
         <div className="p-4 flex flex-col text-sm">
           {config.channelName.length === 0 ? (
             <>

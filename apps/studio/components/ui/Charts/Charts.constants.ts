@@ -9,6 +9,8 @@ export const CHART_COLORS = {
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
+  REFERENCE_LINE: 'hsl(var(--foreground-muted))',
+  REFERENCE_LINE_TEXT: 'hsl(var(--foreground-muted))',
 }
 
 const LIGHT_STACKED_CHART_COLORS = [
@@ -80,6 +82,6 @@ export const DEFAULT_STACK_COLORS: ValidStackColor[] = [
 
 export enum DateTimeFormats {
   FULL = 'MMM D, YYYY, hh:mma',
-  FULL_SECONDS = 'MMM D, YYYY, hh:mm:ssa',
+  FULL_SECONDS = 'MMM D, hh:mm:ssa',
   DATE_ONLY = 'MMM D, YYYY',
 }
