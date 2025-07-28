@@ -2,7 +2,7 @@ export const SCHEMAS_SQL = /* SQL */ `
 -- Adapted from information_schema.schemata
 
 select
-  n.oid::int8 as id,
+  n.oid as id,
   n.nspname as name,
   u.rolname as owner
 from

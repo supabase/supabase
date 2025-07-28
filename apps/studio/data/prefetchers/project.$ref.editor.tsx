@@ -1,20 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, PropsWithChildren, useCallback } from 'react'
+import { PropsWithChildren, useCallback } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { prefetchSchemas } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchEntityTypes } from 'data/entity-types/entity-types-infinite-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
+import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 export function usePrefetchEditorIndexPage() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
-  const tableEditorPrefetchingEnabled = useFlag('tableEditorPrefetching')
 
   const [entityTypesSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -22,7 +20,7 @@ export function usePrefetchEditorIndexPage() {
   )
 
   return useCallback(() => {
-    if (!tableEditorPrefetchingEnabled || !project) return
+    if (!project) return
 
     // Prefetch code
     router.prefetch(`/project/${project.ref}/editor`)
@@ -45,11 +43,9 @@ export function usePrefetchEditorIndexPage() {
   }, [entityTypesSort, project, queryClient, router])
 }
 
-type LinkProps = ComponentProps<typeof Link>
-
-interface EditorIndexPageLinkProps extends Omit<LinkProps, 'href'> {
+interface EditorIndexPageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 'prefetcher'> {
   projectRef?: string
-  href?: LinkProps['href']
+  href?: PrefetchableLinkProps['href']
 }
 
 export function EditorIndexPageLink({
@@ -61,8 +57,12 @@ export function EditorIndexPageLink({
   const prefetch = usePrefetchEditorIndexPage()
 
   return (
-    <Link href={href || `/project/${projectRef}/editor`} onMouseEnter={prefetch} {...props}>
+    <PrefetchableLink
+      href={href || `/project/${projectRef}/editor`}
+      prefetcher={prefetch}
+      {...props}
+    >
       {children}
-    </Link>
+    </PrefetchableLink>
   )
 }

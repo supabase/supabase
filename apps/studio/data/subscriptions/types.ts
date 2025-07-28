@@ -7,17 +7,17 @@ export type SubscriptionTier =
   | 'tier_team'
   | 'tier_enterprise'
 
-export type AddonVariantId = components['schemas']['AddonVariantId']
+export type AddonVariantId = components['schemas']['UpdateAddonBody']['addon_variant']
 
 export type OrgSubscription = components['schemas']['GetSubscriptionResponse']
 
-export type ProjectAddon = components['schemas']['BillingProjectAddonResponse']
+export type ProjectAddon = components['schemas']['GetSubscriptionResponse']['project_addons'][0]
 
-export type PlanId = components['schemas']['BillingPlanId']
+export type PlanId = components['schemas']['PlansResponse']['plans'][number]['id']
 
-export type OrgPlan = components['schemas']['PlanResponse']
+export type OrgPlan = components['schemas']['PlansResponse']['plans'][0]
 
-export type ProjectAddonType = components['schemas']['ProjectAddonType']
+export type ProjectAddonType = components['schemas']['UpdateAddonBody']['addon_type']
 
 export interface ProjectAddonVariantMeta {
   cpu_cores?: number
@@ -31,5 +31,7 @@ export interface ProjectAddonVariantMeta {
   supported_cloud_providers?: string[]
 }
 
-export type ProjectSelectedAddon = components['schemas']['SelectedAddonResponse']
-export type ProjectAvailableAddon = components['schemas']['AvailableAddonResponse']
+export type ProjectSelectedAddon =
+  components['schemas']['ProjectAddonsResponse']['selected_addons'][0]
+export type ProjectAvailableAddon =
+  components['schemas']['ProjectAddonsResponse']['available_addons'][0]

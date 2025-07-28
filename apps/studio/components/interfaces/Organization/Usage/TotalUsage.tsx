@@ -120,7 +120,7 @@ const TotalUsage = ({
           links: [
             {
               name: 'How billing works',
-              url: 'https://supabase.com/docs/guides/platform/org-based-billing',
+              url: 'https://supabase.com/docs/guides/platform/billing-on-supabase',
             },
             {
               name: 'Supabase Plans',

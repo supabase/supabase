@@ -8,4 +8,4 @@ export default {
   strokeWidth: 2,
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
-};
+}

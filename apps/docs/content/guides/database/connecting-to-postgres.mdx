@@ -1,89 +1,145 @@
 ---
-id: 'connecting-to-postgres'
-title: 'Connecting to your database'
-description: 'Explore the options for connecting to your Postgres database.'
-subtitle: 'Explore the options for connecting to your Postgres database.'
+title: 'Connect to your database'
+description: 'Connect to Postgres from your frontend, backend, or serverless environment'
+subtitle: 'Supabase provides multiple methods to connect to your Postgres database, whether you’re working on the frontend, backend, or utilizing serverless functions.'
 ---
 
-Supabase provides several options for programmatically connecting to your Postgres database:
+## How to connect to your Postgres databases
 
-1. The Data APIs
-1. Using one of the many [Client Libraries](/docs/reference)
-1. Direct connections using the built-in Postgres connection system
-1. Connection pooling for scalable connections
+How you connect to your database depends on where you're connecting from:
 
-## Data APIs
+- For frontend applications, use the [Data API](#data-apis-and-client-libraries)
+- For Postgres clients, use a connection string
+  - For single sessions (for example, database GUIs) or Postgres native commands (for example, using client applications like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) or specifying connections for [replication](/docs/guides/database/postgres/setup-replication-external)) use the [direct connection string](#direct-connection) if your environment supports IPv6
+  - For persistent clients, and support for both IPv4 and IPv6, use [Supavisor session mode](#supavisor-session-mode)
+  - For temporary clients (for example, serverless or edge functions) use [Supavisor transaction mode](#supavisor-transaction-mode)
 
-Supabase's Data APIs are the easiest way to get started if you are managing data (fetching, inserting, updating). We provide several types of API to suit your preferences:
+## Quickstarts
 
-- [REST](/docs/guides/api): interact with your database through a REST interface.
-- [GraphQL](/docs/guides/graphql/api): interact with your database through a GraphQL interface.
-- [Realtime](/docs/guides/realtime#realtime-api): listen to database changes over websockets.
+<div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-6   not-prose">
+  <NavData data="ormQuickstarts">
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
+          <GlassPanel
+            key={quickstart.name}
+            title={quickstart.name}
+            className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
+          />
+        </Link>
+      ))
+    }
+  </NavData>
+  <NavData data="guiQuickstarts">
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
+          <GlassPanel
+            key={quickstart.name}
+            title={quickstart.name}
+            className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
+          />
+        </Link>
+      ))
+    }
+  </NavData>
+</div>
 
-## Client libraries
+## Data APIs and client libraries
 
-Supabase offers [client libraries](/docs/reference) for popular programming languages. These libraries provide a convenient wrapper around the Data APIs, making it easier to interact with your database using your preferred language.
+The Data APIs allow you to interact with your database using REST or GraphQL requests. You can use these APIs to fetch and insert data from the frontend, as long as you have [RLS](/docs/guides/database/postgres/row-level-security) enabled.
 
-## Connecting to external libraries and tools
+- [REST](/docs/guides/api)
+- [GraphQL](/docs/guides/graphql/api)
 
-Beyond the [Supabase client-libraries](/docs/guides/api/rest/client-libs), Supabase provides three connection strings for direct database access, compatible with all postgres libraries, such as [Prisma](/docs/guides/database/prisma) and [Drizzle](/docs/guides/database/drizzle), as well as tools like [PSQL](/docs/guides/database/psql) and [pgAdmin](/docs/guides/database/pgadmin).
+For convenience, you can also use the [Supabase client libraries](/docs/reference), which wrap the Data APIs with a developer-friendly interface and automatically handle authentication:
 
-You can find these connection strings in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+- [JavaScript](/docs/reference/javascript)
+- [Flutter](/docs/reference/dart)
+- [Swift](/docs/reference/swift)
+- [Python](/docs/reference/python)
+- [C#](/docs/reference/csharp)
+- [Kotlin](/docs/reference/kotlin)
 
-### Direct connections:
+## Direct connection
 
-It connects directly to your Postgres instance. It is ideal for persistent servers, such as virtual machines (VMs) and long-lasting containers. Examples include AWS EC2 machines, Fly.io VMs, and DigitalOcean Droplets.
+The direct connection string connects directly to your Postgres instance. It is ideal for persistent servers, such as virtual machines (VMs) and long-lasting containers. Examples include AWS EC2 machines, Fly.io VMs, and DigitalOcean Droplets.
 
 <Admonition type="caution">
 
-Direct connections use IPv6 by default. If your environment doesn't support IPv6 or you're unsure but still want to use a direct connection, check out the [networking guide](/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility) for more info.
+Direct connections use IPv6 by default. If your environment doesn't support IPv6, use [Supavisor session mode](#supavisor-session-mode) or get the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 </Admonition>
 
-```md
-// Example String
+The connection string looks like this:
+
+```
 postgresql://postgres:[YOUR-PASSWORD]@db.apbkobhfnmcqqzqeeqss.supabase.co:5432/postgres
 ```
 
-You can find the direct connection string in the [Database settings](https://supabase.com/dashboard/project/_/settings/database) inside the dashboard:
+Get your project's direct connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-1. Go to the `Settings` section.
-2. Click `Database`.
-3. Under `Connection string`, make sure `Use connection pooling` is unchecked. Copy the URI.
+## Shared pooler
 
-### Supavisor session mode (port 5432):
+Every Supabase project includes a free, shared connection pooler. This is ideal for persistent servers when IPv6 is not supported.
 
-In Session mode, Supavisor acts as an IPv4 proxy. It allows developers in IPv4-only environments to access a direct-connection experience without needing the IPv4 add-on.
+### Supavisor session mode
 
-```md
-// Example String
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:5432/postgres
+The session mode connection string connects to your Postgres instance via a proxy.
+
+The connection string looks like this:
+
+```
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-### Transaction mode (port 6543):
+Get your project's Session pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+
+### Supavisor transaction mode
+
+The transaction mode connection string connects to your Postgres instance via a proxy which serves as a connection pooler. This is ideal for serverless or edge functions, which require many transient connections.
 
 <Admonition type="caution">
 
-Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, [turn off prepared statements](https://github.com/orgs/supabase/discussions/28239) for your specific connection library.
+Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, [turn off prepared statements](https://github.com/orgs/supabase/discussions/28239) for your connection library.
 
 </Admonition>
 
-Supavisor in transaction mode forms hot connections with the database and only allows clients to access them when a query is pending. It has amazing scaling capacity, and is best used with temporary servers, such as serverless/Edge Functions or auto-scaling servers.
+The connection string looks like this:
 
-```md
-// Example String
-postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-ca-central-1.pooler.supabase.com:6543/postgres
+```
+postgres://postgres.apbkobhfnmcqqzqeeqss:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 ```
 
-## Connection pooling in-depth
+Get your project's Transaction pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
-### Application side poolers
+## Dedicated pooler
+
+For paying customers, we provision a Dedicated Pooler ([PgBouncer](https://www.pgbouncer.org/)) that's co-located with your Postgres database. This will require you to connect with IPv6 or, if that's not an option, you can use the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+
+The Dedicated Pooler ensures best performance and latency, while using up more of your project's compute resources. If your network supports IPv6 or you have the IPv4 add-on, we encourage you to use the Dedicated Pooler over the Shared Pooler.
+
+Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
+
+<Admonition type="note">
+
+PgBouncer always runs in Transaction mode and the current version does not support prepared statement (will be added in a few weeks).
+
+</Admonition>
+
+## More about connection pooling
+
+Connection pooling improves database performance by reusing existing connections between queries. This reduces the overhead of establishing connections and improves scalability.
+
+You can use an application-side pooler or a server-side pooler (Supabase automatically provides one called Supavisor), depending on whether your backend is persistent or serverless.
+
+### Application-side poolers
 
 Application-side poolers are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and PostgREST. They maintain several active connections with Postgres or a server-side pooler, reducing the overhead of establishing connections between queries. When deploying to static architecture, such as long-standing containers or VMs, application-side poolers are satisfactory on their own.
 
 ### Serverside poolers
 
-Postgres connections are like WebSocket, once established, they are preserved until the client (application server) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
+Postgres connections are like a WebSocket. Once established, they are preserved until the client (application server) disconnects. A server might only make a single 10 ms query, but needlessly reserve its database connection for seconds or longer.
 
 Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/supavisor) in transaction mode, sit between clients and the database and can be thought of as load balancers for Postgres connections.
 
@@ -108,34 +164,46 @@ You can obtain your connection info and Server root certificate from your applic
 
 ![Connection Info and Certificate.](/docs/img/database/database-settings-ssl.png)
 
-## Choosing a connection method
-
-- **Data APIs:** Best for operations supported by the Data APIs.
-- **Supavisor Pooler:**
-  - **Transaction mode (port 6543):** Best for serverless/edge functions and rapidly auto-scaling servers
-  - **Session mode (port 5432):** For long-lived servers, such as virtual machines (VM) and enduring containers (if IPv6 is unsupported)
-- **Direct Connections:** For long-lived servers, such as VMs and enduring containers (if IPv6 is supported or the IPv4 Add-On is enabled).
-
-## Quickstart connection guides
-
-<Admonition type="tip">
-
-If you'd like us to add a new quickstart guide, share your [feedback](https://supabase.com/dashboard/support/new), and we'll try to add it going forwards.
-
-</Admonition>
-
-### External libraries
-
-- [Prisma](/docs/guides/database/prisma)
-- [Drizzle](/docs/guides/database/drizzle)
-- [Postgres.js](/docs/guides/database/postgres-js)
-
-### External tools
-
-- [pgAdmin](/docs/guides/database/pgadmin)
-- [PSQL](/docs/guides/database/psql)
-- [DBeaver](/docs/guides/database/dbeaver)
-
 ## Resources
 
 - [Connection management](/docs/guides/database/connection-management)
+- [Connecting with psql](/docs/guides/database/psql)
+- [Importing data into Supabase](/docs/guides/database/import-data)
+
+## Troubleshooting and Postgres connection string FAQs
+
+Below are answers to common challenges and queries.
+
+### What is a “connection refused” error?
+
+A “Connection refused” error typically means your database isn’t reachable. Ensure your Supabase project is running, confirm your database’s connection string, check firewall settings, and validate network permissions.
+
+### What is the “FATAL: Password authentication failed” error?
+
+This error occurs when your credentials are incorrect. Double-check your username and password from the Supabase dashboard. If the problem persists, reset your database password from the project settings.
+
+### How do you connect using IPv4?
+
+Supabase’s default direct connection supports IPv6 only. To connect over IPv4, consider using the Supavisor session or transaction modes, or a connection pooler (shared or dedicated), which support both IPv4 and IPv6.
+
+### How do you choose a connection method?
+
+- Direct connection: Persistent backend services (IPv6 only)
+- Supavisor session mode: Persistent backend needing IPv4
+- Supavisor transaction mode: Serverless functions
+- Shared pooler: General-purpose connections with IPv4 and IPv6
+- Dedicated pooler: High-performance apps requiring dedicated resources (paid tier)
+
+### Where is the Postgres connection string in Supabase?
+
+Your connection string is located in the Supabase Dashboard. Click the "Connect" button at the top of the page.
+
+### Can you use `psql` with a Supabase database?
+
+Yes. Use the following command structure, replacing `your_connection_string` with the string from your Supabase dashboard:
+
+```
+psql "your_connection_string"
+```
+
+Ensure you have `psql` installed locally before running this command.

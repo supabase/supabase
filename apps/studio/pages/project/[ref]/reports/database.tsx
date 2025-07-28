@@ -1,33 +1,46 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink } from 'lucide-react'
+import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
-import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
-import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import ChartHandler from 'components/ui/Charts/ChartHandler'
+import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+
+import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { analyticsKeys } from 'data/analytics/keys'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
-import { formatBytes } from 'lib/helpers'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { NextPageWithLayout } from 'types'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
+import { formatBytes } from 'lib/helpers'
+
+import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -37,44 +50,132 @@ const DatabaseReport: NextPageWithLayout = () => {
   )
 }
 
-DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</ReportsLayout>
+DatabaseReport.getLayout = (page) => (
+  <DefaultLayout>
+    <ReportsLayout title="Database">{page}</ReportsLayout>
+  </DefaultLayout>
+)
 
+export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { project } = useProjectContext()
-  const diskManagementV2 = useFlag('diskManagementV2')
-
+  const isReportsV2 = useFlag('reportsDatabaseV2')
   const org = useSelectedOrganization()
+
+  const {
+    selectedDateRange,
+    updateDateRange,
+    datePickerValue,
+    datePickerHelpers,
+    isOrgPlanLoading,
+    orgPlan,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleDatePickerChange,
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+
+  const isTeamsOrEnterprisePlan =
+    !isOrgPlanLoading && (orgPlan?.id === 'team' || orgPlan?.id === 'enterprise')
+  const showChartsV2 = isReportsV2 || isTeamsOrEnterprisePlan
+
   const state = useDatabaseSelectorStateSnapshot()
-  const [dateRange, setDateRange] = useState<any>(undefined)
+  const queryClient = useQueryClient()
+
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
-
   const report = useDatabaseReport()
-  const { data } = useDatabaseSizeQuery({
+  const { data, params, largeObjectsSql, isLoading, refresh } = report
+
+  const { data: databaseSizeData } = useDatabaseSizeQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
+    connectionString: project?.connectionString || undefined,
   })
-  const databaseSizeBytes = data?.result[0].db_size ?? 0
+  const databaseSizeBytes = databaseSizeData ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
-  const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
   const canUpdateDiskSizeConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
     },
   })
 
+  const REPORT_ATTRIBUTES = getReportAttributes(org!, project!)
+  const REPORT_ATTRIBUTES_V2 = getReportAttributesV2(org!, project!)
+
   const { isLoading: isUpdatingDiskSize } = useProjectDiskResizeMutation({
-    onSuccess: (res, variables) => {
+    onSuccess: (_, variables) => {
       toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
       setshowIncreaseDiskSizeModal(false)
     },
   })
+
+  const onRefreshReport = async () => {
+    if (!selectedDateRange) return
+
+    // [Joshen] Since we can't track individual loading states for each chart
+    // so for now we mock a loading state that only lasts for a second
+    setIsRefreshing(true)
+    refresh()
+    const { period_start, period_end, interval } = selectedDateRange
+    REPORT_ATTRIBUTES.forEach((attr) => {
+      queryClient.invalidateQueries(
+        analyticsKeys.infraMonitoring(ref, {
+          attribute: attr?.id,
+          startDate: period_start.date,
+          endDate: period_end.date,
+          interval,
+          databaseIdentifier: state.selectedDatabaseId,
+        })
+      )
+    })
+    if (showChartsV2) {
+      REPORT_ATTRIBUTES_V2.forEach((chart: any) => {
+        chart.attributes.forEach((attr: any) => {
+          queryClient.invalidateQueries(
+            analyticsKeys.infraMonitoring(ref, {
+              attribute: attr.attribute,
+              startDate: period_start.date,
+              endDate: period_end.date,
+              interval,
+              databaseIdentifier: state.selectedDatabaseId,
+            })
+          )
+        })
+      })
+    } else {
+      REPORT_ATTRIBUTES.forEach((chart: any) => {
+        chart.attributes.forEach((attr: any) => {
+          queryClient.invalidateQueries(
+            analyticsKeys.infraMonitoring(ref, {
+              attribute: attr.attribute,
+              startDate: period_start.date,
+              endDate: period_end.date,
+              interval,
+              databaseIdentifier: state.selectedDatabaseId,
+            })
+          )
+        })
+      })
+    }
+    if (isReplicaSelected) {
+      queryClient.invalidateQueries(
+        analyticsKeys.infraMonitoring(ref, {
+          attribute: 'physical_replication_lag_physical_replica_lag_seconds',
+          startDate: period_start.date,
+          endDate: period_end.date,
+          interval,
+          databaseIdentifier: state.selectedDatabaseId,
+        })
+      )
+    }
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
 
   // [Joshen] Empty dependency array as we only want this running once
   useEffect(() => {
@@ -97,146 +198,141 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
-      <section>
-        <Panel title={<h2>Database health</h2>}>
-          <Panel.Content>
-            <div className="mb-4 flex items-center space-x-3">
-              <DateRangePicker
-                loading={false}
-                value={'7d'}
-                options={TIME_PERIODS_INFRA}
-                currentBillingPeriodStart={undefined}
-                onChange={setDateRange}
+      <GrafanaPromoBanner />
+      <ReportStickyNav
+        content={
+          <>
+            <ButtonTooltip
+              type="default"
+              disabled={isRefreshing}
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
+            <div className="flex items-center gap-3">
+              <LogsDatePicker
+                onSubmit={handleDatePickerChange}
+                value={datePickerValue}
+                helpers={datePickerHelpers}
               />
-              {dateRange && (
-                <div className="flex items-center gap-x-2">
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="databaseReportDateRange"
+              />
+              {selectedDateRange && (
+                <div className="flex items-center gap-x-2 text-xs">
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
+                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
                     <ArrowRight size={12} />
                   </p>
                   <p className="text-foreground-light">
-                    {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
+                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
                   </p>
                 </div>
               )}
             </div>
-            <div className="space-y-6">
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="ram_usage"
-                  label="Memory usage"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
+          </>
+        }
+      >
+        {selectedDateRange &&
+          orgPlan?.id &&
+          (showChartsV2
+            ? REPORT_ATTRIBUTES_V2.filter((chart) => !chart.hide).map((chart) => (
+                <ComposedChartHandler
+                  key={chart.id}
+                  {...chart}
+                  attributes={chart.attributes as MultiAttribute[]}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  showMaxValue={
+                    chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
                 />
-              )}
-
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="swap_usage"
-                  label="Swap usage"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                />
-              )}
-
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="avg_cpu_usage"
-                  label="Average CPU usage"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                />
-              )}
-
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="max_cpu_usage"
-                  label="Max CPU usage"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                />
-              )}
-
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="disk_io_consumption"
-                  label="Disk IO consumed"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                />
-              )}
-
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
-                  attribute="pg_stat_database_num_backends"
-                  label="Number of database connections"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                />
-              )}
-            </div>
-          </Panel.Content>
-        </Panel>
-
-        {dateRange && isReplicaSelected && (
+              ))
+            : REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart, i) =>
+                chart.availableIn?.includes(orgPlan?.id) ? (
+                  <ComposedChartHandler
+                    key={chart.id}
+                    {...chart}
+                    attributes={chart.attributes as MultiAttribute[]}
+                    interval={selectedDateRange.interval}
+                    startDate={selectedDateRange?.period_start?.date}
+                    endDate={selectedDateRange?.period_end?.date}
+                    updateDateRange={updateDateRange}
+                    defaultChartStyle={
+                      chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'
+                    }
+                    showMaxValue={
+                      chart.id === 'client-connections' || chart.id === 'pgbouncer-connections'
+                        ? true
+                        : chart.showMaxValue
+                    }
+                  />
+                ) : (
+                  <ReportChart
+                    key={`${chart.id}-${i}`}
+                    chart={chart}
+                    className="!mb-0"
+                    interval={selectedDateRange.interval}
+                    startDate={selectedDateRange?.period_start?.date}
+                    endDate={selectedDateRange?.period_end?.date}
+                    updateDateRange={updateDateRange}
+                  />
+                )
+              ))}
+        {selectedDateRange && isReplicaSelected && (
           <Panel title="Replica Information">
             <Panel.Content>
               <div id="replication-lag">
                 <ChartHandler
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
                   attribute="physical_replication_lag_physical_replica_lag_seconds"
                   label="Replication lag"
-                  interval={dateRange.interval}
+                  interval={selectedDateRange.interval}
                   provider="infra-monitoring"
                 />
               </div>
             </Panel.Content>
           </Panel>
         )}
-      </section>
+      </ReportStickyNav>
       <section id="database-size-report">
         <ReportWidget
-          isLoading={report.isLoading}
-          params={report.params.largeObjects}
+          isLoading={isLoading}
+          params={params.largeObjects}
           title="Database Size"
-          data={report.data.largeObjects || []}
+          data={data.largeObjects || []}
           queryType={'db'}
-          resolvedSql={report.largeObjectsSql}
+          resolvedSql={largeObjectsSql}
           renderer={(props) => {
             return (
               <div>
-                <p className="text-sm -mt-4 text-foreground-lighter">
-                  The data refreshes every 24 hours.
-                </p>
                 <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full mt-5">
-                  <div className="grid gap-2 col-span-2">
+                  <div className="grid gap-2 col-span-4 xl:col-span-2">
                     <h5 className="text-sm">Space used</h5>
                     <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>
                   </div>
-                  <div className="grid gap-2 col-span-2">
-                    <h5 className="text-sm">Total size</h5>
+                  <div className="grid gap-2 col-span-4 xl:col-span-3">
+                    <h5 className="text-sm">Provisioned disk size</h5>
                     <span className="text-lg">{currentDiskSize} GB</span>
                   </div>
 
-                  <div className="col-span-8 text-right">
-                    {showNewDiskManagementUI ? (
+                  <div className="col-span-full lg:col-span-4 xl:col-span-7 lg:text-right">
+                    {project?.cloud_provider === 'AWS' ? (
                       <Button asChild type="default">
-                        <Link href={`/project/${ref}/settings/database#disk-management`}>
+                        <Link href={`/project/${ref}/settings/compute-and-disk`}>
                           Increase disk size
                         </Link>
                       </Button>
@@ -296,7 +392,7 @@ const DatabaseUsage = () => {
             )
           }}
           append={() => (
-            <div className="px-6 pb-2">
+            <div className="px-6 pb-6">
               <Alert_Shadcn_ variant="default" className="mt-4">
                 <AlertDescription_Shadcn_>
                   <div className="space-y-2">
@@ -309,11 +405,11 @@ const DatabaseUsage = () => {
 
                     <Button asChild type="default" icon={<ExternalLink />}>
                       <Link
-                        href="https://supabase.com/docs/guides/platform/database-size#database-space-management"
+                        href="https://supabase.com/docs/guides/platform/database-size#disk-space-usage"
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Read about database space
+                        Read about database size
                       </Link>
                     </Button>
                   </div>

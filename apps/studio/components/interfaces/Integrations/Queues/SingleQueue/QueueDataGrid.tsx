@@ -6,17 +6,21 @@ import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
-import { Badge, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
+import { ResponseError } from 'types'
+import AlertError from 'components/ui/AlertError'
 
 interface QueueDataGridProps {
+  error?: ResponseError | null
   isLoading: boolean
   messages: PostgresQueueMessage[]
+  showMessageModal: () => void
   fetchNextPage: () => void
 }
 
-function isAtBottom({ currentTarget }: React.UIEvent<HTMLDivElement>): boolean {
+function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
 }
 
@@ -121,14 +125,16 @@ const columns = messagesCols.map((col) => {
 })
 
 export const QueueMessagesDataGrid = ({
+  error,
   isLoading,
   messages,
+  showMessageModal,
   fetchNextPage,
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
   const router = useRouter()
 
-  const [selectedMessageId, setSelectedMessageId] = useQueryState('id', parseAsInteger)
+  const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return
@@ -169,8 +175,8 @@ export const QueueMessagesDataGrid = ({
                   if (typeof idx === 'number' && idx >= 0) {
                     setSelectedMessageId(props.row.msg_id)
                     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                    const { id, ...rest } = router.query
-                    router.push({ ...router, query: { ...rest, id: props.row.msg_id } })
+                    const { messageId, ...rest } = router.query
+                    router.push({ ...router, query: { ...rest, messageId: props.row.msg_id } })
                   }
                 }}
               />
@@ -180,6 +186,10 @@ export const QueueMessagesDataGrid = ({
             <div className="absolute top-14 px-6 w-full">
               <GenericSkeletonLoader />
             </div>
+          ) : !!error ? (
+            <div className="absolute top-16 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+              <AlertError subject="Failed to retrieve queue messages" error={error} />
+            </div>
           ) : (
             <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
               <TextSearch className="text-foreground-muted" strokeWidth={1} />
@@ -188,6 +198,9 @@ export const QueueMessagesDataGrid = ({
                 <p className="text-foreground-light">
                   The selected queue doesn't have any messages.
                 </p>
+                <Button className="mt-2" onClick={() => showMessageModal()}>
+                  Add message
+                </Button>
               </div>
             </div>
           ),

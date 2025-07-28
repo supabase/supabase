@@ -16,7 +16,7 @@ const quickstarts = [
     url: '/guides/getting-started/quickstarts/nextjs',
   },
   {
-    label: 'Nuxt.js',
+    label: 'Nuxt',
     url: '/guides/getting-started/quickstarts/nuxtjs',
   },
   {

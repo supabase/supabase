@@ -2,9 +2,20 @@ import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo } from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useProjectByRef } from './useSelectedProject'
+import { useProjectByRef, useProjectByRefQuery } from './useSelectedProject'
 
+/**
+ * @deprecated Use useSelectedOrganizationQuery instead for access to loading states etc
+ *
+ * Example migration:
+ * ```
+ * // Old:
+ * const organization = useSelectedOrganization()
+ *
+ * // New:
+ * const { data: organization } = useSelectedOrganizationQuery()
+ * ```
+ */
 export function useSelectedOrganization({ enabled = true } = {}) {
   const isLoggedIn = useIsLoggedIn()
 
@@ -13,18 +24,29 @@ export function useSelectedOrganization({ enabled = true } = {}) {
 
   const selectedProject = useProjectByRef(ref)
 
-  const localStorageSlug = useMemo(() => {
-    return typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.RECENTLY_VISITED_ORGANIZATION)
-      : null
-  }, [])
-
   return useMemo(() => {
     return data?.find((org) => {
       if (slug !== undefined) return org.slug === slug
       if (selectedProject !== undefined) return org.id === selectedProject.organization_id
-      if (localStorageSlug !== undefined) return org.slug === localStorageSlug
       return undefined
     })
-  }, [data, selectedProject, slug, localStorageSlug])
+  }, [data, selectedProject, slug])
+}
+
+export function useSelectedOrganizationQuery({ enabled = true } = {}) {
+  const isLoggedIn = useIsLoggedIn()
+
+  const { ref, slug } = useParams()
+  const { data: selectedProject } = useProjectByRefQuery(ref)
+
+  return useOrganizationsQuery({
+    enabled: isLoggedIn && enabled,
+    select: (data) => {
+      return data.find((org) => {
+        if (slug !== undefined) return org.slug === slug
+        if (selectedProject !== undefined) return org.id === selectedProject.organization_id
+        return undefined
+      })
+    },
+  })
 }

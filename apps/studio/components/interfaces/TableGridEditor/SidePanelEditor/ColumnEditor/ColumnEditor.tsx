@@ -17,7 +17,7 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import type { Dictionary } from 'types'
 import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
 import ActionBar from '../ActionBar'
@@ -35,6 +35,7 @@ import {
   generateColumnFieldFromPostgresColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
+  getPlaceholderText,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
@@ -74,20 +75,22 @@ const ColumnEditor = ({
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [placeholder, setPlaceholder] = useState(
+    getPlaceholderText(columnFields?.format, columnFields?.name)
+  )
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const enumTypes = (types ?? []).filter(
-    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
   )
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-    table: selectedTable?.name,
+    id: selectedTable?.id,
   })
   const primaryKey = (constraints ?? []).find(
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
@@ -130,6 +133,7 @@ const ColumnEditor = ({
     }
 
     const changedName = 'name' in changes && changes.name !== columnFields.name
+    const changedFormat = 'format' in changes && changes.format !== columnFields.format
 
     if (
       changedName &&
@@ -142,6 +146,12 @@ const ColumnEditor = ({
             col.source === columnFields?.name ? { ...col, source: changes.name! } : col
           ),
         }))
+      )
+    }
+
+    if (changedName || changedFormat) {
+      setPlaceholder(
+        getPlaceholderText(changes.format || columnFields.format, changes.name || columnFields.name)
       )
     }
 
@@ -163,7 +173,7 @@ const ColumnEditor = ({
 
       if (isEmpty(errors)) {
         const payload = isNewRecord
-          ? generateCreateColumnPayload(selectedTable.id, columnFields)
+          ? generateCreateColumnPayload(selectedTable, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
         const configuration = {
           columnId: column?.id,
@@ -254,6 +264,7 @@ const ColumnEditor = ({
           <ColumnType
             showRecommendation
             value={columnFields?.format ?? ''}
+            layout="vertical"
             enumTypes={enumTypes}
             error={errors.format}
             description={
@@ -312,7 +323,13 @@ const ColumnEditor = ({
             column={columnFields}
             relations={fkRelations}
             closePanel={closePanel}
-            onUpdateColumnType={(format: string) => onUpdateField({ format })}
+            onUpdateColumnType={(format: string) => {
+              if (format[0] === '_') {
+                onUpdateField({ format: format.slice(1), isArray: true, isIdentity: false })
+              } else {
+                onUpdateField({ format })
+              }
+            }}
             onUpdateFkRelations={setFkRelations}
           />
         </FormSectionContent>
@@ -343,7 +360,7 @@ const ColumnEditor = ({
           <Input
             label="CHECK Constraint"
             labelOptional="Optional"
-            placeholder={`e.g length(${columnFields?.name || 'column_name'}) < 500`}
+            placeholder={placeholder}
             type="text"
             value={columnFields?.check ?? ''}
             onChange={(event: any) => onUpdateField({ check: event.target.value })}

@@ -1,15 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 } & Partial<VaultSecret>
 
@@ -19,11 +18,15 @@ export async function updateVaultSecret({
   id,
   ...payload
 }: VaultSecretUpdateVariables) {
-  const sql = new Query()
-    .from('decrypted_secrets', 'vault')
-    .update({ ...payload, updated_at: new Date().toISOString() }, { returning: true })
-    .match({ id })
-    .toSql()
+  const { name, description, secret } = payload
+  const sql = /* SQL */ `
+select vault.update_secret(
+    secret_id := ${quoteLiteral(id)}
+  ${secret ? `, new_secret := ${quoteLiteral(secret)}` : ''}
+  ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
+  ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
+)
+`
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
@@ -48,9 +51,7 @@ export const useVaultSecretUpdateMutation = ({
         const { id, projectRef } = variables
         await Promise.all([
           queryClient.removeQueries(vaultSecretsKeys.getDecryptedValue(projectRef, id)),
-          queryClient.invalidateQueries(
-            sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))
-          ),
+          queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
         ])
         await onSuccess?.(data, variables, context)
       },

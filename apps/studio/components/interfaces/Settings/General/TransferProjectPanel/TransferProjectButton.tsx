@@ -11,18 +11,20 @@ import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-p
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Alert, Button, InfoIcon, Listbox, Loading, Modal } from 'ui'
+import { Button, InfoIcon, Listbox, Loading, Modal, WarningIcon } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const TransferProjectButton = () => {
   const project = useSelectedProject()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
-  const { data: allOrganizations } = useOrganizationsQuery()
+  const [isOpen, setIsOpen] = useState(false)
+
+  const { data: allOrganizations } = useOrganizationsQuery({ enabled: isOpen })
   const disableProjectTransfer = useFlag('disableProjectTransfer')
 
   const organizations = (allOrganizations || []).filter((it) => it.id !== projectOrgId)
 
-  const [isOpen, setIsOpen] = useState(false)
   const [selectedOrg, setSelectedOrg] = useState()
 
   const {
@@ -145,7 +147,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Wrench size={14} className="flex-shrink-0" />
+                <Wrench size={24} className="flex-shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>
@@ -171,8 +173,7 @@ const TransferProjectButton = () => {
             <div className="space-y-2">
               {organizations.length === 0 ? (
                 <div className="flex items-center gap-3 bg-surface-200 p-3 text-sm rounded-md border">
-                  <InfoIcon /> You do not have any organizations with an organization-based
-                  subscription.
+                  <InfoIcon /> You do not have any organizations you can transfer your project to.
                 </div>
               ) : (
                 <Listbox
@@ -205,22 +206,8 @@ const TransferProjectButton = () => {
           <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
             <Modal.Content>
               <div className="space-y-2">
-                {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-                  <Alert
-                    withIcon
-                    variant="warning"
-                    title="Warnings for project transfer"
-                    className="mt-3"
-                  >
-                    <div className="space-y-1">
-                      {transferPreviewData.warnings.map((warning) => (
-                        <p key={warning.key}>{warning.message}</p>
-                      ))}
-                    </div>
-                  </Alert>
-                )}
                 {transferPreviewData && transferPreviewData.errors.length > 0 && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
+                  <Admonition type="danger" title="Project cannot be transferred">
                     <div className="space-y-1">
                       {transferPreviewData.errors.map((error) => (
                         <p key={error.key}>{error.message}</p>
@@ -244,21 +231,53 @@ const TransferProjectButton = () => {
                         </ul>
                         <p className="text-sm text-foreground-light">
                           These members will need to either delete, pause, or upgrade one or more of
-                          their projects before you can downgrade this project.
+                          their projects before you can transfer this project.
                         </p>
                       </div>
                     )}
-                  </Alert>
+                  </Admonition>
                 )}
+                {transferPreviewData &&
+                  (transferPreviewData.warnings.length > 0 ||
+                    transferPreviewData.info.length > 0) && (
+                    <Admonition type={'caution'} showIcon={false} className="mt-3">
+                      <div className="space-y-1">
+                        {transferPreviewData.warnings.map((warning) => (
+                          <div key={warning.key} className="flex items-center gap-2">
+                            <WarningIcon className="flex-shrink-0 mt-0.25" />
+                            <p className="mb-0.5">{warning.message}</p>
+                          </div>
+                        ))}
+                        {transferPreviewData.info.map((info) => (
+                          <div key={info.key} className="flex items-center gap-2">
+                            <InfoIcon className="flex-shrink-0 mt-0.25" />
+                            <p className="mb-0.5">{info.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Admonition>
+                  )}
                 {transferPreviewError && !transferError && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
-                    <p>{transferPreviewError.message}</p>
-                  </Alert>
+                  <Admonition
+                    type="danger"
+                    title="Project cannot be transferred"
+                    description={
+                      <>
+                        <p>{transferPreviewError.message}</p>
+                      </>
+                    }
+                  />
                 )}
                 {transferError && (
-                  <Alert withIcon variant="danger" title="Project cannot be transferred">
-                    <p>{transferError.message}</p>
-                  </Alert>
+                  <Admonition
+                    type="danger"
+                    title="Project cannot be transferred"
+                    description={
+                      <>
+                        <p>{transferError.message}</p>
+                      </>
+                    }
+                  />
                 )}
               </div>
             </Modal.Content>

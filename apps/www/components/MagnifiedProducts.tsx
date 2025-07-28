@@ -13,7 +13,14 @@ import { Products } from './Sections/ProductsCta'
 import { cn } from 'ui'
 
 import { DEFAULT_TRANSITION } from '~/lib/animations'
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES, products as PRODUCTS } from 'shared-data/products'
+import {
+  PRODUCT_MODULES,
+  PRODUCT_MODULES_NAMES,
+  PRODUCT_MODULES_SHORTNAMES,
+  PRODUCT_NAMES,
+  PRODUCT_SHORTNAMES,
+  products as PRODUCTS,
+} from 'shared-data/products'
 
 function MagnifiedProducts({ currentProduct }: { currentProduct: Products | string }) {
   let mouseX = useMotionValue(Infinity)
@@ -161,9 +168,9 @@ const products = {
     url: '/realtime',
   },
   vector: {
-    shortname: PRODUCT_SHORTNAMES.VECTOR,
-    name: PRODUCT_NAMES.VECTOR,
-    icon: PRODUCTS.vector.icon[24],
+    shortname: PRODUCT_MODULES_SHORTNAMES.VECTOR,
+    name: PRODUCT_MODULES_NAMES.VECTOR,
+    icon: PRODUCT_MODULES.vector.icon[24],
     description: 'Integrate your favorite ML-models to store, index and search vector embeddings.',
     description_short: '',
     label: '',

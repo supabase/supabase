@@ -26,7 +26,7 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>({
     ({ signal }) => getResourceWarnings(signal),
     {
       enabled: IS_PLATFORM && enabled,
-      staleTime: 1000 * 60 * 30, // default 30 minutes
+      staleTime: 1000 * 60 * 60, // default 60 minutes
       ...options,
     }
   )

@@ -10,7 +10,7 @@ import prettier from 'prettier'
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
 
-  const pages = await globby([
+  const unsortedPages = await globby([
     'pages/*.js',
     'pages/*.tsx',
     'pages/*.mdx',
@@ -30,6 +30,8 @@ async function generate() {
     '.next/server/pages/partners/experts/*.html',
     '.next/server/pages/features/*.html',
   ])
+
+  const pages = unsortedPages.sort((a, b) => a.localeCompare(b))
 
   const blogUrl = 'blog'
   const caseStudiesUrl = 'case-studies'

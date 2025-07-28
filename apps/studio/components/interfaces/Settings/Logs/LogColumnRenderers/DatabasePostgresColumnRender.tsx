@@ -14,9 +14,11 @@ const columns: Column<LogData>[] = [
       }
       return (
         <RowLayout>
-          <TimestampInfo value={props.row.timestamp!} />
+          <TimestampInfo utcTimestamp={props.row.timestamp!} />
           <SeverityFormatter value={props.row.error_severity as string} />
           <TextFormatter className="w-full" value={props.row.event_message} />
+          {props.row.detail ? <TextFormatter value={props.row.detail as string} /> : null}
+          {props.row.hint ? <TextFormatter value={props.row.hint as string} /> : null}
         </RowLayout>
       )
     },

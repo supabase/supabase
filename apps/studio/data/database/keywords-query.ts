@@ -1,9 +1,8 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
-export type DatabaseKeyword = { word: string }
-
-export const getKeywordsQuery = () => {
+export const getKeywordsSql = () => {
   const sql = /* SQL */ `
 SELECT word FROM pg_get_keywords();
 `.trim()
@@ -13,30 +12,35 @@ SELECT word FROM pg_get_keywords();
 
 export type KeywordsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
-export type KeywordsData = { result: string[] }
+export async function getKeywords(
+  { projectRef, connectionString }: KeywordsVariables,
+  signal?: AbortSignal
+) {
+  const sql = getKeywordsSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['keywords'] },
+    signal
+  )
+
+  return result.map((x: { word: string }) => x.word.toLocaleLowerCase()) as string[]
+}
+
+export type KeywordsData = Awaited<ReturnType<typeof getKeywords>>
 export type KeywordsError = ExecuteSqlError
 
-export const useKeywordsQuery = <TData extends KeywordsData = KeywordsData>(
+export const useKeywordsQuery = <TData = KeywordsData>(
   { projectRef, connectionString }: KeywordsVariables,
-  options: UseQueryOptions<ExecuteSqlData, KeywordsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
+  { enabled = true, ...options }: UseQueryOptions<KeywordsData, KeywordsError, TData> = {}
+) =>
+  useQuery<KeywordsData, KeywordsError, TData>(
+    databaseKeys.keywords(projectRef),
+    ({ signal }) => getKeywords({ projectRef, connectionString }, signal),
     {
-      projectRef,
-      connectionString,
-      sql: getKeywordsQuery(),
-      queryKey: ['keywords'],
-    },
-    {
-      select: (data) => {
-        return {
-          result: data.result.map((x: DatabaseKeyword) => x.word.toLocaleLowerCase()),
-        } as any
-      },
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )
-}

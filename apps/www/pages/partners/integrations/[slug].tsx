@@ -13,7 +13,7 @@ import 'swiper/css'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
@@ -222,20 +222,18 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
 
   return (
     <div className="lg:col-span-3">
-      <div className="sticky top-20 flex flex-col gap-8">
+      <div className="sticky top-20 flex flex-col gap-4">
         <h2 className="text-foreground" style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
           Details
         </h2>
 
         {partner.video && (
-          <div className="mb-6">
-            <ExpandableVideo
-              videoId={partner.video}
-              imgUrl={videoThumbnail}
-              imgOverlayText="Watch an introductory video"
-              triggerContainerClassName="w-full"
-            />
-          </div>
+          <ExpandableVideo
+            videoId={partner.video}
+            // imgUrl={videoThumbnail}
+            imgOverlayText="Watch an introductory video"
+            triggerContainerClassName="w-full"
+          />
         )}
 
         <div className="text-foreground divide-y">
@@ -326,7 +324,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     .eq('slug', params!.slug as string)
     .single()
 
-  if (!partner) {
+  if (!partner || partner.type === 'expert') {
     return {
       notFound: true,
     }

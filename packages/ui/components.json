@@ -4,7 +4,7 @@
   "rsc": false,
   "tailwind": {
     "config": "./../config/tailwind-shadcn.config.js",
-    "css": ".storybook/shadcn.css",
+    "css": "./build/css/source/global.css",
     "baseColor": "gray",
     "cssVariables": true
   },

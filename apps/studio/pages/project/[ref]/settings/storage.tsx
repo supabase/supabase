@@ -1,3 +1,4 @@
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
@@ -5,8 +6,8 @@ import {
   ScaffoldHeader,
   ScaffoldTitle,
 } from 'components/layouts/Scaffold'
-import { StorageSettings } from 'components/to-be-cleaned/Storage'
-import { S3Connection } from 'components/to-be-cleaned/Storage/StorageSettings/S3Connection'
+import { StorageSettings } from 'components/interfaces/Storage'
+import { S3Connection } from 'components/interfaces/Storage/StorageSettings/S3Connection'
 import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
@@ -26,5 +27,9 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <SettingsLayout title="Settings">{page}</SettingsLayout>
+PageLayout.getLayout = (page) => (
+  <DefaultLayout>
+    <SettingsLayout title="Settings">{page}</SettingsLayout>
+  </DefaultLayout>
+)
 export default PageLayout

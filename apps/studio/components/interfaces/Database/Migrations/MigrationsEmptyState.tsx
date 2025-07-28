@@ -46,8 +46,8 @@ const MigrationsEmptyState = () => {
   ]
 
   return (
-    <div className="w-full px-12 py-12 bg-no-repeat border rounded bg-studio border-default">
-      <div className="space-y-8">
+    <div className="w-full p-4 md:p-12 bg-no-repeat border rounded bg-studio border-default">
+      <div className="space-y-4 md:space-y-8">
         <div className="space-y-2 w-4/5">
           <h4 className="text-lg">Database migrations</h4>
           <p className="text-sm text-foreground-light">

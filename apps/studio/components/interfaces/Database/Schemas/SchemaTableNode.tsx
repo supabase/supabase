@@ -1,8 +1,8 @@
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Link2, Table2 } from 'lucide-react'
-import { Handle, NodeProps } from 'reactflow'
+import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
+import { Handle, NodeProps } from 'reactflow'
 
-import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Button, cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
 const TABLE_NODE_WIDTH = 320
@@ -24,7 +24,12 @@ export type TableNodeData = {
   }[]
 }
 
-const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNodeData>) => {
+const TableNode = ({
+  data,
+  targetPosition,
+  sourcePosition,
+  placeholder,
+}: NodeProps<TableNodeData> & { placeholder?: boolean }) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
@@ -60,7 +65,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               <Table2 strokeWidth={1} size={12} className="text-light" />
               {data.name}
             </div>
-            {data.id && (
+            {data.id && !placeholder && (
               <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
                 <Link href={`/project/${data.ref}/editor/${data.id}`}>
                   <ExternalLink size={10} className="text-foreground-light" />

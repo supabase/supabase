@@ -1,5 +1,5 @@
 import React from 'react'
-import { Loader } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 import styleHandler from '../../lib/theme/styleHandler'
 
@@ -23,7 +23,7 @@ export default function Loading({ children, active }: Props) {
   return (
     <div className={classNames.join(' ')}>
       <div className={contentClasses.join(' ')}>{children}</div>
-      {active && <Loader size={24} className={spinnerClasses.join(' ')} />}
+      {active && <Loader2 size={24} className={spinnerClasses.join(' ')} />}
     </div>
   )
 }

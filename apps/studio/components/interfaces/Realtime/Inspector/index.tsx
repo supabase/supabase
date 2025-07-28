@@ -6,12 +6,14 @@ import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const [sendMessageShown, setSendMessageShown] = useState(false)
 
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
@@ -51,9 +53,8 @@ export const RealtimeInspector = () => {
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
           sendEvent({
-            category: 'realtime_inspector',
-            action: 'send_broadcast_message',
-            label: 'realtime_inspector_results',
+            action: 'realtime_inspector_broadcast_sent',
+            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
           })
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}

@@ -1,4 +1,5 @@
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
+import { skillBasedSolutions, useCaseSolutions } from 'data/Solutions'
 
 const footerData = [
   {
@@ -26,21 +27,42 @@ const footerData = [
       },
       {
         text: 'Vector',
-        url: '/vector',
+        url: '/modules/vector',
+      },
+      {
+        text: 'Cron',
+        url: '/modules/cron',
       },
       {
         text: 'Pricing',
         url: '/pricing',
       },
       {
-        text: 'GA Week',
-        url: '/ga-week',
+        text: 'Launch Week',
+        url: '/launch-week',
       },
+    ],
+  },
+  {
+    title: 'Solutions',
+    links: [
+      ...skillBasedSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...useCaseSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
     ],
   },
   {
     title: 'Resources',
     links: [
+      {
+        text: 'Blog',
+        url: '/blog',
+      },
       {
         text: 'Support',
         url: '/support',
@@ -58,15 +80,11 @@ const footerData = [
         url: '/partners/integrations',
       },
       {
-        text: 'Experts',
-        url: '/partners/experts',
-      },
-      {
-        text: 'Brand Assets / Logos',
+        text: 'Brand Assets',
         url: '/brand-assets',
       },
       {
-        text: 'Security and Compliance',
+        text: 'Security & Compliance',
         url: '/security',
       },
       {
@@ -91,8 +109,16 @@ const footerData = [
         url: '/docs',
       },
       {
+        text: 'Supabase UI',
+        url: 'https://supabase.com/ui',
+      },
+      {
         text: 'Changelog',
         url: '/changelog',
+      },
+      {
+        text: 'Careers',
+        url: '/careers',
       },
       {
         text: 'Contributing',
@@ -120,24 +146,8 @@ const footerData = [
     title: 'Company',
     links: [
       {
-        text: 'Blog',
-        url: '/blog',
-      },
-      {
-        text: 'Customer Stories',
-        url: '/customers',
-      },
-      {
-        text: 'Careers',
-        url: '/careers',
-      },
-      {
         text: 'Company',
         url: '/company',
-      },
-      {
-        text: 'Events & Webinars',
-        url: '/events',
       },
       {
         text: 'General Availability',
