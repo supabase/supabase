@@ -10,18 +10,34 @@ function generateIndustrySQL(activeFilters) {
   if (activeFilters.person_age !== 'unset') {
     whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
-  if (activeFilters.headquarters !== 'unset') {
-    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  if (activeFilters.funding_stage !== 'unset') {
+    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
+  }
+
+  if (activeFilters.market_model !== 'unset') {
+    whereClauses.push(`'${activeFilters.market_model}' = ANY(market_model)`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
-  return `SELECT
-  industry_normalized,
+  return `SELECT 
+  CASE 
+    WHEN industry_normalized = 'Developer tools and platforms' THEN 'Dev tools'
+    WHEN industry_normalized = 'AI / ML tools' THEN 'AI / ML'
+    WHEN industry_normalized IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry_normalized
+    ELSE 'Other'
+  END AS industry_normalized, 
   COUNT(*) AS total
-FROM responses_2025${whereClause ? '\n' + whereClause : ''}
-GROUP BY industry_normalized
-ORDER BY total DESC;`
+FROM responses_2025
+${whereClause}
+GROUP BY CASE 
+    WHEN industry_normalized = 'Developer tools and platforms' THEN 'Dev tools'
+    WHEN industry_normalized = 'AI / ML tools' THEN 'AI / ML'
+    WHEN industry_normalized IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry_normalized
+    ELSE 'Other'
+  END
+ORDER BY total DESC;
+`
 }
 
 export function IndustryChart() {
@@ -29,7 +45,7 @@ export function IndustryChart() {
     <GenericChartWithQuery
       title="What is your startup's primary industry or target customer segment?"
       targetColumn="industry_normalized"
-      filterColumns={['person_age', 'headquarters']}
+      filterColumns={['person_age', 'funding_stage', 'market_model']}
       generateSQLQuery={generateIndustrySQL}
     />
   )

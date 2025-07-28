@@ -226,14 +226,13 @@ function StateOfStartupsPage() {
             title="Roles and Experience"
             description="Most builders are young, technical founders. Many are on their second or third company."
           >
-            <div className="flex flex-col md:flex-row gap-4">
-              <RoleChart />
-              <SurveyStatWrapper>
-                <SurveyStatCard number={83} unit="%" label="Technical founders" />
-                <SurveyStatCard number={82} unit="%" label="Under age 40" />
-                <SurveyStatCard number={33} unit="%" label="Repeat founders" />
-              </SurveyStatWrapper>
-            </div>
+            <SurveyStatWrapper>
+              <SurveyStatCard number={83} unit="%" label="Technical founders" />
+              <SurveyStatCard number={82} unit="%" label="Under age 40" />
+              <SurveyStatCard number={33} unit="%" label="Repeat founders" />
+            </SurveyStatWrapper>
+            <RoleChart />
+
             <SurveyPullQuote
               quote="We’re a two-person team, both technical. It’s not our first rodeo, and that experience helped us move way faster this time."
               author="John Doe"
@@ -247,14 +246,13 @@ function StateOfStartupsPage() {
             title="Team Size and Funding"
             description="Startups are mostly bootstrapped or at early stages of funding. They are small teams, and usually less than a year old."
           >
-            <div className="flex flex-col md:flex-row gap-4">
-              <SurveyStatWrapper>
-                <SurveyStatCard number={91} unit="%" label="Under 10 employees" />
-                <SurveyStatCard number={65} unit="%" label="Under one year old" />
-                <SurveyStatCard number={6} unit="%" label="Over 5 years old" />
-              </SurveyStatWrapper>
-              <FundingStageChart />
-            </div>
+            <SurveyStatWrapper>
+              <SurveyStatCard number={91} unit="%" label="Under 10 employees" />
+              <SurveyStatCard number={65} unit="%" label="Under one year old" />
+              <SurveyStatCard number={6} unit="%" label="Over 5 years old" />
+            </SurveyStatWrapper>
+            <FundingStageChart />
+
             <SurveyPullQuote
               quote="We’re bootstrapped and under a year old… just three of us wearing every hat imaginable."
               author="John Doe"
@@ -268,15 +266,14 @@ function StateOfStartupsPage() {
             title="Where They’re Based"
             description="Startups are building globally, but North America—especially San Francisco—remains overrepresented. Europe and Asia also feature prominently, with hubs like Toronto and NYC following close behind."
           >
-            <div className="flex flex-col md:flex-row gap-4">
-              <HeadquartersChart />
-              <SurveyStatWrapper>
-                <SurveyStatCard number={17} unit="%" label="Global startups in Europe" />
-                <SurveyStatCard number={19} unit="%" label="North American startups in SF" />
-                <SurveyStatCard number={9} unit="%" label="North American startups in Toronto" />
-                <SurveyStatCard number={0} unit="%" label="North American startups in NYC" />
-              </SurveyStatWrapper>
-            </div>
+            <SurveyStatWrapper>
+              <SurveyStatCard number={17} unit="%" label="Global startups in Europe" />
+              <SurveyStatCard number={19} unit="%" label="North American startups in SF" />
+              <SurveyStatCard number={9} unit="%" label="North American startups in Toronto" />
+              <SurveyStatCard number={0} unit="%" label="North American startups in NYC" />
+            </SurveyStatWrapper>
+            <HeadquartersChart />
+
             <SurveyPullQuote
               quote="We’re building from Toronto, but most of our early users are still in San Francisco."
               author="John Doe"
@@ -290,14 +287,35 @@ function StateOfStartupsPage() {
 
         <SurveySection
           number={2}
-          title="Product and Market"
-          description="Startups are building a diverse mix of software products, iterating quickly, and pursuing monetization selectively."
+          title="What Startups are Building"
+          description="Startups are still experimenting. They’re building a diverse mix of software products, iterating quickly, and pursuing monetization selectively."
         >
-          <MonetizationChart />
+          {/* <MonetizationChart />
           <AcceleratorParticipationChart />
           <PivotFreqChart />
-          <IndustryChart />
-          <ProblemBeingSolvedChart />
+       
+          <ProblemBeingSolvedChart /> */}
+          <SurveySubSection
+            number={2.1}
+            title="Industries and Focus"
+            description="Under-30s gravitate toward AI-driven productivity, education, and social tools; areas where rapid iteration and novelty matter. Over-50s skew toward SaaS and consumer products, often bringing domain-specific experience into more established markets. Developer tools and infrastructure attract all age groups."
+          >
+            <SurveyStatWrapper>
+              <SurveyStatCard number={33} unit="%" label="Building for developers" />
+              <SurveyStatCard number={24} unit="%" label="Targeting consumers" />
+              <SurveyStatCard number={38} unit="%" label="Founders under 30 building in AI/ML" />
+            </SurveyStatWrapper>
+            <IndustryChart />
+
+            {/* Ranked answers and Rotating psuedo-quote subsections */}
+
+            <SurveyPullQuote
+              quote="We’re experimenting in edtech for underserved regions. It’s early, but we’re learning fast."
+              author="John Doe"
+              authorPosition="Founder"
+              authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
+            />
+          </SurveySubSection>
         </SurveySection>
 
         <SurveySection
@@ -305,7 +323,8 @@ function StateOfStartupsPage() {
           title="Tech Stack"
           description="The modern stack centers around open tools, modular infrastructure, and cautious spending."
         >
-          <FrontendStackChart />
+          <p>TODO</p>
+          {/* <FrontendStackChart />
           <BackendStackChart />
           <DatabasesChart />
           <DataWarehousesChart />
@@ -315,7 +334,7 @@ function StateOfStartupsPage() {
           <CloudProvidersChart />
           <MustHaveDevToolsChart />
           <AICodingToolsChart />
-          <SubscriptionsChart />
+          <SubscriptionsChart /> */}
         </SurveySection>
 
         <SurveySection
@@ -323,8 +342,9 @@ function StateOfStartupsPage() {
           title="Go-To-Market"
           description="Startups start selling through networks and dev communities, then layer in more structured growth."
         >
-          <SalesToolsChart />
-          <PricingChart />
+          <p>TODO</p>
+          {/* <SalesToolsChart />
+          <PricingChart /> */}
         </SurveySection>
 
         <SurveySection
@@ -332,9 +352,10 @@ function StateOfStartupsPage() {
           title="Community and Influence"
           description="Communities are the learning engine behind every early-stage startup."
         >
-          <NewslettersPaidForChart />
+          <p>TODO</p>
+          {/* <NewslettersPaidForChart />
           <PodcastsListenedToChart />
-          <RegularSocialMediaUseChart />
+          <RegularSocialMediaUseChart /> */}
         </SurveySection>
       </DefaultLayout>
     </>

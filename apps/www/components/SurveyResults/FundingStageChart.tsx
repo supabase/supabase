@@ -7,12 +7,12 @@ function generateFundingStageSQL(activeFilters) {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.money_raised !== 'unset') {
-    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
+  if (activeFilters.team_count !== 'unset') {
+    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'unset') {
-    whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
+  if (activeFilters.previous_company !== 'unset') {
+    whereClauses.push(`previous_company = '${activeFilters.previous_company}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -44,7 +44,7 @@ export function FundingStageChart() {
     <GenericChartWithQuery
       title="What stage of funding is your startup in?"
       targetColumn="funding_stage"
-      filterColumns={['headquarters', 'money_raised', 'currently_monetizing']}
+      filterColumns={['headquarters', 'team_count', 'previous_company']}
       generateSQLQuery={generateFundingStageSQL}
     />
   )
