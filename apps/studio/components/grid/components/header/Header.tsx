@@ -277,7 +277,7 @@ const RowHeader = () => {
     })
   }
 
-  async function onRowsExportCSV() {
+  const onRowsExportCSV = async () => {
     setIsExporting(true)
 
     if (snap.allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
@@ -349,7 +349,7 @@ const RowHeader = () => {
       columns: snap.table!.columns.map((column) => column.name),
     })
     const csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    toast.success(`Downloaded ${rows.length} rows to CSV`, {
+    toast.success(`Downloaded ${rows.length} rows as CSV`, {
       id: toastId,
       closeButton: true,
       duration: 4000,
@@ -358,7 +358,7 @@ const RowHeader = () => {
     setIsExporting(false)
   }
 
-  async function onRowsExportSQL() {
+  const onRowsExportSQL = async () => {
     setIsExporting(true)
 
     if (snap.allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
@@ -423,12 +423,33 @@ const RowHeader = () => {
 
     const sqlStatements = formatTableRowsToSQL(snap.table, rows)
     const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
-    toast.success(`Downloading ${rows.length} rows to SQL`, {
+    toast.success(`Downloading ${rows.length} rows as SQL`, {
       id: toastId,
       closeButton: true,
       duration: 4000,
     })
     saveAs(sqlData, `${snap.table!.name}_rows.sql`)
+    setIsExporting(false)
+  }
+
+  const onRowsExportJSON = async () => {
+    if (!project) {
+      return toast.error('Project is required')
+    }
+
+    setIsExporting(true)
+    const toastId = toast.loading(
+      `Exporting ${snap.selectedRows.size} row${snap.selectedRows.size > 1 ? 's' : ''} from ${snap.table.name}`
+    )
+    const rows = allRows.filter((x) => snap.selectedRows.has(x.idx))
+    const sqlData = new Blob([JSON.stringify(rows)], { type: 'text/sql;charset=utf-8;' })
+    toast.success(`Downloading ${rows.length} rows as JSON`, {
+      id: toastId,
+      closeButton: true,
+      duration: 4000,
+    })
+    saveAs(sqlData, `${snap.table!.name}_rows.json`)
+
     setIsExporting(false)
   }
 
@@ -486,13 +507,15 @@ const RowHeader = () => {
             <DropdownMenuItem onClick={onRowsExportSQL}>Export as SQL</DropdownMenuItem>
             {/* [Joshen] Should make this available for all cases, but that'll involve updating
             the Dialog's SQL output to be dynamic based on any filters applied */}
-            {snap.allRowsSelected && (
+            {snap.allRowsSelected ? (
               <DropdownMenuItem className="group" onClick={() => setShowExportModal(true)}>
                 <div>
                   <p className="group-hover:text-foreground">Export via CLI</p>
                   <p className="text-foreground-lighter">Recommended for large tables</p>
                 </div>
               </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem onClick={onRowsExportJSON}>Export as JSON</DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
