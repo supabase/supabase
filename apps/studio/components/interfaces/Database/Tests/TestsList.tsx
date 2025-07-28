@@ -152,8 +152,6 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
       return regularTests.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
     }, [regularTests, search])
 
-    // Removed circle position calculations and resize listeners
-
     const runSingleTest = async (index: number): Promise<void> => {
       const test = filteredRegularTests[index]
       if (!test) return
@@ -176,12 +174,10 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
         return
       }
 
-      // Set all tests to queued status initially
       filteredRegularTests.forEach((test) => {
         testRowRefs.current[test.id]?.setStatus('queued')
       })
 
-      // Start from first test
       await runSingleTest(0)
     }
 
@@ -199,8 +195,8 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
           <div className="w-full">
             {tests.length === 0 ? (
               <p className="text-sm text-foreground-light p-4">
-                No setup tests found. Create tests with names starting with "000" to set up test
-                environment.
+                Tests starting with "000_setup" will be run before all other tests and can be used
+                to set up the test environment.
               </p>
             ) : (
               tests.map((test, index) => (
@@ -254,7 +250,6 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
             <Card>
               <CardHeader className="px-4">
                 <div className="flex items-center gap-2">
-                  <Settings2 strokeWidth={1.5} size={16} className="text-foreground-lighter" />
                   <CardTitle>Before Tests</CardTitle>
                 </div>
               </CardHeader>
@@ -264,7 +259,6 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
             <Card>
               <CardHeader className="px-4">
                 <div className="flex items-center gap-2">
-                  <FlaskConical strokeWidth={1.5} size={16} className="text-foreground-lighter" />
                   <CardTitle>Tests</CardTitle>
                 </div>
               </CardHeader>
