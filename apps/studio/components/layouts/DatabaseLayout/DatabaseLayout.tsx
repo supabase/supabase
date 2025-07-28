@@ -31,6 +31,7 @@ const DatabaseProductMenu = () => {
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
   const enablePgReplicate = useFlag('enablePgReplicate')
+  const enableDatabaseTests = useFlag('dashboardTests')
 
   return (
     <>
@@ -41,6 +42,7 @@ const DatabaseProductMenu = () => {
           pitrEnabled,
           columnLevelPrivileges,
           enablePgReplicate,
+          enableDatabaseTests,
         })}
       />
     </>

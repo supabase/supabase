@@ -10,11 +10,17 @@ export const generateDatabaseMenu = (
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
     enablePgReplicate: boolean
+    enableDatabaseTests: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges, enablePgReplicate } =
-    flags || {}
+  const {
+    pgNetExtensionExists,
+    pitrEnabled,
+    columnLevelPrivileges,
+    enablePgReplicate,
+    enableDatabaseTests,
+  } = flags || {}
 
   return [
     {
@@ -39,12 +45,16 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/triggers`,
           items: [],
         },
-        {
-          name: 'Tests',
-          key: 'tests',
-          url: `/project/${ref}/database/tests`,
-          items: [],
-        },
+        ...(enableDatabaseTests
+          ? [
+              {
+                name: 'Tests',
+                key: 'tests',
+                url: `/project/${ref}/database/tests`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Enumerated Types',
           key: 'types',
