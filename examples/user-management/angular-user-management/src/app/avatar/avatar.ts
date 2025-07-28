@@ -1,13 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { SupabaseService } from '../supabase.service';
 
 @Component({
   selector: 'app-avatar',
-  templateUrl: './avatar.component.html',
-  styleUrls: ['./avatar.component.css'],
+  templateUrl: './avatar.html',
+  styleUrls: ['./avatar.css'],
+  standalone: false,
 })
-export class AvatarComponent implements OnInit {
+export class AvatarComponent {
   _avatarUrl: SafeResourceUrl | undefined;
   uploading = false;
 
@@ -24,8 +25,6 @@ export class AvatarComponent implements OnInit {
     private readonly supabase: SupabaseService,
     private readonly dom: DomSanitizer
   ) {}
-
-  ngOnInit(): void {}
 
   async downloadImage(path: string) {
     try {

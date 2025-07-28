@@ -3,17 +3,18 @@ import { SupabaseService } from './supabase.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  templateUrl: './app.html',
+  styleUrls: ['./app.css'],
+  standalone: false,
 })
 export class AppComponent implements OnInit {
-  title = 'angular-user-management';
-
-  session = this.supabase.session;
-
   constructor(private readonly supabase: SupabaseService) {}
 
+  title = 'angular-user-management';
+  session: any;
+
   ngOnInit() {
+    this.session = this.supabase.session;
     this.supabase.authChanges((_, session) => (this.session = session));
   }
 }
