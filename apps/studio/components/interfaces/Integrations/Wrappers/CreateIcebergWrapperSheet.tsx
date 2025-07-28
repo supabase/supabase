@@ -2,18 +2,17 @@ import { isEmpty } from 'lodash'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import SchemaEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SchemaEditor'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import SchemaSelector from 'components/ui/SchemaSelector'
+import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Form,
   Input,
-  Label_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -25,7 +24,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { CreateWrapperSheetProps } from './CreateWrapperSheet'
 import InputField from './InputField'
 import { makeValidateRequired } from './Wrappers.utils'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'create-wrapper-form'
 
@@ -68,12 +66,11 @@ export const CreateIcebergWrapperSheet = ({
   const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
   const [selectedTarget, setSelectedTarget] = useState<Target>('S3Tables')
 
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
 
-  const { mutate: createFDW, isLoading: isCreating } = useFDWCreateMutation({
+  const { mutateAsync: createFDW, isLoading: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
       onClose()
@@ -100,8 +97,10 @@ export const CreateIcebergWrapperSheet = ({
     }
   }, [wrapperMetaOriginal, selectedTarget])
 
-  // prefetch schemas to make sure the schema selector is populated
-  useSchemasQuery({ projectRef: project?.ref, connectionString: project?.connectionString })
+  const { data: schemas } = useSchemasQuery({
+    projectRef: project?.ref!,
+    connectionString: project?.connectionString,
+  })
 
   const initialValues = {
     wrapper_name: '',
@@ -113,40 +112,71 @@ export const CreateIcebergWrapperSheet = ({
     ),
   }
 
+  const { mutateAsync: createSchema, isLoading: isCreatingSchema } = useSchemaCreateMutation()
+
   const onSubmit = async (values: any) => {
     const validate = makeValidateRequired(wrapperMeta.server.options)
     const errors: any = validate(values)
 
     if (values.source_schema.length === 0) {
-      errors.source_schema = 'Please provide a source schema'
+      errors.source_schema = 'Please provide a namespace name'
     }
     if (values.wrapper_name.length === 0) {
       errors.wrapper_name = 'Please provide a name for your wrapper'
     }
-    if (!isEmpty(errors)) return setFormErrors(errors)
 
-    createFDW({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      wrapperMeta,
-      formState: { ...values, server_name: `${values.wrapper_name}_server` },
-      mode: 'schema',
-      tables: [],
-      sourceSchema: values.source_schema,
-      targetSchema: values.target_schema,
-    })
+    if (values.target_schema.length === 0) {
+      errors.target_schema = 'Please provide an unique target schema'
+    }
+    const foundSchema = schemas?.find((s) => s.name === values.target_schema)
+    if (foundSchema) {
+      errors.target_schema = 'This schema already exists. Please specify a unique schema name.'
+    }
 
-    sendEvent({
-      action: 'foreign_data_wrapper_created',
-      properties: {
-        wrapperType: wrapperMeta.label,
-      },
-      groups: {
-        project: project?.ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    setFormErrors(errors)
+    if (!isEmpty(errors)) {
+      return
+    }
+
+    try {
+      await createSchema({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        name: values.target_schema,
+      })
+
+      await createFDW({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        wrapperMeta,
+        formState: {
+          ...values,
+          server_name: `${values.wrapper_name}_server`,
+          supabase_target_schema: values.target_schema,
+        },
+        mode: 'schema',
+        tables: [],
+        sourceSchema: values.source_schema,
+        targetSchema: values.target_schema,
+      })
+
+      sendEvent({
+        action: 'foreign_data_wrapper_created',
+        properties: {
+          wrapperType: wrapperMeta.label,
+        },
+        groups: {
+          project: project?.ref ?? 'Unknown',
+          organization: org?.slug ?? 'Unknown',
+        },
+      })
+    } catch (error) {
+      console.error(error)
+      // The error will be handled by the mutation onError callback (toast.error)
+    }
   }
+
+  const isLoading = isCreatingWrapper || isCreatingSchema
 
   return (
     <>
@@ -272,7 +302,8 @@ export const CreateIcebergWrapperSheet = ({
                       <FormSectionLabel>
                         <p>Foreign Schema</p>
                         <p className="text-foreground-light mt-2 w-[90%]">
-                          All wrapper tables will be created in the specified target schema.
+                          You can query your data from the foreign tables in the specified schema
+                          after the wrapper is created.
                         </p>
                       </FormSectionLabel>
                     }
@@ -292,18 +323,21 @@ export const CreateIcebergWrapperSheet = ({
                         </div>
                       )}
                       <div className="flex flex-col gap-2">
-                        <Label_Shadcn_ className="text-foreground-light">
-                          Target Schema
-                        </Label_Shadcn_>
-                        <SchemaSelector
-                          portal={false}
-                          size="small"
-                          selectedSchemaName={values.target_schema}
-                          onSelectSchema={(schema) => setFieldValue('target_schema', schema)}
-                          onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
+                        <InputField
+                          key="target_schema"
+                          option={{
+                            name: 'target_schema',
+                            label: 'Specify a new schema to create all wrapper tables in',
+                            required: true,
+                            encrypted: false,
+                            secureEntry: false,
+                          }}
+                          loading={false}
+                          error={formErrors['target_schema']}
                         />
                         <p className="text-foreground-lighter text-sm">
-                          Be careful not to use an API exposed schema.
+                          A new schema will be created. For security purposes, the wrapper tables
+                          from the foreign schema cannot be created within an existing schema
                         </p>
                       </div>
                     </FormSectionContent>
@@ -316,7 +350,7 @@ export const CreateIcebergWrapperSheet = ({
                     type="default"
                     htmlType="button"
                     onClick={onClosePanel}
-                    disabled={isCreating}
+                    disabled={isLoading}
                   >
                     Cancel
                   </Button>
@@ -325,20 +359,11 @@ export const CreateIcebergWrapperSheet = ({
                     type="primary"
                     form={FORM_ID}
                     htmlType="submit"
-                    disabled={isCreating}
-                    loading={isCreating}
+                    loading={isLoading}
                   >
                     Create wrapper
                   </Button>
                 </SheetFooter>
-                <SchemaEditor
-                  visible={createSchemaSheetOpen}
-                  closePanel={() => setCreateSchemaSheetOpen(false)}
-                  onSuccess={(schema) => {
-                    setFieldValue('target_schema', schema)
-                    setCreateSchemaSheetOpen(false)
-                  }}
-                />
               </>
             )
           }}

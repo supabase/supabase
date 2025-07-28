@@ -1,10 +1,10 @@
-import { expect, test, describe } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { Query } from '../../src/query/Query'
+import * as QueryUtils from '../../src/query/Query.utils'
 import { QueryAction } from '../../src/query/QueryAction'
 import { QueryFilter } from '../../src/query/QueryFilter'
 import { QueryModifier } from '../../src/query/QueryModifier'
-import * as QueryUtils from '../../src/query/Query.utils'
-import type { QueryTable, Filter, Sort } from '../../src/query/types'
+import type { Filter, QueryTable, Sort } from '../../src/query/types'
 
 describe('Query', () => {
   test('from() should create a QueryAction with the correct table', () => {
@@ -515,7 +515,9 @@ describe('End-to-end query chaining', () => {
       .filter('name', '~~', '%John%')
       .toSql()
 
-    expect(sql).toBe("select id, name, email from public.users where id > 10 and name ~~ '%John%';")
+    expect(sql).toBe(
+      "select id, name, email from public.users where id > 10 and name::text ~~ '%John%';"
+    )
   })
 
   test('should correctly build a select query with match criteria', () => {
