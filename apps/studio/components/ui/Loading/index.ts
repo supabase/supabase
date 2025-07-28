@@ -1,1 +1,1 @@
-export { default as Loading } from 'ui/src/components/LogoLoader'
+export { LogoLoader as Loading } from 'ui'

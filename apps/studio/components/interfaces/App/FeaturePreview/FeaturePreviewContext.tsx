@@ -1,35 +1,20 @@
 import { noop } from 'lodash'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { useQueryState } from 'nuqs'
+import {
+  PropsWithChildren,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag, useIsRealtimeSettingsFFEnabled } from 'hooks/ui/useFlag'
 import { EMPTY_OBJ } from 'lib/void'
-import { APISidePanelPreview } from './APISidePanelPreview'
-import { CLSPreview } from './CLSPreview'
-import InlineEditorPreview from './InlineEditorPreview'
-
-export const FEATURE_PREVIEWS = [
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-    name: 'Project API documentation',
-    content: <APISidePanelPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    isNew: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-    name: 'Column-level privileges',
-    content: <CLSPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    isNew: false,
-  },
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
-    name: 'Inline SQL Editor',
-    content: <InlineEditorPreview />,
-    discussionsUrl: 'https://github.com/orgs/supabase/discussions/33690',
-    isNew: true,
-  },
-]
+import { FEATURE_PREVIEWS } from './FeaturePreview.constants'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -44,6 +29,16 @@ const FeaturePreviewContext = createContext<FeaturePreviewContextType>({
 export const useFeaturePreviewContext = () => useContext(FeaturePreviewContext)
 
 export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}>) => {
+  const { hasLoaded } = useContext(FeatureFlagContext)
+
+  // [Joshen] Similar logic to feature flagging previews, we can use flags to default opt in previews
+  const isDefaultOptIn = (feature: (typeof FEATURE_PREVIEWS)[number]) => {
+    switch (feature.key) {
+      default:
+        return false
+    }
+  }
+
   const [flags, setFlags] = useState(() =>
     FEATURE_PREVIEWS.reduce((a, b) => {
       return { ...a, [b.key]: false }
@@ -54,11 +49,16 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     if (typeof window !== 'undefined') {
       setFlags(
         FEATURE_PREVIEWS.reduce((a, b) => {
-          return { ...a, [b.key]: localStorage.getItem(b.key) === 'true' }
+          const defaultOptIn = isDefaultOptIn(b)
+          const localStorageValue = localStorage.getItem(b.key)
+          return {
+            ...a,
+            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+          }
         }, {})
       )
     }
-  }, [])
+  }, [hasLoaded])
 
   const value = {
     flags,
@@ -89,4 +89,117 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 export const useIsInlineEditorEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR]
+}
+
+export const useUnifiedLogsPreview = () => {
+  const organization = useSelectedOrganization()
+  const { flags, onUpdateFlag } = useFeaturePreviewContext()
+
+  const isTeamsOrEnterprise = ['team', 'enterprise'].includes(organization?.plan.id ?? '')
+  const isEnabled = isTeamsOrEnterprise && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+
+  const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
+  const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
+  return { isEnabled, enable, disable }
+}
+
+export const useIsRealtimeSettingsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_REALTIME_SETTINGS]
+}
+
+export const useIsBranching2Enabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+}
+
+export const useIsAdvisorRulesEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+}
+
+export const useFeaturePreviewModal = () => {
+  const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')
+
+  const isRealtimeSettingsEnabled = useIsRealtimeSettingsFFEnabled()
+  const gitlessBranchingEnabled = useFlag('gitlessBranching')
+  const advisorRulesEnabled = useFlag('advisorRules')
+  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+
+  const selectedFeatureKeyFromQuery = featurePreviewModal?.trim() ?? null
+  const showFeaturePreviewModal = selectedFeatureKeyFromQuery !== null
+
+  // [Joshen] Use this if we want to feature flag previews
+  const isFeaturePreviewReleasedToPublic = useCallback(
+    (feature: (typeof FEATURE_PREVIEWS)[number]) => {
+      switch (feature.key) {
+        case 'supabase-ui-realtime-settings':
+          return isRealtimeSettingsEnabled
+        case 'supabase-ui-branching-2-0':
+          return gitlessBranchingEnabled
+        case 'supabase-ui-advisor-rules':
+          return advisorRulesEnabled
+        case 'supabase-ui-preview-unified-logs':
+          return isUnifiedLogsPreviewAvailable
+        default:
+          return true
+      }
+    },
+    [
+      isRealtimeSettingsEnabled,
+      gitlessBranchingEnabled,
+      advisorRulesEnabled,
+      isUnifiedLogsPreviewAvailable,
+    ]
+  )
+
+  const selectedFeatureKey = (
+    !selectedFeatureKeyFromQuery
+      ? FEATURE_PREVIEWS.filter((feature) => isFeaturePreviewReleasedToPublic(feature))[0].key
+      : selectedFeatureKeyFromQuery
+  ) as (typeof FEATURE_PREVIEWS)[number]['key']
+
+  const selectFeaturePreview = useCallback(
+    (featureKey: (typeof FEATURE_PREVIEWS)[number]['key']) => {
+      setFeaturePreviewModal(featureKey)
+    },
+    [setFeaturePreviewModal]
+  )
+
+  const openFeaturePreviewModal = useCallback(() => {
+    selectFeaturePreview(selectedFeatureKey)
+  }, [selectFeaturePreview, selectedFeatureKey])
+
+  const closeFeaturePreviewModal = useCallback(() => {
+    setFeaturePreviewModal(null)
+  }, [setFeaturePreviewModal])
+
+  const toggleFeaturePreviewModal = useCallback(() => {
+    if (showFeaturePreviewModal) {
+      closeFeaturePreviewModal()
+    } else {
+      openFeaturePreviewModal()
+    }
+  }, [showFeaturePreviewModal, openFeaturePreviewModal, closeFeaturePreviewModal])
+
+  return useMemo(
+    () => ({
+      showFeaturePreviewModal,
+      selectedFeatureKey,
+      selectFeaturePreview,
+      openFeaturePreviewModal,
+      closeFeaturePreviewModal,
+      toggleFeaturePreviewModal,
+      isFeaturePreviewReleasedToPublic,
+    }),
+    [
+      showFeaturePreviewModal,
+      selectedFeatureKey,
+      selectFeaturePreview,
+      openFeaturePreviewModal,
+      closeFeaturePreviewModal,
+      toggleFeaturePreviewModal,
+      isFeaturePreviewReleasedToPublic,
+    ]
+  )
 }

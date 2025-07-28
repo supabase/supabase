@@ -22,7 +22,7 @@ export async function getVercelProjects(
         query: {
           // [Alaister]: setting a large limit here to avoid pagination
           // until we have merged the new shadcn listbox which will support it
-          limit: '1000',
+          limit: 1000,
         },
       },
       signal,

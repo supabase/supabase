@@ -489,7 +489,7 @@ create view transcripts as
     left join students on grades.student_id = students.id
     left join courses on grades.course_id = courses.id;
 
-alter view transcripts owner to authenticated;
+grant all on table transcripts to authenticated;
 ```
 
 Once done, we can now access the underlying query with:

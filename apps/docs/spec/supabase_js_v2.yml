@@ -233,7 +233,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
@@ -386,7 +386,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp(
@@ -790,8 +790,8 @@ functions:
       - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls).
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
       - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
@@ -871,8 +871,8 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
-          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls). It does not redirect the user immediately after invoking this method.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```js
           const { data, error } = await supabase.auth.signInWithOAuth({
@@ -1032,6 +1032,49 @@ functions:
               // redirect the user to the identity provider's authentication flow
               window.location.href = data.url
             }
+          ```
+  - id: get-claims
+    title: 'getClaims()'
+    $ref: '@supabase/auth-js.GoTrueClient.getClaims'
+    examples:
+      - id: get-claims
+        name: Get user object
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.getClaims()
+          ```
+        response: |
+          ```json
+          {
+            "data": {
+              "claims": {
+                "aal": "aal1",
+                "amr": [{
+                  "method": "email",
+                  "timestamp": 1715766000
+                }],
+                "app_metadata": {},
+                "aud": "authenticated",
+                "email": "example@email.com",
+                "exp": 1715769600,
+                "iat": 1715766000,
+                "is_anonymous": false,
+                "iss": "https://api.supabase.com/auth/v1",
+                "phone": "+13334445555",
+                "role": "authenticated",
+                "session_id": "11111111-1111-1111-1111-111111111111",
+                "sub": "11111111-1111-1111-1111-111111111111",
+                "user_metadata": {}
+              },
+              "header": {
+                "alg": "RS256",
+                "typ": "JWT",
+                "kid": "abcdefgh"
+              },
+              "signature": [/** Uint8Array */],
+            },
+            "error": null
+          }
           ```
   - id: sign-out
     title: 'signOut()'
@@ -1387,7 +1430,8 @@ functions:
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
-        description: Sends a "Confirm Email Change" email to the new email address.
+        description: |
+          Sends a "Confirm Email Change" email to the new address. If **Secure Email Change** is enabled (default), confirmation is also required from the **old email** before the change is applied. To skip dual confirmation and apply the change after only the new email is verified, disable **Secure Email Change** in the [Email Auth Provider settings](/dashboard/project/_/auth/providers?provider=Email).
         isSpotlight: false
         code: |
           ```js
@@ -1469,6 +1513,10 @@ functions:
           ```
       - id: update-the-users-metadata
         name: Update the user's metadata
+        description: |
+          Updates the user's custom metadata.
+
+          **Note**: The `data` field maps to the `auth.users.raw_user_meta_data` column in your Supabase database. When calling `getUser()`, the data will be available as `user.user_metadata`.
         isSpotlight: true
         code: |
           ```js
@@ -1588,6 +1636,7 @@ functions:
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
       - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+      - After receiving the OTP, include it as the `nonce` in your `updateUser()` call to finalize the password change.
     examples:
       - id: send-reauthentication-nonce
         name: Send reauthentication nonce
@@ -2695,11 +2744,11 @@ functions:
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
       To update the user's password, see [`updateUser()`](/docs/reference/javascript/auth-updateuser).
-      - A `SIGNED_IN` and `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
+      - A `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
       You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
       - When the user clicks the reset link in the email they are redirected back to your application.
       You can configure the URL that the user is redirected to with the `redirectTo` parameter.
-      See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
       ```js
       const { data, error } = await supabase.auth.updateUser({
@@ -3213,6 +3262,69 @@ functions:
               {
                 "name": "woodwinds",
                 "instruments": [
+                  {
+                    "name": "flute"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: query-referenced-tables-with-spaces-in-their-names
+        name: Query referenced tables with spaces in their names
+        description: |
+          If your table name contains spaces, you must use double quotes in the `select` statement to reference the table.
+        code: |
+          ```js
+          const { data, error } = await supabase
+            .from('orchestal sections')
+            .select(`
+              name,
+              "musical instruments" (
+                name
+              )
+            `)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              "orchestral sections" (id int8 primary key, name text);
+            create table
+              "musical instruments" (
+                id int8 primary key,
+                section_id int8 not null references "orchestral sections",
+                name text
+              );
+
+            insert into
+              "orchestral sections" (id, name)
+            values
+              (1, 'strings'),
+              (2, 'woodwinds');
+            insert into
+              "musical instruments" (id, section_id, name)
+            values
+              (1, 2, 'flute'),
+              (2, 1, 'violin');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "strings",
+                "musical instruments": [
+                  {
+                    "name": "violin"
+                  }
+                ]
+              },
+              {
+                "name": "woodwinds",
+                "musical instruments": [
                   {
                     "name": "flute"
                   }
@@ -4337,7 +4449,7 @@ functions:
         name: Call a read-only Postgres function
         code: |
           ```ts
-          const { data, error } = await supabase.rpc('hello_world', { get: true })
+          const { data, error } = await supabase.rpc('hello_world', undefined, { get: true })
           ```
         data:
           sql: |
@@ -5788,10 +5900,10 @@ functions:
           {
             "data": [
               {
-                "name": "Luke"
+                "name": "Leia"
               },
               {
-                "name": "Leia"
+                "name": "Han"
               }
             ],
             "status": 200,
@@ -6530,6 +6642,8 @@ functions:
 
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
+    notes: |
+      - Deprecated: use overrideTypes method instead
     title: returns()
     examples:
       - id: override-type-of-successful-response
@@ -6539,11 +6653,94 @@ functions:
           const { data } = await supabase
             .from('countries')
             .select()
+            .returns<Array<MyType>>()
+          ```
+        response: |
+          ```
+          let x: typeof data // MyType[]
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: override-type-of-object-response
+        name: Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
             .returns<MyType>()
           ```
         response: |
           ```
           let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: overrideTypes
+    $ref: '@supabase/postgrest-js.PostgrestBuilder.overrideTypes'
+    title: overrideTypes()
+    examples:
+      - id: complete-override-type-of-successful-response
+        name: Complete Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .overrideTypes<Array<MyType>, { merge: false }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // MyType[]
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: complete-override-type-of-object-response
+        name: Complete Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
+            .overrideTypes<MyType, { merge: false }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // MyType | null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: partial-override-type-of-successful-response
+        name: Partial Override type of successful response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .overrideTypes<Array<{ status: "A" | "B" }>>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // Array<CountryRowProperties & { status: "A" | "B" }>
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: partial-override-type-of-object-response
+        name: Partial Override type of object response
+        code: |
+          ```ts
+          const { data } = await supabase
+            .from('countries')
+            .select()
+            .maybeSingle()
+            .overrideTypes<{ status: "A" | "B" }>()
+          ```
+        response: |
+          ```ts
+          let x: typeof data // CountryRowProperties & { status: "A" | "B" } | null
           ```
         hideCodeBlock: true
         isSpotlight: true

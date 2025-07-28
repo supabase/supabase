@@ -9,7 +9,7 @@ import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { LintEntity, NoIssuesFound, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
   Button,
@@ -43,7 +43,7 @@ const LinterDataGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
   const router = useRouter()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const snap = useAiAssistantStateSnapshot()
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
 
@@ -243,7 +243,8 @@ const LinterDataGrid = ({
                           <Button
                             icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
                             onClick={() => {
-                              setAiAssistantPanel({
+                              snap.newChat({
+                                name: 'Summarize lint',
                                 open: true,
                                 initialInput: `Summarize the issue and suggest fixes: ${lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
                                 \nEntity: ${(selectedLint.metadata && (selectedLint.metadata.entity || (selectedLint.metadata.schema && selectedLint.metadata.name && `${selectedLint.metadata.schema}.${selectedLint.metadata.name}`))) ?? ''}

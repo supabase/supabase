@@ -1,4 +1,4 @@
-import { Code } from 'lucide-react'
+import { Blocks, Code, Database, History, Search } from 'lucide-react'
 
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
@@ -103,5 +103,71 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
       },
     ],
     { ...options, deps: [ref] }
+  )
+
+  useRegisterCommands(
+    COMMAND_MENU_SECTIONS.DATABASE,
+    [
+      {
+        id: 'run-schema-visualizer',
+        name: 'View your schemas',
+        route: `/project/${ref}/database/schemas`,
+        icon: () => <Search />,
+      },
+      {
+        id: 'run-view-database-functions',
+        name: 'View and create functions',
+        route: `/project/${ref}/database/functions`,
+        icon: () => <Database />,
+      },
+      {
+        id: 'run-view-database-triggers',
+        name: 'View and create triggers',
+        route: `/project/${ref}/database/triggers`,
+        icon: () => <Database />,
+      },
+      {
+        id: 'run-view-database-enumerated-types',
+        name: 'View and create enumerated types',
+        route: `/project/${ref}/database/types`,
+        icon: () => <Database />,
+      },
+      {
+        id: 'run-view-database-extensions',
+        name: 'View your extensions',
+        route: `/project/${ref}/database/extensions`,
+        icon: () => <Blocks />,
+      },
+      {
+        id: 'run-view-database-indexes',
+        name: 'View and create indexes',
+        route: `/project/${ref}/database/indexes`,
+        icon: () => <Database />,
+      },
+      {
+        id: 'run-view-database-roles',
+        name: 'View your roles',
+        route: `/project/${ref}/database/roles`,
+        icon: () => <Database />,
+      },
+      {
+        id: 'run-view-database-backups',
+        name: 'View your backups',
+        route: `/project/${ref}/database/backups/scheduled`,
+        icon: () => <Database />,
+      },
+      {
+        id: 'run-view-database-migrations',
+        name: 'View your migrations',
+        route: `/project/${ref}/database/migrations`,
+        icon: () => <History />,
+      },
+    ],
+    {
+      ...options,
+      deps: [ref],
+      orderSection: orderCommandSectionsByPriority,
+      sectionMeta: { priority: 3 },
+    }
   )
 }

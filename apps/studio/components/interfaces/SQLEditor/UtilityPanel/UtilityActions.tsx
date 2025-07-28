@@ -1,11 +1,11 @@
 import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -80,6 +80,7 @@ const UtilityActions = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            data-testId="sql-editor-utility-actions"
             type="default"
             className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
             icon={<MoreVertical className="text-foreground-light" />}
@@ -176,12 +177,17 @@ const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
-          <DatabaseSelector
-            selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
-            variant="connected-on-right"
-            onSelectId={onSelectDatabase}
+          {IS_PLATFORM && (
+            <DatabaseSelector
+              selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
+              variant="connected-on-right"
+              onSelectId={onSelectDatabase}
+            />
+          )}
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
           />
-          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <SqlRunButton
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}

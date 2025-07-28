@@ -5,7 +5,6 @@ import { useParams } from 'common'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import dayjs from 'dayjs'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -43,24 +42,24 @@ export function DiskSizeField({
     isLoading: isLoadingDiskAttributes,
     error: diskAttributesError,
     isError: isDiskAttributesError,
-  } = useDiskAttributesQuery({ projectRef })
-  const {
-    data: subscription,
-    error: subscriptionError,
-    isError: isSubscriptionError,
-  } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
+  } = useDiskAttributesQuery(
+    { projectRef },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
+
   const {
     data: diskUtil,
     error: diskUtilError,
     isError: isDiskUtilizationError,
-  } = useDiskUtilizationQuery({
-    projectRef: projectRef,
-  })
+  } = useDiskUtilizationQuery(
+    {
+      projectRef: projectRef,
+    },
+    { enabled: project && project.cloud_provider !== 'FLY' }
+  )
 
-  const error = subscriptionError || diskUtilError || diskAttributesError
-  const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError
+  const error = diskUtilError || diskAttributesError
+  const isError = isDiskUtilizationError || isDiskAttributesError
 
   // coming up typically takes 5 minutes, and the request is cached for 5 mins
   // so doing less than 10 mins to account for both
@@ -71,7 +70,7 @@ export function DiskSizeField({
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
 
-  const planId = subscription?.plan.id ?? 'free'
+  const planId = org?.plan.id ?? 'free'
 
   const { includedDiskGB: includedDiskGBMeta } =
     PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
@@ -89,7 +88,7 @@ export function DiskSizeField({
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   return (
-    <div className="grid grid-cols-12 gap-5">
+    <div className="grid @xl:grid-cols-12 gap-5">
       <div className="col-span-4">
         <FormField_Shadcn_
           name="totalSize"
@@ -153,7 +152,7 @@ export function DiskSizeField({
           />
           <span className="text-foreground-lighter text-sm">
             {includedDiskGB > 0 &&
-              subscription?.plan.id &&
+              org?.plan.id &&
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
 
             <div className="mt-3">

@@ -4,11 +4,10 @@ import type { AuthError } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useAddLoginEvent } from 'data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -29,9 +28,21 @@ const SignInForm = () => {
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const [returnTo, setReturnTo] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Only call getReturnToPath after component mounts client-side
+    setReturnTo(getReturnToPath())
+  }, [])
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: addLoginEvent } = useAddLoginEvent()
+
+  let forgotPasswordUrl = `/forgot-password`
+
+  if (returnTo && !returnTo.includes('/forgot-password')) {
+    forgotPasswordUrl = `${forgotPasswordUrl}?returnTo=${encodeURIComponent(returnTo)}`
+  }
 
   const onSignIn = async ({ email, password }: { email: string; password: string }) => {
     const toastId = toast.loading('Signing in...')
@@ -63,15 +74,18 @@ const SignInForm = () => {
 
         toast.success(`Signed in successfully!`, { id: toastId })
         sendEvent({
-          action: TelemetryActions.SIGN_IN,
+          action: 'sign_in',
           properties: { category: 'account', method: 'email' },
         })
         addLoginEvent({})
 
         await queryClient.resetQueries()
-        const returnTo = getReturnToPath()
         // since we're already on the /sign-in page, prevent redirect loops
-        router.push(returnTo === '/sign-in' ? '/projects' : returnTo)
+        let redirectPath = '/organizations'
+        if (returnTo && returnTo !== '/sign-in') {
+          redirectPath = returnTo
+        }
+        router.push(redirectPath)
       } catch (error: any) {
         toast.error(`Failed to sign in: ${(error as AuthError).message}`, { id: toastId })
         Sentry.captureMessage('[CRITICAL] Failed to sign in via EP: ' + error.message)
@@ -125,7 +139,7 @@ const SignInForm = () => {
 
               {/* positioned using absolute instead of labelOptional prop so tabbing between inputs works smoothly */}
               <Link
-                href="/forgot-password"
+                href={forgotPasswordUrl}
                 className="absolute top-0 right-0 text-sm text-foreground-lighter"
               >
                 Forgot Password?

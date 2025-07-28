@@ -188,10 +188,6 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         label: 'Overview',
       },
       {
-        route: 'keys',
-        label: 'Keys',
-      },
-      {
         route: 'secrets',
         label: 'Secrets',
       },
@@ -203,16 +199,6 @@ const supabaseIntegrations: IntegrationDefinition[] = [
             () =>
               import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
                 (mod) => mod.IntegrationOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
-        case 'keys':
-          return dynamic(
-            () =>
-              import('../Vault/Keys/EncryptionKeysManagement').then(
-                (mod) => mod.EncryptionKeysManagement
               ),
             {
               loading: Loading,

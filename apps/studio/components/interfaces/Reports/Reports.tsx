@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { groupBy, isEqual, isNull } from 'lodash'
 import { ArrowRight, Plus, RefreshCw, Save } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { DateRangePicker } from 'components/ui/DateRangePicker'
@@ -16,14 +17,20 @@ import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useContentQuery } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from 'data/content/content-upsert-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Dashboards } from 'types'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
@@ -35,9 +42,12 @@ const DEFAULT_CHART_ROW_COUNT = 1
 const Reports = () => {
   const { id, ref } = useParams()
   const { profile } = useProfile()
+  const { project } = useProjectContext()
+  const selectedOrg = useSelectedOrganization()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
 
+  const [isDraggedOver, setIsDraggedOver] = useState(false)
   const [config, setConfig] = useState<Dashboards.Content>()
   const [startDate, setStartDate] = useState<string>()
   const [endDate, setEndDate] = useState<string>()
@@ -53,14 +63,15 @@ const Reports = () => {
     type: 'report',
   })
   const { mutate: upsertContent, isLoading: isSaving } = useContentUpsertMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       setHasEdits(false)
-      toast.success('Successfully saved report!')
+      if (vars.payload.type === 'report') toast.success('Successfully saved report!')
     },
-    onError: (error) => {
-      toast.error(`Failed to update report: ${error.message}`)
+    onError: (error, vars) => {
+      if (vars.payload.type === 'report') toast.error(`Failed to update report: ${error.message}`)
     },
   })
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const currentReport = userContents?.content.find((report) => report.id === id)
   const currentReportContent = currentReport?.content as Dashboards.Content
@@ -90,7 +101,7 @@ const Reports = () => {
   function checkEditState() {
     if (config === undefined) return
     /*
-     * Shallow copying the config state variable maintains a mobx reference
+     * Shallow copying the config state variable maintains a reference
      * Instead, we stringify it and parse it again to remove anything
      * that can be mutated at component state level.
      *
@@ -262,6 +273,77 @@ const Reports = () => {
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
+  const onDragOverEmptyState = (event: DragEvent<HTMLDivElement>) => {
+    if (event.type === 'dragover' && !isDraggedOver) {
+      setIsDraggedOver(true)
+    } else if (event.type === 'dragleave' || event.type === 'drop') {
+      setIsDraggedOver(false)
+    }
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  const onDropSQLBlockEmptyState = (event: DragEvent<HTMLDivElement>) => {
+    onDragOverEmptyState(event)
+    if (!ref) return console.error('Project ref is required')
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+    if (!config) return console.error('Chart configuration is required')
+
+    const data = event.dataTransfer.getData('application/json')
+    if (!data) return
+
+    const queryData = JSON.parse(data)
+    const { label, sql, config: sqlConfig } = queryData
+    if (!label || !sql) return console.error('SQL and Label required')
+
+    const toastId = toast.loading(`Creating new query: ${label}`)
+    const id = uuidv4()
+
+    const updatedLayout = [...config.layout]
+    updatedLayout.push({
+      id,
+      label,
+      x: 0,
+      y: 0,
+      chart_type: 'bar',
+      attribute: `new_snippet_${id}` as Dashboards.ChartType,
+      w: DEFAULT_CHART_COLUMN_COUNT,
+      h: DEFAULT_CHART_ROW_COUNT,
+      chartConfig: { ...DEFAULT_CHART_CONFIG, ...(sqlConfig ?? {}) },
+      provider: undefined as any,
+    })
+
+    setConfig({ ...config, layout: [...updatedLayout] })
+
+    const payload = createSqlSnippetSkeletonV2({
+      id,
+      name: label,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+    }) as UpsertContentPayload
+
+    upsertContent(
+      { projectRef: ref, payload },
+      {
+        onSuccess: () => {
+          toast.success(`Successfully created new query: ${label}`, { id: toastId })
+          const finalLayout = updatedLayout.map((x) => {
+            if (x.id === id) {
+              return { ...x, attribute: `snippet_${id}` as Dashboards.ChartType }
+            } else return x
+          })
+          setConfig({ ...config, layout: finalLayout })
+        },
+      }
+    )
+    sendEvent({
+      action: 'custom_report_assistant_sql_block_added',
+      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
+    })
+  }
+
   useEffect(() => {
     if (isSuccess && currentReportContent !== undefined) setConfig(currentReportContent)
   }, [isSuccess, currentReportContent])
@@ -379,15 +461,21 @@ const Reports = () => {
         </div>
       </div>
 
-      {config?.layout !== undefined && config.layout.length <= 0 ? (
-        <div className="flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default">
+      {config?.layout !== undefined && config.layout.length === 0 ? (
+        <div
+          className={cn(
+            'flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default transition duration-100',
+            isDraggedOver ? 'bg-surface-100' : ''
+          )}
+          onDragOver={onDragOverEmptyState}
+          onDragLeave={onDragOverEmptyState}
+          onDrop={onDropSQLBlockEmptyState}
+        >
           {canUpdateReport ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" iconRight={<Plus size={14} />}>
-                  <span>
-                    {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
-                  </span>
+                  Add your first chart
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="center">

@@ -175,8 +175,8 @@ export const pricing: Pricing = {
         title: 'Branching',
         plans: {
           free: false,
-          pro: '$0.32 per branch, per day',
-          team: '$0.32 per branch, per day',
+          pro: '$0.01344 per branch, per hour',
+          team: '$0.01344 per branch, per hour',
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -421,8 +421,8 @@ export const pricing: Pricing = {
         title: 'Max file upload size',
         plans: {
           free: '50 MB',
-          pro: '50 GB',
-          team: '50 GB',
+          pro: '500 GB',
+          team: '500 GB',
           enterprise: 'Custom',
         },
         usage_based: false,
@@ -476,28 +476,6 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
-      },
-      {
-        key: 'functions.scriptSize',
-        title: 'Script size',
-        plans: {
-          free: '20 MB',
-          pro: '20 MB',
-          team: '20 MB',
-          enterprise: 'Custom',
-        },
-        usage_based: false,
-      },
-      {
-        key: 'functions.numberOfFunctions',
-        title: 'Number of functions',
-        plans: {
-          free: '25 included',
-          pro: '500 included',
-          team: '1000 included',
-          enterprise: 'Unlimited',
-        },
-        usage_based: false,
       },
     ],
   },
@@ -585,7 +563,7 @@ export const pricing: Pricing = {
     features: [
       {
         key: 'security.byoc',
-        title: 'On Premises / BYO cloud',
+        title: 'BYO cloud',
         plans: {
           free: false,
           pro: false,
@@ -613,8 +591,8 @@ export const pricing: Pricing = {
           pro: false,
           team: [
             '$60 per drain per month',
-            'and $0.20 per Million processed',
-            'and $0.09 per GB bandwidth',
+            '+ $0.20 per million events',
+            '+ $0.09 per GB bandwidth',
           ],
           enterprise: 'Custom',
         },
@@ -681,7 +659,7 @@ export const pricing: Pricing = {
         plans: {
           free: 'Owner, Admin, Developer',
           pro: 'Owner, Admin, Developer',
-          team: 'Owner, Admin, Developer, Read-only',
+          team: 'Owner, Admin, Developer, Read-only, Predefined project scoped roles',
           enterprise: 'Custom project scoped roles',
         },
         usage_based: false,

@@ -1,8 +1,8 @@
 import { useChat } from 'ai/react'
 import { useEffect, useState } from 'react'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { Markdown } from 'components/interfaces/Markdown'
+import { onErrorChat } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { BASE_PATH } from 'lib/constants'
 import { AiIconAnimation, Button, Label_Shadcn_, Textarea } from 'ui'
@@ -45,6 +45,7 @@ export const SchemaGenerator = ({
     api: `${BASE_PATH}/api/ai/onboarding/design`,
     id: 'schema-generator',
     maxSteps: 7,
+    onError: onErrorChat,
     onFinish: () => {
       setInput('')
     },
@@ -172,14 +173,14 @@ export const SchemaGenerator = ({
                 // distinguish between initial step or second step
                 if (step === 'initial') {
                   sendEvent({
-                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED,
+                    action: 'project_creation_initial_step_prompt_intended',
                     properties: {
                       isNewPrompt,
                     },
                   })
                 } else {
                   sendEvent({
-                    action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED,
+                    action: 'project_creation_second_step_prompt_intended',
                     properties: {
                       isNewPrompt,
                     },

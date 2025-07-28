@@ -238,16 +238,9 @@ const BasicAuthSettingsForm = () => {
                     <WarningIcon />
                     <AlertTitle_Shadcn_>
                       We highly recommend{' '}
-                      <span
-                        tabIndex={1}
-                        className="cursor-pointer underline"
-                        onClick={() => {
-                          const el = document.getElementById('enable-captcha')
-                          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                        }}
-                      >
+                      <InlineLink href={`/project/${projectRef}/auth/protection`}>
                         enabling captcha
-                      </span>{' '}
+                      </InlineLink>{' '}
                       for anonymous sign-ins
                     </AlertTitle_Shadcn_>
                     <AlertDescription_Shadcn_>
