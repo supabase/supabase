@@ -11,6 +11,7 @@ import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
 import {
@@ -50,7 +51,20 @@ export const RealtimeSettings = () => {
     projectRef,
   })
 
+  const { data: policies } = useDatabasePoliciesQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    schema: 'realtime',
+  })
+
   const isUsageBillingEnabled = organization?.usage_billing_enabled
+
+  // Check if RLS policies exist for realtime.messages table
+  const realtimeMessagesPolicies = policies?.filter(
+    (policy) => policy.schema === 'realtime' && policy.table === 'messages'
+  )
+  const hasRealtimeMessagesPolicies =
+    realtimeMessagesPolicies && realtimeMessagesPolicies.length > 0
 
   const { mutate: updateRealtimeConfig, isLoading: isUpdatingConfig } =
     useRealtimeConfigurationUpdateMutation({
@@ -132,6 +146,27 @@ export const RealtimeSettings = () => {
                             />
                           </FormControl_Shadcn_>
                         </FormItemLayout>
+
+                        {!hasRealtimeMessagesPolicies && (
+                          <Admonition
+                            showIcon={false}
+                            type="warning"
+                            title="RLS policies recommended"
+                            description={
+                              <>
+                                Private mode requires RLS policies on the{' '}
+                                <code className="text-xs text-brand">realtime.messages</code> table to function
+                                properly.{' '}
+                                <InlineLink
+                                  href={`/project/${projectRef}/auth/policies?schema=realtime&search=messages`}
+                                >
+                                  Add RLS policies
+                                </InlineLink>{' '}
+                                or Realtime won't work.
+                              </>
+                            }
+                          />
+                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}
