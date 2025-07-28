@@ -25,7 +25,7 @@ interface IntegrationTabsProps {
 export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
   const navRef = useRef(null)
   const { project } = useProjectContext()
-  const { id, pageId, childId } = useParams()
+  const { id, pageId, childId, childLabel } = useParams()
   const isMobile = useBreakpoint('md')
 
   const { installedIntegrations } = useInstalledIntegrations()
@@ -97,7 +97,9 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
                       >
                         <NavMenuItem active={true} className="flex items-center gap-2">
                           {tab.childIcon}
-                          <Link href={`${tabUrl}/${childId}`}>{childId}</Link>
+                          <Link href={`${tabUrl}/${childId}`}>
+                            {childLabel ? childLabel : childId}
+                          </Link>
                         </NavMenuItem>
                       </motion.div>
                     </>

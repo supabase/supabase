@@ -1,12 +1,12 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
 import { toPng, toSvg } from 'html-to-image'
-import { Download, Loader2 } from 'lucide-react'
+import { Check, Download, Loader2, Clipboard, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
@@ -16,13 +16,13 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { toast } from 'sonner'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
-
+import { copyToClipboard } from 'ui'
+import { tablesToSQL } from 'lib/helpers'
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
@@ -30,6 +30,13 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    if (copied) {
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }, [copied])
 
   const [isDownloading, setIsDownloading] = useState(false)
 
@@ -193,6 +200,32 @@ export const SchemaGraph = () => {
               onSelectSchema={setSelectedSchema}
             />
             <div className="flex items-center gap-x-2">
+              <ButtonTooltip
+                type="outline"
+                icon={copied ? <Check /> : <Clipboard />}
+                onClick={() => {
+                  if (tables) {
+                    copyToClipboard(tablesToSQL(tables))
+                    setCopied(true)
+                  }
+                }}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: (
+                      <div className="max-w-[180px] space-y-2 text-foreground-light">
+                        <p className="text-foreground">Note</p>
+                        <p>
+                          This schema is for context or debugging only. Table order and constraints
+                          may be invalid. Not meant to be run as-is.
+                        </p>
+                      </div>
+                    ),
+                  },
+                }}
+              >
+                Copy as SQL
+              </ButtonTooltip>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <ButtonTooltip

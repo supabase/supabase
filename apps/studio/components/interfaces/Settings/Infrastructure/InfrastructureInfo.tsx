@@ -13,12 +13,12 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useProjectServiceVersionsQuery } from 'data/projects/project-service-versions'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
-  Button,
   Input,
   Tooltip,
   TooltipContent,
@@ -26,6 +26,12 @@ import {
 } from 'ui'
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import {
+  ObjectsToBeDroppedWarning,
+  ReadReplicasWarning,
+  UnsupportedExtensionsWarning,
+  UserDefinedObjectsInInternalSchemasWarning,
+} from './UpgradeWarnings'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
@@ -54,19 +60,25 @@ const InfrastructureInfo = () => {
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
   const { current_app_version, current_app_version_release_channel, latest_app_version } =
     data || {}
+
   const isOnLatestVersion = current_app_version === latest_app_version
   const currentPgVersion = (current_app_version ?? '')
     .split('supabase-postgres-')[1]
     ?.replace('-orioledb', '')
-  const isOnNonGenerallyAvailableReleaseChannel =
-    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+  const isVisibleReleaseChannel =
+    current_app_version_release_channel &&
+    !['ga', 'withdrawn'].includes(current_app_version_release_channel)
       ? current_app_version_release_channel
       : undefined
-  const isOrioleDb = (current_app_version ?? '').includes('orioledb')
+  const isOrioleDb = useIsOrioleDb()
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
+
+  const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
+  const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
+  const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
 
   return (
     <>
@@ -133,32 +145,30 @@ const InfrastructureInfo = () => {
                           value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
                           label="Postgres version"
                           actions={[
-                            isOnNonGenerallyAvailableReleaseChannel && (
+                            isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1 capitalize">
-                                    {isOnNonGenerallyAvailableReleaseChannel}
+                                    {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
-                                  database version release
+                                  This project uses a {isVisibleReleaseChannel} database version
+                                  release
                                 </TooltipContent>
                               </Tooltip>
                             ),
                             isOrioleDb && (
-                              <>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Badge variant="default" className="mr-1">
-                                      OrioleDB
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom" className="w-44 text-center">
-                                    This project uses OrioleDB
-                                  </TooltipContent>
-                                </Tooltip>
-                              </>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Badge variant="default" className="mr-1">
+                                    OrioleDB
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="w-44 text-center">
+                                  This project uses OrioleDB
+                                </TooltipContent>
+                              </Tooltip>
                             ),
                             isOnLatestVersion && (
                               <Tooltip>
@@ -178,59 +188,29 @@ const InfrastructureInfo = () => {
                       </>
                     )}
 
-                    {data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
-                    {data.eligible && hasReadReplicas && (
-                      <Alert_Shadcn_>
-                        <AlertTitle_Shadcn_>
-                          A new version of Postgres is available for your project
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          You will need to remove all read replicas prior to upgrading your Postgres
-                          version to the latest available ({latestPgVersion}).
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-                    {!data?.eligible && (data?.extension_dependent_objects || []).length > 0 && (
-                      <Alert_Shadcn_
-                        variant="warning"
-                        title="A new version of Postgres is available for your project"
-                      >
-                        <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                          <div>
-                            <p className="mb-1">
-                              This project cannot be upgraded due to the following extension
-                              dependent objects:
-                            </p>
+                    {data.eligible ? (
+                      hasReadReplicas ? (
+                        <ReadReplicasWarning latestPgVersion={latestPgVersion} />
+                      ) : (
+                        <ProjectUpgradeAlert />
+                      )
+                    ) : null}
 
-                            <ul className="pl-4">
-                              {(data?.extension_dependent_objects || []).map((obj) => (
-                                <li className="list-disc" key={obj}>
-                                  {obj}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <p>
-                            Once the above objects are exported and removed, you can proceed to
-                            upgrade your project, and re-import the objects after the upgrade
-                            operation is complete. Please refer to the docs on additional extensions
-                            that might also need to be dropped.
-                          </p>
-                          <div>
-                            <Button size="tiny" type="default" asChild>
-                              <a
-                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                View docs
-                              </a>
-                            </Button>
-                          </div>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
+                    {!data.eligible ? (
+                      hasObjectsToBeDropped ? (
+                        <ObjectsToBeDroppedWarning
+                          objectsToBeDropped={data.objects_to_be_dropped}
+                        />
+                      ) : hasUnsupportedExtensions ? (
+                        <UnsupportedExtensionsWarning
+                          unsupportedExtensions={data.unsupported_extensions}
+                        />
+                      ) : hasObjectsInternalSchema ? (
+                        <UserDefinedObjectsInInternalSchemasWarning
+                          objects={data.user_defined_objects_in_internal_schemas}
+                        />
+                      ) : null
+                    ) : null}
                   </>
                 )}
               </>

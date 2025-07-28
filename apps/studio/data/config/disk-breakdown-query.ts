@@ -6,7 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 
 export type DiskBreakdownVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 type DiskBreakdownResult = {

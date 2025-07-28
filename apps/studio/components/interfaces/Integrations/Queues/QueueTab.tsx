@@ -91,7 +91,8 @@ export const QueueTab = () => {
     updateTable({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: queueTable.id,
+      name: queueTable.name,
       schema: 'pgmq',
       payload: payload,
     })

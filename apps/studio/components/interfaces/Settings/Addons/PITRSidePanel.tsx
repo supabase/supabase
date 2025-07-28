@@ -70,7 +70,6 @@ const PITRSidePanel = () => {
   const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'pitr'
 
-  const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
@@ -102,7 +101,6 @@ const PITRSidePanel = () => {
   const subscriptionPitr = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
-  const hasReadReplicas = (databases ?? []).length > 1
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
   const isFreePlan = subscription?.plan?.id === 'free'
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
@@ -110,8 +108,6 @@ const PITRSidePanel = () => {
     !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'
 
   // These are illegal states. If they are true, we should block the user from saving them.
-  const blockDowngradeDueToReadReplicas =
-    hasChanges && hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
   const blockDowngradeDueToHipaa =
     hasHipaaAddon &&
     (selectedCategory !== 'on' ||
@@ -154,19 +150,16 @@ const PITRSidePanel = () => {
         isSubmitting ||
         !canUpdatePitr ||
         (!!selectedPitr && !hasSufficientCompute) ||
-        blockDowngradeDueToHipaa ||
-        blockDowngradeDueToReadReplicas
+        blockDowngradeDueToHipaa
       }
       tooltip={
         blockDowngradeDueToHipaa
           ? 'Unable to disable PITR with HIPAA add-on'
-          : blockDowngradeDueToReadReplicas
-            ? 'Remove all read replicas before disabling PITR'
-            : isFreePlan
-              ? 'Unable to enable point in time recovery on a Free Plan'
-              : !canUpdatePitr
-                ? 'You do not have permission to update PITR'
-                : undefined
+          : isFreePlan
+            ? 'Unable to enable point in time recovery on a Free Plan'
+            : !canUpdatePitr
+              ? 'You do not have permission to update PITR'
+              : undefined
       }
       header={
         <div className="flex items-center justify-between">
@@ -267,25 +260,6 @@ const PITRSidePanel = () => {
                 </Button>
               </div>
             </Alert_Shadcn_>
-          ) : blockDowngradeDueToReadReplicas ? (
-            <Alert_Shadcn_>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>
-                Remove all read replicas before disabling PITR
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                You currently have active read replicas. The minimum compute size for using read
-                replicas is the Small Compute. You need to remove all read replicas before
-                downgrading Compute as it requires at least a Small compute instance.
-              </AlertDescription_Shadcn_>
-              <AlertDescription_Shadcn_ className="mt-2">
-                <Button asChild type="default">
-                  <Link href={`/project/${projectRef}/settings/infrastructure`}>
-                    Manage read replicas
-                  </Link>
-                </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
           ) : null}
 
           {selectedCategory === 'on' && (
@@ -354,7 +328,9 @@ const PITRSidePanel = () => {
                           {option.identifier.split('_')[1]} days ago
                         </p>
                         <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                          <p className="text-foreground text-sm" translate="no">
+                            {formatCurrency(option.price)}
+                          </p>
                           <p className="text-foreground-light translate-y-[1px]"> / month</p>
                         </div>
                       </div>
@@ -365,7 +341,7 @@ const PITRSidePanel = () => {
             </div>
           )}
 
-          {hasChanges && !blockDowngradeDueToReadReplicas && selectedOption !== 'pitr_0' && (
+          {hasChanges && selectedOption !== 'pitr_0' && (
             <p className="text-sm text-foreground-light">
               There are no immediate charges. The addon is billed at the end of your billing cycle
               based on your usage and prorated to the hour.

@@ -47,7 +47,7 @@ export const useAPIKeyDeleteMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to mutate: ${data.message}`)
+          toast.error(`Failed to delete API key: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

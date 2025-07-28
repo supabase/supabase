@@ -1,10 +1,10 @@
-import { getAccessToken, gotrueClient, type User } from 'common'
+import { getAccessToken, type User } from 'common/auth'
+import { gotrueClient } from 'common/gotrue'
 
 export const auth = gotrueClient
 export { getAccessToken }
 
-// [Joshen] We can flip this to /organizations once the new nav layout is permanent
-export const DEFAULT_FALLBACK_PATH = '/projects'
+export const DEFAULT_FALLBACK_PATH = '/organizations'
 
 export const validateReturnTo = (
   returnTo: string,
@@ -73,6 +73,11 @@ export const buildPathWithParams = (pathname: string) => {
 }
 
 export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
+  // If we're in a server environment, return the fallback
+  if (typeof location === 'undefined') {
+    return fallback
+  }
+
   const searchParams = new URLSearchParams(location.search)
 
   let returnTo = searchParams.get('returnTo') ?? fallback

@@ -8,7 +8,7 @@ import { sqlKeys } from './keys'
 export type QueryAbortVariables = {
   pid: number
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function abortQuery({ pid, projectRef, connectionString }: QueryAbortVariables) {

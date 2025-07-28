@@ -6,7 +6,6 @@ import { integrationKeys } from './keys'
 
 export async function getIntegrations(signal?: AbortSignal) {
   const { data, error } = await get('/platform/integrations', {
-    params: { query: { integration_name: '' } },
     signal,
   })
 

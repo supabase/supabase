@@ -73,7 +73,15 @@ export const generateDatabaseMenu = (
                 items: [],
               },
             ]
-          : []),
+          : [
+              {
+                name: 'Replication',
+                key: 'replication',
+                url: `/project/${ref}/database/replication`,
+                label: 'Coming Soon',
+                items: [],
+              },
+            ]),
       ],
     },
     {

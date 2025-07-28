@@ -24,7 +24,9 @@ breadcrumb: 'Migrations'
       On your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true).
 
       <Admonition type="note">
+
         Use the Session pooler connection string by default. If your ISP supports IPv6 or you have the IPv4 add-on enabled, use the direct connection string.
+
       </Admonition>
 
       Session pooler connection string:
@@ -112,7 +114,9 @@ breadcrumb: 'Migrations'
         Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
 
       <Admonition type="note">
+
         Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
+
       </Admonition>
 
         Session pooler connection string:
@@ -234,9 +238,7 @@ const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
 
 ;(async () => {
   const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-    db: {
-      schema: 'storage',
-    },
+    schema: 'storage',
   })
   const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
   const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)

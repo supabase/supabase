@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { constructHeaders, handleError } from 'data/fetchers'
+import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
@@ -32,7 +32,7 @@ export async function getEdgeFunctionBody(
     })
 
     // Send to our API for processing (the API will handle the fetch from v1 endpoint)
-    const parseResponse = await fetch(`${BASE_PATH}/api/edge-functions/body`, {
+    const parseResponse = await fetchHandler(`${BASE_PATH}/api/edge-functions/body`, {
       method: 'POST',
       body: JSON.stringify({ projectRef, slug }),
       headers,
@@ -54,10 +54,8 @@ export async function getEdgeFunctionBody(
     const { files } = await parseResponse.json()
     return files as EdgeFunctionFile[]
   } catch (error) {
-    console.error('Failed to parse edge function code:', error)
-    throw new Error(
-      'Failed to parse function code. The file may be corrupted or in an invalid format.'
-    )
+    handleError(error)
+    return []
   }
 }
 

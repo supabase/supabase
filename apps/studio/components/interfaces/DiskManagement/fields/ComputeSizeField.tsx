@@ -219,7 +219,10 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                         </div>
                                       ) : (
                                         <>
-                                          <span className="text-foreground text-sm font-semibold">
+                                          <span
+                                            className="text-foreground text-sm font-semibold"
+                                            translate="no"
+                                          >
                                             ${price}
                                           </span>
                                           <span className="text-foreground-light translate-y-[1px]">

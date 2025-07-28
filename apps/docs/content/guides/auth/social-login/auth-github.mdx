@@ -38,6 +38,24 @@ Copy your new OAuth credentials
 
 <$Partial path="social_provider_settings_supabase.mdx" variables={{ "provider": "GitHub" }} />
 
+You can also configure the GitHub auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure GitHub auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_github_enabled": true,
+    "external_github_client_id": "your-github-client-id",
+    "external_github_secret": "your-github-client-secret"
+  }'
+```
+
 ## Add login code to your client app
 
 <Tabs

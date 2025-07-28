@@ -32,7 +32,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb, useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDbInAws, useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
@@ -53,14 +53,14 @@ const Addons = () => {
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
-  const isOrioleDb = useIsOrioleDb()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && settings?.is_sensitive
 
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
@@ -486,7 +486,7 @@ const Addons = () => {
                           </Button>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
-                    ) : isOrioleDb ? (
+                    ) : isOrioleDbInAws ? (
                       <ButtonTooltip
                         disabled
                         type="default"

@@ -4,9 +4,9 @@ import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 const NODE_SEP = 25
 const RANK_SEP = 50

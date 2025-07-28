@@ -1,16 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import DatePicker from 'react-datepicker'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
-
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
-import type { DatetimeHelper } from './Logs.types'
 import { ChevronLeft, ChevronRight, Clock, XIcon } from 'lucide-react'
-import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
-import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
+import { PropsWithChildren, useEffect, useState } from 'react'
+import DatePicker from 'react-datepicker'
+
 import { Label } from '@ui/components/shadcn/ui/label'
+import { Badge } from '@ui/components/shadcn/ui/badge'
+import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
+import TimeSplitInput from 'components/ui/DatePicker/TimeSplitInput'
+import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
+import {
+  Button,
+  ButtonProps,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
+  copyToClipboard,
+} from 'ui'
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
-import { PropsWithChildren } from 'react'
+import type { DatetimeHelper } from './Logs.types'
 
 export type DatePickerValue = {
   to: string
@@ -21,11 +30,19 @@ export type DatePickerValue = {
 
 interface Props {
   value: DatePickerValue
-  onSubmit: (args: DatePickerValue) => void
   helpers: DatetimeHelper[]
+  onSubmit: (value: DatePickerValue) => void
+  buttonTriggerProps?: ButtonProps
+  popoverContentProps?: typeof PopoverContent_Shadcn_
 }
 
-export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<Props>) => {
+export const LogsDatePicker = ({
+  onSubmit,
+  helpers,
+  value,
+  buttonTriggerProps,
+  popoverContentProps,
+}: PropsWithChildren<Props>) => {
   const [open, setOpen] = useState(false)
 
   // Reset the state when the popover closes
@@ -176,12 +193,13 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
     fromDate.setHours(+startTime.HH, +startTime.mm, +startTime.ss)
     toDate.setHours(+endTime.HH, +endTime.mm, +endTime.ss)
 
-    navigator.clipboard.writeText(
+    copyToClipboard(
       JSON.stringify({
         from: fromDate.toISOString(),
         to: toDate.toISOString(),
       })
     )
+
     setCopied(true)
   }
 
@@ -194,28 +212,46 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
   }, [pasted])
 
   useEffect(() => {
-    document.addEventListener('paste', handlePaste)
-    document.addEventListener('copy', handleCopy)
+    if (open) {
+      document.addEventListener('paste', handlePaste)
+      document.addEventListener('copy', handleCopy)
+    }
     return () => {
       document.removeEventListener('paste', handlePaste)
       document.removeEventListener('copy', handleCopy)
     }
-  }, [startDate, endDate])
+  }, [open, startDate, endDate])
 
   const isLargeRange =
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
+  const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
+  const showHelperBadge = (helper?: DatetimeHelper) => {
+    if (!helper) return false
+    if (!helper.availableIn?.length) return false
+
+    if (helper.availableIn.includes('free')) return false
+    if (helper.availableIn.includes(orgPlan?.id || 'free') && !isOrgPlanLoading) return false
+    return true
+  }
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<Clock size={12} />}>
+        <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
           {value.isHelper
             ? value.text
             : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ side="bottom" align="start" className="flex w-full p-0">
+      <PopoverContent_Shadcn_
+        className="flex w-full p-0"
+        side="bottom"
+        align="end"
+        portal={true}
+        {...popoverContentProps}
+      >
         <RadioGroup
           onValueChange={handleHelperChange}
           value={value.isHelper ? value.text : ''}
@@ -225,7 +261,7 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
             <Label
               key={helper.text}
               className={cn(
-                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs',
+                '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
                 {
                   'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
                 }
@@ -239,6 +275,15 @@ export const LogsDatePicker = ({ onSubmit, helpers, value }: PropsWithChildren<P
                 aria-disabled={helper.disabled}
               ></RadioGroupItem>
               {helper.text}
+              {showHelperBadge(helper) ? (
+                <Badge
+                  size="small"
+                  variant="outline"
+                  className="h-5 text-[10px] text-foreground-light capitalize"
+                >
+                  {helper.availableIn?.[0] || ''}
+                </Badge>
+              ) : null}
             </Label>
           ))}
         </RadioGroup>
