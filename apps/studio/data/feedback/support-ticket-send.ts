@@ -52,7 +52,7 @@ export async function sendSupportTicket({
     },
   })
 
-  if (error) handleError(error)
+  if (error) handleError(error, { alwaysCapture: true })
   return data
 }
 

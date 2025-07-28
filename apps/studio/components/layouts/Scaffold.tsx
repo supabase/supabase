@@ -1,10 +1,8 @@
 import { forwardRef, HTMLAttributes } from 'react'
-
-import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
 export const MAX_WIDTH_CLASSES = 'mx-auto w-full max-w-[1200px]'
-export const PADDING_CLASSES = 'px-4 md:px-6 lg:px-14 xl:px-24 2xl:px-28'
+export const PADDING_CLASSES = 'px-4 @lg:px-6 @xl:px-12 @2xl:px-20 @3xl:px-24'
 export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
 
 /**
@@ -19,19 +17,27 @@ export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
  */
 export const ScaffoldContainer = forwardRef<
   HTMLDivElement,
-  HTMLAttributes<HTMLDivElement> & { bottomPadding?: boolean }
->(({ className, bottomPadding, ...props }, ref) => {
-  const { aiAssistantPanel } = useAppStateSnapshot()
-  const { open } = aiAssistantPanel
+  HTMLAttributes<HTMLDivElement> & {
+    bottomPadding?: boolean
+    size?: 'small' | 'default' | 'large' | 'full'
+  }
+>(({ className, bottomPadding, size = 'default', ...props }, ref) => {
+  const maxWidthClass = {
+    small: 'max-w-[768px]',
+    default: 'max-w-[1200px]',
+    large: 'max-w-[1600px]',
+    full: 'max-w-none',
+  }[size]
+
   return (
     <div
       ref={ref}
       {...props}
       className={cn(
-        MAX_WIDTH_CLASSES,
+        'mx-auto w-full',
+        maxWidthClass,
         PADDING_CLASSES,
         bottomPadding && 'pb-16',
-        open ? 'xl:px-6' : '',
         className
       )}
     />

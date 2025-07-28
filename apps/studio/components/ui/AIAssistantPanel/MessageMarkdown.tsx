@@ -1,22 +1,48 @@
-import { useRouter } from 'next/router'
-import { DragEvent, memo, ReactNode, useContext, useEffect, useMemo, useRef } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { TelemetryActions } from 'common/telemetry-constants'
+import { useRouter } from 'next/router'
+import {
+  DragEvent,
+  memo,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
+
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
+import Link from 'next/link'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { Dashboards } from 'types'
-import { Badge, cn, CodeBlock, CodeBlockLang } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  CodeBlock,
+  CodeBlockLang,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 import { DebouncedComponent } from '../DebouncedComponent'
+import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { QueryBlock } from '../QueryBlock/QueryBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { identifyQueryType } from './AIAssistant.utils'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { MessageContext } from './Message'
-import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
+import { defaultUrlTransform } from './Message.utils'
 
 export const OrderedList = memo(({ children }: { children: ReactNode }) => (
   <ol className="flex flex-col gap-y-4">{children}</ol>
@@ -40,17 +66,63 @@ export const InlineCode = memo(
 )
 InlineCode.displayName = 'InlineCode'
 
-export const Link = memo(({ href, children }: { href?: string; children: ReactNode }) => (
-  <a
-    target="_blank"
-    rel="noopener noreferrer"
-    href={href}
-    className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
-  >
-    {children}
-  </a>
-))
-Link.displayName = 'Link'
+export const Hyperlink = memo(({ href, children }: { href?: string; children: ReactNode }) => {
+  const isExternalURL = !href?.startsWith('https://supabase.com/dashboard')
+  const safeUrl = defaultUrlTransform(href ?? '')
+  const isSafeUrl = safeUrl.length > 0
+
+  if (!isSafeUrl) {
+    return <span className="text-foreground">{children}</span>
+  }
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <span
+          className={cn(
+            '!m-0 text-foreground cursor-pointer transition',
+            'underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground-lighter'
+          )}
+        >
+          {children}
+        </span>
+      </DialogTrigger>
+      <DialogContent size="small">
+        <DialogHeader className="border-b">
+          <DialogTitle>Verify the link before navigating</DialogTitle>
+        </DialogHeader>
+
+        <DialogSection className="flex flex-col">
+          <p className="text-sm text-foreground-light">
+            This link will take you to the following URL:
+          </p>
+          <p className="text-sm text-foreground">{safeUrl}</p>
+          <p className="text-sm text-foreground-light mt-2">Are you sure you want to head there?</p>
+        </DialogSection>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="default" className="opacity-100">
+              Cancel
+            </Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button asChild type="primary" className="opacity-100">
+              {isExternalURL ? (
+                <a href={safeUrl} target="_blank" rel="noreferrer noopener">
+                  Head to link
+                </a>
+              ) : (
+                <Link href={safeUrl}>Head to link</Link>
+              )}
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+})
+Hyperlink.displayName = 'Hyperlink'
 
 const MemoizedQueryBlock = memo(
   ({
@@ -62,7 +134,9 @@ const MemoizedQueryBlock = memo(
     isLoading,
     isDraggable,
     runQuery,
+    results,
     onRunQuery,
+    onResults,
     onDragStart,
     onUpdateChartConfig,
   }: {
@@ -74,7 +148,9 @@ const MemoizedQueryBlock = memo(
     isLoading: boolean
     isDraggable: boolean
     runQuery: boolean
+    results?: any[]
     onRunQuery: (queryType: 'select' | 'mutation') => void
+    onResults: (results: any[]) => void
     onDragStart: (e: DragEvent<Element>) => void
     onUpdateChartConfig?: ({
       chart,
@@ -85,7 +161,7 @@ const MemoizedQueryBlock = memo(
     }) => void
   }) => (
     <DebouncedComponent
-      delay={500}
+      delay={isLoading ? 500 : 0}
       value={sql}
       fallback={
         <div className="bg-surface-100 border-overlay rounded border shadow-sm px-3 py-2 text-xs">
@@ -95,6 +171,7 @@ const MemoizedQueryBlock = memo(
     >
       <QueryBlock
         lockColumns
+        showRunButtonIfNotReadOnly
         label={title}
         sql={sql}
         chartConfig={{
@@ -119,7 +196,9 @@ const MemoizedQueryBlock = memo(
         isLoading={isLoading}
         draggable={isDraggable}
         runQuery={runQuery}
+        results={results}
         onRunQuery={onRunQuery}
+        onResults={onResults}
         onDragStart={onDragStart}
         onUpdateChartConfig={onUpdateChartConfig}
       />
@@ -128,12 +207,30 @@ const MemoizedQueryBlock = memo(
 )
 MemoizedQueryBlock.displayName = 'MemoizedQueryBlock'
 
-export const MarkdownPre = ({ children }: { children: any }) => {
+export const MarkdownPre = ({
+  children,
+  id,
+  onResults,
+}: {
+  children: any
+  id: string
+  onResults: ({
+    messageId,
+    resultId,
+    results,
+  }: {
+    messageId: string
+    resultId?: string
+    results: any[]
+  }) => void
+}) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { isLoading, readOnly } = useContext(MessageContext)
   const { mutate: sendEvent } = useSendEventMutation()
-  const supportSQLBlocks = useFlag('reportsV2')
+  const snap = useAiAssistantStateSnapshot()
+  const project = useSelectedProject()
+  const org = useSelectedOrganization()
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -153,21 +250,26 @@ export const MarkdownPre = ({ children }: { children: any }) => {
   const rawContent = children[0].props.children[0]
   const propsMatch = rawContent.match(/(?:--|\/\/)\s*props:\s*(\{[^}]+\})/)
 
-  const snippetProps: AssistantSnippetProps = useMemo(
-    () => (propsMatch ? JSON.parse(propsMatch[1]) : {}),
-    [propsMatch]
-  )
+  const snippetProps: AssistantSnippetProps = useMemo(() => {
+    try {
+      if (propsMatch) {
+        return JSON.parse(propsMatch[1])
+      }
+    } catch {}
+    return {}
+  }, [propsMatch])
 
   const { xAxis, yAxis } = snippetProps
+  const snippetId = snippetProps.id
   const title = snippetProps.title || (language === 'edge' ? 'Edge Function' : 'SQL Query')
   const isChart = snippetProps.isChart === 'true'
   const runQuery = snippetProps.runQuery === 'true'
+  const results = snap.getCachedSQLResults({ messageId: id, snippetId })
 
   // Strip props from the content for both SQL and edge functions
   const cleanContent = rawContent.replace(/(?:--|\/\/)\s*props:\s*\{[^}]+\}/, '').trim()
 
-  const isDraggableToReports =
-    supportSQLBlocks && canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
+  const isDraggableToReports = canCreateSQLSnippet && router.pathname.endsWith('/reports/[id]')
 
   useEffect(() => {
     chartConfig.current = {
@@ -179,20 +281,31 @@ export const MarkdownPre = ({ children }: { children: any }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snippetProps])
 
+  const onResultsReturned = useCallback(
+    (results: any[]) => {
+      onResults({ messageId: id, resultId: snippetProps.id, results })
+    },
+    [onResults, snippetProps.id]
+  )
+
   const onRunQuery = async (queryType: 'select' | 'mutation') => {
     sendEvent({
-      action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
+      action: 'assistant_suggestion_run_query_clicked',
       properties: {
         queryType,
         ...(queryType === 'mutation'
           ? { category: identifyQueryType(cleanContent) ?? 'unknown' }
           : {}),
       },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
     })
   }
 
   return (
-    <div className="w-auto -ml-[36px] overflow-x-hidden">
+    <div className="w-auto overflow-x-hidden not-prose">
       {language === 'edge' ? (
         <EdgeFunctionBlock
           label={title}
@@ -212,8 +325,10 @@ export const MarkdownPre = ({ children }: { children: any }) => {
             isChart={isChart}
             isLoading={isLoading}
             isDraggable={isDraggableToReports}
-            runQuery={runQuery}
+            runQuery={!results && runQuery}
+            results={results}
             onRunQuery={onRunQuery}
+            onResults={onResultsReturned}
             onUpdateChartConfig={({ chartConfig: config }) => {
               chartConfig.current = { ...chartConfig.current, ...config }
             }}

@@ -19,12 +19,17 @@ export const SqlRunButton = ({
 }: SqlRunButtonProps) => {
   const os = detectOS()
 
+  function handleOnClick() {
+    onClick()
+  }
+
   return (
     <Button
-      onClick={onClick}
+      onClick={handleOnClick}
       disabled={isDisabled}
       type="primary"
       size="tiny"
+      data-testid="sql-run-button"
       iconRight={
         isExecuting ? (
           <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />

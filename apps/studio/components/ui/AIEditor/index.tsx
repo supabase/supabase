@@ -18,7 +18,7 @@ interface AIEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
+    connectionString?: string | null
     includeSchemaMetadata?: boolean
   }
   initialPrompt?: string
@@ -125,6 +125,19 @@ const AIEditor = ({
       }
     }
 
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/lib.deno.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
+    // Add edge runtime types to the TS language service
+    fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/deno/edge-runtime.d.ts`)
+      .then((response) => response.text())
+      .then((code) => {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(code)
+      })
+
     if (!!executeQueryRef.current) {
       editor.addAction({
         id: 'run-query',
@@ -182,8 +195,10 @@ const AIEditor = ({
       }))
 
       const headerData = await constructHeaders()
+      const authorizationHeader = headerData.get('Authorization')
+
       await complete(prompt, {
-        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           ...aiMetadata,
           completionMetadata: {
@@ -216,6 +231,20 @@ const AIEditor = ({
   useEffect(() => {
     setCurrentValue(value || defaultValue)
   }, [value, defaultValue])
+
+  useEffect(() => {
+    if (initialPrompt) {
+      setPromptInput(initialPrompt)
+      setPromptState({
+        isOpen: Boolean(initialPrompt),
+        selection: '',
+        beforeSelection: '',
+        afterSelection: '',
+        startLineNumber: 0,
+        endLineNumber: 0,
+      })
+    }
+  }, [initialPrompt])
 
   useEffect(() => {
     if (!isDiffMode) {
@@ -260,7 +289,7 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}
@@ -299,7 +328,7 @@ const AIEditor = ({
       ) : (
         <div className="w-full h-full relative">
           <Editor
-            theme="vs-dark"
+            theme="supabase"
             language={language}
             value={currentValue}
             options={defaultOptions}

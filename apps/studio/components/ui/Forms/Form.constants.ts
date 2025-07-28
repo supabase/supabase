@@ -1,19 +1,5 @@
 import * as z from 'zod'
 
-// This validator validates a string to be a positive integer or if it's an empty string, transforms it to a null
-export const StringToPositiveNumber = z.union([
-  // parse the value if it's a number
-  z.number().positive().int(),
-  // parse the value if it's a non-empty string
-  z.string().min(1).pipe(z.coerce.number().positive().int()),
-  // transform a non-empty string into a null value
-  z
-    .string()
-    .max(0, 'The field accepts only a number')
-    .transform((v) => null),
-  z.null(),
-])
-
 export const StringNumberOrNull = z
   .string()
   .transform((v) => (v === '' ? null : v))
@@ -22,3 +8,10 @@ export const StringNumberOrNull = z
     message: 'Invalid number',
   })
   .transform((value) => (value === null ? null : Number(value)))
+
+/**
+ * [Joshen] After wrangling with RHF I think this is the easiest way to handle nullable number fields
+ * - Declare the field normally as you would in the zod form schema (e.g field: z.number().nullable())
+ * - In the InputField, add a form.register call `{...form.register('field_name', { setValueAs: setValueAsNullableNumber })}`
+ */
+export const setValueAsNullableNumber = (v: any) => (v === '' || v === null ? null : parseInt(v))

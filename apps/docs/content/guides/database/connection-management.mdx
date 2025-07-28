@@ -23,6 +23,32 @@ These numbers are generalizations and depends on other Supabase products that yo
 
 ### Capturing historical usage
 
+#### Dashboard monitoring charts
+
+<Image
+  alt="Database client connections chart"
+  zoomable
+  src={{
+    dark: '/docs/img/database/reports/db-connections-chart-dark.png',
+    light: '/docs/img/database/reports/db-connections-chart-light.png',
+  }}
+/>
+
+For Teams and Enterprise plans, Supabase provides Advanced Telemetry charts directly within the Dashboard. The `Database client connections` chart displays historical connection data broken down by connection type:
+
+- **Postgres**: Direct connections from your application
+- **PostgREST**: Connections from the PostgREST API layer
+- **Reserved**: Administrative connections for Supabase services
+- **Auth**: Connections from Supabase Auth service
+- **Storage**: Connections from Supabase Storage service
+- **Other roles**: Miscellaneous database connections
+
+This chart helps you monitor connection pool usage, identify connection leaks, and plan capacity. It also shows a reference line for your compute size's maximum connection limit.
+
+For more details on using these monitoring charts, see the [Reports guide](/docs/guides/telemetry/reports#advanced-telemetry).
+
+#### Grafana Dashboard
+
 Supabase offers a Grafana Dashboard that records and visualizes over 200 project metrics, including connections. For setup instructions, check the [metrics docs](/docs/guides/platform/metrics).
 
 Its "Client Connections" graph displays connections for both Supavisor and Postgres

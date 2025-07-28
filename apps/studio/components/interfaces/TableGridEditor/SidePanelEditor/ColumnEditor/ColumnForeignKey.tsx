@@ -47,7 +47,7 @@ const ColumnForeignKey = ({
     return {
       id: c.id,
       name: c.name,
-      format: c.format || column.format,
+      format: column.format || c.format,
       isNewColumn: false,
     }
   })

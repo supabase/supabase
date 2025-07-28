@@ -71,7 +71,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
         </Accordion.Item>
       ) : (
         <Link
-          href={section[0].href}
+          href={section[0].href || '#'}
           className={cn(activeLabel === section[0].label && '!text-foreground', itemClassName)}
         >
           {section[0].label}
@@ -163,7 +163,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                 <>
                   {isLoggedIn ? (
                     <Button block size="medium" asChild>
-                      <Link href="/dashboard/projects">Dashboard</Link>
+                      <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
                     </Button>
                   ) : (
                     <>

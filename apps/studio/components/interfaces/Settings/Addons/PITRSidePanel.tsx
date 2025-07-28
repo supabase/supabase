@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -6,6 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
@@ -30,7 +32,6 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
-import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -57,6 +58,7 @@ const PITRSidePanel = () => {
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
 
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
@@ -65,13 +67,12 @@ const PITRSidePanel = () => {
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const { panel, closePanel } = useAddonsPagePanel()
   const visible = panel === 'pitr'
 
-  const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
@@ -100,12 +101,28 @@ const PITRSidePanel = () => {
   const subscriptionPitr = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
-  const hasReadReplicas = (databases ?? []).length > 1
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
-  const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
   const isFreePlan = subscription?.plan?.id === 'free'
-  const blockDowngradeDueToReadReplicas =
-    hasChanges && hasReadReplicas && selectedCategory === 'off' && selectedOption === 'pitr_0'
+  const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
+  const hasSufficientCompute =
+    !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'
+
+  // These are illegal states. If they are true, we should block the user from saving them.
+  const blockDowngradeDueToHipaa =
+    hasHipaaAddon &&
+    (selectedCategory !== 'on' ||
+      // If the project is HIPAA, we don't allow the user to downgrade below 28 days
+      selectedPitr?.identifier !== 'pitr_28')
+
+  const onConfirm = async () => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
+      removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
+    } else {
+      updateAddon({ projectRef, type: 'pitr', variant: selectedOption as AddonVariantId })
+    }
+  }
 
   useEffect(() => {
     if (visible) {
@@ -118,16 +135,6 @@ const PITRSidePanel = () => {
       }
     }
   }, [visible, isLoading])
-
-  const onConfirm = async () => {
-    if (!projectRef) return console.error('Project ref is required')
-
-    if (selectedOption === 'pitr_0' && subscriptionPitr !== undefined) {
-      removeAddon({ projectRef, variant: subscriptionPitr.variant.identifier })
-    } else {
-      updateAddon({ projectRef, type: 'pitr', variant: selectedOption as AddonVariantId })
-    }
-  }
 
   return (
     <SidePanel
@@ -142,12 +149,12 @@ const PITRSidePanel = () => {
         !hasChanges ||
         isSubmitting ||
         !canUpdatePitr ||
-        hasHipaaAddon ||
-        blockDowngradeDueToReadReplicas
+        (!!selectedPitr && !hasSufficientCompute) ||
+        blockDowngradeDueToHipaa
       }
       tooltip={
-        hasHipaaAddon
-          ? 'Unable to change PITR with HIPAA add-on'
+        blockDowngradeDueToHipaa
+          ? 'Unable to disable PITR with HIPAA add-on'
           : isFreePlan
             ? 'Unable to enable point in time recovery on a Free Plan'
             : !canUpdatePitr
@@ -170,20 +177,6 @@ const PITRSidePanel = () => {
       }
     >
       <SidePanel.Content>
-        {hasHipaaAddon && (
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_>PITR cannot be changed with HIPAA</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              All projects should have PITR enabled by default and cannot be changed with HIPAA
-              enabled. Contact support for further assistance.
-            </AlertDescription_Shadcn_>
-            <div className="mt-4">
-              <Button type="default" asChild>
-                <Link href="/support/new">Contact support</Link>
-              </Button>
-            </div>
-          </Alert_Shadcn_>
-        )}
         <div className="py-6 space-y-4">
           <p className="text-sm">
             Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter
@@ -206,7 +199,11 @@ const PITRSidePanel = () => {
                       } else if (subscriptionPitr?.variant.identifier !== undefined) {
                         setSelectedOption(subscriptionPitr.variant.identifier)
                       } else {
-                        setSelectedOption('pitr_7')
+                        if (hasHipaaAddon) {
+                          setSelectedOption('pitr_28')
+                        } else {
+                          setSelectedOption('pitr_7')
+                        }
                       }
                     }}
                   >
@@ -250,24 +247,20 @@ const PITRSidePanel = () => {
             </Alert_Shadcn_>
           )}
 
-          {blockDowngradeDueToReadReplicas && (
+          {blockDowngradeDueToHipaa ? (
             <Alert_Shadcn_>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>Remove all read replicas before downgrading</AlertTitle_Shadcn_>
+              <AlertTitle_Shadcn_>PITR cannot be disabled on HIPAA projects</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
-                You currently have active read replicas. The minimum compute size for using read
-                replicas is the Small Compute. You need to remove all read replicas before
-                downgrading Compute as it requires at least a Small compute instance.
+                PITR is enabled by default for all HIPAA projects and cannot be turned off. Contact
+                support for further assistance.
               </AlertDescription_Shadcn_>
-              <AlertDescription_Shadcn_ className="mt-2">
-                <Button asChild type="default">
-                  <Link href={`/project/${projectRef}/settings/infrastructure`}>
-                    Manage read replicas
-                  </Link>
+              <div className="mt-4">
+                <Button type="default" asChild>
+                  <Link href="/support/new">Contact support</Link>
                 </Button>
-              </AlertDescription_Shadcn_>
+              </div>
             </Alert_Shadcn_>
-          )}
+          ) : null}
 
           {selectedCategory === 'on' && (
             <div className="!mt-8 pb-4">
@@ -289,19 +282,17 @@ const PITRSidePanel = () => {
                 >
                   Upgrade your plan to change PITR for your project
                 </Alert>
-              ) : subscriptionCompute === undefined ? (
+              ) : !hasSufficientCompute ? (
                 <Alert
                   withIcon
                   variant="warning"
                   className="mb-4"
                   title="Your project is required to minimally be on a Small compute size to enable PITR"
                   actions={[
-                    <Button
-                      key="change-compute"
-                      type="default"
-                      onClick={() => setPanel('computeInstance')}
-                    >
-                      Change compute size
+                    <Button asChild key="change-compute" type="default">
+                      <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                        Change compute size
+                      </Link>
                     </Button>,
                   ]}
                 >
@@ -337,7 +328,9 @@ const PITRSidePanel = () => {
                           {option.identifier.split('_')[1]} days ago
                         </p>
                         <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
+                          <p className="text-foreground text-sm" translate="no">
+                            {formatCurrency(option.price)}
+                          </p>
                           <p className="text-foreground-light translate-y-[1px]"> / month</p>
                         </div>
                       </div>
@@ -348,7 +341,7 @@ const PITRSidePanel = () => {
             </div>
           )}
 
-          {hasChanges && !blockDowngradeDueToReadReplicas && selectedOption !== 'pitr_0' && (
+          {hasChanges && selectedOption !== 'pitr_0' && (
             <p className="text-sm text-foreground-light">
               There are no immediate charges. The addon is billed at the end of your billing cycle
               based on your usage and prorated to the hour.

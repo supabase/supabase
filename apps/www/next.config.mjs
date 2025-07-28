@@ -45,11 +45,23 @@ const nextConfig = {
   assetPrefix: getAssetPrefix(),
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'api-types'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'icons',
+    'api-types',
+    // needed to make the octokit packages work in /changelog
+    '@octokit/plugin-paginate-graphql',
+  ],
+  experimental: {
+    // needed to make the octokit packages work in /changelog
+    esmExternals: 'loose',
+  },
   reactStrictMode: true,
-  swcMinify: true,
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
     remotePatterns,
   },
   async headers() {
@@ -63,7 +75,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
           },
         ],
       },
@@ -81,10 +93,16 @@ const nextConfig = {
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
       {
-        source: "/(.*)",
-        headers: [{ 
-          key: 'Strict-Transport-Security', 
-          value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1' ? 'max-age=31536000' : '' }],
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value:
+              process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+                ? 'max-age=31536000; includeSubDomains; preload'
+                : '',
+          },
+        ],
       },
     ]
   },

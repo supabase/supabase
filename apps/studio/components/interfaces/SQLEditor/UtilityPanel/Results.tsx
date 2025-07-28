@@ -2,14 +2,14 @@ import { Clipboard, Expand } from 'lucide-react'
 import { useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 
-import { useKeyboardShortcuts } from 'hooks/deprecated'
-import { copyToClipboard } from 'lib/helpers'
+import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
 import {
   cn,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
 } from 'ui'
 import { CellDetailPanel } from './CellDetailPanel'
 
@@ -25,49 +25,30 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
   const [expandCell, setExpandCell] = useState(false)
   const [cellPosition, setCellPosition] = useState<{ column: any; row: any; rowIdx: number }>()
 
-  const onCopyCell = () => {
-    if (cellPosition) {
-      const { rowIdx, column } = cellPosition
-      const colKey = column.key
-      const cellValue = rows[rowIdx]?.[colKey] ?? ''
-      const value = formatClipboardValue(cellValue)
-      copyToClipboard(value)
-    }
-  }
-
-  useKeyboardShortcuts(
-    {
-      'Command+c': (event: any) => {
-        event.stopPropagation()
-        onCopyCell()
-      },
-      'Control+c': (event: any) => {
-        event.stopPropagation()
-        onCopyCell()
-      },
-    },
-    ['INPUT', 'TEXTAREA'] as any
-  )
-
   const formatter = (column: any, row: any) => {
+    const cellValue = row[column]
+
     return (
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <div
             className={cn(
               'flex items-center h-full font-mono text-xs w-full whitespace-pre',
-              row[column] === null && 'text-foreground-lighter'
+              cellValue === null && 'text-foreground-lighter'
             )}
           >
-            {row[column] === null ? 'NULL' : JSON.stringify(row[column])}
+            {cellValue === null
+              ? 'NULL'
+              : typeof cellValue === 'string'
+                ? cellValue
+                : JSON.stringify(cellValue)}
           </div>
         </ContextMenuTrigger_Shadcn_>
         <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
           <ContextMenuItem_Shadcn_
             className="gap-x-2"
             onSelect={() => {
-              const cellValue = row[column] ?? ''
-              const value = formatClipboardValue(cellValue)
+              const value = formatClipboardValue(cellValue ?? '')
               copyToClipboard(value)
             }}
             onFocusCapture={(e) => e.stopPropagation()}
@@ -141,6 +122,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
             className="h-full flex-grow border-t-0"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onSelectedCellChange={setCellPosition}
+            onCellKeyDown={handleCopyCell}
           />
           <CellDetailPanel
             column={cellPosition?.column.name ?? ''}

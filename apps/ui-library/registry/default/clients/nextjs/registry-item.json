@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "supabase-client-nextjs",
+  "type": "registry:lib",
+  "title": "Supabase Client for Next.js",
+  "description": "",
+  "registryDependencies": [],
+  "dependencies": ["@supabase/ssr@latest", "@supabase/supabase-js@latest"],
+  "docs": "You'll need to add a `.env` file with the following environment variables to your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.",
+  "files": [
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+      "type": "registry:lib"
+    }
+  ]
+}

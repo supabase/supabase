@@ -14,7 +14,6 @@ import NextImage from 'next/image'
 import Link from 'next/link'
 
 import authors from 'lib/authors.json'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
@@ -287,7 +286,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: TelemetryActions.EVENT_PAGE_CTA_CLICKED,
+                          action: 'www_pricing_plan_cta_clicked',
                           properties: { eventTitle: event.title },
                         })
                       }

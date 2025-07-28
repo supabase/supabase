@@ -5,12 +5,12 @@ import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Button, Input, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
-import DatePickers from './Logs.DatePickers'
+import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
   LOG_ROUTES_WITH_REPLICA_SUPPORT,
@@ -41,6 +41,8 @@ interface PreviewFilterPanelProps {
   filters: Filters
   onSelectedDatabaseChange: (id: string) => void
   className?: string
+  selectedDatePickerValue: DatePickerValue
+  setSelectedDatePickerValue: (value: DatePickerValue) => void
 }
 
 /**
@@ -52,8 +54,6 @@ const PreviewFilterPanel = ({
   onRefresh,
   onSearch = () => {},
   defaultSearchValue = '',
-  defaultToValue = '',
-  defaultFromValue = '',
   onExploreClick,
   queryUrl,
   condensedLayout,
@@ -65,10 +65,14 @@ const PreviewFilterPanel = ({
   table,
   onSelectedDatabaseChange,
   className,
+  selectedDatePickerValue,
+  setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const [search, setSearch] = useState('')
+
+  const logName = router.pathname.split('/').pop()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
@@ -78,52 +82,14 @@ const PreviewFilterPanel = ({
 
   const hasEdits = search !== defaultSearchValue
 
+  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
+
   // Sync local state with provided default value
   useEffect(() => {
     if (search !== defaultSearchValue) {
       setSearch(defaultSearchValue)
     }
   }, [defaultSearchValue])
-
-  const RefreshButton = () => (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          title="refresh"
-          type="default"
-          className="px-1.5"
-          icon={
-            <div className="relative">
-              {newCount > 0 && (
-                <div className="absolute -top-3 right-3 flex items-center justify-center">
-                  <div className="absolute z-20">
-                    <p style={{ fontSize: '0.6rem' }} className="text-white">
-                      {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
-                    </p>
-                  </div>
-                  <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
-                  <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
-                </div>
-              )}
-              <RefreshCw />
-            </div>
-          }
-          loading={isLoading}
-          disabled={isLoading}
-          onClick={onRefresh}
-        />
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="text-xs">
-        Refresh logs
-      </TooltipContent>
-    </Tooltip>
-  )
-
-  const handleDatepickerChange = ({ to, from }: Partial<Parameters<LogSearchCallback>[1]>) => {
-    onSearch('datepicker-change', { to, from })
-  }
-
-  const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
     <div
@@ -183,13 +149,45 @@ const PreviewFilterPanel = ({
           />
         </form>
 
-        <RefreshButton />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              title="refresh"
+              type="default"
+              className="px-1.5"
+              icon={
+                <div className="relative">
+                  {newCount > 0 && (
+                    <div className="absolute -top-3 right-3 flex items-center justify-center">
+                      <div className="absolute z-20">
+                        <p style={{ fontSize: '0.6rem' }} className="text-white">
+                          {newCount > 1000 ? `${Math.floor(newCount / 100) / 10}K` : newCount}
+                        </p>
+                      </div>
+                      <div className="h-4 w-4 animate-ping rounded-full bg-green-800 opacity-60"></div>
+                      <div className="z-60 absolute top-0 right-0 h-full w-full rounded-full bg-green-900 opacity-80"></div>
+                    </div>
+                  )}
+                  <RefreshCw />
+                </div>
+              }
+              loading={isLoading}
+              disabled={isLoading}
+              onClick={onRefresh}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-xs">
+            Refresh logs
+          </TooltipContent>
+        </Tooltip>
 
-        <DatePickers
-          onChange={handleDatepickerChange}
-          to={defaultToValue}
-          from={defaultFromValue}
+        <LogsDatePicker
           helpers={PREVIEWER_DATEPICKER_HELPERS}
+          onSubmit={(vals) => {
+            onSearch('datepicker-change', { to: vals.to, from: vals.from })
+            setSelectedDatePickerValue(vals)
+          }}
+          value={selectedDatePickerValue}
         />
 
         {FILTER_OPTIONS[table] !== undefined && (
@@ -233,7 +231,15 @@ const PreviewFilterPanel = ({
             Chart
           </Button>
         </div>
-        <CSVButton data={csvData} disabled={!Boolean(csvData)} title="Download data" />
+        {Boolean(csvData) && (
+          <DownloadResultsButton
+            iconOnly
+            type="default"
+            align="center"
+            results={csvData ?? []}
+            fileName={`supabase-${logName}-${ref}.csv`}
+          />
+        )}
       </div>
 
       {showDatabaseSelector ? (

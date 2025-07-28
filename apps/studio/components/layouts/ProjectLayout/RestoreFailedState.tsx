@@ -1,26 +1,26 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import DeleteProjectModal from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import {
-  Button,
-  CriticalIcon,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
 const RestoreFailedState = () => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const [visible, setVisible] = useState(false)
+
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: { project_id: project?.id },
+  })
 
   const { data } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
@@ -90,9 +90,18 @@ const RestoreFailedState = () => {
                   <Button type="default" className="px-1.5" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
-                  <DropdownMenuItem
+                  <DropdownMenuItemTooltip
                     onClick={() => setVisible(true)}
                     className="items-start gap-x-2"
+                    disabled={!canDeleteProject}
+                    tooltip={{
+                      content: {
+                        side: 'right',
+                        text: !canDeleteProject
+                          ? 'You need additional permissions to delete this project'
+                          : undefined,
+                      },
+                    }}
                   >
                     <div className="translate-y-0.5">
                       <Trash size={14} />
@@ -103,7 +112,7 @@ const RestoreFailedState = () => {
                         Project cannot be restored once it is deleted
                       </p>
                     </div>
-                  </DropdownMenuItem>
+                  </DropdownMenuItemTooltip>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

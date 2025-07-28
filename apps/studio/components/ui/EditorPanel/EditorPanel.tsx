@@ -12,14 +12,31 @@ import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, cn, Input_Shadcn_, SQL_ICON } from 'ui'
+import {
+  Button,
+  cn,
+  CodeBlock,
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  HoverCard_Shadcn_,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  SQL_ICON,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import AIEditor from '../AIEditor'
@@ -34,23 +51,21 @@ interface EditorPanelProps {
 export const EditorPanel = ({ onChange }: EditorPanelProps) => {
   const { ref } = useParams()
   const project = useSelectedProject()
-  const { editorPanel, setEditorPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { editorPanel, setEditorPanel } = useAppStateSnapshot()
   const { profile } = useProfile()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+  const { includeSchemaMetadata } = useOrgAiOptInLevel()
 
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
   const [currentValue, setCurrentValue] = useState(editorPanel.initialValue || '')
-  const [showTemplates, setShowTemplates] = useState(false)
-  const [templateSearch, setTemplateSearch] = useState('')
   const [savedCode, setSavedCode] = useState<string>('')
   const [isPreviewingTemplate, setIsPreviewingTemplate] = useState(false)
   const [showResults, setShowResults] = useState(true)
+  const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
 
   const errorHeader = error?.formattedError?.split('\n')?.filter((x: string) => x.length > 0)?.[0]
   const errorContent =
@@ -68,24 +83,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
       setResults([])
     },
   })
-
-  const handleChat = () => {
-    setAiAssistantPanel({
-      open: true,
-      sqlSnippets: currentValue ? [currentValue] : [],
-      initialInput: 'Help me understand and improve this SQL query...',
-      suggestions: {
-        title:
-          'I can help you understand and improve your SQL query. Here are a few example prompts to get you started:',
-        prompts: [
-          'Explain what this query does...',
-          'Help me optimize this query...',
-          'Show me how to add more conditions...',
-          'Help me join this with another table...',
-        ],
-      },
-    })
-  }
 
   const onExecuteSql = (skipValidation = false) => {
     setError(undefined)
@@ -124,8 +121,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
 
   const onSelectTemplate = (content: string) => {
     handleChange(content)
-    setSavedCode(content)
-    setShowTemplates(false)
+    setIsTemplatesOpen(false)
   }
 
   // Create a debounced version of the revert code function
@@ -136,23 +132,6 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
     }, 300),
     [savedCode]
   )
-
-  const handleTemplateMouseEnter = (templateContent: string) => {
-    // Cancel any pending revert
-    debouncedRevertCode.cancel()
-
-    if (!isPreviewingTemplate) {
-      setSavedCode(currentValue)
-    }
-    setIsPreviewingTemplate(true)
-    handleChange(templateContent)
-  }
-
-  const handleTemplateMouseLeave = () => {
-    if (isPreviewingTemplate) {
-      debouncedRevertCode()
-    }
-  }
 
   // Cleanup debounce on unmount
   useEffect(() => {
@@ -177,18 +156,66 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
 
   return (
     <div className="flex flex-col h-full bg-surface-100">
-      <div className="border-b flex shrink-0 items-center gap-x-3 px-5 h-[46px]">
+      <div className="border-b flex shrink-0 items-center gap-x-3 px-4 h-[46px]">
         <span className="text-sm flex-1">SQL Editor</span>
         <div className="flex gap-2 items-center">
-          <Button
-            size="tiny"
-            type="default"
-            className="h-7"
-            onClick={handleChat}
-            icon={<AiIconAnimation size={16} />}
-          >
-            Chat
-          </Button>
+          <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button
+                size="tiny"
+                type="default"
+                role="combobox"
+                aria-expanded={isTemplatesOpen}
+                icon={<Book size={14} />}
+              >
+                Templates
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
+              <Command_Shadcn_>
+                <CommandInput_Shadcn_ placeholder="Search templates..." />
+                <CommandList_Shadcn_>
+                  <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    {editorPanel.templates?.map((template) => (
+                      <HoverCard_Shadcn_ key={template.name}>
+                        <HoverCardTrigger_Shadcn_ asChild>
+                          <CommandItem_Shadcn_
+                            value={template.name}
+                            onSelect={() => onSelectTemplate(template.content)}
+                            className="cursor-pointer"
+                          >
+                            <div className="flex items-center gap-3">
+                              <SQL_ICON
+                                size={16}
+                                className={cn(
+                                  'w-5 h-5 flex-0 mr-2 transition-colors fill-foreground-muted'
+                                )}
+                              />
+                              <div className="flex-1">
+                                <h4 className="text-foreground flex-1">{template.name}</h4>
+                                <p className="text-xs text-foreground-light">
+                                  {template.description}
+                                </p>
+                              </div>
+                            </div>
+                          </CommandItem_Shadcn_>
+                        </HoverCardTrigger_Shadcn_>
+                        <HoverCardContent_Shadcn_ side="left" className="w-[500px] p-0">
+                          <CodeBlock
+                            language="sql"
+                            className="language-sql border-none"
+                            hideLineNumbers
+                            value={template.content}
+                          />
+                        </HoverCardContent_Shadcn_>
+                      </HoverCard_Shadcn_>
+                    ))}
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
           <ButtonTooltip
             tooltip={{
               content: {
@@ -208,7 +235,9 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
 
               try {
                 setIsSaving(true)
-                const { title: name } = await generateSqlTitle({ sql: currentValue })
+                const { title: name } = await generateSqlTitle({
+                  sql: currentValue,
+                })
                 const snippet = createSqlSnippetSkeletonV2({
                   id: uuidv4(),
                   name,
@@ -248,7 +277,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
             language="pgsql"
             value={currentValue}
             onChange={handleChange}
-            aiEndpoint={`${BASE_PATH}/api/ai/sql/complete`}
+            aiEndpoint={`${BASE_PATH}/api/ai/sql/complete-v2`}
             aiMetadata={{
               projectRef: project?.ref,
               connectionString: project?.connectionString,
@@ -305,7 +334,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
         )}
 
         {results !== undefined && results.length > 0 && (
-          <div className={`max-h-72 shrink-0 flex flex-col`}>
+          <div className={`max-h-72 shrink-0 flex flex-col ${showResults && 'h-full'}`}>
             {showResults && (
               <div className="border-t flex-1 overflow-auto">
                 <Results rows={results} />
@@ -334,58 +363,7 @@ export const EditorPanel = ({ onChange }: EditorPanelProps) => {
           </div>
         )}
 
-        {showTemplates && editorPanel.templates && (
-          <div className="bg-surface-100 border-t w-full flex flex-col max-h-80 h-full text-sm">
-            <div className="px-4 py-3 border-b shrink-0">
-              <Input_Shadcn_
-                placeholder="Search templates..."
-                value={templateSearch}
-                onChange={(e) => setTemplateSearch(e.target.value)}
-              />
-            </div>
-            <div className="overflow-auto flex-1 p-2">
-              {editorPanel.templates
-                ?.filter((template) => {
-                  const searchLower = templateSearch.toLowerCase()
-                  return (
-                    template.name.toLowerCase().includes(searchLower) ||
-                    template.description.toLowerCase().includes(searchLower)
-                  )
-                })
-                ?.map((template, i) => (
-                  <div
-                    key={i}
-                    className="cursor-pointer group rounded-lg flex items-center gap-4 px-4 py-3 hover:bg-surface-200"
-                    onClick={() => onSelectTemplate(template.content)}
-                    onMouseEnter={() => handleTemplateMouseEnter(template.content)}
-                    onMouseLeave={handleTemplateMouseLeave}
-                  >
-                    <SQL_ICON
-                      size={18}
-                      strokeWidth={1.5}
-                      className={cn(
-                        'transition-colors fill-foreground-muted group-aria-selected:fill-foreground',
-                        'w-5 h-5 shrink-0 grow-0 -ml-0.5'
-                      )}
-                    />
-                    <div>
-                      <p className="text-xs mb-1">{template.name}</p>
-                      <p className="text-xs text-foreground-light">{template.description}</p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-        <div className="bg-surface-100 flex items-center gap-2 !justify-between px-5 py-4 w-full border-t shrink-0">
-          <Button
-            size="tiny"
-            type="default"
-            onClick={() => setShowTemplates(!showTemplates)}
-            icon={<Book size={14} />}
-          >
-            {showTemplates ? 'Templates' : 'Templates'}
-          </Button>
+        <div className="bg-surface-100 flex items-center gap-2 justify-end px-5 py-4 w-full border-t shrink-0">
           <SqlRunButton isDisabled={isExecuting} isExecuting={isExecuting} onClick={onExecuteSql} />
         </div>
       </div>

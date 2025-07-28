@@ -118,8 +118,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Filter Bar',
+          href: '/docs/fragments/filter-bar',
+          items: [],
+        },
+        {
           title: 'Logs Bar Chart',
           href: '/docs/fragments/logs-bar-chart',
+          items: [],
+        },
+        {
+          title: 'Table of Contents (TOC)',
+          href: '/docs/fragments/toc',
           items: [],
         },
       ],
