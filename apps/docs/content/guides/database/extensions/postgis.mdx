@@ -453,15 +453,15 @@ BEGIN;
 	UPDATE pg_extension
 	  SET extrelocatable = true
 	WHERE extname = 'postgis';
-	
+
 	ALTER EXTENSION postgis
 	  SET SCHEMA extensions;
-	
+
 	ALTER EXTENSION postgis
 	  UPDATE TO "<POSTGIS_VERSION>next";
-	
+
 	ALTER EXTENSION postgis UPDATE;
-	
+
 	UPDATE pg_extension
 	  SET extrelocatable = false
 	WHERE extname = 'postgis';
