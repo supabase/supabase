@@ -7,10 +7,10 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { ResponseError } from 'types'
 import { lintKeys } from './keys'
 
-export type ProjectLintsVariables = {
+type ProjectLintsVariables = {
   projectRef?: string
 }
-type ProjectLintResponse = components['schemas']['GetProjectLintsResponseDto']
+type ProjectLintResponse = components['schemas']['GetProjectLintsResponse']
 export type Lint = ProjectLintResponse[0]
 export type LINT_TYPES = ProjectLintResponse[0]['name']
 

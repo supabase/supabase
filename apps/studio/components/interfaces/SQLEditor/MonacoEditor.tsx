@@ -3,13 +3,13 @@ import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useEffect, useRef } from 'react'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
@@ -24,6 +24,7 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
     selection: string
     beforeSelection: string
@@ -42,14 +43,16 @@ const MonacoEditor = ({
   executeQuery,
   onHasSelection,
   onPrompt,
+  onMount,
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, content } = useParams()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
 
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -92,7 +95,8 @@ const MonacoEditor = ({
         const selectedValue = (editorRef?.current as any)
           .getModel()
           .getValueInRange((editorRef?.current as any)?.getSelection())
-        setAiAssistantPanel({
+        aiSnap.newChat({
+          name: 'Explain code section',
           open: true,
           sqlSnippets: [selectedValue],
           initialInput: 'Can you explain this section to me in more detail?',
@@ -141,11 +145,16 @@ const MonacoEditor = ({
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
+
+    onMount?.(editor)
   }
 
   const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
 
   function handleEditorChange(value: string | undefined) {
+    // make active tab permanent
+    tabsSnap.makeActiveTabPermanent()
+
     const snippetCheck = snapV2.snippets[id]
 
     if (id && value) {

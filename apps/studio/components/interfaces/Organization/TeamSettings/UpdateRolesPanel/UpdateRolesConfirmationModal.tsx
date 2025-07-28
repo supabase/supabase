@@ -90,10 +90,11 @@ export const UpdateRolesConfirmationModal = ({
         })
         toast.success(`Successfully updated role for ${member.username}`)
         onClose(true)
-        return
       } catch (error: any) {
+        toast.error(`Failed to update role: ${error.message}`)
+      } finally {
         setSaving(false)
-        return toast.error(`Failed to update role: ${error.message}`)
+        return
       }
     }
 
@@ -130,8 +131,10 @@ export const UpdateRolesConfirmationModal = ({
       toast.success(`Successfully updated role for ${member.username}`)
       onClose(true)
     } catch (error: any) {
+      toast.error(`Failed to update role: ${error.message}`)
+    } finally {
       setSaving(false)
-      return toast.error(`Failed to update role: ${error.message}`)
+      return
     }
   }
 
@@ -219,7 +222,7 @@ export const UpdateRolesConfirmationModal = ({
                   return (
                     <li key={`update-${i}`} className="text-sm text-foreground-light">
                       From <span className="text-foreground">{originalRoleName}</span> to{' '}
-                      <span className="text-foreground">{updatedRole?.name}</span> on{' '}
+                      <span className="text-foreground">{updatedRole?.name ?? 'Unknown'}</span> on{' '}
                       <span className={project !== undefined ? 'text-foreground' : ''}>
                         {project?.name ?? 'organization'}
                       </span>

@@ -12,14 +12,13 @@ type SupavisorConfigurationUpdateVariables = {
 
 export async function updateSupavisorConfiguration({
   ref,
-  pool_mode,
   default_pool_size,
 }: SupavisorConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
   const { data, error } = await patch('/platform/projects/{ref}/config/supavisor', {
     params: { path: { ref } },
-    body: { default_pool_size, pool_mode },
+    body: { default_pool_size },
   })
 
   if (error) handleError(error)
@@ -54,7 +53,7 @@ export const useSupavisorConfigurationUpdateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to update Supavisor configuration: ${data.message}`)
+        toast.error(`Failed to update Shared Pooler configuration: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

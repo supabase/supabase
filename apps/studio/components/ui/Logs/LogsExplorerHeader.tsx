@@ -4,9 +4,16 @@ import { useState } from 'react'
 
 import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
 import Table from 'components/to-be-cleaned/Table'
-import { copyToClipboard } from 'lib/helpers'
 import { logConstants } from 'shared-data'
-import { Button, SidePanel, Tabs, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  SidePanel,
+  Tabs,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  copyToClipboard,
+} from 'ui'
 import { DocsButton } from '../DocsButton'
 
 export interface LogsExplorerHeaderProps {

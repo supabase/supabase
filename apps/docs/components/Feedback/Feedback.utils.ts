@@ -1,10 +1,10 @@
-import { pick } from 'lodash'
+import { pick } from 'lodash-es'
 
 /**
  * Gets the Notion team to send feedback to based on the pathname.
  */
-const getNotionTeam = (pathname: string) => {
-  const DEFAULT_TEAM = 'team-docs'
+const getLinearTeam = (pathname: string) => {
+  const DEFAULT_TEAM = 'Docs'
 
   // Pathname has format `/guides/(team)/**`
   const pathParts = pathname.split('/')
@@ -13,26 +13,28 @@ const getNotionTeam = (pathname: string) => {
 
   switch (pathParts[2]) {
     case 'database':
-      return 'team-postgres'
+      return 'Postgres'
     case 'auth':
-      return 'team-auth'
+      return 'Auth'
     case 'storage':
-      return 'team-storage'
+      return 'Storage'
     case 'functions':
-      return 'team-functions'
+      return 'Functions'
     case 'realtime':
-      return 'team-realtime'
+      return 'Realtime'
     case 'ai':
-      return 'team-ai'
+      return 'AI'
     case 'local-development':
     case 'self-hosting':
     case 'deployment':
-      return 'team-dev-workflows'
+      return 'Dev Workflows'
     case 'integrations':
-      return 'team-api'
+      return 'API'
+    case 'security':
+      return 'Security'
     case 'platform':
     case 'monitoring-troubleshooting':
-      return 'team-infra'
+      return 'Infra'
     default:
       return DEFAULT_TEAM
   }
@@ -51,4 +53,4 @@ const getSanitizedTabParams = () => {
   return pick(Object.fromEntries(searchParams.entries()), queryGroups)
 }
 
-export { getNotionTeam, getSanitizedTabParams }
+export { getLinearTeam, getSanitizedTabParams }

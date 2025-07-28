@@ -26,7 +26,7 @@ functions:
         code: |
           ```swift
           import Supabase
-          
+
           let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
           ```
       - id: initialize-client-custom-options
@@ -34,7 +34,7 @@ functions:
         code: |
           ```swift
           import Supabase
-          
+
           let client = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
@@ -58,7 +58,7 @@ functions:
         code: |
           ```swift
           import Supabase
-          
+
           struct AppLogger: SupabaseLogger {
             func log(message: SupabaseLogMessage) {
               print(message.description)
@@ -80,7 +80,7 @@ functions:
         code: |
           ```swift
           import Supabase
-          
+
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",

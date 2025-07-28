@@ -9,8 +9,9 @@ import {
 } from 'react-data-grid'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { SELECT_COLUMN_KEY } from '../../constants'
-import { useTrackedState } from '../../store/Store'
 import type { SupaRow } from '../../types'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
@@ -110,8 +111,7 @@ function SelectCellFormatter({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellFormatterProps) {
-  const state = useTrackedState()
-  const { onEditRow } = state
+  const snap = useTableEditorStateSnapshot()
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
@@ -119,8 +119,8 @@ function SelectCellFormatter({
 
   function onEditClick(e: any) {
     e.stopPropagation()
-    if (onEditRow && row) {
-      onEditRow(row)
+    if (row) {
+      snap.onEditRow(row)
     }
   }
 
@@ -137,7 +137,7 @@ function SelectCellFormatter({
         onChange={handleChange}
         onClick={onClick}
       />
-      {onEditRow && row && (
+      {row && (
         <ButtonTooltip
           type="text"
           size="tiny"
@@ -170,12 +170,11 @@ function SelectCellHeader({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellHeaderProps) {
-  const state = useTrackedState()
-  const { selectedRows, allRowsSelected } = state
+  const snap = useTableEditorTableStateSnapshot()
   const inputRef = useRef<HTMLInputElement>(null)
 
   // indeterminate state === some rows are selected but not all
-  const isIndeterminate = selectedRows.size > 0 && !allRowsSelected
+  const isIndeterminate = snap.selectedRows.size > 0 && !snap.allRowsSelected
 
   useEffect(() => {
     if (inputRef.current) {

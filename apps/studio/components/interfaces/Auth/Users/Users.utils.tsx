@@ -5,7 +5,6 @@ import { Column, useRowSelection } from 'react-data-grid'
 
 import { User } from 'data/auth/users-infinite-query'
 import { BASE_PATH } from 'lib/constants'
-import { copyToClipboard } from 'lib/helpers'
 import {
   Checkbox_Shadcn_,
   cn,
@@ -14,9 +13,11 @@ import {
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
 } from 'ui'
+import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
-import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
@@ -27,7 +28,7 @@ export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean 
 
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
-    const provider: string = user.raw_app_meta_data?.provider ?? ''
+    const provider: string = (user.raw_app_meta_data?.provider as string) ?? ''
     const providers: string[] = user.providers.map((x: string) => {
       if (x.startsWith('sso')) return 'SAML'
       return x
@@ -82,10 +83,11 @@ const providers = {
     { google: 'google-icon' },
     { kakao: 'kakao-icon' },
     { keycloak: 'keycloak-icon' },
-    { linkedin: 'linkedin-icon' },
+    { linkedin_oidc: 'linkedin-icon' },
     { notion: 'notion-icon' },
     { twitch: 'twitch-icon' },
     { twitter: 'twitter-icon' },
+    { slack_oidc: 'slack-icon' },
     { slack: 'slack-icon' },
     { spotify: 'spotify-icon' },
     { workos: 'workos-icon' },
@@ -168,7 +170,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name: cc_last_name,
     firstName: ccFirstName,
     first_name: cc_first_name,
-  } = custom_claims ?? {}
+  } = (custom_claims ?? {}) as any
 
   const last = toPrettyJsonString(
     familyName ||
@@ -297,7 +299,16 @@ export const formatUserColumns = ({
           value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
             ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
             : Array.isArray(value)
-              ? value.join(', ')
+              ? col.id === 'providers'
+                ? value
+                    .map((x) => {
+                      const meta = PROVIDERS_SCHEMAS.find(
+                        (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
+                      )
+                      return meta?.title
+                    })
+                    .join(', ')
+                : value.join(', ')
               : value
         const isConfirmed = !!user?.confirmed_at
 

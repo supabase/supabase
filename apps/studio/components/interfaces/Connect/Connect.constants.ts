@@ -349,7 +349,6 @@ export const CONNECTION_TYPES = [
   { key: 'orms', label: 'ORMs', obj: ORMS },
 ]
 
-// [Joshen] Consolidating reusable copy here
 export const PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT =
-  'Purchase IPv4 add-on or use Supavisor if on a IPv4 network'
+  'Purchase IPv4 add-on or use Shared Pooler if on a IPv4 network'
 export const IPV4_ADDON_TEXT = 'Connections are IPv4 proxied with IPv4 add-on'

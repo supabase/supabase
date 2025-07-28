@@ -11,7 +11,9 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import AlertError from 'components/ui/AlertError'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
@@ -41,6 +43,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import CommandRender from '../CommandRender'
@@ -58,9 +61,19 @@ export const EdgeFunctionDetails = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+  const {
+    data: selectedFunction,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useEdgeFunctionQuery({
+    projectRef,
+    slug: functionSlug,
+  })
 
   const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -75,8 +88,8 @@ export const EdgeFunctionDetails = () => {
     defaultValues: { name: '', verify_jwt: false },
   })
 
-  const { anonKey } = getAPIKeys(settings)
-  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+  const { anonKey, publishableKey } = getKeys(apiKeys)
+  const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
@@ -162,9 +175,18 @@ export const EdgeFunctionDetails = () => {
                     name="verify_jwt"
                     render={({ field }) => (
                       <FormItemLayout
-                        label="Enforce JWT Verification"
+                        label="Verify JWT with legacy secret"
                         layout="flex-row-reverse"
-                        description="Require a valid JWT in the authorization header when invoking the function"
+                        description={
+                          <>
+                            Requires that a JWT signed{' '}
+                            <em className="text-brand not-italic">only by the legacy JWT secret</em>{' '}
+                            is present in the <code>Authorization</code> header. The easy to obtain{' '}
+                            <code>anon</code> key can be used to satisfy this requirement.
+                            Recommendation: OFF with JWT and additional authorization logic
+                            implemented inside your function's code.
+                          </>
+                        }
                       >
                         <FormControl_Shadcn_>
                           <Switch
@@ -296,68 +318,74 @@ export const EdgeFunctionDetails = () => {
               <CardTitle>Details</CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
-              <dl className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-y-4 xl:gap-y-6 gap-x-10">
-                <dt className="text-sm text-foreground-light">Slug</dt>
-                <dd className="text-sm lg:text-left">{selectedFunction?.slug}</dd>
+              {isLoading && <GenericSkeletonLoader />}
+              {isError && (
+                <AlertError error={error} subject="Failed to retrieve edge function details" />
+              )}
+              {isSuccess && (
+                <dl className="grid grid-cols-1 xl:grid-cols-[auto_1fr] gap-y-4 xl:gap-y-6 gap-x-10">
+                  <dt className="text-sm text-foreground-light">Slug</dt>
+                  <dd className="text-sm lg:text-left">{selectedFunction?.slug}</dd>
 
-                <dt className="text-sm text-foreground-light">Endpoint URL</dt>
-                <dd className="text-sm lg:text-left">
-                  <Input
-                    className="font-mono input-mono"
-                    disabled
-                    copy
-                    size="small"
-                    value={functionUrl}
-                  />
-                </dd>
+                  <dt className="text-sm text-foreground-light">Endpoint URL</dt>
+                  <dd className="text-sm lg:text-left">
+                    <Input
+                      className="font-mono input-mono"
+                      disabled
+                      copy
+                      size="small"
+                      value={functionUrl}
+                    />
+                  </dd>
 
-                <dt className="text-sm text-foreground-light">Region</dt>
-                <dd className="text-sm lg:text-left">All functions are deployed globally</dd>
+                  <dt className="text-sm text-foreground-light">Region</dt>
+                  <dd className="text-sm lg:text-left">All functions are deployed globally</dd>
 
-                <dt className="text-sm text-foreground-light">Created at</dt>
-                <dd className="text-sm lg:text-left">
-                  {dayjs(selectedFunction?.created_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
-                </dd>
+                  <dt className="text-sm text-foreground-light">Created at</dt>
+                  <dd className="text-sm lg:text-left">
+                    {dayjs(selectedFunction?.created_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
+                  </dd>
 
-                <dt className="text-sm text-foreground-light">Last updated at</dt>
-                <dd className="text-sm lg:text-left">
-                  {dayjs(selectedFunction?.updated_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
-                </dd>
+                  <dt className="text-sm text-foreground-light">Last updated at</dt>
+                  <dd className="text-sm lg:text-left">
+                    {dayjs(selectedFunction?.updated_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
+                  </dd>
 
-                <dt className="text-sm text-foreground-light">Deployments</dt>
-                <dd className="text-sm lg:text-left">{selectedFunction?.version ?? 0}</dd>
+                  <dt className="text-sm text-foreground-light">Deployments</dt>
+                  <dd className="text-sm lg:text-left">{selectedFunction?.version ?? 0}</dd>
 
-                <dt className="text-sm text-foreground-light">Import Maps</dt>
-                <dd className="text-sm lg:text-left">
-                  <p>
-                    Import maps are{' '}
-                    <span className={cn(hasImportMap ? 'text-brand' : 'text-amber-900')}>
-                      {hasImportMap ? 'used' : 'not used'}
-                    </span>{' '}
-                    for this function
-                  </p>
-                  <p className="text-foreground-light mt-1">
-                    Import maps allow the use of bare specifiers in functions instead of explicit
-                    import URLs
-                  </p>
-                  <div className="mt-4">
-                    <Button
-                      asChild
-                      type="default"
-                      size="tiny"
-                      icon={<ExternalLink strokeWidth={1.5} />}
-                    >
-                      <Link
-                        href="https://supabase.com/docs/guides/functions/dependencies"
-                        target="_blank"
-                        rel="noreferrer"
+                  <dt className="text-sm text-foreground-light">Import Maps</dt>
+                  <dd className="text-sm lg:text-left">
+                    <p>
+                      Import maps are{' '}
+                      <span className={cn(hasImportMap ? 'text-brand' : 'text-amber-900')}>
+                        {hasImportMap ? 'used' : 'not used'}
+                      </span>{' '}
+                      for this function
+                    </p>
+                    <p className="text-foreground-light mt-1">
+                      Import maps allow the use of bare specifiers in functions instead of explicit
+                      import URLs
+                    </p>
+                    <div className="mt-4">
+                      <Button
+                        asChild
+                        type="default"
+                        size="tiny"
+                        icon={<ExternalLink strokeWidth={1.5} />}
                       >
-                        More about import maps
-                      </Link>
-                    </Button>
-                  </div>
-                </dd>
-              </dl>
+                        <Link
+                          href="https://supabase.com/docs/guides/functions/dependencies"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          More about import maps
+                        </Link>
+                      </Button>
+                    </div>
+                  </dd>
+                </dl>
+              )}
             </CardContent>
           </Card>
         </ScaffoldSection>

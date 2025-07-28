@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
+import { Check, ChevronLeft, Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -61,7 +61,7 @@ const ColumnList = ({
   const columns =
     (filterString.length === 0
       ? selectedTable?.columns ?? []
-      : selectedTable?.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
+      : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
   const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
@@ -125,9 +125,12 @@ const ColumnList = ({
                   </Table.th>,
                   <Table.th key="type">Data Type</Table.th>,
                   <Table.th key="format">Format</Table.th>,
+                  <Table.th key="format" className="text-center">
+                    Nullable
+                  </Table.th>,
                   <Table.th key="buttons"></Table.th>,
                 ]}
-                body={columns.map((x: any, i: number) => (
+                body={columns.map((x) => (
                   <Table.tr className="border-t" key={x.name}>
                     <Table.td>
                       <p>{x.name}</p>
@@ -144,6 +147,13 @@ const ColumnList = ({
                     </Table.td>
                     <Table.td className="font-mono text-xs">
                       <code className="text-xs">{x.format}</code>
+                    </Table.td>
+                    <Table.td className="font-mono text-xs">
+                      {x.is_nullable ? (
+                        <Check size={16} className="mx-auto" />
+                      ) : (
+                        <X size={16} className="mx-auto" />
+                      )}
                     </Table.td>
                     <Table.td className="text-right">
                       {!isLocked && isTableEntity && (

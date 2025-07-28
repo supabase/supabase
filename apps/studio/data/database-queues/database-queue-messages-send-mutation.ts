@@ -7,7 +7,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueMessageSendVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
   payload: string
   delay: number

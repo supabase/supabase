@@ -8,7 +8,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   DropdownMenu,
@@ -35,7 +35,7 @@ const FunctionList = ({
 }: FunctionListProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -89,7 +89,13 @@ const FunctionList = ({
         return (
           <Table.tr key={x.id}>
             <Table.td className="truncate">
-              <p title={x.name}>{x.name}</p>
+              <Button
+                type="text"
+                className="text-foreground text-sm p-0 hover:bg-transparent"
+                onClick={() => editFunction(x)}
+              >
+                {x.name}
+              </Button>
             </Table.td>
             <Table.td className="table-cell overflow-auto">
               <p title={x.argument_types} className="truncate">
@@ -125,16 +131,27 @@ const FunctionList = ({
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => {
-                            setAiAssistantPanel({
+                            aiSnap.newChat({
+                              name: `Update function ${x.name}`,
                               open: true,
                               initialInput: 'Update this function to do...',
                               suggestions: {
                                 title:
                                   'I can help you make a change to this function, here are a few example prompts to get you started:',
                                 prompts: [
-                                  'Rename this function to ...',
-                                  'Modify this function so that it ...',
-                                  'Add a trigger for this function that calls it when ...',
+                                  {
+                                    label: 'Rename Function',
+                                    description: 'Rename this function to ...',
+                                  },
+                                  {
+                                    label: 'Modify Function',
+                                    description: 'Modify this function so that it ...',
+                                  },
+                                  {
+                                    label: 'Add Trigger',
+                                    description:
+                                      'Add a trigger for this function that calls it when ...',
+                                  },
                                 ],
                               },
                               sqlSnippets: [x.complete_statement],

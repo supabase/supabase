@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import DeleteProjectModal from './DeleteProjectModal'
+import { DeleteProjectModal } from './DeleteProjectModal'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'

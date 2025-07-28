@@ -1,60 +1,106 @@
 ---
 id: 'function-wasm'
 title: 'Using Wasm modules'
+component: true
 description: 'How to use WebAssembly in Edge Functions.'
-subtitle: 'How to use WebAssembly in Edge Functions.'
+subtitle: 'Use WebAssembly in Edge Functions.'
 ---
 
 Edge Functions supports running [WebAssembly (Wasm)](https://developer.mozilla.org/en-US/docs/WebAssembly) modules. WebAssembly is useful if you want to optimize code that's slower to run in JavaScript or require low-level manipulation.
 
-It also gives you the option to port existing libraries written in other languages to be used with JavaScript. For example, [magick-wasm](https://supabase.com/docs/guides/functions/examples/image-manipulation), which does image manipulation and transforms, is a port of an existing C library to WebAssembly.
+This allows you to:
+
+- Optimize performance-critical code beyond JavaScript capabilities
+- Port existing libraries from other languages (C, C++, Rust) to JavaScript
+- Access low-level system operations not available in JavaScript
+
+For example, libraries like [magick-wasm](https://supabase.com/docs/guides/functions/examples/image-manipulation) port existing C libraries to WebAssembly for complex image processing.
+
+---
 
 ### Writing a Wasm module
 
 You can use different languages and SDKs to write Wasm modules. For this tutorial, we will write a simple Wasm module in Rust that adds two numbers.
 
+<Admonition type="note">
+
 Follow this [guide on writing Wasm modules in Rust](https://developer.mozilla.org/en-US/docs/WebAssembly/Rust_to_Wasm) to setup your dev environment.
 
-Create a new Edge Function called `wasm-add`.
+</Admonition>
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1} fullWidth>
+    <StepHikeCompact.Details title="Create a new Edge Function" fullWidth>
+      Create a new Edge Function called `wasm-add`
+      
+      ```bash
+      supabase functions new wasm-add
+      ```
 
-```bash
-supabase functions new wasm-add
-```
+      </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
 
-Create a new Cargo project for the Wasm module inside the function's directory:
+    <StepHikeCompact.Step step={2} fullWidth>
+    <StepHikeCompact.Details title="Create a new Cargo project" fullWidth>
+      Create a new Cargo project for the Wasm module inside the function's directory:
 
-```bash
-cd supabase/functions/wasm-add
-cargo new --lib add-wasm
-```
+      ```bash
+      cd supabase/functions/wasm-add
+      cargo new --lib add-wasm
+      ```
 
-Add the following code to `add-wasm/src/lib.rs`.
+      </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+    <StepHikeCompact.Step step={3} fullWidth>
+      <StepHikeCompact.Details title="Add the Wasm module code" fullWidth>
 
-<$CodeSample
-path="edge-functions/supabase/functions/wasm-modules/add-wasm/src/lib.rs"
-lines={[[1, -1]]}
-meta="lib.rs"
-/>
+      Add the following code to `add-wasm/src/lib.rs`.
 
-Update the `add-wasm/Cargo.toml` to include the `wasm-bindgen` dependency.
+      <$CodeSample
+        path="edge-functions/supabase/functions/wasm-modules/add-wasm/src/lib.rs"
+        lines={[[1, -1]]}
+        meta="lib.rs"
+        language="rust"
+      />
 
-<$CodeSample
-path="edge-functions/supabase/functions/wasm-modules/add-wasm/Cargo.toml"
-lines={[[1, -1]]}
-meta="Cargo.toml"
-/>
+      </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
 
-After that we can build the package, by running:
+    <StepHikeCompact.Step step={4} fullWidth>
+      <StepHikeCompact.Details title="Update the Cargo.toml file" fullWidth>
 
-```bash
-wasm-pack build --target deno
-```
+      Update the `add-wasm/Cargo.toml` to include the `wasm-bindgen` dependency.
 
-This will produce a Wasm binary file inside `add-wasm/pkg` directory.
+      <$CodeSample
+        path="edge-functions/supabase/functions/wasm-modules/add-wasm/Cargo.toml"
+        lines={[[1, -1]]}
+        meta="Cargo.toml"
+      />
 
-### Calling the Wasm module from the Edge Function
+      </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
 
-Now let's update the Edge Function to call `add` from the Wasm module.
+    <StepHikeCompact.Step step={5} fullWidth>
+      <StepHikeCompact.Details title="Build the Wasm module" fullWidth>
+
+        Build the package by running:
+
+        ```bash
+        wasm-pack build --target deno
+        ```
+
+        This will produce a Wasm binary file inside `add-wasm/pkg` directory.
+
+
+      </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+---
+
+## Calling the Wasm module from the Edge Function
+
+Update your Edge Function to call the add function from the Wasm module:
 
 <$CodeSample
 path="edge-functions/supabase/functions/wasm-modules/index.ts"
@@ -63,16 +109,21 @@ meta="index.ts"
 />
 
 <Admonition type="note">
-  Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm
-  modules](https://deno.com/blog/v2.1) will require even less boilerplate code.
+
+Supabase Edge Functions currently use Deno 1.46. From [Deno 2.1, importing Wasm modules](https://deno.com/blog/v2.1) will require even less boilerplate code.
+
 </Admonition>
 
-### Bundle and deploy the Edge Function
+---
 
-Before deploying the Edge Function, we need to ensure it bundles the Wasm module with it. We can do this by defining it in the `static_files` for the function in `superbase/config.toml`.
+## Bundle and deploy
+
+Before deploying, ensure the Wasm module is bundled with your function by defining it in `supabase/config.toml`:
 
 <Admonition type="note">
-  You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+
+You will need update Supabase CLI to 2.7.0 or higher for the `static_files` support.
+
 </Admonition>
 
 ```toml

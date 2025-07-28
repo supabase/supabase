@@ -7,7 +7,9 @@ import z from 'zod'
 import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
+import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
+import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
 import {
   Button,
   Form_Shadcn_,
@@ -44,6 +46,8 @@ const defaultValues = {
 const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
   const [showSecretValue, setShowSecretValue] = useState(false)
+  const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
+  const [pendingSecrets, setPendingSecrets] = useState<z.infer<typeof FormSchema> | null>(null)
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -55,10 +59,30 @@ const AddNewSecretForm = () => {
     name: 'secrets',
   })
 
+  const { data: existingSecrets } = useSecretsQuery({
+    projectRef: projectRef,
+  })
+
   function handlePaste(e: ClipboardEvent) {
     e.preventDefault()
     const text = e.clipboardData?.getData('text')
     if (!text) return
+
+    // If text doesn't contain '=' and is being pasted into a specific field, handle as single value
+    if (!text.includes('=')) {
+      const inputName = (e.target as HTMLInputElement).name
+      if (inputName?.includes('secrets')) {
+        const [_, indexStr, field] = inputName.match(/secrets\.(\d+)\.(\w+)/) || []
+        if (indexStr && field) {
+          const index = parseInt(indexStr)
+          form.setValue(
+            `secrets.${index}.${field}` as `secrets.${number}.name` | `secrets.${number}.value`,
+            text
+          )
+          return
+        }
+      }
+    }
 
     const pairs: Array<SecretPair> = []
 
@@ -98,7 +122,30 @@ const AddNewSecretForm = () => {
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
+    // Check for duplicate secret names
+    const existingSecretNames = existingSecrets?.map((secret) => secret.name) || []
+    const duplicateSecret = data.secrets.find((secret) => existingSecretNames.includes(secret.name))
+
+    if (duplicateSecret) {
+      setDuplicateSecretName(duplicateSecret.name)
+      setPendingSecrets(data)
+      return
+    }
+
     createSecret({ projectRef, secrets: data.secrets })
+  }
+
+  const handleConfirmDuplicate = () => {
+    if (pendingSecrets) {
+      createSecret({ projectRef, secrets: pendingSecrets.secrets })
+      setDuplicateSecretName('')
+      setPendingSecrets(null)
+    }
+  }
+
+  const handleCancelDuplicate = () => {
+    setDuplicateSecretName('')
+    setPendingSecrets(null)
   }
 
   return (
@@ -186,6 +233,14 @@ const AddNewSecretForm = () => {
           </form>
         </Form_Shadcn_>
       </Panel.Content>
+
+      <DuplicateSecretWarningModal
+        visible={!!duplicateSecretName}
+        onCancel={handleCancelDuplicate}
+        onConfirm={handleConfirmDuplicate}
+        isCreating={isCreating}
+        secretName={duplicateSecretName}
+      />
     </Panel>
   )
 }
