@@ -5372,11 +5372,6 @@ export interface components {
       file_url: string
       fileUrl: string
     }
-    GetAvailableRegionsBody: {
-      /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
-      organization_slug: string
-    }
     GetContentCountResponse: {
       count: number
     }
@@ -11938,6 +11933,12 @@ export interface operations {
           'application/json': components['schemas']['InvitationResponse']
         }
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get organization invitations */
       500: {
         headers: {
@@ -11964,6 +11965,12 @@ export interface operations {
     }
     responses: {
       201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -18461,6 +18468,12 @@ export interface operations {
         }
         content?: never
       }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to get project's status */
       500: {
         headers: {
@@ -18534,16 +18547,15 @@ export interface operations {
   }
   ProjectsController_getRegions: {
     parameters: {
-      query?: never
+      query: {
+        cloud_provider: 'AWS' | 'FLY' | 'AWS_K8S'
+        organization_slug: string
+      }
       header?: never
       path?: never
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GetAvailableRegionsBody']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
@@ -18573,6 +18585,12 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
         }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }

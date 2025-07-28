@@ -1,8 +1,8 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { formatBytes } from 'lib/helpers'
 import { Organization } from 'types'
 import { Project } from '../projects/project-detail-query'
-import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getReportAttributes = (org: Organization, project: Project): ReportAttributes[] => {
   const computeSize = project?.infra_compute_size || 'medium'
