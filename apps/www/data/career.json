@@ -1,23 +1,23 @@
 {
   "company": [
     {
-      "number": "90+",
-      "text": "team members\n\nin 25+ countries"
+      "number": "120+",
+      "text": "team members\n\nin 35+ countries"
     },
     {
       "number": "15+",
       "text": "languages spoken"
     },
     {
-      "number": "$196M",
+      "number": "$396M",
       "text": "in funding"
     },
     {
-      "number": "250,000+",
+      "number": "350,000+",
       "text": "community members"
     },
     {
-      "number": "5,000+",
+      "number": "20,000+",
       "text": "memes posted\n\n(and counting)"
     }
   ],
@@ -77,8 +77,8 @@
     },
     {
       "icon": "tech_allowance",
-      "title": "Hardware Budget",
-      "text": "Use this budget for anything you need to set up your work environment from tech to office setup."
+      "title": "Tech Allowance",
+      "text": "Use this budget for any technology you need for your work setup."
     },
     {
       "icon": "healthcare",

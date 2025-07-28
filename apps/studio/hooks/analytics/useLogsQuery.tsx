@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import {
   EXPLORER_DATEPICKER_HELPERS,
-  genQueryParams,
   getDefaultHelper,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
@@ -11,14 +11,11 @@ import type {
   Logs,
   LogsEndpointParams,
 } from 'components/interfaces/Settings/Logs/Logs.types'
-import { get, isResponseOk } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import {
   checkForILIKEClause,
-  checkForWildcard,
   checkForWithClause,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { IS_PLATFORM } from 'common'
+import { get } from 'data/fetchers'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -40,7 +37,6 @@ const useLogsQuery = (
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
-    project: projectRef,
     iso_timestamp_start: initialParams.iso_timestamp_start
       ? initialParams.iso_timestamp_start
       : defaultHelper.calcFrom(),
@@ -49,13 +45,20 @@ const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
-  const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
+  useEffect(() => {
+    setParams((prev) => ({
+      ...prev,
+      ...initialParams,
+      sql: initialParams?.sql ?? prev.sql,
+      iso_timestamp_start: initialParams.iso_timestamp_start ?? prev.iso_timestamp_start,
+      iso_timestamp_end: initialParams.iso_timestamp_end ?? prev.iso_timestamp_end,
+    }))
+  }, [initialParams.sql, initialParams.iso_timestamp_start, initialParams.iso_timestamp_end])
 
-  const queryParams = genQueryParams(params as any)
+  const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 
   const usesWith = checkForWithClause(params.sql || '')
   const usesILIKE = checkForILIKEClause(params.sql || '')
-  const usesWildcard = checkForWildcard(params.sql || '')
 
   const {
     data,
@@ -64,11 +67,21 @@ const useLogsQuery = (
     isRefetching,
     refetch,
   } = useQuery(
-    ['projects', projectRef, 'logs', queryParams],
-    ({ signal }) =>
-      get<Logs>(`${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${queryParams}`, {
+    ['projects', projectRef, 'logs', params],
+    async ({ signal }) => {
+      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+        params: {
+          path: { ref: projectRef },
+          query: params,
+        },
         signal,
-      }),
+      })
+      if (error) {
+        throw error
+      }
+
+      return data as unknown as Logs
+    },
     {
       enabled: _enabled,
       refetchOnWindowFocus: false,
@@ -94,13 +107,6 @@ const useLogsQuery = (
         docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported',
       }
     }
-    if (usesWildcard) {
-      error = {
-        message:
-          'Wildcard (*) queries are not supported. Please remove the wildcard and try again.',
-        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-wildcard-operator--to-select-columns-is-not-supported',
-      }
-    }
   }
   const changeQuery = (newQuery = '') => {
     setParams((prev) => ({ ...prev, sql: newQuery }))
@@ -109,7 +115,7 @@ const useLogsQuery = (
   return {
     params,
     isLoading: (_enabled && isLoading) || isRefetching,
-    logData: isResponseOk(data) && data.result ? data.result : [],
+    logData: data?.result ?? [],
     error,
     changeQuery,
     runQuery: () => refetch(),

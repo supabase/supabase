@@ -1,43 +1,62 @@
+import { FunctionComponent } from 'react'
 import {
-  ChartScatter,
-  Database,
-  FileCode2,
-  Lock,
-  Cloud,
-  UploadCloud,
-  Image,
-  MessageCircle,
-  ShieldCheck,
-  Package,
-  Users,
-  Folders,
-  RectangleEllipsis,
-  Braces,
-  Globe,
-  UserX,
-  GitBranch,
-  DatabaseZap,
-  Mail,
-  Smartphone,
-  Server,
   Activity,
   BarChart,
+  Braces,
   Brain,
-  Puzzle,
+  ChartScatter,
+  Clock,
+  Cloud,
+  CloudCog,
+  Database,
   DatabaseBackup,
+  DatabaseZap,
+  Eye,
+  FileCode2,
+  Folders,
+  GitBranch,
+  Globe,
+  Image,
+  Lock,
+  Mail,
+  MessageCircle,
+  Package,
+  Puzzle,
+  RectangleEllipsis,
+  Server,
+  Shield,
+  ShieldCheck,
   ShieldPlus,
+  Smartphone,
   Terminal,
+  UploadCloud,
+  Users,
+  UserX,
   Zap,
 } from 'lucide-react'
-import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
+import {
+  PRODUCT,
+  PRODUCT_MODULE,
+  PRODUCT_MODULES_SHORTNAMES,
+  PRODUCT_SHORTNAMES,
+} from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
-  PLATFORM = 'platform management',
+  PLATFORM = 'platform',
   STUDIO = 'studio',
 }
 
-export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
+export type FeatureProductType = PRODUCT | PRODUCT_MODULE | ADDITIONAL_PRODUCTS
+
+export enum PRODUCT_STAGES {
+  PRIVATE_ALPHA = 'Private Alpha',
+  PUBLIC_ALPHA = 'Public Alpha',
+  BETA = 'Beta',
+  PUBLIC_BETA = 'Public Beta',
+  GA = 'General Availability',
+}
 
 export type FeatureType = {
   /**
@@ -59,7 +78,7 @@ export type FeatureType = {
   /**
    * icon will be displayed in the feature card
    */
-  icon: string | LucideIcon
+  icon: string | LucideIcon | FunctionComponent
   /**
    * Each feature belongs to one or more products
    */
@@ -79,6 +98,17 @@ export type FeatureType = {
    * url to docs or blog page for this feature
    */
   docsUrl?: string
+  /**
+   * feature metadata on its status
+   */
+  status?: {
+    stage: PRODUCT_STAGES
+    availableOnSelfHosted: boolean
+    selfHostedTooling?: {
+      label: string
+      link: string
+    }
+  }
 }
 
 export const features: FeatureType[] = [
@@ -106,6 +136,10 @@ It's 100% portable, which means you can easily migrate your data to and from oth
     heroImageLight: '/images/features/postgres-database-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/overview',
     slug: 'postgres-database',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Vector database',
@@ -127,6 +161,10 @@ Supabase provides an open source toolkit for developing AI applications using Po
     heroImage: 'https://www.youtube-nocookie.com/embed/ibzlEQmgPPY',
     docsUrl: 'https://supabase.com/docs/guides/ai',
     slug: 'vector-database',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Auto-generated REST API via PostgREST',
@@ -149,6 +187,10 @@ Supabase automatically generates a comprehensive RESTful API from your database 
     heroImageLight: '/images/features/auto-generated-rest-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/api#rest-api-overview',
     slug: 'auto-generated-rest-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Auto-generated GraphQL API via pg_graphql',
@@ -178,6 +220,10 @@ Supabase offers lightning-fast GraphQL APIs through its custom-built Postgres Gr
     heroImageLight: '/images/features/auto-generated-graphql-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/graphql/api',
     slug: 'auto-generated-graphql-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Database backups',
@@ -213,6 +259,14 @@ Supabase's backup solutions provide a balance of security, flexibility, and ease
     heroImageLight: '/images/features/backups-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/backups',
     slug: 'database-backups',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'wal-g',
+        link: 'https://github.com/wal-g/wal-g',
+      },
+    },
   },
   {
     title: 'Custom domains',
@@ -238,6 +292,10 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     heroImageLight: '/images/features/custom-domains-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/custom-domains',
     slug: 'custom-domains',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Network restrictions',
@@ -271,6 +329,10 @@ By implementing Network Restrictions, you create a more secure environment for y
     heroImageLight: '/images/features/network-restrictions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/network-restrictions',
     slug: 'network-restrictions',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'SSL enforcement',
@@ -306,6 +368,10 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     heroImageLight: '/images/features/ssl-enforcement-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/ssl-enforcement',
     slug: 'ssl-enforcement',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Branching',
@@ -338,6 +404,10 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     heroImageLight: '/images/features/branching-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Terraform provider',
@@ -374,6 +444,10 @@ By adopting the Supabase Terraform provider, teams can implement GitOps practice
     heroImageLight: '/images/features/terraform-provider-light.png',
     docsUrl: 'https://supabase.com/docs/guides/deployment/terraform',
     slug: 'terraform-provider',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Read replicas',
@@ -409,40 +483,10 @@ By leveraging Read Replicas, you can achieve consistent low-latency performance 
     heroImage: 'https://www.youtube-nocookie.com/embed/PX3R1fXjJ2M',
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
     slug: 'read-replicas',
-  },
-  {
-    title: 'Fly Postgres',
-    subtitle: 'Launch the Supabase stack on Fly.io edge network.',
-    description: `
-Fly Postgres allows you to deploy Supabase databases on the Fly.io edge network, bringing your data closer to users and reducing latency for global applications.
-
-## Key features
-1. Edge deployment: Launch databases in any region where Fly.io operates.
-2. CLI integration: Set up and manage databases using the Fly CLI.
-3. Supabase dashboard access: Use familiar Supabase tools for database management.
-4. IPv6 support: Connect directly to databases using IPv6.
-5. Supavisor support: Use Supavisor for IPv4 connections when needed.
-6. Automatic Supabase organization creation: Seamless integration with Fly accounts.
-
-## Benefits:
-- Improved global performance: Serve data from edge locations, minimizing latency.
-- Simplified deployment: Easily set up databases using Fly CLI commands.
-- Familiar tooling: Access Supabase features like SQL editor and table editor.
-- Flexible connectivity: Support for both IPv6 and IPv4 (via Supavisor) connections.
-- Integrated management: Manage database resources alongside other Fly applications.
-
-## Fly Postgres is particularly valuable for:
-- Global applications requiring low-latency database access worldwide
-- Developers familiar with Fly.io looking to integrate Supabase databases
-- Projects needing easy deployment and management of edge-located databases
-
-By leveraging Fly Postgres, you can achieve improved global performance for your applications while maintaining the ease of use and powerful features of Supabase.
-`,
-    icon: Cloud,
-    products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/platform/fly-postgres',
-    slug: 'fly-postgres',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Postgres Extensions',
@@ -471,7 +515,6 @@ Popular Postgres extensions supported by Supabase include:
 - pgjwt: Allows for JSON Web Token (JWT) generation and verification
 - pg_net: Enables making HTTP requests from the database
 - pgroonga: Provides full-text search capabilities for various languages
-- timescaledb: Optimizes the database for time-series data
 
 Postgres extensions are valuable for a wide range of applications, from GIS and machine learning projects to security-focused applications and IoT systems dealing with time-series data.
 
@@ -483,6 +526,10 @@ By leveraging these extensions, you can implement complex features more easily, 
     heroImageLight: '/images/features/postgres-extensions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions',
     slug: 'postgres-extensions',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Database Webhooks',
@@ -491,11 +538,11 @@ By leveraging these extensions, you can implement complex features more easily, 
 Database Webhooks allow you to send real-time data from your database to another system whenever a table event occurs. You can hook into three table events: INSERT, UPDATE, and DELETE, with all events fired after a database row is changed. This feature provides a convenient way to integrate your Supabase database with external applications and services.
 
 ## Key benefits
-1. Real-Time Data Transfer: Automatically send data to external systems in response to database changes, ensuring timely updates.
+1. Real-time data transfer: Automatically send data to external systems in response to database changes, ensuring timely updates.
 2. Flexibility: Configure webhooks for specific tables and events, allowing for tailored integrations based on your application's needs.
-3. Asynchronous Processing: Built on the pg_net extension, webhooks operate asynchronously, preventing long-running network requests from blocking database operations.
-4. Easy Setup: Create webhooks directly from the Supabase Dashboard or through SQL statements, making integration straightforward.
-5. Payload Customization: Automatically generated payloads provide relevant data about the event, including the new and old record states.
+3. Asynchronous processing: Built on the pg_net extension, webhooks operate asynchronously, preventing long-running network requests from blocking database operations.
+4. Easy setup: Create webhooks directly from the Supabase Dashboard or through SQL statements, making integration straightforward.
+5. Payload customization: Automatically generated payloads provide relevant data about the event, including the new and old record states.
 
 This feature is particularly useful for developers looking to automate workflows and integrate their databases with third-party services like payment processors or notification systems.
 `,
@@ -505,6 +552,10 @@ This feature is particularly useful for developers looking to automate workflows
     heroImageLight: '/images/features/database-webhooks-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/webhooks',
     slug: 'database-webhooks',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Vault',
@@ -513,11 +564,11 @@ This feature is particularly useful for developers looking to automate workflows
 Vault is a Postgres extension and accompanying Supabase UI that simplifies the secure storage of encrypted secrets and other sensitive data in your database. This feature allows developers to utilize Postgres in innovative ways beyond its standard capabilities.
 
 ## Key benefits:
-1. Secure Storage: Secrets are stored on disk in an encrypted format, ensuring they remain protected even in backups or replication streams.
-2. Easy Management: The Supabase dashboard UI makes it simple to store and manage secrets, including environment variables and API keys.
-3. Flexible Encryption: Users can create custom encryption keys for different purposes, enhancing data security.
-4. Seamless Access: Secrets can be accessed from SQL as easily as querying a table, facilitating their use in Postgres Functions, Triggers, and Webhooks.
-5. Robust Security Features: The Vault employs authenticated encryption to ensure that secrets cannot be forged or decrypted without proper authorization.
+1. Secure storage: Secrets are stored on disk in an encrypted format, ensuring they remain protected even in backups or replication streams.
+2. Easy management: The Supabase dashboard UI makes it simple to store and manage secrets, including environment variables and API keys.
+3. Flexible encryption: Users can create custom encryption keys for different purposes, enhancing data security.
+4. Seamless access: Secrets can be accessed from SQL as easily as querying a table, facilitating their use in Postgres Functions, Triggers, and Webhooks.
+5. Robust security features: The Vault employs authenticated encryption to ensure that secrets cannot be forged or decrypted without proper authorization.
 
 This feature is particularly useful for teams looking to enhance their security posture by managing sensitive data directly within their database environment.
 `,
@@ -526,6 +577,10 @@ This feature is particularly useful for teams looking to enhance their security 
     heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Supavisor',
@@ -547,10 +602,14 @@ This feature is particularly valuable for teams looking to optimize their databa
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
     docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Realtime
   {
-    title: 'Realtime Postgres changes',
+    title: 'Realtime - Postgres changes',
     subtitle: 'Receive your database changes through websockets.',
     description: `
 Supabase's Realtime Postgres Changes feature allows you to listen to database changes in real-time using the Realtime system. This capability enables you to build responsive, live-updating applications that reflect database changes instantly.
@@ -582,9 +641,13 @@ Supabase's Realtime Postgres Changes feature provides a powerful tool for creati
     heroImage: 'https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
     slug: 'realtime-postgres-changes',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
-    title: 'Realtime Broadcast',
+    title: 'Realtime - Broadcast',
     subtitle: 'Send messages between connected users through websockets.',
     description: `
 Supabase's Realtime Broadcast feature enables real-time communication between connected clients using the Realtime system. This functionality allows you to build interactive, collaborative applications where users can instantly share messages or data in real-time.
@@ -619,9 +682,13 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
     heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
     slug: 'realtime-broadcast',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
-    title: 'Realtime Presence',
+    title: 'Realtime - Presence',
     subtitle: 'Synchronize shared state between users through websockets.',
     description: `
 Supabase's Realtime Presence feature allows you to track and synchronize shared state between connected users in real-time. This capability enables you to build collaborative applications where users can see each other's status, actions, or any custom state information instantly.
@@ -655,6 +722,59 @@ Supabase's Realtime Presence feature provides a powerful tool for creating inter
     heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/presence',
     slug: 'realtime-presence',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Broadcast Authorization',
+    subtitle: 'Control access to broadcast channels in real-time.',
+    description: `
+The Realtime Broadcast Authorization feature allows you to manage access permissions for broadcast channels in your application. This functionality ensures that only authorized users can listen to specific channels, enhancing security and control over real-time data streams.
+
+Key benefits:
+1. Secure access control: Implement fine-grained access control over who can receive broadcast messages in real-time.
+2. Customizable permissions: Define specific authorization rules based on user roles or attributes.
+3. Enhanced user experience: Ensure that users only receive relevant updates based on their permissions.
+4. Easy integration with existing systems: Seamlessly integrate broadcast authorization into your current application architecture.
+5. Comprehensive documentation available: Access detailed guides on how to implement broadcast authorization effectively.
+
+This feature is particularly valuable for applications that require controlled access to live data streams, such as chat applications or collaborative tools.
+`,
+    icon: Shield,
+    products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#broadcast',
+    slug: 'realtime-broadcast-authorization',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Presence Authorization',
+    subtitle: 'Manage presence information securely in real-time.',
+    description: `
+The Realtime Presence Authorization feature enables you to control access permissions related to presence information in your application. This allows you to manage who can see the online status of other users in real-time, enhancing privacy and security within collaborative environments.
+
+Key benefits:
+1. Controlled Visibility of Presence Data: Ensure that only authorized users can view the online status of others, protecting user privacy.
+2. Customizable Presence Rules: Define specific rules based on user roles or attributes for who can see presence information.
+3. Improved User Experience: Enhance collaboration by providing relevant presence information while maintaining security protocols.
+4. Seamless Integration: Easily incorporate presence authorization into existing systems without significant overhead.
+5. Detailed Implementation Guides: Access comprehensive documentation on how to implement presence authorization effectively.
+
+This feature is particularly useful for collaborative applications where knowing the online status of team members is crucial while ensuring privacy and security are maintained.`,
+    icon: Eye,
+    products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#presence',
+    slug: 'realtime-presence-authorization',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Auth
   {
@@ -675,7 +795,7 @@ Supabase's Email Login feature enables secure email-based authentication for you
 - Secure authentication: Implement industry-standard security practices.
 - Customizable workflows: Tailor the signup and login processes to your needs.
 - Seamless integration: Works with Supabase's other auth providers and features.
-- Local development support: Test email flows using built-in tools like Inbucket.
+- Local development support: Test email flows using built-in tools like Mailpit.
 
 ## Email login is valuable for:
 - SaaS applications requiring user accounts
@@ -691,6 +811,10 @@ Supabase's Email Login provides a robust foundation for user authentication, all
     heroImageLight: '/images/features/email-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/passwords',
     slug: 'email-login',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Social login',
@@ -726,6 +850,10 @@ Supabase's Social Login feature allows you to improve user experience and potent
     heroImageLight: '/images/features/social-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
     slug: 'social-login',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Phone logins',
@@ -760,6 +888,10 @@ Supabase's Phone Login feature enables a seamless authentication experience, par
     heroImageLight: '/images/features/phone-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/phone-login',
     slug: 'phone-logins',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Passwordless login via Magic Links',
@@ -795,6 +927,10 @@ Supabase's Magic Links feature offers a secure and user-friendly authentication 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-passwordless',
     slug: 'passwordless-login-via-magicklink',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Multi-Factor Authentication (MFA)',
@@ -830,6 +966,10 @@ Supabase's MFA feature provides a robust tool for enhancing application security
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-mfa',
     slug: 'multi-factor-authentication',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Authorization via Row Level Security',
@@ -865,6 +1005,10 @@ Supabase's RLS feature provides a powerful tool for implementing sophisticated a
     heroImage: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4`,
     docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
     slug: 'row-level-security',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Captcha protection',
@@ -900,6 +1044,10 @@ Supabase's Captcha Protection feature provides a powerful tool for enhancing app
     heroImageLight: '/images/features/auth-captcha-protection-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-captcha',
     slug: 'auth-captcha-protection',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Server-side Auth',
@@ -934,6 +1082,10 @@ Supabase's Server-side Auth feature allows developers to create more secure and 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/server-side',
     slug: 'server-side-auth',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Storage
   {
@@ -971,6 +1123,10 @@ Supabase Storage simplifies adding robust file management to your applications, 
     heroImageLight: '/images/features/file-storage-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage',
     slug: 'file-storage',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Content Delivery Network',
@@ -1006,6 +1162,14 @@ Supabase's CDN significantly improves the performance and user experience of you
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/storage/cdn',
     slug: 'cdn',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'Cloudflare',
+        link: 'https://www.cloudflare.com',
+      },
+    },
   },
   {
     title: 'Smart Content Delivery Network',
@@ -1041,42 +1205,91 @@ Supabase's Smart CDN optimizes both performance and content accuracy, providing 
     heroImage: 'https://www.youtube-nocookie.com/embed/NpEl20iuOtg',
     docsUrl: 'https://supabase.com/docs/guides/storage/cdn/smart-cdn',
     slug: 'smart-cdn',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'Cloudflare',
+        link: 'https://www.cloudflare.com',
+      },
+    },
   },
   {
     title: 'Image transformations',
-    subtitle: 'Transform images on the fly.',
+    subtitle: 'Optimize and resize images on-the-fly directly from your Supabase storage buckets.',
     description: `
-Supabase's Image Transformations feature allows you to optimize and resize images on-the-fly, directly from your storage buckets.
+Supabase’s Image Transformations feature enables developers to dynamically manipulate images stored in Supabase Storage. This functionality is ideal for applications requiring responsive design, efficient media delivery, and streamlined image management.
 
 ## Key features
-1. Dynamic resizing: Adjust image dimensions using width and height parameters.
-2. Quality control: Set image quality with a scale of 20 to 100.
-3. Resize modes: Choose from 'cover', 'contain', or 'fill' to suit your needs.
-4. Automatic format optimization: Convert images to WebP for supported browsers.
-5. Flexible implementation: Use with public URLs, signed URLs, or direct downloads.
-6. Next.js integration: Custom loader for optimized images in Next.js applications.
-7. Self-hosting option: Deploy your own image transformation service using Imgproxy.
+1. Dynamic resizing: Adjust image dimensions using width and height parameters to suit various display requirements.
+2. Quality control: Set image quality on a scale from 20 to 100 to balance visual fidelity and file size.
+3. Resize modes: Choose from ‘cover’, ‘contain’, or ‘fill’ to control how images fit within specified dimensions.
+4. Automatic format optimization: Automatically convert images to WebP format for supported browsers, enhancing load times and reducing bandwidth usage.
+5. Flexible implementation: Utilize with public URLs, signed URLs, or direct downloads to fit various access control needs ([Server-side Auth](/features/server-side-auth)).
+6. [Next.js integration](/nextjs): Leverage a custom loader for optimized image handling in Next.js applications.
+7. Self-hosting option: Deploy your own image transformation service using Imgproxy for greater control and customization.
+
 
 ## Benefits:
 - Performance optimization: Reduce bandwidth usage and improve load times with optimized images.
 - Storage efficiency: Store a single high-quality version and generate variants as needed.
 - Responsive design support: Serve appropriately sized images for different devices and layouts.
-- Simplified workflow: Eliminate the need for manual image processing and multiple version storage.
+- Simplified workflow: Automate image processing tasks, reducing the need for manual intervention and third-party tools.
 
 ## Image transformations are valuable for:
-- Responsive web applications requiring different image sizes
-- E-commerce platforms showcasing product images
-- Content management systems adapting images for various layouts
-- Mobile apps optimizing images for cellular networks
-- Any application handling large volumes of images in varying contexts
+- Responsive web applications: Deliver images optimized for various screen sizes and resolutions.
+- Ecommerce platforms: Showcase product images in multiple sizes without storing redundant files.
+- Content management systems (CMS): Adapt images for different layouts and templates dynamically.
+- Mobile applications: Optimize images for devices with varying bandwidth and display capabilities.
+- High-volume image handling: Efficiently manage and serve large quantities of images in diverse contexts with [resumable uploads](/features/resumable-uploads).
 
 Supabase's Image Transformations feature enables you to efficiently manage and serve optimized images, improving your application's performance and user experience while saving time and resources.
+
+## Integration capabilities
+
+Supabase’s Image Transformations seamlessly integrate within its ecosystem and with external tools:
+- Supabase Storage: Directly apply transformations to images stored in Supabase buckets, streamlining media management.
+- Next.js compatibility: Utilize a custom loader to integrate image transformations within Next.js applications, enhancing performance and user experience.
+- Self-hosting with Imgproxy: Deploy your own image transformation service using Imgproxy, offering greater control and customization options.
+- API access: Leverage RESTful APIs to programmatically apply transformations, enabling automation and integration with various workflows.
+
+These integration options provide flexibility, allowing developers to tailor image transformation processes to their specific project requirements.
+For a deeper understanding and step-by-step guidance on using Image Transformations, please refer to our [documentation](/docs/guides/storage/image-transformations).
+
+## FAQs about image transformations with Supabase
+
+Below are answers to common questions about Supabase Image Transformations.
+
+### What image formats are supported by Supabase Image Transformations?
+
+Supabase Image Transformations primarily support common web-friendly formats such as JPEG, PNG, and WebP. When using the automatic format optimization feature, images can be converted to WebP for supported browsers to enhance performance.
+
+### Can I apply multiple transformations to a single image request?
+
+Yes, you can chain multiple transformation parameters in a single request. For example, you can resize an image and adjust its quality simultaneously by specifying the appropriate query parameters in the image URL.
+
+### How do I implement transformations in my Next.js application?
+
+Supabase provides a custom loader for Next.js, allowing seamless integration of Image Transformations. By configuring the loader, you can optimize images on-the-fly within your Next.js project.
+
+### Are there any limitations on image size or dimensions?
+
+While Supabase does not impose strict limits on image sizes, it’s recommended to optimize images for web use to ensure faster load times and better performance. Large images may consume more bandwidth and affect loading speeds.
+
+### How does automatic format optimization work?
+
+Automatic format optimization detects the capabilities of the user’s browser and serves the most efficient image format supported, such as WebP. This enhances loading times and reduces bandwidth usage without compromising image quality.
+
 `,
     icon: Image,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: 'https://www.youtube-nocookie.com/embed/dLqSmxX3r7I',
     docsUrl: 'https://supabase.com/docs/guides/storage/image-transformations',
     slug: 'image-transformations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Resumable uploads',
@@ -1113,6 +1326,10 @@ Supabase's Resumable Uploads feature significantly improves the reliability and 
     heroImage: 'https://www.youtube-nocookie.com/embed/pT2PcZFq_M0',
     docsUrl: 'https://supabase.com/docs/guides/storage/uploads/resumable-uploads',
     slug: 'resumable-uploads',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'S3 compatibility',
@@ -1150,6 +1367,10 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     heroImageLight: '/images/features/s3-compatibility-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
     slug: 's3-compatibility',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Functions
   {
@@ -1189,6 +1410,10 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Regional invocations',
@@ -1220,6 +1445,10 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocation',
     slug: 'regional-invocations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'NPM compatibility',
@@ -1251,6 +1480,10 @@ By leveraging NPM Compatibility in Supabase Edge Functions, you can take advanta
     heroImage: 'https://www.youtube-nocookie.com/embed/eCbiywoDORw',
     docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
     slug: 'npm-compatibility',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Vector
   {
@@ -1279,10 +1512,14 @@ Supabase's AI Integrations feature provides seamless connectivity with leading A
 By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sophisticated AI-powered applications. This feature bridges the gap between powerful AI models and your application data, enabling you to create more intelligent, responsive, and personalized user experiences without the complexity of managing separate AI infrastructure.
 `,
     icon: Brain,
-    products: [PRODUCT_SHORTNAMES.VECTOR],
+    products: [PRODUCT_MODULES_SHORTNAMES.VECTOR],
     heroImage: 'https://www.youtube-nocookie.com/embed/OgnYxRkxEUw',
     docsUrl: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
     slug: 'ai-integrations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Platform
   {
@@ -1316,6 +1553,10 @@ By leveraging the Supabase CLI, you can significantly improve your development w
     docsUrl:
       'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
     slug: 'cli',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Management API',
@@ -1346,8 +1587,12 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/management-api.png',
     heroImageLight: '/images/features/management-api-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/project-management/api',
+    docsUrl: 'https://supabase.com/docs/reference/api/introduction',
     slug: 'management-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Role-Based Access Control (RBAC)',
@@ -1380,6 +1625,10 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   // Analytics
   {
@@ -1412,6 +1661,10 @@ By leveraging Supabase Reports, you gain a understanding of your project's perfo
     heroImageLight: '/images/features/reports-and-metrics-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
     slug: 'reports-and-metrics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'SOC 2 Compliance',
@@ -1447,31 +1700,45 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     icon: ShieldCheck,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/security/compliance',
+    docsUrl: 'https://supabase.com/docs/guides/security/soc-2-compliance',
     slug: 'soc-2-compliance',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   // Studio
   {
-    title: 'AI-Powered Query Assistance',
-    subtitle: 'Get help crafting complex SQL queries effortlessly.',
+    title: 'Supabase AI Assistant',
+    subtitle: 'Your intelligent companion for managing Postgres databases.',
     description: `
-The AI-Powered Query Assistance feature in Supabase provides users with intelligent suggestions for writing SQL queries based on natural language input. This tool is designed to enhance productivity and streamline the development process, making it easier for both novice and experienced developers to interact with their databases. By transforming user queries into optimized SQL commands, it reduces the time spent on query formulation and minimizes errors.
+Supabase AI Assistant is integrated into the Supabase Dashboard to drastically improve your database management experience. This tool helps streamline your workflow, significantly reducing the time it takes to transition from concept to product.
 
-## Key benefits
-1. User-Friendly: Simplifies the query-writing process by allowing users to express their needs in plain language.
-2. Time-Saving: Accelerates development by quickly generating accurate SQL queries.
-3. Learning Tool: Acts as a learning resource for new developers to understand SQL syntax and best practices.
-4. Error Reduction: Minimizes common mistakes in query formulation through intelligent suggestions.
-5. Integration: Seamlessly integrates with existing Supabase projects, enhancing the overall user experience.
+The AI Assistant can save you hours of work by automating repetitive tasks and providing context-aware support. For instance, when designing a new database schema, it can generate all necessary SQL queries based on your specifications, allowing you to focus on the bigger picture rather than getting bogged down in details. If you encounter an error in your SQL code, the Assistant can quickly analyze the issue and suggest solutions, enabling you to resolve problems efficiently without losing your train of thought. Additionally, while working on a specific table, the Assistant can provide instant feedback and recommendations tailored to that context, ensuring that you always have relevant information at your fingertips.
 
-This feature is especially beneficial for teams looking to improve their database interaction efficiency while ensuring that all members can contribute effectively, regardless of their SQL expertise.
+Key benefits:
+1. Schema Design Assistance: Receive guidance on structuring your database and generating SQL queries.
+2. Enhanced Query Writing: Get precise suggestions for writing SQL queries based on your schema.
+3. Error Debugging: Identify and resolve SQL errors directly within the SQL Editor.
+4. Data Insights Discovery: Execute queries using natural language and view results in a clear format.
+5. RLS Policies Management: Create and modify Row Level Security (RLS) Policies according to your requirements.
+6. Functions and Triggers Support: Easily suggest, create, or update Postgres Functions and Triggers.
+
+With Supabase AI Assistant, you gain a powerful ally in your development process, helping you work more efficiently and effectively while keeping you focused on your goals.
 `,
     icon: Brain,
-    products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: 'https://www.youtube-nocookie.com/embed/hu2SQjvCXIw',
-    docsUrl:
-      'https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant',
-    slug: 'ai-query-assistance',
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/_fdP-aaTHgw',
+    docsUrl: '/blog/supabase-ai-assistant-v2',
+    slug: 'ai-assistant',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'OpenAI API Key',
+        link: 'https://platform.openai.com/docs/libraries#create-and-export-an-api-key',
+      },
+    },
   },
   {
     title: 'Logs & Analytics',
@@ -1494,21 +1761,71 @@ This feature is particularly valuable for teams looking to enhance their applica
     heroImageLight: '/images/features/logs-analytics-light.png',
     docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
     slug: 'logs-analytics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Visual Schema Designer',
-    subtitle: 'Design your database schema with an intuitive interface.',
+    subtitle: 'Design your Postgres database schema with an intuitive interface.',
     description: `
-The Visual Schema Designer feature allows users to create and modify database schemas through a user-friendly drag-and-drop interface. This tool is aimed at simplifying the database design process, making it accessible for users who may not be familiar with traditional SQL commands. By visualizing relationships between tables and fields, users can efficiently plan their database architecture.
+The Visual Schema Designer is an integral part of [Supabase Studio](/features?products=studio), offering users a seamless way to create and modify PostgreSQL database schemas without writing SQL code. This visual database design tool simplifies the process of structuring your database by allowing you to:
+
+- Drag and drop tables and fields. Easily add, remove, and arrange tables and fields to build your schema visually.
+- Define relationships. Establish connections between tables, such as one-to-one, one-to-many, and many-to-many relationships, to accurately represent your data model.
+- Leverage real-time visualization. Instantly see how changes affect your schema, ensuring a clear understanding of your database structure.
+
+This feature is designed to be accessible for users of all technical levels, making database schema design more approachable and efficient.
 
 ## Key benefits
-1. Intuitive Design: Facilitates easy schema creation through visual representation.
-2. Relationship Mapping: Clearly illustrates how tables are interconnected, aiding in effective database design.
-3. Accessibility: Makes database management approachable for non-technical users.
-4. Real-Time Updates: Automatically reflects changes in the schema, ensuring consistency across the project.
-5. Collaboration: Enhances teamwork by allowing multiple users to contribute to schema design simultaneously.
+1. Intuitive design: The intuitive design allows for quick schema creation and modification without the need for complex SQL queries.
+2. Visual relationship mapping: Clearly illustrates how tables are interconnected, aiding in effective database design and ensuring data integrity.
+3. Accessible for all users: Whether you’re a seasoned developer or new to database design, the Visual Schema Designer provides a straightforward way to build and manage your database schema.
+4. Immediate feedback: Real-time updates ensure that all changes are instantly visible, reducing errors and improving accuracy.
+5. Enhanced collaboration: Multiple team members can work on the schema simultaneously, facilitating better teamwork and faster development cycles.
+
 
 This feature is particularly valuable for teams engaged in agile development processes where rapid iteration and collaboration are essential.
+
+## Use Cases for Visual Schema Designer
+
+The Visual Schema Designer caters to a diverse range of users, each benefiting uniquely from its intuitive interface and robust features:
+
+- Front-end developers. Quickly prototype and iterate on database schemas without delving into SQL, streamlining the development process.
+- Backend engineers. Visualize and manage complex relationships between tables, ensuring data integrity and efficient database architecture.
+- Product managers & designers. Collaborate seamlessly with technical teams by understanding and contributing to the database structure through an accessible visual interface.
+- Educators & students. Leverage the tool as an educational resource to teach and learn database design principles in a more interactive and engaging manner.
+
+The Visual Schema Designer addresses the needs of various stakeholders; fostering collaboration and enhancing productivity across the board.
+
+## Integration capabilities with Supabase’s Schema designer
+
+The Visual Schema Designer seamlessly integrates within the Supabase ecosystem, enhancing your database management experience:
+
+- Supabase Studio integration. Embedded directly into Supabase Studio, the Visual Schema Designer allows for intuitive schema creation and modification alongside other powerful tools like the SQL Editor and Role Management UI. 
+- AI-powered SQL Editor. Leverage the AI SQL Editor to generate and modify SQL queries effortlessly, streamlining your development workflow. 
+- Role management UI. Manage user roles and access permissions efficiently, ensuring secure and organized database operations. 
+- Database migration UI. Track and manage database migrations with ease, maintaining consistency across your development and production environments.
+- Wrappers UI. Connect to external data sources like S3, ClickHouse, and BigQuery, expanding the versatility of your database projects. 
+
+These integrations empower you to design, manage, and scale your PostgreSQL databases effectively within a unified platform.
+
+## FAQs about our Visual Schema Designer
+
+Below are answers to common questions about the Visual Schema Designer, covering its functionality, compatibility, and usage to help you get started quickly.
+
+### Do I need to know SQL to use the Schema Designer?
+
+No, the Visual Schema Designer is designed for users of all technical levels. It enables schema design through a visual interface without the need to write SQL code.
+
+### Can I use this with self-hosted Supabase instances?
+
+Yes, our drag-and-drop schema builder is available for both cloud and self-hosted Supabase setups.
+
+### Does the Designer support collaborative editing?
+
+Multiple users can collaborate on schema design in real-time, enhancing teamwork and facilitating agile development processes.
 `,
     icon: RectangleEllipsis,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
@@ -1516,6 +1833,10 @@ This feature is particularly valuable for teams engaged in agile development pro
     heroImageLight: '/images/features/visual-schema-designer-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
     slug: 'visual-schema-designer',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Policy Templates',
@@ -1538,21 +1859,75 @@ This feature is essential for organizations looking to maintain robust security 
     heroImageLight: '/images/features/policy-templates-light.png',
     docsUrl: '',
     slug: 'policy-templates',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'SQL Editor',
     subtitle: 'A powerful interface for writing and executing SQL queries.',
     description: `
-The SQL Editor in Supabase Studio provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. This feature is designed to enhance productivity by offering syntax highlighting, auto-completion, and error detection, making it easier for developers to interact with their databases efficiently.
+The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. This feature is designed to enhance productivity by offering syntax highlighting, auto-completion, and error detection, making it easier for developers to interact with their databases efficiently.
 
 ## Key benefits
-1. User-Friendly Interface: Intuitive design that simplifies the process of writing SQL queries.
-2. Syntax Highlighting: Enhances readability by color-coding SQL syntax, helping users quickly identify errors.
-3. Auto-Completion: Speeds up query writing by suggesting table names, column names, and functions.
-4. Execution History: Keeps track of previously executed queries for easy reference and reuse.
-5. Error Detection: Provides immediate feedback on syntax errors, reducing debugging time.
+1. User-friendly interface: Intuitive design that simplifies the process of writing SQL queries.
+2. Syntax highlighting: Enhances readability by color-coding SQL syntax, helping users quickly identify errors.
+3. Auto-completion: Speeds up query writing by suggesting table names, column names, and functions.
+4. Execution history: Keeps track of previously executed queries for easy reference and reuse.
+5. Error detection: Provides immediate feedback on syntax errors, reducing debugging time.
 
 This feature is particularly valuable for developers looking to streamline their workflow while ensuring accurate and efficient database interactions.
+
+## AI-powered assistance
+
+Integrated directly into the SQL Editor, Supabase AI serves as an intelligent assistant to enhance your database development workflow.
+
+- Natural language to SQL: Transform plain English prompts into accurate SQL queries, making database interactions more accessible.
+- Context-aware suggestions: Receive intelligent recommendations based on your current database schema and query context.
+- Interactive editing: Engage in a conversational interface to refine queries, with the ability to accept or reject AI-generated modifications.
+- Error analysis: Quickly identify and resolve SQL errors with AI-driven explanations and solutions. 
+
+## Seamless integration with Supabase ecosystem
+
+The SQL Editor is deeply integrated within the Supabase platform, offering a cohesive development experience.
+
+- [Schema Visualizer](/features/visual-schema-designer): Visually explore and manage your database schemas, enhancing understanding of table relationships.
+- [Role management](/features/role-based-access-control): Define and control access to your data with fine-grained role-based permissions.
+- Shared SQL snippets: Collaborate with team members by sharing reusable SQL code snippets across projects.
+- Database migration UI: Track and manage schema changes with an intuitive migration interface.
+- Wrappers UI: Easily connect and query external data sources like S3, ClickHouse, and BigQuery within your Supabase projects.
+
+## Use cases for the SQL Editor
+
+- Rapid prototyping: Quickly build and test database queries during the development phase.
+- Data analysis: Perform ad-hoc queries to extract insights and inform decision-making processes.
+- Collaborative development: Work alongside team members to develop and refine database queries and structures.
+- Educational purposes: Learn and teach SQL in an interactive environment with real-time feedback.
+
+## FAQs about our SQL Editor
+
+Below are answers to common questions about the Supabase SQL Editor.
+
+### Can I use the SQL Editor with self-hosted Supabase projects?
+
+Yes, the SQL Editor is available for self-hosted Supabase instances. However, certain features like Shared SQL Snippets may not be fully supported in self-hosted environments.
+
+### How does Supabase AI assistance work in the SQL Editor?
+
+Supabase AI is integrated directly into the SQL Editor, providing real-time assistance for writing and optimizing SQL queries. It can transform natural language prompts into SQL code, offer context-aware suggestions, and help debug errors. This feature enhances productivity and lowers the barrier to effective database management.
+
+### Is there a way to share my SQL queries with team members?
+
+Supabase offers a Shared SQL Snippets feature that allows you to share and manage SQL code snippets collaboratively within your team. This facilitates better collaboration and code reuse among team members.
+
+### Does the SQL Editor support syntax highlighting and auto-completion?
+
+Absolutely. The SQL Editor includes syntax highlighting to improve code readability and auto-completion features that suggest table names, column names, and functions as you type, enhancing the overall development experience.
+
+### Is the editor accessible via the Supabase CLI?
+
+While the editor is primarily a web-based tool within Supabase Studio, you can execute SQL queries using the [Supabase CLI](/features/cli) by utilizing the supabase db query command. This allows for integration into scripts and automation workflows.
 `,
     icon: FileCode2,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
@@ -1560,6 +1935,10 @@ This feature is particularly valuable for developers looking to streamline their
     heroImageLight: '/images/features/sql-editor-light.png',
     docsUrl: '',
     slug: 'sql-editor',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Security & Performance Advisor',
@@ -1568,11 +1947,11 @@ This feature is particularly valuable for developers looking to streamline their
 The Security & Performance Advisor feature in Supabase offers users actionable insights into their database's security posture and performance metrics. By analyzing configurations and usage patterns, this tool identifies potential vulnerabilities and performance bottlenecks, providing recommendations for improvements.
 
 ## Key benefits
-1. Proactive Security Checks: Regular assessments of security settings to identify vulnerabilities.
-2. Performance Optimization: Analyzes query performance to recommend optimizations that enhance efficiency.
-3. User-Friendly Dashboard: Presents findings in an easily digestible format within Supabase Studio.
-4. Actionable Recommendations: Provides clear steps for addressing identified issues, empowering users to enhance their database environments.
-5. Ongoing Monitoring: Continuously evaluates changes in database usage to adapt recommendations accordingly.
+1. Proactive security checks: Regular assessments of security settings to identify vulnerabilities.
+2. Performance optimization: Analyzes query performance to recommend optimizations that enhance efficiency.
+3. User-friendly dashboard: Presents findings in an easily digestible format within Supabase Studio.
+4. Actionable recommendations: Provides clear steps for addressing identified issues, empowering users to enhance their database environments.
+5. Ongoing monitoring: Continuously evaluates changes in database usage to adapt recommendations accordingly.
 
 This feature is essential for organizations aiming to maintain high security standards while ensuring optimal performance across their applications.
 `,
@@ -1580,8 +1959,12 @@ This feature is essential for organizations aiming to maintain high security sta
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/security-and-performance-advisor.png',
     heroImageLight: '/images/features/security-and-performance-advisor-light.png',
-    docsUrl: 'https://supabase.com/blog/security-and-performance-advisor',
+    docsUrl: 'https://supabase.com/blog/security-performance-advisor',
     slug: 'security-and-performance-advisor',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Postgres Roles',
@@ -1590,10 +1973,10 @@ This feature is essential for organizations aiming to maintain high security sta
 Postgres Roles are a fundamental aspect of managing access permissions within your Supabase database. Roles can function as individual users or groups of users, allowing for flexible permission management. This feature is essential for setting up secure access to your database while enabling efficient collaboration among team members.
 
 Key benefits:
-1. Granular Access Control: Configure permissions for various database objects, including tables, views, and functions, using the GRANT command.
-2. Role Hierarchy: Organize roles in a hierarchy to simplify permission management, allowing child roles to inherit permissions from parent roles.
-3. Secure User Management: Create roles with specific login privileges and strong passwords to ensure secure access to your database.
-4. Revocation of Permissions: Easily revoke permissions using the REVOKE command, providing control over who has access to what within your database.
+1. Granular access control: Configure permissions for various database objects, including tables, views, and functions, using the GRANT command.
+2. Role hierarchy: Organize roles in a hierarchy to simplify permission management, allowing child roles to inherit permissions from parent roles.
+3. Secure user management: Create roles with specific login privileges and strong passwords to ensure secure access to your database.
+4. Revocation of permissions: Easily revoke permissions using the REVOKE command, providing control over who has access to what within your database.
 5. Predefined Roles: Supabase extends Postgres with a set of predefined roles, simplifying the initial setup for new projects.
 
 This feature is particularly valuable for teams looking to implement robust security measures while maintaining flexibility in how users interact with their database.
@@ -1604,6 +1987,42 @@ This feature is particularly valuable for teams looking to implement robust secu
     heroImageLight: '/images/features/postgres-roles-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/postgres/roles',
     slug: 'postgres-roles',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'User Impersonation',
+    subtitle: 'Experience your application as any user.',
+    description: `
+User Impersonation in Supabase allows developers to simulate the experience of any user within their application. This feature is particularly useful for testing and debugging, as it enables you to view and interact with your application exactly as a specific user would.
+
+## Key benefits
+1. Realistic testing: Validate user-specific features and permissions by impersonating users directly in Supabase Studio.
+2. RLS policy verification: Test Row Level Security (RLS) policies with real data to ensure they function as intended.
+3. Enhanced debugging: Quickly identify and resolve user-specific issues by experiencing the application from their perspective.
+4. Seamless integration: Use the Table Editor, SQL Editor, and GraphiQL to impersonate users and test queries and mutations.
+5. Efficient Development: Accelerate the process of writing and testing RLS policies, reducing development time and effort.
+
+## User Impersonation is particularly valuable for:
+- Developers testing user-specific features and permissions
+- Teams implementing complex RLS policies
+- Applications requiring detailed user experience validation
+- Debugging user-reported issues with precision
+
+By leveraging User Impersonation, you can ensure that your application delivers the intended experience for every user, enhancing both functionality and security. This feature empowers developers to create more robust and user-friendly applications by providing a comprehensive toolset for testing and validation.
+`,
+    icon: Users,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION, ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '/images/blog/launch-week-x/day-1/3.png',
+    heroImageLight: '/images/blog/launch-week-x/day-1/3.png',
+    docsUrl: '/blog/studio-introducing-assistant#user-impersonation',
+    slug: 'user-impersonation',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Foreign Key Selector',
@@ -1612,11 +2031,11 @@ This feature is particularly valuable for teams looking to implement robust secu
 The Foreign Key Selector feature simplifies the process of establishing and managing foreign key relationships within your database schema. By providing a visual interface for selecting foreign keys, this tool enhances usability and reduces the likelihood of errors during schema design.
 
 ## Key benefits
-1. Visual Management: Allows users to easily visualize and select foreign key relationships between tables.
-2. Error Reduction: Minimizes mistakes associated with manual foreign key configuration.
-3. Streamlined Workflow: Enhances the efficiency of schema design by simplifying complex relationships.
-4. Real-Time Updates: Automatically reflects changes made in the foreign key relationships throughout the project.
-5. Documentation Support: Provides contextual information about foreign keys to guide users during setup.
+1. Visual management: Allows users to easily visualize and select foreign key relationships between tables.
+2. Error reduction: Minimizes mistakes associated with manual foreign key configuration.
+3. Streamlined workflow: Enhances the efficiency of schema design by simplifying complex relationships.
+4. Real-time updates: Automatically reflects changes made in the foreign key relationships throughout the project.
+5. Documentation support: Provides contextual information about foreign keys to guide users during setup.
 
 This feature is particularly beneficial for developers working with complex data models who need a straightforward way to manage relational integrity within their databases.
 `,
@@ -1626,6 +2045,10 @@ This feature is particularly beneficial for developers working with complex data
       'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4',
     docsUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
     slug: 'foreign-key-selector',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Log Drains',
@@ -1634,11 +2057,11 @@ This feature is particularly beneficial for developers working with complex data
 Log Drains enable developers to export logs generated by Supabase products—such as the Database, Storage, Realtime, and Auth—to external destinations like Datadog or custom HTTP endpoints. This feature provides a unified view of logs within existing logging and monitoring systems, allowing teams to build robust alerting and observability pipelines.
 
 ## Key benefits
-1. Centralized Logging: Consolidate logs from multiple Supabase services into a single location for easier management and analysis.
-2. Custom Alerting: Ingest logs into Security Information and Event Management (SIEM) or Intrusion Detection Systems (IDS) to create tailored alerting rules based on database events.
-3. Extended Retention: Supports longer log retention periods to meet compliance requirements, ensuring data availability for audits and investigations.
-4. Flexible Configuration: Easily set up Log Drains through the project settings, with support for popular destinations like Datadog and custom HTTP endpoints.
-5. Scalable Architecture: Built on Logflare's multi-node Elixir cluster, allowing for efficient and scalable log dispatching to multiple destinations.
+1. Centralized logging: Consolidate logs from multiple Supabase services into a single location for easier management and analysis.
+2. Custom alerting: Ingest logs into Security Information and Event Management (SIEM) or Intrusion Detection Systems (IDS) to create tailored alerting rules based on database events.
+3. Extended retention: Supports longer log retention periods to meet compliance requirements, ensuring data availability for audits and investigations.
+4. Flexible configuration: Easily set up Log Drains through the project settings, with support for popular destinations like Datadog and custom HTTP endpoints.
+5. Scalable architecture: Built on Logflare's multi-node Elixir cluster, allowing for efficient and scalable log dispatching to multiple destinations.
 
 This feature is particularly useful for teams seeking to enhance their observability practices while maintaining compliance and security standards across their applications.
 `,
@@ -1647,5 +2070,345 @@ This feature is particularly useful for teams seeking to enhance their observabi
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
     docsUrl: 'https://supabase.com/blog/log-drains',
     slug: 'log-drains',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - JavaScript',
+    subtitle: 'Easily integrate Supabase with your JavaScript applications.',
+    description: `
+The Supabase JavaScript Client Library provides a straightforward way to interact with your Supabase database and services directly from your JavaScript applications. This library simplifies the process of making API calls, managing authentication, and handling real-time updates, making it an essential tool for developers working with Supabase.
+
+Key benefits:
+1. Simplified API interaction: Easily connect to your Supabase backend with minimal setup.
+2. Built-in Authentication: Manage user authentication seamlessly within your JavaScript applications.
+3. Real-time capabilities: Subscribe to changes in your database and receive updates in real-time.
+4. Comprehensive documentation: Access detailed guides and examples to help you get started quickly.
+5. Community support: Join a growing community of developers using the JavaScript Client Library for various projects.
+
+This feature is particularly valuable for developers looking to build dynamic web applications that leverage the power of Supabase as a backend service.
+`,
+    icon: JsIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    slug: 'client-library-javascript',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Flutter',
+    subtitle: 'Integrate Supabase into your Flutter applications effortlessly.',
+    description: `
+The Supabase Flutter Client Library allows developers to easily integrate Supabase into their Flutter applications. This library provides a comprehensive set of tools for managing database interactions, user authentication, and real-time data updates, all tailored for the Flutter framework.
+
+Key benefits:
+1. Seamless integration: Connect your Flutter app to Supabase with minimal configuration.
+2. User Authentication: Manage user sign-ups, logins, and sessions directly within your Flutter application.
+3. Real-time updates: Receive live updates from your database, enhancing user experience.
+4. Detailed documentation: Access extensive resources and examples to facilitate development.
+5. Active community: Engage with other Flutter developers leveraging Supabase for their projects.
+
+This feature is particularly useful for Flutter developers aiming to create responsive mobile applications backed by a powerful database solution.
+`,
+    icon: FlutterIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    slug: 'client-library-flutter',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Swift',
+    subtitle: 'Effortlessly connect your Swift applications to Supabase.',
+    description: `
+The Supabase Swift Client Library provides an easy way for developers to integrate their iOS applications with Supabase services. This library simplifies database access, user authentication, and real-time data handling, making it an essential tool for Swift developers.
+
+Key benefits:
+1. Easy integration: Quickly connect your Swift app to Supabase with straightforward setup instructions.
+2. Authentication management: Handle user authentication seamlessly within your iOS applications.
+3. Real-time data handling: Subscribe to changes in your database and receive updates instantly.
+4. Comprehensive guides: Utilize detailed documentation and examples to streamline development.
+5. Supportive community: Join a community of Swift developers using Supabase for their app development needs.
+
+This feature is particularly valuable for iOS developers looking to leverage the capabilities of Supabase in their mobile applications.
+`,
+    icon: SwiftIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/swift/start',
+    slug: 'client-library-swift',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Python',
+    subtitle: 'Integrate Supabase easily into your Python applications.',
+    description: `
+The Supabase Python Client Library enables developers to connect their Python applications with Supabase effortlessly. This library provides tools for interacting with the database, managing user authentication, and handling real-time updates, tailored specifically for Python developers.
+
+Key benefits:
+1. Simple connection setup: Easily connect your Python application to Supabase with minimal configuration.
+2. User authentication support: Manage user accounts and sessions directly within your Python code.
+3. Real-time data updates: Subscribe to changes in your database and receive live updates as they occur.
+4. In-depth documentation: Access comprehensive guides and examples to assist in development.
+5. Engaged community support: Connect with other Python developers utilizing Supabase in their projects.
+
+This feature is especially beneficial for Python developers looking to build robust applications powered by a scalable backend service like Supabase.
+`,
+    icon: PythonIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/python/start',
+    slug: 'client-library-python',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Cron',
+    subtitle: 'Schedule recurring Jobs in Postgres.',
+    description: `
+Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron syntax directly within your database. Seamlessly integrated into the Supabase ecosystem, it allows users to automate tasks like executing SQL snippets, calling Database Functions, triggering Supabase Edge Functions, or syncing with external systems via webhooks.
+
+## Key benefits:
+1. Just Postgres: Jobs and run details are stored and executed entirely in the database by leveraging the pg_cron database extension.
+4. Versatile scheduling options: Supports standard cron syntax, sub-minute intervals, and natural language scheduling.
+2. Supabase integration: Integrates seamlessly with the rest of the Supabase platform, including Supabase Edge Functions and Database Webhooks.
+3. Zero network latency: Jobs are run directly in your database, eliminating network latency when executing SQL Snippets or calling Database Functions.
+6. Enhanced observability: Monitor job history, debug errors, and review logs directly from the Supabase Dashboard.
+5. Broad use cases: Automate a wide range of tasks, including database maintenance, analytics, performance optimizations, and syncing with remote systems.
+7. Ease of use: Leverage an intuitive UI or SQL for scheduling, managing, and monitoring Jobs.
+`,
+    icon: Clock,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/miRQPbIJOuQ',
+    docsUrl: 'https://supabase.com/docs/guides/cron',
+    slug: 'supabase-cron',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'OrioleDB',
+    subtitle: "New Postgres storage engine that's better than Heap storage.",
+    description: `
+OrioleDB is a PostgreSQL storage extension built on its pluggable storage framework. Serving as a direct replacement for PostgreSQL's Heap storage, it addresses scalability challenges while harnessing the full power of modern hardware. Designed to integrate effortlessly with PostgreSQL, OrioleDB enhances performance, efficiency, and scalability, all while maintaining the reliability and robustness PostgreSQL users depend on.
+
+## Key benefits:
+1. Fully integrated: A drop-in replacement for PostgreSQL’s Heap storage, enabling easy adoption without major changes to existing workflows.
+2. Enhanced scalability: Eliminates buffer mapping bottlenecks and utilizes lock-less page reading, significantly improving vertical scalability and hardware utilization.
+3. Superior performance: Proven to outperform PostgreSQL Heap by up to 5.5x in benchmarks, particularly under high-load and large-scale scenarios.
+4. Reduced maintenance overhead: Undo log-based MVCC eliminates storage bloat and removes the need for VACUUM, preventing common performance degradation.
+5. Efficient storage management: Built-in compression reduces storage requirements by up to 5x, enabling more cost-effective data handling.
+6. Modern write-ahead logging (WAL): Row-level WAL supports parallelism and is designed for future active-active multi-master configurations.
+7. Optimized for large datasets: Index-organized tables improve data locality, reducing disk I/O for workloads exceeding memory cache capacity.
+
+## Roadmap Features:
+1. Decoupled storage and compute with S3 integration for unlimited scalability.
+2. Planned columnar indexes to enable hybrid OLTP and OLAP workloads on the same system.
+3. Multi-master replication for better availability and fault tolerance.
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/orioledb.png',
+    heroImageLight: '/images/features/orioledb-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
+    slug: 'orioledb',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Queues',
+    subtitle: 'Durable messages with guaranteed delivery.',
+    description: `
+Supabase Queues is a native Postgres-based message queue system built on the PGMQ extension, offering developers a seamless way to persist and guarantee delivery of messages, which improves the scalability and resiliency of horizontally deployed services.
+
+Supabase Queues provides the reliability of Postgres with the simplicity of Supabase's developer experience, enabling teams to manage queues without maintaining additional infrastructure.
+
+## Features:
+1. Battle-tested infrastructure: Built on PGMQ with proven production deployments and active maintenance.
+2. Native PostgreSQL integration: Zero additional infrastructure, transactional consistency, and high performance.
+3. Row level security integration: Native PostgreSQL RLS support for granular access control.
+4. Visual queue management: Built-in dashboard for queue monitoring and management.
+5. Message archival: Built-in support for archiving processed messages for audit trails.
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/UEwfaElBnZk',
+    docsUrl: 'https://supabase.com/docs/guides/queues',
+    slug: 'queues',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'MCP Server',
+    subtitle:
+      'Connect your AI tools using the official Supabase Model Context Protocol (MCP) server.',
+    description: `
+The MCP Server bridges the gap between AI tools and your Supabase projects, enabling natural language commands and agent-like experiences for database management. It standardizes how Large Language Models (LLMs) communicate with platforms like Supabase, allowing AI tools such as Cursor, Claude, and Windsurf to spin up projects, design tables, query data, and manage configurations—all through a unified protocol.
+
+With the MCP Server, you can:
+
+- Create and manage Supabase projects directly from your AI tool.
+- Design tables, generate migrations, and manage schema.
+- Query data and run reports using SQL.
+- Manage branches, configurations, and TypeScript types.
+- Retrieve logs for debugging and troubleshooting.
+- Automate repetitive tasks and streamline AI-assisted development workflows.
+
+The MCP Server simplifies the integration of AI tools with Supabase, enabling a seamless development experience without the need for custom APIs or wrappers.
+
+## Key benefits
+1. AI-native development: Let AI tools like Cursor or Claude manage your Supabase projects with natural language commands.
+2. Standardized tool ecosystem: MCP standardizes how tools interact with Supabase, enabling a plug-and-play experience for AI-powered workflows.
+3. Streamlined workflows: Build faster by offloading repetitive tasks like schema design and configuration management to your AI assistant.
+4. Extensive toolset: Access over 20 tools for database design, data querying, and project management.
+5. Evolving capabilities: MCP continues to evolve, with upcoming support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
+
+The MCP Server empowers developers to build AI-native applications, accelerating productivity and reducing the complexity of working across multiple tools.
+
+## Use Cases for MCP Server
+
+The MCP Server unlocks new possibilities for AI-assisted development across various teams:
+
+- Frontend developers. Use tools like Cursor to scaffold Next.js apps backed by Supabase, configure environment files, and manage schema without leaving the IDE.
+- Backend engineers. Automate tasks like table creation, migrations, and TypeScript generation directly from AI tools.
+- AI engineers. Build custom AI agents that interact with Supabase databases, enabling dynamic and responsive AI-powered applications.
+- Educators & learners. Explore modern AI development practices by combining LLMs and databases in real-world projects.
+
+## Integration capabilities with Supabase MCP Server
+
+The MCP Server integrates seamlessly with popular AI tools and the broader Supabase ecosystem:
+
+- Cursor. Connect your IDE directly to Supabase for AI-driven development workflows.
+- Claude. Use Claude desktop and code tools to interact with Supabase resources and services.
+- Windsurf (Codium). Configure the MCP Server to manage Supabase projects directly within Codium's AI assistant.
+- Visual Studio Code (Copilot). Leverage AI capabilities to query data, generate types, and manage projects within VS Code.
+- Cline (VS Code extension). Connect Cline to Supabase through the MCP Server for AI-assisted database operations.
+
+These integrations empower developers to streamline workflows, reduce manual effort, and enhance productivity in AI-driven environments.
+
+## FAQs about the MCP Server
+
+Below are answers to common questions about the MCP Server, covering its functionality, compatibility, and setup requirements.
+
+### What is the Model Context Protocol (MCP)?
+
+MCP is a standard that defines how AI tools and platforms communicate. It enables AI tools to interact with Supabase by calling functions, retrieving data, and executing tasks through a common protocol.
+
+### Do I need a personal access token (PAT) to use the MCP Server?
+
+Yes, you'll need to create a PAT in your Supabase settings to authenticate the MCP Server. Future versions of MCP will support OAuth login flows for simpler authentication.
+
+### Can I use the MCP Server with self-hosted Supabase instances?
+
+No, the official Supabase MCP Server connects directly to Supabase Cloud. For local instances, you can use the Postgres MCP Server instead.
+
+### Which AI tools are compatible with the MCP Server?
+
+The MCP Server works with popular AI tools like Cursor, Claude, Windsurf, Visual Studio Code (CoPilot), and Cline. More tools will be supported as they adopt the MCP standard.
+
+### Can the MCP Server modify my database schema or data?
+
+Yes, the MCP Server can perform actions like creating tables, running queries, and managing branches. Use best practices like branching and access controls to protect production data.
+`,
+    icon: CloudCog,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/1SMldLoOhbg',
+    docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
+    slug: 'mcp-server',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Declarative Schemas',
+    subtitle: 'Simplify database management with declarative schema files.',
+    description: `
+Declarative schemas help you manage complex Postgres databases more easily by defining your database structure in SQL files that represent the final, desired state. These schema files can be stored and versioned alongside your codebase, enabling better collaboration and simplified reviews.
+
+With declarative schemas, you can:
+
+- Maintain a single source of truth for your database schema, reducing duplication and errors.
+- Generate migration files automatically by diffing your declarative schema against the current database state.
+- Review changes easily through concise, readable diffs instead of long, complex migration scripts.
+
+## Key benefits
+1. Single source of truth: Define your entire database schema in a single, centralized location for better visibility and control.
+2. Version-controlled changes: Store your schema files alongside your application code, ensuring consistency across environments.
+3. Simplified code reviews: Schema changes become small, focused diffs that are easier to understand and validate.
+4. Reduce merge conflicts: Minimize the risk of conflicts when multiple developers work on the same schema.
+5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, and more through declarative SQL files.
+
+Declarative schemas make it easier to manage growing database complexity, so your team can iterate faster without sacrificing stability or control.
+
+## Use Cases for Declarative Schemas
+
+Declarative schemas are valuable for a wide range of teams and scenarios:
+
+- Teams managing complex databases. Simplify schema management when working with multiple tables, views, policies, and functions.
+- Collaborative teams. Reduce merge conflicts and improve review processes when multiple developers are making schema changes.
+- CI/CD pipelines. Use declarative schemas to automate schema updates in your deployment workflows.
+- Teams adopting best practices. Adopt a more robust, maintainable approach to schema management with declarative patterns.
+
+## Integration capabilities with Supabase
+
+Declarative schemas integrate directly with the Supabase CLI, allowing you to:
+
+- Define your schema in SQL files within the \`supabase/schemas\` directory.
+- Use \`supabase db diff\` to generate migration files based on schema changes.
+- Apply and deploy migrations using the Supabase CLI, ensuring consistency across local and remote environments.
+- Combine with the Postgres Language Server for enhanced IDE support when working with declarative schemas.
+
+These tools help you maintain control over your database while moving faster and reducing the risk of errors.
+
+## FAQs about Declarative Schemas
+
+Below are answers to common questions about declarative schemas.
+
+### How do declarative schemas differ from migrations?
+
+Migrations are a record of incremental changes to your database schema. Declarative schemas define the final desired state of your schema, and the necessary migration files are generated by comparing the current database state with your schema files.
+
+### Do I need to write my own migration files?
+
+No. Supabase provides a schema diff tool (\`supabase db diff\`) that automatically generates migration files from your declarative schema files.
+
+### Can I use declarative schemas with my existing projects?
+
+Yes. You can pull your production schema into declarative files by running \`supabase db dump > supabase/schemas/prod.sql\`. From there, you can split the schema into smaller files and adopt a declarative workflow.
+
+### Are there any limitations to declarative schemas?
+
+The schema diff tool handles most Postgres objects, but some entities (like DML statements) are not captured and may still require manual migrations.
+
+For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/database/declarative-schemas).
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: 'https://www.youtube-nocookie.com/embed/EALkUlOKvAs',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas',
+    slug: 'declarative-schemas',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
 ]

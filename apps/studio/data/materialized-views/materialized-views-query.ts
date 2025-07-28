@@ -4,10 +4,11 @@ import { PostgresMaterializedView } from '@supabase/postgres-meta'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { materializedViewKeys } from './keys'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 
@@ -22,7 +23,10 @@ export async function getMaterializedViews(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/materialized-views', {
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
       query: {
         included_schemas: schema || '',
@@ -54,6 +58,8 @@ export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
     ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      // We're using a staleTime of 0 here because the only way to create a
+      // materialized view is via SQL, which we don't know about
       staleTime: 0,
       ...options,
     }

@@ -1,12 +1,15 @@
+import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
 import { isNil, noop } from 'lodash'
-import { Archive, X } from 'lucide-react'
+import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
 import { MonacoEditor } from 'components/grid/components/common/MonacoEditor'
 import { RowAction, RowData } from 'components/interfaces/Auth/Users/UserOverview'
 import { useDatabaseQueueMessageArchiveMutation } from 'data/database-queues/database-queue-messages-archive-mutation'
+import { useDatabaseQueueMessageDeleteMutation } from 'data/database-queues/database-queue-messages-delete-mutation'
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
+import { useDatabaseQueueMessageReadMutation } from 'data/database-queues/database-queue-messages-read-mutation'
 import dayjs from 'dayjs'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { prettifyJSON } from 'lib/helpers'
@@ -44,11 +47,28 @@ export const MessageDetailsPanel = ({
   selectedMessage,
   setSelectedMessage,
 }: MessageDetailsPanelProps) => {
-  const { id: _id } = useParams()
-  const { name: queueName } = useParams()
+  const { id: _id, childId: queueName } = useParams()
   const project = useSelectedProject()
 
-  const { mutate, isLoading, isSuccess } = useDatabaseQueueMessageArchiveMutation()
+  useEscapeKeydown(() => setSelectedMessage(null))
+
+  const {
+    mutate: archiveMessage,
+    isLoading: isLoadingArchive,
+    isSuccess: isSuccessArchive,
+  } = useDatabaseQueueMessageArchiveMutation()
+
+  const {
+    mutate: readMessage,
+    isLoading: isLoadingRead,
+    isSuccess: isSuccessRead,
+  } = useDatabaseQueueMessageReadMutation()
+
+  const {
+    mutate: deleteMessage,
+    isLoading: isLoadingDelete,
+    isSuccess: isSuccessDelete,
+  } = useDatabaseQueueMessageDeleteMutation()
 
   const initialValue = JSON.stringify(selectedMessage?.message)
   const jsonString = prettifyJSON(!isNil(initialValue) ? tryFormatInitialValue(initialValue) : '')
@@ -100,7 +120,7 @@ export const MessageDetailsPanel = ({
             <RowData property="Retries" value={`${selectedMessage.read_ct}`} />
 
             <div>
-              <h3 className="text-foreground-light pt-1">Payload</h3>
+              <h3 className="text-foreground-light py-1">Payload</h3>
               <MonacoEditor
                 key={selectedMessage.msg_id}
                 onChange={noop}
@@ -112,33 +132,88 @@ export const MessageDetailsPanel = ({
             </div>
           </div>
           <Separator />
-          <div className="flex flex-col px-4 py-4">
+          <div className="flex flex-col px-4 py-4 -space-y-1">
             {!selectedMessage.archived_at ? (
-              <RowAction
-                title="Archive message"
-                description="The message will be marked as archived and hidden from future reads by consumers"
-                button={{
-                  icon: <Archive />,
-                  text: 'Archive',
-                  isLoading: isLoading,
-                  onClick: () => {
-                    mutate({
-                      projectRef: project!.ref,
-                      connectionString: project?.connectionString,
-                      queryName: queueName!,
-                      messageId: selectedMessage.msg_id,
-                    })
-                  },
-                }}
-                success={
-                  isSuccess
-                    ? {
-                        title: 'Archived',
-                        description: 'The message is archived successfully.',
-                      }
-                    : undefined
-                }
-              />
+              <>
+                <RowAction
+                  title="Postpone message"
+                  description="The message will be postponed and won't show up in reads for 60 seconds."
+                  button={{
+                    icon: <Clock12 />,
+                    text: 'Postpone',
+                    isLoading: isLoadingRead,
+                    onClick: () => {
+                      readMessage({
+                        projectRef: project!.ref,
+                        connectionString: project?.connectionString,
+                        queryName: queueName!,
+                        messageId: selectedMessage.msg_id,
+                        duration: 60,
+                      })
+                    },
+                  }}
+                  success={
+                    isSuccessRead
+                      ? {
+                          title: 'Postponed',
+                          description: 'The message was postponed for 60 seconds.',
+                        }
+                      : undefined
+                  }
+                />
+                <RowAction
+                  title="Archive message"
+                  description="The message will be marked as archived and hidden from future reads by consumers. You can still access the message later."
+                  button={{
+                    icon: <Archive />,
+                    text: 'Archive',
+                    isLoading: isLoadingArchive,
+                    type: 'warning',
+                    onClick: () => {
+                      archiveMessage({
+                        projectRef: project!.ref,
+                        connectionString: project?.connectionString,
+                        queryName: queueName!,
+                        messageId: selectedMessage.msg_id,
+                      })
+                    },
+                  }}
+                  success={
+                    isSuccessArchive
+                      ? {
+                          title: 'Archived',
+                          description: 'The message was archived successfully.',
+                        }
+                      : undefined
+                  }
+                />
+                <RowAction
+                  title="Delete message"
+                  description="The message cannot be recovered afterwards."
+                  button={{
+                    icon: <Trash2 />,
+                    text: 'Delete',
+                    type: 'danger',
+                    isLoading: isLoadingDelete,
+                    onClick: () => {
+                      deleteMessage({
+                        projectRef: project!.ref,
+                        connectionString: project?.connectionString,
+                        queueName: queueName!,
+                        messageId: selectedMessage.msg_id,
+                      })
+                    },
+                  }}
+                  success={
+                    isSuccessDelete
+                      ? {
+                          title: 'Deleted',
+                          description: 'The message was deleted successfully.',
+                        }
+                      : undefined
+                  }
+                />
+              </>
             ) : null}
           </div>
         </TabsContent_Shadcn_>

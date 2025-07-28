@@ -37,6 +37,7 @@ on storage.objects
 for all using (
   bucket_id = 'avatars' 
   and auth.role() = 'authenticated'
+  and (storage.foldername(name))[1] = 'authenticated'
 );`,
     detail_title: 'Allow any authenticated user access to a folder',
     detail_text:

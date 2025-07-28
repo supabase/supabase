@@ -11,7 +11,7 @@ type TableEditorArgs = {
 
 export type TableEditorVariables = TableEditorArgs & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getTableEditor(
@@ -49,6 +49,8 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     {
       enabled:
         enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
       ...options,
     }
@@ -56,7 +58,7 @@ export const useTableEditorQuery = <TData = TableEditorData>(
 
 export function prefetchTableEditor(
   client: QueryClient,
-  { projectRef, connectionString, id }: Required<TableEditorVariables>
+  { projectRef, connectionString, id }: TableEditorVariables
 ) {
   return client.fetchQuery(tableEditorKeys.tableEditor(projectRef, id), ({ signal }) =>
     getTableEditor(

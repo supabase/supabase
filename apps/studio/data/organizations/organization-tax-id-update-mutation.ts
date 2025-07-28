@@ -6,7 +6,7 @@ import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationTaxIdUpdateVariables = {
-  slug: string
+  slug?: string
   taxId: { type: string; value: string; country?: string } | null
 }
 

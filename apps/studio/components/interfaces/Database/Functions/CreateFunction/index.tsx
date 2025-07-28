@@ -13,7 +13,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -134,6 +134,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
 
   useEffect(() => {
     if (visible) {
+      setFocusedEditor(false)
       form.reset({
         name: func?.name ?? '',
         schema: func?.schema ?? 'public',
@@ -156,7 +157,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         className={cn(
           // 'bg-surface-200',
           'p-0 flex flex-row gap-0',
-          assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
+          assistantVisible ? '!min-w-screen lg:!min-w-[1200px]' : '!min-w-screen lg:!min-w-[600px]'
         )}
       >
         <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
@@ -202,8 +203,9 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
+                          portal={false}
                           selectedSchemaName={field.value}
-                          excludedSchemas={EXCLUDED_SCHEMAS}
+                          excludedSchemas={PROTECTED_SCHEMAS}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />

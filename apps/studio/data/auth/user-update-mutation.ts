@@ -1,46 +1,25 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { put } from 'lib/common/fetch'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
 export type UserUpdateVariables = {
-  projectRef?: string
-  protocol: string
-  endpoint: string
-  serviceApiKey: string
-
+  projectRef: string
   userId: string
   // For now just support updating banning the user
   banDuration: number | 'none' // In hours,  "none" to unban, otherwise a string in hours e.g "24h"
 }
 
-export async function updateUser({
-  protocol,
-  endpoint,
-  serviceApiKey,
-  userId,
-  banDuration,
-}: UserUpdateVariables) {
-  // [Joshen] This is probably the only endpoint that needs the put method from lib/common/fetch
-  // as it's not our internal API.
-  const response = await put(
-    `${protocol}://${endpoint}/auth/v1/admin/users/${userId}`,
-    { ban_duration: typeof banDuration === 'number' ? `${banDuration}h` : banDuration },
-    {
-      headers: {
-        apikey: serviceApiKey,
-        Authorization: `Bearer ${serviceApiKey}`,
-      },
-      credentials: undefined,
-    }
-  )
+export async function updateUser({ projectRef, userId, banDuration }: UserUpdateVariables) {
+  const { data, error } = await patch('/platform/auth/{ref}/users/{id}', {
+    params: { path: { ref: projectRef, id: userId } },
+    body: { ban_duration: typeof banDuration === 'number' ? `${banDuration}h` : banDuration },
+  })
 
-  if (response.error) throw response.error
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type UserUpdateData = Awaited<ReturnType<typeof updateUser>>

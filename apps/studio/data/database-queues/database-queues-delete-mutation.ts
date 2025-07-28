@@ -7,7 +7,7 @@ import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueDeleteVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   queueName: string
 }
 
@@ -20,7 +20,7 @@ export async function deleteDatabaseQueue({
     projectRef,
     connectionString,
     sql: `select * from pgmq.drop_queue('${queueName}');`,
-    queryKey: databaseQueuesKeys.delete(),
+    queryKey: databaseQueuesKeys.delete(queueName),
   })
 
   return result
@@ -42,11 +42,8 @@ export const useDatabaseQueueDeleteMutation = ({
     (vars) => deleteDatabaseQueue(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, queueName } = variables
+        const { projectRef } = variables
         await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
-        await queryClient.invalidateQueries(
-          databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
-        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

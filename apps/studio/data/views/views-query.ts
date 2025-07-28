@@ -4,10 +4,11 @@ import { PostgresView } from '@supabase/postgres-meta'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { viewKeys } from './keys'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type ViewsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   schema?: string
 }
 
@@ -22,7 +23,10 @@ export async function getViews(
 
   const { data, error } = await get('/platform/pg-meta/{ref}/views', {
     params: {
-      header: { 'x-connection-encrypted': connectionString! },
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
       path: { ref: projectRef },
       query: {
         included_schemas: schema || '',
@@ -48,6 +52,8 @@ export const useViewsQuery = <TData = ViewsData>(
     ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      // We're using a staleTime of 0 here because the only way to create a
+      // view is via SQL, which we don't know about
       staleTime: 0,
       ...options,
     }

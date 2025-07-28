@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 
 export type SendDowngradeFeedbackVariables = {
@@ -20,15 +19,17 @@ export async function sendDowngradeFeedback({
   message,
   exitAction,
 }: SendDowngradeFeedbackVariables) {
-  const response = await post(`${API_URL}/feedback/downgrade`, {
-    ...(projectRef !== undefined && { projectRef }),
-    ...(orgSlug !== undefined && { orgSlug }),
-    reasons,
-    additionalFeedback: message,
-    exitAction,
+  const { data, error } = await post('/platform/feedback/downgrade', {
+    body: {
+      ...(projectRef !== undefined && { projectRef }),
+      ...(orgSlug !== undefined && { orgSlug }),
+      reasons,
+      additionalFeedback: message,
+      exitAction,
+    },
   })
-  if (response.error) throw response.error
-  return response
+  if (error) handleError(error)
+  return data
 }
 
 type SendDowngradeFeedbackData = Awaited<ReturnType<typeof sendDowngradeFeedback>>

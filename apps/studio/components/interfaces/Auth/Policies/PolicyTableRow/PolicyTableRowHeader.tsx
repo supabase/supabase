@@ -1,14 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
-import { useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge } from 'ui'
 
 interface PolicyTableRowHeaderProps {
@@ -35,15 +33,14 @@ const PolicyTableRowHeader = ({
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
-  const enableAssistantV2 = useIsDatabaseFunctionsAssistantEnabled()
+  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
-  const [_, setEditView] = useQueryState('view', { defaultValue: '' })
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
@@ -96,13 +93,13 @@ const PolicyTableRowHeader = ({
             )}
             <ButtonTooltip
               type="default"
-              disabled={!canToggleRLS}
+              disabled={!canToggleRLS || !canCreatePolicies}
               onClick={() => onSelectCreatePolicy()}
               tooltip={{
                 content: {
                   side: 'bottom',
                   text: !canToggleRLS
-                    ? !canToggleRLS
+                    ? !canToggleRLS || !canCreatePolicies
                       ? 'You need additional permissions to create RLS policies'
                       : undefined
                     : undefined,
@@ -116,28 +113,23 @@ const PolicyTableRowHeader = ({
               type="default"
               className="px-1"
               onClick={() => {
-                if (enableAssistantV2) {
-                  setAiAssistantPanel({
-                    open: true,
-                    editor: 'rls-policies',
-                    entity: undefined,
-                    tables: [{ schema: table.schema, name: table.name }],
-                  })
-                } else {
-                  onSelectCreatePolicy()
-                  setEditView('conversation')
-                }
+                aiSnap.newChat({
+                  name: 'Create new policy',
+                  open: true,
+                  initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
+                })
               }}
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: !canToggleRLS
-                    ? 'You need additional permissions to create RLS policies'
-                    : 'Create with Supabase Assistant',
+                  text:
+                    !canToggleRLS || !canCreatePolicies
+                      ? 'You need additional permissions to create RLS policies'
+                      : 'Create with Supabase Assistant',
                 },
               }}
             >
-              <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+              <AiIconAnimation size={16} />
             </ButtonTooltip>
           </div>
         </div>

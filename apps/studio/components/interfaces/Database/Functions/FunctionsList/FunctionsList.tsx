@@ -5,7 +5,6 @@ import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
@@ -17,8 +16,8 @@ import { useDatabaseFunctionsQuery } from 'data/database-functions/database-func
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useAppStateSnapshot } from 'state/app-state'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
@@ -37,8 +36,7 @@ const FunctionsList = ({
   const router = useRouter()
   const { search } = useParams()
   const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
-  const enableFunctionsAssistant = useIsDatabaseFunctionsAssistantEnabled()
+  const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -63,7 +61,7 @@ const FunctionsList = ({
     connectionString: project?.connectionString,
   })
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const foundSchema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === foundSchema?.id)
@@ -103,11 +101,11 @@ const FunctionsList = ({
         </div>
       ) : (
         <div className="w-full space-y-4">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
               <SchemaSelector
-                className="w-[260px]"
-                size="small"
+                className="w-full lg:w-[180px]"
+                size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
@@ -119,10 +117,10 @@ const FunctionsList = ({
               />
               <Input
                 placeholder="Search for a function"
-                size="small"
+                size="tiny"
                 icon={<Search size={14} />}
                 value={filterString}
-                className="w-64"
+                className="w-full lg:w-52"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -133,6 +131,7 @@ const FunctionsList = ({
                   <ButtonTooltip
                     disabled={!canCreateFunctions}
                     onClick={() => createFunction()}
+                    className="flex-grow"
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -144,31 +143,27 @@ const FunctionsList = ({
                   >
                     Create a new function
                   </ButtonTooltip>
-                  {enableFunctionsAssistant && (
-                    <ButtonTooltip
-                      type="default"
-                      disabled={!canCreateFunctions}
-                      className="px-1 pointer-events-auto"
-                      icon={
-                        <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                      }
-                      onClick={() =>
-                        setAiAssistantPanel({
-                          open: true,
-                          editor: 'functions',
-                          entity: undefined,
-                        })
-                      }
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateFunctions
-                            ? 'You need additional permissions to create functions'
-                            : 'Create with Supabase Assistant',
-                        },
-                      }}
-                    />
-                  )}
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canCreateFunctions}
+                    className="px-1 pointer-events-auto"
+                    icon={<AiIconAnimation size={16} />}
+                    onClick={() =>
+                      aiSnap.newChat({
+                        name: 'Create new function',
+                        open: true,
+                        initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
+                      })
+                    }
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canCreateFunctions
+                          ? 'You need additional permissions to create functions'
+                          : 'Create with Supabase Assistant',
+                      },
+                    }}
+                  />
                 </>
               )}
             </div>

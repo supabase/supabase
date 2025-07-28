@@ -101,15 +101,10 @@ export const useRealtimeMessages = (
       return
     }
 
-    const globalOptions = merge(DEFAULT_GLOBAL_OPTIONS, {
-      headers: {
-        'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
-      },
-    })
     const realtimeOptions = merge(DEFAULT_REALTIME_OPTIONS, { params: { log_level: logLevel } })
 
     const options = {
-      headers: globalOptions.headers,
+      headers: DEFAULT_GLOBAL_OPTIONS.headers,
       ...realtimeOptions,
       params: { apikey: token, ...realtimeOptions.params },
     }

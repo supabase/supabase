@@ -1542,6 +1542,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/local-quickstart',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
@@ -1988,6 +1993,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/enterprise',
+    destination: '/solutions/enterprise',
+  },
+  {
+    permanent: true,
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
   },
@@ -2187,11 +2197,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/docs/guides/database/extensions/pgmq',
-    destination: '/docs/guides/database/extensions',
-  },
-  {
-    permanent: false,
     source: '/docs/guides/database/extensions/pg_partman',
     destination: '/docs/guides/database/extensions',
   },
@@ -2379,6 +2384,12 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/integrations/zuplo',
     destination: '/partners/integrations/zuplo',
+  },
+  // toddle.dev pivoted to nordcraft
+  {
+    permanent: true,
+    source: '/partners/integrations/toddle',
+    destination: '/partners/integrations/nordcraft',
   },
   {
     permanent: true,
@@ -2634,6 +2645,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/import-maps',
+    destination: '/docs/guides/functions/dependencies',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/phone-login/messagebird',
     destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
   },
@@ -2829,6 +2845,156 @@ module.exports = [
     source: '/docs/guides/resources/examples',
     destination: '/docs/guides/getting-started',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres/serverless-drivers',
+    destination: '/docs/guides/database/connecting-to-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
+    destination: '/docs/guides/troubleshooting/http-api-issues',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
+    destination: '/docs/guides/troubleshooting/exhaust-disk-io',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
+    destination: '/docs/guides/troubleshooting/exhaust-ram',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
+    destination: '/docs/guides/troubleshooting/exhaust-swap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
+    destination: '/docs/guides/troubleshooting/high-cpu-usage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/http-status-codes',
+    destination: '/docs/guides/troubleshooting/http-status-codes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/:path*',
+    destination: '/docs/guides/telemetry/:path*',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts',
+    destination: '/partners',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts/:path*',
+    destination: '/partners',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#how-billing-is-organized',
+    destination: '/docs/guides/platform/billing-on-supabase#organization-based-billing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#quotas-and-features',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#usage-items',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
+    destination: '/docs/guides/platform/manage-your-usage/compute',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-pricing',
+    destination: '/docs/guides/platform/manage-your-usage/compute#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-credits',
+    destination: '/docs/guides/platform/manage-your-usage/compute#compute-credits',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#read-replicas',
+    destination: '/docs/guides/platform/manage-your-usage/read-replicas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#project-add-ons',
+    destination: '/docs/guides/platform/manage-your-usage',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#unified-egress',
+    destination: '/docs/guides/platform/manage-your-usage/egress',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#included-egress-quota',
+    destination: '/docs/guides/platform/manage-your-usage/egress#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#egress-dashboards',
+    destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#disk-size',
+    destination: '/docs/guides/platform/manage-your-usage/disk-size',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#free-plan',
+    destination: '/docs/guides/platform/billing-on-supabase#free-plan',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-examples',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-free-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-pro-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/spend-cap',
+    destination: '/docs/guides/platform/cost-control#spend-cap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/project-management/api',
+    destination: '/docs/reference/api/introduction',
+  },
+  {
+    permanent: false,
+    source: '/mcp',
+    destination: '/docs/guides/getting-started/mcp',
+  },
 
   // marketing
 
@@ -2836,5 +3002,22 @@ module.exports = [
     permanent: true,
     source: '/changelogpod',
     destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
+  },
+
+  // features
+  {
+    permanent: true,
+    source: '/features/ai-query-assistance',
+    destination: '/features/ai-assistant',
+  },
+  {
+    permanent: true,
+    source: '/features/fly-postgres',
+    destination: '/features/postgres-database',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/fly-postgres',
+    destination: '/docs/guides/database/overview',
   },
 ]

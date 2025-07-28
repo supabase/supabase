@@ -1,14 +1,14 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { contentKeys } from 'data/content/keys'
 import { Snippet } from 'data/content/sql-folders-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
-import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
 
@@ -43,12 +43,13 @@ const UtilityPanel = ({
   onDebug,
 }: UtilityPanelProps) => {
   const { ref } = useParams()
-  const queryClient = useQueryClient()
+  const org = useSelectedOrganization()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
-  const queryKeys = contentKeys.list(ref)
   const result = snapV2.results[id]?.[0]
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -59,9 +60,6 @@ const UtilityPanel = ({
       // No need to update the cache for non-SQL content
       if (payload.type !== 'sql') return
       if (!('chart' in payload.content)) return
-
-      // Cancel any existing queries so that the new content is fetched
-      await queryClient.cancelQueries(queryKeys)
 
       const newSnippet = {
         ...snippet,
@@ -83,7 +81,7 @@ const UtilityPanel = ({
       return DEFAULT_CHART_CONFIG
     }
 
-    if (!snippet.content.chart) {
+    if (!snippet.content?.chart) {
       return DEFAULT_CHART_CONFIG
     }
 
@@ -113,7 +111,7 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between gap-2 px-2 overflow-x-auto min-h-[42px]">
+      <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-[1px]">Results</span>
@@ -121,7 +119,31 @@ const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-[1px]">Chart</span>
           </TabsTrigger_Shadcn_>
-          {result?.rows && <ResultsDropdown id={id} />}
+          {result?.rows && (
+            <DownloadResultsButton
+              type="text"
+              results={result.rows as any[]}
+              fileName={`Supabase Snippet ${snippet.name}`}
+              onDownloadAsCSV={() =>
+                sendEvent({
+                  action: 'sql_editor_result_download_csv_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }
+              onCopyAsMarkdown={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_markdown_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
+              onCopyAsJSON={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_json_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
+            />
+          )}
         </div>
         <UtilityActions
           id={id}

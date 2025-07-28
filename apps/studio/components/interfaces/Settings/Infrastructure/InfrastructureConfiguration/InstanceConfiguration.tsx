@@ -17,9 +17,10 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
+import Link from 'next/link'
 import { type AWS_REGIONS_KEYS } from 'shared-data'
-import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Button,
   DropdownMenu,
@@ -29,7 +30,6 @@ import {
   DropdownMenuTrigger,
   cn,
 } from 'ui'
-import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
@@ -39,18 +39,19 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { useShowNewReplicaPanel } from './use-show-new-replica'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
+  const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
-  const { setPanel } = useAddonsPagePanel()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
-  const [showNewReplicaPanel, setShowNewReplicaPanel] = useState(false)
+  const { showNewReplicaPanel, setShowNewReplicaPanel } = useShowNewReplicaPanel()
   const [refetchInterval, setRefetchInterval] = useState<number | boolean>(10000)
   const [newReplicaRegion, setNewReplicaRegion] = useState<AWS_REGIONS_KEYS>()
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
@@ -225,7 +226,7 @@ const InstanceConfigurationUI = () => {
               <div className="flex items-center justify-center">
                 <ButtonTooltip
                   type="default"
-                  disabled={!canManageReplicas}
+                  disabled={!canManageReplicas || isOrioleDb}
                   className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
                   onClick={() => setShowNewReplicaPanel(true)}
                   tooltip={{
@@ -233,7 +234,9 @@ const InstanceConfigurationUI = () => {
                       side: 'bottom',
                       text: !canManageReplicas
                         ? 'You need additional permissions to deploy replicas'
-                        : undefined,
+                        : isOrioleDb
+                          ? 'Read replicas are not supported with OrioleDB'
+                          : undefined,
                     },
                   }}
                 >
@@ -249,8 +252,10 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem onClick={() => setPanel('computeInstance')}>
-                        <div>Resize databases</div>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                          Resize databases
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>
@@ -342,8 +347,6 @@ const InstanceConfigurationUI = () => {
         onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setSelectedReplicaToRestart(undefined)}
       />
-
-      <ComputeInstanceSidePanel />
     </div>
   )
 }

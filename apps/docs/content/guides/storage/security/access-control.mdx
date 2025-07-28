@@ -80,7 +80,7 @@ Allow a user to access a file that was previously uploaded by the same user:
 create policy "Individual user Access"
 on storage.objects for select
 to authenticated
-using ( (select auth.uid()) = owner_id );
+using ( (select auth.uid()) = owner_id::uuid );
 ```
 
 ---

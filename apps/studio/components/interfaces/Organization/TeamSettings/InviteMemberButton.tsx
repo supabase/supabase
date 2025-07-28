@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isNil } from 'lodash'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -9,21 +8,15 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import {
-  useHasAccessToProjectLevelPermissions,
-  useOrgSubscriptionQuery,
-} from 'data/subscriptions/org-subscription-query'
-import {
-  doPermissionsCheck,
-  useCheckPermissions,
-  useGetPermissions,
-} from 'hooks/misc/useCheckPermissions'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+import { doPermissionsCheck, useGetPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
@@ -55,9 +48,6 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
   Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -68,6 +58,10 @@ export const InviteMemberButton = () => {
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
+
+  const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
+    'organization_members:create',
+  ])
 
   const [isOpen, setIsOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
@@ -80,15 +74,8 @@ export const InviteMemberButton = () => {
   const orgProjects = (projects ?? [])
     .filter((project) => project.organization_id === organization?.id)
     .sort((a, b) => a.name.localeCompare(b.name))
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
-    { orgSlug: slug },
-    { enabled: canReadSubscriptions }
-  )
-  const currentPlan = subscription?.plan
+
+  const currentPlan = organization?.plan
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
@@ -104,6 +91,7 @@ export const InviteMemberButton = () => {
 
   const canInviteMembers =
     hasOrgRole &&
+    rolesAddable.length > 0 &&
     orgScopedRoles.some(({ id: role_id }) =>
       doPermissionsCheck(
         permissions,
@@ -115,8 +103,6 @@ export const InviteMemberButton = () => {
     )
 
   const { mutate: inviteMember, isLoading: isInviting } = useOrganizationCreateInvitationMutation()
-  const { mutate: inviteMemberOld, isLoading: isInvitingOld } =
-    useOrganizationMemberInviteCreateMutation()
 
   const FormSchema = z.object({
     email: z.string().email('Must be a valid email address').min(1, 'Email is required'),
@@ -150,54 +136,27 @@ export const InviteMemberButton = () => {
       }
     }
 
-    if (hasAccessToProjectLevelPermissions) {
-      inviteMember(
-        {
-          slug,
-          email: values.email.toLowerCase(),
-          roleId: Number(values.role),
-          ...(!values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}),
-        },
-        {
-          onSuccess: () => {
-            toast.success('Successfully sent invitation to new member')
-            setIsOpen(!isOpen)
+    inviteMember(
+      {
+        slug,
+        email: values.email.toLowerCase(),
+        roleId: Number(values.role),
+        ...(!values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}),
+      },
+      {
+        onSuccess: () => {
+          toast.success('Successfully sent invitation to new member')
+          setIsOpen(!isOpen)
 
-            form.reset({
-              email: '',
-              role: developerRole?.id.toString() ?? '',
-              applyToOrg: true,
-              projectRef: '',
-            })
-          },
-        }
-      )
-    } else {
-      inviteMemberOld(
-        {
-          slug,
-          invitedEmail: values.email.toLowerCase(),
-          ownerId: profile.id,
-          roleId: Number(values.role),
+          form.reset({
+            email: '',
+            role: developerRole?.id.toString() ?? '',
+            applyToOrg: true,
+            projectRef: '',
+          })
         },
-        {
-          onSuccess: (data) => {
-            if (isNil(data)) {
-              toast.error('Failed to add member')
-            } else {
-              toast.success('Successfully added new member')
-              setIsOpen(!isOpen)
-              form.reset({
-                email: '',
-                role: developerRole?.id.toString() ?? '',
-                applyToOrg: true,
-                projectRef: '',
-              })
-            }
-          },
-        }
-      )
-    }
+      }
+    )
   }
 
   useEffect(() => {
@@ -219,22 +178,24 @@ export const InviteMemberButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button
-              disabled={!canInviteMembers}
-              className="pointer-events-auto"
-              onClick={() => setIsOpen(true)}
-            >
-              Invite
-            </Button>
-          </TooltipTrigger_Shadcn_>
-          {!canInviteMembers && (
-            <TooltipContent_Shadcn_ side="bottom">
-              You need additional permissions to invite a member to this organization
-            </TooltipContent_Shadcn_>
-          )}
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          type="primary"
+          disabled={!canInviteMembers}
+          className="pointer-events-auto flex-grow md:flex-grow-0"
+          onClick={() => setIsOpen(true)}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !organizationMembersCreationEnabled
+                ? 'Inviting members is currently disabled'
+                : !canInviteMembers
+                  ? 'You need additional permissions to invite a member to this organization'
+                  : undefined,
+            },
+          }}
+        >
+          Invite member
+        </ButtonTooltip>
       </DialogTrigger>
       <DialogContent size="medium">
         <DialogHeader>
@@ -407,7 +368,7 @@ export const InviteMemberButton = () => {
                         autoFocus
                         {...field}
                         autoComplete="off"
-                        disabled={isInviting || isInvitingOld}
+                        disabled={isInviting}
                         placeholder="Enter email address"
                       />
                     </FormControl_Shadcn_>
@@ -436,14 +397,15 @@ export const InviteMemberButton = () => {
                           Learn more
                         </Link>
                       </Button>
-                      {isSuccessSubscription &&
-                        (currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
-                          <Button asChild type="default">
-                            <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                              Upgrade to Team
-                            </Link>
-                          </Button>
-                        )}
+                      {(currentPlan?.id === 'free' || currentPlan?.id === 'pro') && (
+                        <Button asChild type="default">
+                          <Link
+                            href={`/org/${slug}/billing?panel=subscriptionPlan&source=inviteMemberSSO`}
+                          >
+                            Upgrade to Team
+                          </Link>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 }
@@ -451,7 +413,7 @@ export const InviteMemberButton = () => {
             </DialogSection>
             <DialogSectionSeparator />
             <DialogSection className="pt-0">
-              <Button block htmlType="submit" loading={isInviting || isInvitingOld}>
+              <Button block htmlType="submit" loading={isInviting}>
                 Send invitation
               </Button>
             </DialogSection>

@@ -25,14 +25,20 @@ Example:
 1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
    Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/settings/database).
 
-1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
-1. Under **Connection string**, make sure `Use connection pooling` is enabled. Copy the URI and replace the password placeholder with your database password.
+1. On your project dashboard, click [Connect](https://supabase.com/dashboard/project/_?showConnect=true)
+1. Under Session pooler, Copy the connection string and replace the password placeholder with your database password.
+
+   <Admonition type="note">
+
+   If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+
+   </Admonition>
 
 ![Finding Supabase host address](/docs/img/guides/resources/migrating-to-supabase/postgres/database-settings-host.png)
 
 ## Migrate the database
 
-The fastest way to migrate your database is with the Supabase migration tool on [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb). Alternatively, you can use the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full PostgreSQL installation.
+The fastest way to migrate your database is with the Supabase migration tool on [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb). Alternatively, you can use the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full Postgres installation.
 
 <Tabs
   scrollable
@@ -80,7 +86,7 @@ Run `pg_dump --help` for a full list of options.
 </TabPanel>
 </Tabs>
 
-<MigrationWarnings />
+<$Partial path="migration_warnings.mdx" />
 
 ## Enterprise
 
