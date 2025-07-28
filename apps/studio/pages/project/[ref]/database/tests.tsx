@@ -18,7 +18,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import type { NextPageWithLayout } from 'types'
-import { toast } from 'sonner'
 import { useProfile } from 'lib/profile'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabaseTestCreateMutation } from 'data/database-tests/database-test-create-mutation'
@@ -34,7 +33,6 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
 
   const canReadTests = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
   const canCreateTests = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const isPermissionsLoaded = usePermissionsLoaded()
 
   const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -61,7 +59,8 @@ const DatabaseTestsPage: NextPageWithLayout = () => {
       initialValue: test.query,
       label: `Edit test: ${test.name}`,
       saveLabel: 'Save test',
-      onSave: (query, name) => {
+      onSave: (query: string, name: string) => {
+        if (!profile?.id) return
         updateTest({
           projectRef: project?.ref!,
           id: test.id,
@@ -91,7 +90,6 @@ rollback;
         createTest({
           projectRef: project?.ref!,
           name: name || 'New test',
-          connectionString: project?.connectionString,
           query,
         })
       },

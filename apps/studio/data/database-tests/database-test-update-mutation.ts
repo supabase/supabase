@@ -49,8 +49,11 @@ export const useDatabaseTestUpdateMutation = ({
 
       if (error) handleError(error)
 
-      // Invalidate cache so that refetch happens
-      await queryClient.invalidateQueries(databaseTestsKeys.list(projectRef))
+      // Invalidate caches so that refetch happens for both the list and the specific test detail
+      await Promise.all([
+        queryClient.invalidateQueries(databaseTestsKeys.list(projectRef)),
+        queryClient.invalidateQueries(databaseTestsKeys.detail(projectRef, id)),
+      ])
 
       return { id, name, query }
     },

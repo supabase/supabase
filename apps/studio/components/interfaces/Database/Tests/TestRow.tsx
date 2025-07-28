@@ -13,6 +13,7 @@ import {
 } from 'ui'
 import TestStatusHoverCard from './TestStatusHoverCard'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ConfirmDialog from 'ui-patterns/Dialogs/ConfirmDialog'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 import { DatabaseTest } from 'data/database-tests/database-tests-query'
@@ -38,7 +39,10 @@ interface TestRowProps {
 // Utility function to validate test query format
 const isValidTestQuery = (query: string): boolean => {
   const trimmedQuery = query.trim().toLowerCase()
-  return trimmedQuery.startsWith('begin;') && trimmedQuery.endsWith('rollback;')
+  return (
+    trimmedQuery.toLowerCase().startsWith('begin;') &&
+    trimmedQuery.toLowerCase().endsWith('rollback;')
+  )
 }
 
 const TestRow = forwardRef<TestRowHandle, TestRowProps>(
@@ -48,6 +52,7 @@ const TestRow = forwardRef<TestRowHandle, TestRowProps>(
     const [status, setStatus] = useState<'queued' | 'passed' | 'failed' | undefined>()
     const [lastRun, setLastRun] = useState<string | undefined>()
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [isConfirmRunModalOpen, setIsConfirmRunModalOpen] = useState(false)
 
     const { mutateAsync: runTestMutation } = useExecuteSqlMutation()
     const { mutate: deleteTest, isLoading: isDeleting } = useDatabaseTestDeleteMutation({
@@ -80,7 +85,14 @@ const TestRow = forwardRef<TestRowHandle, TestRowProps>(
       return await fetchQuery()
     }
 
-    const isTestQueryValid = isValidTestQuery(fullQuery)
+    const onRunClick = async () => {
+      const sql = await ensureQuery()
+      if (!isValidTestQuery(sql)) {
+        setIsConfirmRunModalOpen(true)
+      } else {
+        await handleRunTest()
+      }
+    }
 
     const handleRunTest = async () => {
       setIsRunning(true)
@@ -97,13 +109,6 @@ const TestRow = forwardRef<TestRowHandle, TestRowProps>(
         // If a setup test exists, prepend it to regular tests
         if (prependQuery && canRun) {
           sqlToRun = `${prependQuery.query}\n\n${sqlToRun}`
-        }
-
-        if (!isValidTestQuery(sqlToRun)) {
-          toast.error(
-            `Test "${test.name}" has invalid format. Must start with BEGIN; and end with ROLLBACK;`
-          )
-          return { error: new Error('Invalid test format') }
         }
 
         const res = await runTestMutation({
@@ -247,14 +252,11 @@ const TestRow = forwardRef<TestRowHandle, TestRowProps>(
                 type="default"
                 icon={<Play />}
                 loading={isRunning}
-                disabled={isRunning || status === 'queued' || !isTestQueryValid}
-                onClick={handleRunTest}
+                disabled={isRunning || status === 'queued'}
+                onClick={onRunClick}
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: !isTestQueryValid
-                      ? 'Test query must start with BEGIN; and end with ROLLBACK;'
-                      : undefined,
                   },
                 }}
                 className="h-7 w-7"
@@ -275,6 +277,19 @@ const TestRow = forwardRef<TestRowHandle, TestRowProps>(
             </DropdownMenu>
           </div>
         </div>
+        <ConfirmDialog
+          visible={isConfirmRunModalOpen}
+          danger
+          title="Run test with invalid format?"
+          description="Test query must start with BEGIN; and end with ROLLBACK;. Do you want to run it anyway?"
+          buttonLabel="Run anyway"
+          onSelectCancel={() => setIsConfirmRunModalOpen(false)}
+          onSelectConfirm={async () => {
+            setIsConfirmRunModalOpen(false)
+            await handleRunTest()
+          }}
+        />
+
         <ConfirmationModal
           visible={isDeleteModalOpen}
           title="Delete test"

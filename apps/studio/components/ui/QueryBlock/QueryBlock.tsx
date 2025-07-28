@@ -288,7 +288,7 @@ export const QueryBlock = ({
 
     createTest({
       projectRef: ref!,
-      connectionString: postgresConnectionString,
+      name: label,
       query: sql,
     })
   }

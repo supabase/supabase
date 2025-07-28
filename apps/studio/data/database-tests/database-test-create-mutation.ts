@@ -10,7 +10,6 @@ type DatabaseTestCreateVariables = {
   projectRef: string
   query: string
   name: string
-  connectionString?: string // preserved for API compatibility, currently unused
 }
 
 export const useDatabaseTestCreateMutation = ({
