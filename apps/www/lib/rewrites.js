@@ -25,6 +25,16 @@ module.exports = [
     source: '/docs/:path*',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*`,
   },
+
+  {
+    source: '/ui',
+    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}`,
+  },
+  {
+    source: '/ui/:path*',
+    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
+  },
+
   {
     source: '/new-docs',
     destination: `${process.env.NEXT_PUBLIC_REFERENCE_DOCS_URL}`,

@@ -15,7 +15,7 @@ Data sent to the client when retrieving data stored in your database.
 
 <Admonition type="note">
 
-There are various ways to interact with your database, such as through the PostgREST API using one of the client SDKs or via the Supavisor connection pooler. On the Supabase Dashboard, Egress from the PostgREST API is labeled as **Database Egress**, while Egress through Supavisor is labeled as **Supavisor Egress**.
+There are various ways to interact with your database, such as through the PostgREST API using one of the client SDKs or via the Supavisor connection pooler. On the Supabase Dashboard, Egress from the PostgREST API is labeled as **Database Egress**, while Egress through Supavisor is labeled as **Shared Pooler Egress**.
 
 </Admonition>
 
@@ -43,6 +43,12 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 
 **Example:** When a user views a product page in an online shop, their client subscribes to real-time inventory updates. As stock levels change, Supabase Realtime pushes updates to all subscribed clients, contributing to Realtime Egress.
 
+### Shared pooler Egress
+
+Data sent to the client when using the shared connection pooler (Supavisor) to access your database. When using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
+
+**Example:** You are using our [shared connection pooler](https://supabase.com/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
+
 ### Log Drain Egress
 
 Data pushed to the connected log drain.
@@ -59,14 +65,15 @@ Usage is shown as "Egress GB" on your invoice.
 
 ## Pricing
 
-$0.09 per GB per month. You are only charged for usage exceeding your subscription plan's quota.
+<Price price="0.09" /> per GB per month. You are only charged for usage exceeding your subscription plan's
+quota.
 
-| Plan       | Unified Egress Quota | Over-Usage per month |
-| ---------- | -------------------- | -------------------- |
-| Free       | 5 GB                 | -                    |
-| Pro        | 250 GB               | $0.09 per GB         |
-| Team       | 250 GB               | $0.09 per GB         |
-| Enterprise | Custom               | Custom               |
+| Plan       | Unified Egress Quota | Over-Usage per month          |
+| ---------- | -------------------- | ----------------------------- |
+| Free       | 5 GB                 | -                             |
+| Pro        | 250 GB               | <Price price="0.09" /> per GB |
+| Team       | 250 GB               | <Price price="0.09" /> per GB |
+| Enterprise | Custom               | Custom                        |
 
 ## Billing examples
 
@@ -74,27 +81,27 @@ $0.09 per GB per month. You are only charged for usage exceeding your subscripti
 
 The organization's Egress usage is within the quota, so no charges for Egress apply.
 
-| Line Item           | Units     | Costs   |
-| ------------------- | --------- | ------- |
-| Pro Plan            | 1         | $25     |
-| Compute Hours Micro | 744 hours | $10     |
-| Egress              | 200 GB    | $0      |
-| **Subtotal**        |           | **$35** |
-| Compute Credits     |           | -$10    |
-| **Total**           |           | **$25** |
+| Line Item           | Units     | Costs                    |
+| ------------------- | --------- | ------------------------ |
+| Pro Plan            | 1         | <Price price="25" />     |
+| Compute Hours Micro | 744 hours | <Price price="10" />     |
+| Egress              | 200 GB    | <Price price="0" />      |
+| **Subtotal**        |           | **<Price price="35" />** |
+| Compute Credits     |           | -<Price price="10" />    |
+| **Total**           |           | **<Price price="25" />** |
 
 ### Exceeding quota
 
 The organization's Egress usage exceeds the quota by 50 GB, incurring charges for this additional usage.
 
-| Line Item           | Units     | Costs     |
-| ------------------- | --------- | --------- |
-| Pro Plan            | 1         | $25       |
-| Compute Hours Micro | 744 hours | $10       |
-| Egress              | 300 GB    | $4.5      |
-| **Subtotal**        |           | **$39.5** |
-| Compute Credits     |           | -$10      |
-| **Total**           |           | **$29.5** |
+| Line Item           | Units     | Costs                      |
+| ------------------- | --------- | -------------------------- |
+| Pro Plan            | 1         | <Price price="25" />       |
+| Compute Hours Micro | 744 hours | <Price price="10" />       |
+| Egress              | 300 GB    | <Price price="4.5" />      |
+| **Subtotal**        |           | **<Price price="39.5" />** |
+| Compute Credits     |           | -<Price price="10" />      |
+| **Total**           |           | **<Price price="29.5" />** |
 
 ## View usage
 

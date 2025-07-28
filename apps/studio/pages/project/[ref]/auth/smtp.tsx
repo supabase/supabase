@@ -2,8 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { SmtpForm } from 'components/interfaces/Auth'
 import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import NoPermission from 'components/ui/NoPermission'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
 
 const SmtpPage: NextPageWithLayout = () => {
@@ -17,6 +18,10 @@ const SmtpPage: NextPageWithLayout = () => {
   return <SmtpForm />
 }
 
-SmtpPage.getLayout = (page) => <AuthEmailsLayout>{page}</AuthEmailsLayout>
+SmtpPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthEmailsLayout>{page}</AuthEmailsLayout>
+  </DefaultLayout>
+)
 
 export default SmtpPage

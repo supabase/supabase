@@ -21,7 +21,7 @@ export async function createLogDrain(payload: LogDrainCreateVariables) {
       name: payload.name,
       description: payload.description,
       type: payload.type,
-      config: payload.config,
+      config: payload.config as any,
     },
   })
 

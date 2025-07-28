@@ -134,6 +134,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
 
   useEffect(() => {
     if (visible) {
+      setFocusedEditor(false)
       form.reset({
         name: func?.name ?? '',
         schema: func?.schema ?? 'public',
@@ -202,6 +203,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     >
                       <FormControl_Shadcn_>
                         <SchemaSelector
+                          portal={false}
                           selectedSchemaName={field.value}
                           excludedSchemas={PROTECTED_SCHEMAS}
                           size="small"

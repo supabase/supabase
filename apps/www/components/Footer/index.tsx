@@ -1,15 +1,18 @@
 import { CheckIcon } from '@heroicons/react/outline'
+import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
-import SectionContainer from '../Layouts/SectionContainer'
+import { useEffect } from 'react'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import footerData from 'data/Footer'
+import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
+import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
+import SectionContainer from '../Layouts/SectionContainer'
 
 interface Props {
   className?: string
@@ -22,6 +25,24 @@ const Footer = (props: Props) => {
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeek = pathname.includes('/ga-week')
   const forceDark = isDarkLaunchWeek
+
+  useEffect(() => {
+    const channel = supabase.channel('footer')
+    if (channel.state === REALTIME_CHANNEL_STATES.closed) {
+      channel.subscribe((status: string) => {
+        if (status == 'SUBSCRIBED') {
+          channel.send({
+            type: 'broadcast',
+            event: 'footer_subscribed',
+            payload: { ts: Date.now() },
+          })
+        }
+      })
+    }
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [])
 
   if (props.hideFooter) {
     return null
@@ -62,8 +83,8 @@ const Footer = (props: Props) => {
         <div className="w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
       <SectionContainer className="py-8">
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="space-y-8 xl:col-span-1">
+        <div className="xl:grid xl:grid-cols-7 xl:gap-4">
+          <div className="space-y-8 xl:col-span-2">
             <Link href="#" as="/" className="w-40">
               <Image
                 src={supabaseLogoWordmarkLight}
@@ -116,8 +137,8 @@ const Footer = (props: Props) => {
               </a>
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-5 xl:mt-0">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
               {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>

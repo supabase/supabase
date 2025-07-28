@@ -13,11 +13,12 @@ import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunc
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import FileExplorerAndEditor from 'components/ui/FileExplorerAndEditor/FileExplorerAndEditor'
 import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
+import { BASE_PATH } from 'lib/constants'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
   Button,
@@ -99,10 +100,10 @@ const NewFunctionPage = () => {
   const router = useRouter()
   const { ref, template } = useParams()
   const project = useSelectedProject()
-  const isOptedInToAI = useOrgOptedIntoAi()
-  const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-  const { setAiAssistantPanel } = useAppStateSnapshot()
-  const edgeFunctionCreate = useFlag('edgeFunctionCreate')
+  const { includeSchemaMetadata } = useOrgAiOptInLevel()
+  const snap = useAiAssistantStateSnapshot()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const org = useSelectedOrganization()
 
   const [files, setFiles] = useState<
     { id: number; name: string; content: string; selected?: boolean }[]
@@ -141,6 +142,7 @@ const NewFunctionPage = () => {
 
     deployFunction({
       projectRef: ref,
+      slug: values.functionName,
       metadata: {
         entrypoint_path: 'index.ts',
         name: values.functionName,
@@ -148,11 +150,17 @@ const NewFunctionPage = () => {
       },
       files: files.map(({ name, content }) => ({ name, content })),
     })
+    sendEvent({
+      action: 'edge_function_deploy_button_clicked',
+      properties: { origin: 'functions_editor' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+    })
   }
 
   const handleChat = () => {
     const selectedFile = files.find((f) => f.selected) ?? files[0]
-    setAiAssistantPanel({
+    snap.newChat({
+      name: 'Explain edge function',
       open: true,
       sqlSnippets: [selectedFile.content],
       initialInput: 'Help me understand and improve this edge function...',
@@ -160,12 +168,29 @@ const NewFunctionPage = () => {
         title:
           'I can help you understand and improve your edge function. Here are a few example prompts to get you started:',
         prompts: [
-          'Explain what this function does...',
-          'Help me optimize this function...',
-          'Show me how to add more features...',
-          'Help me handle errors better...',
+          {
+            label: 'Explain Function',
+            description: 'Explain what this function does...',
+          },
+          {
+            label: 'Optimize Function',
+            description: 'Help me optimize this function...',
+          },
+          {
+            label: 'Add Features',
+            description: 'Show me how to add more features...',
+          },
+          {
+            label: 'Error Handling',
+            description: 'Help me handle errors better...',
+          },
         ],
       },
+    })
+    sendEvent({
+      action: 'edge_function_ai_assistant_button_clicked',
+      properties: { origin: 'functions_editor_chat' },
+      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
   }
 
@@ -176,6 +201,11 @@ const NewFunctionPage = () => {
         prev.map((file) => (file.selected ? { ...file, content: template.content } : file))
       )
       setOpen(false)
+      sendEvent({
+        action: 'edge_function_template_clicked',
+        properties: { templateName: template.name, origin: 'editor_page' },
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }
 
@@ -209,13 +239,6 @@ const NewFunctionPage = () => {
 
     form.handleSubmit(onSubmit)()
   }
-
-  // TODO (Saxon): Remove this once the flag is fully launched
-  useEffect(() => {
-    if (!edgeFunctionCreate) {
-      router.push(`/project/${ref}/functions`)
-    }
-  }, [edgeFunctionCreate, ref, router])
 
   useEffect(() => {
     if (template) {
@@ -260,7 +283,7 @@ const NewFunctionPage = () => {
                 Templates
               </Button>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ className="w-[300px] p-0" align="end">
+            <PopoverContent_Shadcn_ portal className="w-[300px] p-0" align="end">
               <Command_Shadcn_>
                 <CommandInput_Shadcn_ placeholder="Search templates..." />
                 <CommandList_Shadcn_>
@@ -312,7 +335,7 @@ const NewFunctionPage = () => {
       <FileExplorerAndEditor
         files={files}
         onFilesChange={setFiles}
-        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete`}
+        aiEndpoint={`${BASE_PATH}/api/ai/edge-function/complete-v2`}
         aiMetadata={{
           projectRef: project?.ref,
           connectionString: project?.connectionString,

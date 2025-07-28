@@ -37,10 +37,13 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
   const [defaultSchema, setDefaultSchema] = useState()
   const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: visible }
+  )
   const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
       toast.success(`Extension "${extension.name}" is now enabled`)

@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Badge } from 'ui'
 
 interface PolicyTableRowHeaderProps {
@@ -33,7 +33,7 @@ const PolicyTableRowHeader = ({
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
 
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
@@ -113,7 +113,8 @@ const PolicyTableRowHeader = ({
               type="default"
               className="px-1"
               onClick={() => {
-                setAiAssistantPanel({
+                aiSnap.newChat({
+                  name: 'Create new policy',
                   open: true,
                   initialInput: `Create and name a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                 })

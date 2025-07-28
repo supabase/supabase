@@ -27,7 +27,7 @@ interface FileExplorerAndEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
+    connectionString?: string | null
     includeSchemaMetadata?: boolean
   }
 }
@@ -82,7 +82,7 @@ const FileExplorerAndEditor = ({
   }
 
   const addNewFile = () => {
-    const newId = Math.max(...files.map((f) => f.id)) + 1
+    const newId = Math.max(0, ...files.map((f) => f.id)) + 1
     const updatedFiles = files.map((f) => ({ ...f, selected: false }))
     onFilesChange([
       ...updatedFiles,
@@ -194,13 +194,16 @@ const FileExplorerAndEditor = ({
                         level={level}
                         xPadding={16}
                         name={element.name}
-                        icon={<File size={14} className="text-foreground-light" />}
+                        icon={<File size={14} className="text-foreground-light shrink-0" />}
                         isEditing={Boolean(element.metadata?.isEditing)}
                         onEditSubmit={(value) => {
                           if (originalId !== null) handleFileNameChange(originalId, value)
                         }}
                         onClick={() => {
                           if (originalId !== null) handleFileSelect(originalId)
+                        }}
+                        onDoubleClick={() => {
+                          if (originalId !== null) handleStartRename(originalId)
                         }}
                       />
                     </div>
@@ -248,7 +251,7 @@ const FileExplorerAndEditor = ({
           aiMetadata={aiMetadata}
           options={{
             tabSize: 2,
-            fontSize: 12,
+            fontSize: 13,
             minimap: { enabled: false },
             wordWrap: 'on',
             lineNumbers: 'on',

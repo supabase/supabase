@@ -4,36 +4,27 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getDocument } from 'data/documents/document-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 const SOC2 = () => {
-  const { slug } = useParams()
+  const organization = useSelectedOrganization()
+  const slug = organization?.slug
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
 
-  const {
-    data: subscription,
-    error,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
-  const currentPlan = subscription?.plan
+  const currentPlan = organization?.plan
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -61,31 +52,17 @@ const SOC2 = () => {
         {!canReadSubscriptions ? (
           <NoPermission resourceText="access our SOC2 Type 2 report" />
         ) : (
-          <>
-            {isLoading && (
-              <div className="space-y-2">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-3/4" />
-                <ShimmeringLoader className="w-1/2" />
-              </div>
+          <div className="flex items-center justify-center h-full">
+            {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
+              <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
+                <Button type="default">Upgrade to Team</Button>
+              </Link>
+            ) : (
+              <Button type="default" icon={<Download />} onClick={() => setIsOpen(true)}>
+                Download SOC2 Type 2 Report
+              </Button>
             )}
-
-            {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
-
-            {isSuccess && (
-              <div className="flex items-center justify-center h-full">
-                {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=soc2`}>
-                    <Button type="default">Upgrade to Team</Button>
-                  </Link>
-                ) : (
-                  <Button type="default" icon={<Download />} onClick={() => setIsOpen(true)}>
-                    Download SOC2 Type 2 Report
-                  </Button>
-                )}
-              </div>
-            )}
-          </>
+          </div>
         )}
         <ConfirmationModal
           visible={isOpen}

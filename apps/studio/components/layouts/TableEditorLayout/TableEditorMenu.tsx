@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { ExportDialog } from 'components/grid/components/header/ExportDialog'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -40,12 +40,12 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
-  const router = useRouter()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -53,6 +53,7 @@ const TableEditorMenu = () => {
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [tableToExport, setTableToExport] = useState<{ name: string; schema: string }>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -114,6 +115,14 @@ const TableEditorMenu = () => {
     }
   }, [selectedTable?.schema])
 
+  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
+  useEffect(() => {
+    // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
+    if (entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ schemas: [selectedSchema], entities: entityTypes })
+    }
+  }, [entityTypes, searchText, selectedSchema, tableEditorTabsCleanUp])
+
   return (
     <>
       <div className="flex flex-col flex-grow gap-5 pt-5 h-full">
@@ -124,7 +133,6 @@ const TableEditorMenu = () => {
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
-              router.push(`/project/${project?.ref}/editor?schema=${name}`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
@@ -174,12 +182,10 @@ const TableEditorMenu = () => {
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
               name="search-tables"
-              aria-labelledby="Search tables"
-              onChange={(e) => {
-                setSearchText(e.target.value)
-              }}
               value={searchText}
               placeholder="Search tables..."
+              aria-labelledby="Search tables"
+              onChange={(e) => setSearchText(e.target.value)}
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
@@ -277,6 +283,11 @@ const TableEditorMenu = () => {
                       projectRef: project?.ref!,
                       id: Number(id),
                       isLocked,
+                      onExportCLI: () => {
+                        const entity = entityTypes?.find((x) => x.id === id)
+                        if (!entity) return
+                        setTableToExport({ name: entity.name, schema: entity.schema })
+                      },
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -290,6 +301,13 @@ const TableEditorMenu = () => {
         </div>
       </div>
 
+      <ExportDialog
+        table={tableToExport}
+        open={!!tableToExport}
+        onOpenChange={(open) => {
+          if (!open) setTableToExport(undefined)
+        }}
+      />
       <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
     </>
   )

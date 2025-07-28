@@ -110,6 +110,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         onSuccess: () => {
           resetForm({ values: { ...values }, initialValues: { ...values } })
           setOpen(false)
+          setUrlProvider(null)
           toast.success('Successfully updated settings')
         },
       }
@@ -243,6 +244,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                           onClick={() => {
                             handleReset()
                             setOpen(false)
+                            setUrlProvider(null)
                           }}
                           disabled={isUpdatingConfig}
                         >

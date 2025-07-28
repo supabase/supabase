@@ -27,7 +27,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
   accessToken: async () => {
-    return await firebase.auth().currentUser?.getIdToken(/* forceRefresh */ false)) ?? null
+    return (await firebase.auth().currentUser?.getIdToken(/* forceRefresh */ false)) ?? null
   },
 })
 ```

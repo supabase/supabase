@@ -7,16 +7,16 @@ import { useParams } from 'common'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Popover, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
+import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
   row,
@@ -30,7 +30,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   isEditable?: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }) => {
-  const state = useTrackedState()
+  const snap = useTableEditorTableStateSnapshot()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const project = useSelectedProject()
@@ -41,7 +41,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     id,
   })
 
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
+  const gridColumn = snap.gridColumns.find((x) => x.name == column.key)
   const rawValue = row[column.key as keyof TRow] as unknown
   const initialValue = rawValue || rawValue === '' ? String(rawValue) : null
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
@@ -50,10 +50,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
-  const isTruncated =
-    typeof initialValue === 'string' &&
-    initialValue.endsWith('...') &&
-    initialValue.length > MAX_CHARACTERS
+  const isTruncated = isValueTruncated(initialValue)
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return

@@ -1,4 +1,4 @@
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 
 interface CodeSnippetProps {
   selectedLang: 'bash' | 'js'

@@ -1,23 +1,25 @@
+import { AnimatePresence, motion } from 'framer-motion'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+
 import { useParams } from 'common'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
-import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
-import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { PROJECT_STATUS } from 'lib/constants'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import LoadingState from './LoadingState'
@@ -84,14 +86,20 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
+
     const {
       editorPanel,
-      aiAssistantPanel,
-      setAiAssistantPanel,
       mobileMenuOpen,
+      showSidebar,
       setMobileMenuOpen,
+      toggleEditorPanel,
+      setEditorPanel,
     } = useAppStateSnapshot()
-    const { open } = aiAssistantPanel
+    const aiSnap = useAiAssistantStateSnapshot()
+
+    const editor = useEditorType()
+    const forceShowProductMenu = editor === undefined
+    const sideBarIsOpen = forceShowProductMenu || showSidebar
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -100,7 +108,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const showProductMenu = selectedProject
       ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
         (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings'))
+          router.pathname.includes('/project/[ref]/settings')) ||
+        router.pathname.includes('/project/[ref]/branches')
       : true
 
     const ignorePausedState =
@@ -113,8 +122,17 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
+        // Cmd+I: Open AI Assistant, close Editor Panel
         if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
-          setAiAssistantPanel({ open: !open })
+          setEditorPanel({ open: false })
+          aiSnap.toggleAssistant()
+          e.preventDefault()
+          e.stopPropagation()
+        }
+        // Cmd+E: Toggle Editor Panel, always close AI Assistant
+        if (e.metaKey && e.key === 'e' && !e.altKey && !e.shiftKey) {
+          aiSnap.closeAssistant()
+          toggleEditorPanel()
           e.preventDefault()
           e.stopPropagation()
         }
@@ -122,9 +140,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       window.addEventListener('keydown', handler)
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open])
-
-    const sideBarIsOpen = true // @mildtomato - var for later to use collapsible sidebar
+    }, [setEditorPanel, aiSnap, editorPanel.open])
 
     return (
       <>
@@ -143,7 +159,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           <meta name="description" content="Supabase Studio" />
         </Head>
         <div className="flex flex-row h-full w-full">
-          <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
+          <ResizablePanelGroup direction="horizontal" autoSaveId="project-layout">
             {showProductMenu && productMenu && (
               <ResizablePanel
                 order={1}
@@ -190,8 +206,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             )}
             <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
               <ResizablePanelGroup
-                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                 direction="horizontal"
+                className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
                 autoSaveId="project-layout-content"
               >
                 <ResizablePanel
@@ -199,7 +215,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   className={cn('w-full xl:min-w-[600px] bg-dash-sidebar')}
                 >
                   <main
-                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
+                    className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden @container"
                     ref={ref}
                   >
                     {showPausedState ? (
@@ -216,19 +232,25 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                     )}
                   </main>
                 </ResizablePanel>
-                {isClient && (aiAssistantPanel.open || editorPanel.open) && (
+                {isClient && (aiSnap.open || editorPanel.open) && (
                   <>
                     <ResizableHandle withHandle />
                     <ResizablePanel
                       id="panel-assistant"
+                      minSize={30}
+                      maxSize={50}
                       className={cn(
-                        'border-l xl:border-l-0 bg fixed z-40 md:absolute md:z-0 right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
-                        'w-screen h-[100dvh] md:h-auto md:w-auto md:min-w-[400px] max-w-[500px]',
-                        '2xl:min-w-[500px] 2xl:max-w-[600px]'
+                        'border-l bg fixed z-40 right-0 top-0 bottom-0',
+                        'w-screen h-[100dvh]',
+                        'md:absolute md:h-auto md:w-3/4',
+                        'xl:relative xl:border-l-0'
                       )}
                     >
-                      {aiAssistantPanel.open && <AIAssistantPanel />}
-                      {editorPanel.open && <EditorPanel />}
+                      {aiSnap.open ? (
+                        <AIAssistant className="w-full h-[100dvh] md:h-full max-h-[100dvh]" />
+                      ) : editorPanel.open ? (
+                        <EditorPanel />
+                      ) : null}
                     </ResizablePanel>
                   </>
                 )}
@@ -236,8 +258,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <EnableBranchingModal />
-        <AISettingsModal />
+        <CreateBranchModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
@@ -304,6 +325,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
+  const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
@@ -367,7 +389,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding) {
+  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
     return <BuildingState />
   }
 

@@ -8,7 +8,7 @@ import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: string
 } & Partial<VaultSecret>
 
@@ -18,14 +18,13 @@ export async function updateVaultSecret({
   id,
   ...payload
 }: VaultSecretUpdateVariables) {
-  const { name, description, secret, key_id } = payload
+  const { name, description, secret } = payload
   const sql = /* SQL */ `
 select vault.update_secret(
     secret_id := ${quoteLiteral(id)}
   ${secret ? `, new_secret := ${quoteLiteral(secret)}` : ''}
   ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
   ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
-  ${key_id ? `, new_key_id := ${quoteLiteral(key_id)}` : ''}
 )
 `
 

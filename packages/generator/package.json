@@ -22,7 +22,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@redocly/cli": "^1.6.0",
+    "@redocly/cli": "^1.28.0",
     "@types/json-stringify-safe": "^5.0.0",
     "@types/lodash": "^4.14.202",
     "json-stringify-safe": "^5.0.1",

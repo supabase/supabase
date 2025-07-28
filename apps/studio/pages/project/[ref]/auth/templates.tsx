@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { EmailTemplates } from 'components/interfaces/Auth'
 import { AuthEmailsLayout } from 'components/layouts/AuthLayout/AuthEmailsLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
@@ -21,6 +22,10 @@ const TemplatesPage: NextPageWithLayout = () => {
   )
 }
 
-TemplatesPage.getLayout = (page) => <AuthEmailsLayout>{page}</AuthEmailsLayout>
+TemplatesPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthEmailsLayout>{page}</AuthEmailsLayout>
+  </DefaultLayout>
+)
 
 export default TemplatesPage

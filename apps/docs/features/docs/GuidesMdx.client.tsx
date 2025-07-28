@@ -1,14 +1,7 @@
 'use client'
 
-/**
- * The MDXProvider is necessary so that MDX partials will have access
- * to components.
- */
-
-import { MDXProvider } from '@mdx-js/react'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { AnchorProvider } from 'ui-patterns'
-import { components } from '~/features/docs/MdxBase.shared'
 import { TocAnchorsContext, useSubscribeTocRerender } from './GuidesMdx.state'
 
 interface TOCHeader {
@@ -42,7 +35,7 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
-          const text = heading.textContent.replace('#', '')
+          const text = heading.textContent?.replace('#', '') || ''
           const link = heading.querySelector('a')?.getAttribute('href')
           if (!link) return null
 
@@ -71,8 +64,4 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
   )
 }
 
-const MDXProviderGuides = ({ children }: PropsWithChildren) => {
-  return <MDXProvider components={components}>{children}</MDXProvider>
-}
-
-export { MDXProviderGuides, TocAnchorsProvider }
+export { TocAnchorsProvider }

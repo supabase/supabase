@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { cn } from 'ui'
-import LogoLoader from 'ui/src/components/LogoLoader'
+import { LogoLoader } from 'ui'
 
 import RepoCard from './RepoCard'
 import { Pencil, Users, Users2 } from 'lucide-react'

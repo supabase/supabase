@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ReactNode } from 'react'
 
-import { useParams } from 'common'
 import { RedirectUrls } from 'components/interfaces/Auth/RedirectUrls/RedirectUrls'
 import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
@@ -12,27 +10,6 @@ import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-
-interface URLConfigurationLayoutProps {
-  children: ReactNode
-}
-
-export const URLConfigurationLayout = ({ children }: URLConfigurationLayoutProps) => {
-  const { ref } = useParams()
-
-  return (
-    <DefaultLayout>
-      <AuthLayout>
-        <PageLayout
-          title="URL Configuration"
-          subtitle="Configure site URL and redirect URLs for authentication"
-        >
-          {children}
-        </PageLayout>
-      </AuthLayout>
-    </DefaultLayout>
-  )
-}
 
 const URLConfiguration: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -58,6 +35,17 @@ const URLConfiguration: NextPageWithLayout = () => {
   )
 }
 
-URLConfiguration.getLayout = (page) => <URLConfigurationLayout>{page}</URLConfigurationLayout>
+URLConfiguration.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout>
+      <PageLayout
+        title="URL Configuration"
+        subtitle="Configure site URL and redirect URLs for authentication"
+      >
+        {page}
+      </PageLayout>
+    </AuthLayout>
+  </DefaultLayout>
+)
 
 export default URLConfiguration

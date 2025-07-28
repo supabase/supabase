@@ -1,46 +1,41 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { InfoIcon, Check, ExternalLink } from 'lucide-react'
+import { Check, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import tweets from 'shared-data/tweets'
 
+import {
+  billingPartnerLabel,
+  getPlanChangeType,
+} from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-  Card,
-  CardContent,
-  Badge,
-} from 'ui'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { organizationKeys } from 'data/organizations/keys'
-import { formatCurrency } from 'lib/helpers'
-import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
-import { SubscriptionTier } from 'data/subscriptions/types'
-import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import PaymentMethodSelection from './PaymentMethodSelection'
-import { Button, Dialog, DialogContent } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
+import { ProjectInfo } from 'data/projects/projects-query'
+import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
+import { SubscriptionTier } from 'data/subscriptions/types'
+import { PRICING_TIER_PRODUCT_IDS, PROJECT_STATUS, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { formatCurrency } from 'lib/helpers'
+import { Button, Dialog, DialogContent, Table, TableBody, TableCell, TableRow } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import PaymentMethodSelection from './PaymentMethodSelection'
+import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
+import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
+import { useTheme } from 'next-themes'
+import { PaymentIntentResult } from '@stripe/stripe-js'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
+import type { PaymentMethodElementRef } from '../PaymentMethods/NewPaymentMethodElement'
+import { useParams } from 'common'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 
-const getRandomTweet = () => {
-  const filteredTweets = tweets.filter((it) => it.text.length < 180)
-  const randomIndex = Math.floor(Math.random() * filteredTweets.length)
-  return filteredTweets[randomIndex]
-}
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const PLAN_HEADINGS = {
   tier_pro:
-    'the Pro plan and create unlimited projects, daily backups and premium support when you need it',
+    'the Pro plan to unlock unlimited projects, daily backups, and email support whenever you need it',
   tier_team: 'the Team plan for SOC2, SSO, priority support and greater data and log retention',
   default: 'to a new plan',
 } as const
@@ -59,80 +54,123 @@ type DowngradePlanHeadingKey = keyof typeof DOWNGRADE_PLAN_HEADINGS
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
-  subscriptionPlanMeta: any
   planMeta: any
   subscriptionPreviewError: any
   subscriptionPreviewIsLoading: boolean
   subscriptionPreviewInitialized: boolean
   subscriptionPreview: OrganizationBillingSubscriptionPreviewResponse | undefined
-  billingViaPartner: boolean
-  billingPartner?: string
-  selectedOrganization: any
   subscription: any
-  slug?: string
   currentPlanMeta: any
+  projects: ProjectInfo[]
 }
 
-const SubscriptionPlanUpdateDialog = ({
+export const SubscriptionPlanUpdateDialog = ({
   selectedTier,
   onClose,
-  subscriptionPlanMeta,
   planMeta,
   subscriptionPreviewError,
   subscriptionPreviewIsLoading,
   subscriptionPreviewInitialized,
   subscriptionPreview,
-  billingViaPartner,
-  billingPartner,
-  selectedOrganization,
   subscription,
-  slug,
   currentPlanMeta,
+  projects,
 }: Props) => {
-  const queryClient = useQueryClient()
+  const { resolvedTheme } = useTheme()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
-  const [testimonialTweet, setTestimonialTweet] = useState(getRandomTweet())
+  const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
+  const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
+  const paymentMethodSelectionRef = useRef<{
+    createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+  }>(null)
 
-  useEffect(() => {
-    if (selectedTier !== undefined && selectedTier !== 'tier_free') {
-      setTestimonialTweet(getRandomTweet())
-    }
-  }, [selectedTier])
+  const billingViaPartner = subscription?.billing_via_partner === true
+  const billingPartner = subscription?.billing_partner
+
+  const stripeOptionsConfirm = useMemo(() => {
+    return {
+      clientSecret: paymentIntentSecret,
+      appearance: getStripeElementsAppearanceOptions(resolvedTheme),
+    } as StripeElementsOptions
+  }, [paymentIntentSecret, resolvedTheme])
+
+  const changeType = useMemo(() => {
+    return getPlanChangeType(subscription?.plan?.id, planMeta?.id)
+  }, [planMeta, subscription])
+
+  const subscriptionPlanMeta = useMemo(
+    () => subscriptionsPlans.find((tier) => tier.id === selectedTier),
+    [selectedTier]
+  )
+
+  const onSuccessfulPlanChange = () => {
+    setPaymentConfirmationLoading(false)
+    toast.success(
+      `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
+    )
+    onClose()
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  }
 
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
-      onSuccess: () => {
-        toast.success(
-          `Successfully ${planMeta?.change_type === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
-        )
-        onClose()
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      onSuccess: (data) => {
+        if (data.pending_payment_intent_secret) {
+          setPaymentIntentSecret(data.pending_payment_intent_secret)
+          return
+        }
+
+        onSuccessfulPlanChange()
       },
       onError: (error) => {
+        setPaymentConfirmationLoading(false)
         toast.error(`Unable to update subscription: ${error.message}`)
       },
     }
   )
 
+  const { mutate: confirmPendingSubscriptionChange, isLoading: isConfirming } =
+    useConfirmPendingSubscriptionChangeMutation({
+      onSuccess: () => {
+        onSuccessfulPlanChange()
+      },
+      onError: (error) => {
+        toast.error(`Unable to update subscription: ${error.message}`)
+      },
+    })
+
+  const paymentIntentConfirmed = async (paymentIntentConfirmation: PaymentIntentResult) => {
+    // Reset payment intent secret to ensure another attempt works as expected
+    setPaymentIntentSecret('')
+
+    if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded') {
+      await confirmPendingSubscriptionChange({
+        slug: selectedOrganization?.slug,
+        payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
+      })
+    } else {
+      setPaymentConfirmationLoading(false)
+      // If the payment intent is not successful, we reset the payment method and show an error
+      toast.error(`Could not confirm payment. Please try again or use a different card.`)
+    }
+  }
+
   const onUpdateSubscription = async () => {
-    if (!slug) return console.error('org slug is required')
+    if (!selectedOrganization?.slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
-    if (!selectedPaymentMethod && subscription?.payment_method_type !== 'invoice') {
-      return toast.error('Please select a payment method')
+
+    setPaymentConfirmationLoading(true)
+
+    const result = await paymentMethodSelectionRef.current?.createPaymentMethod()
+    if (result) {
+      setSelectedPaymentMethod(result.paymentMethod.id)
+    } else {
+      setPaymentConfirmationLoading(false)
     }
 
-    if (selectedPaymentMethod) {
-      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          defaultPaymentMethodId: selectedPaymentMethod,
-          data: prev.data.map((pm: any) => ({
-            ...pm,
-            is_default: pm.id === selectedPaymentMethod,
-          })),
-        }
-      })
+    if (!result && subscription?.payment_method_type !== 'invoice' && changeType === 'upgrade') {
+      return
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default
@@ -141,7 +179,14 @@ const SubscriptionPlanUpdateDialog = ({
         ? (PRICING_TIER_PRODUCT_IDS.PAYG as SubscriptionTier)
         : selectedTier
 
-    updateOrgSubscription({ slug, tier, paymentMethod: selectedPaymentMethod })
+    updateOrgSubscription({
+      slug: selectedOrganization?.slug,
+      tier,
+      paymentMethod: result?.paymentMethod?.id,
+      address: result?.address,
+      tax_id: result?.taxId ?? undefined,
+      billing_name: result?.customerName ?? undefined,
+    })
   }
 
   const features = subscriptionPlanMeta?.features?.[0]?.features || []
@@ -152,40 +197,89 @@ const SubscriptionPlanUpdateDialog = ({
 
   // Features that will be lost when downgrading
   const featuresToLose =
-    planMeta?.change_type === 'downgrade'
+    changeType === 'downgrade'
       ? currentPlanFeatures.filter((feature: string | [string, ...any[]]) => {
           const featureStr = typeof feature === 'string' ? feature : feature[0]
           // Check if this feature exists in the new plan
-          return !topFeatures.some((newFeature: string | [string, ...any[]]) => {
+          return !topFeatures.some((newFeature: string | string[]) => {
             const newFeatureStr = typeof newFeature === 'string' ? newFeature : newFeature[0]
             return newFeatureStr === featureStr
           })
         })
       : []
 
+  // Calculate remaining days in current billing cycle
+  const now = Math.floor(Date.now() / 1000) // current time in seconds
+  const remainingSeconds = subscription?.current_period_end - now
+  const totalSeconds = subscription?.current_period_end - subscription?.current_period_start
+  const remainingRatio = remainingSeconds / totalSeconds
+
+  // Calculate prorated credit for current plan
+  const currentPlanMonthlyPrice = currentPlanMeta?.price ?? 0
+  const proratedCredit = currentPlanMonthlyPrice * remainingRatio
+
+  // Calculate new plan cost
+  const newPlanCost = Number(subscriptionPlanMeta?.priceMonthly) ?? 0
+
+  const customerBalance = ((subscription?.customer_balance ?? 0) / 100) * -1
+
+  // Calculate total charge (new plan - prorated credit)
+  const totalCharge = Math.max(0, newPlanCost - proratedCredit - customerBalance)
+
   return (
     <Dialog
       open={selectedTier !== undefined && selectedTier !== 'tier_free'}
       onOpenChange={(open) => {
+        // Do not allow closing mid-change
+        if (isUpdating || paymentConfirmationLoading || isConfirming) {
+          return
+        }
         if (!open) onClose()
       }}
     >
       <DialogContent
         onOpenAutoFocus={(event) => event.preventDefault()}
         size="xlarge"
-        className="p-0"
+        className="p-0 overflow-y-auto max-h-[1000px]"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 h-full items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 h-full items-stretch">
           {/* Left Column */}
-          <div className="p-8 pb-8 flex flex-col">
+          <div className="p-8 pb-8 flex flex-col xl:col-span-3">
             <div className="flex-1">
-              <h3 className="text-lg font-medium mb-4">
-                {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
-                {selectedOrganization?.name} to{' '}
-                {planMeta?.change_type === 'downgrade'
-                  ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
-                  : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
-              </h3>
+              <div>
+                {!billingViaPartner && subscriptionPreview != null && changeType === 'upgrade' && (
+                  <div className="space-y-2 mb-4">
+                    <PaymentMethodSelection
+                      ref={paymentMethodSelectionRef}
+                      selectedPaymentMethod={selectedPaymentMethod}
+                      onSelectPaymentMethod={(pm) => setSelectedPaymentMethod(pm)}
+                      readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
+                    />
+                  </div>
+                )}
+
+                {billingViaPartner && (
+                  <div className="mb-4">
+                    <p className="text-sm">
+                      This organization is billed through our partner{' '}
+                      {billingPartnerLabel(billingPartner)}.{' '}
+                      {billingPartner === 'aws' ? (
+                        <>The organization's credit balance will be decreased accordingly.</>
+                      ) : (
+                        <>You will be charged by them directly.</>
+                      )}
+                    </p>
+                    {billingViaPartner &&
+                      billingPartner === 'fly' &&
+                      subscriptionPreview?.plan_change_type === 'downgrade' && (
+                        <p className="text-sm">
+                          Your organization will be downgraded at the end of your current billing
+                          cycle.
+                        </p>
+                      )}
+                  </div>
+                )}
+              </div>
 
               {subscriptionPreviewIsLoading && (
                 <div className="space-y-2 mb-4 mt-2">
@@ -196,402 +290,345 @@ const SubscriptionPlanUpdateDialog = ({
               )}
               {subscriptionPreviewInitialized && (
                 <>
-                  <Table className="mt-2 mb-4 text-foreground-light">
-                    <TableBody>
-                      {(() => {
-                        // Calculate remaining days in current billing cycle
-                        const now = Math.floor(Date.now() / 1000) // current time in seconds
-                        const remainingSeconds = subscription?.current_period_end - now
-                        const totalSeconds =
-                          subscription?.current_period_end - subscription?.current_period_start
-                        const remainingRatio = remainingSeconds / totalSeconds
-
-                        // Calculate prorated credit for current plan
-                        const currentPlanMonthlyPrice = currentPlanMeta?.price ?? 0
-                        const proratedCredit = currentPlanMonthlyPrice * remainingRatio
-
-                        // Calculate new plan cost
-                        const newPlanCost = subscriptionPlanMeta?.priceMonthly ?? 0
-
-                        const customerBalance = ((subscription?.customer_balance ?? 0) / 100) * -1
-
-                        // Calculate total charge (new plan - prorated credit)
-                        const totalCharge = Math.max(
-                          0,
-                          newPlanCost - proratedCredit - customerBalance
-                        )
-
-                        return (
+                  <div className="mt-2 mb-4 text-foreground-light text-sm">
+                    <div className="flex items-center justify-between gap-2 border-b border-muted text-foreground">
+                      <div className="py-2 pl-0">Charge today</div>
+                      <div className="py-2 pr-0 text-right" translate="no">
+                        {formatCurrency(totalCharge)}
+                        {subscription?.plan?.id !== 'free' && (
                           <>
-                            <TableRow>
-                              <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                <span>{subscriptionPlanMeta?.name} Plan</span>
-                                <Badge variant={'brand'} size={'small'} className="ml-1">
-                                  New
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="py-2 pr-0 text-right">
-                                {formatCurrency(newPlanCost)}
-                              </TableCell>
-                            </TableRow>
-                            {subscription?.plan?.id !== 'free' && (
-                              <TableRow>
-                                <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                  <span>Unused Time on {subscription?.plan?.name} Plan</span>
-                                  <InfoTooltip className="max-w-sm">
-                                    Your previous plan was charged upfront, so a plan change will
-                                    prorate any unused time in credits. If the prorated credits
-                                    exceed the new plan charge, the excessive credits are added to
-                                    your organization for future use.
-                                  </InfoTooltip>
-                                </TableCell>
-                                <TableCell className="py-2 pr-0 text-right">
-                                  -{formatCurrency(proratedCredit)}
-                                </TableCell>
-                              </TableRow>
-                            )}
-
-                            {/* Ignore rare case with negative balance (debt) */}
-                            {customerBalance > 0 && (
-                              <TableRow>
-                                <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                  <span>Credits</span>
-                                  <InfoTooltip>
-                                    Credits will be used first before charging your card.
-                                  </InfoTooltip>
-                                </TableCell>
-                                <TableCell className="py-2 pr-0 text-right">
-                                  {formatCurrency(customerBalance)}
-                                </TableCell>
-                              </TableRow>
-                            )}
-                            <TableRow className="text-foreground">
-                              <TableCell className="py-2 pl-0 border-t">Charge today</TableCell>
-                              <TableCell className="py-2 pr-0 text-right border-t">
-                                {formatCurrency(totalCharge)}
-                              </TableCell>
-                            </TableRow>
-                            {subscription?.plan?.id !== 'free' && (
-                              <TableRow>
-                                <TableCell className="py-2 pl-0 flex items-center gap-1">
-                                  <span>+ current cycle usage</span>
-                                  <InfoTooltip className="max-w-sm">
-                                    Changing your plan resets your billing cycle. If your previous
-                                    billing cycle still has any outstanding usage charges, they will
-                                    be added to your total charge today.
-                                  </InfoTooltip>
-                                </TableCell>
-                                <TableCell className="py-2 pr-0 text-right">
-                                  <Link
-                                    href={`/org/${slug}/billing#breakdown`}
-                                    className="text-sm text-brand hover:text-brand-600 transition"
-                                    target="_blank"
-                                  >
-                                    View spend
-                                  </Link>
-                                </TableCell>
-                              </TableRow>
-                            )}
+                            {' '}
+                            <Link
+                              href={`/org/${selectedOrganization?.slug}/billing#breakdown`}
+                              className="text-sm text-brand hover:text-brand-600 transition"
+                              target="_blank"
+                            >
+                              + current spend
+                            </Link>
                           </>
-                        )
-                      })()}
-                    </TableBody>
-                  </Table>
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Card className="cursor-help text-sm">
-                        <CardContent className="flex items-center gap-2 py-2 px-3 text-foreground-light hover:text-foreground">
-                          <InfoIcon strokeWidth={1.5} size={16} className="text-foreground-light" />
-                          Monthly invoice estimate is{' '}
-                          {formatCurrency(
-                            Math.round(
-                              subscriptionPreview?.breakdown.reduce(
-                                (prev: number, cur) => prev + cur.total_price,
-                                0
-                              ) ?? 0
-                            )
-                          )}
-                        </CardContent>
-                      </Card>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-[520px] p-6">
-                      <h3 className="text-md font-medium mb-2">Your new monthly invoice</h3>
+                        )}
+                      </div>
+                    </div>
 
-                      {subscriptionPreviewError && (
-                        <AlertError
-                          error={subscriptionPreviewError}
-                          subject="Failed to preview subscription."
-                        />
-                      )}
-
-                      {subscriptionPreviewIsLoading && (
-                        <div className="space-y-2 p-6">
-                          <span className="text-sm">Estimating monthly costs...</span>
-                          <ShimmeringLoader />
-                          <ShimmeringLoader className="w-3/4" />
-                          <ShimmeringLoader className="w-1/2" />
+                    {subscription?.plan?.id !== 'free' && (
+                      <div className="flex items-center justify-between gap-2 border-b border-muted text-xs">
+                        <div className="py-2 pl-0 flex items-center gap-1">
+                          <span>Unused Time on {subscription?.plan?.name} Plan</span>
+                          <InfoTooltip className="max-w-sm">
+                            Your previous plan was charged upfront, so a plan change will prorate
+                            any unused time in credits. If the prorated credits exceed the new plan
+                            charge, the excessive credits are added to your organization for future
+                            use.
+                          </InfoTooltip>
                         </div>
-                      )}
+                        <div className="py-2 pr-0 text-right" translate="no">
+                          -{formatCurrency(proratedCredit)}
+                        </div>
+                      </div>
+                    )}
 
-                      {subscriptionPreviewInitialized && (
-                        <>
-                          <Table className="[&_tr:last-child]:border-t font-mono text-xs">
-                            <TableBody>
-                              {/* Non-compute items and Projects list */}
-                              {(() => {
-                                // Combine all compute-related projects
-                                const computeItems =
-                                  subscriptionPreview?.breakdown?.filter(
-                                    (item) =>
-                                      item.description?.toLowerCase().includes('compute') &&
-                                      item.breakdown?.length > 0
-                                  ) || []
+                    {/* Ignore rare case with negative balance (debt) */}
+                    {customerBalance > 0 && (
+                      <div className="flex items-center justify-between gap-2 border-b border-muted text-xs">
+                        <div className="py-2 pl-0 flex items-center gap-1">
+                          <span>Credits</span>
+                          <InfoTooltip>
+                            Credits will be used first before charging your card.
+                          </InfoTooltip>
+                        </div>
+                        <div className="py-2 pr-0 text-right" translate="no">
+                          {formatCurrency(customerBalance)}
+                        </div>
+                      </div>
+                    )}
 
-                                const computeCreditsItem =
-                                  subscriptionPreview?.breakdown?.find((item) =>
-                                    item.description.startsWith('Compute Credits')
-                                  ) ?? null
+                    <div className="flex items-center justify-between gap-2 text-foreground-lighter text-xs">
+                      <div className="py-2 pl-0 flex items-center gap-1">
+                        <span>Monthly invoice estimate</span>
+                        <InfoTooltip side="right">
+                          <div className="w-[520px] p-6">
+                            <h3 className="text-base font-medium mb-2">Your new monthly invoice</h3>
+                            <p className="prose text-xs mb-2">
+                              Paid projects run 24/7 without pausing. First project uses Compute
+                              Credits; additional projects start at <span translate="no">$10</span>
+                              /month regardless of usage.{' '}
+                              <Link
+                                href={'/docs/guides/platform/manage-your-usage/compute'}
+                                target="_blank"
+                              >
+                                Learn more
+                              </Link>
+                              .
+                            </p>
 
-                                const planItem = subscriptionPreview?.breakdown?.find((item) =>
-                                  item.description?.toLowerCase().includes('plan')
-                                )
+                            {subscriptionPreviewError && (
+                              <AlertError
+                                error={subscriptionPreviewError}
+                                subject="Failed to preview subscription."
+                              />
+                            )}
 
-                                const allProjects = computeItems.flatMap((item) =>
-                                  item.breakdown.map((project) => ({
-                                    ...project,
-                                    computeType: item.description,
-                                    computeCosts: Math.round(
-                                      item.total_price / item.breakdown.length
-                                    ),
-                                  }))
-                                )
+                            {subscriptionPreviewIsLoading && (
+                              <div className="space-y-2 p-6">
+                                <span className="text-sm">Estimating monthly costs...</span>
+                                <ShimmeringLoader />
+                                <ShimmeringLoader className="w-3/4" />
+                                <ShimmeringLoader className="w-1/2" />
+                              </div>
+                            )}
 
-                                const otherItems =
-                                  subscriptionPreview?.breakdown?.filter(
-                                    (item) =>
-                                      !item.description?.toLowerCase().includes('compute') &&
-                                      !item.description?.toLowerCase().includes('plan')
-                                  ) || []
+                            {subscriptionPreviewInitialized && (
+                              <>
+                                <Table className="[&_tr:last-child]:border-t font-mono text-xs">
+                                  <TableBody>
+                                    {/* Non-compute items and Projects list */}
+                                    {(() => {
+                                      // Combine all compute-related projects
+                                      const computeItems =
+                                        subscriptionPreview?.breakdown?.filter(
+                                          (item) =>
+                                            item.description?.toLowerCase().includes('compute') &&
+                                            item.breakdown &&
+                                            item.breakdown.length > 0
+                                        ) || []
 
-                                const content = (
-                                  <>
-                                    {/* Combined projects section */}
-                                    {allProjects.length > 0 && (
-                                      <>
-                                        <TableRow className="text-foreground-light">
-                                          <TableCell className="!py-2 px-0">
-                                            {planItem?.description}
-                                          </TableCell>
-                                          <TableCell className="text-right py-2 px-0">
-                                            {formatCurrency(planItem?.total_price)}
-                                          </TableCell>
-                                        </TableRow>
+                                      const computeCreditsItem =
+                                        subscriptionPreview?.breakdown?.find((item) =>
+                                          item.description.startsWith('Compute Credits')
+                                        ) ?? null
 
-                                        <TableRow className="text-foreground-light">
-                                          <TableCell className="!py-2 px-0 flex items-center gap-1">
-                                            <span>Compute</span>
-                                            <InfoTooltip className="max-w-sm p-3">
-                                              <p className="prose text-xs mb-2">
-                                                Each project on a paid plan is a dedicated server
-                                                running 24/7 with no pausing. The first project is
-                                                covered by Compute Credits. Additional projects will
-                                                incur compute costs starting at $10/month,
-                                                independent of activity. See{' '}
-                                                <Link
-                                                  href={
-                                                    '/docs/guides/platform/manage-your-usage/compute'
-                                                  }
-                                                  target="_blank"
+                                      const planItem = subscriptionPreview?.breakdown?.find(
+                                        (item) => item.description?.toLowerCase().includes('plan')
+                                      )
+
+                                      const allProjects = computeItems.flatMap((item) =>
+                                        (item.breakdown || []).map((project) => ({
+                                          ...project,
+                                          computeType: item.description,
+                                          computeCosts: Math.round(
+                                            item.total_price / item.breakdown!.length
+                                          ),
+                                        }))
+                                      )
+
+                                      const otherItems =
+                                        subscriptionPreview?.breakdown?.filter(
+                                          (item) =>
+                                            !item.description?.toLowerCase().includes('compute') &&
+                                            !item.description?.toLowerCase().includes('plan')
+                                        ) || []
+
+                                      const content = (
+                                        <>
+                                          {/* Combined projects section */}
+                                          {allProjects.length > 0 && (
+                                            <>
+                                              <TableRow className="text-foreground-light">
+                                                <TableCell className="!py-2 px-0">
+                                                  {planItem?.description}
+                                                </TableCell>
+                                                <TableCell
+                                                  className="text-right py-2 px-0"
+                                                  translate="no"
                                                 >
-                                                  docs
-                                                </Link>
-                                                .
-                                              </p>
-                                              {subscription?.plan?.id === 'free' && (
-                                                <>
-                                                  <p className="text-xs text-foreground-light mb-3">
-                                                    Mixing paid and non-paid projects in a single
-                                                    organization is not possible. If you want
-                                                    projects to be on the Free Plan, use self-serve
-                                                    project transfers.
-                                                  </p>
-                                                  <div className="space-x-3">
-                                                    <Button
-                                                      asChild
-                                                      type="default"
-                                                      icon={<ExternalLink strokeWidth={1.5} />}
-                                                    >
-                                                      <Link
-                                                        href="/docs/guides/platform/manage-your-usage/compute"
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                      >
-                                                        How billing for Compute works
-                                                      </Link>
-                                                    </Button>
-                                                    <Button
-                                                      asChild
-                                                      type="default"
-                                                      icon={<ExternalLink strokeWidth={1.5} />}
-                                                    >
-                                                      <Link
-                                                        href="/docs/guides/platform/project-transfer"
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                      >
-                                                        Project transfers
-                                                      </Link>
-                                                    </Button>
-                                                  </div>
-                                                </>
+                                                  {formatCurrency(planItem?.total_price)}
+                                                </TableCell>
+                                              </TableRow>
+
+                                              <TableRow className="text-foreground-light">
+                                                <TableCell className="!py-2 px-0 flex items-center gap-1">
+                                                  <span>Compute</span>
+                                                </TableCell>
+                                                <TableCell
+                                                  className="text-right py-2 px-0"
+                                                  translate="no"
+                                                >
+                                                  {formatCurrency(
+                                                    computeItems.reduce(
+                                                      (sum: number, item) => sum + item.total_price,
+                                                      0
+                                                    ) + (computeCreditsItem?.total_price ?? 0)
+                                                  )}
+                                                </TableCell>
+                                              </TableRow>
+                                              {/* Show first 3 projects */}
+                                              {allProjects.map((project) => (
+                                                <TableRow
+                                                  key={project.project_ref}
+                                                  className="text-foreground-light"
+                                                >
+                                                  <TableCell
+                                                    className="!py-2 px-0 pl-6"
+                                                    translate="no"
+                                                  >
+                                                    {project.project_name} ({project.computeType}) |{' '}
+                                                    {formatCurrency(project.computeCosts)}
+                                                  </TableCell>
+                                                </TableRow>
+                                              ))}
+                                              {computeCreditsItem && (
+                                                <TableRow className="text-foreground-light">
+                                                  <TableCell
+                                                    className="!py-2 px-0 pl-6"
+                                                    translate="no"
+                                                  >
+                                                    Compute Credits |{' '}
+                                                    {formatCurrency(computeCreditsItem.total_price)}
+                                                  </TableCell>
+                                                </TableRow>
                                               )}
-                                            </InfoTooltip>
-                                          </TableCell>
-                                          <TableCell className="text-right py-2 px-0">
-                                            {formatCurrency(
-                                              computeItems.reduce(
-                                                (sum: number, item) => sum + item.total_price,
-                                                0
-                                              ) + (computeCreditsItem?.total_price ?? 0)
-                                            )}
-                                          </TableCell>
-                                        </TableRow>
-                                        {/* Show first 3 projects */}
-                                        {allProjects.map((project) => (
-                                          <TableRow
-                                            key={project.project_ref}
-                                            className="text-foreground-light"
-                                          >
-                                            <TableCell className="!py-2 px-0 pl-6">
-                                              {project.project_name} ({project.computeType}) |{' '}
-                                              {formatCurrency(project.computeCosts)}
-                                            </TableCell>
-                                          </TableRow>
-                                        ))}
-                                        {computeCreditsItem && (
-                                          <TableRow className="text-foreground-light">
-                                            <TableCell className="!py-2 px-0 pl-6">
-                                              Compute Credits |{' '}
-                                              {formatCurrency(computeCreditsItem.total_price)}
-                                            </TableCell>
-                                          </TableRow>
-                                        )}
-                                      </>
-                                    )}
+                                            </>
+                                          )}
 
-                                    {/* Non-compute items */}
-                                    {otherItems.map((item) => (
-                                      <TableRow
-                                        key={item.description}
-                                        className="text-foreground-light"
+                                          {/* Non-compute items */}
+                                          {otherItems.map((item) => (
+                                            <TableRow
+                                              key={item.description}
+                                              className="text-foreground-light"
+                                            >
+                                              <TableCell className="text-xs py-2 px-0">
+                                                <div className="flex items-center gap-1">
+                                                  <span>{item.description ?? 'Unknown'}</span>
+                                                  {item.breakdown && item.breakdown.length > 0 && (
+                                                    <InfoTooltip className="max-w-sm">
+                                                      <p>Projects using {item.description}:</p>
+                                                      <ul className="ml-6 list-disc">
+                                                        {item.breakdown.map((breakdown) => (
+                                                          <li
+                                                            key={`${item.description}-breakdown-${breakdown.project_ref}`}
+                                                          >
+                                                            {breakdown.project_name}
+                                                          </li>
+                                                        ))}
+                                                      </ul>
+                                                    </InfoTooltip>
+                                                  )}
+                                                </div>
+                                              </TableCell>
+                                              <TableCell
+                                                className="text-right text-xs py-2 px-0"
+                                                translate="no"
+                                              >
+                                                {formatCurrency(item.total_price)}
+                                              </TableCell>
+                                            </TableRow>
+                                          ))}
+                                        </>
+                                      )
+                                      return content
+                                    })()}
+
+                                    <TableRow>
+                                      <TableCell className="font-medium py-2 px-0">
+                                        Total per month (excluding other usage)
+                                      </TableCell>
+                                      <TableCell
+                                        className="text-right font-medium py-2 px-0"
+                                        translate="no"
                                       >
-                                        <TableCell className="text-xs py-2 px-0">
-                                          <div className="flex items-center gap-1 flex items-center gap-1">
-                                            <span>{item.description ?? 'Unknown'}</span>
-                                            {item.breakdown.length > 0 && (
-                                              <InfoTooltip className="max-w-sm">
-                                                <p>Projects using {item.description}:</p>
-                                                <ul className="ml-6 list-disc">
-                                                  {item.breakdown.map((breakdown) => (
-                                                    <li
-                                                      key={`${item.description}-breakdown-${breakdown.project_ref}`}
-                                                    >
-                                                      {breakdown.project_name}
-                                                    </li>
-                                                  ))}
-                                                </ul>
-                                              </InfoTooltip>
-                                            )}
-                                          </div>
-                                        </TableCell>
-                                        <TableCell className="text-right text-xs py-2 px-0">
-                                          {formatCurrency(item.total_price)}
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </>
-                                )
-                                return content
-                              })()}
-
-                              <TableRow>
-                                <TableCell className="font-medium py-2 px-0">
-                                  Total per month (excluding other usage)
-                                </TableCell>
-                                <TableCell className="text-right font-medium py-2 px-0">
-                                  {formatCurrency(
-                                    Math.round(
-                                      subscriptionPreview?.breakdown?.reduce(
-                                        (prev, cur) => prev + cur.total_price,
-                                        0
-                                      ) ?? 0
-                                    ) ?? 0
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </>
-                      )}
-                    </HoverCardContent>
-                  </HoverCard>
+                                        {formatCurrency(
+                                          Math.round(
+                                            subscriptionPreview?.breakdown?.reduce(
+                                              (prev, cur) => prev + cur.total_price,
+                                              0
+                                            ) ?? 0
+                                          ) ?? 0
+                                        )}
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+                              </>
+                            )}
+                          </div>
+                        </InfoTooltip>
+                      </div>
+                      <div className="py-2 pr-0 text-right" translate="no">
+                        {formatCurrency(
+                          Math.round(
+                            subscriptionPreview?.breakdown.reduce(
+                              (prev: number, cur) => prev + cur.total_price,
+                              0
+                            ) ?? 0
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
 
-            <div className="mt-4 pt-4">
-              {!billingViaPartner ? (
-                <div className="space-y-4">
-                  <PaymentMethodSelection
-                    selectedPaymentMethod={selectedPaymentMethod}
-                    onSelectPaymentMethod={setSelectedPaymentMethod}
-                  />
-                </div>
-              ) : (
-                <div className="mb-4">
-                  <p className="text-sm">
-                    This organization is billed through our partner{' '}
-                    {billingPartnerLabel(billingPartner)}.{' '}
-                    {billingPartner === 'aws' ? (
-                      <>The organization's credit balance will be decreased accordingly.</>
-                    ) : (
-                      <>You will be charged by them directly.</>
-                    )}
-                  </p>
-                  {billingViaPartner &&
-                    billingPartner === 'fly' &&
-                    subscriptionPreview?.plan_change_type === 'downgrade' && (
-                      <p className="text-sm">
-                        Your organization will be downgraded at the end of your current billing
-                        cycle.
-                      </p>
-                    )}
-                </div>
-              )}
-              <div className="flex space-x-4">
-                <Button type="default" onClick={onClose} className="flex-1">
-                  Cancel
-                </Button>
+            <div className="pt-4">
+              {projects.filter(
+                (it) =>
+                  it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+                  it.status === PROJECT_STATUS.COMING_UP
+              ).length === 5 &&
+                subscriptionPreview?.plan_change_type !== 'downgrade' && (
+                  <div className="pb-2">
+                    <Admonition title="Empty organization" type="warning">
+                      This organization has no active projects. Did you select the correct
+                      organization?
+                    </Admonition>
+                  </div>
+                )}
+
+              {projects.filter(
+                (it) =>
+                  it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+                  it.status === PROJECT_STATUS.COMING_UP
+              ).length === 1 &&
+                subscriptionPlanMeta?.planId === 'pro' &&
+                changeType === 'upgrade' && (
+                  <div className="pb-2">
+                    <Admonition type="note">
+                      <div className="text-sm prose">
+                        Paid projects run 24/7 without pausing. First project uses Compute Credits;
+                        additional projects cost <span translate="no">$10+</span>
+                        /month regardless of usage.{' '}
+                      </div>
+                      <Link
+                        href={'/docs/guides/platform/manage-your-usage/compute'}
+                        target="_blank"
+                        className="underline"
+                      >
+                        Learn more
+                      </Link>
+                    </Admonition>
+                  </div>
+                )}
+
+              <div className="flex space-x-2">
                 <Button
-                  loading={isUpdating}
+                  loading={isUpdating || paymentConfirmationLoading || isConfirming}
+                  disabled={subscriptionPreviewIsLoading}
                   type="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
+                  size="small"
                 >
-                  Confirm {planMeta?.change_type === 'downgrade' ? 'Downgrade' : 'Upgrade'}
+                  Confirm {changeType === 'downgrade' ? 'downgrade' : 'upgrade'}
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Right Column */}
-          <div className="bg-surface-100 p-8 flex flex-col border-l">
-            {planMeta?.change_type === 'downgrade'
+          <div className="bg-surface-100 p-8 flex flex-col border-l xl:col-span-2">
+            <h3 className="text-base mb-8">
+              {changeType === 'downgrade' ? 'Downgrade' : 'Upgrade'}{' '}
+              <span className="font-bold">{selectedOrganization?.name}</span> to{' '}
+              {changeType === 'downgrade'
+                ? DOWNGRADE_PLAN_HEADINGS[(selectedTier as DowngradePlanHeadingKey) || 'default']
+                : PLAN_HEADINGS[(selectedTier as PlanHeadingKey) || 'default']}
+            </h3>
+            {changeType === 'downgrade'
               ? featuresToLose.length > 0 && (
                   <div className="mb-4">
                     <h3 className="text-sm mb-1">Features you'll lose</h3>
                     <p className="text-xs text-foreground-light mb-4">
-                      Please review this carefully before downgrading.
+                      Please review carefully before downgrading.
                     </p>
                     <div className="space-y-2 mb-4 text-foreground-light">
                       {featuresToLose.map((feature: string | [string, ...any[]]) => (
@@ -615,7 +652,7 @@ const SubscriptionPlanUpdateDialog = ({
                     <h3 className="text-sm mb-4">Upgrade features</h3>
 
                     <div className="space-y-2 mb-4 text-foreground-light">
-                      {topFeatures.map((feature: string | [string, ...any[]]) => (
+                      {topFeatures.map((feature: string | string[]) => (
                         <div
                           key={typeof feature === 'string' ? feature : feature[0]}
                           className="flex items-center gap-2"
@@ -634,19 +671,21 @@ const SubscriptionPlanUpdateDialog = ({
                     </div>
                   </div>
                 )}
-            {planMeta?.change_type !== 'downgrade' && (
-              <div className="border-t pt-6">
-                <blockquote className="text-sm text-foreground-light italic">
-                  {testimonialTweet.text}
-                  <div className="mt-2 text-foreground">— @{testimonialTweet.handle}</div>
-                </blockquote>
-              </div>
-            )}
           </div>
         </div>
+
+        {stripePromise && paymentIntentSecret && (
+          <Elements stripe={stripePromise} options={stripeOptionsConfirm}>
+            <PaymentConfirmation
+              paymentIntentSecret={paymentIntentSecret}
+              onPaymentIntentConfirm={(paymentIntentConfirmation) =>
+                paymentIntentConfirmed(paymentIntentConfirmation)
+              }
+              onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
+            />
+          </Elements>
+        )}
       </DialogContent>
     </Dialog>
   )
 }
-
-export default SubscriptionPlanUpdateDialog
