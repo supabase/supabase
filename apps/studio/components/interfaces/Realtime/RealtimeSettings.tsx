@@ -151,14 +151,14 @@ export const RealtimeSettings = () => {
                           <Admonition
                             showIcon={false}
                             type="warning"
-                            title="RLS policies recommended"
+                            title="RLS policies are missing"
                             description={
                               <>
                                 Private mode requires RLS policies on the{' '}
-                                <code className="text-xs text-brand">realtime.messages</code> table to function
-                                properly.{' '}
+                                <code className="text-xs text-brand">realtime.messages</code> table
+                                to function properly.{' '}
                                 <InlineLink
-                                  href={`/project/${projectRef}/auth/policies?schema=realtime&search=messages`}
+                                  href={`/project/${projectRef}/realtime/policies`}
                                 >
                                   Add RLS policies
                                 </InlineLink>{' '}
