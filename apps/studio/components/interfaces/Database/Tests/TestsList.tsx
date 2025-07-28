@@ -1,233 +1,87 @@
-import { useRouter } from 'next/router'
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { MoreVertical, Trash, Settings2, FlaskConical } from 'lucide-react'
-import {
-  Alert,
-  Button,
-  Card,
-  CardHeader,
-  CardTitle,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
+import { useMemo, useState } from 'react'
+import { Alert, Card, CardHeader, CardTitle } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useDatabaseTestsQuery } from 'data/database-tests/database-tests-query'
-import { DatabaseTest } from 'data/database-tests/database-tests-query'
-import { useDatabaseTestDeleteMutation } from 'data/database-tests/database-test-delete-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { toast } from 'sonner'
-import TestRow, { TestRowHandle } from './TestRow'
+import { DatabaseTest, DatabaseTestStatus } from 'data/database-tests/database-tests-query'
+import TestRow from './TestRow'
 
-// Utility function to validate test query format
-const isValidTestQuery = (query: string): boolean => {
-  const trimmedQuery = query.trim().toLowerCase()
-  return trimmedQuery.startsWith('begin;') && trimmedQuery.endsWith('rollback;')
-}
-
-// Simple component for setup test rows - just name and actions
-interface SetupTestRowProps {
-  test: DatabaseTest
-  index: number
-  onSelectTest: (test: DatabaseTest) => void
-}
-
-const SetupTestRow = ({ test, index, onSelectTest }: SetupTestRowProps) => {
-  const project = useSelectedProject()
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-
-  const { mutate: deleteTest, isLoading: isDeleting } = useDatabaseTestDeleteMutation({
-    onSuccess: () => {
-      setIsDeleteModalOpen(false)
-    },
-  })
-
-  const onDelete = () => {
-    if (!project) return
-    deleteTest({ projectRef: project.ref, id: test.id })
-  }
-
-  return (
-    <div className="w-full flex justify-between items-center p-4 gap-3 border-b last:border-b-0">
-      <span className="flex items-center justify-center w-5 h-5 text-xs rounded bg border border-default text-foreground-lighter">
-        {index + 1}
-      </span>
-      <p className="text-sm cursor-pointer w-full" onClick={() => onSelectTest(test)}>
-        {test.name}
-      </p>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button type="text" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => setIsDeleteModalOpen(true)}>
-            <Trash size={14} />
-            <span className="ml-2">Remove test</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <ConfirmationModal
-        visible={isDeleteModalOpen}
-        title="Delete test"
-        confirmLabel="Delete test"
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={onDelete}
-        loading={isDeleting}
-      >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to delete the test "{test.name}"? This action cannot be undone.
-        </p>
-      </ConfirmationModal>
-    </div>
-  )
-}
-
-export interface TestsListHandle {
-  runAllTests: () => void
-}
+const SETUP_TEST_PREFIX = '00_setup'
 
 interface DatabaseTestsListProps {
+  tests: DatabaseTest[]
+  statuses: Record<string, DatabaseTestStatus>
   onSelectTest: (test: DatabaseTest) => void
+  onRunTest: (id: string) => void
 }
 
-const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
-  ({ onSelectTest }, ref) => {
-    // Removed moving circle animation state and refs
-    const router = useRouter()
-    const [search, setSearch] = useState('')
-    const testRowRefs = useRef<{ [key: string]: TestRowHandle | null }>({})
-    const project = useSelectedProject()
-    const handleSelectTest = (test: DatabaseTest) => {
-      onSelectTest(test)
+const DatabaseTestsList = ({
+  tests,
+  statuses,
+  onSelectTest,
+  onRunTest,
+}: DatabaseTestsListProps) => {
+  const [search, setSearch] = useState('')
+  const [activeTestId, setActiveTestId] = useState<string | null>(null)
+  const handleSelectTest = (test: DatabaseTest) => {
+    setActiveTestId(test.id)
+    onSelectTest(test)
+  }
+
+  // Assuming tests prop is already fetched.
+  const isLoading = false
+  const isError = false
+  const error = null
+  const isSuccess = true
+
+  // Split tests into setup and regular groups
+  const { setupTests, regularTests } = useMemo(() => {
+    if (!tests) return { setupTests: [], regularTests: [] }
+
+    const setupTests = tests.filter((test) => test.name.startsWith(SETUP_TEST_PREFIX))
+    const regularTests = tests.filter((test) => !test.name.startsWith(SETUP_TEST_PREFIX))
+
+    // Sort setup tests alphabetically to ensure consistent order
+    const sortedSetupTests = setupTests.sort((a, b) => a.name.localeCompare(b.name))
+
+    return {
+      setupTests: sortedSetupTests,
+      regularTests,
     }
+  }, [tests])
 
-    const {
-      data: tests,
-      isLoading,
-      isSuccess,
-      isError,
-      error,
-    } = useDatabaseTestsQuery({
-      projectRef: router.query.ref as string,
-    })
+  // Filter both groups based on search
+  const filteredSetupTests = useMemo(() => {
+    if (search.length === 0) return setupTests
+    return setupTests.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
+  }, [setupTests, search])
 
-    // Split tests into setup and regular groups
-    const { setupTests, regularTests, combinedSetupQuery } = useMemo(() => {
-      if (!tests) return { setupTests: [], regularTests: [], combinedSetupQuery: null }
+  const filteredRegularTests = useMemo(() => {
+    if (search.length === 0) return regularTests
+    return regularTests.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
+  }, [regularTests, search])
 
-      const setupTests = tests.filter((test) => test.name.startsWith('000'))
-      const regularTests = tests.filter((test) => !test.name.startsWith('000'))
+  // runAll logic now lives in parent page.
 
-      // Sort setup tests alphabetically to ensure consistent order
-      const sortedSetupTests = setupTests.sort((a, b) => a.name.localeCompare(b.name))
-
-      // Combine all setup test queries into a single query
-      const combinedSetupQuery =
-        sortedSetupTests.length > 0
-          ? ({
-              id: 'combined-setup',
-              name: 'Combined Setup Tests',
-              query: sortedSetupTests.map((test) => test.query).join('\n\n'),
-            } as DatabaseTest)
-          : null
-
-      return {
-        setupTests: sortedSetupTests,
-        regularTests,
-        combinedSetupQuery,
-      }
-    }, [tests])
-
-    // Filter both groups based on search
-    const filteredSetupTests = useMemo(() => {
-      if (search.length === 0) return setupTests
-      return setupTests.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
-    }, [setupTests, search])
-
-    const filteredRegularTests = useMemo(() => {
-      if (search.length === 0) return regularTests
-      return regularTests.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
-    }, [regularTests, search])
-
-    const runSingleTest = async (index: number): Promise<void> => {
-      const test = filteredRegularTests[index]
-      if (!test) return
-
-      const testRef = testRowRefs.current[test.id]
-      let result = null
-      if (testRef) {
-        testRef.setStatus(undefined)
-        result = await testRef.runTest()
-      }
-
-      if (!result?.error && index < filteredRegularTests.length - 1) {
-        await runSingleTest(index + 1)
-      }
-    }
-
-    const runAllTests = async () => {
-      if (filteredRegularTests.length === 0) {
-        toast.error('No tests to run.')
-        return
-      }
-
-      filteredRegularTests.forEach((test) => {
-        testRowRefs.current[test.id]?.setStatus('queued')
-      })
-
-      await runSingleTest(0)
-    }
-
-    useImperativeHandle(ref, () => ({
-      runAllTests,
-    }))
-
-    // Pass combined setup query to child components for prepending
-    const setupTest = combinedSetupQuery
-
-    const renderTestTable = (tests: DatabaseTest[], isSetupSection = false) => {
-      if (isSetupSection) {
-        // Simplified view for setup tests - just name and actions
-        return (
-          <div className="w-full">
-            {tests.length === 0 ? (
-              <p className="text-sm text-foreground-light p-4">
-                Tests starting with "000_setup" will be run before all other tests and can be used
-                to set up the test environment.
-              </p>
-            ) : (
-              tests.map((test, index) => (
-                <SetupTestRow
-                  key={test.id}
-                  index={index}
-                  test={test}
-                  onSelectTest={handleSelectTest}
-                />
-              ))
-            )}
-          </div>
-        )
-      }
-
-      // Regular tests view with full TestRow component
+  const renderTestTable = (tests: DatabaseTest[], isSetupSection = false) => {
+    if (isSetupSection) {
+      // Simplified view for setup tests - just name and actions
       return (
-        <div className="relative">
+        <div className="w-full">
           {tests.length === 0 ? (
-            <p className="text-sm text-foreground-light p-4">No tests found.</p>
+            <p className="text-sm text-foreground-light p-4">
+              Tests starting with "{SETUP_TEST_PREFIX}" will be run before all other tests and can
+              be used to set up the test environment.
+            </p>
           ) : (
             tests.map((test, index) => (
               <TestRow
-                ref={(el) => (testRowRefs.current[test.id] = el)}
                 key={test.id}
                 index={index}
                 isLast={index === tests.length - 1}
-                test={test}
-                prependQuery={setupTest}
-                canRun={true}
+                test={{ ...test, status: statuses[test.id] }}
+                canRun={false}
                 onSelectTest={handleSelectTest}
+                isActive={test.id === activeTestId}
+                onRun={() => {}}
               />
             ))
           )}
@@ -235,41 +89,62 @@ const DatabaseTestsList = forwardRef<TestsListHandle, DatabaseTestsListProps>(
       )
     }
 
+    // Regular tests view with full TestRow component
     return (
-      <div className="flex flex-col h-full space-y-4">
-        {isLoading && <ShimmeringLoader />}
-        {isError && (
-          <div className="p-4">
-            <Alert variant="danger" title="Failed to fetch database tests">
-              {(error as any)?.message}
-            </Alert>
-          </div>
-        )}
-        {isSuccess && (
-          <>
-            <Card>
-              <CardHeader className="px-4">
-                <div className="flex items-center gap-2">
-                  <CardTitle>Before Tests</CardTitle>
-                </div>
-              </CardHeader>
-              {renderTestTable(filteredSetupTests, true)}
-            </Card>
-
-            <Card>
-              <CardHeader className="px-4">
-                <div className="flex items-center gap-2">
-                  <CardTitle>Tests</CardTitle>
-                </div>
-              </CardHeader>
-              {renderTestTable(filteredRegularTests, false)}
-            </Card>
-          </>
+      <div className="relative">
+        {tests.length === 0 ? (
+          <p className="text-sm text-foreground-light p-4">No tests found.</p>
+        ) : (
+          tests.map((test, index) => (
+            <TestRow
+              key={test.id}
+              index={index}
+              isLast={index === tests.length - 1}
+              test={{ ...test, status: statuses[test.id] }}
+              canRun={true}
+              onSelectTest={handleSelectTest}
+              isActive={test.id === activeTestId}
+              onRun={() => onRunTest(test.id)}
+            />
+          ))
         )}
       </div>
     )
   }
-)
 
-DatabaseTestsList.displayName = 'DatabaseTestsList'
+  return (
+    <div className="flex flex-col h-full space-y-4">
+      {isLoading && <ShimmeringLoader />}
+      {isError && (
+        <div className="p-4">
+          <Alert variant="danger" title="Failed to fetch database tests">
+            {(error as any)?.message}
+          </Alert>
+        </div>
+      )}
+      {isSuccess && (
+        <>
+          <Card>
+            <CardHeader className="px-4">
+              <div className="flex items-center gap-2">
+                <CardTitle>Before Tests</CardTitle>
+              </div>
+            </CardHeader>
+            {renderTestTable(filteredSetupTests, true)}
+          </Card>
+
+          <Card>
+            <CardHeader className="px-4">
+              <div className="flex items-center gap-2">
+                <CardTitle>Tests</CardTitle>
+              </div>
+            </CardHeader>
+            {renderTestTable(filteredRegularTests, false)}
+          </Card>
+        </>
+      )}
+    </div>
+  )
+}
+
 export default DatabaseTestsList

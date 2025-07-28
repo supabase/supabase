@@ -2,10 +2,13 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { databaseTestsKeys } from './database-tests-key'
 import { get } from 'data/fetchers'
 
+export type DatabaseTestStatus = 'queued' | 'running' | 'passed' | 'failed' | undefined
+
 export type DatabaseTest = {
   id: string
   name: string
   query: string
+  status?: DatabaseTestStatus
 }
 
 export type DatabaseTestsVariables = {
@@ -45,7 +48,7 @@ export async function getDatabaseTests(
 
   if (error) throw error
 
-  const contents = (data.data ?? []) as Array<{
+  const contents = (data.data ?? []) as unknown as Array<{
     id: string
     name: string
     content: { sql: string }

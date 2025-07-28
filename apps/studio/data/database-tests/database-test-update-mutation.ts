@@ -3,6 +3,12 @@ import { toast } from 'sonner'
 
 import { put, handleError } from 'data/fetchers'
 import { databaseTestsKeys } from './database-tests-key'
+import type { components } from 'data/api'
+
+// Re-use the same payload typing strategy as in `content-upsert-mutation.ts`
+type UpsertSnippetPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
+  content: { sql: string }
+}
 
 type DatabaseTestUpdateVariables = {
   projectRef: string
@@ -21,23 +27,13 @@ export const useDatabaseTestUpdateMutation = ({
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({
-      projectRef,
-      id,
-      query,
-      name,
-      folderId,
-      ownerId,
-    }: DatabaseTestUpdateVariables) => {
-      // Prepare payload for upsert
-      const payload: any = {
+    mutationFn: async ({ projectRef, id, query, name, ownerId }: DatabaseTestUpdateVariables) => {
+      const payload: UpsertSnippetPayload = {
         id,
         name,
         description: '',
-        type: 'test' as any,
-        visibility: 'project' as const,
-        // folder_id no longer used for tests
-        folder_id: undefined,
+        type: 'test',
+        visibility: 'project',
         owner_id: ownerId,
         content: { sql: query },
       }
