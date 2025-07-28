@@ -11,6 +11,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,11 +25,11 @@ jobs:
             apps/docs
             examples
             packages
+            supabase
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
-          version: 9.10.0
           run_install: false
 
       - name: Use Node.js
@@ -39,4 +42,10 @@ jobs:
         run: pnpm i
 
       - name: Run tests
-        run: pnpm run test:docs
+        run: |
+          touch .env
+          # Needed to prevent local Supabase startup from erroring, due to
+          # GitHub Auth being enabled in config
+          echo "GITHUB_CLIENT_ID=dummy-id" >> .env
+          echo "GITHUB_SECRET=dummy-secret" >> .env
+          pnpm run test:docs

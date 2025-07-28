@@ -12,6 +12,7 @@ export type InfraMonitoringAttribute =
   | 'ram_usage'
   | 'disk_io_consumption'
   | 'pg_stat_database_num_backends'
+  | 'supavisor_connections_active'
 
 export type InfraMonitoringVariables = {
   projectRef?: string
@@ -30,7 +31,7 @@ export async function getInfraMonitoring(
     attribute,
     startDate,
     endDate,
-    interval = '1d',
+    interval = '1h',
     databaseIdentifier,
   }: InfraMonitoringVariables,
   signal?: AbortSignal
@@ -67,8 +68,8 @@ export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
     attribute,
     startDate,
     endDate,
-    interval = '1d',
-    dateFormat = 'DD MMM',
+    interval = '1h',
+    dateFormat = 'HH:mm DD MMM',
     databaseIdentifier,
     modifier,
   }: InfraMonitoringVariables,

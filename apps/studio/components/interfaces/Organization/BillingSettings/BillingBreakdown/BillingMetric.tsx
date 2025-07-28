@@ -97,7 +97,9 @@ const BillingMetric = ({
             )}
             <span className="text-sm">{usageLabel}</span>&nbsp;
             {relativeToSubscription && usageMeta.cost && usageMeta.cost > 0 ? (
-              <span className="text-sm">({formatCurrency(usageMeta.cost)})</span>
+              <span className="text-sm" translate="no">
+                ({formatCurrency(usageMeta.cost)})
+              </span>
             ) : usageMeta.available_in_plan && !usageMeta.unlimited && relativeToSubscription ? (
               <span className="text-sm">{percentageLabel}</span>
             ) : null}
@@ -143,7 +145,11 @@ const BillingMetric = ({
           ) : (
             <div>
               <Button type="default" asChild>
-                <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>Upgrade</Link>
+                <Link
+                  href={`/org/${slug}/billing?panel=subscriptionPlan&source=billingBreakdownUsage${metric.anchor}`}
+                >
+                  Upgrade
+                </Link>
               </Button>
             </div>
           )}
@@ -152,7 +158,9 @@ const BillingMetric = ({
       {usageMeta.available_in_plan && (
         <HoverCardContent side="bottom" align="center" className="w-[500px]" animate="slide-in">
           <div className="text-sm">
-            <p className="font-medium">{usageMeta.unit_price_desc}</p>
+            <p className="font-medium" translate="no">
+              {usageMeta.unit_price_desc}
+            </p>
 
             {metric.tip && (
               <div className="my-2">

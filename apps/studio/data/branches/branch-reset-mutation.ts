@@ -13,6 +13,7 @@ export type BranchResetVariables = {
 export async function resetBranch({ id }: Pick<BranchResetVariables, 'id'>) {
   const { data, error } = await post('/v1/branches/{branch_id}/reset', {
     params: { path: { branch_id: id } },
+    body: {},
   })
 
   if (error) handleError(error)

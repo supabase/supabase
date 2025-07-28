@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export type DatabaseFunction = z.infer<typeof pgMeta.functions.pgFunctionZod>

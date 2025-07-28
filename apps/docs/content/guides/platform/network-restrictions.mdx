@@ -18,6 +18,30 @@ If direct connections to your database [resolve to a IPv6 address](https://supab
 
 Network restrictions can be configured in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database) page. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling network restrictions.
 
+## To get started via the Management API:
+
+You can also manage network restrictions using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get current network restrictions
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/network-restrictions" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+# Update network restrictions
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/network-restrictions/apply" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "db_allowed_cidrs": [
+      "192.168.0.1/24",
+    ]
+  }'
+```
+
 ## To get started via the CLI:
 
 1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.

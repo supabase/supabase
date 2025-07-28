@@ -1,5 +1,7 @@
-/packages/shared-data/pricing.ts @roryw10 @kevcodez
-/packages/shared-data/plans.ts @roryw10 @kevcodez
+/packages/ui/  @supabase/design
+/packages/shared-data/pricing.ts @roryw10 @supabase/billing
+/packages/shared-data/plans.ts @roryw10 @supabase/billing
+/packages/common/telemetry-constants.ts @supabase/growth-eng
 
 /apps/studio/ @supabase/Dashboard
 
@@ -12,10 +14,8 @@
 
 /docker/ @supabase/dev-workflows
 
-/apps/studio/next.config.js                                         @supabase/security
+/apps/studio/csp.js                                                 @supabase/security
 /apps/studio/components/interfaces/Billing/Payment                  @supabase/security
 /apps/studio/components/interfaces/Organization/BillingSettings/    @supabase/security
 /apps/studio/components/interfaces/Organization/Documents/          @supabase/security
 /apps/studio/pages/new/index.tsx                                    @supabase/security
-
-/apps/studio/lib/constants/telemetry.ts @4L3k51 @loong @pamelachia

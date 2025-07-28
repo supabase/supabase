@@ -1,17 +1,18 @@
-import dayjs from 'dayjs'
-import { RefreshCw } from 'lucide-react'
+import { ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
 import { useParams } from 'common'
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { User } from 'data/auth/users-infinite-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { Button, cn, CriticalIcon, Separator } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { UserHeader } from './UserHeader'
-import { PANEL_PADDING } from './UserPanel'
+import { PANEL_PADDING } from './Users.constants'
 
 interface UserLogsProps {
   user: User
@@ -19,14 +20,13 @@ interface UserLogsProps {
 
 export const UserLogs = ({ user }: UserLogsProps) => {
   const { ref } = useParams()
+  const { filters, setFilters } = useLogsUrlState()
 
   const {
     logData: authLogs,
     isSuccess: isSuccessAuthLogs,
     isLoading: isLoadingAuthLogs,
-    filters,
     refresh,
-    setFilters,
   } = useLogsPreview({
     projectRef: ref as string,
     table: LOGS_TABLES.auth,
@@ -100,7 +100,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           />
         ) : (
           <div>
-            <div className="border border-b-0 rounded-t divide-y">
+            <div className="border border-b-0 rounded-t-md divide-y overflow-hidden">
               {authLogs.map((log) => {
                 const status = ((log.status ?? '-') as any).toString()
                 const is400 = status.startsWith('4')
@@ -135,7 +135,20 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                         {status}
                       </div>
                     </div>
-                    <p className="text-xs text-foreground-light px-2 truncate">{`${log.path} | ${log.msg}`}</p>
+                    <p className="group relative flex items-center py-1.5 text-xs text-foreground-light px-2 truncate w-full">
+                      {`${log.path} | ${log.msg}`}
+
+                      <ButtonTooltip
+                        type="outline"
+                        asChild
+                        tooltip={{ content: { text: 'Open in logs' } }}
+                        className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
+                      >
+                        <Link href={`/project/${ref}/logs/auth-logs?log=${log.id}`}>
+                          <ExternalLink size="12" className="text-foreground-light" />
+                        </Link>
+                      </ButtonTooltip>
+                    </p>
                   </div>
                 )
               })}

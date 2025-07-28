@@ -109,7 +109,7 @@ Let's build an Edge Function that will accept an input string and generate an em
 
       Note the two options we pass to `session.run()`:
 
-      - `mean_pool`: The first option sets `pooling` to `mean`. Pooling referes to how token-level embedding representations are compressed into a single sentence embedding that reflects the meaning of the entire sentence. Average pooling is the most common type of pooling for sentence embeddings.
+      - `mean_pool`: The first option sets `pooling` to `mean`. Pooling refers to how token-level embedding representations are compressed into a single sentence embedding that reflects the meaning of the entire sentence. Average pooling is the most common type of pooling for sentence embeddings.
       - `normalize`: The second option tells to normalize the embedding vector so that it can be used with distance measures like dot product. A normalized vector means its length (magnitude) is 1 - also referred to as a unit vector. A vector is normalized by dividing each element by the vector's length (magnitude), which maintains its direction but changes its length to 1.
 
     </StepHikeCompact.Details>

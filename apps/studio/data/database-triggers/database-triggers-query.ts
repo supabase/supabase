@@ -1,13 +1,12 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import { databaseTriggerKeys } from './keys'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { databaseTriggerKeys } from './keys'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 
 export type DatabaseTriggersVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseTriggers(
@@ -19,13 +18,21 @@ export async function getDatabaseTriggers(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const response = (await get(`${API_URL}/pg-meta/${projectRef}/triggers`, {
-    headers: Object.fromEntries(headers),
+  const { data, error } = await get('/platform/pg-meta/{ref}/triggers', {
+    params: {
+      header: {
+        'x-connection-encrypted': connectionString!,
+        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
+      },
+      path: { ref: projectRef },
+      query: undefined as any,
+    },
+    headers,
     signal,
-  })) as PostgresTrigger[] | { error?: any }
+  })
 
-  if (!Array.isArray(response) && response.error) throw response.error
-  return response as PostgresTrigger[]
+  if (error) handleError(error)
+  return data
 }
 
 export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers>>
@@ -42,13 +49,13 @@ export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
     databaseTriggerKeys.list(projectRef),
     ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
     {
-      // @ts-ignore
-      select(data) {
-        return (data as PostgresTrigger[]).filter(
-          (trigger) =>
+      select: (data) => {
+        return data.filter((trigger) => {
+          return (
             trigger.function_schema === 'supabase_functions' &&
             (trigger.schema !== 'net' || trigger.function_args.length === 0)
-        )
+          )
+        }) as any
       },
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,

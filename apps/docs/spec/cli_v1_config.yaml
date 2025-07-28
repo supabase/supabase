@@ -50,6 +50,9 @@ info:
     - id: local
       title: Local Development
       description: Local Development settings.
+    - id: branching
+      title: Branching
+      description: Branching configurations settings.
 
 # This section is an array of public functions which a user might need to execute.
 parameters:
@@ -382,6 +385,17 @@ parameters:
       - name: 'PostgreSQL configuration'
         link: 'https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT'
 
+  - id: 'db.settings.track_activity_query_size'
+    title: 'db.settings.track_activity_query_size'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum size of the query string that will be tracked in pg_stat_activity.current_query field.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-statistics.html#GUC-TRACK-ACTIVITY-QUERY-SIZE'
+
   - id: 'db.settings.track_commit_timestamp'
     title: 'db.settings.track_commit_timestamp'
     tags: ['database']
@@ -499,6 +513,18 @@ parameters:
     description: |
       External URL of the API server that frontend connects to.
     links: []
+
+  - id: 'studio.openai_api_key'
+    title: 'studio.openai_api_key'
+    tags: ['dashboard']
+    required: false
+    default: 'env(OPENAI_API_KEY)'
+    description: |
+      OpenAI API key used for AI features in the Studio dashboard.
+      DO NOT commit your OpenAI API key to git. Use environment variable substitution instead.
+    links:
+      - name: 'OpenAI API Keys'
+        link: 'https://platform.openai.com/api-keys'
 
   - id: 'inbucket.enabled'
     title: 'inbucket.enabled'
@@ -710,6 +736,72 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.rate_limit.email_sent'
+    title: 'auth.rate_limit.email_sent'
+    tags: ['auth']
+    required: false
+    default: '2'
+    description: |
+      Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.sms_sent'
+    title: 'auth.rate_limit.sms_sent'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.anonymous_users'
+    title: 'auth.rate_limit.anonymous_users'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.token_refresh'
+    title: 'auth.rate_limit.token_refresh'
+    tags: ['auth']
+    required: false
+    default: '150'
+    description: |
+      Number of sessions that can be refreshed in a 5 minute interval per IP address.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.sign_in_sign_ups'
+    title: 'auth.rate_limit.sign_in_sign_ups'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.rate_limit.token_verifications'
+    title: 'auth.rate_limit.token_verifications'
+    tags: ['auth']
+    required: false
+    default: '30'
+    description: |
+      Number of OTP / Magic link verifications that can be made in a 5 minute interval per IP address.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.enable_signup'
     title: 'auth.enable_signup'
     tags: ['auth']
@@ -803,14 +895,14 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'auth.email.otp_exp'
-    title: 'auth.email.otp_exp'
+  - id: 'auth.email.otp_expiry'
+    title: 'auth.email.otp_expiry'
     tags: ['auth']
     required: false
-    default: '300'
+    default: '3600'
     description: |
       The expiry time for an OTP code in seconds.
-      Default is 300 seconds (5 minutes).
+      Default is 3600 seconds (1 hour).
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
@@ -1482,6 +1574,21 @@ parameters:
       [functions.my_function]
       entrypoint = "path/to/custom/function.ts"
 
+  - id: 'functions.function_name.static_files'
+    title: 'functions.<function_name>.static_files'
+    tags: ['edge-functions']
+    required: false
+    description: |
+      Specify an array of static files to be bundled with the function. Supports glob patterns.
+
+      NOTE: only file paths within `functions` directory are supported at the moment.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+    usage: |
+      [functions.my_function]
+      static_files = [ "./functions/MY_FUNCTION_NAME/*.html", "./functions/MY_FUNCTION_NAME/custom.wasm" ]
+
   - id: 'analytics.enabled'
     title: 'analytics.enabled'
     tags: ['analytics']
@@ -1587,3 +1694,19 @@ parameters:
       DO NOT commit your AWS secret key to git. Use environment variable substitution instead.
       Note: This is an experimental feature and may change in future releases.
     links: []
+
+  - id: 'remotes.branch_name.project_id'
+    title: 'remotes.<branch_name>.project_id'
+    tags: ['branching']
+    required: true
+    description: |
+      The project reference ID for a specific persistent Supabase branch.
+      This ID is used to configure branch-specific settings in your config.toml file for branches deployments.
+      All other configuration options available in the root config are also supported in the remotes block.
+      For example, you can specify branch-specific database settings like so:
+    usage: |
+      [remotes.<branch_name>]
+      project_id = "your-project-ref"
+
+      [remotes.<branch_name>.db.seed]
+      sql_paths = ["./seeds/staging.sql"]

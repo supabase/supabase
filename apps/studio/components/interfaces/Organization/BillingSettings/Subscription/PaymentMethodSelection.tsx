@@ -1,41 +1,159 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useState } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { toast } from 'sonner'
-
-import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
-import { getURL } from 'lib/helpers'
-import { Button, Listbox } from 'ui'
-import { Loader, AlertCircle, CreditCard, Plus } from 'lucide-react'
+import {
+  useSelectedOrganization,
+  useSelectedOrganizationQuery,
+} from 'hooks/misc/useSelectedOrganization'
+import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { Loader, Plus } from 'lucide-react'
+import { Checkbox_Shadcn_, Listbox } from 'ui'
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
+import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
+import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
+import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
+import { useTheme } from 'next-themes'
+import { Elements } from '@stripe/react-stripe-js'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from '../PaymentMethods/NewPaymentMethodElement'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { useFlag } from 'hooks/ui/useFlag'
+import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
+import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
+import { useParams } from 'common'
+
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 export interface PaymentMethodSelectionProps {
   selectedPaymentMethod?: string
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
+  readOnly: boolean
 }
 
-const PaymentMethodSelection = ({
-  selectedPaymentMethod,
-  onSelectPaymentMethod,
-  layout = 'vertical',
-}: PaymentMethodSelectionProps) => {
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug
-  const [showAddNewPaymentMethodModal, setShowAddNewPaymentMethodModal] = useState(false)
+const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
+  {
+    selectedPaymentMethod,
+    onSelectPaymentMethod,
+    layout = 'vertical',
+    readOnly,
+  }: PaymentMethodSelectionProps,
+  ref
+) {
+  const { slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
+  const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
+  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
+  const { resolvedTheme } = useTheme()
+  const paymentRef = useRef<PaymentMethodElementRef | null>(null)
+  const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
+  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
+    useOrganizationCustomerProfileQuery({
+      slug,
+    })
+  const { data: taxId, isLoading: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
 
-  const {
-    data: paymentMethods,
-    isLoading,
-    refetch: refetchPaymentMethods,
-  } = useOrganizationPaymentMethodsQuery({ slug })
+  const hidePaymentMethodsWithoutAddress = useFlag('hidePaymentMethodsWithoutAddress')
 
-  const canUpdatePaymentMethods = useCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.payment_methods'
+  const { data: allPaymentMethods, isLoading } = useOrganizationPaymentMethodsQuery({ slug })
+
+  const paymentMethods = useMemo(() => {
+    if (!allPaymentMethods)
+      return {
+        data: [],
+        defaultPaymentMethodId: null,
+      }
+
+    const filtered = allPaymentMethods.data.filter(
+      (pm) => !hidePaymentMethodsWithoutAddress || pm.has_address
+    )
+    return {
+      data: filtered,
+      defaultPaymentMethodId: allPaymentMethods.data.some(
+        (pm) => pm.id === allPaymentMethods.defaultPaymentMethodId
+      )
+        ? allPaymentMethods.defaultPaymentMethodId
+        : null,
+    }
+  }, [allPaymentMethods])
+
+  const captchaRefCallback = useCallback((node: any) => {
+    setCaptchaRef(node)
+  }, [])
+
+  const { mutate: initSetupIntent, isLoading: setupIntentLoading } =
+    useOrganizationPaymentMethodSetupIntent({
+      onSuccess: (intent) => {
+        setSetupIntent(intent)
+      },
+      onError: (error) => {
+        toast.error(`Failed to setup intent: ${error.message}`)
+      },
+    })
+
+  useEffect(() => {
+    if (paymentMethods?.data && paymentMethods.data.length === 0 && setupNewPaymentMethod == null) {
+      setSetupNewPaymentMethod(true)
+    }
+  }, [paymentMethods])
+
+  useEffect(() => {
+    const loadSetupIntent = async (hcaptchaToken: string | undefined) => {
+      const slug = selectedOrganization?.slug
+      if (!slug) return console.error('Slug is required')
+      if (!hcaptchaToken) return console.error('HCaptcha token required')
+
+      setSetupIntent(undefined)
+      initSetupIntent({ slug: slug!, hcaptchaToken })
+    }
+
+    const loadPaymentForm = async () => {
+      if (setupNewPaymentMethod && captchaRef) {
+        let token = captchaToken
+
+        try {
+          if (!token) {
+            const captchaResponse = await captchaRef.execute({ async: true })
+            token = captchaResponse?.response ?? null
+          }
+        } catch (error) {
+          return
+        }
+
+        await loadSetupIntent(token ?? undefined)
+        resetCaptcha()
+      }
+    }
+
+    loadPaymentForm()
+  }, [captchaRef, setupNewPaymentMethod])
+
+  const resetCaptcha = () => {
+    setCaptchaToken(null)
+    captchaRef?.resetCaptcha()
+  }
+
+  const stripeOptionsPaymentMethod: StripeElementsOptions = useMemo(
+    () =>
+      ({
+        clientSecret: setupIntent ? setupIntent.client_secret! : '',
+        appearance: getStripeElementsAppearanceOptions(resolvedTheme),
+        paymentMethodCreation: 'manual',
+      }) as const,
+    [setupIntent, resolvedTheme]
   )
 
   useEffect(() => {
@@ -55,54 +173,65 @@ const PaymentMethodSelection = ({
     }
   }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
 
+  // If createPaymentMethod already exists, use it. Otherwise, define it here.
+  const createPaymentMethod = async (): ReturnType<
+    PaymentMethodElementRef['createPaymentMethod']
+  > => {
+    if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
+      const paymentResult = await paymentRef.current?.createPaymentMethod()
+
+      if (!paymentResult) return paymentResult
+
+      return {
+        paymentMethod: paymentResult.paymentMethod,
+        customerName: useAsDefaultBillingAddress ? paymentResult.customerName : null,
+        address: useAsDefaultBillingAddress ? paymentResult.address : null,
+        taxId: useAsDefaultBillingAddress ? paymentResult.taxId : null,
+      }
+    } else {
+      return {
+        paymentMethod: { id: selectedPaymentMethod } as PaymentMethod,
+        customerName: useAsDefaultBillingAddress ? customerProfile?.billing_name || '' : null,
+        address: useAsDefaultBillingAddress ? customerProfile?.address ?? null : null,
+        taxId: useAsDefaultBillingAddress ? taxId ?? null : null,
+      }
+    }
+  }
+
+  useImperativeHandle(ref, () => ({
+    createPaymentMethod,
+  }))
+
   return (
     <>
+      <HCaptcha
+        ref={captchaRefCallback}
+        sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+        size="invisible"
+        onOpen={() => {
+          // [Joshen] This is to ensure that hCaptcha popup remains clickable
+          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+        }}
+        onClose={() => {
+          setSetupIntent(undefined)
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+        }}
+        onVerify={(token) => {
+          setCaptchaToken(token)
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+        }}
+        onExpire={() => {
+          setCaptchaToken(null)
+        }}
+      />
+
       <div>
         {isLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
             <Loader className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
-        ) : paymentMethods?.data.length === 0 ? (
-          <div className="flex items-center justify-between px-4 py-2 border border-dashed rounded-md bg-alternative">
-            <div className="flex items-center space-x-4 text-foreground-light">
-              <AlertCircle size={16} strokeWidth={1.5} />
-              <p className="text-sm">No saved payment methods</p>
-            </div>
-
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="default"
-                  disabled={!canUpdatePaymentMethods}
-                  icon={<CreditCard />}
-                  onClick={() => setShowAddNewPaymentMethodModal(true)}
-                  htmlType="button"
-                >
-                  Add new
-                </Button>
-              </Tooltip.Trigger>
-              {!canUpdatePaymentMethods && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                        'w-48 border border-background text-center', //border
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to add new payment methods to this
-                        organization
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-          </div>
-        ) : (
+        ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
           <Listbox
             layout={layout}
             label="Payment method"
@@ -135,7 +264,9 @@ const PaymentMethodSelection = ({
             })}
             <div
               className="flex items-center px-3 py-2 space-x-2 transition cursor-pointer group hover:bg-surface-300"
-              onClick={() => setShowAddNewPaymentMethodModal(true)}
+              onClick={() => {
+                setSetupNewPaymentMethod(true)
+              }}
             >
               <Plus size={16} />
               <p className="transition text-foreground-light group-hover:text-foreground">
@@ -143,30 +274,55 @@ const PaymentMethodSelection = ({
               </p>
             </div>
           </Listbox>
+        ) : null}
+
+        {stripePromise && setupIntent && customerProfile && (
+          <>
+            <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
+              <NewPaymentMethodElement
+                ref={paymentRef}
+                email={selectedOrganization?.billing_email ?? undefined}
+                readOnly={readOnly}
+                customerName={customerProfile?.billing_name}
+                currentAddress={customerProfile?.address}
+                currentTaxId={taxId}
+              />
+            </Elements>
+
+            {/* If the customer already has a billing address, optionally allow overwriting it - if they have no address, we use that as a default */}
+            {customerProfile?.address != null && (
+              <div className="flex items-center space-x-2 mt-4">
+                <Checkbox_Shadcn_
+                  id="defaultBillingAddress"
+                  checked={useAsDefaultBillingAddress}
+                  onCheckedChange={() => setUseAsDefaultBillingAddress(!useAsDefaultBillingAddress)}
+                />
+                <label
+                  htmlFor="defaultBillingAddress"
+                  className="text-sm leading-none text-foreground-light"
+                >
+                  Use address as my org's billing address
+                </label>
+              </div>
+            )}
+          </>
+        )}
+
+        {(setupIntentLoading || isCustomerProfileLoading || isCustomerTaxIdLoading) && (
+          <div className="space-y-2">
+            <ShimmeringLoader className="h-10" />
+            <div className="grid grid-cols-2 gap-4">
+              <ShimmeringLoader className="h-10" />
+              <ShimmeringLoader className="h-10" />
+            </div>
+            <ShimmeringLoader className="h-10" />
+          </div>
         )}
       </div>
-
-      <AddNewPaymentMethodModal
-        visible={showAddNewPaymentMethodModal}
-        returnUrl={`${getURL()}/org/${selectedOrganization?.slug}/billing?panel=subscriptionPlan`}
-        onCancel={() => setShowAddNewPaymentMethodModal(false)}
-        autoMarkAsDefaultPaymentMethod={true}
-        onConfirm={async () => {
-          setShowAddNewPaymentMethodModal(false)
-          toast.success('Successfully added new payment method')
-          const { data: refetchedPaymentMethods } = await refetchPaymentMethods()
-          if (refetchedPaymentMethods?.data?.length) {
-            // Preselect the card that was just added
-            const mostRecentPaymentMethod = refetchedPaymentMethods?.data.reduce(
-              (prev, current) => (prev.created > current.created ? prev : current),
-              refetchedPaymentMethods.data[0]
-            )
-            onSelectPaymentMethod(mostRecentPaymentMethod.id)
-          }
-        }}
-      />
     </>
   )
-}
+})
+
+PaymentMethodSelection.displayName = 'PaymentMethodSelection'
 
 export default PaymentMethodSelection

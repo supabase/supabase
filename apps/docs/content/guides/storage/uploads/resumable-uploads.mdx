@@ -12,7 +12,15 @@ The resumable upload method is recommended when:
 - Network stability is a concern
 - You want to have progress events for your uploads
 
-Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the [tus-js-client](https://github.com/tus/tus-js-client) library, or other client-side libraries like [Uppy-js](https://uppy.io/docs/tus/) that support the TUS protocol.
+Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resumable uploads. TUS stands for The Upload Server and is an open protocol for supporting resumable uploads. The protocol allows the upload process to be resumed from where it left off in case of interruptions. This method can be implemented using the [`tus-js-client`](https://github.com/tus/tus-js-client) library, or other client-side libraries like [Uppy](https://uppy.io/docs/tus/) that support the TUS protocol.
+
+<Admonition type="note">
+
+For optimal performance when uploading large files you should always use the direct storage hostname. This provides several performance enhancements that will greatly improve performance when uploading large files.
+
+Instead of `https://project-id.supabase.co` use `https://project-id.storage.supabase.co`
+
+</Admonition>
 
 <Tabs
   scrollable
@@ -35,7 +43,8 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
 
         return new Promise((resolve, reject) => {
             var upload = new tus.Upload(file, {
-                endpoint: `https://${projectId}.supabase.co/storage/v1/upload/resumable`,
+                // Supabase TUS endpoint (with direct storage hostname)
+                endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
                 retryDelays: [0, 3000, 5000, 10000, 20000],
                 headers: {
                     authorization: `Bearer ${session.access_token}`,
@@ -125,7 +134,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
         // Initialize Uppy instance only once
         const [uppy] = useState(() => new Uppy());
         // Initialize Supabase client with project URL and anon key
-        const supabase = createClient(projectURL, anonKey);
+        const supabase = createClient(`https://${projectId}.supabase.co`, anonKey);
 
         useEffect(() => {
             const initializeUppy = async () => {
@@ -135,7 +144,8 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
             } = await supabase.auth.getSession();
 
             uppy.use(Tus, {
-                    endpoint: `${projectURL}/storage/v1/upload/resumable`, // Supabase TUS endpoint
+                    // Supabase TUS endpoint (with direct storage hostname)
+                    endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
                     retryDelays: [0, 3000, 5000, 10000, 20000], // Retry delays for resumable uploads
                     headers: {
                         authorization: `Bearer ${session?.access_token}`, // User session access token
@@ -173,7 +183,7 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     ```
 
   </TabPanel>
-  
+
   <TabPanel id="kotlin" label="Kotlin">
 
     Kotlin supports resumable uploads natively for all targets:
@@ -205,6 +215,53 @@ Supabase Storage implements the [TUS protocol](https://tus.io/) to enable resuma
     ```
 
   </TabPanel>
+
+  <TabPanel id="py" label="Python">
+
+    Here's an example of how to upload a file using [`tus-py-client`](https://github.com/tus/tus-py-client):
+
+    ```python
+    from io import BufferedReader
+    from tusclient import client
+    from supabase import create_client
+
+    def upload_file(
+        bucket_name: str, file_name: str, file: BufferedReader, access_token: str
+    ):
+        # create Tus client
+        my_client = client.TusClient(
+            f"{supabase_url}/storage/v1/upload/resumable",
+            headers={"Authorization": f"Bearer {access_token}", "x-upsert": "true"},
+        )
+        uploader = my_client.uploader(
+            file_stream=file,
+            chunk_size=(6 * 1024 * 1024),
+            metadata={
+                "bucketName": bucket_name,
+                "objectName": file_name,
+                "contentType": "image/png",
+                "cacheControl": "3600",
+            },
+        )
+        uploader.upload()
+
+    # create client and sign in
+    supabase = create_client(supabase_url, supabase_key)
+
+    # retrieve the current user's session for authentication
+    session = supabase.auth.get_session()
+
+    # open file and send file stream to upload
+    with open("./assets/40mb.jpg", "rb") as fs:
+        upload_file(
+            bucket_name="assets",
+            file_name="large_file",
+            file=fs,
+            access_token=session.access_token,
+        )
+    ```
+
+  </TabPanel>
 </Tabs>
 
 ### Upload URL
@@ -221,11 +278,11 @@ When two or more clients upload a file to the same path using different upload U
 
 If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
 
-### UppyJS example
+### Uppy example
 
-You can check a [full example using UppyJS](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
+You can check a [full example using Uppy](https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy).
 
-UppyJS has integrations with different frameworks:
+Uppy has integrations with different frameworks:
 
 - [React](https://uppy.io/docs/react/)
 - [Svelte](https://uppy.io/docs/svelte/)

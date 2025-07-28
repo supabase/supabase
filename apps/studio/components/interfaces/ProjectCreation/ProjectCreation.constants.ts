@@ -252,3 +252,5 @@ export const COUNTRY_LAT_LON = {
   ZM: { lat: -15, lon: 30 },
   ZW: { lat: -20, lon: 30 },
 }
+
+export const SPECIAL_CHARS_REGEX = /^[^@:\/]*$/

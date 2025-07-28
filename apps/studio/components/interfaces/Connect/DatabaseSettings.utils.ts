@@ -1,5 +1,3 @@
-import type { PoolingConfiguration } from 'data/database/pooling-configuration-query'
-
 type ConnectionStrings = {
   psql: string
   uri: string
@@ -12,23 +10,33 @@ type ConnectionStrings = {
   sqlalchemy: string
 }
 
-export const getConnectionStrings = (
+export const getConnectionStrings = ({
+  connectionInfo,
+  poolingInfo,
+  metadata,
+}: {
   connectionInfo: {
     db_user: string
     db_port: number
     db_host: string
     db_name: string
-  },
-  poolingInfo: PoolingConfiguration,
+  }
+  poolingInfo?: {
+    connectionString: string
+    db_user: string
+    db_port: number
+    db_host: string
+    db_name: string
+  }
   metadata: {
     projectRef?: string
     pgVersion?: string
   }
-): {
+}): {
   direct: ConnectionStrings
   pooler: ConnectionStrings
 } => {
-  const isMd5 = poolingInfo.connectionString.includes('options=reference')
+  const isMd5 = poolingInfo?.connectionString.includes('options=reference')
   const { projectRef } = metadata
   const password = '[YOUR-PASSWORD]'
 
@@ -39,10 +47,10 @@ export const getConnectionStrings = (
   const directName = connectionInfo.db_name
 
   // Pooler connection variables
-  const poolerUser = poolingInfo.db_user
-  const poolerPort = poolingInfo.db_port
-  const poolerHost = poolingInfo.db_host
-  const poolerName = poolingInfo.db_name
+  const poolerUser = poolingInfo?.db_user
+  const poolerPort = poolingInfo?.db_port
+  const poolerHost = poolingInfo?.db_host
+  const poolerName = poolingInfo?.db_name
 
   // Direct connection strings
   const directPsqlString = isMd5
@@ -76,9 +84,9 @@ export const getConnectionStrings = (
     ? `psql "postgresql://${poolerUser}:${password}@${poolerHost}:${poolerPort}/${poolerName}?options=reference%3D${projectRef}"`
     : `psql -h ${poolerHost} -p ${poolerPort} -d ${poolerName} -U ${poolerUser}`
 
-  const poolerUriString = poolingInfo.connectionString
+  const poolerUriString = poolingInfo?.connectionString ?? ''
 
-  const nodejsPoolerUriString = `DATABASE_URL=${poolingInfo.connectionString}`
+  const nodejsPoolerUriString = `DATABASE_URL=${poolingInfo?.connectionString}`
 
   const poolerGolangString = `user=${poolerUser} 
 password=${password} 
