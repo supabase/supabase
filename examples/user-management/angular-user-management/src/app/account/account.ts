@@ -1,30 +1,42 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { AuthSession } from '@supabase/supabase-js';
 import { Profile, SupabaseService } from '../supabase.service';
 
 @Component({
   selector: 'app-account',
-  templateUrl: './account.component.html',
-  styleUrls: ['./account.component.css'],
+  templateUrl: './account.html',
+  styleUrls: ['./account.css'],
+  standalone: false,
 })
 export class AccountComponent implements OnInit {
   loading = false;
   profile!: Profile;
+  updateProfileForm!: FormGroup;
+
+  get avatarUrl() {
+    return this.updateProfileForm.value.avatar_url as string;
+  }
+  async updateAvatar(event: string): Promise<void> {
+    this.updateProfileForm.patchValue({
+      avatar_url: event,
+    });
+    await this.updateProfile();
+  }
 
   @Input()
   session!: AuthSession;
 
-  updateProfileForm = this.formBuilder.group({
-    username: '',
-    website: '',
-    avatar_url: '',
-  });
-
   constructor(
     private readonly supabase: SupabaseService,
     private formBuilder: FormBuilder
-  ) {}
+  ) {
+    this.updateProfileForm = this.formBuilder.group({
+      username: '',
+      website: '',
+      avatar_url: '',
+    });
+  }
 
   async ngOnInit(): Promise<void> {
     await this.getProfile();
@@ -37,15 +49,15 @@ export class AccountComponent implements OnInit {
     });
   }
 
-  get avatarUrl() {
-    return this.updateProfileForm.value.avatar_url as string;
-  }
-
   async getProfile() {
     try {
       this.loading = true;
       const { user } = this.session;
-      let { data: profile, error, status } = await this.supabase.profile(user);
+      const {
+        data: profile,
+        error,
+        status,
+      } = await this.supabase.profile(user);
 
       if (error && status !== 406) {
         throw error;
@@ -61,13 +73,6 @@ export class AccountComponent implements OnInit {
     } finally {
       this.loading = false;
     }
-  }
-
-  async updateAvatar(event: string): Promise<void> {
-    this.updateProfileForm.patchValue({
-      avatar_url: event,
-    });
-    await this.updateProfile();
   }
 
   async updateProfile(): Promise<void> {
