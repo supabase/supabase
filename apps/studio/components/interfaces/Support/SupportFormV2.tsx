@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import { ChevronRight, ExternalLink, Mail, Plus, X } from 'lucide-react'
+import { Book, ChevronRight, ExternalLink, Github, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -28,7 +28,6 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
-  ScrollArea,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -42,7 +41,6 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
-import { DocsLinkGroup } from './DocsLink'
 import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { LibrarySuggestions } from './LibrarySuggestions'
 import { PlanExpectationInfoBox } from './PlanExpectationInfoBox'
@@ -516,29 +514,7 @@ export const SupportFormV2 = ({
             name="subject"
             control={form.control}
             render={({ field }) => (
-              <FormItemLayout
-                layout="vertical"
-                label="Subject"
-                description={
-                  field.value.length > 0 &&
-                  INCLUDE_DISCUSSIONS.includes(category) && (
-                    <p className="flex items-center gap-x-1">
-                      <span>Check our </span>
-                      <Link
-                        key="gh-discussions"
-                        href={`https://github.com/orgs/supabase/discussions?discussions_q=${field.value}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-x-1 text-foreground-light underline hover:text-foreground transition"
-                      >
-                        Github discussions
-                        <ExternalLink size={14} strokeWidth={2} />
-                      </Link>
-                      <span> for a quick answer</span>
-                    </p>
-                  )
-                }
-              >
+              <FormItemLayout layout="vertical" label="Subject">
                 <FormControl_Shadcn_>
                   <Input_Shadcn_ {...field} placeholder="Summary of the problem you have" />
                 </FormControl_Shadcn_>
@@ -546,17 +522,73 @@ export const SupportFormV2 = ({
             )}
           />
 
-          {docsResults.length > 0 && hasResults && (
-            <div className="pt-4 px-4 border rounded-md">
-              <h2 className="text-sm text-foreground-light px-2 mb-4">
-                Suggested resources ({Math.min(docsResults.length, 5)})
-              </h2>
-              <ScrollArea className={docsResults.length > 3 ? 'h-[300px]' : ''}>
-                {docsResults.slice(0, 5).map((page, i) => (
-                  <DocsLinkGroup key={`${page.id}-group`} page={page} />
-                ))}
-              </ScrollArea>
+          {searchState.status === 'loading' && docsResults.length === 0 && (
+            <div className="flex items-center gap-2 text-sm text-foreground-light">
+              <Loader2 className="animate-spin" size={14} />
+              <span>Searching for relevant resources...</span>
             </div>
+          )}
+
+          {docsResults.length > 0 && hasResults && (
+            <>
+              <div className="flex items-center gap-2">
+                <h5 className="text-sm text-foreground-lighter">AI Suggested resources</h5>
+                {searchState.status === 'loading' && (
+                  <div className="flex items-center gap-2 text-xs text-foreground-light">
+                    <Loader2 className="animate-spin" size={12} />
+                    <span>Updating results...</span>
+                  </div>
+                )}
+              </div>
+
+              <ul
+                className={cn(
+                  'flex flex-col gap-y-0.5 transition-opacity duration-200',
+                  searchState.status === 'loading' ? 'opacity-50' : 'opacity-100'
+                )}
+              >
+                {docsResults.slice(0, 5).map((page, i) => {
+                  return (
+                    <li key={page.id} className="flex items-center gap-x-1">
+                      {page.type === 'github-discussions' ? (
+                        <Github size={16} className="text-foreground-muted" />
+                      ) : (
+                        <Book size={16} className="text-foreground-muted" />
+                      )}
+                      <a
+                        href={
+                          page.type === 'github-discussions'
+                            ? page.path
+                            : `https://supabase.com/docs${page.path}`
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-foreground-light hover:text-foreground transition"
+                      >
+                        {page.title}
+                      </a>
+                    </li>
+                  )
+                })}
+              </ul>
+            </>
+          )}
+
+          {form.getValues('subject').length > 0 && INCLUDE_DISCUSSIONS.includes(category) && (
+            <p className="flex items-center gap-x-1 text-foreground-lighter text-sm">
+              <span>Check our </span>
+              <Link
+                key="gh-discussions"
+                href={`https://github.com/orgs/supabase/discussions?discussions_q=${form.getValues('subject')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-x-1 underline hover:text-foreground transition"
+              >
+                Github discussions
+                <ExternalLink size={14} strokeWidth={2} />
+              </Link>
+              <span> for a quick answer</span>
+            </p>
           )}
         </div>
 

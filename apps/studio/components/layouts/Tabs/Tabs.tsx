@@ -13,27 +13,29 @@ import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { useAppStateSnapshot } from 'state/app-state'
+import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import {
-  editorEntityTypes,
-  handleTabClose,
-  handleTabDragEnd,
-  handleTabNavigation,
-  useTabsStore,
-  type Tab,
-} from 'state/tabs'
-import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+  cn,
+  ContextMenu_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 
 export const EditorTabs = () => {
-  const { ref } = useParams()
+  const { ref, id } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
 
   const editor = useEditorType()
-  const tabs = useTabsStore(ref)
+  const tabs = useTabsStateSnapshot()
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -61,21 +63,64 @@ export const EditorTabs = () => {
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
     if (oldIndex !== newIndex) {
-      handleTabDragEnd(ref, oldIndex, newIndex, active.id.toString(), router)
+      tabs.handleTabDragEnd(oldIndex, newIndex, active.id.toString(), router)
     }
   }
 
-  const handleClose = (id: string) => {
-    const onClearDashboardHistory = () => {
-      if (ref && editor) {
-        appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
+  const onClearDashboardHistory = () => {
+    if (ref && editor) {
+      appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
+    }
+  }
+
+  const handleClose = (tabId: string) => {
+    tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+  }
+
+  const handleCloseAll = () => {
+    if (editor) {
+      const tabsToClose =
+        editor === 'table'
+          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
+          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+
+      tabs.removeTabs(tabsToClose)
+      onClearDashboardHistory()
+      router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+    }
+  }
+
+  const handleCloseOthers = (tabId: string) => {
+    if (editor) {
+      const tabsToClose =
+        editor === 'table'
+          ? tabs.openTabs.filter((x) => !x.startsWith('sql') && x !== tabId)
+          : tabs.openTabs.filter((x) => x.startsWith('sql') && x !== tabId)
+
+      tabs.removeTabs(tabsToClose)
+      onClearDashboardHistory()
+
+      const entityId = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
+      if (id !== entityId) {
+        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
       }
     }
-    handleTabClose({ ref, id, router, editor, onClearDashboardHistory })
+  }
+
+  const handleCloseRight = (tabId: string) => {
+    if (editor) {
+      const openedTabs =
+        editor === 'table'
+          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
+          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+      const tabIdx = openedTabs.indexOf(tabId)
+      const tabsToClose = openedTabs.slice(tabIdx + 1)
+      tabs.removeTabs(tabsToClose)
+    }
   }
 
   const handleTabChange = (id: string) => {
-    handleTabNavigation(ref, id, router)
+    tabs.handleTabNavigation(id, router)
   }
 
   return (
@@ -86,61 +131,82 @@ export const EditorTabs = () => {
         onValueChange={handleTabChange}
       >
         <CollapseButton hideTabs={false} />
-        <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-clip overflow-x-auto ">
+        <TabsList_Shadcn_
+          className={cn(
+            'rounded-b-none gap-0 h-10 flex items-center w-full z-[1]',
+            'bg-surface-200 dark:bg-alternative border-none overflow-clip overflow-x-auto'
+          )}
+        >
           <SortableContext
             items={editorTabs.map((tab) => tab.id)}
             strategy={horizontalListSortingStrategy}
           >
             {editorTabs.map((tab, index) => (
-              <SortableTab
-                key={tab.id}
-                tab={tab}
-                index={index}
-                openTabs={openTabs}
-                onClose={() => handleClose(tab.id)}
-              />
+              <ContextMenu_Shadcn_>
+                <ContextMenuTrigger_Shadcn_>
+                  <SortableTab
+                    key={tab.id}
+                    tab={tab}
+                    index={index}
+                    openTabs={openTabs}
+                    onClose={() => handleClose(tab.id)}
+                  />
+                </ContextMenuTrigger_Shadcn_>
+                <ContextMenuContent_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={() => handleClose(tab.id)}>
+                    Close
+                  </ContextMenuItem_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseOthers(tab.id)}>
+                    Close Others
+                  </ContextMenuItem_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseRight(tab.id)}>
+                    Close to the Right
+                  </ContextMenuItem_Shadcn_>
+                  <ContextMenuItem_Shadcn_ onClick={handleCloseAll}>
+                    Close All
+                  </ContextMenuItem_Shadcn_>
+                </ContextMenuContent_Shadcn_>
+              </ContextMenu_Shadcn_>
             ))}
           </SortableContext>
 
           {/* Non-draggable new tab */}
           {hasNewTab && (
-            <>
-              <TabsTrigger_Shadcn_
-                value="new"
-                className={cn(
-                  'flex items-center gap-2 px-3 text-xs',
-                  'bg-dash-sidebar/50 dark:bg-surface-100/50',
-                  'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                  'relative group h-full border-t-2 !border-b-0',
-                  'hover:bg-surface-300 dark:hover:bg-surface-100'
-                )}
+            <TabsTrigger_Shadcn_
+              value="new"
+              className={cn(
+                'flex items-center gap-2 px-3 text-xs',
+                'bg-dash-sidebar/50 dark:bg-surface-100/50',
+                'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+                'relative group h-full border-t-2 !border-b-0',
+                'hover:bg-surface-300 dark:hover:bg-surface-100'
+              )}
+            >
+              <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+              <div className="flex items-center gap-0">
+                <span>New</span>
+              </div>
+              <span
+                role="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onPointerDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleClose('new')
+                }}
               >
-                <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
-                <div className="flex items-center gap-0">
-                  <span>New</span>
-                </div>
-                <span
-                  role="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onPointerDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleClose('new')
-                  }}
-                >
-                  <X size={12} className="text-foreground-light" />
-                </span>{' '}
-                <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-              </TabsTrigger_Shadcn_>
-            </>
+                <X size={12} className="text-foreground-light" />
+              </span>{' '}
+              <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+            </TabsTrigger_Shadcn_>
           )}
 
           <AnimatePresence initial={false}>
@@ -167,6 +233,7 @@ export const EditorTabs = () => {
           <div className="grow h-full border-b pr-6" />
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
+
       <DragOverlay dropAnimation={null}>
         {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
       </DragOverlay>

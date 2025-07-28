@@ -1,6 +1,6 @@
 import { Code, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useState } from 'react'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -12,9 +12,10 @@ import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-
 import dayjs from 'dayjs'
 import { Parameter, parseParameters } from 'lib/sql-parameters'
 import { Dashboards } from 'types'
-import { ChartContainer, ChartTooltip, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
+import { ChartContainer, ChartTooltipContent, cn, CodeBlock, SQL_ICON } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { CHART_COLORS } from '../Charts/Charts.constants'
 import SqlWarningAdmonition from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
@@ -130,6 +131,7 @@ export const QueryBlock = ({
   const [readOnlyError, setReadOnlyError] = useState(false)
   const [queryError, setQueryError] = useState<QueryResponseError>()
   const [queryResult, setQueryResult] = useState<any[] | undefined>(results)
+  const [focusDataIndex, setFocusDataIndex] = useState<number>()
 
   const formattedQueryResult = useMemo(() => {
     // Make sure Y axis values are numbers
@@ -165,9 +167,14 @@ export const QueryBlock = ({
     onSuccess: (data) => {
       onResults?.(data.result)
       setQueryResult(data.result)
+
+      setReadOnlyError(false)
+      setQueryError(undefined)
     },
     onError: (error) => {
-      if (error?.message.includes('permission denied')) {
+      const permissionDenied = error.message.includes('permission denied')
+      const notOwner = error.message.includes('must be owner')
+      if (permissionDenied || notOwner) {
         setReadOnlyError(true)
         if (showRunButtonIfNotReadOnly) setShowWarning('hasWriteOperation')
       } else {
@@ -251,7 +258,7 @@ export const QueryBlock = ({
             type="text"
             size="tiny"
             className="w-7 h-7"
-            icon={<Code size={14} />}
+            icon={<Code size={14} strokeWidth={1.5} />}
             onClick={() => setShowSql(!showSql)}
             tooltip={{
               content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
@@ -295,7 +302,7 @@ export const QueryBlock = ({
               type="text"
               size="tiny"
               className="w-7 h-7"
-              icon={<Play size={14} />}
+              icon={<Play size={14} strokeWidth={1.5} />}
               loading={isExecuting || isLoading}
               disabled={isLoading}
               onClick={() => {
@@ -379,10 +386,9 @@ export const QueryBlock = ({
               <p className="text-foreground-light text-xs">Select columns for the X and Y axes</p>
             </div>
           ) : (
-            <div className={cn('flex-1 w-full')}>
+            <div className="flex-1 w-full">
               <ChartContainer
                 className="aspect-auto px-3 py-2"
-                config={{}}
                 style={{
                   height: maxHeight ? `${maxHeight}px` : undefined,
                   minHeight: maxHeight ? `${maxHeight}px` : undefined,
@@ -392,12 +398,18 @@ export const QueryBlock = ({
                   accessibilityLayer
                   margin={{ left: -20, right: 0, top: 10 }}
                   data={chartData}
+                  onMouseMove={(e: any) => {
+                    if (e.activeTooltipIndex !== focusDataIndex) {
+                      setFocusDataIndex(e.activeTooltipIndex)
+                    }
+                  }}
+                  onMouseLeave={() => setFocusDataIndex(undefined)}
                 >
-                  <CartesianGrid vertical={false} />
+                  <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />
                   <XAxis
-                    tickLine
                     dataKey={xKey}
-                    axisLine={false}
+                    tickLine={{ stroke: CHART_COLORS.AXIS }}
+                    axisLine={{ stroke: CHART_COLORS.AXIS }}
                     interval="preserveStartEnd"
                     tickMargin={4}
                     minTickGap={32}
@@ -406,8 +418,18 @@ export const QueryBlock = ({
                     }
                   />
                   <YAxis tickLine={false} axisLine={false} tickMargin={4} />
-                  <ChartTooltip content={<ChartTooltipContent className="w-[150px]" />} />
-                  <Bar dataKey={yKey} fill="var(--chart-1)" radius={4} />
+                  <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
+                  <Bar radius={1} dataKey={yKey}>
+                    {chartData?.map((_: any, index: number) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        className="transition-all duration-100"
+                        fill="hsl(var(--chart-1))"
+                        opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
+                        enableBackground={12}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ChartContainer>
             </div>

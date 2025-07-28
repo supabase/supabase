@@ -130,7 +130,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   tooltip={
                     <p className="prose text-xs">
                       The first project is covered by Compute Credits. Additional projects incur
-                      compute costs starting at $10/month, independent of activity. See{' '}
+                      compute costs starting at <span translate="no">$10</span>/month, independent
+                      of activity. See{' '}
                       <Link
                         href={'/docs/guides/platform/manage-your-usage/compute'}
                         target="_blank"
@@ -217,7 +218,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           item.usage_metric != null) && (
                           <InfoTooltip className="max-w-sm">
                             {item.unit_price_desc && (
-                              <p className="mb-2">Pricing: {item.unit_price_desc}</p>
+                              <p className="mb-2" translate="no">
+                                Pricing: {item.unit_price_desc}
+                              </p>
                             )}
 
                             {item.breakdown && item.breakdown.length > 0 && (
@@ -287,7 +290,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       Costs accumulated from the beginning of the billing cycle up to now.
                     </InfoTooltip>
                   </TableCell>
-                  <TableCell className="text-right font-medium py-2 px-0">
+                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
                     {formatCurrency(upcomingInvoice?.amount_total) ?? '-'}
                   </TableCell>
                 </TableRow>
@@ -301,7 +304,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       vary depending on your usage.
                     </InfoTooltip>
                   </TableCell>
-                  <TableCell className="text-right font-medium py-2 px-0">
+                  <TableCell className="text-right font-medium py-2 px-0" translate="no">
                     {formatCurrency(upcomingInvoice?.amount_projected) ?? '-'}
                   </TableCell>
                 </TableRow>
@@ -324,14 +327,14 @@ function InvoiceLineItemAmount({
   if (amountBeforeDiscount && amount < amountBeforeDiscount) {
     return (
       <div>
-        <span className="text-foreground-light line-through mr-2">
+        <span className="text-foreground-light line-through mr-2" translate="no">
           {formatCurrency(amountBeforeDiscount)}
         </span>
-        <span>{formatCurrency(amount)}</span>
+        <span translate="no">{formatCurrency(amount)}</span>
       </div>
     )
   } else {
-    return formatCurrency(amount)
+    return <span translate="no">{formatCurrency(amount)}</span>
   }
 }
 
@@ -389,7 +392,7 @@ function ComputeLineItem({
             {project.project_name} ({project.computeType} - {project.usage} Hours)
           </TableCell>
 
-          <TableCell className="!py-2 px-0 text-right">
+          <TableCell className="!py-2 px-0 text-right" translate="no">
             {formatCurrency(project.computeCosts)}
           </TableCell>
         </TableRow>
@@ -398,7 +401,7 @@ function ComputeLineItem({
       {computeCredits && (
         <TableRow className="text-foreground-light text-xs">
           <TableCell className="!py-2 px-0 pl-6">Compute Credits</TableCell>
-          <TableCell className="!py-2 px-0 text-right">
+          <TableCell className="!py-2 px-0 text-right" translate="no">
             {formatCurrency(computeCredits.amount)}
           </TableCell>
         </TableRow>

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { useIsTableEditorTabsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ExportDialog } from 'components/grid/components/header/ExportDialog'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -40,20 +40,20 @@ import {
   InnerSideBarFilters,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { tableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
+import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
-  const { ref, id: _id } = useParams()
-  const isMobile = useBreakpoint()
+  const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
-  const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isMobile = useBreakpoint()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [tableToExport, setTableToExport] = useState<{ name: string; schema: string }>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -115,12 +115,13 @@ const TableEditorMenu = () => {
     }
   }, [selectedTable?.schema])
 
+  const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
-    if (isTableEditorTabsEnabled && ref && entityTypes && !searchText) {
-      tableEditorTabsCleanUp({ ref, schemas: [selectedSchema], entities: entityTypes })
+    if (entityTypes && !searchText) {
+      tableEditorTabsCleanUp({ schemas: [selectedSchema], entities: entityTypes })
     }
-  }, [entityTypes])
+  }, [entityTypes, searchText, selectedSchema, tableEditorTabsCleanUp])
 
   return (
     <>
@@ -282,6 +283,11 @@ const TableEditorMenu = () => {
                       projectRef: project?.ref!,
                       id: Number(id),
                       isLocked,
+                      onExportCLI: () => {
+                        const entity = entityTypes?.find((x) => x.id === id)
+                        if (!entity) return
+                        setTableToExport({ name: entity.name, schema: entity.schema })
+                      },
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -295,6 +301,13 @@ const TableEditorMenu = () => {
         </div>
       </div>
 
+      <ExportDialog
+        table={tableToExport}
+        open={!!tableToExport}
+        onOpenChange={(open) => {
+          if (!open) setTableToExport(undefined)
+        }}
+      />
       <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
     </>
   )

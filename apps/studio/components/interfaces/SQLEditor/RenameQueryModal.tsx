@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { getContentById } from 'data/content/content-id-query'
 import {
   UpsertContentPayload,
@@ -13,9 +14,8 @@ import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, updateTab } from 'state/tabs'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
-import { useIsSQLEditorTabsEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 
 export interface RenameQueryModalProps {
@@ -35,15 +35,16 @@ const RenameQueryModal = ({
   const organization = useSelectedOrganization()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const tabsSnap = useTabsStateSnapshot()
   const { data: subscription } = useOrgSubscriptionQuery(
     { orgSlug: organization?.slug },
     { enabled: visible }
   )
   const isSQLSnippet = snippet.type === 'sql'
-  const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
 
   // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
   const { id, name, description } = snippet
 
@@ -67,9 +68,7 @@ const RenameQueryModal = ({
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        if ('sql' in content) {
-          titleSql({ sql: content.sql })
-        }
+        if ('sql' in content) titleSql({ sql: content.sql })
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }
@@ -109,10 +108,8 @@ const RenameQueryModal = ({
 
       snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
 
-      if (isSQLEditorTabsEnabled && ref) {
-        const tabId = createTabId('sql', { id })
-        updateTab(ref, tabId, { label: nameInput })
-      }
+      const tabId = createTabId('sql', { id })
+      tabsSnap.updateTab(tabId, { label: nameInput })
 
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()

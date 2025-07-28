@@ -1,4 +1,4 @@
-import { sanitizeTaxIdValue } from 'components/interfaces/Organization/BillingSettings/TaxID/TaxID.utils'
+import { sanitizeTaxIdValue } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
 import { describe, test, expect } from 'vitest'
 
 /**

@@ -6,8 +6,7 @@ import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { lintKeys } from './keys'
 
-type ExceptionPayload =
-  components['schemas']['CreateNotificationExceptionsBodyDto']['exceptions'][0]
+type ExceptionPayload = components['schemas']['CreateNotificationExceptionsBody']['exceptions'][0]
 
 export type LintRuleCreateVariables = {
   projectRef: string
@@ -42,7 +41,10 @@ export const useLintRuleCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(lintKeys.lintRules(projectRef))
+        await Promise.all([
+          queryClient.invalidateQueries(lintKeys.lintRules(projectRef)),
+          queryClient.invalidateQueries(lintKeys.lint(projectRef)),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

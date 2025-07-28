@@ -2,7 +2,7 @@ import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import crypto, { createHash } from 'node:crypto'
-import { BaseLoader, BaseSource } from './base'
+import { BaseLoader, BaseSource } from './base.js'
 
 export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
 export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
@@ -25,11 +25,9 @@ export type DiscussionsResponse = {
   }
 }
 
-const appId = process.env.SEARCH_GITHUB_APP_ID ?? process.env.DOCS_GITHUB_APP_ID
-const installationId =
-  process.env.SEARCH_GITHUB_APP_INSTALLATION_ID ?? process.env.DOCS_GITHUB_APP_INSTALLATION_ID
-const privateKey =
-  process.env.SEARCH_GITHUB_APP_PRIVATE_KEY ?? process.env.DOCS_GITHUB_APP_PRIVATE_KEY
+const appId = process.env.DOCS_GITHUB_APP_ID
+const installationId = process.env.DOCS_GITHUB_APP_INSTALLATION_ID
+const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
 
 /**
  * Fetches GitHub discussions for a repository + category
@@ -40,7 +38,7 @@ export async function fetchDiscussions(owner: string, repo: string, categoryId: 
     auth: {
       appId,
       installationId,
-      privateKey: crypto.createPrivateKey(privateKey).export({ type: 'pkcs8', format: 'pem' }),
+      privateKey: crypto.createPrivateKey(privateKey!).export({ type: 'pkcs8', format: 'pem' }),
     },
   })
 

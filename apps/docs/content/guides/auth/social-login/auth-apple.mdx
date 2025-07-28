@@ -14,7 +14,7 @@ To support Sign in with Apple, you need to configure the [Apple provider in the 
 There are three general ways to use Sign in with Apple, depending on the application you're trying to build:
 
 - Sign in on the web or in web-based apps
-  - Using an OAuth flow initiated by Supabase Auth using the [Sign in with Apple REST API](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api).
+  - Using an OAuth flow initiated by Supabase Auth using the [Sign in with Apple REST API](https://developer.apple.com/documentation/signinwithapplerestapi).
   - Using [Sign in with Apple JS](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js) directly in the browser, usually suitable for websites.
 - Sign in natively inside iOS, macOS, watchOS or tvOS apps using [Apple's Authentication Services](https://developer.apple.com/documentation/authenticationservices)
 
@@ -35,7 +35,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
 
     Sign in with Apple's OAuth flow is designed for web or browser based sign in methods. It can be used on web-based apps as well as websites, though some users can benefit by using Sign in with Apple JS directly.
 
-    Behind the scenes, Supabase Auth uses the [REST APIs](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api) provided by Apple.
+    Behind the scenes, Supabase Auth uses the [REST APIs](https://developer.apple.com/documentation/signinwithapplerestapi) provided by Apple.
 
     <$Partial path="create_client_snippet.mdx" />
 
@@ -66,6 +66,24 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     5. Configure Website URLs for the newly created **Services ID**. The web domain you should use is the domain your Supabase project is hosted on. This is usually `<project-id>.supabase.co` while the redirect URL is `https://<project-id>.supabase.co/auth/v1/callback`.
     6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally, revoke it from the Apple Developer Console and create a new one immediately. You will have to generate a new secret key using this file every 6 months, so make sure you schedule a recurring meeting in your calendar!
     7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers).
+
+You can also configure the Apple auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Apple auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_apple_enabled": true,
+    "external_apple_client_id": "your-services-id",
+    "external_apple_secret": "your-generated-secret-key"
+  }'
+```
 
     <Admonition type="tip">
 
@@ -118,7 +136,9 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     4. Register the Services ID you created to your project's [Apple provider configuration in the Supabase dashboard](https://supabase.com/dashboard/project/_/auth/providers) under _Client IDs_.
 
     <Admonition type="note">
+
       If you're using Sign in with Apple JS you do not need to configure the OAuth settings.
+
     </Admonition>
 
   </TabPanel>
@@ -189,6 +209,12 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     <Admonition type="note">
 
     When testing with Expo Go, the Expo App ID `host.exp.Exponent` will be used. Make sure to add this to the "Client IDs" list in your [Supabase dashboard Apple provider configuration](https://supabase.com/dashboard/project/_/auth/providers)!
+
+    </Admonition>
+
+    <Admonition type="note">
+
+    When testing with Expo development build with custom `bundleIdentifier`, for example com.example.app , com.example.app.dev , com.example.app.preview. Make sure to add all these variants to the "Client IDs" list in your [Supabase dashboard Apple provider configuration](https://supabase.com/dashboard/project/_/auth/providers)!
 
     </Admonition>
 
@@ -368,7 +394,7 @@ When developing with Expo, you can test Sign in with Apple via the Expo Go app, 
     ) {
     	install(GoTrue)
     	install(ComposeAuth) {
-    		nativeAppleLogin()
+    		appleNativeLogin()
     	}
     }
     ```

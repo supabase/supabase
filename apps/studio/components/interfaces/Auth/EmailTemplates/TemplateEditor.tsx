@@ -340,6 +340,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                     className="!mb-0 mt-0 overflow-hidden h-96 w-full"
                     title={id}
                     srcDoc={bodyValue}
+                    sandbox="allow-scripts allow-forms"
                   />
                   <Admonition
                     type="default"

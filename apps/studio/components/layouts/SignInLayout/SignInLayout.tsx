@@ -82,7 +82,7 @@ const SignInLayout = ({
 
   return (
     <>
-      <div className="relative flex flex-col bg-alternative h-screen">
+      <div className="relative flex flex-col bg-alternative min-h-screen">
         <div
           className={`absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8 ${
             ongoingIncident ? 'mt-14' : 'mt-6'
@@ -91,7 +91,7 @@ const SignInLayout = ({
           <nav className="relative flex items-center justify-between sm:h-10">
             <div className="flex items-center flex-grow flex-shrink-0 lg:flex-grow-0">
               <div className="flex items-center justify-between w-full md:w-auto">
-                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
+                <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
                   <Image
                     src={
                       resolvedTheme?.includes('dark')

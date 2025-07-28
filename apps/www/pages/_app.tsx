@@ -9,6 +9,7 @@ import {
   PageTelemetry,
   ThemeProvider,
   useThemeSandbox,
+  TelemetryTagManager,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
@@ -16,7 +17,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsentToast } from 'ui-patterns/consent'
 
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
@@ -28,11 +29,11 @@ import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
-  const { hasAcceptedConsent } = useConsent()
+  const { hasAcceptedConsent } = useConsentToast()
 
   useThemeSandbox()
 
-  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+  const site_title = `${APP_NAME} | The Postgres Development Platform.`
   const { basePath } = useRouter()
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
@@ -107,6 +108,7 @@ export default function App({ Component, pageProps }: AppProps) {
           </ThemeProvider>
         </FeatureFlagProvider>
       </AuthProvider>
+      <TelemetryTagManager />
     </>
   )
 }

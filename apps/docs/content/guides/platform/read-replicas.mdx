@@ -51,6 +51,30 @@ Projects must meet these requirements to use Read Replicas:
 
 To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard.
 
+You can also manage Read Replicas using the Management API (beta functionality):
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Create a new Read Replica
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/setup" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "region": "us-east-1"
+  }'
+
+# Delete a Read Replica
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/remove" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "database_identifier": "abcdefghijklmnopqrst"
+  }'
+```
+
 Projects on an XL compute add-on or larger can create up to five Read Replicas. Projects on compute add-ons smaller than XL can create up to two Read Replicas. All Read Replicas inherit the compute size of their Primary database.
 
 ### Deploying a Read Replica
@@ -112,6 +136,7 @@ To call a read-only Postgres function on Read Replicas through the REST API, use
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
 
 <Admonition type="note">
+
 Starting on April 4th, 2025, we will be changing the routing behavior for eligible Data API requests:
 
 - Old behavior: Round-Robin distribution among all databases (all read replicas + primary) of your project, regardless of location

@@ -1,8 +1,7 @@
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, LOCAL_STORAGE_KEYS } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type Template = {
   name: string
@@ -52,12 +51,8 @@ const getInitialState = () => {
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
       showProjectApiDocs: false,
-      isOptedInTelemetry: false,
-      showEnableBranchingModal: false,
-      showFeaturePreviewModal: false,
-      selectedFeaturePreview: '',
+      showCreateBranchModal: false,
       showAiSettingsModal: false,
-      showGenerateSqlModal: false,
       showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
@@ -84,12 +79,8 @@ const getInitialState = () => {
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
-    isOptedInTelemetry: false,
-    showEnableBranchingModal: false,
-    showFeaturePreviewModal: false,
-    selectedFeaturePreview: '',
+    showCreateBranchModal: false,
     showAiSettingsModal: false,
-    showGenerateSqlModal: false,
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
@@ -132,29 +123,19 @@ export const appState = proxy({
     }
   },
 
-  showEnableBranchingModal: false,
-  setShowEnableBranchingModal: (value: boolean) => {
-    appState.showEnableBranchingModal = value
+  isMfaEnforced: false,
+  setIsMfaEnforced: (value: boolean) => {
+    appState.isMfaEnforced = value
   },
 
-  showFeaturePreviewModal: false,
-  setShowFeaturePreviewModal: (value: boolean) => {
-    appState.showFeaturePreviewModal = value
-  },
-
-  selectedFeaturePreview: '',
-  setSelectedFeaturePreview: (value: string) => {
-    appState.selectedFeaturePreview = value
+  showCreateBranchModal: false,
+  setShowCreateBranchModal: (value: boolean) => {
+    appState.showCreateBranchModal = value
   },
 
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
-  },
-
-  showGenerateSqlModal: false,
-  setShowGenerateSqlModal: (value: boolean) => {
-    appState.showGenerateSqlModal = value
   },
 
   showSidebar: true,
@@ -181,6 +162,10 @@ export const appState = proxy({
       ...appState.editorPanel,
       ...value,
     }
+  },
+
+  toggleEditorPanel: (value?: boolean) => {
+    appState.editorPanel.open = value ?? !appState.editorPanel.open
   },
 
   mobileMenuOpen: false,
