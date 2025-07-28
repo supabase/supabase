@@ -8,7 +8,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
     title: 'State of Startups 2025',
     subheader: (
       <>
-        We surveyed over 1,800 startup founders and builders to uncover what's powering modern
+        We surveyed over 1,800 startup founders and builders to uncover What’s powering modern
         startups: their stacks, their go-to-market motion, and their approach to AI.
         <br />
         This report is built for builders.
@@ -156,7 +156,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
       ],
     },
     {
-      title: "What's in a Startup's Tech Stack",
+      title: 'What’s in a Startup’s Tech Stack',
       description:
         'The modern stack centers around open tools, modular infrastructure, and cautious spending.',
       sections: [
@@ -174,7 +174,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
           charts: ['DatabasesChart'],
           pullQuote: {
             quote:
-              "Supabase gave us everything we needed out of the box. We hooked it up in a weekend and haven't looked back.",
+              'Supabase gave us everything we needed out of the box. We hooked it up in a weekend and haven’t looked back.',
             author: 'David Kim',
             authorPosition: 'Founder',
             authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
@@ -196,7 +196,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
           charts: ['AICodingToolsChart'],
           pullQuote: {
             quote:
-              "I spend less time fighting code thanks to Cursor and Claude. It's like pair programming without the scheduling.",
+              'I spend less time fighting code thanks to Cursor and Claude. It’s like pair programming without the scheduling.',
             author: 'Lisa Wang',
             authorPosition: 'Founder',
             authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
@@ -236,7 +236,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             ],
           },
           summarizedAnswer: {
-            label: "What's one tool you wish existed?",
+            label: 'What’s one tool you wish existed?',
             answers: [
               'Unified backend platform combining auth, edge, database, and queues',
               'AI agents with real memory and workflow context',
