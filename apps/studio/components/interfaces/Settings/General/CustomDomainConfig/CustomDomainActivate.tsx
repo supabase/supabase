@@ -1,16 +1,16 @@
-import Link from 'next/link'
+import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { AlertCircle, ExternalLink } from 'lucide-react'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -20,7 +20,7 @@ export type CustomDomainActivateProps = {
 const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
-  const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
     {
@@ -30,9 +30,15 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
       },
     }
   )
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      toast.success(
+        'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
+      )
+    },
+  })
 
-  const endpoint = settings?.autoApiService.endpoint
+  const endpoint = settings?.app_config?.endpoint
 
   const onActivateCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -66,19 +72,19 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
             <Alert_Shadcn_>
               <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
               <AlertTitle_Shadcn_>
-                Remember to restore the original CNAME record from the first step before activating
+                Remember to retain your CNAME record for service continuity after activation
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
-                  Set up a CNAME record for <code className="text-xs">{customDomain.hostname}</code>
-                  , resolving to{' '}
+                  Your custom domain CNAME record for{' '}
+                  <code className="text-xs">{customDomain.hostname}</code>
+                  should resolve to{' '}
                   {endpoint ? (
                     <code className="text-xs">{endpoint}</code>
                   ) : (
                     "your project's API URL"
                   )}
-                  , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-                  disable the proxy option.
+                  . If you're using Cloudflare as your DNS provider, disable the proxy option.
                 </p>
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
@@ -89,22 +95,13 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
 
         <Panel.Content className="w-full">
           <div className="flex items-center justify-between">
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/platform/custom-domains"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
+            <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
             <div className="flex items-center space-x-2">
               <Button
                 type="default"
+                className="self-end"
                 onClick={onCancelCustomDomain}
                 loading={isDeleting}
-                disabled={isDeleting}
-                className="self-end"
               >
                 Cancel
               </Button>

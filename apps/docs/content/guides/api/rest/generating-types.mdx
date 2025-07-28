@@ -37,13 +37,13 @@ npx supabase init
 Generate types for your project to produce the `database.types.ts` file:
 
 ```bash
-npx supabase gen types --lang=typescript --project-id "$PROJECT_REF" --schema public > database.types.ts
+npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > database.types.ts
 ```
 
 or in case of local development:
 
 ```bash
-npx supabase gen types --lang=typescript --local > database.types.ts
+npx supabase gen types typescript --local > database.types.ts
 ```
 
 These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:
@@ -141,10 +141,96 @@ To use `MergeDeep`, set `compilerOptions.strictNullChecks` to `true` in your `ts
 
 </Admonition>
 
+## Enhanced type inference for JSON fields
+
+Starting from [supabase-js v2.48.0](https://github.com/supabase/supabase-js/releases/tag/v2.48.0), you can define custom types for JSON fields and get enhanced type inference when using JSON selectors with the `->` and `->>` operators. This makes your code more type-safe and intuitive when working with JSON/JSONB columns.
+
+### Defining custom JSON types
+
+You can extend your generated database types to include custom JSON schemas using `MergeDeep`:
+
+```ts ./database.types.ts
+import { MergeDeep } from 'type-fest'
+import { Database as DatabaseGenerated } from './database-generated.types'
+
+// Define your custom JSON type
+type CustomJsonType = {
+  foo: string
+  bar: { baz: number }
+  en: 'ONE' | 'TWO' | 'THREE'
+}
+
+export type Database = MergeDeep<
+  DatabaseGenerated,
+  {
+    public: {
+      Tables: {
+        your_table: {
+          Row: {
+            data: CustomJsonType | null
+          }
+          // Optional: Use if you want type-checking for inserts and updates
+          // Insert: {
+          //   data?: CustomJsonType | null;
+          // };
+          // Update: {
+          //   data?: CustomJsonType | null;
+          // };
+        }
+      }
+      Views: {
+        your_view: {
+          Row: {
+            data: CustomJsonType | null
+          }
+        }
+      }
+    }
+  }
+>
+```
+
+### Type-safe JSON querying
+
+Once you've defined your custom JSON types, TypeScript will automatically infer the correct types when using JSON selectors:
+
+```ts
+const res = await client.from('your_table').select('data->bar->baz, data->en, data->bar')
+
+if (res.data) {
+  console.log(res.data)
+  // TypeScript infers the shape of your JSON data:
+  // [
+  //   {
+  //     baz: number;
+  //     en: 'ONE' | 'TWO' | 'THREE';
+  //     bar: { baz: number };
+  //   }
+  // ]
+}
+```
+
+This feature works with:
+
+- Single-level JSON access: `data->foo`
+- Nested JSON access: `data->bar->baz`
+- Text extraction: `data->>foo` (returns string)
+- Mixed selections combining multiple JSON paths
+
+The type inference automatically handles the difference between `->` (returns JSON) and `->>` (returns text) operators, ensuring your TypeScript types match the actual runtime behavior.
+
 You can also override the type of an individual successful response if needed:
 
 ```ts
-const { data } = await supabase.from('countries').select().returns<MyType>()
+// Partial type override allows you to only override some of the properties in your results
+const { data } = await supabase.from('countries').select().overrideTypes<Array<{ id: string }>>()
+// For a full replacement of the original return type use the `{ merge: false }` property as second argument
+const { data } = await supabase
+  .from('countries')
+  .select()
+  .overrideTypes<Array<{ id: string }>, { merge: false }>()
+// Use it with `maybeSingle` or `single`
+const { data } = await supabase.from('countries').select().single().overrideTypes<{ id: string }>()
 ```
 
 ### Type shorthands
@@ -231,13 +317,13 @@ jobs:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       PROJECT_REF: <your-project-id>
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
           fetch-depth: 0
-      - uses: actions/setup-node@v2.1.5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 22
       - run: npm run update-types
       - name: check for file changes
         id: git_status
@@ -258,7 +344,7 @@ jobs:
           branch: ${{ github.ref }}
 ```
 
-Alternatively, you can use a community-supported GitHub action: [generate-supabase-db-types-github-action](https://github.com/lyqht/generate-supabase-db-types-github-action).
+Alternatively, you can use a community-supported GitHub action: [`generate-supabase-db-types-github-action`](https://github.com/lyqht/generate-supabase-db-types-github-action).
 
 ## Resources
 

@@ -1,8 +1,24 @@
-import { withSentry } from '@sentry/nextjs'
-import { isResponseOk } from 'lib/common/fetch'
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+
+import { ResponseError, ResponseFailure } from 'types'
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
+
+export function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
+  if (response === undefined || response === null) {
+    return false
+  }
+
+  if (response instanceof ResponseError) {
+    return false
+  }
+
+  if (typeof response === 'object' && 'error' in response && Boolean(response.error)) {
+    return false
+  }
+
+  return true
+}
 
 // Purpose of this apiWrapper is to function like a global catchall for ANY errors
 // It's a safety net as the API service should never drop, nor fail
@@ -30,9 +46,7 @@ export default async function apiWrapper(
       }
     }
 
-    const func = withSentry(handler as any)
-    // @ts-ignore
-    return await func(req, res)
+    return handler(req, res)
   } catch (error) {
     return res.status(500).json({ error })
   }

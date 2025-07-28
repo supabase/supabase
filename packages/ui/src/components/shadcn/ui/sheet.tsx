@@ -113,22 +113,22 @@ const sheetVariants = cva(classes, {
     {
       side: ['right', 'left'],
       size: 'default',
-      class: 'w-1/3',
+      class: 'lg:w-1/3',
     },
     {
       side: ['right', 'left'],
       size: 'sm',
-      class: 'w-1/4',
+      class: 'lg:w-1/4',
     },
     {
       side: ['right', 'left'],
       size: 'lg',
-      class: 'w-1/2',
+      class: 'lg:w-1/2',
     },
     {
       side: ['right', 'left'],
       size: 'xl',
-      class: 'w-4/6',
+      class: 'lg:w-4/6',
     },
     {
       side: ['right', 'left'],
@@ -177,12 +177,15 @@ const SheetContent = React.forwardRef<
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('px-5 py-4 text-center sm:text-left border-b', className)} {...props} />
+  <div
+    className={cn('px-5 py-4 text-center sm:text-left border-b bg-dash-sidebar', className)}
+    {...props}
+  />
 )
 SheetHeader.displayName = 'SheetHeader'
 
 const SheetSection = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('px-content py-content', className)} {...props} />
+  <div className={cn('px-5 py-4', className)} {...props} />
 )
 SheetSection.displayName = 'SheetSection'
 
@@ -190,7 +193,7 @@ const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   <div
     className={cn(
       'px-5 py-3 border-t w-full',
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
+      'flex flex-col-reverse sm:flex-row sm:justify-end gap-2',
       className
     )}
     {...props}
@@ -202,11 +205,7 @@ const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <SheetPrimitive.Title
-    ref={ref}
-    className={cn('text-base text-foreground', className)}
-    {...props}
-  />
+  <SheetPrimitive.Title ref={ref} className={cn('text-lg text-foreground', className)} {...props} />
 ))
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
@@ -216,7 +215,7 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-foreground-muted', className)}
+    className={cn('text-sm text-foreground-light', className)}
     {...props}
   />
 ))

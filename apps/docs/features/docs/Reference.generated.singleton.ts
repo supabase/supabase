@@ -5,6 +5,7 @@ import { parse } from 'yaml'
 import type { ModuleTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { type Json } from '../helpers.types'
+import { type IApiEndPoint } from './Reference.api.utils'
 
 let typeSpec: Array<ModuleTypes>
 
@@ -47,6 +48,34 @@ export async function getCliSpec() {
   return cliSpec
 }
 
+let apiEndpointsById: Map<string, IApiEndPoint>
+
+export async function getApiEndpointById(id: string) {
+  if (!apiEndpointsById) {
+    const rawJson = await readFile(
+      join(process.cwd(), 'features/docs', './generated/api.latest.endpointsById.json'),
+      'utf-8'
+    )
+    apiEndpointsById = new Map(JSON.parse(rawJson))
+  }
+
+  return apiEndpointsById.get(id)
+}
+
+let selfHostedEndpointsById = new Map<string, Map<string, IApiEndPoint>>()
+
+export async function getSelfHostedApiEndpointById(servicePath: string, id: string) {
+  if (!selfHostedEndpointsById.has(servicePath)) {
+    const rawJson = await readFile(
+      join(process.cwd(), 'features/docs', `./generated/${servicePath}.latest.endpointsById.json`),
+      'utf-8'
+    )
+    selfHostedEndpointsById.set(servicePath, new Map(JSON.parse(rawJson)))
+  }
+
+  return selfHostedEndpointsById.get(servicePath)?.get(id)
+}
+
 const functionsList = new Map<string, Array<{ id: unknown }>>()
 
 export async function getFunctionsList(sdkId: string, version: string) {
@@ -76,7 +105,8 @@ export async function getReferenceSections(sdkId: string, version: string) {
     referenceSections.set(key, JSON.parse(data))
   }
 
-  return referenceSections.get(key)
+  const result = referenceSections.get(key)
+  return result
 }
 
 const flatSections = new Map<string, Array<AbbrevApiReferenceSection>>()
@@ -92,7 +122,8 @@ export async function getFlattenedSections(sdkId: string, version: string) {
     flatSections.set(key, JSON.parse(data))
   }
 
-  return flatSections.get(key)
+  const result = flatSections.get(key)
+  return result
 }
 
 const sectionsBySlug = new Map<string, Map<string, AbbrevApiReferenceSection>>()

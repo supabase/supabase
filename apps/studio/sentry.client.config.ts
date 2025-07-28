@@ -1,44 +1,93 @@
+// This file configures the initialization of Sentry on the client.
+// The config you add here will be used whenever a users loads a page in their browser.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
 import * as Sentry from '@sentry/nextjs'
+import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { match } from 'path-to-regexp'
+
+// This is a workaround to ignore hCaptcha related errors.
+function isHCaptchaRelatedError(event: Sentry.Event): boolean {
+  const errors = event.exception?.values ?? []
+  for (const error of errors) {
+    if (
+      error.value?.includes('is not a function') &&
+      error.stacktrace?.frames?.some((f) => f.filename === 'api.js')
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+// We want to ignore errors not originating from docs app static files
+// (such as errors from browser extensions). Those errors come from files
+// not starting with 'app:///_next'.
+//
+// However, there is a complication because the Sentry code that sends
+// the error shows up in the stack trace, and that _does_ start with
+// 'app:///_next'. It is always the first frame in the stack trace,
+// and has a specific pre_context comment that we can use for filtering.
+// Copied from docs app instrumentation-client.ts
+function isThirdPartyError(frames: Sentry.StackFrame[] | undefined) {
+  if (!frames) return false
+
+  function isSentryFrame(frame: Sentry.StackFrame, index: number) {
+    return index === 0 && frame.pre_context?.[0]?.includes('sentry.javascript')
+  }
+
+  return !frames.some((frame, index) => {
+    // Check both abs_path and filename for paths starting with app:///_next.
+    const path = frame.abs_path || frame.filename
+    return path?.startsWith('app:///_next') && !isSentryFrame(frame, index)
+  })
+}
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  tracesSampleRate: 0.01,
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
   beforeSend(event, hint) {
-    const consent =
-      typeof window !== 'undefined'
-        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-        : null
+    const consent = hasConsented()
 
-    if (IS_PLATFORM && consent === 'true') {
-      // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
-      const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
-        `Failed to construct 'URL': Invalid URL`
-      )
-      if (isInvalidUrlEvent && Math.random() > 0.01) {
-        return null
-      }
-      return event
+    if (!consent) {
+      return null
     }
-    return null
+
+    if (!IS_PLATFORM) {
+      return null
+    }
+
+    // Ignore invalid URL events for 99% of the time because it's using up a lot of quota.
+    const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
+      `Failed to construct 'URL': Invalid URL`
+    )
+
+    if (isInvalidUrlEvent && Math.random() > 0.01) {
+      return null
+    }
+
+    if (isHCaptchaRelatedError(event)) {
+      return null
+    }
+
+    const frames = event.exception?.values?.[0].stacktrace?.frames || []
+
+    if (isThirdPartyError(frames)) {
+      return null
+    }
+
+    // Filter out errors like 'e._5BLbSXV[t] is not a function' or anything matching '[t] is not a function'
+    if (
+      hint.originalException instanceof Error &&
+      hint.originalException.message.includes('[t] is not a function')
+    ) {
+      return null
+    }
+
+    return event
   },
-  integrations: [
-    new Sentry.BrowserTracing({
-      // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
-      // then remove these options
-      traceFetch: false,
-      traceXHR: false,
-      beforeNavigate: (context) => {
-        return {
-          ...context,
-          name: standardiseRouterUrl(location.pathname),
-        }
-      },
-    }),
-  ],
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
     'ResizeObserver',
@@ -79,7 +128,7 @@ Sentry.init({
 function standardiseRouterUrl(url: string) {
   let finalUrl = url
 
-  const orgMatch = match('/org/:slug/(.*)', { decode: decodeURIComponent })
+  const orgMatch = match('/org/:slug{/*path}', { decode: decodeURIComponent })
   const orgMatchResult = orgMatch(finalUrl)
   if (orgMatchResult) {
     finalUrl = finalUrl.replace((orgMatchResult.params as any).slug, '[slug]')
@@ -91,7 +140,7 @@ function standardiseRouterUrl(url: string) {
     finalUrl = finalUrl.replace((newOrgMatchResult.params as any).slug, '[slug]')
   }
 
-  const projectMatch = match('/project/:ref/(.*)', { decode: decodeURIComponent })
+  const projectMatch = match('/project/:ref{/*path}', { decode: decodeURIComponent })
   const projectMatchResult = projectMatch(finalUrl)
   if (projectMatchResult) {
     finalUrl = finalUrl.replace((projectMatchResult.params as any).ref, '[ref]')

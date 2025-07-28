@@ -1,43 +1,37 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import {
-  Copy,
-  Mail,
-  RefreshCw,
-  Search,
-  ShieldOffIcon,
-  Trash,
-  User as UserIcon,
-  Users,
-  X,
-} from 'lucide-react'
-import { UIEvent, useMemo, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { ArrowDown, ArrowUp, Loader2, RefreshCw, Search, Trash, Users, X } from 'lucide-react'
+import { UIEvent, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
+import { authKeys } from 'data/auth/keys'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
-import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
-import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import { useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import type { User } from 'data/auth/users-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { copyToClipboard, timeout } from 'lib/helpers'
+import { useUsersCountQuery } from 'data/auth/users-count-query'
+import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import {
   Button,
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  LoadingLine,
+  ResizablePanel,
+  ResizablePanelGroup,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
@@ -45,297 +39,114 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AddUserDropdown from './AddUserDropdown'
-import { formatUsersData, isAtBottom } from './Users.utils'
-import UsersSidePanel from './UserSidePanel'
-import { formatClipboardValue } from 'components/grid/utils/common'
+import { DeleteUserModal } from './DeleteUserModal'
+import { UserPanel } from './UserPanel'
+import {
+  ColumnConfiguration,
+  MAX_BULK_DELETE,
+  PROVIDER_FILTER_OPTIONS,
+  USERS_TABLE_COLUMNS,
+} from './Users.constants'
+import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
 
-type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
-const USERS_TABLE_COLUMNS = [
-  { id: 'img', name: '', minWidth: 65, width: 65, resizable: false },
-  { id: 'id', name: 'UID', minWidth: undefined, width: 280, resizable: true },
-  { id: 'name', name: 'Display name', minWidth: 0, width: 150, resizable: false },
-  {
-    id: 'email',
-    name: 'Email',
-    minWidth: undefined,
-    width: 300,
-    resizable: true,
-  },
-  { id: 'provider', name: 'Provider', minWidth: 150, resizable: true },
-  { id: 'provider_type', name: 'Provider type', minWidth: 150, resizable: true },
-  { id: 'phone', name: 'Phone', minWidth: undefined, resizable: true },
-  {
-    id: 'created_at',
-    name: 'Created at',
-    minWidth: undefined,
-    width: 260,
-    resizable: true,
-  },
-  {
-    id: 'last_sign_in_at',
-    name: 'Last sign in at',
-    minWidth: undefined,
-    width: 260,
-    resizable: true,
-  },
-]
+export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
 // [Joshen] Just naming it as V2 as its a rewrite of the old one, to make it easier for reviews
 // Can change it to remove V2 thereafter
 export const UsersV2 = () => {
+  const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const gridRef = useRef<DataGridHandle>(null)
+  const xScroll = useRef<number>(0)
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
 
+  const [columns, setColumns] = useState<Column<any>[]>([])
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<Filter>('all')
   const [filterKeywords, setFilterKeywords] = useState('')
-  const [selectedRow, setSelectedRow] = useState<number>()
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([])
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([])
+  const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
 
-  const [toastId, setToastId] = useState<string | number>()
-  const [selectedUser, setSelectedUser] = useState<User>()
-  const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<string>()
+  const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState<User>()
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeletingUsers, setIsDeletingUsers] = useState(false)
 
-  const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
-  const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
-  const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
-  const canRemoveUser = useCheckPermissions(PermissionAction.TENANT_SQL_DELETE, 'auth.users')
-  const canRemoveMFAFactors = useCheckPermissions(
-    PermissionAction.TENANT_SQL_DELETE,
-    'auth.mfa_factors'
+  const [
+    columnConfiguration,
+    setColumnConfiguration,
+    { isSuccess: isSuccessStorage, isError: isErrorStorage, error: errorStorage },
+  ] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.AUTH_USERS_COLUMNS_CONFIGURATION(projectRef ?? ''),
+    null as ColumnConfiguration[] | null
   )
+
+  const [sortColumn, sortOrder] = sortByValue.split(':')
 
   const {
     data,
     error,
+    isSuccess,
     isLoading,
     isRefetching,
     isError,
-    // hasNextPage,
     isFetchingNextPage,
     refetch,
+    hasNextPage,
     fetchNextPage,
   } = useUsersInfiniteQuery(
     {
       projectRef,
+      connectionString: project?.connectionString,
       keywords: filterKeywords,
       filter: filter === 'all' ? undefined : filter,
+      providers: selectedProviders,
+      sort: sortColumn as 'created_at' | 'email' | 'phone',
+      order: sortOrder as 'asc' | 'desc',
     },
     {
       keepPreviousData: Boolean(filterKeywords),
+      // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
+      // a barrage of requests to invalidate each page esp when the project has many many users.
+      staleTime: Infinity,
     }
   )
 
-  const totalUsers = useMemo(() => data?.pages[0].total, [data?.pages[0].total])
-  const users = useMemo(() => data?.pages.flatMap((page) => page.users), [data?.pages])
-
-  const { mutate: resetPassword } = useUserResetPasswordMutation({
-    onSuccess: (_, vars) => {
-      toast.success(`Sent password recovery to ${vars.user.email}`, { id: toastId })
-    },
-    onError: (err) => {
-      toast.error(`Failed to send password recovery: ${err.message}`, { id: toastId })
-    },
-  })
-  const { mutate: sendMagicLink } = useUserSendMagicLinkMutation({
-    onSuccess: (_, vars) => {
-      toast.success(`Sent magic link to ${vars.user.email}`)
-    },
-    onError: (err) => {
-      toast.error(`Failed to send magic link: ${err.message}`, { id: toastId })
-    },
-  })
-  const { mutate: sendOTP } = useUserSendOTPMutation({
-    onSuccess: (_, vars) => {
-      toast.success(`Sent OTP to ${vars.user.phone}`)
-    },
-    onError: (err) => {
-      toast.error(`Failed to send OTP: ${err.message}`, { id: toastId })
-    },
-  })
-  const { mutate: deleteUser } = useUserDeleteMutation({
-    onSuccess: () => {
-      toast.success(`Successfully deleted ${selectedUser?.email}`)
-      setIsDeleteModalOpen(false)
-    },
-  })
-  const { mutate: deleteUserMFAFactors } = useUserDeleteMFAFactorsMutation({
-    onSuccess: () => {
-      toast.success("Successfully deleted the user's factors")
-      setIsDeleteFactorsModalOpen(false)
-    },
+  const { data: countData, refetch: refetchCount } = useUsersCountQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    keywords: filterKeywords,
+    filter: filter === 'all' ? undefined : filter,
+    providers: selectedProviders,
   })
 
-  const usersTableColumns = USERS_TABLE_COLUMNS.map((col) => {
-    const res: Column<any> = {
-      key: col.id,
-      name: col.name,
-      resizable: col.resizable,
-      sortable: false,
-      width: col.width,
-      minWidth: col.minWidth ?? 120,
-      renderHeaderCell: () => {
-        if (col.id === 'img') return undefined
-        return (
-          <div className="flex items-center justify-between font-normal text-xs w-full">
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
-            </div>
-          </div>
-        )
-      },
-      renderCell: ({ row }) => {
-        const value = row?.[col.id]
-        const user = users?.find((u) => u.id === row.id)
-        const formattedValue =
-          value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
-            ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
-            : value
-        const isConfirmed = user?.email_confirmed_at || user?.phone_confirmed_at
+  const { mutateAsync: deleteUser } = useUserDeleteMutation()
 
-        if (col.id === 'img') {
-          return (
-            <div className="flex items-center justify-center">
-              <div
-                className={cn(
-                  'flex items-center justify-center w-6 h-6 rounded-full bg-center bg-cover bg-no-repeat',
-                  !row.img ? 'bg-selection' : 'border'
-                )}
-                style={{ backgroundImage: row.img ? `url('${row.img}')` : 'none' }}
-              >
-                {!row.img && <UserIcon size={12} />}
-              </div>
-            </div>
-          )
-        }
-
-        return (
-          <ContextMenu_Shadcn_ modal={false}>
-            <ContextMenuTrigger_Shadcn_ asChild>
-              <div
-                className={cn(
-                  'w-full flex items-center text-xs gap-x-2',
-                  col.id.includes('provider') ? 'capitalize' : ''
-                )}
-              >
-                {col.id === 'provider' && row.provider_icon && (
-                  <img width={16} src={row.provider_icon} alt={`${row.provider} auth icon`} />
-                )}
-                {col.id === 'last_sign_in_at' && !isConfirmed ? (
-                  <p className="text-foreground-lighter">Waiting for verification</p>
-                ) : (
-                  <p>{formattedValue === null ? '-' : formattedValue}</p>
-                )}
-              </div>
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                onSelect={() => {
-                  const valueToCopy = formatClipboardValue(value)
-                  copyToClipboard(valueToCopy)
-                }}
-                onFocusCapture={(e) => e.stopPropagation()}
-              >
-                <Copy size={14} />
-                Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                onSelect={() => {
-                  setSelectedUser(user)
-                  setIsUserDetailsOpen(true)
-                }}
-                onFocusCapture={(e) => e.stopPropagation()}
-              >
-                <UserIcon size={14} />
-                View user info
-              </ContextMenuItem_Shadcn_>
-              {row.email !== null && (
-                <>
-                  <ContextMenuSeparator_Shadcn_ />
-                  <ContextMenuItem_Shadcn_
-                    className="gap-x-2"
-                    disabled={!canSendRecovery}
-                    onSelect={() => {
-                      if (user) handleResetPassword(user)
-                    }}
-                    onFocusCapture={(e) => e.stopPropagation()}
-                  >
-                    <Mail size={14} />
-                    Send password recovery
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_
-                    className="gap-x-2"
-                    disabled={!canSendMagicLink}
-                    onSelect={() => {
-                      if (user) handleSendMagicLink(user)
-                    }}
-                    onFocusCapture={(e) => e.stopPropagation()}
-                  >
-                    <Mail size={14} />
-                    Send magic link
-                  </ContextMenuItem_Shadcn_>
-                </>
-              )}
-              {row.phone !== null && (
-                <>
-                  <ContextMenuSeparator_Shadcn_ />
-                  <ContextMenuItem_Shadcn_
-                    className="gap-x-2"
-                    disabled={!canSendOtp}
-                    onSelect={() => {
-                      if (user) handleSendOtp(user)
-                    }}
-                    onFocusCapture={(e) => e.stopPropagation()}
-                  >
-                    <Mail size={14} />
-                    Send OTP
-                  </ContextMenuItem_Shadcn_>
-                </>
-              )}
-              <ContextMenuSeparator_Shadcn_ />
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                disabled={!canRemoveMFAFactors}
-                onSelect={() => {
-                  setSelectedUser(user)
-                  setIsDeleteFactorsModalOpen(true)
-                }}
-                onFocusCapture={(e) => e.stopPropagation()}
-              >
-                <ShieldOffIcon size={14} />
-                Remove MFA factors
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuItem_Shadcn_
-                className="gap-x-2"
-                disabled={!canRemoveUser}
-                onSelect={() => {
-                  setSelectedUser(user)
-                  setIsDeleteModalOpen(true)
-                }}
-                onFocusCapture={(e) => e.stopPropagation()}
-              >
-                <Trash size={14} />
-                Delete user
-              </ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
-        )
-      },
-    }
-    return res
-  })
+  const totalUsers = countData ?? 0
+  const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
+  // [Joshen] Only relevant for when selecting one user only
+  const selectedUserFromCheckbox = users.find((u) => u.id === [...selectedUsers][0])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    if (isLoading || !isAtBottom(event)) return
+    const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
+    xScroll.current = event.currentTarget.scrollLeft
+
+    if (
+      isLoading ||
+      isFetchingNextPage ||
+      isScrollingHorizontally ||
+      !isAtBottom(event) ||
+      !hasNextPage
+    ) {
+      return
+    }
     fetchNextPage()
   }
 
@@ -344,188 +155,443 @@ export const UsersV2 = () => {
     setFilterKeywords('')
   }
 
-  const handleResetPassword = async (user: User) => {
-    if (!projectRef) return console.error('Project ref is required')
-    const id = toast.loading(`Sending password recovery to ${user.email}`)
-    setToastId(id)
-    resetPassword({ projectRef, user })
+  const swapColumns = (data: any[], sourceIdx: number, targetIdx: number) => {
+    const updatedColumns = data.slice()
+    const [removed] = updatedColumns.splice(sourceIdx, 1)
+    updatedColumns.splice(targetIdx, 0, removed)
+    return updatedColumns
   }
 
-  async function handleSendMagicLink(user: User) {
+  // [Joshen] Left off here - it's tricky trying to do both column toggling and re-ordering
+  const saveColumnConfiguration = AwesomeDebouncePromise(
+    (event: 'resize' | 'reorder' | 'toggle', value) => {
+      if (event === 'toggle') {
+        const columnConfig = value.columns.map((col: any) => ({
+          id: col.key,
+          width: col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      } else if (event === 'resize') {
+        const columnConfig = columns.map((col, idx) => ({
+          id: col.key,
+          width: idx === value.idx ? value.width : col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      } else if (event === 'reorder') {
+        const columnConfig = value.columns.map((col: any) => ({
+          id: col.key,
+          width: col.width,
+        }))
+        setColumnConfiguration(columnConfig)
+      }
+    },
+    500
+  )
+
+  const handleDeleteUsers = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    sendMagicLink({ projectRef, user })
+    const userIds = [...selectedUsers]
+
+    setIsDeletingUsers(true)
+    try {
+      await Promise.all(
+        userIds.map((id) => deleteUser({ projectRef, userId: id, skipInvalidation: true }))
+      )
+      // [Joshen] Skip invalidation within RQ to prevent multiple requests, then invalidate once at the end
+      await Promise.all([
+        queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
+        queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
+      ])
+      toast.success(
+        `Successfully deleted the selected ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`
+      )
+      setShowDeleteModal(false)
+      setSelectedUsers(new Set([]))
+
+      if (userIds.includes(selectedUser)) setSelectedUser(undefined)
+    } catch (error: any) {
+      toast.error(`Failed to delete selected users: ${error.message}`)
+    } finally {
+      setIsDeletingUsers(false)
+    }
   }
 
-  async function handleSendOtp(user: User) {
-    if (!projectRef) return console.error('Project ref is required')
-    sendOTP({ projectRef, user })
-  }
-
-  async function handleDelete() {
-    await timeout(200)
-    if (!projectRef) return console.error('Project ref is required')
-    if (!selectedUser) return console.error('No user is selected')
-    deleteUser({ projectRef, user: selectedUser })
-  }
-
-  async function handleDeleteFactors() {
-    await timeout(200)
-    if (!projectRef) return console.error('Project ref is required')
-    if (!selectedUser) return console.error('No user is selected')
-    deleteUserMFAFactors({ projectRef, userId: selectedUser.id as string })
-  }
+  useEffect(() => {
+    if (
+      !isRefetching &&
+      (isSuccessStorage ||
+        (isErrorStorage && (errorStorage as Error).message.includes('data is undefined')))
+    ) {
+      const columns = formatUserColumns({
+        config: columnConfiguration ?? [],
+        users: users ?? [],
+        visibleColumns: selectedColumns,
+        setSortByValue,
+        onSelectDeleteUser: setSelectedUserToDelete,
+      })
+      setColumns(columns)
+      if (columns.length < USERS_TABLE_COLUMNS.length) {
+        setSelectedColumns(columns.filter((col) => col.key !== 'img').map((col) => col.key))
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isSuccess,
+    isRefetching,
+    isSuccessStorage,
+    isErrorStorage,
+    errorStorage,
+    users,
+    selectedUsers,
+  ])
 
   return (
     <>
       <div className="h-full flex flex-col">
         <FormHeader className="py-4 px-6 !mb-0" title="Users" />
-        <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
-          <div className="flex items-center gap-x-2">
-            <Input
-              size="tiny"
-              className="w-64"
-              icon={<Search size={14} className="text-foreground-lighter" />}
-              placeholder="Search by email or phone number"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.code === 'Enter' && search.length > 0) setFilterKeywords(search)
-              }}
-              actions={[
-                search && (
-                  <Button size="tiny" type="text" icon={<X />} onClick={() => clearSearch()} />
-                ),
-              ]}
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
+          {selectedUsers.size > 0 ? (
+            <div className="flex items-center gap-x-2">
+              <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
+                Delete {selectedUsers.size} users
+              </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<X />}
+                className="px-1.5"
+                onClick={() => setSelectedUsers(new Set([]))}
+                tooltip={{ content: { side: 'bottom', text: 'Cancel selection' } }}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  size="tiny"
+                  className="w-52 pl-7 bg-transparent"
+                  iconContainerClassName="pl-2"
+                  icon={<Search size={14} className="text-foreground-lighter" />}
+                  placeholder="Search email, phone or UID"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.code === 'Enter') {
+                      setSearch(search.trim())
+                      setFilterKeywords(search.trim().toLocaleLowerCase())
+                    }
+                  }}
+                  actions={[
+                    search && (
+                      <Button
+                        size="tiny"
+                        type="text"
+                        icon={<X />}
+                        onClick={() => clearSearch()}
+                        className="p-0 h-5 w-5"
+                      />
+                    ),
+                  ]}
+                />
+
+                <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
+                  <SelectTrigger_Shadcn_
+                    size="tiny"
+                    className={cn('w-[140px] !bg-transparent', filter === 'all' && 'border-dashed')}
+                  >
+                    <SelectValue_Shadcn_ />
+                  </SelectTrigger_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectGroup_Shadcn_>
+                      <SelectItem_Shadcn_ value="all" className="text-xs">
+                        All users
+                      </SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="verified" className="text-xs">
+                        Verified users
+                      </SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="unverified" className="text-xs">
+                        Unverified users
+                      </SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="anonymous" className="text-xs">
+                        Anonymous users
+                      </SelectItem_Shadcn_>
+                    </SelectGroup_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
+
+                <FilterPopover
+                  name="Provider"
+                  options={PROVIDER_FILTER_OPTIONS}
+                  labelKey="name"
+                  valueKey="value"
+                  iconKey="icon"
+                  activeOptions={selectedProviders}
+                  labelClass="text-xs"
+                  maxHeightClass="h-[190px]"
+                  onSaveFilters={setSelectedProviders}
+                />
+
+                <div className="border-r border-strong h-6" />
+
+                <FilterPopover
+                  name={selectedColumns.length === 0 ? 'All columns' : 'Columns'}
+                  title="Select columns to show"
+                  buttonType={selectedColumns.length === 0 ? 'dashed' : 'default'}
+                  options={USERS_TABLE_COLUMNS.slice(1)} // Ignore user image column
+                  labelKey="name"
+                  valueKey="id"
+                  labelClass="text-xs"
+                  maxHeightClass="h-[190px]"
+                  clearButtonText="Reset"
+                  activeOptions={selectedColumns}
+                  onSaveFilters={(value) => {
+                    // When adding back hidden columns:
+                    // (1) width set to default value if any
+                    // (2) they will just get appended to the end
+                    // (3) If "clearing", reset order of the columns to original
+
+                    let updatedConfig = (columnConfiguration ?? []).slice()
+                    if (value.length === 0) {
+                      updatedConfig = USERS_TABLE_COLUMNS.map((c) => ({ id: c.id, width: c.width }))
+                    } else {
+                      value.forEach((col) => {
+                        const hasExisting = updatedConfig.find((c) => c.id === col)
+                        if (!hasExisting)
+                          updatedConfig.push({
+                            id: col,
+                            width: USERS_TABLE_COLUMNS.find((c) => c.id === col)?.width,
+                          })
+                      })
+                    }
+
+                    const updatedColumns = formatUserColumns({
+                      config: updatedConfig,
+                      users: users ?? [],
+                      visibleColumns: value,
+                      setSortByValue,
+                      onSelectDeleteUser: setSelectedUserToDelete,
+                    })
+
+                    setSelectedColumns(value)
+                    setColumns(updatedColumns)
+                    saveColumnConfiguration('toggle', { columns: updatedColumns })
+                  }}
+                />
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
+                      Sorted by {sortColumn.replaceAll('_', ' ')}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-44" align="start">
+                    <DropdownMenuRadioGroup value={sortByValue} onValueChange={setSortByValue}>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Sort by created at</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuRadioItem value="created_at:asc">
+                            Ascending
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="created_at:desc">
+                            Descending
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Sort by last sign in at</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuRadioItem value="last_sign_in_at:asc">
+                            Ascending
+                          </DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="last_sign_in_at:desc">
+                            Descending
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuRadioItem value="email:asc">Ascending</DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="email:desc">
+                            Descending
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>Sort by phone</DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuRadioItem value="phone:asc">Ascending</DropdownMenuRadioItem>
+                          <DropdownMenuRadioItem value="phone:desc">
+                            Descending
+                          </DropdownMenuRadioItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="flex items-center gap-x-2">
+                {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
+                <Button
+                  size="tiny"
+                  icon={<RefreshCw />}
+                  type="default"
+                  loading={isRefetching && !isFetchingNextPage}
+                  onClick={() => {
+                    refetch()
+                    refetchCount()
+                  }}
+                >
+                  Refresh
+                </Button>
+                <AddUserDropdown />
+              </div>
+            </>
+          )}
+        </div>
+        <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="relative flex flex-grow bg-alternative min-h-0"
+          autoSaveId="query-performance-layout-v1"
+        >
+          <ResizablePanel defaultSize={1}>
+            <div className="flex flex-col w-full h-full">
+              <DataGrid
+                ref={gridRef}
+                className="flex-grow border-t-0"
+                rowHeight={44}
+                headerRowHeight={36}
+                columns={columns}
+                rows={formatUsersData(users ?? [])}
+                rowClass={(row) => {
+                  const isSelected = row.id === selectedUser
+                  return [
+                    `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                    '[&>.rdg-cell:first-child>div]:ml-4',
+                  ].join(' ')
+                }}
+                rowKeyGetter={(row) => row.id}
+                selectedRows={selectedUsers}
+                onScroll={handleScroll}
+                onSelectedRowsChange={(rows) => {
+                  if (rows.size > MAX_BULK_DELETE) {
+                    toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
+                  } else setSelectedUsers(rows)
+                }}
+                onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
+                onColumnsReorder={(source, target) => {
+                  const sourceIdx = columns.findIndex((col) => col.key === source)
+                  const targetIdx = columns.findIndex((col) => col.key === target)
+
+                  const updatedColumns = swapColumns(columns, sourceIdx, targetIdx)
+                  setColumns(updatedColumns)
+
+                  saveColumnConfiguration('reorder', { columns: updatedColumns })
+                }}
+                renderers={{
+                  renderRow(id, props) {
+                    return (
+                      <Row
+                        {...props}
+                        onClick={() => {
+                          const user = users.find((u) => u.id === id)
+                          if (user) {
+                            const idx = users.indexOf(user)
+                            if (props.row.id) {
+                              setSelectedUser(props.row.id)
+                              gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                            }
+                          }
+                        }}
+                      />
+                    )
+                  },
+                  noRowsFallback: isLoading ? (
+                    <div className="absolute top-14 px-6 w-full">
+                      <GenericSkeletonLoader />
+                    </div>
+                  ) : isError ? (
+                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                      <AlertError subject="Failed to retrieve users" error={error} />
+                    </div>
+                  ) : (
+                    <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+                      <Users className="text-foreground-lighter" strokeWidth={1} />
+                      <div className="text-center">
+                        <p className="text-foreground">
+                          {filter !== 'all' || filterKeywords.length > 0
+                            ? 'No users found'
+                            : 'No users in your project'}
+                        </p>
+                        <p className="text-foreground-light">
+                          {filter !== 'all' || filterKeywords.length > 0
+                            ? 'There are currently no users based on the filters applied'
+                            : 'There are currently no users who signed up to your project'}
+                        </p>
+                      </div>
+                    </div>
+                  ),
+                }}
+              />
+            </div>
+          </ResizablePanel>
+          {selectedUser !== undefined && (
+            <UserPanel
+              selectedUser={users.find((u) => u.id === selectedUser)}
+              onClose={() => setSelectedUser(undefined)}
             />
-            <Select_Shadcn_ value={filter} onValueChange={(val) => setFilter(val as Filter)}>
-              <SelectTrigger_Shadcn_ size="tiny" className="w-[150px]">
-                <SelectValue_Shadcn_ />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  <SelectItem_Shadcn_ value="all">All users</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="verified">Verified users</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="unverified">Unverified users</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="anonymous">Anonymous users</SelectItem_Shadcn_>
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </div>
-          <div className="flex items-center gap-2">
-            {isNewAPIDocsEnabled && <APIDocsButton section={['user-management']} />}
-            <Button
-              size="tiny"
-              icon={<RefreshCw />}
-              type="default"
-              loading={isRefetching && !isFetchingNextPage}
-              onClick={() => refetch()}
-            >
-              Refresh
-            </Button>
-            <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
-          </div>
-        </div>
-        <div className="flex flex-col w-full h-full">
-          <DataGrid
-            ref={gridRef}
-            className="flex-grow"
-            rowHeight={44}
-            headerRowHeight={36}
-            columns={usersTableColumns}
-            rows={formatUsersData(users ?? [])}
-            rowClass={(_, idx) => {
-              const isSelected = idx === selectedRow
-              return [
-                `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-                '[&>.rdg-cell:first-child>div]:ml-4',
-              ].join(' ')
-            }}
-            onScroll={handleScroll}
-            renderers={{
-              renderRow(idx, props) {
-                return (
-                  <Row
-                    {...props}
-                    key={props.row.id}
-                    onClick={() => {
-                      if (typeof idx === 'number' && idx >= 0) {
-                        setSelectedRow(idx)
-                        gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                      }
-                    }}
-                  />
-                )
-              },
-              noRowsFallback: isLoading ? (
-                <div className="absolute top-14 px-6 w-full">
-                  <GenericSkeletonLoader />
-                </div>
-              ) : isError ? (
-                <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
-                  <AlertError subject="Failed to retrieve users" error={error} />
-                </div>
-              ) : (
-                <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                  <Users className="text-foreground-lighter" strokeWidth={1} />
-                  <div className="text-center">
-                    <p className="text-foreground">
-                      {filter !== 'all' || filterKeywords.length > 0
-                        ? 'No users found'
-                        : 'No users in your project'}
-                    </p>
-                    <p className="text-foreground-light">
-                      {filter !== 'all' || filterKeywords.length > 0
-                        ? 'There are currently no users based on the filters applied'
-                        : 'There are currently no users who signed up to your project'}
-                    </p>
-                  </div>
-                </div>
-              ),
-            }}
-          />
-        </div>
-        <div className="flex min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
-          Total: {totalUsers} users
+          )}
+        </ResizablePanelGroup>
+
+        <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
+          {isLoading || isRefetching ? 'Loading users...' : `Total: ${totalUsers} users`}
+          {(isLoading || isRefetching || isFetchingNextPage) && (
+            <span className="flex items-center gap-2">
+              <Loader2 size={14} className="animate-spin" /> Loading...
+            </span>
+          )}
         </div>
       </div>
 
-      <UsersSidePanel
-        selectedUser={selectedUser}
-        userSidePanelOpen={isUserDetailsOpen}
-        setUserSidePanelOpen={() => {
-          setSelectedUser(undefined)
-          setIsUserDetailsOpen(false)
+      <ConfirmationModal
+        visible={showDeleteModal}
+        variant="destructive"
+        title={`Confirm to delete ${selectedUsers.size} user${selectedUsers.size > 1 ? 's' : ''}`}
+        loading={isDeletingUsers}
+        confirmLabel="Delete"
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={() => handleDeleteUsers()}
+        alert={{
+          title: `Deleting ${selectedUsers.size === 1 ? 'a user' : 'users'} is irreversible`,
+          description: `This will remove the selected ${selectedUsers.size === 1 ? '' : `${selectedUsers.size} `}user${selectedUsers.size > 1 ? 's' : ''} from the project and all associated data.`,
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to delete the{' '}
+          {selectedUsers.size === 1 ? '' : `selected ${selectedUsers.size} `}user
+          {selectedUsers.size > 1 ? 's' : ''}
+          {selectedUsers.size === 1 ? (
+            <span className="text-foreground">
+              {' '}
+              {selectedUserFromCheckbox?.email ?? selectedUserFromCheckbox?.phone ?? 'this user'}
+            </span>
+          ) : null}
+          ?
+        </p>
+      </ConfirmationModal>
+
+      {/* [Joshen] For deleting via context menu, the dialog above is dependent on the selectedUsers state */}
+      <DeleteUserModal
+        visible={!!selectedUserToDelete}
+        selectedUser={selectedUserToDelete}
+        onClose={() => setSelectedUserToDelete(undefined)}
+        onDeleteSuccess={() => {
+          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
+          setSelectedUserToDelete(undefined)
         }}
       />
-
-      <ConfirmationModal
-        visible={isDeleteModalOpen}
-        title="Confirm to delete"
-        confirmLabel="Delete"
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => {
-          handleDelete()
-        }}
-      >
-        <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete user {selectedUser?.email}?
-        </p>
-      </ConfirmationModal>
-
-      <ConfirmationModal
-        visible={isDeleteFactorsModalOpen}
-        title="Confirm to delete"
-        confirmLabel="Delete"
-        onCancel={() => setIsDeleteFactorsModalOpen(false)}
-        onConfirm={() => {
-          handleDeleteFactors()
-        }}
-      >
-        <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to delete the user's MFA factors?
-        </p>
-      </ConfirmationModal>
     </>
   )
 }

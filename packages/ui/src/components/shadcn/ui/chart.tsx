@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import * as RechartsPrimitive from 'recharts'
 
@@ -35,10 +37,10 @@ function useChart() {
 const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & {
-    config: ChartConfig
+    config?: ChartConfig
     children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>['children']
   }
->(({ id, className, children, config, ...props }, ref) => {
+>(({ id, className, children, config = {}, ...props }, ref) => {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`
 
@@ -71,8 +73,9 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   return (
     <style
       dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES).map(
-          ([theme, prefix]) => `
+        __html: Object.entries(THEMES)
+          .map(
+            ([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
@@ -82,7 +85,8 @@ ${colorConfig
   .join('\n')}
 }
 `
-        ),
+          )
+          .join('\n'),
       }}
     />
   )
@@ -99,6 +103,7 @@ const ChartTooltipContent = React.forwardRef<
       indicator?: 'line' | 'dot' | 'dashed'
       nameKey?: string
       labelKey?: string
+      labelSuffix?: string
     }
 >(
   (
@@ -111,6 +116,7 @@ const ChartTooltipContent = React.forwardRef<
       hideIndicator = false,
       label,
       labelFormatter,
+      labelSuffix,
       labelClassName,
       formatter,
       color,
@@ -176,7 +182,7 @@ const ChartTooltipContent = React.forwardRef<
                   indicator === 'dot' && 'items-center'
                 )}
               >
-                {formatter && item.value && item.name ? (
+                {formatter && item?.value !== undefined && item.name ? (
                   formatter(item.value, item.name, item, index, item.payload)
                 ) : (
                   <>
@@ -212,13 +218,14 @@ const ChartTooltipContent = React.forwardRef<
                     >
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
-                        <span className="text-foreground-muted">
+                        <span className="text-foreground-light">
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
                       {item.value && (
                         <span className="font-mono font-medium tabular-nums text-foreground">
                           {item.value.toLocaleString()}
+                          {labelSuffix}
                         </span>
                       )}
                     </div>
@@ -317,9 +324,9 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
 
 export {
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  ChartTooltip,
+  ChartTooltipContent,
 }

@@ -7,18 +7,24 @@ import { handleError, post } from 'data/fetchers'
 import { PROVIDERS } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
 
 const WHITELIST_ERRORS = [
   'The following organization members have reached their maximum limits for the number of active free projects',
   'db_pass must be longer than or equal to 4 characters',
   'There are overdue invoices in the organization(s)',
+  'name should not contain a . string',
+  'Project creation in the Supabase dashboard is disabled for this Vercel-managed organization.',
+  'Your account, which is handled by the Fly Supabase extension, cannot access this endpoint.',
+  'already exists in your organization.',
 ]
 
-export type DbInstanceSize = components['schemas']['DesiredInstanceSize']
+type CreateProjectBody = components['schemas']['CreateProjectBody']
+type CloudProvider = CreateProjectBody['cloud_provider']
 
 export type ProjectCreateVariables = {
   name: string
-  organizationId: number
+  organizationSlug: string
   dbPass: string
   dbRegion: string
   dbSql?: string
@@ -26,14 +32,16 @@ export type ProjectCreateVariables = {
   cloudProvider?: string
   authSiteUrl?: string
   customSupabaseRequest?: object
-  dbInstanceSize?: DbInstanceSize
+  dbInstanceSize?: DesiredInstanceSize
   dataApiExposedSchemas?: string[]
   dataApiUseApiSchema?: boolean
+  postgresEngine?: PostgresEngine
+  releaseChannel?: ReleaseChannel
 }
 
 export async function createProject({
   name,
-  organizationId,
+  organizationSlug,
   dbPass,
   dbRegion,
   dbSql,
@@ -43,10 +51,12 @@ export async function createProject({
   dbInstanceSize,
   dataApiExposedSchemas,
   dataApiUseApiSchema,
+  postgresEngine,
+  releaseChannel,
 }: ProjectCreateVariables) {
-  const body: components['schemas']['CreateProjectBody'] = {
-    cloud_provider: cloudProvider,
-    org_id: organizationId,
+  const body: CreateProjectBody = {
+    cloud_provider: cloudProvider as CloudProvider,
+    organization_slug: organizationSlug,
     name,
     db_pass: dbPass,
     db_region: dbRegion,
@@ -58,6 +68,8 @@ export async function createProject({
     desired_instance_size: dbInstanceSize,
     data_api_exposed_schemas: dataApiExposedSchemas,
     data_api_use_api_schema: dataApiUseApiSchema,
+    postgres_engine: postgresEngine,
+    release_channel: releaseChannel,
   }
 
   const { data, error } = await post(`/platform/projects`, {

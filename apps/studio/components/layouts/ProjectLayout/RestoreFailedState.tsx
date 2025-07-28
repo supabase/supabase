@@ -1,21 +1,48 @@
-import { MoreVertical, Trash } from 'lucide-react'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Download, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-import DeleteProjectModal from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
-import {
-  Button,
-  CriticalIcon,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { useParams } from 'common'
+import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from 'data/database/backup-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import { useProjectContext } from './ProjectContext'
 
 const RestoreFailedState = () => {
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const [visible, setVisible] = useState(false)
+
+  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: { project_id: project?.id },
+  })
+
+  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const backups = data?.backups ?? []
+
+  const { mutate: downloadBackup, isLoading: isDownloading } = useBackupDownloadMutation({
+    onSuccess: (res) => {
+      const { fileUrl } = res
+
+      // Trigger browser download by create,trigger and remove tempLink
+      const tempLink = document.createElement('a')
+      tempLink.href = fileUrl
+      document.body.appendChild(tempLink)
+      tempLink.click()
+      document.body.removeChild(tempLink)
+    },
+  })
+
+  const onClickDownloadBackup = () => {
+    if (!ref) return console.error('Project ref is required')
+    if (backups.length === 0) return console.error('No available backups to download')
+    downloadBackup({ ref, backup: backups[0] })
+  }
 
   return (
     <>
@@ -43,14 +70,38 @@ const RestoreFailedState = () => {
                   Contact support
                 </Link>
               </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<Download />}
+                loading={isDownloading}
+                disabled={backups.length === 0}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: backups.length === 0 ? 'No available backups to download' : undefined,
+                  },
+                }}
+                onClick={onClickDownloadBackup}
+              >
+                Download backup
+              </ButtonTooltip>
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button type="default" className="px-1.5" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
-                  <DropdownMenuItem
+                  <DropdownMenuItemTooltip
                     onClick={() => setVisible(true)}
                     className="items-start gap-x-2"
+                    disabled={!canDeleteProject}
+                    tooltip={{
+                      content: {
+                        side: 'right',
+                        text: !canDeleteProject
+                          ? 'You need additional permissions to delete this project'
+                          : undefined,
+                      },
+                    }}
                   >
                     <div className="translate-y-0.5">
                       <Trash size={14} />
@@ -61,7 +112,7 @@ const RestoreFailedState = () => {
                         Project cannot be restored once it is deleted
                       </p>
                     </div>
-                  </DropdownMenuItem>
+                  </DropdownMenuItemTooltip>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

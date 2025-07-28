@@ -1,9 +1,13 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, includes, noop } from 'lodash'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, SidePanel, Tabs } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
@@ -18,7 +22,6 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
-import { ExternalLink } from 'lucide-react'
 
 const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
 
@@ -43,11 +46,8 @@ const SpreadsheetImport = ({
   closePanel,
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
-  useEffect(() => {
-    if (visible && headers.length === 0) {
-      resetSpreadsheetImport()
-    }
-  }, [visible])
+  const { ref: projectRef } = useParams()
+  const org = useSelectedOrganization()
 
   const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
   const [input, setInput] = useState<string>('')
@@ -61,6 +61,8 @@ const SpreadsheetImport = ({
   })
   const [errors, setErrors] = useState<any>([])
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
   const incompatibleHeaders = selectedHeaders.filter(
@@ -77,7 +79,9 @@ const SpreadsheetImport = ({
     event.persist()
     const [file] = event.target.files || event.dataTransfer.files
 
-    if (file.size > MAX_CSV_SIZE) {
+    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
+      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
+    } else if (file.size > MAX_CSV_SIZE) {
       event.target.value = ''
       return toast(
         <div className="space-y-1">
@@ -95,10 +99,6 @@ const SpreadsheetImport = ({
         </div>,
         { duration: Infinity }
       )
-    }
-
-    if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
-      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
     } else {
       updateEditorDirty(true)
       setUploadedFile(file)
@@ -170,8 +170,16 @@ const SpreadsheetImport = ({
       resolve()
     } else {
       saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
+      sendEvent({
+        action: 'import_data_added',
+        groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     }
   }
+
+  useEffect(() => {
+    if (visible && headers.length === 0) resetSpreadsheetImport()
+  }, [visible])
 
   return (
     <SidePanel

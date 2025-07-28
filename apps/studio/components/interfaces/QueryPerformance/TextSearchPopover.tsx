@@ -10,10 +10,18 @@ import {
 interface TextSearchPopoverProps {
   name: string
   value: string
+  placeholder?: string
+  rows?: number
   onSaveText: (value: string) => void
 }
 
-export const TextSearchPopover = ({ name, value = '', onSaveText }: TextSearchPopoverProps) => {
+export const TextSearchPopover = ({
+  name,
+  value = '',
+  placeholder,
+  rows = 4,
+  onSaveText,
+}: TextSearchPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState<string>(value)
 
@@ -37,14 +45,14 @@ export const TextSearchPopover = ({ name, value = '', onSaveText }: TextSearchPo
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+      <PopoverContent_Shadcn_ portal className="p-0" side="bottom" align="start">
         <div className="space-y-4 p-3 min-w-[170px]">
           <TextArea_Shadcn_
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            rows={4}
+            rows={rows}
             className="text-xs font-mono tracking-tight"
-            placeholder="Search for a query"
+            placeholder={placeholder ?? 'Search for a query'}
             onKeyDown={(event) => {
               if (event.metaKey && event.code === 'Enter') applySearch()
             }}

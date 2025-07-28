@@ -1,14 +1,14 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { some } from 'lodash'
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
-import type { ImportContent, TableField } from './TableEditor.types'
-import { DEFAULT_COLUMNS } from './TableEditor.constants'
-import type { ColumnField } from '../SidePanelEditor.types'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import {
   generateColumnField,
   generateColumnFieldFromPostgresColumn,
 } from '../ColumnEditor/ColumnEditor.utils'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ColumnField } from '../SidePanelEditor.types'
+import { DEFAULT_COLUMNS } from './TableEditor.constants'
+import type { ImportContent, TableField } from './TableEditor.types'
 
 export const validateFields = (field: TableField) => {
   const errors = {} as any
@@ -45,7 +45,7 @@ export const generateTableFieldFromPostgresTable = (
     id: table.id,
     name: isDuplicating ? `${table.name}_duplicate` : table.name,
     comment: isDuplicating ? `This is a duplicate of ${table.name}` : table?.comment ?? '',
-    columns: (table.columns ?? []).map((column: PostgresColumn) => {
+    columns: (table.columns ?? []).map((column) => {
       return generateColumnFieldFromPostgresColumn(column, table, foreignKeys)
     }),
     isRLSEnabled: table.rls_enabled,

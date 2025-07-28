@@ -6,6 +6,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/platform/compute-add-ons',
+    destination: '/docs/guides/platform/compute-and-disk',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage-caching',
     destination: '/docs/guides/storage/cdn/fundamentals',
   },
@@ -1185,6 +1190,11 @@ module.exports = [
     source: '/blog/supabase-aquires-oriole',
     destination: '/blog/supabase-acquires-oriole',
   },
+  {
+    permanent: true,
+    source: '/events/scale-to-billions-generative-ai-humata',
+    destination: '/events/scale-to-millions-generative-ai-humata',
+  },
 
   //  DOCS
   {
@@ -1257,11 +1267,6 @@ module.exports = [
     permanent: true,
     source: '/docs/reference/tools/reference-auth',
     destination: '/docs/reference/auth',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/local-development',
-    destination: '/docs/guides/cli/local-development',
   },
   {
     permanent: true,
@@ -1537,9 +1542,83 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/local-quickstart',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
+  // Reorganizing pooler docs:-----------------------------
+
+  //external libraries
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#integrations',
+    destination: '/docs/guides/database/connecting-to-postgres#quickstart-connection-guides',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-drizzle',
+    destination: '/docs/guides/database/drizzle',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-prisma',
+    destination: '/docs/guides/database/prisma',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-postgresjs',
+    destination: '/docs/guides/database/postgres-js',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-pgadmin',
+    destination: '/docs/guides/database/pgadmin',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connecting-with-psql',
+    destination: '/docs/guides/database/psql',
+  },
+
+  // pooling
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#connection-pooler',
+    destination: '/docs/guides/database/connecting-to-postgres#connection-pooling-in-depth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#troubleshooting-supavisor',
+    destination: '/docs/guides/database/supavisor',
+  },
+
+  //IPv4/IPv6
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#finding-your-database-hostname',
+    destination: '/docs/guides/platform/ipv4-address#finding-your-databases-ip-address',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#managing-your-ip-address',
+    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#ipv6-address',
+    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres#ipv4-address',
+    destination: '/docs/guides/platform/ipv4-address',
+  },
+  //--------------------------------------------------------
+
   // START docs 2.0, moving pages in to structure
   {
     permanent: true,
@@ -1570,11 +1649,6 @@ module.exports = [
     permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
-  },
-  {
-    permanent: true,
-    source: '/docs/reference',
-    destination: '/docs#reference-documentation',
   },
   {
     permanent: true,
@@ -1919,6 +1993,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/enterprise',
+    destination: '/solutions/enterprise',
+  },
+  {
+    permanent: true,
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
   },
@@ -2117,6 +2196,11 @@ module.exports = [
     destination: '/docs/guides/database/extensions/pg_repack',
   },
   {
+    permanent: false,
+    source: '/docs/guides/database/extensions/pg_partman',
+    destination: '/docs/guides/database/extensions',
+  },
+  {
     permanent: true,
     source: '/docs/guides/ai/structured-unstructured-embeddings',
     destination: '/docs/guides/ai/structured-unstructured',
@@ -2140,11 +2224,6 @@ module.exports = [
     permanent: true,
     source: '/blog/flutter-authentication-and-authorization-with-rls',
     destination: '/blog/flutter-authorization-with-rls',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/integrations',
-    destination: '/docs/guides/platform/marketplace',
   },
   {
     permanent: true,
@@ -2305,6 +2384,12 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/integrations/zuplo',
     destination: '/partners/integrations/zuplo',
+  },
+  // toddle.dev pivoted to nordcraft
+  {
+    permanent: true,
+    source: '/partners/integrations/toddle',
+    destination: '/partners/integrations/nordcraft',
   },
   {
     permanent: true,
@@ -2560,6 +2645,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/import-maps',
+    destination: '/docs/guides/functions/dependencies',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/phone-login/messagebird',
     destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
   },
@@ -2589,6 +2679,322 @@ module.exports = [
     source: '/docs/guides/platform/enterprise-billing',
     destination: '/docs/guides/platform/org-based-billing',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/cli',
+    destination: '/docs/guides/local-development',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/getting-started',
+    destination: '/docs/guides/local-development/cli/getting-started',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/config',
+    destination: '/docs/guides/local-development/cli/config',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/local-development/overview',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/managing-environments',
+    destination: '/docs/guides/deployment/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/:path*',
+    destination: '/docs/guides/local-development/cli/:path*',
+  },
+  {
+    // Not permanent because I don't want to risk decommissioning this
+    // path entirely, just solving the problem temporarily for people
+    // whose browsers have already cached the wrong redirect above
+    permanent: false,
+    source: '/docs/guides/local-development/cli/managing-environments',
+    destination: '/docs/guides/deployment/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/branching',
+    destination: '/docs/guides/deployment/branching',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/terraform',
+    destination: '/docs/guides/deployment/terraform',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/terraform/:path*',
+    destination: '/docs/guides/deployment/terraform/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/going-into-prod',
+    destination: '/docs/guides/deployment/going-into-prod',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/maturity-model',
+    destination: '/docs/guides/deployment/maturity-model',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/shared-responsibility-model',
+    destination: '/docs/guides/deployment/shared-responsibility-model',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/github-actions/:path*',
+    destination: '/docs/guides/deployment/ci/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/:path*',
+    destination: '/docs/guides/platform/migrating-to-supabase/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-and-upgrading-projects',
+    destination: '/docs/guides/platform/upgrading',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/vercel-marketplace',
+    destination: '/docs/guides/integrations/vercel-marketplace',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/marketplace',
+    destination: '/docs/guides/integrations/supabase-marketplace',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+    destination: '/docs/guides/integrations/build-a-supabase-integration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/oauth-apps/oauth-scopes',
+    destination: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/logs',
+    destination: '/docs/guides/monitoring-troubleshooting/logs',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/metrics',
+    destination: '/docs/guides/monitoring-troubleshooting/metrics',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/sentry-monitoring',
+    destination: '/docs/guides/monitoring-troubleshooting/sentry-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/advanced-log-filtering',
+    destination: '/docs/guides/monitoring-troubleshooting/advanced-log-filtering',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-disk-io',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-cpu',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-ram',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/exhaust-swap',
+    destination: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/http-status-codes',
+    destination: '/docs/guides/monitoring-troubleshooting/http-status-codes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/troubleshooting',
+    destination: '/docs/guides/monitoring-troubleshooting/troubleshooting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/log-drains',
+    destination: '/docs/guides/monitoring-troubleshooting/log-drains',
+  },
+  {
+    // [Charis] This is a nice URL and I'm not 100% on permanently
+    // decommissioning it yet (cache-busting a permanent redirect could be a
+    // hassle if we ever resurrect it with new content)
+    permanent: false,
+    source: '/docs/guides/resources/examples',
+    destination: '/docs/guides/getting-started',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres/serverless-drivers',
+    destination: '/docs/guides/database/connecting-to-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
+    destination: '/docs/guides/troubleshooting/http-api-issues',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
+    destination: '/docs/guides/troubleshooting/exhaust-disk-io',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
+    destination: '/docs/guides/troubleshooting/exhaust-ram',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
+    destination: '/docs/guides/troubleshooting/exhaust-swap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
+    destination: '/docs/guides/troubleshooting/high-cpu-usage',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/http-status-codes',
+    destination: '/docs/guides/troubleshooting/http-status-codes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/:path*',
+    destination: '/docs/guides/telemetry/:path*',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts',
+    destination: '/partners',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts/:path*',
+    destination: '/partners',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#how-billing-is-organized',
+    destination: '/docs/guides/platform/billing-on-supabase#organization-based-billing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#quotas-and-features',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#usage-items',
+    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
+    destination: '/docs/guides/platform/manage-your-usage/compute',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-pricing',
+    destination: '/docs/guides/platform/manage-your-usage/compute#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#compute-credits',
+    destination: '/docs/guides/platform/manage-your-usage/compute#compute-credits',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#read-replicas',
+    destination: '/docs/guides/platform/manage-your-usage/read-replicas',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#project-add-ons',
+    destination: '/docs/guides/platform/manage-your-usage',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#unified-egress',
+    destination: '/docs/guides/platform/manage-your-usage/egress',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#included-egress-quota',
+    destination: '/docs/guides/platform/manage-your-usage/egress#pricing',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#egress-dashboards',
+    destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#disk-size',
+    destination: '/docs/guides/platform/manage-your-usage/disk-size',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#free-plan',
+    destination: '/docs/guides/platform/billing-on-supabase#free-plan',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#billing-examples',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-free-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-pro-plan-organization',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/platform/spend-cap',
+    destination: '/docs/guides/platform/cost-control#spend-cap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/project-management/api',
+    destination: '/docs/reference/api/introduction',
+  },
+  {
+    permanent: false,
+    source: '/mcp',
+    destination: '/docs/guides/getting-started/mcp',
+  },
 
   // marketing
 
@@ -2596,5 +3002,22 @@ module.exports = [
     permanent: true,
     source: '/changelogpod',
     destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
+  },
+
+  // features
+  {
+    permanent: true,
+    source: '/features/ai-query-assistance',
+    destination: '/features/ai-assistant',
+  },
+  {
+    permanent: true,
+    source: '/features/fly-postgres',
+    destination: '/features/postgres-database',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/fly-postgres',
+    destination: '/docs/guides/database/overview',
   },
 ]

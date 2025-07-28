@@ -8,6 +8,7 @@ export interface Provider {
   $schema: string
   type: 'object'
   title: string
+  link: string
   properties: {
     [x: string]: {
       title: string

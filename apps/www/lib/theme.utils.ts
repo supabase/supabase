@@ -8,8 +8,7 @@ export function useForceDeepDark() {
   const { resolvedTheme, theme } = useTheme()
 
   const isDarkTheme = resolvedTheme?.includes('dark')
-  const forceDarkMode = router.pathname === '/' || useDarkLaunchWeeks()
-  const isGaSection = router.pathname.includes('/ga-week') || router.pathname === '/ga'
+  const forceDarkMode = useDarkLaunchWeeks()
 
   useEffect(() => {
     const handleDocumentLoad = () => {

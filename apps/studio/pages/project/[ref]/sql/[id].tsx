@@ -1,180 +1,137 @@
-import { useMonaco } from '@monaco-editor/react'
 import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
-import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
+import { useEditorType } from 'components/layouts/editors/EditorsLayout.hooks'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
-import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { useContentIdQuery } from 'data/content/content-id-query'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useKeywordsQuery } from 'data/database/keywords-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTableColumnsQuery } from 'data/database/table-columns-query'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import Link from 'next/link'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
-  const monaco = useMonaco()
-  const { id, ref, content } = useParams()
+  const { id, ref, content, skip } = useParams()
 
-  const { project } = useProjectContext()
+  const editor = useEditorType()
+  const tabs = useTabsStateSnapshot()
   const appSnap = useAppStateSnapshot()
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippets = useSnippets(ref)
-  const enableFolders = useFlag('sqlFolderOrganization')
-  const { mutateAsync: formatQuery } = useFormatQueryMutation()
+  const allSnippets = useSnippets(ref!)
+  const snippet = allSnippets.find((x) => x.id === id)
 
-  const [intellisenseEnabled] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
-    true
-  )
+  const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
 
-  useContentIdQuery(
+  // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
+  // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
+  const { data, error, isError } = useContentIdQuery(
     { projectRef: ref, id },
     {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
-      enabled: Boolean(enableFolders && id !== 'new' && typeof snapV2.addSnippet === 'function'),
-      onSuccess: (data) => {
-        snapV2.addSnippet({ projectRef: ref as string, snippet: data })
-      },
-      onError: () => {
-        // [Joshen] Thinking if we need some error handler - it'll error out here when a new snippet is created from quickstart/templates
-      },
+      enabled: Boolean(
+        id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
+      ),
     }
   )
-
-  async function formatPgsql(value: string) {
-    try {
-      if (!project) throw new Error('No project')
-      const formatted = await formatQuery({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: value,
-      })
-      return formatted.result
-    } catch (error) {
-      console.error('formatPgsql error:', error)
-      return value
-    }
-  }
-
-  const { data: keywords, isSuccess: isKeywordsSuccess } = useKeywordsQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: intellisenseEnabled }
-  )
-  const { data: functions, isSuccess: isFunctionsSuccess } = useDatabaseFunctionsQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: intellisenseEnabled }
-  )
-  const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: intellisenseEnabled }
-  )
-  const { data: tableColumns, isSuccess: isTableColumnsSuccess } = useTableColumnsQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: intellisenseEnabled }
-  )
-
-  const pgInfoRef = useRef<any>(null)
-  const formatPgsqlRef = useRef(formatPgsql)
-  formatPgsqlRef.current = formatPgsql
-
-  const isPgInfoReady =
-    intellisenseEnabled &&
-    isTableColumnsSuccess &&
-    isSchemasSuccess &&
-    isKeywordsSuccess &&
-    isFunctionsSuccess
-
-  if (isPgInfoReady) {
-    if (pgInfoRef.current === null) {
-      pgInfoRef.current = {}
-    }
-    pgInfoRef.current.tableColumns = tableColumns?.result
-    pgInfoRef.current.schemas = schemas
-    pgInfoRef.current.keywords = keywords?.result
-    pgInfoRef.current.functions = functions
-  }
+  const snippetMissing =
+    isError && error.code === 404 && error.message.includes('Content not found')
+  const invalidId = isError && error.code === 400 && error.message.includes('Invalid uuid')
 
   useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
-      const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
+    if (ref && data) {
+      snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+    }
+  }, [ref, data])
+
+  // Load the last visited snippet when landing on /new
+  useEffect(() => {
+    if (
+      id === 'new' &&
+      skip !== 'true' && // [Joshen] Skip flag implies to skip loading the last visited snippet
+      appSnap.dashboardHistory.sql !== undefined &&
+      content === undefined
+    ) {
+      const snippet = allSnippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
       if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
-  }, [id, snippets, content])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, allSnippets, content])
 
-  // Enable pgsql format
+  // Watch for route changes
   useEffect(() => {
-    if (monaco) {
-      const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-        async provideDocumentFormattingEdits(model: any) {
-          const value = model.getValue()
-          const formatted = await formatPgsqlRef.current(value)
-          if (id) snap.setSql(id, formatted)
-          return [{ range: model.getFullModelRange(), text: formatted }]
-        },
-      })
-      return () => formatProvider.dispose()
-    }
-  }, [monaco])
+    if (!router.isReady || !id || id === 'new') return
 
-  // Register auto completion item provider for pgsql
-  useEffect(() => {
-    if (isPgInfoReady) {
-      let completeProvider: any
-      let signatureHelpProvider: any
+    const tabId = createTabId('sql', { id })
+    const snippet = allSnippets.find((x) => x.id === id)
 
-      if (monaco && isPgInfoReady) {
-        completeProvider = monaco.languages.registerCompletionItemProvider(
-          'pgsql',
-          getPgsqlCompletionProvider(monaco, pgInfoRef)
-        )
-        signatureHelpProvider = monaco.languages.registerSignatureHelpProvider(
-          'pgsql',
-          getPgsqlSignatureHelpProvider(monaco, pgInfoRef)
-        )
-      }
+    tabs.addTab({
+      id: tabId,
+      type: 'sql',
+      label: snippet?.name || 'Untitled Query',
+      metadata: {
+        sqlId: id,
+        name: snippet?.name,
+      },
+    })
+  }, [router.isReady, id])
 
-      return () => {
-        completeProvider?.dispose()
-        signatureHelpProvider?.dispose()
-      }
-    }
-  }, [isPgInfoReady])
+  if (snippetMissing || invalidId) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-[400px]">
+          <Admonition
+            type="default"
+            title={`Unable to find snippet with ID ${id}`}
+            description="This snippet doesn't exist in your project"
+          >
+            {!!tabId ? (
+              <Button
+                type="default"
+                className="mt-2"
+                onClick={() => {
+                  tabs.handleTabClose({
+                    id: tabId,
+                    router,
+                    editor,
+                    onClearDashboardHistory: () => {
+                      if (ref) appSnap.setDashboardHistory(ref, 'sql', undefined)
+                    },
+                  })
+                }}
+              >
+                Close tab
+              </Button>
+            ) : (
+              <Button asChild type="default" className="mt-2">
+                <Link href={`/project/${ref}/sql`}>Head back</Link>
+              </Button>
+            )}
+          </Admonition>
+        </div>
+      </div>
+    )
+  }
 
-  return (
-    <div className="flex-1 overflow-auto">
-      <SQLEditor />
-    </div>
-  )
+  return <SQLEditor />
 }
 
-SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+SqlEditor.getLayout = (page) => (
+  <DefaultLayout>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
+  </DefaultLayout>
+)
 
 export default SqlEditor

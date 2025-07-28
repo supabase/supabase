@@ -1,11 +1,9 @@
-import type { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { Query } from 'components/grid/query/Query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { Query } from '@supabase/pg-meta/src/query'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
@@ -13,17 +11,27 @@ import { updateDatabaseColumn } from 'data/database-columns/database-column-upda
 import type { Constraint } from 'data/database/constraints-query'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
+import { tableEditorKeys } from 'data/table-editor/keys'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
-import { getTable } from 'data/tables/table-query'
-import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
-import { getViews } from 'data/views/views-query'
+import {
+  getTable,
+  RetrievedTableColumn,
+  RetrieveTableResult,
+} from 'data/tables/table-retrieve-query'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -37,74 +45,13 @@ import type { ImportContent } from './TableEditor/TableEditor.types'
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
-export interface UseEncryptedColumnsArgs {
-  schemaName?: string
-  tableName?: string
-}
-const listEncryptedColumns = async (
-  projectRef: string,
-  connectionString: string | undefined = undefined,
-  schema: string,
-  table: string
-) => {
-  if (!table) return []
-
-  const views = await getViews({ projectRef, connectionString, schema })
-  const decryptedView = views.find((view) => view.name === `decrypted_${table}`)
-  if (!decryptedView) return []
-
-  try {
-    const encryptedColumns = await executeSql({
-      projectRef,
-      connectionString,
-      sql: `SELECT column_name as name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'decrypted_${table}' and column_name like 'decrypted_%'`,
-    })
-    return encryptedColumns.result.map((column: any) => column.name.split('decrypted_')[1])
-  } catch (error) {
-    console.error('Error fetching encrypted columns', error)
-    return []
-  }
-}
-
-export function useEncryptedColumns({ schemaName, tableName }: UseEncryptedColumnsArgs) {
-  const { project } = useProjectContext()
-  const [encryptedColumns, setEncryptedColumns] = useState<string[]>([])
-
-  useEffect(() => {
-    let isMounted = true
-
-    const getEncryptedColumns = async () => {
-      if (schemaName !== undefined && tableName !== undefined) {
-        const columns = await listEncryptedColumns(
-          project?.ref!,
-          project?.connectionString,
-          schemaName,
-          tableName
-        )
-
-        if (isMounted) {
-          setEncryptedColumns(columns)
-        }
-      }
-    }
-
-    getEncryptedColumns()
-
-    return () => {
-      isMounted = false
-    }
-  }, [schemaName, tableName])
-
-  return encryptedColumns
-}
-
 /**
  * The functions below are basically just queries but may be supported directly
  * from the pg-meta library in the future
  */
 export const addPrimaryKey = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   schema: string,
   table: string,
   columns: string[]
@@ -121,7 +68,7 @@ export const addPrimaryKey = async (
 
 export const dropConstraint = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   schema: string,
   table: string,
   name: string
@@ -185,7 +132,7 @@ export const addForeignKey = async ({
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -226,7 +173,7 @@ export const removeForeignKey = async ({
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -246,7 +193,7 @@ export const updateForeignKey = async ({
   foreignKeys,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
@@ -275,19 +222,23 @@ export const createColumn = async ({
   selectedTable,
   primaryKey,
   foreignKeyRelations = [],
+  skipSuccessMessage = false,
+  toastId: _toastId,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   payload: CreateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
+  skipSuccessMessage?: boolean
+  toastId?: string | number
 }) => {
-  const toastId = toast.loading(`Creating column "${payload.name}"...`)
+  const toastId = _toastId ?? toast.loading(`Creating column "${payload.name}"...`)
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await createDatabaseColumn({
+    await createDatabaseColumn({
       projectRef: projectRef,
       connectionString: connectionString,
       payload: formattedPayload,
@@ -303,18 +254,18 @@ export const createColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          payload.schema,
+          payload.table,
           primaryKey.name
         )
       }
 
-      const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
+      const primaryKeyColumns = existingPrimaryKeys.concat([formattedPayload.name])
       await addPrimaryKey(
         projectRef,
         connectionString,
-        column.schema,
-        column.table,
+        payload.schema,
+        payload.table,
         primaryKeyColumns
       )
     }
@@ -324,12 +275,15 @@ export const createColumn = async ({
       await addForeignKey({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: payload.schema, name: payload.table },
         foreignKeys: foreignKeyRelations,
       })
     }
 
-    toast.success(`Successfully created column "${column.name}"`, { id: toastId })
+    if (!skipSuccessMessage) {
+      toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
+    }
+    return { error: undefined }
   } catch (error: any) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
@@ -339,7 +293,7 @@ export const createColumn = async ({
 export const updateColumn = async ({
   projectRef,
   connectionString,
-  id,
+  originalColumn,
   payload,
   selectedTable,
   primaryKey,
@@ -349,10 +303,10 @@ export const updateColumn = async ({
   skipSuccessMessage = false,
 }: {
   projectRef: string
-  connectionString: string | undefined
-  id: string
+  connectionString?: string | null
+  originalColumn: RetrievedTableColumn
   payload: UpdateColumnPayload
-  selectedTable: PostgresTable
+  selectedTable: RetrieveTableResult
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
   existingForeignKeyRelations?: ForeignKeyConstraint[]
@@ -361,10 +315,10 @@ export const updateColumn = async ({
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
-    const column = await updateDatabaseColumn({
+    await updateDatabaseColumn({
       projectRef,
       connectionString,
-      id,
+      originalColumn,
       payload: formattedPayload,
     })
 
@@ -376,22 +330,23 @@ export const updateColumn = async ({
         await dropConstraint(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          originalColumn.schema,
+          originalColumn.table,
           primaryKey.name
         )
       }
 
+      const columnName = formattedPayload.name ?? originalColumn.name
       const primaryKeyColumns = isPrimaryKey
-        ? existingPrimaryKeys.concat([column.name])
-        : existingPrimaryKeys.filter((x) => x !== column.name)
+        ? existingPrimaryKeys.concat([columnName])
+        : existingPrimaryKeys.filter((x) => x !== columnName)
 
       if (primaryKeyColumns.length) {
         await addPrimaryKey(
           projectRef,
           connectionString,
-          column.schema,
-          column.table,
+          originalColumn.schema,
+          originalColumn.table,
           primaryKeyColumns
         )
       }
@@ -402,13 +357,13 @@ export const updateColumn = async ({
       await updateForeignKeys({
         projectRef,
         connectionString,
-        table: { schema: column.schema, name: column.table },
+        table: { schema: originalColumn.schema, name: originalColumn.table },
         foreignKeys: foreignKeyRelations,
         existingForeignKeyRelations,
       })
     }
 
-    if (!skipSuccessMessage) toast.success(`Successfully updated column "${column.name}"`)
+    if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalColumn.name}"`)
   } catch (error: any) {
     return { error }
   }
@@ -416,10 +371,10 @@ export const updateColumn = async ({
 
 export const duplicateTable = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   payload: { name: string; comment?: string },
   metadata: {
-    duplicateTable: PostgresTable
+    duplicateTable: RetrieveTableResult
     isRLSEnabled: boolean
     isDuplicateRows: boolean
     foreignKeyRelations: ForeignKey[]
@@ -487,6 +442,7 @@ export const duplicateTable = async (
       projectRef,
       connectionString,
       id: duplicatedTable?.id!,
+      name: duplicatedTable?.name!,
       schema: duplicatedTable?.schema!,
       payload: { rls_enabled: isRLSEnabled },
     })
@@ -506,7 +462,7 @@ export const createTable = async ({
   importContent,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   toastId: string | number
   payload: {
     name: string
@@ -518,11 +474,22 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
 }) => {
+  const queryClient = getQueryClient()
+
   // Create the table first. Error may be thrown.
-  const table = await createTableMutation({
+  await createTableMutation({
     projectRef: projectRef,
     connectionString: connectionString,
     payload: payload,
+  })
+
+  const table = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(projectRef, payload.name, payload.schema),
+    queryFn: ({ signal }) =>
+      getTable(
+        { projectRef, connectionString, name: payload.name, schema: payload.schema },
+        signal
+      ),
   })
 
   // If we face any errors during this process after the actual table creation
@@ -536,6 +503,7 @@ export const createTable = async ({
         projectRef,
         connectionString,
         id: table.id,
+        name: table.name,
         schema: table.schema,
         payload: { rls_enabled: isRLSEnabled },
       })
@@ -548,7 +516,7 @@ export const createTable = async ({
 
     for (const column of columns) {
       // We create all columns without primary keys first
-      const columnPayload = generateCreateColumnPayload(table.id, {
+      const columnPayload = generateCreateColumnPayload(table, {
         ...column,
         isPrimaryKey: false,
       })
@@ -561,8 +529,8 @@ export const createTable = async ({
 
     // Then add the primary key constraints here to support composite keys
     const primaryKeyColumns = columns
-      .filter((column: ColumnField) => column.isPrimaryKey)
-      .map((column: ColumnField) => column.name)
+      .filter((column) => column.isPrimaryKey)
+      .map((column) => column.name)
     if (primaryKeyColumns.length > 0) {
       await addPrimaryKey(projectRef, connectionString, table.schema, table.name, primaryKeyColumns)
     }
@@ -585,7 +553,7 @@ export const createTable = async ({
           projectRef,
           connectionString,
           importContent.file,
-          table as PostgresTable,
+          table,
           importContent.selectedHeaders,
           (progress: number) => {
             toast.loading(
@@ -628,7 +596,7 @@ export const createTable = async ({
         await insertTableRows(
           projectRef,
           connectionString,
-          table as PostgresTable,
+          table,
           importContent.rows,
           importContent.selectedHeaders,
           (progress: number) => {
@@ -662,6 +630,13 @@ export const createTable = async ({
       }
     }
 
+    await prefetchEditorTablePage({
+      queryClient,
+      projectRef,
+      connectionString,
+      id: table.id,
+    })
+
     // Finally, return the created table
     return table
   } catch (error) {
@@ -669,6 +644,7 @@ export const createTable = async ({
       projectRef,
       connectionString,
       id: table.id,
+      name: table.name,
       schema: table.schema,
     })
     throw error
@@ -687,15 +663,17 @@ export const updateTable = async ({
   primaryKey,
 }: {
   projectRef: string
-  connectionString: string | undefined
+  connectionString?: string | null
   toastId: string | number
-  table: PostgresTable
-  payload: any
+  table: RetrieveTableResult
+  payload: UpdateTableBody
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
 }) => {
+  const queryClient = getQueryClient()
+
   // Prepare a check to see if primary keys to the tables were updated or not
   const primaryKeyColumns = columns
     .filter((column) => column.isPrimaryKey)
@@ -715,15 +693,34 @@ export const updateTable = async ({
   }
 
   // Update the table
-  const updatedTable = await updateTableMutation({
+  await updateTableMutation({
     projectRef,
     connectionString,
     id: table.id,
+    name: table.name,
     schema: table.schema,
     payload,
   })
 
-  const originalColumns = table.columns ?? []
+  const updatedTable = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(
+      projectRef,
+      payload.name ?? table.name,
+      payload.schema ?? table.schema
+    ),
+    queryFn: ({ signal }) =>
+      getTable(
+        {
+          projectRef,
+          connectionString,
+          name: payload.name ?? table.name,
+          schema: payload.schema ?? table.schema,
+        },
+        signal
+      ),
+  })
+
+  const originalColumns = updatedTable.columns ?? []
   const columnIds = columns.map((column) => column.id)
 
   // Delete any removed columns
@@ -733,7 +730,7 @@ export const updateTable = async ({
     await deleteDatabaseColumn({
       projectRef,
       connectionString,
-      id: column.id,
+      column,
     })
   }
 
@@ -744,36 +741,34 @@ export const updateTable = async ({
       toast.loading(`Adding column ${column.name} to ${updatedTable.name}`, { id: toastId })
       // Ensure that columns do not created as primary key first, cause the primary key will
       // be added later on further down in the code
-      const columnPayload = generateCreateColumnPayload(updatedTable.id, {
+      const columnPayload = generateCreateColumnPayload(updatedTable, {
         ...column,
         isPrimaryKey: false,
       })
-      await createColumn({
+      const { error } = await createColumn({
         projectRef: projectRef,
         connectionString: connectionString,
         payload: columnPayload,
-        selectedTable: updatedTable as PostgresTable,
+        selectedTable: updatedTable,
+        skipSuccessMessage: true,
+        toastId,
       })
+      if (!!error) hasError = true
     } else {
       const originalColumn = find(originalColumns, { id: column.id })
       if (originalColumn) {
-        const columnPayload = generateUpdateColumnPayload(
-          originalColumn,
-          updatedTable as PostgresTable,
-          column
-        )
+        const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
         if (!isEmpty(columnPayload)) {
           toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
-          const skipPKCreation = true
-          const skipSuccessMessage = true
+
           const res = await updateColumn({
             projectRef: projectRef,
             connectionString: connectionString,
-            id: column.id,
+            originalColumn: originalColumn,
             payload: columnPayload,
-            selectedTable: updatedTable as PostgresTable,
-            skipPKCreation,
-            skipSuccessMessage,
+            selectedTable: updatedTable,
+            skipPKCreation: true,
+            skipSuccessMessage: true,
           })
           if (res?.error) {
             hasError = true
@@ -804,21 +799,20 @@ export const updateTable = async ({
     existingForeignKeyRelations,
   })
 
-  const queryClient = getQueryClient()
-
   await Promise.all([
-    queryClient.invalidateQueries(sqlKeys.query(projectRef, ['foreign-key-constraints'])),
-    // invalidate list of tables, as well as visible individual tables
-    queryClient.invalidateQueries(['projects', projectRef, 'tables']),
-    queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name])),
-    queryClient.invalidateQueries(
-      sqlKeys.query(projectRef, ['table-definition', table.schema, table.name])
-    ),
+    queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
+    queryClient.invalidateQueries(databaseKeys.foreignKeyConstraints(projectRef, table.schema)),
+    queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
     queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
+    queryClient.invalidateQueries(tableKeys.list(projectRef, table.schema, true)),
   ])
 
+  // We need to invalidate tableRowsAndCount after tableEditor
+  // to ensure the query sent is correct
+  await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+
   return {
-    table: await getTable({
+    table: await prefetchTableEditor(queryClient, {
       projectRef,
       connectionString,
       id: table.id,
@@ -829,9 +823,9 @@ export const updateTable = async ({
 
 export const insertRowsViaSpreadsheet = async (
   projectRef: string,
-  connectionString: string | undefined,
+  connectionString: string | undefined | null,
   file: any,
-  table: PostgresTable,
+  table: RetrieveTableResult,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
 ) => {
@@ -891,8 +885,8 @@ export const insertRowsViaSpreadsheet = async (
 
 export const insertTableRows = async (
   projectRef: string,
-  connectionString: string | undefined,
-  table: PostgresTable,
+  connectionString: string | undefined | null,
+  table: RetrieveTableResult,
   rows: any,
   selectedHeaders: string[],
   onProgressUpdate: (progress: number) => void
@@ -954,7 +948,7 @@ const updateForeignKeys = async ({
   existingForeignKeyRelations,
 }: {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]

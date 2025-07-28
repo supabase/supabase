@@ -1,0 +1,16 @@
+---
+title: 'Branching'
+subtitle: 'Use Supabase Branches to test and preview changes'
+---
+
+Use branching to safely experiment with changes to your Supabase project.
+
+Supabase branches create separate environments that spin off from your main project. You can use these branching environments to create and test changes like new configurations, database schemas, or features without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
+
+## How branching works
+
+- **Separate Environments**: Each branch is a separate environment with its own Supabase instance and API credentials.
+- **Preview Branches**: You can create multiple Preview Branches for testing.
+- **Persistent Branches**: Persistent branches are long-lived branches. They aren't automatically paused or deleted due to non-inactivity or merging.
+- **GitHub integration and Branching 2.0**: You can use branching with the GitHub integration, or use Branching 2.0 to manage your branches without Git (in Feature Preview).
+- **Data-less**: New branches do not start with any data from your main project. This is meant to better protect your sensitive production data. To start your branches with data, you can use a [seed file](/docs/guides/deployment/branching/github-integration#seeding) if using the GitHub integration.

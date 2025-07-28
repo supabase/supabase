@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { TreeView, TreeViewItem } from 'ui'
-import { flattenTree } from 'react-accessible-treeview'
 import {
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  flattenTree,
+  TreeView,
+  TreeViewItem,
 } from 'ui'
 
 const data = {
@@ -83,6 +84,7 @@ export default function TreeViewDemo() {
       togglableSelect
       clickAction="EXCLUSIVE_SELECT"
       multiSelect
+      className="w-[420px] border bg py-2"
       nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => {
         return (
           <ContextMenu_Shadcn_ modal={false}>
@@ -96,7 +98,6 @@ export default function TreeViewDemo() {
                 name={element.name}
                 isEditing={element.metadata?.isEditing === true}
                 onEditSubmit={(value) => {
-                  console.log('value', value)
                   let updatedTreeData = { ...treeData }
                   const findNode = (node: any) => {
                     if (node.id === element.id) {

@@ -15,6 +15,7 @@ import {
 
 import { cn } from '../../../lib/utils/cn'
 import { Label } from './label'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const Form = FormProvider
 
@@ -133,7 +134,7 @@ const FormDescription = React.forwardRef<
   const { formDescriptionId } = useFormField()
 
   return (
-    <p
+    <div
       ref={ref}
       id={formDescriptionId}
       className={cn('text-sm text-foreground-light', className)}
@@ -150,21 +151,30 @@ const FormMessage = React.forwardRef<
   const { error, formMessageId } = useFormField()
   const body = error ? String(error?.message) : children
 
-  if (!body) {
-    return null
-  }
-
   return (
-    <p
-      ref={ref}
-      id={formMessageId}
-      className={cn('text-sm text-destructive', className)}
-      {...props}
-    >
-      {body}
-    </p>
+    <AnimatePresence initial={false}>
+      {body ? ( // Only animate if there is a message body
+        <motion.div
+          key={formMessageId} // Use a unique key to help with animations
+          initial={{ opacity: 0, y: -5, height: 0 }} // Start slightly hidden
+          animate={{ opacity: 1, y: 0, height: 'auto' }} // Fade in and slide up
+          exit={{ opacity: 0, y: -5, height: 0 }} // Fade out and slide back up
+          transition={{ duration: 0.15, ease: 'easeInOut' }} // Smooth transition
+        >
+          <p
+            ref={ref}
+            id={formMessageId}
+            className={cn('text-sm text-destructive', className)}
+            {...props}
+          >
+            {body}
+          </p>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   )
 })
+
 FormMessage.displayName = 'FormMessage'
 
 export {

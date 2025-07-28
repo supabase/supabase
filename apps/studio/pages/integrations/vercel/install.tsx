@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import OrganizationPicker from 'components/interfaces/Integrations/OrganizationPicker'
+import OrganizationPicker from 'components/interfaces/Integrations/Vercel/OrganizationPicker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'

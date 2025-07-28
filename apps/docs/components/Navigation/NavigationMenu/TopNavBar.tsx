@@ -1,15 +1,17 @@
-import { Command, Search, Menu } from 'lucide-react'
+import { memo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { FC } from 'react'
-import { memo, useState } from 'react'
+import { Command, Search, Menu } from 'lucide-react'
 
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
-import { CommandMenuTrigger, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-
+import { AuthenticatedDropdownMenu, CommandMenuTrigger } from 'ui-patterns'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
+import useDropdownMenu from './useDropdownMenu'
+
+import type { FC } from 'react'
+
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
@@ -17,7 +19,8 @@ const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+  const user = useUser()
+  const menu = useDropdownMenu(user)
 
   return (
     <>
@@ -93,10 +96,14 @@ const TopNavBar: FC = () => {
             )}
             {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
               <Button asChild>
-                <Link href="/__dev-secret-auth">Dev-only secret sign-in</Link>
+                <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>
               </Button>
             )}
-            <TopNavDropdown />
+            {isLoggedIn ? (
+              <AuthenticatedDropdownMenu menu={menu} user={user} site="docs" />
+            ) : (
+              <TopNavDropdown />
+            )}
           </div>
         </div>
       </nav>

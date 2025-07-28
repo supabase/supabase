@@ -1,9 +1,11 @@
-import { isEqual } from 'lodash'
+import { isEqual } from 'lodash-es'
 import { ChevronRight, XCircle } from 'lucide-react'
-import type { PropsWithChildren } from 'react'
+import type { HTMLAttributes, PropsWithChildren } from 'react'
+import ReactMarkdown from 'react-markdown'
 
-import { Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_, cn } from 'ui'
+import { cn, Collapsible_Shadcn_, CollapsibleContent_Shadcn_, CollapsibleTrigger_Shadcn_ } from 'ui'
 
+import ApiSchema from '~/components/ApiSchema'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type {
@@ -15,6 +17,8 @@ import type {
 import { TYPESPEC_NODE_ANONYMOUS } from '~/features/docs/Reference.typeSpec'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
+import { getTypeDisplayFromSchema, IApiEndPoint, type ISchema } from './Reference.api.utils'
+import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
 
 interface SectionProps extends PropsWithChildren {
   link: string
@@ -27,7 +31,7 @@ function Section({ slug, link, columns = 'single', children }: SectionProps) {
 
   return (
     <ReferenceSectionWrapper
-      id={slug}
+      id={slug || ''}
       link={link}
       className={cn(
         'grid grid-cols-[1fr] gap-x-16 gap-y-8',
@@ -57,7 +61,7 @@ function Examples({ children }: PropsWithChildren) {
 
 function EducationSection({ children, slug, ...props }: SectionProps) {
   return (
-    <ReferenceSectionWrapper id={slug} className={'prose max-w-none'} {...props}>
+    <ReferenceSectionWrapper id={slug || ''} className={'prose max-w-none'} {...props}>
       {children}
     </ReferenceSectionWrapper>
   )
@@ -80,7 +84,7 @@ export const RefSubLayout = {
 }
 
 interface StickyHeaderProps {
-  title?: string
+  title?: React.ReactNode | string
   monoFont?: boolean
   className?: string
 }
@@ -90,7 +94,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
     <h2
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
-        'sticky top-0 z-10',
+        'sticky top-0 z-[1]',
         'w-full',
         // Enough padding to cover the background when stuck to the top,
         // then readjust with negative margin to prevent it looking too
@@ -101,6 +105,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         'bg-gradient-to-b from-background from-85% to-transparent to-100%',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
+        'focus:outline-none',
         monoFont && 'font-mono',
         className
       )}
@@ -199,6 +204,8 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
         ? getSubDetails(paramOrType)
         : undefined
 
+  const defaultOpen = isDefaultExpanded(paramOrType)
+
   return (
     <>
       <div className="flex flex-wrap items-baseline gap-3">
@@ -220,10 +227,12 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
       </div>
       {description && (
         <div className="prose text-sm">
-          <MDXRemoteBase source={normalizeMarkdown(description)} />
+          <MDXRemoteBase source={description} customPreprocess={normalizeMarkdown} />
         </div>
       )}
-      {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
+      {subContent && subContent.length > 0 && (
+        <TypeSubDetails details={subContent} defaultOpen={defaultOpen || false} />
+      )}
     </>
   )
 }
@@ -231,22 +240,30 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
 export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret'] }) {
   // These custom names that aren't defined aren't particularly meaningful, so
   // just don't display them.
-  const isNameOnlyType = returnType.type.type === 'nameOnly'
+  const isNameOnlyType = returnType?.type?.type === 'nameOnly'
   if (isNameOnlyType) return
 
   const subContent = getSubDetails(returnType)
+  const isDefaultOpen = returnType ? isDefaultExpanded(returnType) : false
 
   return (
     <div>
       <h3 className="mb-3 text-base text-foreground">Return Type</h3>
       <div className="border-t border-b py-5 flex flex-col gap-3">
-        <div className="text-xs text-foreground-muted">{getTypeName(returnType)}</div>
-        {returnType.comment?.shortText && (
+        <div className="text-xs text-foreground-muted">
+          {returnType ? getTypeName(returnType) : ''}
+        </div>
+        {returnType?.comment?.shortText && (
           <div className="prose text-sm">
-            <MDXRemoteBase source={normalizeMarkdown(returnType.comment?.shortText)} />
+            <MDXRemoteBase
+              source={returnType?.comment?.shortText}
+              customPreprocess={normalizeMarkdown}
+            />
           </div>
         )}
-        {subContent && subContent.length > 0 && <TypeSubDetails details={subContent} />}
+        {subContent && subContent.length > 0 && (
+          <TypeSubDetails defaultOpen={isDefaultOpen || false} details={subContent} />
+        )}
       </div>
     </div>
   )
@@ -255,12 +272,14 @@ export function ReturnTypeDetails({ returnType }: { returnType: MethodTypes['ret
 function TypeSubDetails({
   details,
   className,
+  defaultOpen = false,
 }: {
   details: Array<SubContent> | Array<CustomTypePropertyType> | Array<TypeDetails>
   className?: string
+  defaultOpen?: boolean
 }) {
   return (
-    <Collapsible_Shadcn_>
+    <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
       <CollapsibleTrigger_Shadcn_
         className={cn(
           'group',
@@ -326,6 +345,244 @@ export function RequiredBadge({ isOptional }: { isOptional: boolean | 'NA' }) {
   ) : undefined
 }
 
+export function ApiSchemaParamDetails({ param }: { param: IApiEndPoint['parameters'][number] }) {
+  return (
+    <li className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
+      <div className="flex flex-wrap items-baseline gap-3">
+        <span className="font-mono text-sm font-medium text-foreground break-all">
+          {param.name}
+        </span>
+        <RequiredBadge isOptional={!param.required} />
+        {param.schema?.deprecated && <span className="text-xs text-warning-600">Deprecated</span>}
+        {param.schema && (
+          <span className="text-xs text-foreground-muted">
+            {getTypeDisplayFromSchema(param.schema)?.displayName ?? ''}
+          </span>
+        )}
+      </div>
+      {param.description && (
+        <ReactMarkdown className="prose break-words text-sm">{param.description}</ReactMarkdown>
+      )}
+      {param.schema && <ApiSchemaParamSubdetails schema={param.schema} />}
+    </li>
+  )
+}
+
+export function ApiOperationRequestBodyDetails({
+  requestBody,
+}: {
+  requestBody: IApiEndPoint['requestBody']
+}) {
+  const availableSchemes = Object.keys(requestBody?.content || {}) as Array<
+    'application/json' | 'application/x-www-form-urlencoded'
+  >
+
+  return (
+    <>
+      {availableSchemes.map((scheme, index) => (
+        <ApiOperationRequestBodyDetailsInternal
+          key={index}
+          schema={requestBody?.content?.[scheme]?.schema || ({} as ISchema)}
+          hidden={index > 0}
+          {...{
+            [API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES.KEY]: scheme,
+          }}
+        />
+      ))}
+    </>
+  )
+}
+
+interface ApiOperationRequestBodyDetailsInternalProps extends HTMLAttributes<HTMLUListElement> {
+  schema: ISchema
+}
+
+function ApiOperationRequestBodyDetailsInternal({
+  schema,
+  ...props
+}: ApiOperationRequestBodyDetailsInternalProps) {
+  if ('allOf' in schema) {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">All of the following:</span>
+        {schema.allOf.map((option, index) => (
+          <ApiSchemaParamSubdetails key={index} schema={option} />
+        ))}
+      </>
+    )
+  } else if ('anyOf' in schema) {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">Any of the following:</span>
+        {schema.anyOf.map((option, index) => (
+          <ApiSchemaParamSubdetails key={index} schema={option} />
+        ))}
+      </>
+    )
+  } else if ('oneOf' in schema) {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">One of the following:</span>
+        {schema.oneOf.map((option, index) => (
+          <ApiSchemaParamSubdetails key={index} schema={option} />
+        ))}
+      </>
+    )
+  } else if ('enum' in schema) {
+    return (
+      <span className="font-mono text-sm font-medium text-foreground">
+        {schema.enum.join(' | ')}
+      </span>
+    )
+  } else if (
+    schema.type === 'string' ||
+    schema.type === 'boolean' ||
+    schema.type === 'number' ||
+    schema.type === 'integer'
+  ) {
+    return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
+  } else if (schema.type === 'array') {
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">{`Array of ${getTypeDisplayFromSchema(schema.items).displayName}`}</span>
+        {!(
+          'type' in schema.items &&
+          ['string', 'boolean', 'number', 'integer'].includes(schema.items.type)
+        ) && <ApiSchemaParamSubdetails className="mt-4" schema={schema.items} />}
+      </>
+    )
+  } else if (schema.type === 'object') {
+    return (
+      <ul {...props}>
+        {Object.keys(schema.properties || {})
+          .map((property) => ({
+            name: property,
+            required: schema.required?.includes(property) || false,
+            in: 'body' as const,
+            schema: schema.properties?.[property] || ({} as ISchema),
+          }))
+          .map((property, index) => (
+            <ApiSchemaParamDetails key={index} param={property} />
+          ))}
+      </ul>
+    )
+  }
+}
+
+export function ApiSchemaParamSubdetails({
+  schema,
+  className,
+}: {
+  schema: ISchema
+  className?: string
+}) {
+  if (
+    !('enum' in schema) &&
+    'type' in schema &&
+    (['boolean', 'number', 'integer'].includes(schema.type) ||
+      (schema.type === 'string' &&
+        !('minLength' in schema || 'maxLength' in schema || 'pattern' in schema)) ||
+      (schema.type === 'array' &&
+        'type' in schema.items &&
+        ['boolean', 'number', 'integer', 'string', 'file'].includes(schema.items.type)))
+  ) {
+    return null
+  }
+
+  const subContent =
+    'enum' in schema
+      ? schema.enum
+      : 'anyOf' in schema
+        ? schema.anyOf
+        : 'oneOf' in schema
+          ? schema.oneOf
+          : 'allOf' in schema
+            ? schema.allOf
+            : 'type' in schema && schema.type === 'string'
+              ? ['minLength', 'maxLength', 'pattern']
+                  .filter((key) => key in schema)
+                  .map((key) => ({
+                    constraint: key,
+                    value: schema[key],
+                  }))
+              : []
+
+  return (
+    <Collapsible_Shadcn_>
+      <CollapsibleTrigger_Shadcn_
+        className={cn(
+          'group',
+          'w-fit rounded-full',
+          'px-5 py-1',
+          'border border-default',
+          'flex items-center gap-2',
+          'text-left text-sm text-foreground-light',
+          'hover:bg-surface-100',
+          'data-[state=open]:w-full',
+          'data-[state=open]:rounded-b-none data-[state=open]:rounded-tl-lg data-[state=open]:rounded-tr-lg',
+          'transition [transition-property:width,background-color]',
+          className
+        )}
+      >
+        <XCircle
+          size={14}
+          className={cn(
+            'text-foreground-muted',
+            'group-data-[state=closed]:rotate-45',
+            'transition-transform'
+          )}
+        />
+        {'enum' in schema
+          ? 'Accepted values'
+          : 'allOf' in schema || 'anyOf' in schema || 'oneOf' in schema
+            ? 'Options'
+            : schema.type === 'array'
+              ? 'Items'
+              : schema.type === 'object'
+                ? 'Object schema'
+                : 'Details'}
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_>
+        {'type' in schema && schema.type === 'object' ? (
+          <div className={cn('border-b border-x border-fault', 'rounded-b-lg', 'p-5')}>
+            <ApiSchema schema={schema} />
+          </div>
+        ) : (
+          <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+            {subContent.map((detail: any, index: number) => (
+              <li
+                key={index}
+                className={cn(
+                  'px-5 py-3',
+                  'border-t border-default first:border-t-0',
+                  'flex flex-col gap-3'
+                )}
+              >
+                {'enum' in schema ? (
+                  <span className="font-mono text-sm font-medium text-foreground">
+                    {String(detail)}
+                  </span>
+                ) : 'type' in schema && schema.type === 'string' ? (
+                  <span className="text-sm text-foreground flex items-baseline gap-2">
+                    <span className="font-mono text-sm font-medium text-foreground">
+                      {detail.constraint}
+                    </span>
+                    {detail.value}
+                  </span>
+                ) : 'anyOf' in schema || 'allOf' in schema || 'oneOf' in schema ? (
+                  <ApiSchemaParamDetails
+                    param={{ name: '', schema: detail, required: !detail.nullable, in: 'body' }}
+                  />
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
+  )
+}
+
 /**
  * Whether the param comes from overwritten params in the library spec file or
  * directly from the type spec.
@@ -344,7 +601,11 @@ function getTypeName(parameter: object): string {
     return parameter.type
   }
 
-  if (typeof parameter.type !== 'object' || !('type' in parameter.type)) {
+  if (
+    typeof parameter.type !== 'object' ||
+    parameter.type === null ||
+    !('type' in parameter.type)
+  ) {
     return ''
   }
 
@@ -370,7 +631,7 @@ function getTypeName(parameter: object): string {
       // @ts-ignore
       return `Promise<${getTypeName({ type: type.awaited })}>`
     case 'union':
-      return 'Union: expand to see options'
+      return 'One of the following options'
     case 'index signature':
       // Needs an extra level of wrapping to fake the wrapping parameter
       // @ts-ignore
@@ -378,7 +639,8 @@ function getTypeName(parameter: object): string {
     case 'array':
       // Needs an extra level of wrapping to fake the wrapping parameter
       // @ts-ignore
-      return `Array<${getTypeName({ type: type.elemType })}>`
+      const innerType = getTypeName({ type: type.elemType })
+      return innerType ? `Array<${innerType}>` : 'Array'
   }
 
   return ''
@@ -389,28 +651,28 @@ function nameOrDefault(node: object, fallback: string) {
 }
 
 function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['ret']) {
-  let subDetails: Array<any>
+  let subDetails: Array<any> = []
 
-  switch (parentType.type?.type) {
+  switch (parentType?.type?.type) {
     case 'object':
-      subDetails = parentType.type.properties
+      subDetails = parentType?.type?.properties
       break
     case 'function':
       subDetails = [
-        ...(parentType.type.params.length === 0
+        ...(parentType?.type?.params?.length === 0
           ? []
           : [
               {
                 name: 'Parameters',
                 type: 'callback parameters',
                 isOptional: 'NA',
-                params: parentType.type.params.map((param) => ({
+                params: parentType?.type?.params?.map((param) => ({
                   ...param,
                   isOptional: 'NA',
                 })),
               },
             ]),
-        { name: 'Return', type: parentType.type.ret.type, isOptional: 'NA' },
+        { name: 'Return', type: parentType?.type?.ret?.type, isOptional: 'NA' },
       ]
       break
     // @ts-ignore -- Adding these fake types to take advantage of existing recursion
@@ -419,39 +681,46 @@ function getSubDetails(parentType: MethodTypes['params'][number] | MethodTypes['
       subDetails = parentType.params
       break
     case 'union':
-      subDetails = parentType.type.subTypes.map((subType, index) => ({
-        name: `union option ${index + 1}`,
+      subDetails = parentType?.type?.subTypes?.map((subType, index) => ({
+        name: `Option ${index + 1}`,
         type: { ...subType },
         isOptional: 'NA',
       }))
       break
     case 'promise':
-      if (parentType.type.awaited.type === 'union') {
-        subDetails = parentType.type.awaited.subTypes.map((subType, index) => ({
-          name: `union option ${index + 1}`,
+      if (parentType?.type?.awaited?.type === 'union') {
+        subDetails = parentType?.type?.awaited?.subTypes?.map((subType, index) => ({
+          name: `Option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
-      } else if (parentType.type.awaited.type === 'object') {
-        subDetails = parentType.type.awaited.properties.map((property) => ({
+      } else if (
+        parentType?.type?.awaited?.type === 'object' &&
+        'properties' in parentType.type.awaited
+      ) {
+        subDetails = (parentType.type.awaited as any).properties?.map((property) => ({
           ...property,
           isOptional: 'NA',
         }))
-      } else if (parentType.type.awaited.type === 'array') {
+      } else if (parentType?.type?.awaited?.type === 'array') {
         subDetails = [
-          { name: 'array element', type: parentType.type.awaited.elemType, isOptional: 'NA' },
+          {
+            name: 'array element',
+            type: (parentType?.type?.awaited as any)?.elemType,
+            isOptional: 'NA',
+          },
         ]
       }
       break
     case 'array':
-      if (parentType.type.elemType.type === 'union') {
+      if (parentType.type.elemType?.type === 'union') {
         subDetails = parentType.type.elemType.subTypes.map((subType, index) => ({
-          name: `union option ${index + 1}`,
+          name: `Option ${index + 1}`,
           type: { ...subType },
           isOptional: 'NA',
         }))
       }
-      if (parentType.type.elemType.type === 'object') {
+      if (parentType.type.elemType?.type === 'object') {
         subDetails = parentType.type.elemType.properties
       }
       break
@@ -580,7 +849,7 @@ function applyParameterMergeStrategy(
           if (clonedParametersByName.has(key)) {
             clonedParametersByName.set(
               key,
-              applyParameterMergeStrategy(clonedParametersByName.get(key), alternateValue)
+              applyParameterMergeStrategy(clonedParametersByName.get(key)!, alternateValue)
             )
           } else {
             clonedParametersByName.set(key, alternateValue)
@@ -600,7 +869,7 @@ function applyParameterMergeStrategy(
    *********/
 
   function mergeIntoUnion() {
-    if (alternateParameter.type.type === 'union') {
+    if (alternateParameter.type?.type === 'union') {
       const originalType = clonedParameter.type
 
       if (
@@ -610,7 +879,7 @@ function applyParameterMergeStrategy(
       } else {
         clonedParameter.type = {
           type: 'union',
-          subTypes: [originalType, ...alternateParameter.type.subTypes],
+          subTypes: [originalType as TypeDetails, ...(alternateParameter.type?.subTypes || [])],
         }
       }
     } else {
@@ -618,9 +887,25 @@ function applyParameterMergeStrategy(
       if (!isEqual(originalType, alternateParameter.type)) {
         clonedParameter.type = {
           type: 'union',
-          subTypes: [originalType, alternateParameter.type],
+          subTypes: [originalType as TypeDetails, alternateParameter.type!],
         }
       }
     }
   }
+}
+
+function isDefaultExpanded(meta: object) {
+  return (
+    'type' in meta &&
+    typeof meta.type === 'object' &&
+    meta.type &&
+    'type' in meta.type &&
+    (meta.type.type == 'union' ||
+      (meta.type.type === 'promise' &&
+        'awaited' in meta.type &&
+        typeof meta.type.awaited === 'object' &&
+        meta.type.awaited &&
+        'type' in meta.type.awaited &&
+        meta.type.awaited.type === 'union'))
+  )
 }

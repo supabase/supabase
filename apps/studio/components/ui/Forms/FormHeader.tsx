@@ -1,10 +1,6 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
-
-import { Markdown } from 'components/interfaces/Markdown'
 import { ReactNode } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
+import { DocsButton } from '../DocsButton'
 
 const FormHeader = ({
   title,
@@ -20,23 +16,17 @@ const FormHeader = ({
   className?: string
 }) => {
   return (
-    <div className={cn(`mb-6 flex items-center justify-between ${className}`)}>
+    <div
+      className={cn(
+        `w-full mb-6 flex flex-col sm:flex-row md:items-center justify-between gap-4 ${className}`
+      )}
+    >
       <div className="space-y-1">
-        <h3 className="text-foreground text-xl">
-          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-            {title}
-          </ReactMarkdown>
-        </h3>
-        {description && <Markdown content={description} className="max-w-full" />}
+        <h3 className="text-foreground text-xl prose">{title}</h3>
+        {description && <div className="prose text-sm max-w-2xl">{description}</div>}
       </div>
-      <div className="flex items-center gap-x-2">
-        {docsUrl !== undefined && (
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link href={docsUrl} target="_blank" rel="noreferrer">
-              Documentation
-            </Link>
-          </Button>
-        )}
+      <div className="flex flex-col sm:flex-row md:items-center gap-x-2">
+        {docsUrl !== undefined && <DocsButton href={docsUrl} />}
         {actions}
       </div>
     </div>

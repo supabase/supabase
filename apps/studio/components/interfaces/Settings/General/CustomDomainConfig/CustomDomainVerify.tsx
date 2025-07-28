@@ -1,11 +1,16 @@
+import { AlertCircle, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
-import type { ProjectApiResponse } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
+import { useInterval } from 'hooks/misc/useInterval'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -14,16 +19,18 @@ import {
   WarningIcon,
 } from 'ui'
 import DNSRecord from './DNSRecord'
-import { AlertCircle, HelpCircle, ExternalLink, RefreshCw } from 'lucide-react'
+import { DNSTableHeaders } from './DNSTableHeaders'
 
-export type CustomDomainVerifyProps = {
-  projectRef?: string
-  customDomain: CustomDomainResponse
-  settings?: ProjectApiResponse
-}
-
-const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomainVerifyProps) => {
+const CustomDomainVerify = () => {
+  const { ref: projectRef } = useParams()
   const [isNotVerifiedYet, setIsNotVerifiedYet] = useState(false)
+
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const customDomain = customDomainData?.customDomain
+  const isSSLCertificateDeploying =
+    customDomain?.ssl.status !== undefined && customDomain.ssl.txt_name === undefined
 
   const { mutate: reverifyCustomDomain, isLoading: isReverifyLoading } =
     useCustomDomainReverifyMutation({
@@ -31,17 +38,31 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         if (res.status === '2_initiated') setIsNotVerifiedYet(true)
       },
     })
-  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
-  const hasCAAErrors = customDomain.ssl.validation_errors?.reduce(
+  const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation({
+    onSuccess: () => {
+      toast.success(
+        'Custom domain setup cancelled successfully. It may take a few seconds before your custom domain is fully removed, so you may need to refresh your browser.'
+      )
+    },
+  })
+
+  const hasCAAErrors = customDomain?.ssl.validation_errors?.reduce(
     (acc, error) => acc || error.message.includes('caa_error'),
     false
   )
+  const isValidating = (customDomain?.ssl.txt_name ?? '') === ''
 
   const onReverifyCustomDomain = () => {
     if (!projectRef) return console.error('Project ref is required')
     reverifyCustomDomain({ projectRef })
   }
+
+  useInterval(
+    onReverifyCustomDomain,
+    // Poll every 5 seconds if the SSL certificate is being deployed
+    isSSLCertificateDeploying && !isDeleting ? 5000 : false
+  )
 
   const onCancelCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -54,7 +75,7 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         <div>
           <h4 className="text-foreground mb-2">
             Configure TXT verification for your custom domain{' '}
-            <code className="text-sm">{customDomain.hostname}</code>
+            <code className="text-sm">{customDomain?.hostname}</code>
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
@@ -63,56 +84,51 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           <p className="text-sm text-foreground-light">
             Records which have been successfully verified will be removed from this list below.
           </p>
-          <div className="mt-4 mb-2">
-            <Alert_Shadcn_ variant="default">
-              {isNotVerifiedYet ? (
-                <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
-              ) : (
-                <HelpCircle className="text-foreground-light" strokeWidth={1.5} />
-              )}
-              <AlertTitle_Shadcn_>
-                {isNotVerifiedYet
-                  ? 'Unable to verify records from DNS provider yet.'
-                  : 'Please note that it may take up to 24 hours for the DNS records to propagate.'}
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+          {!isValidating && (
+            <div className="mt-4 mb-2">
+              <Alert_Shadcn_ variant="default">
                 {isNotVerifiedYet ? (
-                  <div className="mt-2">
-                    <p>
-                      Please check again soon. Note that it may take up to 24 hours for changes in
-                      DNS records to propagate.
-                    </p>
+                  <AlertCircle className="text-foreground-light" strokeWidth={1.5} />
+                ) : (
+                  <HelpCircle className="text-foreground-light" strokeWidth={1.5} />
+                )}
+                <AlertTitle_Shadcn_>
+                  {isNotVerifiedYet
+                    ? 'Unable to verify records from DNS provider yet.'
+                    : 'Please note that it may take up to 24 hours for the DNS records to propagate.'}
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  <div>
+                    {isNotVerifiedYet && (
+                      <p>
+                        Please check again soon. Note that it may take up to 24 hours for changes in
+                        DNS records to propagate.
+                      </p>
+                    )}
                     <p>
                       You may also visit{' '}
                       <Link
-                        href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`https://whatsmydns.net/#TXT/${customDomain?.hostname}`}
                         className="text-brand"
                       >
                         here
                       </Link>{' '}
                       to check if your DNS has been propagated successfully before clicking verify.
                     </p>
-                    <p>
-                      Some registrars will require you to remove the domain name when creating DNS
-                      records. As an example, to create a record for `foo.app.example.com`, you
-                      would need to create an entry for `foo.app`.
-                    </p>
+                    {isNotVerifiedYet && (
+                      <p className="mt-1 text-foreground-lighter">
+                        Some registrars will require you to remove the domain name when creating DNS
+                        records. As an example, to create a record for `foo.app.example.com`, you
+                        would need to create an entry for `foo.app`.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p>
-                    You may also visit{' '}
-                    <Link
-                      href={`https://whatsmydns.net/#TXT/${customDomain.hostname}`}
-                      className="text-brand"
-                    >
-                      here
-                    </Link>{' '}
-                    to check if your DNS has been propagated successfully before clicking verify.
-                  </p>
-                )}
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            </div>
+          )}
         </div>
 
         {hasCAAErrors && (
@@ -123,13 +139,13 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-              <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
+              <code className="text-xs">{customDomain?.hostname}</code>. For example:{' '}
               <code className="text-xs">0 issue "digicert.com"</code>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
 
-        {customDomain.ssl.status === 'validation_timed_out' ? (
+        {customDomain?.ssl.status === 'validation_timed_out' ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>Validation timed out</AlertTitle_Shadcn_>
@@ -139,49 +155,27 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
           </Alert_Shadcn_>
         ) : (
           <div className="space-y-2">
-            <div className="flex gap-4">
-              <div className="w-[50px]">
-                <p className="text-foreground-light text-sm">Type</p>
-              </div>
-              <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
-                <div className="flex flex-row space-x-2 justify-between col-span-12">
-                  <label className="block text-foreground-light text-sm break-all">Name</label>
-                </div>
-              </div>
-              <div className="text-sm grid gap-2 md:grid md:grid-cols-12 md:gap-x-4 input-mono flex-1">
-                <div className="flex flex-row space-x-2 justify-between col-span-12">
-                  <label className="block text-foreground-light text-sm break-all">Content</label>
-                </div>
-              </div>
-            </div>
+            <DNSTableHeaders display={customDomain?.ssl.txt_name ?? ''} />
 
-            {customDomain.verification_errors?.includes(
+            {customDomain?.verification_errors?.includes(
               'custom hostname does not CNAME to this zone.'
             ) && (
               <DNSRecord
                 type="CNAME"
-                name={customDomain.hostname}
-                value={settings?.autoApiService.endpoint ?? 'Loading...'}
+                name={customDomain?.hostname}
+                value={settings?.app_config?.endpoint ?? 'Loading...'}
               />
             )}
 
-            {customDomain.ownership_verification && (
-              <DNSRecord
-                type={customDomain.ownership_verification.type}
-                name={customDomain.ownership_verification.name}
-                value={customDomain.ownership_verification.value}
-              />
-            )}
-
-            {customDomain.ssl.status === 'pending_validation' && (
+            {!isValidating && customDomain?.ssl.status === 'pending_validation' && (
               <DNSRecord
                 type="TXT"
-                name={customDomain.ssl.txt_name ?? 'Loading...'}
-                value={customDomain.ssl.txt_value ?? 'Loading...'}
+                name={customDomain?.ssl.txt_name ?? 'Loading...'}
+                value={customDomain?.ssl.txt_value ?? 'Loading...'}
               />
             )}
 
-            {customDomain.ssl.status === 'pending_deployment' && (
+            {customDomain?.ssl.status === 'pending_deployment' && (
               <div className="flex items-center justify-center space-x-2 py-8">
                 <AlertCircle size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">
@@ -191,39 +185,18 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             )}
           </div>
         )}
-
-        <div className="!mt-4">
-          <p className="text-sm text-foreground-light">
-            One of the records requires you to{' '}
-            <span className="text-foreground-light">replace</span> the CNAME record set up in the
-            first step with a TXT record.
-          </p>
-          <p className="text-sm text-foreground-light">
-            You'll be able to restore it back to the CNAME after the verification process has been
-            completed.
-          </p>
-        </div>
       </Panel.Content>
 
       <div className="border-t border-muted" />
 
       <Panel.Content>
         <div className="flex items-center justify-between">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/guides/platform/custom-domains"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
+          <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
           <div className="flex items-center space-x-2">
             <Button
               type="default"
               onClick={onCancelCustomDomain}
               loading={isDeleting}
-              disabled={isDeleting || isReverifyLoading}
               className="self-end"
             >
               Cancel
@@ -231,8 +204,8 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
             <Button
               icon={<RefreshCw />}
               onClick={onReverifyCustomDomain}
-              loading={isReverifyLoading}
-              disabled={isDeleting || isReverifyLoading}
+              loading={!isValidating && isReverifyLoading}
+              disabled={isDeleting || isReverifyLoading || isValidating}
               className="self-end"
             >
               Verify

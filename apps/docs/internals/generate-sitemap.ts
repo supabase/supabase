@@ -8,16 +8,14 @@ import { globby } from 'globby'
 import matter from 'gray-matter'
 import prettier from 'prettier'
 
-import { generateAPIPages } from './files/api'
 import { generateCLIPages } from './files/cli'
 import { generateReferencePages } from './files/reference-lib'
 
 async function generate() {
-  const apiPages = generateAPIPages()
   const cliPages = generateCLIPages()
   const referencePages = await generateReferencePages()
 
-  const contentFiles = await globby(['content/**/!(_)*.mdx'])
+  const contentFiles = await globby(['content/guides/**/!(_)*.mdx'])
   const contentPages = await Promise.all(
     contentFiles.map(async (filePath) => {
       const fileContents = await fs.promises.readFile(filePath, 'utf8')
@@ -32,10 +30,20 @@ async function generate() {
     })
   )
 
+  const troubleshootingFiles = await globby(['content/troubleshooting/**/!(_)*.mdx'])
+  const troubleshootingPages = await Promise.all(
+    troubleshootingFiles.map(async (filePath) => {
+      return {
+        link: filePath.replace(/^content/, 'guides').replace(/\.mdx$/, ''),
+        priority: 1,
+      }
+    })
+  )
+
   const allPages = (contentPages as Array<{ link: string; priority?: number }>).concat(
+    troubleshootingPages,
     referencePages,
-    cliPages,
-    apiPages
+    cliPages
   )
 
   const sitemap = `

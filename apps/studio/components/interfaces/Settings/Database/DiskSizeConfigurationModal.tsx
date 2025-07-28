@@ -17,6 +17,7 @@ import {
   Alert_Shadcn_,
   Button,
   Form,
+  InfoIcon,
   InputNumber,
   Modal,
   WarningIcon,
@@ -40,7 +41,7 @@ const DiskSizeConfigurationModal = ({
 
   const organization = useSelectedOrganization()
   const { data: projectSubscriptionData, isLoading: isLoadingSubscription } =
-    useOrgSubscriptionQuery({ orgSlug: organization?.slug })
+    useOrgSubscriptionQuery({ orgSlug: organization?.slug }, { enabled: visible })
 
   const isLoading = isLoadingProject || isLoadingSubscription
 
@@ -117,7 +118,7 @@ const DiskSizeConfigurationModal = ({
                   </p>
                   <Button asChild type="default" className="mt-3">
                     <Link
-                      href={`/support/new?ref=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
+                      href={`/support/new?projectRef=${projectRef}&category=${SupportCategories.PERFORMANCE_ISSUES}&subject=Increase%20disk%20size%20beyond%20200GB`}
                     >
                       Contact support
                     </Link>
@@ -177,7 +178,7 @@ const DiskSizeConfigurationModal = ({
         </Form>
       ) : (
         <Alert_Shadcn_ className="border-none">
-          <Info size={16} />
+          <InfoIcon />
           <AlertTitle_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free'
               ? 'Disk size configuration is not available for projects on the Free Plan'

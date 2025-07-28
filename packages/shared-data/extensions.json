@@ -177,7 +177,7 @@
     "link": "/guides/database/extensions/index_advisor",
     "github_url": "https://github.com/supabase/index_advisor",
     "product": "Index Advisor Report",
-    "product_url": "/project/{ref}/database/query-performance"
+    "product_url": "/project/{ref}/advisors/query-performance"
   },
   {
     "name": "intarray",
@@ -229,9 +229,9 @@
     "comment": "Job scheduler for PostgreSQL",
     "tags": ["Utility"],
     "link": "/guides/database/extensions/pg_cron",
-    "github_url": null,
-    "product": null,
-    "product_url": null
+    "github_url": "https://github.com/citusdata/pg_cron",
+    "product": "Supabase Cron",
+    "product_url": "/project/{ref}/integrations/cron"
   },
   {
     "name": "pg_freespacemap",
@@ -288,22 +288,13 @@
     "product_url": null
   },
   {
-    "name": "pg_stat_monitor",
-    "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
-    "tags": ["Utility"],
-    "link": "/guides/database/extensions/pg_stat_monitor",
-    "github_url": null,
-    "product": null,
-    "product_url": null
-  },
-  {
     "name": "pg_stat_statements",
     "comment": "track execution statistics of all SQL statements executed",
     "tags": ["Admin", "Utility"],
     "link": "/guides/database/extensions/pg_stat_statements",
     "github_url": null,
     "product": "Query Performance",
-    "product_url": "/project/{ref}/database/query-performance"
+    "product_url": "/project/{ref}/advisors/query-performance"
   },
   {
     "name": "pg_surgery",
@@ -357,7 +348,8 @@
     "link": "/guides/database/extensions/pgjwt",
     "github_url": "https://github.com/michelp/pgjwt",
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "pgroonga",
@@ -428,7 +420,8 @@
     "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#coffeescript-extension",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "pljava",
@@ -445,7 +438,8 @@
     "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#livescript-extension",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "plpgsql",
@@ -472,7 +466,8 @@
     "link": "/guides/database/extensions/plv8",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "postgis",
@@ -487,7 +482,7 @@
     "name": "postgres_fdw",
     "comment": "foreign-data wrapper for remote PostgreSQL servers",
     "tags": ["Admin"],
-    "link": "https://www.postgresql.org/docs/current/postgres-fdw.html",
+    "link": "/guides/database/extensions/postgres_fdw",
     "github_url": null,
     "product": null,
     "product_url": null
@@ -553,7 +548,8 @@
     "link": "/guides/database/extensions/timescaledb",
     "github_url": null,
     "product": null,
-    "product_url": null
+    "product_url": null,
+    "deprecated": ["Postgres 17"]
   },
   {
     "name": "tsm_system_rows",
@@ -598,6 +594,12 @@
     "github_url": "https://github.com/pgvector/pgvector",
     "product": "Supabase Vector",
     "product_url": null
+  },
+  {
+    "name": "pg_repack",
+    "comment": "Optimize physical storage and remove bloat from tables and indexes",
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/pg_repack"
   },
   {
     "name": "wrappers",

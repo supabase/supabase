@@ -7,10 +7,14 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
-import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
-import { Snippet, SnippetDetail } from 'data/content/sql-folders-query'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { Snippet } from 'data/content/sql-folders-query'
+import {
+  SnippetWithContent,
+  useSnippetFolders,
+  useSqlEditorV2StateSnapshot,
+} from 'state/sql-editor-v2'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -65,17 +69,29 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
   const { mutateAsync: createFolder, isLoading: isCreatingFolder } =
     useSQLSnippetFolderCreateMutation()
-  const {
-    mutate: moveSnippet,
-    mutateAsync: moveSnippetAsync,
-    isLoading: isMovingSnippet,
-  } = useContentUpsertV2Mutation({
+  const { mutateAsync: moveSnippetAsync, isLoading: isMovingSnippet } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to move query: ${error.message}`)
     },
   })
 
-  const FormSchema = z.object({ name: z.string() })
+  const getFormSchema = () => {
+    if (selectedId === 'new-folder') {
+      return z
+        .object({
+          name: z.string().min(1, 'Please provide a name for the folder'),
+        })
+        .refine((data) => !snapV2.allFolderNames.includes(data.name), {
+          message: 'This folder name already exists',
+          path: ['name'],
+        })
+    } else {
+      return z.object({})
+    }
+  }
+
+  const FormSchema = getFormSchema()
+
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -103,23 +119,28 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     try {
       let folderId = selectedId
 
-      if (selectedId === 'new-folder') {
-        const { id } = await createFolder({ projectRef: ref, name: values.name })
+      if (selectedId === 'new-folder' && 'name' in values) {
+        const { id } = await createFolder({
+          projectRef: ref,
+          name: values.name,
+        })
         folderId = id
       }
 
       await Promise.all(
         snippets.map(async (snippet) => {
-          let snippetContent = (snippet as SnippetDetail)?.content
+          let snippetContent = (snippet as SnippetWithContent)?.content
           if (snippetContent === undefined) {
             const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-            snippetContent = content
+            if ('sql' in content) {
+              snippetContent = content
+            }
           }
 
           if (snippetContent === undefined) {
             return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
           } else {
-            moveSnippetAsync({
+            await moveSnippetAsync({
               projectRef: ref,
               payload: {
                 id: snippet.id,
@@ -129,7 +150,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 visibility: snippet.visibility,
                 project_id: snippet.project_id,
                 owner_id: snippet.owner_id,
-                folder_id: selectedId === 'root' ? (null as any) : folderId,
+                folder_id: selectedId === 'root' ? null : folderId,
                 content: snippetContent as any,
               },
             })
@@ -143,7 +164,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       snippets.forEach((snippet) => {
         snapV2.updateSnippet({
           id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? (null as any) : selectedId },
+          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : folderId },
           skipSave: true,
         })
       })
@@ -171,8 +192,8 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
               <DialogTitle>
-                Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`} to a
-                folder
+                Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`}{' '}
+                snippet{snippets.length > 1 ? 's' : ''} to a folder
               </DialogTitle>
               <DialogDescription>
                 Select which folder to move your quer{snippets.length > 1 ? 'ies' : 'y'} to
@@ -241,7 +262,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                             {folders?.map((folder) => (
                               <CommandItem_Shadcn_
                                 key={folder.id}
-                                value={folder.id}
+                                value={folder.name}
                                 className="cursor-pointer w-full justify-between"
                                 onSelect={() => {
                                   setOpen(false)

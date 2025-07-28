@@ -3,7 +3,7 @@ import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { toHast } from 'mdast-util-to-hast'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { visit } from 'unist-util-visit'
 
 import { REFERENCES } from '~/content/navigation.references'
@@ -15,7 +15,6 @@ import {
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { BASE_PATH } from '~/lib/constants'
 
 export async function GET(request: Request) {
@@ -30,8 +29,8 @@ export async function GET(request: Request) {
     slug = maybeVersion
   }
 
-  let section: AbbrevApiReferenceSection
-  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }>
+  let section: AbbrevApiReferenceSection | undefined
+  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }> = []
   try {
     const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
     sectionsWithUrl = flattenedSections.map((section) => {
@@ -52,7 +51,7 @@ export async function GET(request: Request) {
   } catch {}
 
   if (!section) {
-    redirect(notFoundLink(`${lib}/${slug}`))
+    notFound()
   }
 
   const html = htmlShell(
@@ -86,7 +85,6 @@ function htmlShell(
     `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
-    (version ? '/' + version : '') +
     (slug ? '/' + slug : '') +
     `">` +
     '</head>' +
@@ -158,9 +156,7 @@ async function functionDetails(
   return fullDescription + parameters + examples
 }
 
-function mdxToHtml(markdownUnescaped: string): string {
-  const markdown = markdownUnescaped.replace(/(?<!\\)\{/g, '\\{').replace(/(?<!\\)\}/g, '\\}')
-
+function mdxToHtml(markdown: string): string {
   const mdast = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],

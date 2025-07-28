@@ -1,4 +1,8 @@
-import type { GlobalMenuItems, NavMenuConstant } from '../Navigation.types'
+import type { ComponentProps } from 'react'
+
+import type { IconPanel } from 'ui-patterns/IconPanel'
+
+import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
@@ -44,11 +48,26 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/realtime',
             level: 'realtime',
           },
+        ],
+        [
+          { label: 'Postgres Modules' },
           {
             label: 'AI & Vectors',
             icon: 'ai',
             href: '/guides/ai',
             level: 'ai',
+          },
+          {
+            label: 'Cron',
+            icon: 'cron',
+            href: '/guides/cron',
+            level: 'cron',
+          },
+          {
+            label: 'Queues',
+            icon: 'queues',
+            href: '/guides/queues',
+            level: 'queues',
           },
         ],
       ],
@@ -60,16 +79,16 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
-            label: 'Local Dev / CLI',
+            label: 'Local Development & CLI',
             icon: 'dev-cli',
-            href: '/guides/cli',
-            level: 'reference_javascript',
+            href: '/guides/local-development',
+            level: 'local_development',
           },
           {
-            label: 'Platform',
-            icon: 'platform',
-            href: '/guides/platform',
-            level: 'platform',
+            label: 'Deployment',
+            icon: 'deployment',
+            href: '/guides/deployment',
+            level: 'deployment',
           },
           {
             label: 'Self-Hosting',
@@ -81,8 +100,40 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Integrations',
             icon: 'integrations',
             hasLightIcon: true,
-            href: 'https://supabase.com/partners/integrations',
+            href: '/guides/integrations',
             level: 'integrations',
+          },
+        ],
+      ],
+    },
+  ],
+  [
+    {
+      label: 'Manage',
+      menuItems: [
+        [
+          {
+            label: 'Platform Management',
+            icon: 'platform',
+            href: '/guides/platform',
+            level: 'platform',
+          },
+          {
+            label: 'Security & Compliance',
+            icon: 'security',
+            href: '/guides/security',
+            level: 'security',
+          },
+          {
+            label: 'Telemetry',
+            icon: 'telemetry',
+            href: '/guides/telemetry',
+            level: 'telemetry',
+          },
+          {
+            label: 'Troubleshooting',
+            icon: 'troubleshooting',
+            href: '/guides/troubleshooting',
           },
         ],
       ],
@@ -173,9 +224,9 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
-            label: 'Migration guides',
+            label: 'Glossary',
             icon: 'resources',
-            href: '/guides/resources',
+            href: '/guides/resources/glossary',
             level: 'resources',
           },
           {
@@ -213,8 +264,9 @@ export const gettingstarted: NavMenuConstant = {
       items: [
         { name: 'Next.js', url: '/guides/getting-started/quickstarts/nextjs' },
         { name: 'React', url: '/guides/getting-started/quickstarts/reactjs' },
-        { name: 'NuxtJS', url: '/guides/getting-started/quickstarts/nuxtjs' },
+        { name: 'Nuxt', url: '/guides/getting-started/quickstarts/nuxtjs' },
         { name: 'Vue', url: '/guides/getting-started/quickstarts/vue' },
+        { name: 'Hono', url: '/guides/getting-started/quickstarts/hono' },
         { name: 'Flutter', url: '/guides/getting-started/quickstarts/flutter' },
         { name: 'iOS SwiftUI', url: '/guides/getting-started/quickstarts/ios-swiftui' },
         {
@@ -316,6 +368,20 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Swift',
           url: '/guides/getting-started/tutorials/with-swift',
+        },
+      ],
+    },
+    {
+      name: 'AI Tools',
+      url: undefined,
+      items: [
+        {
+          name: 'Prompts',
+          url: '/guides/getting-started/ai-prompts',
+        },
+        {
+          name: 'Model context protocol (MCP)',
+          url: '/guides/getting-started/mcp',
         },
       ],
     },
@@ -504,6 +570,7 @@ export const auth = {
         },
       ],
     },
+
     {
       name: 'Concepts',
       items: [
@@ -564,6 +631,7 @@ export const auth = {
           ],
         },
         { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Web3 (Sign in with Solana)', url: '/guides/auth/auth-web3' },
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
         {
           name: 'Identity Linking',
@@ -584,12 +652,18 @@ export const auth = {
       ],
     },
     {
+      name: 'Debugging',
+      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
+    },
+    {
       name: 'Third-party auth',
       items: [
         { name: 'Overview', url: '/guides/auth/third-party/overview' },
+        { name: 'Clerk', url: '/guides/auth/third-party/clerk' },
         { name: 'Firebase Auth', url: '/guides/auth/third-party/firebase-auth' },
         { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
         { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
+        { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
       ],
     },
     {
@@ -628,6 +702,10 @@ export const auth = {
               name: 'Password verification hook',
               url: '/guides/auth/auth-hooks/password-verification-hook',
             },
+            {
+              name: 'Before User Created hook',
+              url: '/guides/auth/auth-hooks/before-user-created-hook',
+            },
           ],
         },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
@@ -640,7 +718,12 @@ export const auth = {
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
         { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
-        { name: 'JWTs', url: '/guides/auth/jwts' },
+        {
+          name: 'JSON Web Tokens (JWT)',
+          url: '/guides/auth/jwts',
+          items: [{ name: 'Claims Reference', url: '/guides/auth/jwt-fields' }],
+        },
+        { name: 'JWT Signing Keys', url: '/guides/auth/signing-keys' },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
           name: 'Column Level Security',
@@ -666,6 +749,58 @@ export const auth = {
   ],
 }
 
+const ormQuickstarts: NavMenuSection = {
+  name: 'ORM Quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'Prisma',
+      url: '/guides/database/prisma',
+      items: [
+        {
+          name: 'Prisma troubleshooting',
+          url: '/guides/database/prisma/prisma-troubleshooting',
+        },
+      ],
+    },
+    {
+      name: 'Drizzle',
+      url: '/guides/database/drizzle',
+    },
+    {
+      name: 'Postgres.js',
+      url: '/guides/database/postgres-js',
+    },
+  ],
+}
+
+const guiQuickstarts: NavMenuSection = {
+  name: 'GUI quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'pgAdmin',
+      url: '/guides/database/pgadmin',
+    },
+    {
+      name: 'PSQL',
+      url: '/guides/database/psql',
+    },
+    {
+      name: 'DBeaver',
+      url: '/guides/database/dbeaver',
+    },
+    {
+      name: 'Metabase',
+      url: '/guides/database/metabase',
+    },
+    {
+      name: 'Beekeeper Studio',
+      url: '/guides/database/beekeeper-studio',
+    },
+  ],
+}
+
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
@@ -679,12 +814,6 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
-          items: [
-            {
-              name: 'Serverless Drivers',
-              url: '/guides/database/connecting-to-postgres/serverless-drivers',
-            },
-          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -739,6 +868,20 @@ export const database: NavMenuConstant = {
           name: 'Partitioning your tables',
           url: '/guides/database/partitions',
         },
+        {
+          name: 'Managing connections',
+          url: '/guides/database/connection-management',
+        },
+      ],
+    },
+    {
+      name: 'OrioleDB',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/orioledb',
+        },
       ],
     },
     {
@@ -785,10 +928,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/configuration',
         },
         {
-          name: 'Managing database replication',
-          url: '/guides/database/replication',
-        },
-        {
           name: 'Query optimization',
           url: '/guides/database/query-optimization',
         },
@@ -819,6 +958,28 @@ export const database: NavMenuConstant = {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
         },
+        {
+          name: 'Supavisor',
+          url: '/guides/database/supavisor',
+        },
+      ],
+    },
+    ormQuickstarts,
+    guiQuickstarts,
+    {
+      name: 'Database replication',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/database/replication' },
+        {
+          name: 'Setting up replication',
+          url: '/guides/database/replication/setting-up-replication',
+        },
+        {
+          name: 'Monitoring replication',
+          url: '/guides/database/replication/monitoring-replication',
+        },
+        { name: 'FAQ', url: '/guides/database/replication/faq' },
       ],
     },
     {
@@ -831,7 +992,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/hypopg',
         },
         {
-          name: 'plv8: Javascript Language',
+          name: 'plv8 (deprecated)',
           url: '/guides/database/extensions/plv8',
         },
         {
@@ -847,7 +1008,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgaudit',
         },
         {
-          name: 'pgjwt: JSON Web Tokens',
+          name: 'pgjwt (deprecated)',
           url: '/guides/database/extensions/pgjwt',
         },
         {
@@ -859,7 +1020,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgrouting',
         },
         {
-          name: 'pg_cron: Job Scheduling',
+          name: 'pg_cron: Schedule Recurring Jobs',
           url: '/guides/database/extensions/pg_cron',
         },
         {
@@ -883,8 +1044,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_plan_filter',
         },
         {
-          name: 'pg_stat_monitor: Extended Query Performance Monitoring',
-          url: '/guides/database/extensions/pg_stat_monitor',
+          name: 'postgres_fdw: query data from an external Postgres server',
+          url: '/guides/database/extensions/postgres_fdw',
         },
         {
           name: 'pgvector: Embeddings and vector similarity',
@@ -895,8 +1056,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_stat_statements',
         },
         {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pg_repack',
+        },
+        {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
+        },
+        {
+          name: 'pgmq: Queues',
+          url: '/guides/database/extensions/pgmq',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',
@@ -911,7 +1080,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/plpgsql_check',
         },
         {
-          name: 'timescaledb: Time-series data',
+          name: 'timescaledb (deprecated)',
           url: '/guides/database/extensions/timescaledb',
         },
         {
@@ -953,12 +1122,24 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/bigquery',
         },
         {
+          name: 'Connecting to Clerk',
+          url: '/guides/database/extensions/wrappers/clerk',
+        },
+        {
           name: 'Connecting to ClickHouse',
           url: '/guides/database/extensions/wrappers/clickhouse',
         },
         {
+          name: 'Connecting to DuckDB',
+          url: '/guides/database/extensions/wrappers/duckdb',
+        },
+        {
           name: 'Connecting to Firebase',
           url: '/guides/database/extensions/wrappers/firebase',
+        },
+        {
+          name: 'Connecting to Iceberg',
+          url: '/guides/database/extensions/wrappers/iceberg',
         },
         {
           name: 'Connecting to Logflare',
@@ -967,6 +1148,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to MSSQL',
           url: '/guides/database/extensions/wrappers/mssql',
+        },
+        {
+          name: 'Connecting to Notion',
+          url: '/guides/database/extensions/wrappers/notion',
         },
         {
           name: 'Connecting to Paddle',
@@ -1006,6 +1191,45 @@ export const database: NavMenuConstant = {
           name: 'Replicating from Supabase to External Postgres',
           url: '/guides/database/postgres/setup-replication-external',
         },
+      ],
+    },
+  ],
+}
+
+export const cron: NavMenuConstant = {
+  icon: 'cron',
+  title: 'Cron',
+  url: '/guides/cron',
+  items: [
+    { name: 'Overview', url: '/guides/cron' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [
+        { name: 'Install', url: '/guides/cron/install' },
+        { name: 'Quickstart', url: '/guides/cron/quickstart' },
+      ],
+    },
+  ],
+}
+
+export const queues: NavMenuConstant = {
+  icon: 'queues',
+  title: 'Queues',
+  url: '/guides/queues',
+  items: [
+    { name: 'Overview', url: '/guides/queues' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+    },
+    {
+      name: 'References',
+      url: undefined,
+      items: [
+        { name: 'API', url: '/guides/queues/api' },
+        { name: 'PGMQ Extension', url: '/guides/queues/pgmq' },
       ],
     },
   ],
@@ -1127,55 +1351,37 @@ export const functions: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Create an Edge Function',
+          name: 'Quickstart (Dashboard)',
+          url: '/guides/functions/quickstart-dashboard',
+        },
+        {
+          name: 'Quickstart (CLI)',
           url: '/guides/functions/quickstart',
         },
         {
-          name: 'Deploy to Production',
-          url: '/guides/functions/deploy',
-        },
-        {
-          name: 'Setting up your editor',
-          url: '/guides/functions/local-development',
+          name: 'Development Environment',
+          url: '/guides/functions/development-environment',
         },
       ],
     },
     {
-      name: 'Guides',
+      name: 'Configuration',
       url: undefined,
       items: [
-        { name: 'Managing dependencies', url: '/guides/functions/import-maps' },
+        { name: 'Environment Variables', url: '/guides/functions/secrets' },
+        { name: 'Managing Dependencies', url: '/guides/functions/dependencies' },
+        { name: 'Function Configuration', url: '/guides/functions/function-configuration' },
+      ],
+    },
+    {
+      name: 'Development',
+      url: undefined,
+      items: [
+        { name: 'Error Handling', url: '/guides/functions/error-handling' },
+        { name: 'Routing', url: '/guides/functions/routing' },
         {
-          name: 'Managing environment variables',
-          url: '/guides/functions/secrets',
-        },
-        {
-          name: 'Integrating with Supabase Auth',
-          url: '/guides/functions/auth',
-        },
-        {
-          name: 'Integrating with Postgres',
-          url: '/guides/functions/connect-to-postgres',
-        },
-        {
-          name: 'Integrating with Supabase Storage',
-          url: '/guides/functions/storage-caching',
-        },
-        {
-          name: 'Handling Routing in Functions',
-          url: '/guides/functions/routing',
-        },
-        {
-          name: 'Running AI Models',
-          url: '/guides/functions/ai-models',
-        },
-        {
-          name: 'Deploying with CI / CD pipelines',
-          url: '/guides/functions/cicd-workflow',
-        },
-        {
-          name: 'Integrating with Log Drains',
-          url: '/guides/functions/log-drains',
+          name: 'Deploy to Production',
+          url: '/guides/functions/deploy',
         },
       ],
     },
@@ -1188,20 +1394,16 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/debugging-tools',
         },
         {
+          name: 'Testing your Functions',
+          url: '/guides/functions/unit-test',
+        },
+        {
           name: 'Logging',
           url: '/guides/functions/logging',
         },
         {
-          name: 'Troubleshooting Common Issues',
+          name: 'Troubleshooting',
           url: '/guides/functions/troubleshooting',
-        },
-        {
-          name: 'Testing your Edge Functions',
-          url: '/guides/functions/unit-test',
-        },
-        {
-          name: 'Monitoring with Sentry',
-          url: '/guides/functions/examples/sentry-monitoring',
         },
       ],
     },
@@ -1221,6 +1423,31 @@ export const functions: NavMenuConstant = {
           name: 'Limits',
           url: '/guides/functions/limits',
         },
+        {
+          name: 'Pricing',
+          url: '/guides/functions/pricing',
+        },
+      ],
+    },
+    {
+      name: 'Integrations',
+      url: undefined,
+      items: [
+        { name: 'Supabase Auth', url: '/guides/functions/auth' },
+        { name: 'Supabase Database (Postgres)', url: '/guides/functions/connect-to-postgres' },
+        { name: 'Supabase Storage', url: '/guides/functions/storage-caching' },
+      ],
+    },
+    {
+      name: 'Advanced Features',
+      url: undefined,
+      items: [
+        { name: 'Background Tasks', url: '/guides/functions/background-tasks' },
+        { name: 'File Storage', url: '/guides/functions/ephemeral-storage' },
+        { name: 'WebSockets', url: '/guides/functions/websockets' },
+        { name: 'Custom Routing', url: '/guides/functions/routing' },
+        { name: 'Wasm Modules', url: '/guides/functions/wasm' },
+        { name: 'AI Models', url: '/guides/functions/ai-models' },
       ],
     },
     {
@@ -1283,6 +1510,10 @@ export const functions: NavMenuConstant = {
           name: 'Slack Bot responding to mentions',
           url: '/guides/functions/examples/slack-bot-mention',
         },
+        {
+          name: 'Image Transformation & Optimization',
+          url: '/guides/functions/examples/image-manipulation',
+        },
       ],
     },
     {
@@ -1319,6 +1550,14 @@ export const functions: NavMenuConstant = {
           name: 'Type-Safe SQL with Kysely',
           url: '/guides/functions/kysely-postgres',
         },
+        {
+          name: 'Text To Speech with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-generate-speech-stream',
+        },
+        {
+          name: 'Speech Transcription with ElevenLabs',
+          url: '/guides/functions/examples/elevenlabs-transcribe-speech',
+        },
       ],
     },
   ],
@@ -1347,6 +1586,7 @@ export const realtime: NavMenuConstant = {
           name: 'Postgres Changes',
           url: '/guides/realtime/postgres-changes',
         },
+        { name: 'Settings', url: '/guides/realtime/settings' },
       ],
     },
     {
@@ -1381,8 +1621,10 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
+        { name: 'Pricing', url: '/guides/realtime/pricing' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
     },
     {
@@ -1465,6 +1707,7 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
         { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+        { name: 'Pricing', url: '/guides/storage/management/pricing' },
       ],
     },
     {
@@ -1473,6 +1716,25 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Authentication', url: '/guides/storage/s3/authentication' },
         { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
+      ],
+    },
+    {
+      name: 'Analytics Buckets',
+      url: undefined,
+      items: [
+        { name: 'Introduction', url: '/guides/storage/analytics/introduction' },
+        {
+          name: 'Creating Analytics Buckets',
+          url: '/guides/storage/analytics/creating-analytics-buckets',
+        },
+        {
+          name: 'Connecting to Analytics Buckets',
+          url: '/guides/storage/analytics/connecting-to-analytics-bucket',
+        },
+        {
+          name: 'Limits',
+          url: '/guides/storage/analytics/limits',
+        },
       ],
     },
     {
@@ -1543,6 +1805,10 @@ export const ai = {
           name: 'Vector indexes',
           url: '/guides/ai/vector-indexes',
           items: vectorIndexItems,
+        },
+        {
+          name: 'Automatic embeddings',
+          url: '/guides/ai/automatic-embeddings',
         },
         {
           name: 'Engineering for scale',
@@ -1679,63 +1945,174 @@ export const ai = {
   ],
 }
 
-export const supabase_cli: NavMenuConstant = {
+export const local_development: NavMenuConstant = {
   icon: 'dev-cli',
   title: 'Local Dev / CLI',
-  url: '/guides/cli',
+  url: '/guides/local-development',
   items: [
-    { name: 'Overview', url: '/guides/cli' },
+    { name: 'Overview', url: '/guides/local-development' },
     {
-      name: 'Using the CLI',
+      name: 'CLI',
       url: undefined,
       items: [
-        { name: 'Getting started', url: '/guides/cli/getting-started' },
-        { name: 'CLI Configuration', url: '/guides/cli/config' },
+        { name: 'Getting started', url: '/guides/local-development/cli/getting-started' },
+        { name: 'Configuration', url: '/guides/local-development/cli/config' },
+        { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
     {
-      name: 'Developing with Supabase',
+      name: 'Local development',
       url: undefined,
       items: [
-        { name: 'Local Development', url: '/guides/cli/local-development' },
+        { name: 'Getting started', url: '/guides/local-development/overview' },
         {
-          name: 'Managing environments',
-          url: '/guides/cli/managing-environments',
-        },
-        {
-          name: 'Managing config and secrets',
-          url: '/guides/cli/managing-config',
+          name: 'Declarative database schemas',
+          url: '/guides/local-development/declarative-database-schemas',
         },
         {
           name: 'Seeding your database',
-          url: '/guides/cli/seeding-your-database',
+          url: '/guides/local-development/seeding-your-database',
         },
         {
-          name: 'Testing and linting',
-          url: '/guides/cli/testing-and-linting',
+          name: 'Managing config and secrets',
+          url: '/guides/local-development/managing-config',
+        },
+        {
+          name: 'Restoring downloaded backup',
+          url: '/guides/local-development/restoring-downloaded-backup',
         },
         {
           name: 'Customizing email templates',
-          url: '/guides/cli/customizing-email-templates',
+          url: '/guides/local-development/customizing-email-templates',
         },
       ],
     },
     {
-      name: 'GitHub Action',
+      name: 'Testing',
       url: undefined,
       items: [
+        { name: 'Getting started', url: '/guides/local-development/testing/overview' },
         {
-          name: 'Generate types from your database',
-          url: '/guides/cli/github-action/generating-types',
+          name: 'pgTAP advanced guide',
+          url: '/guides/local-development/testing/pgtap-extended',
         },
+        { name: 'Database testing', url: '/guides/database/testing' },
         {
-          name: 'Automated testing',
-          url: '/guides/cli/github-action/testing',
+          name: 'RLS policies testing',
+          url: '/guides/database/extensions/pgtap#testing-rls-policies',
         },
+      ],
+    },
+  ],
+}
+
+export const contributing: NavMenuConstant = {
+  icon: 'contributing',
+  title: 'Contributing',
+  url: '/contributing',
+  items: [{ name: 'Overview', url: '/contributing' }],
+}
+
+export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
+  {
+    name: 'Auth0',
+    icon: '/docs/img/icons/auth0-icon',
+    url: '/guides/platform/migrating-to-supabase/auth0',
+    hasLightIcon: true,
+  },
+  {
+    name: 'Firebase Auth',
+    icon: '/docs/img/icons/firebase-icon',
+    url: '/guides/platform/migrating-to-supabase/firebase-auth',
+  },
+  {
+    name: 'Firestore Data',
+    icon: '/docs/img/icons/firebase-icon',
+    url: '/guides/platform/migrating-to-supabase/firestore-data',
+  },
+  {
+    name: 'Firebase Storage',
+    icon: '/docs/img/icons/firebase-icon',
+    url: '/guides/platform/migrating-to-supabase/firebase-storage',
+  },
+  {
+    name: 'Heroku',
+    icon: '/docs/img/icons/heroku-icon',
+    url: '/guides/platform/migrating-to-supabase/heroku',
+  },
+  {
+    name: 'Render',
+    icon: '/docs/img/icons/render-icon',
+    url: '/guides/platform/migrating-to-supabase/render',
+  },
+  {
+    name: 'Amazon RDS',
+    icon: '/docs/img/icons/aws-rds-icon',
+    url: '/guides/platform/migrating-to-supabase/amazon-rds',
+  },
+  {
+    name: 'Postgres',
+    icon: '/docs/img/icons/postgres-icon',
+    url: '/guides/platform/migrating-to-supabase/postgres',
+  },
+  {
+    name: 'Vercel Postgres',
+    icon: '/docs/img/icons/vercel-icon',
+    url: '/guides/platform/migrating-to-supabase/vercel-postgres',
+    hasLightIcon: true,
+  },
+  {
+    name: 'Neon',
+    icon: '/docs/img/icons/neon-icon',
+    url: '/guides/platform/migrating-to-supabase/neon',
+    hasLightIcon: true,
+  },
+  {
+    name: 'MySQL',
+    icon: '/docs/img/icons/mysql-icon',
+    url: '/guides/platform/migrating-to-supabase/mysql',
+  },
+  {
+    name: 'MSSQL',
+    icon: '/docs/img/icons/mssql-icon',
+    url: '/guides/platform/migrating-to-supabase/mssql',
+  },
+]
+
+export const security: NavMenuConstant = {
+  icon: 'security',
+  title: 'Security',
+  url: '/guides/security',
+  items: [
+    { name: 'Overview', url: '/guides/security' },
+    {
+      name: 'Product security',
+      url: undefined,
+      items: [
+        { name: 'Platform configuration', url: '/guides/security/platform-security' },
+        { name: 'Product configuration', url: '/guides/security/product-security' },
+        { name: 'Security testing', url: '/guides/security/security-testing' },
+      ],
+    },
+    {
+      name: 'Compliance',
+      url: undefined,
+      items: [
+        { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
+        { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+      ],
+    },
+    {
+      name: 'Guides',
+      url: undefined,
+      items: [
+        { name: 'Production Checklist', url: '/guides/deployment/going-into-prod' },
         {
-          name: 'Backup your database',
-          url: '/guides/cli/github-action/backups',
+          name: 'Shared Responsibility Model',
+          url: '/guides/deployment/shared-responsibility-model',
         },
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        { name: 'Hardening the Data API', url: '/guides/database/hardening-data-api' },
       ],
     },
   ],
@@ -1750,7 +2127,6 @@ export const platform: NavMenuConstant = {
       name: 'Add-ons',
       url: undefined,
       items: [
-        { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons' },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
         { name: 'IPv4 Address', url: '/guides/platform/ipv4-address' },
@@ -1758,55 +2134,83 @@ export const platform: NavMenuConstant = {
       ],
     },
     {
-      name: 'Logging and observability',
+      name: 'Upgrades & Migrations',
       url: undefined,
       items: [
-        { name: 'Logging', url: '/guides/platform/logs' },
-        { name: 'Advanced Log Filtering', url: '/guides/platform/advanced-log-filtering' },
-        { name: 'Log Drains', url: '/guides/platform/log-drains' },
-        { name: 'Metrics', url: '/guides/platform/metrics' },
-        { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
+        { name: 'Upgrading', url: '/guides/platform/upgrading' },
+        {
+          name: 'Migrating within Supabase',
+          url: '/guides/platform/migrating-within-supabase',
+          items: [
+            {
+              name: 'Restore Dashboard backup',
+              url: '/guides/platform/migrating-within-supabase/dashboard-restore',
+            },
+            {
+              name: 'Backup and restore using CLI',
+              url: '/guides/platform/migrating-within-supabase/backup-restore',
+            },
+          ],
+        },
+        {
+          name: 'Migrating to Supabase',
+          url: '/guides/platform/migrating-to-supabase',
+          items: MIGRATION_PAGES,
+        },
       ],
     },
     {
-      name: 'Platform Management',
+      name: 'Project & Account Management',
       url: undefined,
       items: [
-        { name: 'Regions', url: '/guides/platform/regions' },
-        { name: 'Database Size', url: '/guides/platform/database-size' },
-        { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
-        { name: 'Vercel Marketplace', url: '/guides/platform/vercel-marketplace' },
         {
-          name: 'HTTP Status Codes',
-          url: '/guides/platform/http-status-codes',
-        },
-        {
-          name: 'Migrating and Upgrading',
-          url: '/guides/platform/migrating-and-upgrading-projects',
+          name: 'Access Control',
+          url: '/guides/platform/access-control',
         },
         {
           name: 'Multi-factor Authentication',
           url: '/guides/platform/multi-factor-authentication',
+          items: [
+            {
+              name: 'Enforce MFA on organization',
+              url: '/guides/platform/mfa/org-mfa-enforcement',
+            },
+          ],
         },
         {
           name: 'Transfer Project',
           url: '/guides/platform/project-transfer',
         },
         {
+          name: 'Single Sign-On',
+          url: '/guides/platform/sso',
+          items: [
+            { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
+            {
+              name: 'SSO with Google Workspace',
+              url: '/guides/platform/sso/gsuite',
+            },
+            { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Platform Configuration',
+      url: undefined,
+      items: [
+        { name: 'Regions', url: '/guides/platform/regions' },
+        { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
+        { name: 'Database Size', url: '/guides/platform/database-size' },
+        { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
+        {
           name: 'Network Restrictions',
           url: '/guides/platform/network-restrictions',
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' },
-        { name: 'Branching', url: '/guides/platform/branching' },
-      ],
-    },
-    {
-      name: 'Security',
-      url: undefined,
-      items: [
-        { name: 'Access Control', url: '/guides/platform/access-control' },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' },
-        { name: 'Platform-required Permissions', url: '/guides/platform/permissions' },
+        { name: 'Default Platform Permissions', url: '/guides/platform/permissions' },
+        { name: 'PrivateLink', url: '/guides/platform/privatelink' },
       ],
     },
     {
@@ -1814,12 +2218,114 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'How billing works',
-          url: '/guides/platform/org-based-billing',
+          name: 'About billing on Supabase',
+          url: '/guides/platform/billing-on-supabase',
         },
         {
-          name: 'Spend caps and cost-controls',
-          url: '/guides/platform/spend-cap',
+          name: 'Get set up for billing',
+          url: '/guides/platform/get-set-up-for-billing',
+        },
+        {
+          name: 'Manage your subscription',
+          url: '/guides/platform/manage-your-subscription',
+        },
+        {
+          name: 'Manage your usage',
+          url: '/guides/platform/manage-your-usage',
+          items: [
+            {
+              name: 'Compute',
+              url: '/guides/platform/manage-your-usage/compute',
+            },
+            {
+              name: 'Egress',
+              url: '/guides/platform/manage-your-usage/egress',
+            },
+            {
+              name: 'Disk Size',
+              url: '/guides/platform/manage-your-usage/disk-size',
+            },
+            {
+              name: 'Disk Throughput',
+              url: '/guides/platform/manage-your-usage/disk-throughput',
+            },
+            {
+              name: 'Disk IOPS',
+              url: '/guides/platform/manage-your-usage/disk-iops',
+            },
+            {
+              name: 'Monthly Active Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users',
+            },
+            {
+              name: 'Monthly Active Third-Party Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-third-party',
+            },
+            {
+              name: 'Monthly Active SSO Users',
+              url: '/guides/platform/manage-your-usage/monthly-active-users-sso',
+            },
+            {
+              name: 'Storage Size',
+              url: '/guides/platform/manage-your-usage/storage-size',
+            },
+            {
+              name: 'Storage Image Transformations',
+              url: '/guides/platform/manage-your-usage/storage-image-transformations',
+            },
+            {
+              name: 'Edge Function Invocations',
+              url: '/guides/platform/manage-your-usage/edge-function-invocations',
+            },
+            {
+              name: 'Realtime Messages',
+              url: '/guides/platform/manage-your-usage/realtime-messages',
+            },
+            {
+              name: 'Realtime Peak Connections',
+              url: '/guides/platform/manage-your-usage/realtime-peak-connections',
+            },
+            {
+              name: 'Custom Domains',
+              url: '/guides/platform/manage-your-usage/custom-domains',
+            },
+            {
+              name: 'Point-in-Time Recovery',
+              url: '/guides/platform/manage-your-usage/point-in-time-recovery',
+            },
+            {
+              name: 'IPv4',
+              url: '/guides/platform/manage-your-usage/ipv4',
+            },
+            {
+              name: 'MFA Phone',
+              url: '/guides/platform/manage-your-usage/advanced-mfa-phone',
+            },
+            {
+              name: 'Read Replicas',
+              url: '/guides/platform/manage-your-usage/read-replicas',
+            },
+            {
+              name: 'Branching',
+              url: '/guides/platform/manage-your-usage/branching',
+            },
+            {
+              name: 'Log Drains',
+              url: '/guides/platform/manage-your-usage/log-drains',
+            },
+          ],
+        },
+        {
+          name: 'Your monthly invoice',
+          url: '/guides/platform/your-monthly-invoice',
+        },
+        {
+          name: 'Control your costs',
+          url: '/guides/platform/cost-control',
+        },
+        {
+          name: 'Credits',
+          url: '/guides/platform/credits',
         },
         {
           name: 'Billing FAQ',
@@ -1827,99 +2333,42 @@ export const platform: NavMenuConstant = {
         },
       ],
     },
+  ],
+}
+
+export const telemetry: NavMenuConstant = {
+  icon: 'telemetry',
+  title: 'Telemetry',
+  url: '/guides/telemetry',
+  items: [
+    { name: 'Overview', url: '/guides/telemetry' },
     {
-      name: 'Single sign-on',
+      name: 'Logging & observability',
       url: undefined,
       items: [
         {
-          name: 'Enable SSO for your organization',
-          url: '/guides/platform/sso',
-        },
-        { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
-        {
-          name: 'SSO with Google Workspace',
-          url: '/guides/platform/sso/gsuite',
-        },
-        { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
-      ],
-    },
-    {
-      name: 'Terraform',
-      url: undefined,
-      items: [
-        {
-          name: 'Terraform Provider',
-          url: '/guides/platform/terraform',
+          name: 'Logging',
+          url: '/guides/telemetry/logs',
         },
         {
-          name: 'Terraform Tutorial',
-          url: '/guides/platform/terraform/tutorial',
+          name: 'Advanced log filtering',
+          url: '/guides/telemetry/advanced-log-filtering',
         },
         {
-          name: 'Reference',
-          url: '/guides/platform/terraform/reference',
-        },
-      ],
-    },
-    {
-      name: 'Production Readiness',
-      url: undefined,
-      items: [
-        {
-          name: 'Shared Responsibility Model',
-          url: '/guides/platform/shared-responsibility-model',
+          name: 'Log drains',
+          url: '/guides/telemetry/log-drains',
         },
         {
-          name: 'Maturity Model',
-          url: '/guides/platform/maturity-model',
+          name: 'Reports',
+          url: '/guides/telemetry/reports',
         },
         {
-          name: 'Production Checklist',
-          url: '/guides/platform/going-into-prod',
-        },
-      ],
-    },
-    {
-      name: 'Integrations',
-      url: undefined,
-      items: [
-        {
-          name: 'Integrations Marketplace',
-          url: '/guides/platform/marketplace',
+          name: 'Metrics',
+          url: '/guides/telemetry/metrics',
         },
         {
-          name: 'Build a Supabase Integration',
-          url: '/guides/platform/oauth-apps/build-a-supabase-integration',
-        },
-        {
-          name: 'OAuth Scopes',
-          url: '/guides/platform/oauth-apps/oauth-scopes',
-        },
-      ],
-    },
-    {
-      name: 'Troubleshooting',
-      url: undefined,
-      items: [
-        {
-          name: 'HTTP and Project Issues',
-          url: '/guides/platform/troubleshooting',
-        },
-        {
-          name: 'High Disk IO Consumption',
-          url: '/guides/platform/exhaust-disk-io',
-        },
-        {
-          name: 'High CPU Usage',
-          url: '/guides/platform/exhaust-cpu',
-        },
-        {
-          name: 'High RAM Usage',
-          url: '/guides/platform/exhaust-ram',
-        },
-        {
-          name: 'High Swap Usage',
-          url: '/guides/platform/exhaust-swap',
+          name: 'Sentry integration',
+          url: '/guides/telemetry/sentry-monitoring',
         },
       ],
     },
@@ -1930,60 +2379,7 @@ export const resources: NavMenuConstant = {
   icon: 'resources',
   title: 'Resources',
   url: '/guides/resources',
-  items: [
-    { name: 'Examples', url: '/guides/resources/examples' },
-    { name: 'Glossary', url: '/guides/resources/glossary' },
-    {
-      name: 'Migrate to Supabase',
-      url: '/guides/resources/migrating-to-supabase',
-      items: [
-        {
-          name: 'Amazon RDS',
-          url: '/guides/resources/migrating-to-supabase/amazon-rds',
-          items: [],
-        },
-        {
-          name: 'Auth0',
-          url: '/guides/resources/migrating-to-supabase/auth0',
-        },
-        {
-          name: 'Firebase Auth',
-          url: '/guides/resources/migrating-to-supabase/firebase-auth',
-        },
-        {
-          name: 'Firebase Firestore',
-          url: '/guides/resources/migrating-to-supabase/firestore-data',
-        },
-        {
-          name: 'Firebase Storage',
-          url: '/guides/resources/migrating-to-supabase/firebase-storage',
-        },
-        {
-          name: 'Heroku Postgres',
-          url: '/guides/resources/migrating-to-supabase/heroku',
-        },
-        {
-          name: 'MySQL',
-          url: '/guides/resources/migrating-to-supabase/mysql',
-          items: [],
-        },
-        {
-          name: 'MSSQL',
-          url: '/guides/resources/migrating-to-supabase/mssql',
-          items: [],
-        },
-        {
-          name: 'Postgres',
-          url: '/guides/resources/migrating-to-supabase/postgres',
-          items: [],
-        },
-        {
-          name: 'Render',
-          url: '/guides/resources/migrating-to-supabase/render',
-        },
-      ],
-    },
-  ],
+  items: [{ name: 'Glossary', url: '/guides/resources/glossary' }],
 }
 
 export const self_hosting: NavMenuConstant = {
@@ -2048,16 +2444,107 @@ export const self_hosting: NavMenuConstant = {
   ],
 }
 
-export const migrate = {
-  title: 'Migrate to Supabase',
-  url: '/guides/migrate',
+export const deployment: NavMenuConstant = {
+  title: 'Deployment',
+  url: '/guides/deployment',
+  icon: 'deployment',
   items: [
-    { name: 'Firebase Auth', url: '/guides/migrations/firebase-auth' },
-    { name: 'Firestore Data', url: '/guides/migrations/firestore-data' },
-    { name: 'Firebase Storage', url: '/guides/migrations/firebase-storage' },
-    { name: 'Heroku', url: '/guides/migrations/heroku' },
-    { name: 'Render', url: '/guides/migrations/render' },
-    { name: 'Amazon RDS', url: '/guides/migrations/amazon-rds' },
+    { name: 'Overview', url: '/guides/deployment' },
+    {
+      name: 'Environments',
+      items: [
+        { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
+        { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
+      ],
+    },
+    {
+      name: 'Branching',
+      url: undefined,
+      items: [
+        { name: 'Overview', url: '/guides/deployment/branching' },
+        { name: 'GitHub integration', url: '/guides/deployment/branching/github-integration' },
+        {
+          name: 'Branching 2.0 (Alpha)',
+          url: '/guides/deployment/branching/branching-2',
+        },
+        {
+          name: 'Working with branches',
+          url: '/guides/deployment/branching/working-with-branches',
+        },
+        { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
+        { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
+        { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
+        { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
+      ],
+    },
+    {
+      name: 'Terraform',
+      items: [
+        { name: 'Terraform provider', url: '/guides/deployment/terraform' },
+        { name: 'Terraform tutorial', url: '/guides/deployment/terraform/tutorial' },
+        { name: 'Terraform reference', url: '/guides/deployment/terraform/reference' },
+      ],
+    },
+    {
+      name: 'Production readiness',
+      items: [
+        {
+          name: 'Shared responsibility model',
+          url: '/guides/deployment/shared-responsibility-model',
+        },
+        { name: 'Maturity model', url: '/guides/deployment/maturity-model' },
+        { name: 'Production checklist', url: '/guides/deployment/going-into-prod' },
+        { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
+      ],
+    },
+    {
+      name: 'CI/CD',
+      items: [
+        {
+          name: 'Generate types from your database',
+          url: '/guides/deployment/ci/generating-types',
+        },
+        { name: 'Automated testing', url: '/guides/deployment/ci/testing' },
+        { name: 'Back up your database', url: '/guides/deployment/ci/backups' },
+      ],
+    },
+  ],
+}
+
+export const integrations: NavMenuConstant = {
+  title: 'Integrations',
+  icon: 'integrations',
+  url: '/guides/integrations',
+  items: [
+    {
+      name: 'Overview',
+      url: '/guides/integrations',
+    },
+    {
+      name: 'Vercel Marketplace',
+      url: '/guides/integrations/vercel-marketplace',
+    },
+    {
+      name: 'Supabase Marketplace',
+      url: '/guides/integrations/supabase-marketplace',
+    },
+    {
+      name: 'Build Your Own',
+      url: undefined,
+      items: [
+        {
+          name: 'Build a Supabase integration',
+          url: '/guides/integrations/build-a-supabase-integration',
+          items: [
+            {
+              name: 'OAuth scopes',
+              url: '/guides/integrations/build-a-supabase-integration/oauth-scopes',
+            },
+          ],
+        },
+      ],
+    },
+    { name: 'Integrations', url: undefined, items: [] },
   ],
 }
 
@@ -2247,6 +2734,17 @@ export const reference_kotlin_v2 = {
   },
 }
 
+export const reference_kotlin_v3 = {
+  icon: 'reference-kotlin',
+  title: 'kotlin',
+  url: 'guides/reference/kotlin',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase-community/supabase-kt',
+    repo: 'https://github.com/supabase-community/supabase-kt',
+  },
+}
+
 export const reference_cli = {
   icon: 'reference-cli',
   title: 'Supabase CLI',
@@ -2339,7 +2837,7 @@ export const references = [
       },
       {
         label: 'supabase-kt',
-        versions: ['v2', 'v1'],
+        versions: ['v3', 'v2', 'v1'],
         description: 'something about the reference',
         icon: '/docs/img/icons/kotlin-icon.svg',
         url: '/reference/kotlin/start',
@@ -2389,7 +2887,10 @@ export const references = [
 ]
 
 export const navDataForMdx = {
+  migrationPages: MIGRATION_PAGES,
   nativeMobileLoginItems: NativeMobileLoginItems,
   phoneLoginsItems: PhoneLoginsItems,
   socialLoginItems: SocialLoginItems,
+  ormQuickstarts,
+  guiQuickstarts,
 }

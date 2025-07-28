@@ -1,6 +1,6 @@
 import { Button, Form, Input, Modal } from 'ui'
 
-type SavedQuery = { name: string; description: string | null }
+type SavedQuery = { name: string; description?: string }
 
 export interface UpdateSavedQueryProps {
   visible: boolean
@@ -31,7 +31,7 @@ export const UpdateSavedQueryModal = ({
       onCancel={onCancel}
       hideFooter
       header="Update saved query"
-      size="small"
+      size="medium"
     >
       <Form
         onReset={onCancel}

@@ -70,7 +70,7 @@ const DropAllReplicasConfirmationModal = ({
       }}
     >
       <p className="text-sm">Before deleting all replicas, consider:</p>
-      <ul className="text-sm text-foreground-light list-disc">
+      <ul className="text-sm text-foreground-light list-disc pl-6">
         <li>Network traffic from this region may slow down</li>
       </ul>
     </ConfirmationModal>

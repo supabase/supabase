@@ -5,10 +5,10 @@ import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 
 const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
@@ -16,10 +16,12 @@ const SignInSSOForm = () => {
   const queryClient = useQueryClient()
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
-  const [lastSignInUsed, setLastSignInUsed] = useLastSignIn()
+  const [_, setLastSignInUsed] = useLastSignIn()
+
   const signInSchema = object({
     email: string().email('Must be a valid email').required('Email is required'),
   })
+
   const onSignIn = async ({ email }: { email: string }) => {
     const toastId = toast.loading('Signing in...')
 
@@ -35,7 +37,7 @@ const SignInSSOForm = () => {
         process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
           ? location.origin
           : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/sign-in-mfa`
+      }${BASE_PATH}/sign-in-mfa?method=sso`
     )
 
     const { data, error } = await auth.signInWithSSO({

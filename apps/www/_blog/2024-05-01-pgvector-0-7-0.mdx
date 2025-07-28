@@ -165,7 +165,7 @@ And new distance types for indexing:
 create index on items using hnsw (embedding vector_l1_ops);
 ```
 
-[Hamming distance](https://www.notion.so/What-s-new-in-pgvector-0-7-0-fd27d50c8d7e4186a0a4a4bc8b69c7ab?pvs=21) - added in 0.7.0
+[Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance) - added in 0.7.0
 
 ```sql
 create index on items using hnsw (embedding bit_hamming_ops);
