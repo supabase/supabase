@@ -20,24 +20,24 @@ function generateIndustrySQL(activeFilters) {
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
-  return `SELECT 
-  CASE 
-    WHEN industry_normalized = 'Developer tools and platforms' THEN 'Dev tools'
-    WHEN industry_normalized = 'AI / ML tools' THEN 'AI / ML'
-    WHEN industry_normalized IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry_normalized
-    ELSE 'Other'
-  END AS industry_normalized, 
+  return `WITH industry_mapping AS (
+  SELECT 
+    industry_normalized,
+    CASE 
+      WHEN industry_normalized = 'Developer tools and platforms' THEN 'Dev tools'
+      WHEN industry_normalized = 'AI / ML tools' THEN 'AI / ML'
+      WHEN industry_normalized IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry_normalized
+      ELSE 'Other'
+    END AS industry_clean
+  FROM responses_2025
+  ${whereClause}
+)
+SELECT 
+  industry_clean AS industry_normalized,
   COUNT(*) AS total
-FROM responses_2025
-${whereClause}
-GROUP BY CASE 
-    WHEN industry_normalized = 'Developer tools and platforms' THEN 'Dev tools'
-    WHEN industry_normalized = 'AI / ML tools' THEN 'AI / ML'
-    WHEN industry_normalized IN ('SaaS', 'Dev tools', 'AI / ML', 'Consumer', 'Education', 'eCommerce', 'Fintech', 'Healthtech') THEN industry_normalized
-    ELSE 'Other'
-  END
-ORDER BY total DESC;
-`
+FROM industry_mapping
+GROUP BY industry_clean
+ORDER BY total DESC;`
 }
 
 export function IndustryChart() {

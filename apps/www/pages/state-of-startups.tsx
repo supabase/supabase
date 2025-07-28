@@ -50,6 +50,8 @@ import { NewslettersPaidForChart } from '~/components/SurveyResults/NewslettersP
 import { PodcastsListenedToChart } from '~/components/SurveyResults/PodcastsListenedToChart'
 import { RegularSocialMediaUseChart } from '~/components/SurveyResults/RegularSocialMediaUseChart'
 import { SurveyStatWrapper } from '~/components/SurveyResults/SurveyStatWrapper'
+import { SurveySummarizedAnswer } from '~/components/SurveyResults/SurveySummarizedAnswer'
+import { SurveyWordCloud } from '~/components/SurveyResults/SurveyWordCloud'
 
 interface FormData {
   email: string
@@ -307,10 +309,50 @@ function StateOfStartupsPage() {
             </SurveyStatWrapper>
             <IndustryChart />
 
-            {/* Ranked answers and Rotating psuedo-quote subsections */}
+            <SurveySummarizedAnswer
+              label="Problems being solved by startups"
+              // TODO: loop through data from database
+              answers={[
+                'AI-powered productivity tools',
+                'Agent workflows (internal or customer-facing)',
+                'Career preparation and job search',
+                'AI copilots for small businesses',
+                'AI-enhanced education and tutoring',
+                'Tools for solopreneurs and creators',
+                'Developer experience and API abstraction',
+                'Sales and outreach automation',
+                'Healthcare access and diagnostics',
+                'Financial planning and forecasting',
+                'Sustainability and climate data',
+                'Privacy and compliance automation',
+                'Time management and prioritization',
+                'Collaboration and communication',
+                'Mental health and wellness tracking',
+              ]}
+            />
 
             <SurveyPullQuote
               quote="We’re experimenting in edtech for underserved regions. It’s early, but we’re learning fast."
+              author="John Doe"
+              authorPosition="Founder"
+              authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
+            />
+          </SurveySubSection>
+
+          <SurveySubSection
+            number={2.2}
+            title="Traction and Early Growth"
+            description="One in five startups joined an accelerator. Y Combinator is the most common choice, especially in North America. Elsewhere, participation was more evenly distributed. Pivoting remains the norm, and less than half of startups are monetizing today."
+          >
+            <SurveyStatWrapper>
+              <SurveyStatCard number={18} unit="%" label="Joined accelerators" />
+              <SurveyStatCard number={59} unit="%" label="Pivoted at least once" />
+              <SurveyStatCard number={58} unit="%" label="Pre-revenue" />
+            </SurveyStatWrapper>
+            <AcceleratorParticipationChart />
+
+            <SurveyPullQuote
+              quote="We joined an accelerator outside the US, which gave us credibility but we still had to pivot twice."
               author="John Doe"
               authorPosition="Founder"
               authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
@@ -320,31 +362,87 @@ function StateOfStartupsPage() {
 
         <SurveySection
           number={3}
-          title="Tech Stack"
+          title="What’s in a Startup’s Tech Stack"
           description="The modern stack centers around open tools, modular infrastructure, and cautious spending."
         >
-          <p>TODO</p>
-          {/* <FrontendStackChart />
-          <BackendStackChart />
-          <DatabasesChart />
-          <DataWarehousesChart />
-          <VectorDatabasesChart />
-          <OpenTelemetryChart />
-          <ObservabilityChart />
-          <CloudProvidersChart />
-          <MustHaveDevToolsChart />
-          <AICodingToolsChart />
-          <SubscriptionsChart /> */}
+          <SurveySubSection
+            number={3.1}
+            title="Frameworks and Cloud Infra"
+            description="Supabase and Postgres dominate backend infra. React and Node top the frontend and backend respectively. Cursor, Claude, and VS Code lead AI-assisted development. Developer tools like GitHub, Stripe, and Postman round out the stack."
+          >
+            <SurveyStatWrapper>
+              <SurveyStatCard number={75} unit="%" label="JavaScript framework in frontend stack" />
+              <SurveyStatCard number={61} unit="%" label="Node.js in backend stack" />
+              <SurveyStatCard number={62} unit="%" label="Supabase as cloud provider stack" />
+              <SurveyStatCard number={30} unit="%" label="Sentry in observability stack" />
+              <SurveyStatCard number={75} unit="%" label="Supabase for databases" />
+            </SurveyStatWrapper>
+            <DatabasesChart />
+
+            <SurveyPullQuote
+              quote="Supabase gave us everything we needed out of the box. We hooked it up in a weekend and haven’t looked back."
+              author="John Doe"
+              authorPosition="Founder"
+              authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
+            />
+          </SurveySubSection>
+
+          <SurveySubSection
+            number={3.2}
+            title="Dev Tools and Time Savers"
+            description="AI coding tools are indispensable for startups, and not just Cursor and Visual Studio Code. ‘Vibe coding’ tools like Loveable, Bolt.new, and v0 are also common."
+          >
+            <SurveyStatWrapper>
+              <SurveyStatCard number={57} unit="%" label="Pay for OpenAI or ChatGPT" />
+              <SurveyStatCard number={37} unit="%" label="Pay for Cursor" />
+              <SurveyStatCard number={27} unit="%" label="Pay for Claude" />
+              <SurveyStatCard number={5} unit="%" label="Pay nothing for AI tools" />
+            </SurveyStatWrapper>
+            <AICodingToolsChart />
+
+            <SurveyWordCloud
+              label="Dev tools that are must-have for founders"
+              // TODO: loop through data from database
+              answers={['Supabase', 'Vercel', 'Postgres', 'Tailwind', 'Next.js']}
+            />
+
+            <SurveySummarizedAnswer
+              label="What founders wish for in dev tools"
+              // TODO: loop through data from database
+              answers={[
+                'Unified backend platform combining auth, edge, database, and queues',
+                'AI agents with real memory and workflow context',
+                'Local-first dev environments that sync to Supabase or Git',
+                'AI copilots for sales, marketing, or documentation',
+                'UI builders with direct-to-code export and stateful logic',
+                'Better CLI-driven or REPL-native dev tools',
+                'Automated integration layers between SaaS APIs',
+                'Real-time dashboards that don’t require BI tools',
+                'Supabase + Neon or PlanetScale seamless sync',
+                'One-click staging, testing, and preview environments',
+                'AI validators for production database migrations',
+                'Visual version control and state inspection for app logic',
+                'Time-aware tools (versioned environments, snapshots, undoable infra)',
+                'GPT-based toolchain composers (meta-dev agents)',
+                'Agent-like task runners for cron jobs, workflows, monitoring',
+              ]}
+            />
+
+            <SurveyPullQuote
+              quote="I spend less time fighting code thanks to Cursor and Claude. It’s like pair programming without the scheduling."
+              author="John Doe"
+              authorPosition="Founder"
+              authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
+            />
+          </SurveySubSection>
         </SurveySection>
 
-        <SurveySection
+        {/* <SurveySection
           number={4}
           title="Go-To-Market"
           description="Startups start selling through networks and dev communities, then layer in more structured growth."
         >
           <p>TODO</p>
-          {/* <SalesToolsChart />
-          <PricingChart /> */}
         </SurveySection>
 
         <SurveySection
@@ -353,10 +451,7 @@ function StateOfStartupsPage() {
           description="Communities are the learning engine behind every early-stage startup."
         >
           <p>TODO</p>
-          {/* <NewslettersPaidForChart />
-          <PodcastsListenedToChart />
-          <RegularSocialMediaUseChart /> */}
-        </SurveySection>
+        </SurveySection> */}
       </DefaultLayout>
     </>
   )

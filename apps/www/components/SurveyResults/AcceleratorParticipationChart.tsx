@@ -6,16 +6,16 @@ function generateAcceleratorParticipationSQL(activeFilters: Record<string, strin
   // Always filter out NULL values
   whereClauses.push(`accelerator_participation_normalized IS NOT NULL`)
 
+  if (activeFilters.role !== 'unset') {
+    whereClauses.push(`previous_company = '${activeFilters.previous_company}'`)
+  }
+
   if (activeFilters.headquarters !== 'unset') {
     whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
   }
 
-  if (activeFilters.role !== 'unset') {
-    whereClauses.push(`role = '${activeFilters.role}'`)
-  }
-
-  if (activeFilters.money_raised !== 'unset') {
-    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
+  if (activeFilters.funding_stage !== 'unset') {
+    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
   }
 
   const whereClause = `WHERE ${whereClauses.join('\n  AND ')}`
@@ -34,7 +34,7 @@ export function AcceleratorParticipationChart() {
     <GenericChartWithQuery
       title="If your startup has participated in an accelerator, which one?"
       targetColumn="accelerator_participation_normalized"
-      filterColumns={['headquarters', 'role', 'money_raised']}
+      filterColumns={['previous_company', 'headquarters', 'funding_stage']}
       generateSQLQuery={generateAcceleratorParticipationSQL}
     />
   )
