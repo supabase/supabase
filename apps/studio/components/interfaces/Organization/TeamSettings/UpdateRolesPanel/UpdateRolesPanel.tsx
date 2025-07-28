@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
@@ -85,20 +86,25 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     allRoles !== undefined
       ? formatMemberRoleToProjectRoleConfiguration(member, allRoles, projects ?? [])
       : []
+  const originalConfigurationType =
+    originalConfiguration.length === 1 &&
+    !!orgScopedRoles.find((r) => r.id === originalConfiguration[0].roleId)
+      ? 'org-scope'
+      : 'project-scope'
+
   const orgProjects = (projects ?? []).filter((p) => p.organization_id === organization?.id)
   const isApplyingRoleToAllProjects =
     projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
   const canSaveRoles = projectsRoleConfiguration.length > 0
 
   const lowerPermissionsRole = orgScopedRoles.find((r) => r.name === 'Developer')?.id
-  const sortByObject: any = ['Owner', 'Administrator', 'Developer'].reduce((obj, item, index) => {
-    return { ...obj, [item]: index }
-  }, {})
   const noAccessProjects = orgProjects.filter((project) => {
     return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
   })
   const numberOfProjectsWithAccess = orgProjects.length - noAccessProjects.length
   const numberOfAccessHasChanges = originalConfiguration.length !== noAccessProjects.length
+
+  const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
   const onSelectProject = (ref: string) => {
     setProjectsRoleConfiguration(
@@ -131,17 +137,25 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     }
   }
 
-  const onToggleApplyToAllProjects = () => {
-    const roleIdToApply =
-      projectsRoleConfiguration[0]?.roleId ?? lowerPermissionsRole ?? orgScopedRoles[0].id
-    if (isApplyingRoleToAllProjects) {
-      setProjectsRoleConfiguration(
-        orgProjects.map((p) => {
-          return { ref: p.ref, projectId: p.id, roleId: roleIdToApply }
-        })
-      )
+  const onToggleApplyToAllProjects = (isApplyAllProjects: boolean) => {
+    const roleIdToApply = lowerPermissionsRole ?? orgScopedRoles[0].id
+
+    if (isApplyAllProjects) {
+      if (originalConfigurationType === 'org-scope') {
+        setProjectsRoleConfiguration(originalConfiguration)
+      } else {
+        setProjectsRoleConfiguration([{ ref: undefined, roleId: roleIdToApply }])
+      }
     } else {
-      setProjectsRoleConfiguration([{ ref: undefined, roleId: roleIdToApply }])
+      if (originalConfigurationType === 'project-scope') {
+        setProjectsRoleConfiguration(originalConfiguration)
+      } else {
+        setProjectsRoleConfiguration(
+          orgProjects.map((p) => {
+            return { ref: p.ref, projectId: p.id, roleId: roleIdToApply }
+          })
+        )
+      }
     }
   }
 
@@ -275,7 +289,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       <SelectItem_Shadcn_
                                         key={role.id}
                                         value={role.id.toString()}
-                                        className="text-sm"
+                                        className="text-sm hover:bg-selection cursor-pointer"
                                         disabled={!canAssignRole}
                                       >
                                         {role.name}
@@ -288,22 +302,21 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           )}
 
                           {!isApplyingRoleToAllProjects && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type="text"
-                                  disabled={!canRemoveRole}
-                                  className="px-1"
-                                  icon={<X />}
-                                  onClick={() => onRemoveProject(project?.ref)}
-                                />
-                              </TooltipTrigger>
-                              {!canRemoveRole && (
-                                <TooltipContent side="bottom">
-                                  Additional permission required to remove role from member
-                                </TooltipContent>
-                              )}
-                            </Tooltip>
+                            <ButtonTooltip
+                              type="text"
+                              disabled={!canRemoveRole}
+                              className="px-1"
+                              icon={<X />}
+                              onClick={() => onRemoveProject(project?.ref)}
+                              tooltip={{
+                                content: {
+                                  side: 'bottom',
+                                  text: !canRemoveRole
+                                    ? 'Additional permission required to remove role from member'
+                                    : 'Remove access to project',
+                                },
+                              }}
+                            />
                           )}
                         </div>
                       </div>
@@ -363,13 +376,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               </Button>
               <Button
                 loading={false}
-                disabled={!canSaveRoles}
+                disabled={!canSaveRoles || hasNoChanges}
                 onClick={() => {
-                  if (isEqual(projectsRoleConfiguration, originalConfiguration)) {
-                    onClose()
-                  } else {
-                    setShowConfirmation(true)
-                  }
+                  setShowConfirmation(true)
                 }}
               >
                 Save roles

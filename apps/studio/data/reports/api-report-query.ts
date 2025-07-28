@@ -65,7 +65,7 @@ export const useApiReport = () => {
   // [Joshen] Keeping database selector separate from filter state, and merging them here for simplicity
   const formattedFilters: ReportFilterItem[] = [
     ...filters,
-    ...(identifier !== undefined && identifier !== project?.ref
+    ...(identifier !== undefined
       ? [{ key: 'identifier', value: `'${identifier}'`, compare: 'is' } as ReportFilterItem]
       : []),
   ]

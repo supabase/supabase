@@ -1542,6 +1542,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/local-quickstart',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
@@ -1988,6 +1993,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/enterprise',
+    destination: '/solutions/enterprise',
+  },
+  {
+    permanent: true,
     source: '/legal/soc2',
     destination: 'https://forms.supabase.com/soc2',
   },
@@ -2374,6 +2384,12 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/integrations/zuplo',
     destination: '/partners/integrations/zuplo',
+  },
+  // toddle.dev pivoted to nordcraft
+  {
+    permanent: true,
+    source: '/partners/integrations/toddle',
+    destination: '/partners/integrations/nordcraft',
   },
   {
     permanent: true,
@@ -2836,11 +2852,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/monitoring-troubleshooting/:path*',
-    destination: '/docs/guides/telemetry/:path*',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
     destination: '/docs/guides/troubleshooting/http-api-issues',
   },
@@ -2868,6 +2879,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/http-status-codes',
     destination: '/docs/guides/troubleshooting/http-status-codes',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-troubleshooting/:path*',
+    destination: '/docs/guides/telemetry/:path*',
   },
   {
     permanent: true,
@@ -2969,6 +2985,16 @@ module.exports = [
     source: '/docs/guides/platform/spend-cap',
     destination: '/docs/guides/platform/cost-control#spend-cap',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/project-management/api',
+    destination: '/docs/reference/api/introduction',
+  },
+  {
+    permanent: false,
+    source: '/mcp',
+    destination: '/docs/guides/getting-started/mcp',
+  },
 
   // marketing
 
@@ -2988,5 +3014,10 @@ module.exports = [
     permanent: true,
     source: '/features/fly-postgres',
     destination: '/features/postgres-database',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/fly-postgres',
+    destination: '/docs/guides/database/overview',
   },
 ]

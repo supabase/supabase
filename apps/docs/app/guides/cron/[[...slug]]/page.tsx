@@ -9,7 +9,8 @@ export const dynamicParams = false
 
 type Params = { slug?: string[] }
 
-const CronGuidePage = async ({ params }: { params: Params }) => {
+const CronGuidePage = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const slug = ['cron', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 

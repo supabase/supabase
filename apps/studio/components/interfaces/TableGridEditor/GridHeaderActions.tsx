@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useTrackedState } from 'components/grid/store/Store'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
@@ -22,9 +21,12 @@ import {
   isView as isTableLikeView,
 } from 'data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -42,17 +44,15 @@ import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
-  canEditViaTableEditor: boolean
 }
 
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
 
   // need project lints to get security status for views
-  const { data: lints = [] } = useProjectLintsQuery({
-    projectRef: project?.ref,
-  })
+  const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
 
   const isTable = isTableLike(table)
   const isForeignTable = isTableLikeForeignTable(table)
@@ -71,13 +71,12 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     },
   })
 
-  const [open, setOpen] = useState(false)
   const [showEnableRealtime, setShowEnableRealtime] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isAutofixViewSecurityModalOpen, setIsAutofixViewSecurityModalOpen] = useState(false)
-  const state = useTrackedState()
-  const { selectedRows } = state
-  const showHeaderActions = selectedRows.size === 0
+
+  const snap = useTableEditorTableStateSnapshot()
+  const showHeaderActions = snap.selectedRows.size === 0
 
   const projectRef = project?.ref
   const { data } = useDatabasePoliciesQuery({
@@ -131,6 +130,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       table.schema
     )
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const toggleRealtime = async () => {
     if (!project) return console.error('Project is required')
     if (!realtimePublication) return console.error('Unable to find realtime publication')
@@ -143,6 +144,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
       : realtimeEnabledTables
           .filter((x: any) => x.id != table.id)
           .map((x: any) => `${x.schema}.${x.name}`)
+
+    sendEvent({
+      action: 'realtime_toggle_table_clicked',
+      properties: {
+        newState: exists ? 'disabled' : 'enabled',
+        origin: 'tableGridHeader',
+      },
+      groups: {
+        project: project?.ref ?? 'Unknown',
+        organization: org?.slug ?? 'Unknown',
+      },
+    })
 
     updatePublications({
       projectRef: project?.ref,
@@ -164,14 +177,15 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
     updateTable({
       projectRef: project?.ref!,
       connectionString: project?.connectionString,
-      id: payload.id,
+      id: table.id,
+      name: table.name,
       schema: table.schema,
       payload: payload,
     })
   }
 
   return (
-    <>
+    <div className="sb-grid-header__inner">
       {showHeaderActions && (
         <div className="flex items-center gap-x-2">
           {isReadOnly && (
@@ -243,13 +257,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 )}
               </>
             ) : (
-              <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+              <Popover_Shadcn_ modal={false}>
                 <PopoverTrigger_Shadcn_ asChild>
                   <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
                 </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+                <PopoverContent_Shadcn_
+                  // using `portal` for a safari fix. issue with rendering outside of body element
+                  portal
+                  className="min-w-[395px] text-sm"
+                  align="end"
+                >
                   <h3 className="flex items-center gap-2">
                     <Lock size={16} /> Row Level Security (RLS)
                   </h3>
@@ -278,13 +297,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             )
           ) : null}
           {isView && viewHasLints && (
-            <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+            <Popover_Shadcn_ modal={false}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -323,13 +347,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Popover_Shadcn_>
           )}
           {isMaterializedView && materializedViewHasLints && (
-            <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+            <Popover_Shadcn_ modal={false}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
                   Security Definer view
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure your View
                 </h3>
@@ -360,20 +389,26 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
             </Popover_Shadcn_>
           )}
           {isForeignTable && table.schema === 'public' && (
-            <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+            <Popover_Shadcn_ modal={false}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                  Foreign table is accessible via your project's APIs
+                  Unprotected Data API access
                 </Button>
               </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <PopoverContent_Shadcn_
+                // using `portal` for a safari fix. issue with rendering outside of body element
+                portal
+                className="min-w-[395px] text-sm"
+                align="end"
+              >
                 <h3 className="flex items-center gap-2">
                   <Unlock size={16} /> Secure Foreign table
                 </h3>
                 <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                   <p>
-                    Foreign tables do not enforce RLS. Move them to a private schema not exposed to
-                    Postgrest or disable Postgrest.
+                    Foreign tables do not enforce RLS, which may allow unrestricted access. To
+                    secure them, either move foreign tables to a private schema not exposed by
+                    PostgREST, or <a href="">disable PostgREST access</a> entirely.
                   </p>
 
                   <div className="mt-2">
@@ -452,7 +487,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           onSelectConfirm={onToggleRLS}
         />
       )}
-    </>
+    </div>
   )
 }
 

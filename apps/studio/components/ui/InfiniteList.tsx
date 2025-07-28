@@ -111,33 +111,34 @@ function InfiniteList<T, P>({
 
   return (
     <>
-      <AutoSizer>
-        {({ height, width }: { height: number; width: number }) => (
-          <InfiniteLoader
-            itemCount={itemCount}
-            isItemLoaded={isItemLoaded}
-            loadMoreItems={loadMoreItems}
-          >
-            {({ onItemsRendered, ref }) => (
-              <VariableSizeList
-                ref={(refy) => {
-                  ref(refy)
-                  listRef.current = refy
-                }}
-                height={height ?? 0}
-                width={width ?? 0}
-                itemCount={itemCount}
-                itemData={itemData}
-                itemSize={getItemSize}
-                onItemsRendered={onItemsRendered}
-              >
-                {Item}
-              </VariableSizeList>
-            )}
-          </InfiniteLoader>
-        )}
-      </AutoSizer>
-
+      <div className="flex-grow">
+        <AutoSizer>
+          {({ height, width }: { height: number; width: number }) => (
+            <InfiniteLoader
+              itemCount={itemCount}
+              isItemLoaded={isItemLoaded}
+              loadMoreItems={loadMoreItems}
+            >
+              {({ onItemsRendered, ref }) => (
+                <VariableSizeList
+                  ref={(refy) => {
+                    ref(refy)
+                    listRef.current = refy
+                  }}
+                  height={height ?? 0}
+                  width={width ?? 0}
+                  itemCount={itemCount}
+                  itemData={itemData}
+                  itemSize={getItemSize}
+                  onItemsRendered={onItemsRendered}
+                >
+                  {Item}
+                </VariableSizeList>
+              )}
+            </InfiniteLoader>
+          )}
+        </AutoSizer>
+      </div>
       <div
         style={{
           position: 'absolute',

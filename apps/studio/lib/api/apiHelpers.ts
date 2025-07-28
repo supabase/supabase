@@ -1,5 +1,5 @@
-import { snakeCase } from 'lodash'
 import { IS_PLATFORM } from 'lib/constants'
+import { snakeCase } from 'lodash'
 
 /**
  * Construct headers for api request.
@@ -13,6 +13,7 @@ export function constructHeaders(headers: { [prop: string]: any }) {
     const cleansedHeaders = {
       Accept: headers.Accept,
       Authorization: headers.Authorization,
+      cookie: headers.cookie,
       'Content-Type': headers['Content-Type'],
       'x-connection-encrypted': headers['x-connection-encrypted'],
     } as any

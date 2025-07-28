@@ -138,6 +138,7 @@ export const QueuesSettings = () => {
             projectRef: project?.ref,
             connectionString: project?.connectionString,
             id: x.id,
+            name: x.name,
             schema: x.schema,
             payload: { id: x.id, rls_enabled: true },
           })

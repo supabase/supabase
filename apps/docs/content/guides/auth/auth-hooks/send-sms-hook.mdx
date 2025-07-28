@@ -464,7 +464,7 @@ const sendTextMessage = async (
 
 Deno.serve(async (req) => {
   const payload = await req.text()
-  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET')
+  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET').replace('v1,whsec_', '')
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret)
   try {
@@ -494,7 +494,7 @@ Deno.serve(async (req) => {
       )
     }
     return new Response(
-      {},
+      JSON.stringify({}),
       {
         status: 200,
         headers: {
@@ -527,12 +527,8 @@ Deno.serve(async (req) => {
 Your company is expanding into Latin America and would like to use WhatsApp for higher deliverability. Write a hook to send WhatsApp messages to requests from the continent and SMS messages to all other numbers.
 
 ```javascript
-import {
-    Webhook
-} from "https://esm.sh/standardwebhooks@1.0.0";
-import {
-    readAll
-} from "https://deno.land/std/io/read_all.ts";
+import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
+import { readAll } from "https://deno.land/std/io/read_all.ts";
 import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 
 const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -580,7 +576,7 @@ const sendMessage = async (
 
 Deno.serve(async (req) => {
     const payload = await req.text();
-    const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET");
+    const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET").replace('v1,whsec_', '');
     const headers = Object.fromEntries(req.headers);
     const wh = new Webhook(base64_secret);
     try {

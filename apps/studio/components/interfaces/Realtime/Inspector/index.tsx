@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { useState } from 'react'
 
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
@@ -54,7 +53,7 @@ export const RealtimeInspector = () => {
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
           sendEvent({
-            action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT,
+            action: 'realtime_inspector_broadcast_sent',
             groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
           })
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))

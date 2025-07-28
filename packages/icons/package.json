@@ -11,9 +11,9 @@
     "@supabase/build-icons": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^18.2.24"
+    "@types/react": "catalog:"
   },
   "peerDependencies": {
-    "react": "*"
+    "react": "catalog:"
   }
 }

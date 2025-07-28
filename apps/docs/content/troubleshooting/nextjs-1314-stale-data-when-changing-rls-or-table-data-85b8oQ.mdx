@@ -12,7 +12,7 @@ Next.js caches URLs in certain cases. This is causing users to lose lots of time
 You can look at the Dashboard API Edge log to see if the request is making it to Supabase.
 Another way to check if the URL caching is impacting you is to change `.select('*')` to `.select('colname')` or change column names. This would bust the next.js cache.
 
-Users have suggested the following three options to turn off the caching, but please refer to next.js docs as needed.
+Users have suggested the following three options to turn off the caching, but refer to next.js docs as needed.
 
 `export const dynamic = 'force-dynamic'; // no caching`
 or

@@ -22,7 +22,7 @@ The `http` extension allows you to call RESTful endpoints within Postgres.
 
 Let's cover some basic concepts:
 
-- REST: stands for REpresentational State Transfer. It's simply a way to request data from external services.
+- REST: stands for REpresentational State Transfer. It's a way to request data from external services.
 - RESTful APIs are servers which accept HTTP "calls". The calls are typically:
   - `GET` − Read only access to a resource.
   - `POST` − Creates a new resource.
@@ -69,7 +69,7 @@ It's good practice to create the extension within a separate schema (like `exten
 
 ### Available functions
 
-While the main usage is simply `http('http_request')`, there are 5 wrapper functions for specific functionality:
+While the main usage is `http('http_request')`, there are 5 wrapper functions for specific functionality:
 
 - `http_get()`
 - `http_post()`

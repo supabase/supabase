@@ -30,6 +30,7 @@ const SplitCodeBlockCarousel = dynamic(
   () => import('~/components/Carousels/SplitCodeBlockCarousel')
 )
 const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
 const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
 const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
@@ -76,13 +77,13 @@ function Database() {
           title={MainProducts['database'].name}
           h1={[
             <span key={'database-h1'}>
-              Open Source SQL Database
+              It’s just Postgres
               <br /> (without the hassle)
             </span>,
           ]}
           subheader={[
-            'Every Supabase project is a dedicated PostgreSQL database, trusted by millions of developers.',
-            "PostgreSQL is one of the world's most scalable databases.",
+            'Every Supabase project is a dedicated Postgres database, trusted by millions of developers.',
+            "Postgres is one of the world's most scalable databases.",
           ]}
           image={[
             <Image
@@ -110,7 +111,7 @@ function Database() {
                     src={`${basePath}/images/product/database/postgresql-icon.svg`}
                     width={30}
                     height={30}
-                    alt="postgresql icon"
+                    alt="Postgres icon"
                   />
                 </div>
               </div>
@@ -127,8 +128,8 @@ function Database() {
                 <ProductIcon icon={MainProducts['authentication'].icon} />
               </div>
 
-              <h4 className="h4">Built-in Auth</h4>
-              <p className="p">Leveraging PostgreSQL's proven Row Level Security.</p>
+              <h4 className="h4">Secure by default</h4>
+              <p className="p">Leveraging Postgres's proven Row Level Security.</p>
               <p className="p text-sm">
                 Integrated with JWT authentication which controls exactly what your users can
                 access.
@@ -150,7 +151,27 @@ function Database() {
           </div>
         </SectionContainer>
 
-        <SectionContainer className="!py-0 grid lg:grid-cols-2 gap-2 lg:gap-4">
+        <SingleQuote
+          id="quote"
+          quote={{
+            text: 'You can have a really great product, but you need to want to work with the people behind it. With Supabase, we always felt very aligned.',
+            author: 'Howard Haynes',
+            role: 'CPO at Next Door Lending',
+            link: '/customers/next-door-lending',
+            logo: (
+              <NextImage
+                draggable={false}
+                src="/images/blog/avatars/howard-haynes.webp"
+                alt="Howard Haynes, CPO at Next Door Lending"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
+        />
+
+        <SectionContainer className="grid lg:grid-cols-2 gap-2 lg:gap-4">
           <NewFeatureCard {...HighlightsCards.branching} />
           <NewFeatureCard {...HighlightsCards.readReplicas} />
         </SectionContainer>
@@ -225,7 +246,7 @@ function Database() {
                       handle="@jim_bisenius"
                       key="@jim_bisenius"
                       img_url={`${basePath}/images/twitter-profiles/rLgwUZSB_400x400.jpg`}
-                      quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase and the wonderful world of @PostgreSQL before it's too late!!"
+                      quote="@MongoDB or @MySQL?!?! Please, let me introduce you to @supabase and the wonderful world of @Postgres before it's too late!!"
                     />,
                   ]}
                 />
