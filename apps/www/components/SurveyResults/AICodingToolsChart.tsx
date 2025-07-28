@@ -3,16 +3,16 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateAICodingToolsSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.headquarters !== 'unset') {
-    whereClauses.push(`headquarters = '${activeFilters.headquarters}'`)
+  if (activeFilters.person_age !== 'unset') {
+    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
-  if (activeFilters.industry_normalized !== 'unset') {
-    whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
+  if (activeFilters.team_count !== 'unset') {
+    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'unset') {
-    whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
+  if (activeFilters.funding_stage !== 'unset') {
+    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -32,7 +32,7 @@ export function AICodingToolsChart() {
     <GenericChartWithQuery
       title="Which AI coding tools do you use?"
       targetColumn="ai_coding_tools"
-      filterColumns={['headquarters', 'industry_normalized', 'currently_monetizing']}
+      filterColumns={['person_age', 'team_count', 'funding_stage']}
       generateSQLQuery={generateAICodingToolsSQL}
     />
   )

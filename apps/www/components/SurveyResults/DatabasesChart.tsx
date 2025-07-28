@@ -3,20 +3,16 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.frontend_stack !== 'unset') {
-    whereClauses.push(`'${activeFilters.frontend_stack}' = ANY(frontend_stack)`)
+  if (activeFilters.team_count !== 'unset') {
+    whereClauses.push(`'${activeFilters.team_count}' = ANY(team_count)`)
+  }
+
+  if (activeFilters.ai_models_used !== 'unset') {
+    whereClauses.push(`'${activeFilters.ai_models_used}' = ANY(ai_models_used)`)
   }
 
   if (activeFilters.backend_stack !== 'unset') {
     whereClauses.push(`'${activeFilters.backend_stack}' = ANY(backend_stack)`)
-  }
-
-  if (activeFilters.industry_normalized !== 'unset') {
-    whereClauses.push(`industry_normalized = '${activeFilters.industry_normalized}'`)
-  }
-
-  if (activeFilters.person_age !== 'unset') {
-    whereClauses.push(`person_age = '${activeFilters.person_age}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -36,7 +32,7 @@ export function DatabasesChart() {
     <GenericChartWithQuery
       title="Which database(s) is your startup using?"
       targetColumn="databases"
-      filterColumns={['frontend_stack', 'backend_stack', 'industry_normalized', 'person_age']}
+      filterColumns={['team_count', 'ai_models_used', 'backend_stack']}
       generateSQLQuery={generateDatabasesSQL}
     />
   )

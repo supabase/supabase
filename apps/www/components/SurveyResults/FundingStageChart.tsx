@@ -12,7 +12,9 @@ function generateFundingStageSQL(activeFilters) {
   }
 
   if (activeFilters.previous_company !== 'unset') {
-    whereClauses.push(`previous_company = '${activeFilters.previous_company}'`)
+    // Convert string to boolean for the SQL query
+    const previousCompanyBool = activeFilters.previous_company === 'true'
+    whereClauses.push(`previous_company = ${previousCompanyBool}`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''

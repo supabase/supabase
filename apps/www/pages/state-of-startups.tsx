@@ -17,41 +17,8 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 import data from '~/data/surveys/state-of-startups-2025'
 
-import { TeamCountChart } from '~/components/SurveyResults/TeamCountChart'
-import { TechnicalFoundersChart } from '~/components/SurveyResults/TechnicalFoundersChart'
-import { PreviousCompanyChart } from '~/components/SurveyResults/PreviousCompanyChart'
-import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
-import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
-import { SurveySection } from '~/components/SurveyResults/SurveySection'
-import { SurveySubSection } from '~/components/SurveyResults/SurveySubSection'
-import { SurveyPullQuote } from '~/components/SurveyResults/SurveyPullQuote'
-import { SurveyStatCard } from '~/components/SurveyResults/SurveyStatCard'
-import { RoleChart } from '~/components/SurveyResults/RoleChart'
-import { ProblemBeingSolvedChart } from '~/components/SurveyResults/ProblemBeingSolvedChart'
-import { PersonAgeChart } from '~/components/SurveyResults/AgeChart'
-import { MonetizationChart } from '~/components/SurveyResults/MonetizationChart'
-import { AcceleratorParticipationChart } from '~/components/SurveyResults/AcceleratorParticipationChart'
-import { PivotFreqChart } from '~/components/SurveyResults/PivotFreqChart'
-import { FrontendStackChart } from '~/components/SurveyResults/FrontendStackChart'
-import { BackendStackChart } from '~/components/SurveyResults/BackendStackChart'
-import { SalesToolsChart } from '~/components/SurveyResults/SalesToolsChart'
-import { PricingChart } from '~/components/SurveyResults/PricingChart'
-import { IndustryChart } from '~/components/SurveyResults/IndustryChart'
-import { DatabasesChart } from '~/components/SurveyResults/DatabasesChart'
-import { DataWarehousesChart } from '~/components/SurveyResults/DataWarehousesChart'
-import { VectorDatabasesChart } from '~/components/SurveyResults/VectorDatabasesChart'
-import { OpenTelemetryChart } from '~/components/SurveyResults/OpenTelemetryChart'
-import { ObservabilityChart } from '~/components/SurveyResults/ObservabilityChart'
-import { CloudProvidersChart } from '~/components/SurveyResults/CloudProvidersChart'
-import { MustHaveDevToolsChart } from '~/components/SurveyResults/MustHaveDevToolsChart'
-import { AICodingToolsChart } from '~/components/SurveyResults/AICodingToolsChart'
-import { SubscriptionsChart } from '~/components/SurveyResults/SubscriptionsChart'
-import { NewslettersPaidForChart } from '~/components/SurveyResults/NewslettersPaidForChart'
-import { PodcastsListenedToChart } from '~/components/SurveyResults/PodcastsListenedToChart'
-import { RegularSocialMediaUseChart } from '~/components/SurveyResults/RegularSocialMediaUseChart'
-import { SurveyStatWrapper } from '~/components/SurveyResults/SurveyStatWrapper'
-import { SurveySummarizedAnswer } from '~/components/SurveyResults/SurveySummarizedAnswer'
-import { SurveyWordCloud } from '~/components/SurveyResults/SurveyWordCloud'
+import { SurveyChapter } from '~/components/SurveyResults/SurveyChapter'
+import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSection'
 
 interface FormData {
   email: string
@@ -109,27 +76,29 @@ function StateOfStartupsPage() {
       <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
         <Hero {...pageData.heroSection} />
 
-        {pageData.pageChapters.map((chapter) => (
-          <SurveySection
-            key={chapter.id}
-            number={chapter.id}
+        {pageData.pageChapters.map((chapter, chapterIndex) => (
+          <SurveyChapter
+            key={chapterIndex + 1}
+            number={chapterIndex + 1}
+            totalChapters={pageData.pageChapters.length}
             title={chapter.title}
             description={chapter.description}
           >
-            {chapter.sections.map((section) => (
-              <SurveySubSection
-                key={section.id}
-                number={section.id}
+            {chapter.sections.map((section, sectionIndex) => (
+              <SurveyChapterSection
+                key={sectionIndex + 1}
+                number={`${chapterIndex + 1}.${sectionIndex + 1}`}
                 title={section.title}
                 description={section.description}
                 stats={section.stats}
                 charts={section.charts}
-                pullQuote={section.pullQuote}
                 wordCloud={section.wordCloud}
                 summarizedAnswer={section.summarizedAnswer}
+                rankedAnswersPair={section.rankedAnswersPair}
+                pullQuote={section.pullQuote}
               />
             ))}
-          </SurveySection>
+          </SurveyChapter>
         ))}
       </DefaultLayout>
     </>

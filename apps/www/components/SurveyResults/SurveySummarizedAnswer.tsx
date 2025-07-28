@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export function SurveySummarizedAnswer({ answers, label }: { answers: string[]; label: string }) {
+export function SurveySummarizedAnswer({ label, answers }: { label: string; answers: string[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {

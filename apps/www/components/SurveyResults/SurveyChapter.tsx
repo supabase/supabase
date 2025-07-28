@@ -1,27 +1,30 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-interface SurveySectionProps {
+interface SurveyChapterProps {
   number: number
   title: string
   description: string
   children: React.ReactNode
   className?: string
+  totalChapters?: number
 }
 
-export function SurveySection({
+export function SurveyChapter({
   number,
   title,
   description,
   children,
   className,
-}: SurveySectionProps) {
+  totalChapters,
+}: SurveyChapterProps) {
   return (
     <SectionContainer
       className={`flex flex-col gap-12 border-t border-default pt-12 ${className || ''}`}
     >
       <header className="flex flex-col gap-2">
         <aside className="text-brand font-mono uppercase tracking-widest text-sm">
-          {number} / 7
+          {number}
+          {totalChapters && ` / ${totalChapters}`}
         </aside>
         <h2 className="heading-gradient text-3xl sm:text-3xl xl:text-5xl text-balance leading-tight">
           {title}
