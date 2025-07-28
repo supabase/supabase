@@ -47,8 +47,8 @@ const UpgradeToPro = ({
     >
       <div className="flex gap-x-3">
         {icon && <div className="mt-1">{icon}</div>}
-        <div className="flex flex-col md:flex-row w-full md:items-center justify-between gap-4 md:gap-x-8 xl:gap-x-32">
-          <div className="space-y-1">
+        <div className="flex flex-col md:flex-row w-full md:items-center justify-between gap-4 md:gap-x-8">
+          <div className="space-y-1 flex-1 max-w-2xl">
             <p className="text-sm">{primaryText}</p>
             <div>
               <p className="text-sm text-foreground-light">{secondaryText}</p>
@@ -69,7 +69,7 @@ const UpgradeToPro = ({
                 },
               }}
             >
-              Reset database password
+              {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}
             </ButtonTooltip>
           ) : (
             <Button
@@ -81,7 +81,9 @@ const UpgradeToPro = ({
                 href={
                   plan === 'free'
                     ? `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
-                    : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
+                    : addon == null
+                      ? `/org/${organization?.slug ?? '_'}/billing?panel=costControl&source=${source}`
+                      : `/project/${project?.ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
                 }
               >
                 {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable add on')}

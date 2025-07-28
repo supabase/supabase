@@ -97,11 +97,11 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
           </Link>
         </>
       ) : menuItem.title === 'Developers' ? (
-        <div className="px-3 mb-2 flex flex-col gap-2">
+        <div className="px-3 mb-2 flex flex-col gap-6">
           {menuItem.subMenu['navigation'].map((column: any) => (
             <div key={column.label} className="flex flex-col gap-3">
               {column.label !== 'Developers' && (
-                <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono mt-4">
+                <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
                   {column.label}
                 </label>
               )}
@@ -135,6 +135,27 @@ const MobileMenu = ({ open, setOpen, menu }: Props) => {
               className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay"
             />
           </div>
+        </div>
+      ) : menuItem.title === 'Solutions' ? (
+        <div className="px-3 mb-2 flex flex-col gap-6">
+          {menuItem.subMenu['navigation'].map((column: any) => (
+            <div key={column.label} className="flex flex-col gap-3">
+              {column.label !== 'Solutions' && (
+                <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
+                  {column.label}
+                </label>
+              )}
+              {column.links.map((link: any) => (
+                <TextLink
+                  hasChevron={false}
+                  key={link.text}
+                  url={link.url}
+                  label={link.text}
+                  className="focus-visible:ring-offset-4 focus-visible:ring-offset-background-overlay !mt-0"
+                />
+              ))}
+            </div>
+          ))}
         </div>
       ) : null}
     </>

@@ -6,9 +6,10 @@ import { BillingCustomerDataFormValues, BillingCustomerDataSchema } from './Bill
 import { TAX_IDS } from './TaxID.constants'
 import { sanitizeTaxIdValue } from './TaxID.utils'
 import { components } from 'api-types'
+import type { CustomerAddress } from 'data/organizations/types'
 
 export type FormCustomerData = {
-  address: components['schemas']['CustomerResponse']['address'] | undefined
+  address: CustomerAddress | undefined
   billing_name: string
   tax_id: components['schemas']['TaxIdResponse']['tax_id'] | null
 }

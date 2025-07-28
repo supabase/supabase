@@ -43,7 +43,7 @@ export const BlockViewConfiguration = ({
           id="help-popover-button"
           type="text"
           className="px-1"
-          icon={<Settings2 size={14} />}
+          icon={<Settings2 size={14} strokeWidth={1.5} />}
           tooltip={{ content: { side: 'bottom', text: 'View data' } }}
         />
       </PopoverTrigger_Shadcn_>

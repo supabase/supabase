@@ -5,7 +5,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
+import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
@@ -16,22 +18,26 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import type { OrgPlan } from 'data/subscriptions/types'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import {
+  useSelectedOrganization,
+  useSelectedOrganizationQuery,
+} from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Button, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
-import ExitSurveyModal from './ExitSurveyModal'
+import { ExitSurveyModal } from './ExitSurveyModal'
+import { useParams } from 'common'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
-  const selectedOrganization = useSelectedOrganization()
-  const slug = selectedOrganization?.slug
+  const { slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const originalPlanRef = useRef<string>()
@@ -69,7 +75,6 @@ const PlanUpdateSidePanel = () => {
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
 
-  const billingViaPartner = subscription?.billing_via_partner === true
   const billingPartner = subscription?.billing_partner
 
   const {
@@ -83,7 +88,6 @@ const PlanUpdateSidePanel = () => {
   const hasMembersExceedingFreeTierLimit =
     (membersExceededLimit || []).length > 0 &&
     orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
-  const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 
   useEffect(() => {
     if (visible) {
@@ -143,12 +147,25 @@ const PlanUpdateSidePanel = () => {
           </div>
         }
       >
+        {selectedOrganization?.managed_by === 'vercel-marketplace' && (
+          <PartnerManagedResource
+            partner={selectedOrganization?.managed_by}
+            resource="Organization plans"
+            cta={{
+              installationId: selectedOrganization?.partner_id,
+              path: '/settings',
+              message: 'Change Plan on Vercel Marketplace',
+            }}
+            // TODO: support AWS marketplace here: `https://us-east-1.console.aws.amazon.com/billing/home#/bills`
+          />
+        )}
         <SidePanel.Content>
           <div className="py-6 grid grid-cols-12 gap-3">
             {subscriptionsPlans.map((plan) => {
               const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
               const price = planMeta?.price ?? 0
-              const isDowngradeOption = planMeta?.change_type === 'downgrade'
+              const isDowngradeOption =
+                getPlanChangeType(subscription?.plan.id, plan?.planId) === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
               const features = pickFeatures(plan, billingPartner)
               const footer = pickFooter(plan, billingPartner)
@@ -208,6 +225,9 @@ const PlanUpdateSidePanel = () => {
                         type={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           subscription?.plan?.id === 'enterprise' ||
+                          // Downgrades to free are still allowed through the dashboard given we have much better control about showing customers the impact + any possible issues with downgrading to free
+                          (selectedOrganization?.managed_by !== 'supabase' &&
+                            plan.id !== 'tier_free') ||
                           hasOrioleProjects ||
                           !canUpdateSubscription
                         }
@@ -283,7 +303,6 @@ const PlanUpdateSidePanel = () => {
 
       <DowngradeModal
         visible={selectedTier === 'tier_free'}
-        selectedPlan={subscriptionPlanMeta}
         subscription={subscription}
         onClose={() => setSelectedTier(undefined)}
         onConfirm={onConfirmDowngrade}
@@ -292,16 +311,12 @@ const PlanUpdateSidePanel = () => {
 
       <SubscriptionPlanUpdateDialog
         selectedTier={selectedTier}
-        selectedOrganization={selectedOrganization}
         onClose={() => setSelectedTier(undefined)}
-        subscriptionPlanMeta={subscriptionPlanMeta}
         planMeta={planMeta}
         subscriptionPreviewError={subscriptionPreviewError}
         subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
         subscriptionPreviewInitialized={subscriptionPreviewInitialized}
         subscriptionPreview={subscriptionPreview}
-        billingViaPartner={billingViaPartner}
-        billingPartner={billingPartner}
         subscription={subscription}
         projects={orgProjects}
         currentPlanMeta={{

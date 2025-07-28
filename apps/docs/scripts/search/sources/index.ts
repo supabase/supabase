@@ -5,6 +5,7 @@ import {
   type GitHubDiscussionSource,
   fetchDiscussions,
 } from './github-discussion.js'
+import { LintWarningsGuideLoader, type LintWarningsGuideSource } from './lint-warnings-guide.js'
 import { MarkdownLoader, type MarkdownSource } from './markdown.js'
 import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations.js'
 import {
@@ -26,6 +27,7 @@ export type SearchSource =
   | CliReferenceSource
   | GitHubDiscussionSource
   | IntegrationSource
+  | LintWarningsGuideSource
 
 export async function fetchGuideSources() {
   return (
@@ -122,12 +124,23 @@ export async function fetchCliLibReferenceSource() {
   ).load()
 }
 
+export async function fetchLintWarningsGuideSources() {
+  return new LintWarningsGuideLoader(
+    'guide',
+    '/guides/database/database-advisors',
+    'supabase',
+    'splinter',
+    'main',
+    'docs'
+  ).load()
+}
+
 /**
  * Fetches all the sources we want to index for search
  */
 export async function fetchAllSources() {
   const guideSources = fetchGuideSources()
-
+  const lintWarningsGuideSources = fetchLintWarningsGuideSources()
   const openApiReferenceSource = fetchOpenApiReferenceSource()
   const jsLibReferenceSource = fetchJsLibReferenceSource()
   const dartLibReferenceSource = fetchDartLibReferenceSource()
@@ -164,6 +177,7 @@ export async function fetchAllSources() {
   const sources: SearchSource[] = (
     await Promise.all([
       guideSources,
+      lintWarningsGuideSources,
       openApiReferenceSource,
       jsLibReferenceSource,
       dartLibReferenceSource,

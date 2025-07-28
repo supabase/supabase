@@ -36,6 +36,7 @@ interface DatabaseSelectorProps {
   buttonProps?: ButtonProps
   onSelectId?: (id: string) => void // Optional callback
   onCreateReplicaClick?: () => void
+  portal?: boolean
 }
 
 const DatabaseSelector = ({
@@ -45,6 +46,7 @@ const DatabaseSelector = ({
   onSelectId = noop,
   buttonProps,
   onCreateReplicaClick = noop,
+  portal = true,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -110,7 +112,7 @@ const DatabaseSelector = ({
           </Button>
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end" portal={true}>
+      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end" portal={portal}>
         <Command_Shadcn_>
           <CommandList_Shadcn_>
             {additionalOptions.length > 0 && (

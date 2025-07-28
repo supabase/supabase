@@ -4,13 +4,9 @@ import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import {
-  useIsSQLEditorTabsEnabled,
-  useIsTableEditorTabsEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { CreateBranchModal } from 'components/interfaces/BranchManagement/CreateBranchModal'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistant } from 'components/ui/AIAssistantPanel/AIAssistant'
-import AISettingsModal from 'components/ui/AISettingsModal'
 import { EditorPanel } from 'components/ui/EditorPanel/EditorPanel'
 import { Loading } from 'components/ui/Loading'
 import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -23,7 +19,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { EnableBranchingModal } from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -91,6 +86,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const [isClient, setIsClient] = useState(false)
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
+
     const {
       editorPanel,
       mobileMenuOpen,
@@ -101,14 +97,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     } = useAppStateSnapshot()
     const aiSnap = useAiAssistantStateSnapshot()
 
-    const isTableEditorTabsEnabled = useIsTableEditorTabsEnabled()
-    const isSQLEditorTabsEnabled = useIsSQLEditorTabsEnabled()
-
-    // For tabs preview flag logic - only conditionally collapse sidebar for table editor and sql editor if feature flags are on
     const editor = useEditorType()
-    const tableEditorTabsEnabled = editor === 'table' && isTableEditorTabsEnabled
-    const sqlEditorTabsEnabled = editor === 'sql' && isSQLEditorTabsEnabled
-    const forceShowProductMenu = !tableEditorTabsEnabled && !sqlEditorTabsEnabled
+    const forceShowProductMenu = editor === undefined
     const sideBarIsOpen = forceShowProductMenu || showSidebar
 
     const projectName = selectedProject?.name
@@ -118,7 +108,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const showProductMenu = selectedProject
       ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
         (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-          router.pathname.includes('/project/[ref]/settings'))
+          router.pathname.includes('/project/[ref]/settings')) ||
+        router.pathname.includes('/project/[ref]/branches')
       : true
 
     const ignorePausedState =
@@ -267,8 +258,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
-        <EnableBranchingModal />
-        <AISettingsModal />
+        <CreateBranchModal />
         <ProjectAPIDocs />
         <MobileSheetNav open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           {productMenu}
@@ -335,6 +325,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
+  const isBranchesPage = router.pathname.includes('/project/[ref]/branches')
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
   const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
   const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
@@ -398,7 +389,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     return <RestoreFailedState />
   }
 
-  if (requiresDbConnection && isProjectBuilding) {
+  if (requiresDbConnection && isProjectBuilding && !isBranchesPage) {
     return <BuildingState />
   }
 

@@ -28,9 +28,34 @@ IPv4 addresses are guaranteed to be static for ingress traffic. If your database
 
 You can enable the IPv4 add-on in your project's [add-ons settings](/dashboard/project/_/settings/addons).
 
+You can also manage the IPv4 add-on using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get current IPv4 add-on status
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+# Enable IPv4 add-on
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/addons" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "addon_type": "ipv4"
+  }'
+
+# Disable IPv4 add-on
+curl -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons/ipv4" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 <Admonition type="caution">
-  Note that direct database connections can experience a short amount of downtime when toggling the
-  add-on due to DNS reconfiguration and propagation. Generally, this should be less than a minute.
+
+Note that direct database connections can experience a short amount of downtime when toggling the add-on due to DNS reconfiguration and propagation. Generally, this should be less than a minute.
+
 </Admonition>
 
 ## Read replicas and IPv4 add-on

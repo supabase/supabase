@@ -16,7 +16,6 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
@@ -27,7 +26,7 @@ import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
@@ -63,6 +62,7 @@ const RestoreToNewProject = () => {
   const organization = useSelectedOrganization()
   const isFreePlan = organization?.plan?.id === 'free'
   const isOrioleDb = useIsOrioleDb()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
@@ -215,9 +215,16 @@ const RestoreToNewProject = () => {
         type="default"
         title="Restoring to new projects are not available for OrioleDB"
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
-      >
-        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
-      </Admonition>
+      />
+    )
+  }
+
+  if (isAwsK8s) {
+    return (
+      <Admonition
+        type="default"
+        title="Restoring to new projects is temporarily not available for AWS (Revamped) projects"
+      />
     )
   }
 

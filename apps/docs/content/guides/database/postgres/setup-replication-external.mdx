@@ -29,7 +29,7 @@ select pg_create_logical_replication_slot('example_slot', 'pgoutput');
 
 This will need a **direct** connection (not a Connection Pooler) to your database and you can find the connection info in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database).
 
-You will also need to ensure that IPv6 is supported by your replication destination (or you can enable the [IPv4 add-on](/guides/platform/ipv4-address))
+You will also need to ensure that IPv6 is supported by your replication destination (or you can enable the [IPv4 add-on](/docs/guides/platform/ipv4-address))
 
 If you would prefer not to use the `postgres` user, then you can run `CREATE ROLE <user> WITH REPLICATION;` using the `postgres` user.
 
@@ -49,7 +49,7 @@ To copy data from before the slot was created, set `copy_data` to `true`.
 
 </Admonition>
 
-4. Add all the tables that you want replicated to the publication.
+4. Now we'll go back to the Supabase DB and add all the tables that you want replicated to the publication.
 
 ```sql
 ALTER PUBLICATION example_pub ADD TABLE example_table;
@@ -60,3 +60,10 @@ ALTER PUBLICATION example_pub ADD TABLE example_table;
 ```sql
 select * from pg_stat_replication;
 ```
+
+<Admonition type="note">
+
+You can add more tables to the initial publication, but you're going to need to do a REFRESH on the subscribing database.
+See https://www.postgresql.org/docs/current/sql-alterpublication.html
+
+</Admonition>

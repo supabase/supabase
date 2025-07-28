@@ -134,6 +134,7 @@ export const SQLEditorMenu = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                data-testId="sql-editor-new-query-button"
                 type="default"
                 icon={<Plus className="text-foreground" />}
                 className="w-[26px]"

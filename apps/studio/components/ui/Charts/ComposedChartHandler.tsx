@@ -1,46 +1,25 @@
-import React, { PropsWithChildren, useState, useMemo, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
 import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
+import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { cn, WarningIcon } from 'ui'
 
 import Panel from 'components/ui/Panel'
 import ComposedChart from './ComposedChart'
 
 import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
-import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
+import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
 import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
+import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useChartHighlight } from './useChartHighlight'
 
-import type { ChartData } from './Charts.types'
+import dayjs from 'dayjs'
 import type { UpdateDateRange } from 'pages/project/[ref]/reports/database'
+import type { ChartData } from './Charts.types'
+import { MultiAttribute } from './ComposedChart.utils'
 
-type Provider = 'infra-monitoring' | 'daily-stats' | 'reference-line'
-
-export type MultiAttribute = {
-  attribute: string
-  provider: Provider
-  label?: string
-  color?: string
-  stackId?: string
-  format?: 'percent' | 'number'
-  description?: string
-  docsLink?: string
-  isMaxValue?: boolean
-  type?: 'line' | 'area-bar'
-  omitFromTotal?: boolean
-  tooltip?: string
-  customValue?: number
-  id?: string
-  value?: number
-  isReferenceLine?: boolean
-  strokeDasharray?: string
-  className?: string
-}
-
-interface ComposedChartHandlerProps {
+export interface ComposedChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
@@ -59,10 +38,11 @@ interface ComposedChartHandlerProps {
   showLegend?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
-  updateDateRange: UpdateDateRange
+  updateDateRange?: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
   docsUrl?: string
+  hide?: boolean
 }
 
 /**
@@ -189,6 +169,7 @@ const ComposedChartHandler = ({
         // Add regular attributes
         attributes.forEach((attr, index) => {
           if (!attr) return
+
           // Handle custom value attributes (like disk size)
           if (attr.customValue !== undefined) {
             point[attr.attribute] = attr.customValue
@@ -200,7 +181,16 @@ const ComposedChartHandler = ({
 
           const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
-          point[attr.attribute] = matchingPoint?.[attr.attribute] ?? 0
+          let value = matchingPoint?.[attr.attribute] ?? 0
+
+          // Apply value manipulation if provided
+          if (attr.manipulateValue && typeof attr.manipulateValue === 'function') {
+            // Ensure value is a number before manipulation
+            const numericValue = typeof value === 'number' ? value : Number(value) || 0
+            value = attr.manipulateValue(numericValue)
+          }
+
+          point[attr.attribute] = value
         })
 
         // Add reference line values for each timestamp
@@ -210,7 +200,12 @@ const ComposedChartHandler = ({
           point[attr] = value
         })
 
-        return point as DataPoint
+        const formattedDataPoint: DataPoint =
+          !('period_start' in point) && 'timestamp' in point
+            ? { ...point, period_start: dayjs.utc(point.timestamp).unix() * 1000 }
+            : point
+
+        return formattedDataPoint
       })
 
     return combined as DataPoint[]
@@ -249,7 +244,7 @@ const ComposedChartHandler = ({
     return (
       <Panel
         className={cn(
-          'flex min-h-[320px] w-full flex-col items-center justify-center gap-y-2',
+          'flex min-h-[280px] w-full flex-col items-center justify-center gap-y-2',
           className
         )}
         wrapWithLoading={false}
@@ -276,7 +271,7 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative py-2 w-full scroll-mt-16', className)}
+      className={cn('relative w-full scroll-mt-16', className)}
       wrapWithLoading={false}
       id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
@@ -286,6 +281,7 @@ const ComposedChartHandler = ({
           attributes={attributes}
           data={combinedData as DataPoint[]}
           format={format}
+          // [Joshen] This is where it's messing up
           xAxisKey="period_start"
           yAxisKey={attributes[0].attribute}
           highlightedValue={_highlightedValue}
@@ -367,6 +363,8 @@ const useAttributeQueries = (
 }
 
 export default function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
+  if (props.hide) return null
+
   return (
     <LazyChartWrapper>
       <ComposedChartHandler {...props} />
