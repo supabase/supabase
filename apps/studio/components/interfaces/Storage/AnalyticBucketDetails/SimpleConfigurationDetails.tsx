@@ -24,7 +24,7 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName: string 
   const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint
+  const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
 
   const { serviceKey } = getKeys(apiKeys)
   const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
