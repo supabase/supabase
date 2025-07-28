@@ -311,11 +311,7 @@ const ProjectLinks = () => {
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={{
-                  label: route.label,
-                  icon: route.icon,
-                  key: route.key,
-                }}
+                route={route}
                 active={activeRoute === route.key}
               />
             )
