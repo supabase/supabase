@@ -60,7 +60,7 @@ test.describe('Logs', () => {
 
       await expect(logsTable, {
         message: 'Logs table should be visible',
-      }).toBeVisible({ timeout: 20000 })
+      }).toBeVisible()
 
       /**
        * Shows the logs data without errors

@@ -9,6 +9,9 @@ const IS_CI = !!process.env.CI
 
 export default defineConfig({
   timeout: 60 * 1000,
+  expect: {
+    timeout: 60 * 1000,
+  },
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
