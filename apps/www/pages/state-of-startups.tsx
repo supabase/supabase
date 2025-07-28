@@ -262,7 +262,31 @@ function StateOfStartupsPage() {
               authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
             />
           </SurveySubSection>
+
+          <SurveySubSection
+            number={1.3}
+            title="Where They’re Based"
+            description="Startups are building globally, but North America—especially San Francisco—remains overrepresented. Europe and Asia also feature prominently, with hubs like Toronto and NYC following close behind."
+          >
+            <div className="flex flex-col md:flex-row gap-4">
+              <HeadquartersChart />
+              <SurveyStatWrapper>
+                <SurveyStatCard number={17} unit="%" label="Global startups in Europe" />
+                <SurveyStatCard number={19} unit="%" label="North American startups in SF" />
+                <SurveyStatCard number={9} unit="%" label="North American startups in Toronto" />
+                <SurveyStatCard number={0} unit="%" label="North American startups in NYC" />
+              </SurveyStatWrapper>
+            </div>
+            <SurveyPullQuote
+              quote="We’re building from Toronto, but most of our early users are still in San Francisco."
+              author="John Doe"
+              authorPosition="Founder"
+              authorAvatar="/images/twitter-profiles/qhvO9V6x_400x400.jpg"
+            />
+          </SurveySubSection>
         </SurveySection>
+
+        {/* Next section ...*/}
 
         <SurveySection
           number={2}

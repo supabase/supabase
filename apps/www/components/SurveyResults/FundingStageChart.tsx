@@ -17,21 +17,26 @@ function generateFundingStageSQL(activeFilters) {
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
-  return `SELECT
-  funding_stage,
-  COUNT(*) AS total
-FROM responses_2025${whereClause ? '\n' + whereClause : ''}
-GROUP BY funding_stage
-ORDER BY 
-  CASE funding_stage
-    WHEN 'Bootstrapped' THEN 1
-    WHEN 'Pre-seed' THEN 2
-    WHEN 'Seed' THEN 3
-    WHEN 'Series A' THEN 4
-    WHEN 'Series B' THEN 5
-    WHEN 'Series C' THEN 5
-    WHEN 'Series D+' THEN 6
-  END;`
+  return `SELECT * FROM (
+    SELECT
+      CASE 
+        WHEN funding_stage IN ('Series A', 'Series B', 'Series C', 'Series D or later') THEN 'Series A+'
+        ELSE funding_stage
+      END AS funding_stage,
+      COUNT(*) AS total
+    FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+    GROUP BY CASE 
+        WHEN funding_stage IN ('Series A', 'Series B', 'Series C', 'Series D or later') THEN 'Series A+'
+        ELSE funding_stage
+      END
+  ) subquery
+  ORDER BY CASE 
+      WHEN funding_stage = 'Bootstrapped' THEN 1
+      WHEN funding_stage = 'Pre-seed' THEN 2
+      WHEN funding_stage = 'Seed' THEN 3
+      WHEN funding_stage = 'Series A+' THEN 4
+      ELSE 5
+    END;`
 }
 
 export function FundingStageChart() {

@@ -16,14 +16,29 @@ function generateRoleSQL(activeFilters) {
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
-  return `SELECT
-  person_role_normalized,
+  return `SELECT 
+  CASE 
+    WHEN role = 'Founder / Co-founder' THEN 'Founder'
+    WHEN role IN ('Engineer', 'Founder / Co-founder') THEN role
+    ELSE 'Other'
+  END AS role, 
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
-GROUP BY person_role_normalized
-ORDER BY total DESC
+GROUP BY CASE 
+    WHEN role = 'Founder / Co-founder' THEN 'Founder'
+    WHEN role IN ('Engineer', 'Founder / Co-founder') THEN role
+    ELSE 'Other'
+  END
+ORDER BY total DESC;
 `
 }
+
+// SELECT
+//   person_role_normalized,
+//   COUNT(*) AS total
+// FROM responses_2025${whereClause ? '\n' + whereClause : ''}
+// GROUP BY person_role_normalized
+// ORDER BY total DESC
 
 export function RoleChart() {
   return (

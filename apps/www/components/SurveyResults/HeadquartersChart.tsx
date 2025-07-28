@@ -3,12 +3,16 @@ import { GenericChartWithQuery } from './GenericChartWithQuery'
 function generateHeadquartersSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
-  if (activeFilters.money_raised !== 'unset') {
-    whereClauses.push(`money_raised = '${activeFilters.money_raised}'`)
+  if (activeFilters.funding_stage !== 'unset') {
+    whereClauses.push(`funding_stage = '${activeFilters.funding_stage}'`)
   }
 
-  if (activeFilters.currently_monetizing !== 'unset') {
-    whereClauses.push(`currently_monetizing = '${activeFilters.currently_monetizing}'`)
+  if (activeFilters.startup_age !== 'unset') {
+    whereClauses.push(`startup_age = '${activeFilters.startup_age}'`)
+  }
+
+  if (activeFilters.previous_company !== 'unset') {
+    whereClauses.push(`previous_company = '${activeFilters.previous_company}'`)
   }
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
@@ -18,7 +22,7 @@ function generateHeadquartersSQL(activeFilters: Record<string, string>) {
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY headquarters
-ORDER BY headquarters;`
+ORDER BY total DESC;`
 }
 
 export function HeadquartersChart() {
@@ -26,7 +30,7 @@ export function HeadquartersChart() {
     <GenericChartWithQuery
       title="Where is your startup headquartered?"
       targetColumn="headquarters"
-      filterColumns={['money_raised', 'currently_monetizing']}
+      filterColumns={['funding_stage', 'startup_age', 'previous_company']}
       generateSQLQuery={generateHeadquartersSQL}
     />
   )
