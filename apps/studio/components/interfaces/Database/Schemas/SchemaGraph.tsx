@@ -1,11 +1,12 @@
 import type { PostgresSchema } from '@supabase/postgres-meta'
-import { Loader2 } from 'lucide-react'
+import { toPng, toSvg } from 'html-to-image'
+import { Check, Download, Loader2, Clipboard, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
@@ -15,11 +16,13 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { toast } from 'sonner'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
-
+import { copyToClipboard } from 'ui'
+import { tablesToSQL } from 'lib/helpers'
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = () => {
@@ -27,6 +30,15 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    if (copied) {
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }, [copied])
+
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -94,6 +106,68 @@ export const SchemaGraph = () => {
     }
   }
 
+  const downloadImage = (format: 'png' | 'svg') => {
+    const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
+    if (!reactflowViewport) return
+
+    setIsDownloading(true)
+    const width = reactflowViewport.clientWidth
+    const height = reactflowViewport.clientHeight
+    const { x, y, zoom } = reactFlowInstance.getViewport()
+
+    if (format === 'svg') {
+      toSvg(reactflowViewport, {
+        backgroundColor: 'white',
+        width,
+        height,
+        style: {
+          width: width.toString(),
+          height: height.toString(),
+          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
+        },
+      })
+        .then((data) => {
+          const a = document.createElement('a')
+          a.setAttribute('download', `supabase-schema-${ref}.svg`)
+          a.setAttribute('href', data)
+          a.click()
+          toast.success('Successfully downloaded as SVG')
+        })
+        .catch((error) => {
+          console.error('Failed to download:', error)
+          toast.error('Failed to download current view:', error.message)
+        })
+        .finally(() => {
+          setIsDownloading(false)
+        })
+    } else if (format === 'png') {
+      toPng(reactflowViewport, {
+        backgroundColor: 'white',
+        width,
+        height,
+        style: {
+          width: width.toString(),
+          height: height.toString(),
+          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
+        },
+      })
+        .then((data) => {
+          const a = document.createElement('a')
+          a.setAttribute('download', `supabase-schema-${ref}.png`)
+          a.setAttribute('href', data)
+          a.click()
+          toast.success('Successfully downloaded as PNG')
+        })
+        .catch((error) => {
+          console.error('Failed to download:', error)
+          toast.error('Failed to download current view:', error.message)
+        })
+        .finally(() => {
+          setIsDownloading(false)
+        })
+    }
+  }
+
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
@@ -125,15 +199,65 @@ export const SchemaGraph = () => {
               selectedSchemaName={selectedSchema}
               onSelectSchema={setSelectedSchema}
             />
-            <ButtonTooltip
-              type="default"
-              onClick={resetLayout}
-              tooltip={{
-                content: { side: 'bottom', text: 'Automatically arrange the layout of all nodes' },
-              }}
-            >
-              Auto layout
-            </ButtonTooltip>
+            <div className="flex items-center gap-x-2">
+              <ButtonTooltip
+                type="outline"
+                icon={copied ? <Check /> : <Clipboard />}
+                onClick={() => {
+                  if (tables) {
+                    copyToClipboard(tablesToSQL(tables))
+                    setCopied(true)
+                  }
+                }}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: (
+                      <div className="max-w-[180px] space-y-2 text-foreground-light">
+                        <p className="text-foreground">Note</p>
+                        <p>
+                          This schema is for context or debugging only. Table order and constraints
+                          may be invalid. Not meant to be run as-is.
+                        </p>
+                      </div>
+                    ),
+                  },
+                }}
+              >
+                Copy as SQL
+              </ButtonTooltip>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <ButtonTooltip
+                    type="default"
+                    loading={isDownloading}
+                    className="px-1.5"
+                    icon={<Download />}
+                    tooltip={{ content: { side: 'bottom', text: 'Download current view' } }}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-32">
+                  <DropdownMenuItem onClick={() => downloadImage('png')}>
+                    Download as PNG
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => downloadImage('svg')}>
+                    Download as SVG
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <ButtonTooltip
+                type="default"
+                onClick={resetLayout}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: 'Automatically arrange the layout of all nodes',
+                  },
+                }}
+              >
+                Auto layout
+              </ButtonTooltip>
+            </div>
           </>
         )}
       </div>

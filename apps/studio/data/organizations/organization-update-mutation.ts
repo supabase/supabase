@@ -25,7 +25,7 @@ export async function updateOrganization({
   const payload: components['schemas']['UpdateOrganizationBody'] = {}
   if (name) payload.name = name
   if (billing_email) payload.billing_email = billing_email
-  if (opt_in_tags) payload.opt_in_tags = opt_in_tags
+  if (opt_in_tags) payload.opt_in_tags = opt_in_tags as any
   if (additional_billing_emails) payload.additional_billing_emails = additional_billing_emails
 
   const { data, error } = await patch('/platform/organizations/{slug}', {

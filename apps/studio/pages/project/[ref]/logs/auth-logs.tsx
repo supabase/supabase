@@ -10,14 +10,13 @@ import type { NextPageWithLayout } from 'types'
 
 const LogsPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
-
   const canReadAuthLogs = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
 
   return !canReadAuthLogs ? (
     <NoPermission isFullPage resourceText="access your project's authentication logs" />
-  ) : (
-    <>{project && <LogsPreviewer condensedLayout projectRef={project!.ref} queryType="auth" />}</>
-  )
+  ) : !!project ? (
+    <LogsPreviewer condensedLayout projectRef={project!.ref} queryType="auth" />
+  ) : null
 }
 
 LogsPage.getLayout = (page) => (

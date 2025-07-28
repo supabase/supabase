@@ -1,4 +1,5 @@
-
+-- We apply our test seedings to template1 so every new created db will have the same structure
+\c template1
 
 -- Tables for testing
 

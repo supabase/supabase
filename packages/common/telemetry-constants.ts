@@ -1,76 +1,17 @@
-// Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
+/**
+ * Consolidated event definitions coming from the frontend, including studio, www, and docs.
+ *
+ * Note that events are not emitted for users that have opted out of telemetry.
+ *
+ * Original definitions located at:
+ * https://github.com/supabase/supabase/blob/master/packages/common/telemetry-constants.ts
+ *
+ * @module telemetry-frontend
+ */
 
-export enum TelemetryActions {
-  SIGN_UP = 'sign_up',
-  SIGN_IN = 'sign_in',
-
-  ASSISTANT_PROMPT_SUBMITTED = 'assistant_prompt_submitted',
-  ASSISTANT_DEBUG_SUBMITTED = 'assistant_debug_submitted',
-  ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED = 'assistant_suggestion_run_query_clicked',
-  ASSISTANT_SQL_DIFF_HANDLER_EVALUATED = 'assistant_sql_diff_handler_evaluated',
-  ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED = 'assistant_edit_in_sql_editor_clicked',
-
-  CONNECTION_STRING_COPIED = 'connection_string_copied',
-  CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED = 'custom-report-add-sql-block-clicked',
-  CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED = 'custom-report-assistant-sql-block-added',
-
-  CRON_JOB_CREATED = 'cron_job_created',
-  CRON_JOB_UPDATED = 'cron_job_updated',
-  CRON_JOB_DELETED = 'cron_job_deleted',
-  CRON_JOB_DELETE_CLICKED = 'cron_job_delete_clicked',
-  CRON_JOB_UPDATE_CLICKED = 'cron_job_update_clicked',
-  CRON_JOB_CREATE_CLICKED = 'cron_job_create_clicked',
-  CRON_JOB_HISTORY_CLICKED = 'cron_job_history_clicked',
-
-  FEATURE_PREVIEWS_CLICKED = 'feature_previews_clicked',
-  FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
-  FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
-
-  PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED = 'project_creation_simple_version_submitted',
-  PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED = 'project_creation_initial_step_prompt_intended',
-  PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
-  PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED = 'project_creation_second_step_prompt_intended',
-  PROJECT_CREATION_SECOND_STEP_SUBMITTED = 'project_creation_second_step_submitted',
-
-  REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
-  REALTIME_INSPECTOR_BROADCAST_SENT = 'realtime_inspector_broadcast_sent',
-  REALTIME_INSPECTOR_MESSAGE_CLICKED = 'realtime_inspector_message_clicked',
-  REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED = 'realtime_inspector_copy_message_clicked',
-  REALTIME_INSPECTOR_FILTERS_APPLIED = 'realtime_inspector_filters_applied',
-  REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED = 'realtime_inspector_database_role_updated',
-
-  SQL_EDITOR_QUICKSTART_CLICKED = 'sql_editor_quickstart_clicked',
-  SQL_EDITOR_TEMPLATE_CLICKED = 'sql_editor_template_clicked',
-  SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
-  SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-  SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
-
-  DOCS_FEEDBACK_CLICKED = 'docs_feedback_clicked',
-
-  HOMEPAGE_HERO_REQUEST_DEMO_CLICKED = 'homepage_hero_request_demo_clicked',
-  HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED = 'homepage_framework_quickstart_clicked',
-  HOMEPAGE_PRODUCT_CARD_CLICKED = 'homepage_product_card_clicked',
-  WWW_PRICING_PLAN_CTA_CLICKED = 'www_pricing_plan_cta_clicked',
-  EVENT_PAGE_CTA_CLICKED = 'event_page_cta_clicked',
-  HOMEPAGE_GITHUB_BUTTON_CLICKED = 'homepage_github_button_clicked',
-  HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED = 'homepage_github_discussions_button_clicked',
-  HOMEPAGE_DISCORD_BUTTON_CLICKED = 'homepage_discord_button_clicked',
-  HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED = 'homepage_customer_story_card_clicked',
-  HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED = 'homepage_project_template_card_clicked',
-  OPEN_SOURCE_REPO_CARD_CLICKED = 'open_source_repo_card_clicked',
-  START_PROJECT_BUTTON_CLICKED = 'start_project_button_clicked',
-  SEE_DOCUMENTATION_BUTTON_CLICKED = 'see_documentation_button_clicked',
-  REQUEST_DEMO_BUTTON_CLICKED = 'request_demo_button_clicked',
-  SIGN_IN_BUTTON_CLICKED = 'sign_in_button_clicked',
-
-  HELP_BUTTON_CLICKED = 'help_button_clicked',
-  SEND_FEEDBACK_BUTTON_CLICKED = 'send_feedback_button_clicked',
-  EXAMPLE_PROJECT_CARD_CLICKED = 'example_project_card_clicked',
-  IMPORT_DATA_BUTTON_CLICKED = 'import_data_button_clicked',
-  IMPORT_DATA_ADDED = 'import_data_added',
-  SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED = 'sql_editor_query_run_button_clicked',
-  STUDIO_PRICING_PLAN_CTA_CLICKED = 'studio_pricing_plan_cta_clicked',
-  STUDIO_PRICING_SIDE_PANEL_OPENED = 'studio_pricing_side_panel_opened',
+type TelemetryGroups = {
+  project: string
+  organization: string
 }
 
 /**
@@ -81,7 +22,7 @@ export enum TelemetryActions {
  * @page /sign-up
  */
 export interface SignUpEvent {
-  action: TelemetryActions.SIGN_UP
+  action: 'sign_up'
   properties: {
     category: 'conversion'
   }
@@ -98,9 +39,13 @@ export interface SignUpEvent {
  * @page /sign-in-mfa
  */
 export interface SignInEvent {
-  action: TelemetryActions.SIGN_IN
+  action: 'sign_in'
   properties: {
     category: 'account'
+    /**
+     * The method used to sign in, e.g. email, github, sso
+     */
+    method: string
   }
 }
 
@@ -111,7 +56,7 @@ export interface SignInEvent {
  * @source studio
  */
 export interface ConnectionStringCopiedEvent {
-  action: TelemetryActions.CONNECTION_STRING_COPIED
+  action: 'connection_string_copied'
   properties: {
     /**
      * Method selected by user, e.g. URI, PSQL, SQLAlchemy, etc.
@@ -126,10 +71,7 @@ export interface ConnectionStringCopiedEvent {
      */
     connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -140,7 +82,7 @@ export interface ConnectionStringCopiedEvent {
  * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
  */
 export interface CronJobCreatedEvent {
-  action: TelemetryActions.CRON_JOB_CREATED
+  action: 'cron_job_created'
   properties: {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
@@ -151,10 +93,7 @@ export interface CronJobCreatedEvent {
      */
     schedule: string
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -165,7 +104,7 @@ export interface CronJobCreatedEvent {
  * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
  */
 export interface CronJobUpdatedEvent {
-  action: TelemetryActions.CRON_JOB_UPDATED
+  action: 'cron_job_updated'
   properties: {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
@@ -176,10 +115,7 @@ export interface CronJobUpdatedEvent {
      */
     schedule: string
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -190,11 +126,8 @@ export interface CronJobUpdatedEvent {
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
 export interface CronJobDeletedEvent {
-  action: TelemetryActions.CRON_JOB_DELETED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'cron_job_deleted'
+  groups: TelemetryGroups
 }
 
 /**
@@ -205,11 +138,8 @@ export interface CronJobDeletedEvent {
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
 export interface CronJobCreateClickedEvent {
-  action: TelemetryActions.CRON_JOB_CREATE_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'cron_job_create_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -220,11 +150,8 @@ export interface CronJobCreateClickedEvent {
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
 export interface CronJobUpdateClickedEvent {
-  action: TelemetryActions.CRON_JOB_UPDATE_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'cron_job_update_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -235,11 +162,8 @@ export interface CronJobUpdateClickedEvent {
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
 export interface CronJobDeleteClickedEvent {
-  action: TelemetryActions.CRON_JOB_DELETE_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'cron_job_delete_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -250,27 +174,8 @@ export interface CronJobDeleteClickedEvent {
  * @page /dashboard/project/{ref}/integrations/cron/jobs
  */
 export interface CronJobHistoryClickedEvent {
-  action: TelemetryActions.CRON_JOB_HISTORY_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
-}
-
-/**
- * The FeaturePreviewModal was opened.
- *
- * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
- *
- * @group Events
- * @source studio
- */
-export interface FeaturePreviewsClickedEvent {
-  action: TelemetryActions.FEATURE_PREVIEWS_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'cron_job_history_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -282,17 +187,14 @@ export interface FeaturePreviewsClickedEvent {
  * @source studio
  */
 export interface FeaturePreviewEnabledEvent {
-  action: TelemetryActions.FEATURE_PREVIEW_ENABLED
+  action: 'feature_preview_enabled'
   properties: {
     /**
      * Feature key of the preview that was enabled. e.g. supabase-ui-api-side-panel
      */
     feature: string
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -304,17 +206,14 @@ export interface FeaturePreviewEnabledEvent {
  * @source studio
  */
 export interface FeaturePreviewDisabledEvent {
-  action: TelemetryActions.FEATURE_PREVIEW_DISABLED
+  action: 'feature_preview_disabled'
   properties: {
     /**
      * Feature key of the preview that was disabled. e.g. supabase-ui-api-side-panel
      */
     feature: string
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -325,7 +224,32 @@ export interface FeaturePreviewDisabledEvent {
  * @page new/{slug}
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
-  action: TelemetryActions.PROJECT_CREATION_SIMPLE_VERSION_SUBMITTED
+  action: 'project_creation_simple_version_submitted'
+  /**
+   * the instance size selected in the project creation form
+   */
+  properties: {
+    instanceSize: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Existing project creation form confirm modal was triggered and opened.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
+  action: 'project_creation_simple_version_confirm_modal_opened'
+  /**
+   * the instance size selected in the project creation form
+   */
+  properties: {
+    instanceSize: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -337,7 +261,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
  * @page new/v2/{slug}
  */
 export interface ProjectCreationInitialStepPromptIntendedEvent {
-  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED
+  action: 'project_creation_initial_step_prompt_intended'
   /**
    * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
    * words, was this not just an edit. In this case, it should always be true.
@@ -355,7 +279,7 @@ export interface ProjectCreationInitialStepPromptIntendedEvent {
  * @page new/v2/{slug}
  */
 export interface ProjectCreationInitialStepSubmittedEvent {
-  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED
+  action: 'project_creation_initial_step_submitted'
   properties: {
     /**
      * Records what the user selected in the first step of project creation.
@@ -372,7 +296,7 @@ export interface ProjectCreationInitialStepSubmittedEvent {
  * @page new/v2/{slug}
  */
 export interface ProjectCreationSecondStepPromptIntendedEvent {
-  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED
+  action: 'project_creation_second_step_prompt_intended'
   properties: {
     /**
      * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
@@ -391,7 +315,7 @@ export interface ProjectCreationSecondStepPromptIntendedEvent {
  * @page new/v2/{slug}
  */
 export interface ProjectCreationSecondStepSubmittedEvent {
-  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED
+  action: 'project_creation_second_step_submitted'
 }
 
 /**
@@ -402,11 +326,8 @@ export interface ProjectCreationSecondStepSubmittedEvent {
  * @page /dashboard/project/{ref}/realtime/inspector
  */
 export interface RealtimeInspectorListenChannelClickedEvent {
-  action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'realtime_inspector_listen_channel_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -417,11 +338,8 @@ export interface RealtimeInspectorListenChannelClickedEvent {
  * @page /dashboard/project/{ref}/realtime/inspector
  */
 export interface RealtimeInspectorBroadcastSentEvent {
-  action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'realtime_inspector_broadcast_sent'
+  groups: TelemetryGroups
 }
 
 /**
@@ -432,11 +350,8 @@ export interface RealtimeInspectorBroadcastSentEvent {
  * @page /dashboard/project/{ref}/realtime/inspector
  */
 export interface RealtimeInspectorMessageClickedEvent {
-  action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'realtime_inspector_message_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -447,11 +362,8 @@ export interface RealtimeInspectorMessageClickedEvent {
  * @page /dashboard/project/{ref}/realtime/inspector
  */
 export interface RealtimeInspectorCopyMessageClickedEvent {
-  action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'realtime_inspector_copy_message_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -462,11 +374,8 @@ export interface RealtimeInspectorCopyMessageClickedEvent {
  * @page /dashboard/project/{ref}/realtime/inspector
  */
 export interface RealtimeInspectorFiltersAppliedEvent {
-  action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'realtime_inspector_filters_applied'
+  groups: TelemetryGroups
 }
 
 /**
@@ -477,11 +386,30 @@ export interface RealtimeInspectorFiltersAppliedEvent {
  * @page /dashboard/project/{ref}/realtime/inspector
  */
 export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
-  action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED
-  groups: {
-    project: string
-    organization: string
+  action: 'realtime_inspector_database_role_updated'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked to toggle realtime on a table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface RealtimeToggleTableClickedEvent {
+  action: 'realtime_toggle_table_clicked'
+  properties: {
+    /**
+     * The state of the toggle.
+     */
+    newState: 'enabled' | 'disabled'
+    /**
+     * Where the toggle was clicked from
+     */
+    origin: 'tableSidePanel' | 'tableGridHeader'
   }
+  groups: TelemetryGroups
 }
 
 /**
@@ -492,17 +420,14 @@ export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorQuickstartClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED
+  action: 'sql_editor_quickstart_clicked'
   properties: {
     /**
      * The title of the quickstart card clicked.
      */
     quickstartName: string
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -513,62 +438,50 @@ export interface SqlEditorQuickstartClickedEvent {
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorTemplateClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED
+  action: 'sql_editor_template_clicked'
   properties: {
     /**
      * The name of the template card clicked.
      */
     templateName: string
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
- * User clicked the “Result download CSV” button in the SQL editor.
+ * User clicked the "Result download CSV" button in the SQL editor.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorResultDownloadCsvClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'sql_editor_result_download_csv_clicked'
+  groups: TelemetryGroups
 }
 
 /**
- * User clicked the “Result copy Markdown” button in the SQL editor.
+ * User clicked the "Result copy Markdown" button in the SQL editor.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorResultCopyMarkdownClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'sql_editor_result_copy_markdown_clicked'
+  groups: TelemetryGroups
 }
 
 /**
- * User clicked the “Result copy JSON” button in the SQL editor
+ * User clicked the "Result copy JSON" button in the SQL editor
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/sql
  */
 export interface SqlEditorResultCopyJsonClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'sql_editor_result_copy_json_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -578,11 +491,8 @@ export interface SqlEditorResultCopyJsonClickedEvent {
  * @source studio
  */
 export interface AssistantPromptSubmittedEvent {
-  action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'assistant_prompt_submitted'
+  groups: TelemetryGroups
 }
 
 /**
@@ -592,11 +502,8 @@ export interface AssistantPromptSubmittedEvent {
  * @source studio
  */
 export interface AssistantDebugSubmittedEvent {
-  action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'assistant_debug_submitted'
+  groups: TelemetryGroups
 }
 
 /**
@@ -606,7 +513,7 @@ export interface AssistantDebugSubmittedEvent {
  * @source studio
  */
 export interface AssistantSuggestionRunQueryClickedEvent {
-  action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED
+  action: 'assistant_suggestion_run_query_clicked'
   properties: {
     /**
      * The type of suggestion that was run by the user. Mutate or Select query types only.
@@ -614,6 +521,7 @@ export interface AssistantSuggestionRunQueryClickedEvent {
     queryType: string
     category?: string
   }
+  groups: TelemetryGroups
 }
 
 /**
@@ -627,17 +535,14 @@ export interface AssistantSuggestionRunQueryClickedEvent {
  * @page /dashboard/project/{ref}/sql
  */
 export interface AssistantSqlDiffHandlerEvaluatedEvent {
-  action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED
+  action: 'assistant_sql_diff_handler_evaluated'
   properties: {
     /**
      * Whether the user accepted or rejected the changes.
      */
     handlerAccepted: boolean
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -647,7 +552,7 @@ export interface AssistantSqlDiffHandlerEvaluatedEvent {
  * @source studio
  */
 export interface AssistantEditInSqlEditorClickedEvent {
-  action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED
+  action: 'assistant_edit_in_sql_editor_clicked'
   properties: {
     /**
      * Whether the user is in the SQL editor page or in a new snippet.
@@ -655,10 +560,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
     isInSQLEditor: boolean
     isInNewSnippet: boolean
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -669,7 +571,8 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @page /dashboard/project/{ref}/reports/{id}
  */
 export interface CustomReportAddSQLBlockClicked {
-  action: TelemetryActions.CUSTOM_REPORT_ADD_SQL_BLOCK_CLICKED
+  action: 'custom_report_add_sql_block_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -679,8 +582,9 @@ export interface CustomReportAddSQLBlockClicked {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAssistantSQLBlockAdded {
-  action: TelemetryActions.CUSTOM_REPORT_ASSISTANT_SQL_BLOCK_ADDED
+export interface CustomReportAssistantSQLBlockAddedEvent {
+  action: 'custom_report_assistant_sql_block_added'
+  groups: TelemetryGroups
 }
 
 /**
@@ -690,24 +594,13 @@ export interface CustomReportAssistantSQLBlockAdded {
  * @source docs
  */
 export interface DocsFeedbackClickedEvent {
-  action: TelemetryActions.DOCS_FEEDBACK_CLICKED
+  action: 'docs_feedback_clicked'
   properties: {
     /**
      * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
      */
     response: 'yes' | 'no'
   }
-}
-
-/**
- * User clicked the "Request a Demo" button in the homepage hero section.
- *
- * @group Events
- * @source www
- * @page /
- */
-export interface HomepageHeroRequestDemoClickedEvent {
-  action: TelemetryActions.HOMEPAGE_HERO_REQUEST_DEMO_CLICKED
 }
 
 /**
@@ -718,7 +611,7 @@ export interface HomepageHeroRequestDemoClickedEvent {
  * @page /
  */
 export interface HomepageFrameworkQuickstartClickedEvent {
-  action: TelemetryActions.HOMEPAGE_FRAMEWORK_QUICKSTART_CLICKED
+  action: 'homepage_framework_quickstart_clicked'
   properties: {
     /**
      * The name of the framework quickstart card clicked.
@@ -735,7 +628,7 @@ export interface HomepageFrameworkQuickstartClickedEvent {
  * @page /
  */
 export interface HomepageProductCardClickedEvent {
-  action: TelemetryActions.HOMEPAGE_PRODUCT_CARD_CLICKED
+  action: 'homepage_product_card_clicked'
   properties: {
     product: string
   }
@@ -749,7 +642,7 @@ export interface HomepageProductCardClickedEvent {
  * @page /pricing
  */
 export interface WwwPricingPlanCtaClickedEvent {
-  action: TelemetryActions.WWW_PRICING_PLAN_CTA_CLICKED
+  action: 'www_pricing_plan_cta_clicked'
   properties: {
     /**
      * The plan type that was clicked.
@@ -777,7 +670,7 @@ export interface WwwPricingPlanCtaClickedEvent {
  * @page /events/*
  */
 export interface EventPageCtaClickedEvent {
-  action: TelemetryActions.EVENT_PAGE_CTA_CLICKED
+  action: 'www_pricing_plan_cta_clicked'
   properties: {
     /**
      * The title of the event clicked.
@@ -794,7 +687,7 @@ export interface EventPageCtaClickedEvent {
  * @page /
  */
 export interface HomepageGitHubButtonClickedEvent {
-  action: TelemetryActions.HOMEPAGE_GITHUB_BUTTON_CLICKED
+  action: 'homepage_github_button_clicked'
 }
 
 /**
@@ -805,7 +698,7 @@ export interface HomepageGitHubButtonClickedEvent {
  * @page /
  */
 export interface HomepageGitHubDiscussionsButtonClickedEvent {
-  action: TelemetryActions.HOMEPAGE_GITHUB_DISCUSSIONS_BUTTON_CLICKED
+  action: 'homepage_github_discussions_button_clicked'
 }
 
 /**
@@ -816,7 +709,7 @@ export interface HomepageGitHubDiscussionsButtonClickedEvent {
  * @page /
  */
 export interface HomepageDiscordButtonClickedEvent {
-  action: TelemetryActions.HOMEPAGE_DISCORD_BUTTON_CLICKED
+  action: 'homepage_discord_button_clicked'
 }
 
 /**
@@ -827,7 +720,7 @@ export interface HomepageDiscordButtonClickedEvent {
  * @page /
  */
 export interface HomepageCustomerStoryCardClickedEvent {
-  action: TelemetryActions.HOMEPAGE_CUSTOMER_STORY_CARD_CLICKED
+  action: 'homepage_customer_story_card_clicked'
   properties: {
     customer?: string
     /**
@@ -845,7 +738,7 @@ export interface HomepageCustomerStoryCardClickedEvent {
  * @page /
  */
 export interface HomepageProjectTemplateCardClickedEvent {
-  action: TelemetryActions.HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED
+  action: 'homepage_project_template_card_clicked'
   properties: {
     /**
      * The title of the project template card clicked.
@@ -862,7 +755,7 @@ export interface HomepageProjectTemplateCardClickedEvent {
  * @page /open-source
  */
 export interface OpenSourceRepoCardClickedEvent {
-  action: TelemetryActions.OPEN_SOURCE_REPO_CARD_CLICKED
+  action: 'open_source_repo_card_clicked'
   properties: {
     /**
      * The name of the open source repository clicked.
@@ -872,13 +765,13 @@ export interface OpenSourceRepoCardClickedEvent {
 }
 
 /**
- * User clicked the green “Start Project” button in various locations described in properties.
+ * User clicked the green "Start Project" button in various locations described in properties.
  *
  * @group Events
  * @source www
  */
 export interface StartProjectButtonClickedEvent {
-  action: TelemetryActions.START_PROJECT_BUTTON_CLICKED
+  action: 'start_project_button_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, product page header.
@@ -894,7 +787,7 @@ export interface StartProjectButtonClickedEvent {
  * @source www
  */
 export interface SeeDocumentationButtonClickedEvent {
-  action: TelemetryActions.SEE_DOCUMENTATION_BUTTON_CLICKED
+  action: 'see_documentation_button_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, product page header - product name.
@@ -910,7 +803,24 @@ export interface SeeDocumentationButtonClickedEvent {
  * @source www
  */
 export interface RequestDemoButtonClickedEvent {
-  action: TelemetryActions.REQUEST_DEMO_BUTTON_CLICKED
+  action: 'request_demo_button_clicked'
+  properties: {
+    /**
+     * The source of the button click, e.g. homepage hero, cta banner, product page header.
+     * If it states it came from the request demo form, it can come from different pages so refer to path name to determine.
+     */
+    buttonLocation: string
+  }
+}
+
+/**
+ * User clicked the "Register" button in the State of Startups 2025 newsletter form.
+ *
+ * @group Events
+ * @source www
+ */
+export interface RegisterStateOfStartups2025NewsletterClicked {
+  action: 'register_for_state_of_startups_newsletter_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, cta banner, product page header.
@@ -927,7 +837,7 @@ export interface RequestDemoButtonClickedEvent {
  * @source www
  */
 export interface SignInButtonClickedEvent {
-  action: TelemetryActions.SIGN_IN_BUTTON_CLICKED
+  action: 'sign_in_button_clicked'
   properties: {
     /**
      * The source of the button click, e.g. homepage hero, cta banner, product page header.
@@ -943,11 +853,8 @@ export interface SignInButtonClickedEvent {
  * @source studio
  */
 export interface HelpButtonClickedEvent {
-  action: TelemetryActions.HELP_BUTTON_CLICKED
-  groups: {
-    project?: string
-    organization?: string
-  }
+  action: 'help_button_clicked'
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -957,11 +864,8 @@ export interface HelpButtonClickedEvent {
  * @source studio
  */
 export interface SendFeedbackButtonClickedEvent {
-  action: TelemetryActions.SEND_FEEDBACK_BUTTON_CLICKED
-  groups: {
-    project?: string
-    organization?: string
-  }
+  action: 'send_feedback_button_clicked'
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -972,17 +876,14 @@ export interface SendFeedbackButtonClickedEvent {
  * @page /project/{ref}
  */
 export interface ExampleProjectCardClickedEvent {
-  action: TelemetryActions.EXAMPLE_PROJECT_CARD_CLICKED
+  action: 'example_project_card_clicked'
   properties: {
     /**
      * The title of the example project card clicked.
      */
     cardTitle: string
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -993,7 +894,7 @@ export interface ExampleProjectCardClickedEvent {
  * @page /dashboard/project/{ref}/editor
  */
 export interface ImportDataButtonClickedEvent {
-  action: TelemetryActions.IMPORT_DATA_BUTTON_CLICKED
+  action: 'import_data_button_clicked'
   properties: {
     /**
      * The type of table the data is imported to.
@@ -1002,10 +903,7 @@ export interface ImportDataButtonClickedEvent {
      */
     tableType: 'New Table' | 'Existing Table'
   }
-  groups: {
-    project: string
-    organization: string
-  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -1016,11 +914,8 @@ export interface ImportDataButtonClickedEvent {
  * @page /dashboard/project/{ref}/editor
  */
 export interface ImportDataAddedEvent {
-  action: TelemetryActions.IMPORT_DATA_ADDED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'import_data_added'
+  groups: TelemetryGroups
 }
 
 /**
@@ -1031,11 +926,8 @@ export interface ImportDataAddedEvent {
  * @page /dashboard/project/{ref}/sql/{id}
  */
 export interface SqlEditorQueryRunButtonClickedEvent {
-  action: TelemetryActions.SQL_EDITOR_QUERY_RUN_BUTTON_CLICKED
-  groups: {
-    project: string
-    organization: string
-  }
+  action: 'sql_editor_query_run_button_clicked'
+  groups: TelemetryGroups
 }
 
 /**
@@ -1046,7 +938,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
  * @page /billing?panel=subscriptionPlan
  */
 export interface StudioPricingPlanCtaClickedEvent {
-  action: TelemetryActions.STUDIO_PRICING_PLAN_CTA_CLICKED
+  action: 'studio_pricing_plan_cta_clicked'
   properties: {
     /**
      * The plan type that was clicked.
@@ -1057,7 +949,7 @@ export interface StudioPricingPlanCtaClickedEvent {
      */
     currentPlan?: string
   }
-  groups: { organization: string }
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -1068,7 +960,7 @@ export interface StudioPricingPlanCtaClickedEvent {
  * @page /billing?panel=subscriptionPlan
  */
 export interface StudioPricingSidePanelOpenedEvent {
-  action: TelemetryActions.STUDIO_PRICING_SIDE_PANEL_OPENED
+  action: 'studio_pricing_side_panel_opened'
   properties: {
     currentPlan?: string
     /**
@@ -1076,9 +968,435 @@ export interface StudioPricingSidePanelOpenedEvent {
      */
     origin?: string
   }
-  groups: { organization: string }
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
+/**
+ * User clicks on grafana banner in studio Reports page.
+ *
+ * @group Events
+ * @source studio
+ * @page /reports/database
+ */
+export interface ReportsDatabaseGrafanaBannerClickedEvent {
+  action: 'reports_database_grafana_banner_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the deploy button for an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/new
+ */
+export interface EdgeFunctionDeployButtonClickedEvent {
+  action: 'edge_function_deploy_button_clicked'
+  properties: {
+    /**
+     * Click on Deploy can either happen:
+     *   1. in the functions editor page
+     *   2. in the chat button in the functions editor
+     */
+    origin: 'functions_editor' | 'functions_ai_assistant'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the confirm deploy updates button for an Edge Function in the code page within the warning model.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}/code
+ */
+export interface EdgeFunctionDeployUpdatesConfirmClickedEvent {
+  action: 'edge_function_deploy_updates_confirm_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the AI Assistant button to create an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionAiAssistantButtonClickedEvent {
+  action: 'edge_function_ai_assistant_button_clicked'
+  properties: {
+    /**
+     * Click on AI Assistant can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     *   3. on the chat button in the functions editor
+     */
+    origin: 'no_functions_block' | 'secondary_action' | 'functions_editor_chat'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the button to go to the functions editor page to create an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionViaEditorButtonClickedEvent {
+  action: 'edge_function_via_editor_button_clicked'
+  properties: {
+    /**
+     * Click on Via Editor can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     */
+    origin: 'no_functions_block' | 'secondary_action'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked on an Edge Function template.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionTemplateClickedEvent {
+  action: 'edge_function_template_clicked'
+  properties: {
+    templateName: string
+    /**
+     * Where the edge function template was clicked from:
+     *  1. functions page
+     *  2. editor page
+     */
+    origin: 'functions_page' | 'editor_page'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the button to create an edge function via CLI.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions
+ */
+export interface EdgeFunctionViaCliButtonClickedEvent {
+  action: 'edge_function_via_cli_button_clicked'
+  properties: {
+    /**
+     * Click on Via CLI can either happen:
+     *   1. on the main block when there are no functions
+     *   2. in the secondary action section of the page
+     */
+    origin: 'no_functions_block' | 'secondary_action'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the deploy updates button for an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}/code
+ */
+export interface EdgeFunctionDeployUpdatesButtonClickedEvent {
+  action: 'edge_function_deploy_updates_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Send Request button for testing an Edge Function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}
+ */
+export interface EdgeFunctionTestSendButtonClickedEvent {
+  action: 'edge_function_test_send_button_clicked'
+  properties: {
+    /**
+     * The HTTP method used for the test request, e.g., GET, POST.
+     */
+    httpMethod: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the side panel for testing an edge function.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/functions/{id}
+ */
+export interface EdgeFunctionTestSidePanelOpenedEvent {
+  action: 'edge_function_test_side_panel_opened'
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted a support ticket. Project and organization are optional because the ticket might be about user account issues.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface SupportTicketSubmittedEvent {
+  action: 'support_ticket_submitted'
+  properties: {
+    ticketCategory: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked the AI Assistant card on top of the support ticket form.
+ * This event is specifically when the user goes back to the AI Assistant in the Studio.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/support/new
+ */
+export interface AiAssistantInSupportFormClickedEvent {
+  action: 'ai_assistant_in_support_form_clicked'
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User copied the command for a Supabase UI component.
+ *
+ * @group Events
+ * @source supabase-ui
+ * @page /ui/docs/{framework}/{templateTitle}
+ */
+export interface SupabaseUiCommandCopyButtonClickedEvent {
+  action: 'supabase_ui_command_copy_button_clicked'
+  properties: {
+    templateTitle: string
+    command: string
+    framework: 'nextjs' | 'react-router' | 'tanstack' | 'react'
+    packageManager: 'npm' | 'pnpm' | 'yarn' | 'bun'
+  }
+}
+
+/**
+ * Triggered when the organization MFA enforcement setting is updated.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/security
+ */
+export interface OrganizationMfaEnforcementUpdated {
+  action: 'organization_mfa_enforcement_updated'
+  properties: {
+    mfaEnforced: boolean
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when a new foreign data wrapper is created in a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/database/integrations
+ */
+export interface ForeignDataWrapperCreatedEvent {
+  action: 'foreign_data_wrapper_created'
+  properties: {
+    /**
+     * The type of the foreign data wrapper, e.g. postgres_fdw, mysql_fdw, etc.
+     */
+    wrapperType: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a new storage bucket is created in a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/buckets
+ */
+export interface StorageBucketCreatedEvent {
+  action: 'storage_bucket_created'
+  properties: {
+    /**
+     * The type of the bucket created. E.g. standard or analytics iceberg.
+     */
+    bucketType?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a new branch is created.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches
+ */
+export interface BranchCreateButtonClickedEvent {
+  action: 'branch_create_button_clicked'
+  properties: {
+    /**
+     * The type of branch created, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+    /**
+     * Whether the branch was created with a git branch association
+     */
+    gitlessBranching: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a branch delete button is clicked.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches
+ */
+export interface BranchDeleteButtonClickedEvent {
+  action: 'branch_delete_button_clicked'
+  properties: {
+    /**
+     * The type of branch being deleted, e.g. preview, persistent
+     */
+    branchType?: 'preview' | 'persistent'
+    /**
+     * Where the delete action was initiated from
+     */
+    origin: 'branches_page' | 'merge_page'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a create merge request is clicked for a branch.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches
+ */
+export interface BranchCreateMergeRequestButtonClickedEvent {
+  action: 'branch_create_merge_request_button_clicked'
+  properties: {
+    /**
+     * The type of branch being merged, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+    origin: 'header' | 'merge_page' | 'branch_selector'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a merge request is closed.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/branches/merge-requests
+ */
+export interface BranchCloseMergeRequestButtonClickedEvent {
+  action: 'branch_close_merge_request_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks the merge button successfully to attempt merging a branch.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchMergeSubmittedEvent {
+  action: 'branch_merge_submitted'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a branch merge is successful.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchMergeSucceededEvent {
+  action: 'branch_merge_succeeded'
+  properties: {
+    /**
+     * The type of branch being merged, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a branch merge fails.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchMergeFailedEvent {
+  action: 'branch_merge_failed'
+  properties: {
+    /**
+     * The type of branch being merged, e.g. preview, persistent
+     */
+    branchType: 'preview' | 'persistent'
+    /**
+     * The error message or reason for failure
+     */
+    error?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a branch is updated on push with latest changes from production.
+ * Does not include renaming and linking to GitHub branch.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchUpdatedEvent {
+  action: 'branch_updated'
+  properties: {
+    /**
+     * The source of the update action
+     */
+    source: 'merge_page' | 'out_of_date_notice'
+    modifiedEdgeFunctions?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks the review with assistant button for a merge.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/merge
+ */
+export interface BranchReviewWithAssistantClickedEvent {
+  action: 'branch_review_with_assistant_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * @hidden
+ */
 export type TelemetryEvent =
   | SignUpEvent
   | SignInEvent
@@ -1090,10 +1408,10 @@ export type TelemetryEvent =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
-  | FeaturePreviewsClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationSimpleVersionSubmittedEvent
+  | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent
@@ -1104,6 +1422,7 @@ export type TelemetryEvent =
   | RealtimeInspectorCopyMessageClickedEvent
   | RealtimeInspectorFiltersAppliedEvent
   | RealtimeInspectorDatabaseRoleUpdatedEvent
+  | RealtimeToggleTableClickedEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
@@ -1115,7 +1434,6 @@ export type TelemetryEvent =
   | AssistantSqlDiffHandlerEvaluatedEvent
   | AssistantEditInSqlEditorClickedEvent
   | DocsFeedbackClickedEvent
-  | HomepageHeroRequestDemoClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
@@ -1126,11 +1444,12 @@ export type TelemetryEvent =
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
   | CustomReportAddSQLBlockClicked
-  | CustomReportAssistantSQLBlockAdded
+  | CustomReportAssistantSQLBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
   | RequestDemoButtonClickedEvent
+  | RegisterStateOfStartups2025NewsletterClicked
   | SignInButtonClickedEvent
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
@@ -1140,3 +1459,28 @@ export type TelemetryEvent =
   | SqlEditorQueryRunButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
+  | ReportsDatabaseGrafanaBannerClickedEvent
+  | EdgeFunctionDeployButtonClickedEvent
+  | EdgeFunctionDeployUpdatesConfirmClickedEvent
+  | EdgeFunctionAiAssistantButtonClickedEvent
+  | EdgeFunctionViaEditorButtonClickedEvent
+  | EdgeFunctionTemplateClickedEvent
+  | EdgeFunctionViaCliButtonClickedEvent
+  | EdgeFunctionDeployUpdatesButtonClickedEvent
+  | EdgeFunctionTestSendButtonClickedEvent
+  | EdgeFunctionTestSidePanelOpenedEvent
+  | SupabaseUiCommandCopyButtonClickedEvent
+  | SupportTicketSubmittedEvent
+  | AiAssistantInSupportFormClickedEvent
+  | OrganizationMfaEnforcementUpdated
+  | ForeignDataWrapperCreatedEvent
+  | StorageBucketCreatedEvent
+  | BranchCreateButtonClickedEvent
+  | BranchDeleteButtonClickedEvent
+  | BranchCreateMergeRequestButtonClickedEvent
+  | BranchCloseMergeRequestButtonClickedEvent
+  | BranchMergeSubmittedEvent
+  | BranchMergeSucceededEvent
+  | BranchMergeFailedEvent
+  | BranchUpdatedEvent
+  | BranchReviewWithAssistantClickedEvent

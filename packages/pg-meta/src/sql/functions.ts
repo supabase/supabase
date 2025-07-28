@@ -80,7 +80,8 @@ from
         'mode', t2.mode,
         'name', name,
         'type_id', type_id,
-        'has_default', has_default
+        -- Cast null into false boolean
+        'has_default', COALESCE(has_default, false)
       )) as args
     from
       (
@@ -88,7 +89,9 @@ from
           oid,
           unnest(arg_modes) as mode,
           unnest(arg_names) as name,
-          unnest(arg_types) as type_id,
+          -- Coming from: coalesce(p.proallargtypes, p.proargtypes) postgres won't automatically assume
+          -- integer, we need to cast it to be properly parsed
+          unnest(arg_types)::int8 as type_id,
           unnest(arg_has_defaults) as has_default
         from
           functions

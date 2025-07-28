@@ -9,15 +9,24 @@ When you need granular authorization rules, nothing beats Postgres's [Row Level 
 
 ## Row Level Security in Supabase
 
-RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/database/postgres/row-level-security) for end-to-end user security from the browser to the database.
+<Admonition type="danger">
 
-RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through third-party tooling.
+Supabase allows convenient and secure data access from the browser, as long as you enable RLS.
 
-<Admonition type="note">
+RLS _must_ always be enabled on any tables stored in an exposed schema. By default, this is the `public` schema.
 
-You should _always_ enable RLS on tables created in a public schema. This is done for you when you create a table with the Table Editor. If you create one in raw SQL or with the SQL Editor, remember to enable RLS yourself.
+RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself:
+
+```sql
+alter table <schema_name>.<table_name>
+enable row level security;
+```
 
 </Admonition>
+
+RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be combined with [Supabase Auth](/docs/guides/auth) for end-to-end user security from the browser to the database.
+
+RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through third-party tooling.
 
 ## Policies
 
@@ -81,7 +90,7 @@ Using the `anon` Postgres role is different from an [anonymous user](/docs/guide
 
 ## Creating policies
 
-Policies are simply SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
+Policies are SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
 
 Supabase provides some [helpers](#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic policies:
 

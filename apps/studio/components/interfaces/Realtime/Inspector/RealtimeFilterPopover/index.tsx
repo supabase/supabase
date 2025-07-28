@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
 
 import { useParams } from 'common'
-import { TelemetryActions } from 'common/telemetry-constants'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
@@ -206,7 +205,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         onCancel={() => setApplyConfigOpen(false)}
         onConfirm={() => {
           sendEvent({
-            action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED,
+            action: 'realtime_inspector_filters_applied',
             groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
           })
           onChangeConfig(tempConfig)

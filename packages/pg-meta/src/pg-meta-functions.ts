@@ -36,10 +36,10 @@ export const pgFunctionZod = z.object({
   config_params: z.union([z.record(z.string(), z.string()), z.null()]),
 })
 
+export type PGFunction = z.infer<typeof pgFunctionZod>
+
 export const pgFunctionArrayZod = z.array(pgFunctionZod)
 export const pgFunctionOptionalZod = z.optional(pgFunctionZod)
-
-export type PGFunction = z.infer<typeof pgFunctionZod>
 
 export function list({
   includeSystemSchemas = false,
@@ -86,10 +86,12 @@ export function list({
   }
 }
 
-export function retrieve({ id }: { id: number }): {
+type FunctionsRetrieveReturn = {
   sql: string
   zod: typeof pgFunctionOptionalZod
 }
+
+export function retrieve({ id }: { id: number }): FunctionsRetrieveReturn
 export function retrieve({
   name,
   schema,
@@ -98,10 +100,7 @@ export function retrieve({
   name: string
   schema: string
   args: string[]
-}): {
-  sql: string
-  zod: typeof pgFunctionOptionalZod
-}
+}): FunctionsRetrieveReturn
 export function retrieve({
   id,
   name,
@@ -112,10 +111,7 @@ export function retrieve({
   name?: string
   schema?: string
   args?: string[]
-}): {
-  sql: string
-  zod: typeof pgFunctionOptionalZod
-} {
+}): FunctionsRetrieveReturn {
   if (id) {
     const sql = /* SQL */ `
       with f as (
@@ -212,8 +208,8 @@ function _generateCreateFunctionSql(
       config_params
         ? Object.entries(config_params)
             .map(
-              ([param, value]: string[]) =>
-                `SET ${param} ${value[0] === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + (value === '""' ? "''" : value)}`
+              ([param, value]) =>
+                `SET ${param} ${value === 'FROM CURRENT' ? 'FROM CURRENT' : 'TO ' + (value === '""' ? "''" : value)}`
             )
             .join('\n')
         : ''

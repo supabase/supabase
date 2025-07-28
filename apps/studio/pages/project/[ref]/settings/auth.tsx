@@ -87,7 +87,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <ChevronRight strokeWidth={1.5} size={16} />
         </Link>
         <Link
-          href={`/project/${ref}/settings/database#connection-pooler`}
+          href={`/project/${ref}/auth/advanced`}
           className="block py-2 hover:text-foreground flex items-center justify-between"
         >
           Max direct database connections

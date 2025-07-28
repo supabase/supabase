@@ -2,25 +2,35 @@ import { tool } from 'ai'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
+// import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
+import { IS_PLATFORM } from 'common'
+import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
-import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
+import { queryPgMetaSelfHosted } from 'lib/self-hosted'
 
 export const getTools = ({
   projectRef,
   connectionString,
+  cookie,
   authorization,
   includeSchemaMetadata,
 }: {
   projectRef: string
   connectionString: string
+  cookie?: string
   authorization?: string
   includeSchemaMetadata: boolean
 }) => {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(cookie && { cookie }),
+    ...(authorization && { Authorization: authorization }),
+  }
+
   return {
-    getSchema: tool({
+    getSchemaTables: tool({
       description: 'Get more information about one or more schemas',
       parameters: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the definitions for'),
@@ -35,10 +45,8 @@ export const getTools = ({
                   sql: getEntityDefinitionsSql({ schemas }),
                 },
                 undefined,
-                {
-                  'Content-Type': 'application/json',
-                  ...(authorization && { Authorization: authorization }),
-                }
+                headers,
+                IS_PLATFORM ? undefined : queryPgMetaSelfHosted
               )
             : { result: [] }
 
@@ -49,25 +57,28 @@ export const getTools = ({
         }
       },
     }),
-    convertSqlToSupabaseJs: tool({
-      description: 'Convert an sql query into supabase-js client code',
-      parameters: z.object({
-        sql: z
-          .string()
-          .describe(
-            'The sql statement to convert. Only a subset of statements are supported currently. '
-          ),
-      }),
-      execute: async ({ sql }) => {
-        try {
-          const statement = await processSql(sql)
-          const { code } = await renderSupabaseJs(statement)
-          return code
-        } catch (error) {
-          return `Failed to convert SQL: ${error}`
-        }
-      },
-    }),
+    // [Ivan] The tool relies on `libpg-query` binaries which we've removed intentionally because they couldn't build on MacOS.
+    // Once we figure out a way how to use wasm binaries, we can add it back.
+    //
+    // convertSqlToSupabaseJs: tool({
+    //   description: 'Convert an sql query into supabase-js client code',
+    //   parameters: z.object({
+    //     sql: z
+    //       .string()
+    //       .describe(
+    //         'The sql statement to convert. Only a subset of statements are supported currently. '
+    //       ),
+    //   }),
+    //   execute: async ({ sql }) => {
+    //     try {
+    //       const statement = await processSql(sql)
+    //       const { code } = await renderSupabaseJs(statement)
+    //       return code
+    //     } catch (error) {
+    //       return `Failed to convert SQL: ${error}`
+    //     }
+    //   },
+    // }),
     getRlsKnowledge: tool({
       description:
         'Get existing policies and examples and instructions on how to write RLS policies',
@@ -80,12 +91,10 @@ export const getTools = ({
               {
                 projectRef,
                 connectionString,
+                schema: schemas?.join(','),
               },
               undefined,
-              {
-                'Content-Type': 'application/json',
-                ...(authorization && { Authorization: authorization }),
-              }
+              headers
             )
           : []
 
@@ -357,10 +366,7 @@ export const getTools = ({
                   connectionString,
                 },
                 undefined,
-                {
-                  'Content-Type': 'application/json',
-                  ...(authorization && { Authorization: authorization }),
-                }
+                headers
               )
             : []
 

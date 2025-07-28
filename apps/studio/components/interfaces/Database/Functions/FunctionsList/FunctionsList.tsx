@@ -17,7 +17,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
@@ -36,7 +36,7 @@ const FunctionsList = ({
   const router = useRouter()
   const { search } = useParams()
   const { project } = useProjectContext()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -149,7 +149,8 @@ const FunctionsList = ({
                     className="px-1 pointer-events-auto"
                     icon={<AiIconAnimation size={16} />}
                     onClick={() =>
-                      setAiAssistantPanel({
+                      aiSnap.newChat({
+                        name: 'Create new function',
                         open: true,
                         initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                       })

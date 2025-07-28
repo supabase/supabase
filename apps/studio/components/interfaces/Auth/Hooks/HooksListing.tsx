@@ -3,9 +3,9 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -68,8 +68,11 @@ export const HooksListing = () => {
   }
 
   return (
-    <div className="pb-4">
-      <FormHeader title="All hooks" actions={<AddHookDropdown onSelectHook={setSelectedHook} />} />
+    <ScaffoldSection isFullWidth>
+      <div className="flex justify-between items-center mb-4">
+        <ScaffoldSectionTitle>All hooks</ScaffoldSectionTitle>
+        <AddHookDropdown onSelectHook={setSelectedHook} />
+      </div>
 
       {hooks.filter((h) => isValidHook(h)).length === 0 && (
         <div
@@ -79,7 +82,11 @@ export const HooksListing = () => {
           ].join(' ')}
         >
           <p className="text-sm text-foreground-light">No hooks configured yet</p>
-          <AddHookDropdown buttonText="Add a new hook" onSelectHook={setSelectedHook} />
+          <AddHookDropdown
+            align="center"
+            buttonText="Add a new hook"
+            onSelectHook={setSelectedHook}
+          />
         </div>
       )}
 
@@ -155,6 +162,6 @@ export const HooksListing = () => {
           )}
         </div>
       </ConfirmationModal>
-    </div>
+    </ScaffoldSection>
   )
 }

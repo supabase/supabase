@@ -9,13 +9,13 @@ import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCa
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Loading } from 'components/ui/Loading'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
@@ -30,24 +30,25 @@ export const GraphiQLTab = () => {
   const pgGraphqlExtension = (data ?? []).find((ext) => ext.name === 'pg_graphql')
 
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { data: settings, isFetched } = useProjectSettingsV2Query({ projectRef })
 
-  const { serviceKey } = getAPIKeys(settings)
+  const { data: apiKeys, isFetched } = useAPIKeysQuery({ projectRef, reveal: true })
+  const { serviceKey, secretKey } = getKeys(apiKeys)
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
 
-  const getImpersonatedRole = useGetImpersonatedRole()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
-      url: `${API_URL}/projects/${projectRef}/api/graphql`,
+      // [Joshen] Opting to hard code /platform for local to match the routes, so that it's clear what's happening
+      url: `${API_URL}${IS_PLATFORM ? '' : '/platform'}/projects/${projectRef}/api/graphql`,
       fetch,
     })
     const customFetcher: Fetcher = async (graphqlParams, opts) => {
       let userAuthorization: string | undefined
 
-      const role = getImpersonatedRole()
+      const role = getImpersonatedRoleState().role
       if (
         projectRef !== undefined &&
         jwtSecret !== undefined &&
@@ -73,13 +74,13 @@ export const GraphiQLTab = () => {
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
             userAuthorization ??
-            `Bearer ${serviceKey?.api_key}`,
+            `Bearer ${secretKey?.api_key ?? serviceKey?.api_key}`,
         },
       })
     }
 
     return customFetcher
-  }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceKey])
+  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken, serviceKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
     return <Loading />

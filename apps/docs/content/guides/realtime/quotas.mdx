@@ -17,10 +17,10 @@ Upgrade your plan to increase your quotas. Without a spend cap, or on an Enterpr
 
 |                                                                                        | Free  | Pro   | Pro (no spend cap) | Team   | Enterprise |
 | -------------------------------------------------------------------------------------- | ----- | ----- | ------------------ | ------ | ---------- |
-| **Concurrent clients**                                                                 | 200   | 500   | 10,000             | 10,000 | 10,000+    |
+| **Concurrent connections**                                                             | 200   | 500   | 10,000             | 10,000 | 10,000+    |
 | **Messages per second**                                                                | 100   | 500   | 2,500              | 2,500  | 2,500+     |
 | **Channel joins per second**                                                           | 100   | 500   | 2,500              | 2,500  | 2,500+     |
-| **Channels per client**                                                                | 100   | 100   | 100                | 100    | 100+       |
+| **Channels per connection**                                                            | 100   | 100   | 100                | 100    | 100+       |
 | **Presence keys per object**                                                           | 10    | 10    | 10                 | 10     | 10+        |
 | **Presence messages per second**                                                       | 20    | 50    | 1,000              | 1,000  | 1,000+     |
 | **Broadcast payload size KB**                                                          | 256   | 3,000 | 3,000              | 3,000  | 3,000+     |
@@ -44,7 +44,7 @@ Some quotas can cause a Channel join to be refused. Realtime will reply with one
 
 ### `too_many_channels`
 
-Too many channels currently joined for a single client.
+Too many channels currently joined for a single connection.
 
 ### `too_many_connections`
 
@@ -56,7 +56,7 @@ Too many Channel joins per second.
 
 ### `tenant_events`
 
-Clients will be disconnected if your project is generating too many messages per second. `supabase-js` will reconnect automatically when the message throughput decreases below your plan quota. An `event` is a WebSocket message delivered to, or sent from a client.
+Connections will be disconnected if your project is generating too many messages per second. `supabase-js` will reconnect automatically when the message throughput decreases below your plan quota. An `event` is a WebSocket message delivered to, or sent from a client.
 
 ## Postgres changes payload quota
 

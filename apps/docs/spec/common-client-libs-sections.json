@@ -377,6 +377,14 @@
             "type": "function"
           },
           {
+            "id": "overrideTypes",
+            "title": "Partially override or replace type of successful response",
+            "slug": "db-overrideTypes",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
             "id": "explain",
             "title": "Using explain",
             "slug": "explain",
@@ -479,6 +487,13 @@
         "id": "sign-in-with-sso",
         "title": "Sign in a user through SSO",
         "slug": "auth-signinwithsso",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "get-claims",
+        "title": "Get user claims from verified JWT",
+        "slug": "auth-getclaims",
         "product": "auth",
         "type": "function"
       },
@@ -783,6 +798,12 @@
     "type": "category",
     "title": "Realtime",
     "items": [
+      {
+        "id": "realtime-api",
+        "title": "Overview",
+        "slug": "realtime-api",
+        "type": "function"
+      },
       {
         "id": "stream",
         "title": "Listen to database changes",

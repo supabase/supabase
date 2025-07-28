@@ -11,15 +11,15 @@ You can customize the email templates for local development [using the `config.t
 
 You should provide a relative URL to the `content_path` parameter, pointing to an HTML file which contains the template. For example
 
-<CH.Code>
+<$CodeTabs>
 
-```toml supabase/config.toml
+```toml name=supabase/config.toml
 [auth.email.template.invite]
 subject = "You are invited to Acme Inc"
 content_path = "./supabase/templates/invite.html"
 ```
 
-```html supabase/templates/invite.html
+```html name=supabase/templates/invite.html
 <html>
   <body>
     <h2>Confirm your signup</h2>
@@ -28,17 +28,53 @@ content_path = "./supabase/templates/invite.html"
 </html>
 ```
 
-</CH.Code>
+</$CodeTabs>
 
 ## Available email templates
 
-There are several Auth email templates which can be configured:
+There are several Auth email templates which can be configured. Each template serves a specific authentication flow:
 
-- `auth.email.template.invite`
-- `auth.email.template.confirmation`
-- `auth.email.template.recovery`
-- `auth.email.template.magic_link`
-- `auth.email.template.email_change`
+### `auth.email.template.invite`
+
+**Default subject**: "You have been invited"
+**When sent**: When a user is invited to join your application via email invitation
+**Purpose**: Allows administrators to invite users who don't have accounts yet
+**Content**: Contains a link for the invited user to accept the invitation and create their account
+
+### `auth.email.template.confirmation`
+
+**Default subject**: "Confirm Your Signup"
+**When sent**: When a user signs up and needs to verify their email address
+**Purpose**: Email verification for new user registrations
+**Content**: Contains a confirmation link to verify the user's email address
+
+### `auth.email.template.recovery`
+
+**Default subject**: "Reset Your Password"
+**When sent**: When a user requests a password reset
+**Purpose**: Password recovery flow for users who forgot their password
+**Content**: Contains a link to reset the user's password
+
+### `auth.email.template.magic_link`
+
+**Default subject**: "Your Magic Link"
+**When sent**: When a user requests a magic link for passwordless authentication
+**Purpose**: Passwordless login using email links
+**Content**: Contains a secure link that automatically logs the user in when clicked
+
+### `auth.email.template.email_change`
+
+**Default subject**: "Confirm Email Change"
+**When sent**: When a user requests to change their email address
+**Purpose**: Verification for email address changes
+**Content**: Contains a confirmation link to verify the new email address
+
+### `auth.email.template.reauthentication`
+
+**Default subject**: "Confirm Reauthentication"
+**When sent**: When a user needs to re-authenticate for sensitive operations
+**Purpose**: Additional verification for sensitive actions (like changing password, deleting account)
+**Content**: Contains a 6-digit OTP code for verification
 
 ## Template variables
 

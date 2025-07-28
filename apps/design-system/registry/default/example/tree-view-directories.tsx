@@ -5,34 +5,85 @@ export default function TreeViewDemo() {
     name: '',
     children: [
       {
-        name: 'Current batch',
-        children: [{ name: 'index.js' }, { name: 'styles.css' }],
+        name: 'Active Projects',
+        children: [{ name: 'main.js' }, { name: 'styles.css' }],
       },
       {
-        name: 'Older queries',
+        name: 'Archived Queries',
         children: [
           {
-            name: 'all countries',
+            name: 'Historical Data',
+            children: [
+              {
+                name: 'Country Statistics',
+              },
+              {
+                name: 'Add New Countries',
+              },
+              {
+                name: 'Regional Insights',
+              },
+              {
+                name: 'Customer-Specific Regions',
+              },
+            ],
           },
           {
-            name: 'add new countries',
+            name: 'Previous Queries',
+            children: [
+              {
+                name: 'Country Statistics',
+                children: [
+                  {
+                    name: 'Country Overview',
+                  },
+                  {
+                    name: 'Add New Countries',
+                  },
+                  {
+                    name: 'Regional Insights',
+                  },
+                  {
+                    name: 'Customer-Specific Regions',
+                  },
+                ],
+              },
+              {
+                name: 'Country Overview',
+              },
+              {
+                name: 'Add New Countries',
+              },
+              {
+                name: 'Regional Insights',
+              },
+              {
+                name: 'Customer-Specific Regions',
+              },
+            ],
           },
           {
-            name: 'regions',
+            name: 'Country Overview',
           },
           {
-            name: 'regions by customer',
+            name: 'Add New Countries',
+          },
+          {
+            name: 'Regional Insights',
+          },
+          {
+            name: 'Customer-Specific Regions',
           },
         ],
       },
       {
-        name: 'query all users',
+        name: 'User Query Logs',
       },
       {
-        name: 'users in last day',
+        name: 'Recent User Activity',
       },
       {
-        name: 'new users over time',
+        name: 'User Growth Trends',
       },
     ],
   }
@@ -41,14 +92,13 @@ export default function TreeViewDemo() {
     <TreeView
       data={flattenTree(data)}
       aria-label="directory tree"
-      className="w-[420px]"
+      className="w-[420px] border bg py-2"
       nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
         <TreeViewItem
           isExpanded={isExpanded}
           isBranch={isBranch}
           isSelected={isSelected}
           level={level}
-          xPadding={16}
           name={element.name}
           {...getNodeProps()}
         />

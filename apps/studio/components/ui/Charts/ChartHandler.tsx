@@ -59,6 +59,7 @@ const ChartHandler = ({
   isLoading,
   format,
   highlightedValue,
+  ...otherProps
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
@@ -148,7 +149,7 @@ const ChartHandler = ({
 
   return (
     <div className="h-full w-full">
-      <div className="absolute right-6 z-50 flex justify-between">
+      <div className="absolute right-6 z-10 flex justify-between">
         {!hideChartType && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -168,7 +169,6 @@ const ChartHandler = ({
       </div>
       {chartStyle === 'bar' ? (
         <BarChart
-          YAxisProps={{ width: 1 }}
           data={(chartData?.data ?? []) as any}
           format={format || chartData?.format}
           xAxisKey={'period_start'}
@@ -176,6 +176,7 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          {...otherProps}
         />
       ) : (
         <AreaChart
@@ -186,6 +187,7 @@ const ChartHandler = ({
           highlightedValue={_highlightedValue}
           title={label}
           customDateFormat={customDateFormat}
+          {...otherProps}
         />
       )}
     </div>

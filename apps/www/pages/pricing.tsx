@@ -93,7 +93,10 @@ export default function IndexPage() {
             </Button>
           </a>
           <Button size="tiny" type="default" asChild iconRight={<ArrowUpRight className="w-4" />}>
-            <a href="/docs/guides/platform/org-based-billing" target="_blank">
+            <a
+              href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
+              target="_blank"
+            >
               Learn how billing works
             </a>
           </Button>

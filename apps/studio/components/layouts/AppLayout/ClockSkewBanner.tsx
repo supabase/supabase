@@ -1,3 +1,4 @@
+import { fetchHandler } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from 'ui'
@@ -9,7 +10,7 @@ const CLOCK_SKEW_CHECK_INTERVAL = 30 * 60 * 1000
 
 const isClockSkewed = async () => {
   try {
-    const response = await fetch(`${BASE_PATH}/api/get-utc-time`)
+    const response = await fetchHandler(`${BASE_PATH}/api/get-utc-time`)
     const data = await response.json()
     // The received time is in UTC timezone, add Z at the end to make JS understand that
     const serverTime = new Date(data.utcTime).getTime()
@@ -41,14 +42,11 @@ export const ClockSkewBanner = () => {
   if (!clockSkew) return null
 
   return (
-    <div
-      style={{ height: '44px' }}
-      className="flex items-center justify-center gap-x-4 bg-destructive-400 py-3 transition text-foreground box-border border-b border-default"
-    >
+    <div className="flex items-center justify-center gap-x-4 bg-destructive-400 py-0.5 transition text-foreground box-border border-b border-default">
       <p className="text-sm">
         Your computer's clock appears to be inaccurate. This can cause issues with certain features.
       </p>
-      <Button asChild type="default">
+      <Button asChild type="text">
         <a href="https://supabase.com/docs" target="_blank">
           More information
         </a>

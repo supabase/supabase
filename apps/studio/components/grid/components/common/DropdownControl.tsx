@@ -11,6 +11,7 @@ interface DropdownControlProps {
   onSelect: (value: string | number) => void
   side?: 'bottom' | 'left' | 'top' | 'right' | undefined
   align?: 'start' | 'center' | 'end' | undefined
+  className?: string
 }
 
 export const DropdownControl = ({
@@ -19,10 +20,11 @@ export const DropdownControl = ({
   align,
   options,
   onSelect,
+  className,
 }: PropsWithChildren<DropdownControlProps>) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+      <DropdownMenuTrigger className={className}>{children}</DropdownMenuTrigger>
       <DropdownMenuContent side={side} align={align}>
         <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
           {options.length === 0 && <p className="dropdown-control__empty-text">No more items</p>}

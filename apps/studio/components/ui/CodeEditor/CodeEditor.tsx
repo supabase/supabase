@@ -22,7 +22,7 @@ const DEFAULT_ACTIONS = {
 
 interface CodeEditorProps {
   id: string
-  language: 'pgsql' | 'json' | 'html' | undefined
+  language: 'pgsql' | 'json' | 'html' | 'typescript' | undefined
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean

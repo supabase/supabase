@@ -1,7 +1,7 @@
 ---
 # Specify the following for Cursor rules
 description: Guidelines for writing Next.js apps with Supabase Auth
-globs: "**/*.ts, **/*.tsx, **/*.js, **/*.jsx"
+alwaysApply: false
 ---
 
 # Bootstrap Next.js app with Supabase Auth

@@ -1,50 +1,39 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { ArrowRight, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+
+import { useParams } from 'common'
 import ClientLibrary from 'components/interfaces/Home/ClientLibrary'
 import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
-import Link from 'next/link'
-import { useEffect, useRef } from 'react'
-
-import { useParams } from 'common'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { getWithTimeout } from 'lib/common/fetch'
-import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { ArrowRight, Loader2 } from 'lucide-react'
+import { PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const queryClient = useQueryClient()
-  const checkServerInterval = useRef<number>()
 
-  // TODO: move to react-query
-  async function checkServer() {
-    if (!project) return
-
-    const projectStatus = await getWithTimeout(`${API_URL}/projects/${project.ref}/status`, {
-      timeout: 2000,
-    })
-    if (projectStatus && !projectStatus.error) {
-      const { status } = projectStatus
-      if (status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-        clearInterval(checkServerInterval.current)
-        if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
-        await invalidateProjectsQuery(queryClient)
-      }
+  useProjectStatusQuery(
+    { projectRef: ref },
+    {
+      enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
+      refetchInterval: (res) => {
+        return res?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
+      },
+      onSuccess: async (res) => {
+        if (res.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+          if (ref) invalidateProjectDetailsQuery(queryClient, ref)
+          invalidateProjectsQuery(queryClient)
+        }
+      },
     }
-  }
-
-  useEffect(() => {
-    // check server status every 4s
-    checkServerInterval.current = window.setInterval(checkServer, 4000)
-    return () => {
-      clearInterval(checkServerInterval.current)
-    }
-  }, [])
+  )
 
   if (project === undefined) return null
 
@@ -122,8 +111,8 @@ const BuildingState = () => {
                 </ul>
               </div>
             </div>
-            <div className="col-span-12  lg:col-span-8">
-              <DisplayApiSettings />
+            <div className="col-span-12  lg:col-span-8 flex flex-col gap-8">
+              <DisplayApiSettings showLegacyText={false} />
               <DisplayConfigSettings />
             </div>
           </div>

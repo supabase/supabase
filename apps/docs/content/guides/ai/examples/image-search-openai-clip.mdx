@@ -134,7 +134,7 @@ After activating the virtual environment with `poetry shell` you can now run you
 
 ## Perform an image search from a text query
 
-With Supabase Vector we can easily query our embeddings. We can use either an image as search input or alternative we can generate an embedding from a string input and use that as the query input:
+With Supabase Vector we can query our embeddings. We can use either an image as search input or alternative we can generate an embedding from a string input and use that as the query input:
 
 ```python
 def search():
@@ -164,7 +164,7 @@ def search():
 
 By limiting the query to one result, we can show the most relevant image to the user. Finally we use `matplotlib` to show the image result to the user.
 
-That's it, go ahead and test it out by running `poetry run search` and you will be presented with an image of a "bike in front of a red brick wall".
+Go ahead and test it out by running `poetry run search` and you will be presented with an image of a "bike in front of a red brick wall".
 
 ## Conclusion
 

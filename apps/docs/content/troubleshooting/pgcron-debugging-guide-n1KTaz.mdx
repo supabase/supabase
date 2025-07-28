@@ -17,7 +17,7 @@ Cron jobs can only be modified with the respective SQL functions:
 - Alter: [cron.alter_job](https://supabase.com/docs/guides/database/extensions/pg_cron#edit-a-job)
 - Delete: [cron.unschedule](https://supabase.com/docs/guides/database/extensions/pg_cron#unschedule-a-job)
 
-If you are trying to make changes, please use the cron functions. If the cron functions are inaccessible, please contact [Support](https://supabase.com/dashboard/support/new)
+If you are trying to make changes, use the cron functions. If the cron functions are inaccessible, contact [Support](https://supabase.com/dashboard/support/new)
 
 <br />
 
@@ -106,7 +106,7 @@ SELECT
 FROM pg_stat_activity where application_name ilike 'pg_cron';
 ```
 
-You can view your peak connection usage throughout the day at the bottom of the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database)
+You can view your concurrent peak connection usage throughout the day at the bottom of the [Reports Dashboard](https://supabase.com/dashboard/project/_/reports/database)
 
 <br />
 

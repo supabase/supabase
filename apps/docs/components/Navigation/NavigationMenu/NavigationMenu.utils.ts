@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
 import type { Json } from '~/features/helpers.types'
@@ -52,7 +52,10 @@ export function deepFilterSections<T extends ICommonItem>(
  *
  * See https://webpack.js.org/api/module-methods/#dynamic-expressions-in-import
  */
-export function useCommonSections(commonSectionsFile: string) {
+export function useCommonSections(
+  commonSectionsFile: string,
+  { enabled = true }: { enabled: boolean }
+) {
   const [commonSections, setCommonSections] = useState<ICommonItem[]>()
 
   useEffect(() => {
@@ -66,6 +69,10 @@ export function useCommonSections(commonSectionsFile: string) {
     }
     fetchCommonSections()
   }, [commonSectionsFile])
+
+  if (!enabled) {
+    return null
+  }
 
   return commonSections
 }
@@ -135,10 +142,14 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Realtime
     case pathname.startsWith('resources'):
       return MenuId.Resources
+    case pathname.startsWith('security'):
+      return MenuId.Security
     case pathname.startsWith('self-hosting'):
       return MenuId.SelfHosting
     case pathname.startsWith('storage'):
       return MenuId.Storage
+    case pathname.startsWith('/contributing'):
+      return MenuId.Contributing
     default:
       return MenuId.GettingStarted
   }

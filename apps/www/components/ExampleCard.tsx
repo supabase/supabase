@@ -6,7 +6,6 @@ import { useBreakpoint } from 'common'
 import { Button } from 'ui'
 import Panel from './Panel'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { TelemetryActions } from 'common/telemetry-constants'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
@@ -27,7 +26,7 @@ function ExampleCard(props: any) {
       onClick={() => {
         if (props.inHomepage)
           sendTelemetryEvent({
-            action: TelemetryActions.HOMEPAGE_PROJECT_TEMPLATE_CARD_CLICKED,
+            action: 'homepage_project_template_card_clicked',
             properties: { templateTitle: props.title },
           })
       }}

@@ -41,6 +41,8 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -80,9 +82,11 @@ const TableEditor = ({
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
   const { project } = useProjectContext()
+  const org = useSelectedOrganization()
   const { selectedSchema } = useQuerySchemaState()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const [params, setParams] = useUrlState()
   useEffect(() => {
@@ -352,7 +356,20 @@ const TableEditor = ({
             label="Enable Realtime"
             description="Broadcast changes on this table to authorized subscribers"
             checked={tableFields.isRealtimeEnabled}
-            onChange={() => onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })}
+            onChange={() => {
+              sendEvent({
+                action: 'realtime_toggle_table_clicked',
+                properties: {
+                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                  origin: 'tableSidePanel',
+                },
+                groups: {
+                  project: project?.ref ?? 'Unknown',
+                  organization: org?.slug ?? 'Unknown',
+                },
+              })
+              onUpdateField({ isRealtimeEnabled: !tableFields.isRealtimeEnabled })
+            }}
             size="medium"
           />
         )}
