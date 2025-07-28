@@ -8,8 +8,8 @@ import {
 import { PropsWithChildren, useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { GOTRUE_ERRORS, IS_PLATFORM } from './constants'
 
 const AuthErrorToaster = ({ children }: PropsWithChildren) => {
   const error = useAuthError()
@@ -53,5 +53,5 @@ export function useSignOut() {
     await queryClient.clear()
 
     return result
-  }, [queryClient, clearStorage])
+  }, [queryClient, clearAssistantStorage])
 }
