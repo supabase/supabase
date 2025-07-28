@@ -32,11 +32,14 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
 }
 
 // This hook checks if the user is using old Studio pages and shows a toast to refresh the page. It's only triggered if
-// the user has been more than 24 hours and a new version of Studio is available.
+// there's a new version of Studio is available, and the user has been on the old dashboard (based on commit) for more than 24 hours.
+// [Joshen] K-Dog has a suggestion here to bring down the time period here by checking commits
 export function useCheckLatestDeploy() {
   const showRefreshToast = useFlag('showRefreshToast')
+
   const [currentCommitTime, setCurrentCommitTime] = useState('')
   const [isToastShown, setIsToastShown] = useState(false)
+
   const { data: commit } = useDeploymentCommitQuery({
     enabled: IS_PLATFORM && showRefreshToast,
     staleTime: 10000, // 10 seconds
@@ -66,13 +69,14 @@ export function useCheckLatestDeploy() {
 
     // check if the time difference between commits is more than 24 hours
     const hourDiff = dayjs(commit.commitTime).diff(dayjs(currentCommitTime), 'hour')
-    // if (hourDiff < 24) {
-    //   return
-    // }
+    if (hourDiff < 24) {
+      return
+    }
 
     // show the toast
     toast.custom((id) => <DeployCheckToast id={id} />, {
       duration: Infinity,
+      position: 'bottom-right',
     })
     setIsToastShown(true)
   }, [commit, isToastShown, currentCommitTime])

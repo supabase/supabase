@@ -25,7 +25,7 @@ export default async function handler(
   res: NextApiResponse<{ commitSha: string; commitTime: string }>
 ) {
   // Set cache control headers for 10 minutes so that we don't get banned by Github API
-  // res.setHeader('Cache-Control', 's-maxage=600')
+  res.setHeader('Cache-Control', 's-maxage=600')
 
   // Get the build commit SHA from Vercel environment variable
   const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || 'development'
