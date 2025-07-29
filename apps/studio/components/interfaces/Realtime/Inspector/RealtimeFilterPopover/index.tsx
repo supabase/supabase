@@ -69,7 +69,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             )}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start">
+        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start" portal={true}>
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types
           </div>
