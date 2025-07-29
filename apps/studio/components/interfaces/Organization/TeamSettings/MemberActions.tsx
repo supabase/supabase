@@ -27,6 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -190,60 +191,50 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             <>
               {isPendingInviteAcceptance ? (
                 <>
-                  {canRevokeInvite ? (
-                    <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
-                      <div className="flex flex-col">
-                        <p>Cancel invitation</p>
-                        <p className="text-foreground-lighter">Revoke this invitation.</p>
-                      </div>
-                    </DropdownMenuItem>
-                  ) : (
-                    <DropdownMenuItem disabled>
-                      <div className="flex flex-col">
-                        <p>Cancel invitation</p>
-                        <p className="text-foreground-lighter">Additional permissions required</p>
-                      </div>
-                    </DropdownMenuItem>
-                  )}
-                  {canResendInvite ? (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleResendInvite(member)}>
-                        <div className="flex flex-col">
-                          <p>Resend invitation</p>
-                          <p className="text-foreground-lighter">Invites expire after 24hrs.</p>
-                        </div>
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem disabled>
-                        <div className="flex flex-col">
-                          <p>Resend invitation</p>
-                          <p className="text-foreground-lighter">Additional permissions required</p>
-                        </div>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                  <DropdownMenuItemTooltip
+                    className="gap-x-2"
+                    disabled={!canRevokeInvite}
+                    onClick={() => handleRevokeInvitation(member)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Additional permissions required',
+                      },
+                    }}
+                  >
+                    <p>Cancel invitation</p>
+                  </DropdownMenuItemTooltip>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItemTooltip
+                    className="gap-x-2"
+                    disabled={!canResendInvite}
+                    onClick={() => handleResendInvite(member)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Additional permissions required',
+                      },
+                    }}
+                  >
+                    <p>Resend invitation</p>
+                  </DropdownMenuItemTooltip>
                 </>
               ) : (
                 organizationMembersDeletionEnabled && (
-                  <DropdownMenuItem
-                    className="space-x-2 items-start"
+                  <DropdownMenuItemTooltip
+                    className="gap-x-2"
                     disabled={!canRemoveMember}
-                    onClick={() => {
-                      setIsDeleteModalOpen(true)
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    tooltip={{
+                      content: {
+                        side: 'left',
+                        text: 'Additional permissions required',
+                      },
                     }}
                   >
                     <Trash size={16} />
-                    <div className="flex flex-col">
-                      <p>Remove member</p>
-                      {!canRemoveMember && (
-                        <p className="text-foreground-lighter">Additional permissions required</p>
-                      )}
-                    </div>
-                  </DropdownMenuItem>
+                    <p>Remove member</p>
+                  </DropdownMenuItemTooltip>
                 )
               )}
             </>
