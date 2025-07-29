@@ -128,7 +128,7 @@ function ApiKeyInput() {
       key={apiKey?.id}
       size={size}
       className={cn(baseClasses, 'font-mono')}
-      value={apiKey?.api_key}
+      defaultValue={apiKey?.api_key}
     />
   )
 }

@@ -1,7 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Plus, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import * as z from 'zod'
+
+import { useParams } from 'common'
+import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -12,22 +21,17 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
   Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormDescription_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
-  Alert,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
-import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
-import { Plus, ShieldCheck } from 'lucide-react'
 
 const NAME_SCHEMA = z
   .string()
@@ -44,6 +48,7 @@ const FORM_ID = 'create-secret-api-key'
 const SCHEMA = z.object({
   name: NAME_SCHEMA,
   description: z.string().max(256, "Description shouldn't be too long").trim(),
+  expose_as_env: z.boolean(),
 })
 
 const CreateSecretAPIKeyDialog = () => {
@@ -59,18 +64,21 @@ const CreateSecretAPIKeyDialog = () => {
     defaultValues: {
       name: '',
       description: '',
+      expose_as_env: true,
     },
   })
 
   const { mutate: createAPIKey, isLoading: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
+    console.log(values)
     createAPIKey(
       {
         projectRef,
         type: 'secret',
         name: values.name,
         description: values.description,
+        expose_as_env: values.expose_as_env,
       },
       {
         onSuccess: (data) => {
@@ -135,6 +143,42 @@ const CreateSecretAPIKeyDialog = () => {
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
+              />
+              <FormField_Shadcn_
+                key="expose_as_env"
+                name="expose_as_env"
+                control={form.control}
+                render={({ field }) => {
+                  const secretName = form.watch('name').toUpperCase()
+
+                  return (
+                    <FormItem_Shadcn_>
+                      <div className="flex flex-row gap-2">
+                        <FormControl_Shadcn_>
+                          <Switch
+                            id="expose_as_env"
+                            checked={field.value}
+                            onCheckedChange={(value) => field.onChange(value)}
+                          />
+                        </FormControl_Shadcn_>
+                        <div>
+                          <FormLabel_Shadcn_ className="text-foreground" htmlFor="expose_as_env">
+                            Expose as environment variable
+                          </FormLabel_Shadcn_>
+                          <FormDescription_Shadcn_ className="text-foreground-lighter">
+                            Will be available as{' '}
+                            <span className="text-brand font-mono">
+                              SUPABASE_SECRET_KEY_{secretName || '<NAME>'}
+                            </span>{' '}
+                            in Edge Functions and other integrations that support them.
+                          </FormDescription_Shadcn_>
+                        </div>
+                      </div>
+
+                      <FormMessage_Shadcn_ />
+                    </FormItem_Shadcn_>
+                  )
+                }}
               />
             </form>
           </Form_Shadcn_>

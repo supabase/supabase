@@ -45,10 +45,10 @@ const EdgeFunctionSecrets = () => {
   const headers = [
     <Table.th key="secret-name">Name</Table.th>,
     <Table.th key="secret-value" className="flex items-center gap-x-2">
-      Digest{' '}
       <Badge color="scale" className="font-mono">
         SHA256
-      </Badge>
+      </Badge>{' '}
+      Digest or prefix
     </Table.th>,
     <Table.th key="secret-updated-at">Updated at</Table.th>,
     <Table.th key="actions" />,
