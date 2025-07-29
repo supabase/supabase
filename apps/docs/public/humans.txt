@@ -26,18 +26,22 @@ Chris Caruso
 Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Martin
 Chris Stockton
+Chris Ward
 Craig Cannon
 Danny White
 Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
+Deepthi Sigireddi
 Deji I
 Div Arora
 Divit D
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Emmett Folger
 Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
@@ -53,6 +57,7 @@ Inian P
 Ivan Vasilov
 Jenny Kibiri
 Jess Shears
+Jim Chanco Jr
 John Pena
 Jon M
 Jonny Summers-Muir
@@ -65,18 +70,22 @@ Kang Ming Tay
 Karan S
 Karlo Ison
 Katerina Skroumpelou
+Kemal Y
 Kevin Brolly
 Kevin Grüneberg
 Lakshan Perera
 Laura C
 Laurence Isla
 Lenny Urbanowski
+Leonardo Santiago
 Long Hoang
 Luca Forstner
 Łukasz Niemier
+Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
 Monica Khoury
+Mykhailo Mischa Lieibenson
 Nyannyacha
 Oli R
 Pamela Chia
@@ -100,6 +109,7 @@ Stanislav M
 Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
+Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taryn King
 Terry Sutton

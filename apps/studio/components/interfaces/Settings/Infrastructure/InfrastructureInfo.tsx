@@ -27,7 +27,6 @@ import {
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
 import {
-  DatabaseExtensionsWarning,
   ObjectsToBeDroppedWarning,
   ReadReplicasWarning,
   UnsupportedExtensionsWarning,
@@ -58,9 +57,6 @@ const InfrastructureInfo = () => {
     isSuccess: isSuccessServiceVersions,
   } = useProjectServiceVersionsQuery({ projectRef: ref })
 
-  const { data: projectUpgradeEligibilityData } = useProjectUpgradeEligibilityQuery({
-    projectRef: ref,
-  })
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
   const { current_app_version, current_app_version_release_channel, latest_app_version } =
     data || {}
@@ -69,8 +65,9 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '')
     .split('supabase-postgres-')[1]
     ?.replace('-orioledb', '')
-  const isOnNonGenerallyAvailableReleaseChannel =
-    current_app_version_release_channel && current_app_version_release_channel !== 'ga'
+  const isVisibleReleaseChannel =
+    current_app_version_release_channel &&
+    !['ga', 'withdrawn'].includes(current_app_version_release_channel)
       ? current_app_version_release_channel
       : undefined
   const isOrioleDb = useIsOrioleDb()
@@ -79,8 +76,6 @@ const InfrastructureInfo = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  // @ts-ignore [Bobbie] to be removed after 2025-06-30 prod deploy
-  const hasExtensionDependentObjects = (data?.extension_dependent_objects ?? []).length > 0
   const hasObjectsToBeDropped = (data?.objects_to_be_dropped ?? []).length > 0
   const hasUnsupportedExtensions = (data?.unsupported_extensions || []).length > 0
   const hasObjectsInternalSchema = (data?.user_defined_objects_in_internal_schemas || []).length > 0
@@ -150,16 +145,16 @@ const InfrastructureInfo = () => {
                           value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
                           label="Postgres version"
                           actions={[
-                            isOnNonGenerallyAvailableReleaseChannel && (
+                            isVisibleReleaseChannel && (
                               <Tooltip>
                                 <TooltipTrigger>
                                   <Badge variant="warning" className="mr-1 capitalize">
-                                    {isOnNonGenerallyAvailableReleaseChannel}
+                                    {isVisibleReleaseChannel}
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent side="bottom" className="w-44 text-center">
-                                  This project uses a {isOnNonGenerallyAvailableReleaseChannel}{' '}
-                                  database version release
+                                  This project uses a {isVisibleReleaseChannel} database version
+                                  release
                                 </TooltipContent>
                               </Tooltip>
                             ),
@@ -202,16 +197,7 @@ const InfrastructureInfo = () => {
                     ) : null}
 
                     {!data.eligible ? (
-                      hasExtensionDependentObjects ? (
-                        <DatabaseExtensionsWarning
-                          // @ts-ignore
-                          extensions={data.extension_dependent_objects ?? []}
-                          potentialBreakingChanges={
-                            // @ts-ignore
-                            projectUpgradeEligibilityData?.potential_breaking_changes
-                          }
-                        />
-                      ) : hasObjectsToBeDropped ? (
+                      hasObjectsToBeDropped ? (
                         <ObjectsToBeDroppedWarning
                           objectsToBeDropped={data.objects_to_be_dropped}
                         />
