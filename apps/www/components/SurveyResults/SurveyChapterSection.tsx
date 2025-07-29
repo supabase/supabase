@@ -17,7 +17,7 @@ import { AIModelsChart } from './AIModelsChart'
 // import { TechnicalFoundersChart } from '~/components/SurveyResults/TechnicalFoundersChart'
 // import { PreviousCompanyChart } from '~/components/SurveyResults/PreviousCompanyChart'
 // import { FundingStageChart } from '~/components/SurveyResults/FundingStageChart'
-// import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
+import { HeadquartersChart } from '~/components/SurveyResults/HeadquartersChart'
 // import { SurveyPullQuote } from '~/components/SurveyResults/SurveyPullQuote'
 // import { SurveyStatCard } from '~/components/SurveyResults/SurveyStatCard'
 // import { RoleChart } from '~/components/SurveyResults/RoleChart'
@@ -69,7 +69,6 @@ interface SurveyChapterSectionProps {
   }
   rankedAnswersPair?: Array<{ label: string; answers: string[] }>
   children?: React.ReactNode
-  className?: string
 }
 
 export function SurveyChapterSection({
@@ -83,7 +82,6 @@ export function SurveyChapterSection({
   summarizedAnswer,
   rankedAnswersPair,
   children,
-  className,
 }: SurveyChapterSectionProps) {
   const chartComponents = {
     RoleChart,
@@ -99,58 +97,49 @@ export function SurveyChapterSection({
     SalesToolsChart,
     WorldOutlookChart,
     BiggestChallengeChart,
+    HeadquartersChart,
   }
 
   return (
-    <div className={`flex flex-col gap-8 md:gap-12 ${className || ''}`}>
-      <header className="flex flex-col gap-3">
+    <div className="flex flex-col divide-y bg-surface-100 border border-default rounded-md overflow-hidden">
+      <header className="flex flex-col gap-3 px-6 py-8">
         <h3 className="text-brand font-mono uppercase tracking-widest text-sm">
           {number} {title}
         </h3>
         <p className="text-foreground text-xl text-balance leading-relaxed">{description}</p>
       </header>
 
-      <div className="flex flex-col gap-8">
-        {stats && (
-          <SurveyStatWrapper>
-            {stats.map((stat, index) => (
-              <SurveyStatCard
-                key={index}
-                number={stat.number}
-                unit={stat.unit}
-                label={stat.label}
-              />
-            ))}
-          </SurveyStatWrapper>
-        )}
+      {stats && (
+        <aside className="flex flex-row divide-x bg-alternative">
+          {stats.map((stat, index) => (
+            <SurveyStatCard key={index} number={stat.number} unit={stat.unit} label={stat.label} />
+          ))}
+        </aside>
+      )}
 
-        {charts?.map((chartName, index) => {
-          const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
-          return ChartComponent ? <ChartComponent key={index} /> : null
-        })}
+      {charts?.map((chartName, index) => {
+        const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
+        return ChartComponent ? <ChartComponent key={index} /> : null
+      })}
 
-        {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
+      {pullQuote && (
+        <SurveyPullQuote
+          quote={pullQuote.quote}
+          author={pullQuote.author}
+          authorPosition={pullQuote.authorPosition}
+          authorAvatar={pullQuote.authorAvatar}
+        />
+      )}
 
-        {summarizedAnswer && (
-          <SurveySummarizedAnswer
-            label={summarizedAnswer.label}
-            answers={summarizedAnswer.answers}
-          />
-        )}
+      {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
 
-        {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
+      {summarizedAnswer && (
+        <SurveySummarizedAnswer label={summarizedAnswer.label} answers={summarizedAnswer.answers} />
+      )}
 
-        {pullQuote && (
-          <SurveyPullQuote
-            quote={pullQuote.quote}
-            author={pullQuote.author}
-            authorPosition={pullQuote.authorPosition}
-            authorAvatar={pullQuote.authorAvatar}
-          />
-        )}
+      {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
 
-        {children}
-      </div>
+      {children}
     </div>
   )
 }

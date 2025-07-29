@@ -111,7 +111,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
           },
           wordCloud: undefined,
           summarizedAnswer: {
-            label: 'What problem is your startup solving?',
+            label: 'Problems startups are solving',
             answers: [
               'AI-powered productivity tools',
               'Agent workflows (internal or customer-facing)',
@@ -202,7 +202,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             authorAvatar: '/images/twitter-profiles/qhvO9V6x_400x400.jpg',
           },
           wordCloud: {
-            label: 'What are your must-have developer tools?',
+            label: 'Must-have developer tools',
             words: [
               { text: 'cursor', count: 495 },
               { text: 'code', count: 396 },
@@ -236,7 +236,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             ],
           },
           summarizedAnswer: {
-            label: 'What’s one tool you wish existed?',
+            label: 'Tools that startups wish existed',
             answers: [
               'Unified backend platform combining auth, edge, database, and queues',
               'AI agents with real memory and workflow context',
@@ -282,14 +282,13 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
           },
           wordCloud: undefined,
           summarizedAnswer: {
-            label: 'What are the most important AI use cases in your product?',
+            label: 'Most important AI use cases in product',
             answers: [
               'Summarization / content generation',
               'Recommendations / personalization',
               'Workflow / agent-based automation',
               'Search / semantic search',
               'Customer support automation',
-              'Other',
             ],
           },
           rankedAnswersPair: undefined,
@@ -395,7 +394,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 75, unit: '%', label: 'Founder still responsible for sales' },
             { number: 13, unit: '%', label: 'Dedicated sales team' },
             { number: 62, unit: '%', label: 'Yet to start paid customer acquisition' },
-            { number: 18, unit: '%', label: 'got initial paying customers from personal network' },
+            { number: 18, unit: '%', label: 'Initial customers from personal network' },
           ],
           charts: ['SalesToolsChart'],
           pullQuote: {

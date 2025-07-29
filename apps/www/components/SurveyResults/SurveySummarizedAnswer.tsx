@@ -15,7 +15,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
 
   if (answers.length <= 1) {
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 px-6 py-8">
         <p className="font-mono text-brand text-2xl">{answers[0]}</p>
         <p className="text-foreground-light text-sm">{label}</p>
       </div>
@@ -23,7 +23,7 @@ export function SurveySummarizedAnswer({ label, answers }: { label: string; answ
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 px-6 py-8">
       <div className="min-h-[1.5rem] flex items-center">
         <p className="font-mono text-brand text-2xl transition-opacity duration-500">
           {answers[currentIndex]}

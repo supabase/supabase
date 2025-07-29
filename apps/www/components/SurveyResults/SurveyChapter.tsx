@@ -5,7 +5,6 @@ interface SurveyChapterProps {
   title: string
   description: string
   children: React.ReactNode
-  className?: string
   totalChapters?: number
 }
 
@@ -14,13 +13,10 @@ export function SurveyChapter({
   title,
   description,
   children,
-  className,
   totalChapters,
 }: SurveyChapterProps) {
   return (
-    <SectionContainer
-      className={`flex flex-col gap-12 border-t border-default pt-12 ${className || ''}`}
-    >
+    <SectionContainer className="flex flex-col gap-12 border-t border-default pt-12">
       <header className="flex flex-col gap-2">
         <aside className="text-brand font-mono uppercase tracking-widest text-sm">
           {number}

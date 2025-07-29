@@ -36,7 +36,7 @@ export function SurveyWordCloud({
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 px-6 py-8">
       <ol className="flex flex-wrap gap-3 items-baseline">
         {answers.map(({ text, count }, index) => (
           <li key={index} className={`font-mono text-brand ${getFontSize(count)}`}>
