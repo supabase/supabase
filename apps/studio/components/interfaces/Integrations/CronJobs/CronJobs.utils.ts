@@ -73,7 +73,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       }
     } else {
       const headersStringMatch = command.match(/headers:='([^']*)'/i)
-      const headersString = headersStringMatch?.[1] || ''
+      const headersString = headersStringMatch?.[1] || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
