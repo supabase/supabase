@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { Pipeline } from 'data/replication/pipelines-query'
 import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
@@ -19,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { Pipeline } from './DestinationRow'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatusName } from './PipelineStatus'
 
@@ -103,55 +103,26 @@ export const RowMenu = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            type="default"
-            className="px-1.5"
-            icon={<MoreVertical />}
-            onClick={(e) => e.stopPropagation()}
-          />
+          <Button type="default" className="px-1.5" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           {pipelineEnabled ? (
-            <DropdownMenuItem
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                onDisablePipeline()
-              }}
-            >
+            <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
               <Pause size={14} />
               <p>Disable pipeline</p>
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                onEnablePipeline()
-              }}
-            >
+            <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
               <Play size={14} />
               <p>Enable pipeline</p>
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="space-x-2"
-            onClick={(e) => {
-              e.stopPropagation()
-              onEditClick()
-            }}
-          >
+          <DropdownMenuItem className="space-x-2" onClick={onEditClick}>
             <Edit size={14} />
             <p>Edit destination</p>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            className="space-x-2"
-            onClick={(e) => {
-              e.stopPropagation()
-              onDeleteClick()
-            }}
-          >
+          <DropdownMenuItem className="space-x-2" onClick={onDeleteClick}>
             <Trash stroke="red" size={14} />
             <p>Delete destination</p>
           </DropdownMenuItem>

@@ -20,23 +20,15 @@ import { Badge, Button, cn, copyToClipboard, Input_Shadcn_ } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
+import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
 
-interface ReplicationPipelineStatusProps {
-  pipelineId: number
-  destinationName?: string
-  onSelectBack: () => void
-}
-
-export const ReplicationPipelineStatus = ({
-  pipelineId,
-  destinationName,
-  onSelectBack,
-}: ReplicationPipelineStatusProps) => {
-  const { ref: projectRef } = useParams()
+export const ReplicationPipelineStatus = () => {
+  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const [filterString, setFilterString] = useState<string>('')
 
+  const pipelineId = Number(_pipelineId)
   const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
 
@@ -60,7 +52,7 @@ export const ReplicationPipelineStatus = ({
     { projectRef, pipelineId },
     {
       enabled: !!pipelineId,
-      refetchInterval: 2000, // Poll every 2 seconds
+      refetchInterval: STATUS_REFRESH_FREQUENCY_MS,
     }
   )
 
@@ -73,13 +65,14 @@ export const ReplicationPipelineStatus = ({
     { projectRef, pipelineId },
     {
       enabled: !!pipelineId,
-      refetchInterval: 2000, // Poll every 2 seconds
+      refetchInterval: STATUS_REFRESH_FREQUENCY_MS,
     }
   )
 
   const { mutateAsync: startPipeline, isLoading: isStartingPipeline } = useStartPipelineMutation()
   const { mutateAsync: stopPipeline, isLoading: isStoppingPipeline } = useStopPipelineMutation()
 
+  const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
@@ -138,36 +131,13 @@ export const ReplicationPipelineStatus = ({
     updatePipelineStatus(pipelineId, statusName)
   }, [pipelineId, statusName, updatePipelineStatus])
 
-  if (isPipelineError) {
-    return (
-      <div className="flex flex-col gap-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-x-3">
-            <Button
-              type="outline"
-              onClick={onSelectBack}
-              icon={<ChevronLeft />}
-              style={{ padding: '5px' }}
-            />
-            <h3 className="text-xl font-semibold">Pipeline Status</h3>
-          </div>
-        </div>
-        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-4">
-      {/* Header with back button and filters */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-3">
-          <Button
-            type="outline"
-            onClick={onSelectBack}
-            icon={<ChevronLeft />}
-            style={{ padding: '5px' }}
-          />
+          <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
+            <Link href={`/project/${projectRef}/database/replication`} />
+          </Button>
           <div>
             <div className="flex items-center gap-x-3">
               <h3 className="text-xl font-semibold">{destinationName || 'Pipeline'}</h3>
@@ -192,13 +162,14 @@ export const ReplicationPipelineStatus = ({
               className="pl-7 h-[26px] text-xs"
               placeholder="Search for tables"
               value={filterString}
+              disabled={isPipelineError}
               onChange={(e) => setFilterString(e.target.value)}
             />
           </div>
           <Button
             type={statusName === 'stopped' ? 'primary' : 'default'}
             onClick={() => onTogglePipeline()}
-            loading={isStartingPipeline || isStoppingPipeline}
+            loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
             disabled={!['failed', 'started', 'stopped'].includes(statusName ?? '')}
           >
             {statusName === 'stopped' ? 'Enable' : 'Disable'} pipeline
@@ -207,6 +178,10 @@ export const ReplicationPipelineStatus = ({
       </div>
 
       {(isPipelineLoading || isStatusLoading) && <GenericSkeletonLoader />}
+
+      {isPipelineError && (
+        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
+      )}
 
       {isStatusError && (
         <AlertError
