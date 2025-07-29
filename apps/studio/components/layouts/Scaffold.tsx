@@ -105,7 +105,7 @@ export const ScaffoldSection = forwardRef<
  */
 export const ScaffoldDivider = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    return <div ref={ref} {...props} className={cn('w-full h-px bg-border', className)} />
+    return <div ref={ref} {...props} className={cn('w-full h-px bg-border shrink-0', className)} />
   }
 )
 

@@ -156,7 +156,7 @@ You can change the scope of the access for Supabase by configuring
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail title={VercelTitle}>
           <Markdown content={VercelDetailsSection} />
           <IntegrationImageHandler title="vercel" />

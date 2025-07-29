@@ -70,7 +70,7 @@ const GitHubSection = () => {
 
   return (
     <ScaffoldContainer>
-      <ScaffoldSection>
+      <ScaffoldSection className="py-12">
         <ScaffoldSectionDetail title={GitHubTitle}>
           <p>Connect any of your GitHub repositories to a project.</p>
           <IntegrationImageHandler title="github" />

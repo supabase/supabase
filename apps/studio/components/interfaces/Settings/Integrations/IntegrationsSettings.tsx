@@ -7,8 +7,9 @@ import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 import GitHubSection from './GithubIntegration/GithubSection'
 import VercelSection from './VercelIntegration/VercelSection'
+import AWSPrivateLinkSection from './AWSPrivateLink/AWSPrivateLinkSection'
 
-export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
+export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'aws' }) => {
   return (
     <img
       className="border rounded-lg shadow w-full sm:w-48 mt-6 border-body"
@@ -45,6 +46,8 @@ const IntegrationSettings = () => {
       <GitHubSection />
       <ScaffoldDivider />
       <VercelSection isProjectScoped={true} />
+      <ScaffoldDivider />
+      <AWSPrivateLinkSection />
       <SidePanelVercelProjectLinker />
     </>
   )
