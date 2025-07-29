@@ -54,7 +54,7 @@ import {
   TooltipTrigger,
   cn,
 } from 'ui'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 
 interface TableListProps {

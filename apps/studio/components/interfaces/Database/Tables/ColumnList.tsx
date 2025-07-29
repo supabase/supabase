@@ -26,7 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
   onAddColumn: () => void

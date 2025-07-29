@@ -17,7 +17,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
 
 const Indexes = () => {

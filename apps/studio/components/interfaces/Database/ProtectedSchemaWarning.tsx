@@ -1,10 +1,6 @@
-import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -14,9 +10,11 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
+  cn,
 } from 'ui'
 
 import { INTERNAL_SCHEMAS, useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { Admonition } from 'ui-patterns'
 
 export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -72,38 +70,40 @@ export const ProtectedSchemaWarning = ({
   if (!isSchemaLocked) return null
 
   return (
-    <Alert_Shadcn_>
-      {size === 'md' && <AlertCircle strokeWidth={2} />}
-      <AlertTitle_Shadcn_>
-        {size === 'sm' ? `Viewing protected schema` : `Viewing ${entity} from a protected schema`}
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        {reason === 'fdw' ? (
-          <p>
-            The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
-            analytics buckets and is read-only through the dashboard.
+    <Admonition
+      showIcon={false}
+      type="note"
+      title={
+        size === 'sm' ? `Viewing protected schema` : `Viewing ${entity} from a protected schema`
+      }
+      className={cn(
+        '[&>div>p]:prose [&>div>p]:max-w-full [&>div>p]:!leading-normal',
+        size === 'sm' ? '[&>div>p]:text-xs' : '[&>div>p]:text-sm'
+      )}
+    >
+      {reason === 'fdw' ? (
+        <p>
+          The <code className="text-xs">{schema}</code> schema is used by Supabase to connect to
+          analytics buckets and is read-only through the dashboard.
+        </p>
+      ) : (
+        <>
+          <p className="mb-2">
+            The <code className="text-xs">{schema}</code> schema is managed by Supabase and is
+            read-only through the dashboard.
           </p>
-        ) : (
-          <>
-            <p className="mb-2">
-              The <code className="text-xs">{schema}</code> schema is managed by Supabase and is
-              read-only through the dashboard.
-            </p>
-            <Dialog open={showModal} onOpenChange={setShowModal}>
-              <DialogTrigger asChild>
-                <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                  Learn more
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <ProtectedSchemaDialog onClose={() => setShowModal(false)} />
-              </DialogContent>
-            </Dialog>
-          </>
-        )}
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+          <Dialog open={showModal} onOpenChange={setShowModal}>
+            <DialogTrigger asChild>
+              <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+                Learn more
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <ProtectedSchemaDialog onClose={() => setShowModal(false)} />
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
+    </Admonition>
   )
 }
-
-export default ProtectedSchemaWarning
