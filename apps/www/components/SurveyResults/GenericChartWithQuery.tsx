@@ -134,6 +134,7 @@ function useFilterOptions(filterColumns: string[]) {
 }
 
 // Custom hook to fetch survey data using SQL query via RPC
+// TODO: switch out to use supabase-js instead
 function useSurveyData(sqlQuery: string) {
   const [chartData, setChartData] = useState([])
   const [isLoading, setIsLoading] = useState(true)

@@ -4,7 +4,7 @@ function generateDatabasesSQL(activeFilters: Record<string, string>) {
   const whereClauses = []
 
   if (activeFilters.team_count !== 'unset') {
-    whereClauses.push(`'${activeFilters.team_count}' = ANY(team_count)`)
+    whereClauses.push(`team_count = '${activeFilters.team_count}'`)
   }
 
   if (activeFilters.ai_models_used !== 'unset') {
@@ -17,14 +17,12 @@ function generateDatabasesSQL(activeFilters: Record<string, string>) {
 
   const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join('\n  AND ')}` : ''
 
-  return `
-  SELECT 
+  return `SELECT 
   unnest(databases) AS technology,
   COUNT(*) AS total
 FROM responses_2025${whereClause ? '\n' + whereClause : ''}
 GROUP BY technology
-ORDER BY total DESC;
-`
+ORDER BY total DESC;`
 }
 
 export function DatabasesChart() {

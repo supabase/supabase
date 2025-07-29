@@ -12,6 +12,7 @@ import { RoleChart } from './RoleChart'
 import { IndustryChart } from './IndustryChart'
 import { FundingStageChart } from './FundingStageChart'
 import { DatabasesChart } from './DatabasesChart'
+import { AIModelsChart } from './AIModelsChart'
 // import { TeamCountChart } from '~/components/SurveyResults/TeamCountChart'
 // import { TechnicalFoundersChart } from '~/components/SurveyResults/TechnicalFoundersChart'
 // import { PreviousCompanyChart } from '~/components/SurveyResults/PreviousCompanyChart'
@@ -27,7 +28,7 @@ import { DatabasesChart } from './DatabasesChart'
 // import { PivotFreqChart } from '~/components/SurveyResults/PivotFreqChart'
 // import { FrontendStackChart } from '~/components/SurveyResults/FrontendStackChart'
 // import { BackendStackChart } from '~/components/SurveyResults/BackendStackChart'
-// import { SalesToolsChart } from '~/components/SurveyResults/SalesToolsChart'
+import { SalesToolsChart } from '~/components/SurveyResults/SalesToolsChart'
 // import { PricingChart } from '~/components/SurveyResults/PricingChart'
 // import { IndustryChart } from '~/components/SurveyResults/IndustryChart'
 // import { DataWarehousesChart } from '~/components/SurveyResults/DataWarehousesChart'
@@ -40,7 +41,11 @@ import { AICodingToolsChart } from './AICodingToolsChart'
 // import { SubscriptionsChart } from '~/components/SurveyResults/SubscriptionsChart'
 // import { NewslettersPaidForChart } from '~/components/SurveyResults/NewslettersPaidForChart'
 // import { PodcastsListenedToChart } from '~/components/SurveyResults/PodcastsListenedToChart'
-// import { RegularSocialMediaUseChart } from '~/components/SurveyResults/RegularSocialMediaUseChart'
+import { RegularSocialMediaUseChart } from '~/components/SurveyResults/RegularSocialMediaUseChart'
+import { NewIdeasChart } from '~/components/SurveyResults/NewIdeasChart'
+import { InitialPayingCustomersChart } from '~/components/SurveyResults/InitialPayingCustomersChart'
+import { WorldOutlookChart } from '~/components/SurveyResults/WorldOutlookChart'
+import { BiggestChallengeChart } from '~/components/SurveyResults/BiggestChallengeChart'
 
 interface SurveyChapterSectionProps {
   number: string
@@ -87,7 +92,13 @@ export function SurveyChapterSection({
     AcceleratorParticipationChart,
     DatabasesChart,
     AICodingToolsChart,
-    // ... add as needed
+    AIModelsChart,
+    RegularSocialMediaUseChart,
+    NewIdeasChart,
+    InitialPayingCustomersChart,
+    SalesToolsChart,
+    WorldOutlookChart,
+    BiggestChallengeChart,
   }
 
   return (

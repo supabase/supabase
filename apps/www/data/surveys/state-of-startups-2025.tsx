@@ -310,7 +310,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 20, unit: '%', label: 'Regularly post content' },
             { number: 7, unit: '%', label: 'Don’t use social media' },
           ],
-          charts: ['SocialMediaChart'],
+          charts: ['RegularSocialMediaUseChart'],
           pullQuote: {
             quote:
               'I mostly lurk, but Twitter and Discord have been where I find the best tools and smartest minds.',
@@ -332,7 +332,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 20, unit: '%', label: 'Pay for a newsletter' },
             { number: 36, unit: '%', label: 'Built a dev community' },
           ],
-          charts: ['DiscoveryChart'],
+          charts: ['NewIdeasChart'],
           pullQuote: {
             quote:
               'I discovered most of our stack via GitHub and indie YouTubers showing their setups.',
@@ -375,7 +375,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
               label: 'Built or building a dev community around their product',
             },
           ],
-          charts: ['CustomerAcquisitionChart'],
+          charts: ['InitialPayingCustomersChart'],
           pullQuote: {
             quote:
               'Our first 10 customers came from one tweet. No landing page, no funnel. Just good timing and network.',
@@ -430,7 +430,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             },
             { number: 81, unit: '%', label: 'Evaluate tools via hands-on experience' },
           ],
-          charts: ['ChallengesChart'],
+          charts: ['BiggestChallengeChart'],
           pullQuote: {
             quote:
               'Growth is still our hardest problem. We’ve got a good product, but breaking through the noise is brutal.',
@@ -451,7 +451,7 @@ const stateOfStartupsData = (isMobile?: boolean) => ({
             { number: 32, unit: '%', label: 'Operations leads are optimistic' },
             { number: 42, unit: '%', label: 'Other roles that are optimistic' },
           ],
-          charts: ['OptimismChart'],
+          charts: ['WorldOutlookChart'],
           pullQuote: {
             quote:
               "I'm cautiously optimistic. There's more uncertainty, but also more tools and leverage than ever.",
