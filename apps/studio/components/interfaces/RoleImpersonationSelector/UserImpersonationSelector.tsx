@@ -39,13 +39,13 @@ const UserImpersonationSelector = () => {
   const [additionalClaims, setAdditionalClaims] = useState('')
 
   const { id: tableId } = useParams()
+  const [selectedTab, setSelectedTab] = useState<'user' | 'external'>('user')
 
   const [previousSearches, setPreviousSearches] = useLocalStorage<User[]>(
     LOCAL_STORAGE_KEYS.USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES(tableId!),
     []
   )
 
-  const [showExternalAuth, setShowExternalAuth] = useState(false)
   const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
 
@@ -152,7 +152,6 @@ const UserImpersonationSelector = () => {
 
   function stopImpersonating() {
     state.setRole(undefined)
-    setShowExternalAuth(false) // Reset external auth impersonation when stopping impersonation
   }
 
   function toggleAalState() {
@@ -204,7 +203,7 @@ const UserImpersonationSelector = () => {
         )}
 
         {!impersonatingUser && !isExternalAuthImpersonating && (
-          <Tabs_Shadcn_ defaultValue="user">
+          <Tabs_Shadcn_ value={selectedTab} onValueChange={(value: any) => setSelectedTab(value)}>
             <TabsList_Shadcn_ className="gap-x-3">
               <TabsTrigger_Shadcn_ value="user">Project user</TabsTrigger_Shadcn_>
               <TabsTrigger_Shadcn_ value="external" className="gap-x-1.5">
