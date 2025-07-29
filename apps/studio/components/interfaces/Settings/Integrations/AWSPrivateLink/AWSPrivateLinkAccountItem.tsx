@@ -1,11 +1,10 @@
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
-import { BASE_PATH } from 'lib/constants'
 import { Badge } from 'ui'
 
 interface AWSPrivateLinkAccountItemProps {
   id: string
   awsAccountId: string
-  region: string
+  description: string
   status: string
   onClick: () => void
   onDelete: () => void
@@ -14,21 +13,21 @@ interface AWSPrivateLinkAccountItemProps {
 const AWSPrivateLinkAccountItem = ({
   id,
   awsAccountId,
-  region,
+  description,
   status,
   onClick,
   onDelete,
 }: AWSPrivateLinkAccountItemProps) => {
-  const isActive = status === 'ACTIVE'
+  const isActive = status === 'connected'
 
   return (
     <ResourceItem
       onClick={onClick}
       actions={[{ label: 'Delete account', onClick: onDelete }]}
-      meta={isActive ? <Badge variant="success">Connected</Badge> : <Badge>Disconnected</Badge>}
+      meta={isActive ? <Badge variant="success">Connected</Badge> : <Badge>Pending</Badge>}
     >
       <div>{awsAccountId}</div>
-      <div className="text-sm text-foreground-lighter">{region}</div>
+      <div className="text-sm text-foreground-lighter">{description}</div>
     </ResourceItem>
   )
 }

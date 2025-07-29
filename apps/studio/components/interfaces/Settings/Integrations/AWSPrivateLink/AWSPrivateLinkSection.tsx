@@ -11,16 +11,18 @@ import AWSPrivateLinkForm from './AWSPrivateLinkForm'
 import { ResourceList } from 'components/ui/Resource/ResourceList'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
+import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
 
 const AWSPrivateLinkSection = () => {
+  const project = useSelectedProject()
+  const { data: accounts } = useAWSAccountsQuery({ projectRef: project?.ref })
+  const { mutate: deleteAccount } = useAWSAccountDeleteMutation()
+
   const [selectedAccount, setSelectedAccount] = useState<any>(null)
   const [showForm, setShowForm] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-
-  const mockAccounts = [
-    { id: '1', awsAccountId: '123456789012', region: 'us-east-1', status: 'ACTIVE' },
-    { id: '2', awsAccountId: '210987654321', region: 'eu-west-1', status: 'INACTIVE' },
-  ]
 
   const onAddAccount = () => {
     setSelectedAccount(null)
@@ -38,9 +40,8 @@ const AWSPrivateLinkSection = () => {
   }
 
   const onConfirmDelete = () => {
-    if (selectedAccount) {
-      console.log('Deleting account:', selectedAccount)
-      // Call API to delete account here
+    if (selectedAccount && project) {
+      deleteAccount({ projectRef: project.ref, id: selectedAccount.id })
     }
     setShowDeleteModal(false)
     setSelectedAccount(null)
@@ -69,9 +70,9 @@ const AWSPrivateLinkSection = () => {
                 <h3 className="text-foreground text-sm">AWS Accounts</h3>
                 <Button onClick={onAddAccount}>Add Account</Button>
               </div>
-              {mockAccounts.length > 0 ? (
+              {(accounts?.length ?? 0) > 0 ? (
                 <ResourceList>
-                  {mockAccounts.map((account) => (
+                  {accounts?.map((account) => (
                     <AWSPrivateLinkAccountItem
                       key={account.id}
                       {...account}
@@ -91,13 +92,7 @@ const AWSPrivateLinkSection = () => {
           </ScaffoldSectionContent>
         </ScaffoldSection>
       </ScaffoldContainer>
-      <AWSPrivateLinkForm
-        awsAccountId={selectedAccount?.awsAccountId}
-        region={selectedAccount?.region}
-        status={selectedAccount?.status}
-        open={showForm}
-        onOpenChange={setShowForm}
-      />
+      <AWSPrivateLinkForm account={selectedAccount} open={showForm} onOpenChange={setShowForm} />
       <ConfirmationModal
         variant="destructive"
         visible={showDeleteModal}

@@ -19,29 +19,53 @@ import {
 import { useForm } from 'react-hook-form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Admonition } from 'ui-patterns'
+import { AWSAccount } from 'data/aws-accounts/aws-accounts-query'
+import { useAWSAccountCreateMutation } from 'data/aws-accounts/aws-account-create-mutation'
+import { useAWSAccountUpdateMutation } from 'data/aws-accounts/aws-account-update-mutation'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 interface AWSPrivateLinkFormProps {
-  awsAccountId?: string
-  region?: string
-  status?: string
+  account?: AWSAccount
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-const AWSPrivateLinkForm = ({
-  awsAccountId,
-  region,
-  status,
-  open,
-  onOpenChange,
-}: AWSPrivateLinkFormProps) => {
-  const isNew = !awsAccountId
+const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
+  const isNew = !account
+  const project = useSelectedProject()
+  const { mutate: createAccount } = useAWSAccountCreateMutation()
+  const { mutate: updateAccount } = useAWSAccountUpdateMutation()
+
   const form = useForm({
     defaultValues: {
-      awsAccountId: awsAccountId ?? '',
-      region: region ?? '',
+      awsAccountId: account?.awsAccountId ?? '',
+      description: account?.description ?? '',
     },
   })
+
+  const onSubmit = (values: any) => {
+    if (!project) return
+    if (isNew) {
+      createAccount(
+        {
+          projectRef: project.ref,
+          awsAccountId: values.awsAccountId,
+          description: values.description,
+        },
+        { onSuccess: () => onOpenChange(false) }
+      )
+    } else {
+      updateAccount(
+        {
+          projectRef: project.ref,
+          id: account.id,
+          awsAccountId: values.awsAccountId,
+          description: values.description,
+        },
+        { onSuccess: () => onOpenChange(false) }
+      )
+    }
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -53,15 +77,19 @@ const AWSPrivateLinkForm = ({
           </SheetDescription>
         </SheetHeader>
         <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(() => {})} className="flex flex-col flex-1">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1">
             <SheetSection className="space-y-4 flex-1">
-              {!isNew && status && (
+              {!isNew && account.status && (
                 <Card className="mb-6">
                   <CardContent className="flex items-center gap-2">
                     <p className="text-sm flex-1">
-                      This account needs to be accepted by the AWS account owner
+                      {account.status === 'connected'
+                        ? 'This account has been accepted by the AWS account owner.'
+                        : 'This account needs to be accepted by the AWS account owner.'}
                     </p>
-                    <Badge variant="success">Connected</Badge>
+                    <Badge variant={account.status === 'connected' ? 'success' : 'warning'}>
+                      {account.status === 'connected' ? 'Connected' : 'Pending'}
+                    </Badge>
                   </CardContent>
                 </Card>
               )}
@@ -81,12 +109,9 @@ const AWSPrivateLinkForm = ({
               />
               <FormField_Shadcn_
                 control={form.control}
-                name="region"
+                name="description"
                 render={({ field }) => (
-                  <FormItemLayout
-                    label="Region"
-                    description="The AWS region where your VPC is located."
-                  >
+                  <FormItemLayout label="Description" description="A description for this account.">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} />
                     </FormControl_Shadcn_>
