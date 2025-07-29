@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -97,6 +98,9 @@ export const RealtimeSettings = () => {
     },
   })
 
+  const { allow_public } = form.watch()
+  const isSettingToPrivate = !data?.private_only && !allow_public
+
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
     if (!projectRef) return console.error('Project ref is required')
     updateRealtimeConfig({
@@ -147,22 +151,25 @@ export const RealtimeSettings = () => {
                           </FormControl_Shadcn_>
                         </FormItemLayout>
 
-                        {!hasRealtimeMessagesPolicies && (
+                        {!hasRealtimeMessagesPolicies && !allow_public && (
                           <Admonition
                             showIcon={false}
                             type="warning"
-                            title="RLS policies are missing"
+                            title="No Realtime RLS policies found"
                             description={
                               <>
-                                Private mode requires RLS policies on the{' '}
-                                <code className="text-xs text-brand">realtime.messages</code> table
-                                to function properly.{' '}
-                                <InlineLink
-                                  href={`/project/${projectRef}/realtime/policies`}
-                                >
-                                  Add RLS policies
-                                </InlineLink>{' '}
-                                or Realtime won't work.
+                                <p className="prose max-w-full text-sm">
+                                  Private mode is {isSettingToPrivate ? 'being ' : ''}
+                                  enabled, but no RLS policies exists on the{' '}
+                                  <code className="text-xs">realtime.messages</code> table. No
+                                  messages will be received by users.
+                                </p>
+
+                                <Button asChild type="default" className="mt-2">
+                                  <Link href={`/project/${projectRef}/realtime/policies`}>
+                                    Create policy
+                                  </Link>
+                                </Button>
                               </>
                             }
                           />
