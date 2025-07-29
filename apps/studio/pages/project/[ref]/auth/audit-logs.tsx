@@ -37,7 +37,7 @@ const AuditLogsPage: NextPageWithLayout = () => {
 }
 
 const secondaryActions = [
-  <DocsButton key="docs" href="https://supabase.com/docs/guides/functions" />,
+  <DocsButton key="docs" href="https://supabase.com/docs/guides/auth/audit-logs" />,
 ]
 
 AuditLogsPage.getLayout = (page) => (

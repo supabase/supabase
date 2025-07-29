@@ -8,7 +8,7 @@ import { boolean, object } from 'yup'
 import { useParams } from 'common'
 import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
 import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
+import { NoPermission } from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -98,28 +98,6 @@ export const AuditLogsForm = () => {
   return (
     <ScaffoldSection isFullWidth>
       <div className="space-y-4">
-        {/* <div>
-          <h3 className="text-lg font-medium text-foreground">About Audit Logs</h3>
-          <p className="text-sm text-foreground-light mt-2">
-            Audit logs provide comprehensive tracking of auth events in your project. By default,
-            all auth-related actions such as user sign-ups, sign-ins, password changes, and
-            administrative actions are logged to both your PostgreSQL database and your project's
-            logs dashboard (since <strong>August 1, 2025</strong>, audit logs are being written to
-            the logs dashboard).
-          </p>
-          <p className="text-sm text-foreground-light mt-2">
-            <strong>Note:</strong> This feature is currently in beta. If you disable PostgreSQL
-            storage, you can access audit logs through the{' '}
-            <a
-              href={`/project/${projectRef}/logs/auth-logs?s=auth_audit_event`}
-              className="text-brand underline hover:no-underline"
-            >
-              Auth logs section
-            </a>
-            .
-          </p>
-        </div> */}
-
         <ScaffoldSectionTitle className="mb-4">Settings</ScaffoldSectionTitle>
 
         <Form_Shadcn_ {...form}>
