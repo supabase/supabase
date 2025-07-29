@@ -32,7 +32,6 @@ You can disable Postgres storage to reduce database storage costs while keeping 
 3. Find the **Audit Logs** under **Configuration** section
 4. Toggle on "Disable writing auth audit logs to project database" to disable database storage
 
-
 <Admonition type="tip">
 
 Disabling Postgres storage reduces your database storage costs. Audit logs will still be available through the dashboard.
@@ -58,32 +57,32 @@ Audit logs contain detailed information about each authentication event:
 
 ### Log actions reference
 
-| Action | Description |
-|--------|-------------|
-| `login` | User login attempt |
-| `logout` | User logout |
-| `invite_accepted` | Team invitation accepted |
-| `user_signedup` | New user registration |
-| `user_invited` | User invitation sent |
-| `user_deleted` | User account deleted |
-| `user_modified` | User profile updated |
-| `user_recovery_requested` | Password reset request |
-| `user_reauthenticate_requested` | User reauthentication required |
-| `user_confirmation_requested` | Email/phone confirmation requested |
-| `user_repeated_signup` | Duplicate signup attempt |
-| `user_updated_password` | Password change completed |
-| `token_revoked` | Refresh token revoked |
-| `token_refreshed` | Refresh token used to obtain new tokens |
-| `generate_recovery_codes` | MFA recovery codes generated |
-| `factor_in_progress` | MFA factor enrollment started |
-| `factor_unenrolled` | MFA factor removed |
-| `challenge_created` | MFA challenge initiated |
-| `verification_attempted` | MFA verification attempt |
-| `factor_deleted` | MFA factor deleted |
-| `recovery_codes_deleted` | MFA recovery codes deleted |
-| `factor_updated` | MFA factor settings updated |
-| `mfa_code_login` | Login with MFA code |
-| `identity_unlinked` | An identity unlinked from account |
+| Action                          | Description                             |
+| ------------------------------- | --------------------------------------- |
+| `login`                         | User login attempt                      |
+| `logout`                        | User logout                             |
+| `invite_accepted`               | Team invitation accepted                |
+| `user_signedup`                 | New user registration                   |
+| `user_invited`                  | User invitation sent                    |
+| `user_deleted`                  | User account deleted                    |
+| `user_modified`                 | User profile updated                    |
+| `user_recovery_requested`       | Password reset request                  |
+| `user_reauthenticate_requested` | User reauthentication required          |
+| `user_confirmation_requested`   | Email/phone confirmation requested      |
+| `user_repeated_signup`          | Duplicate signup attempt                |
+| `user_updated_password`         | Password change completed               |
+| `token_revoked`                 | Refresh token revoked                   |
+| `token_refreshed`               | Refresh token used to obtain new tokens |
+| `generate_recovery_codes`       | MFA recovery codes generated            |
+| `factor_in_progress`            | MFA factor enrollment started           |
+| `factor_unenrolled`             | MFA factor removed                      |
+| `challenge_created`             | MFA challenge initiated                 |
+| `verification_attempted`        | MFA verification attempt                |
+| `factor_deleted`                | MFA factor deleted                      |
+| `recovery_codes_deleted`        | MFA recovery codes deleted              |
+| `factor_updated`                | MFA factor settings updated             |
+| `mfa_code_login`                | Login with MFA code                     |
+| `identity_unlinked`             | An identity unlinked from account       |
 
 ## Limitations
 
