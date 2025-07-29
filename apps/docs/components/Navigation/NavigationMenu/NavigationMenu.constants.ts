@@ -718,6 +718,7 @@ export const auth = {
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
         { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
+        { name: 'Audit Logs', url: '/guides/auth/audit-logs' },
         {
           name: 'JSON Web Tokens (JWT)',
           url: '/guides/auth/jwts',
