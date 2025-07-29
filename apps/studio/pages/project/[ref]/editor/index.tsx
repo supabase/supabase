@@ -33,7 +33,10 @@ const TableEditorPage: NextPageWithLayout = () => {
     } else if (lastTabId) {
       // Handle redirect to last opened table tab, or last table tab
       const lastTab = tabStore.tabsMap[lastTabId]
-      if (lastTab) router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
+      if (lastTab)
+        router.push(
+          `/project/${projectRef}/editor/${lastTab.metadata?.tableId}?schema=${lastTab.metadata?.schema}`
+        )
     }
   }, [])
 

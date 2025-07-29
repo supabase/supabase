@@ -79,7 +79,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                   />
                 </Badge>
 
-                <Link href={`/project/${ref}/editor/${table.id}`}>
+                <Link href={`/project/${ref}/editor/${table.id}?schema=${table.schema}`}>
                   <Badge className="transition hover:bg-surface-300 pl-5 rounded-l-none gap-2 h-6 font-mono text-[0.75rem] border-l-0">
                     <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                     {table.schema}.{table.table_name}
