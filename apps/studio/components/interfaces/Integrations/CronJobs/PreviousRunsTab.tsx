@@ -11,6 +11,7 @@ import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import {
   Button,
   cn,
@@ -163,6 +164,16 @@ export const PreviousRunsTab = () => {
     { enabled: !!jobId, staleTime: 30 }
   )
 
+  const { data: edgeFunctions = [] } = useEdgeFunctionsQuery({ projectRef: project?.ref })
+
+  const currentJobState = cronJobs?.find((job) => job.jobid === jobId)
+  const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
+  const cronJobValues = parseCronJobCommand(currentJobState?.command || '', project?.ref!)
+  const edgeFunction =
+    cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
+  const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
+  const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
+
   const handleScroll = useCallback(
     (event: UIEvent<HTMLDivElement>) => {
       if (isLoadingCronJobRuns || !isAtBottom(event)) return
@@ -172,13 +183,6 @@ export const PreviousRunsTab = () => {
     },
     [fetchNextPage, isLoadingCronJobRuns]
   )
-
-  const currentJobState = cronJobs?.find((job) => job.jobid === jobId)
-  const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
-  const cronJobValues = parseCronJobCommand(currentJobState?.command || '', project?.ref!)
-  const edgeFunction =
-    cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
-  const edgeFunctionName = edgeFunction?.split('/functions/v1/').pop()
 
   useEffect(() => {
     // Refetch only the first page
@@ -287,12 +291,12 @@ export const PreviousRunsTab = () => {
                     View Cron logs
                   </Link>
                 </Button>
-                {!!edgeFunction && (
+                {isValidEdgeFunction && (
                   <Button asChild type="outline">
                     <Link
                       target="_blank"
                       rel="noopener noreferrer"
-                      href={`/project/${project?.ref}/functions/${edgeFunctionName}/logs`}
+                      href={`/project/${project?.ref}/functions/${edgeFunctionSlug}/logs`}
                     >
                       View Edge Function logs
                     </Link>
