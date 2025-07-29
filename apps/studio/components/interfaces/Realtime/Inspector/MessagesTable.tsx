@@ -5,8 +5,10 @@ import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
@@ -83,15 +85,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
               </div>
-              <Button type="default" iconRight={<ExternalLink />}>
-                <a
-                  href="https://supabase.com/docs/guides/realtime"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </a>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/realtime" />
             </div>
           </div>
         </>
@@ -116,6 +110,8 @@ const MessagesTable = ({
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
 
+  const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
@@ -185,9 +181,11 @@ const MessagesTable = ({
                       selectedCellIdx={undefined}
                       onClick={() => {
                         sendEvent({
-                          category: 'realtime_inspector',
-                          action: 'focused-specific-message',
-                          label: 'realtime_inspector_results',
+                          action: 'realtime_inspector_message_clicked',
+                          groups: {
+                            project: ref ?? 'Unknown',
+                            organization: org?.slug ?? 'Unknown',
+                          },
                         })
                         setFocusedLog(row)
                       }}

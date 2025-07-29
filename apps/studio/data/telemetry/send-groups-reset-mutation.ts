@@ -1,20 +1,17 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
+import { hasConsented } from 'common'
 import { handleError, post } from 'data/fetchers'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export type SendGroupsResetVariables = components['schemas']['TelemetryGroupsResetBody']
 
-export async function sendGroupsReset({
-  consent,
-  body,
-}: {
-  consent: boolean
-  body: SendGroupsResetVariables
-}) {
-  if (!consent) return undefined
+export async function sendGroupsReset({ body }: { body: SendGroupsResetVariables }) {
+  const consent = hasConsented()
+
+  if (!consent || !IS_PLATFORM) return undefined
 
   const { data, error } = await post(`/platform/telemetry/groups/reset`, {
     body,
@@ -34,13 +31,8 @@ export const useSendGroupsResetMutation = ({
   UseMutationOptions<SendGroupsResetData, ResponseError, SendGroupsResetVariables>,
   'mutationFn'
 > = {}) => {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH)
-      : null) === 'true'
-
   return useMutation<SendGroupsResetData, ResponseError, SendGroupsResetVariables>(
-    (vars) => sendGroupsReset({ consent, body: vars }),
+    (vars) => sendGroupsReset({ body: vars }),
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)

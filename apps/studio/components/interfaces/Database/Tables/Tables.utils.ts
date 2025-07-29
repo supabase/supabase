@@ -29,7 +29,7 @@ export const formatAllEntities = ({
   const formattedTables: Entity[] = tables.map((x) => {
     return {
       ...x,
-      type: ENTITY_TYPE.TABLE,
+      type: ENTITY_TYPE.TABLE as const,
       rows: x.live_rows_estimate,
       columns: x.columns ?? [],
       schema: x.schema,
@@ -38,7 +38,7 @@ export const formatAllEntities = ({
 
   const formattedViews: Entity[] = views.map((x) => {
     return {
-      type: ENTITY_TYPE.VIEW,
+      type: ENTITY_TYPE.VIEW as const,
       id: x.id,
       name: x.name,
       comment: x.comment,
@@ -51,7 +51,7 @@ export const formatAllEntities = ({
 
   const formattedMaterializedViews: Entity[] = materializedViews.map((x) => {
     return {
-      type: ENTITY_TYPE.MATERIALIZED_VIEW,
+      type: ENTITY_TYPE.MATERIALIZED_VIEW as const,
       id: x.id,
       name: x.name,
       comment: x.comment,
@@ -64,7 +64,7 @@ export const formatAllEntities = ({
 
   const formattedForeignTables: Entity[] = foreignTables.map((x) => {
     return {
-      type: ENTITY_TYPE.FOREIGN_TABLE,
+      type: ENTITY_TYPE.FOREIGN_TABLE as const,
       id: x.id,
       name: x.name,
       comment: x.comment,

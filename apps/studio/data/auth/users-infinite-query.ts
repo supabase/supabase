@@ -2,25 +2,29 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 
 import type { components } from 'data/api'
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import { authKeys } from './keys'
 
 export type Filter = 'verified' | 'unverified' | 'anonymous'
 
 export type UsersVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
   page?: number
   keywords?: string
   filter?: Filter
   providers?: string[]
-  sort?: 'created_at' | 'email' | 'phone'
+  sort?: 'created_at' | 'email' | 'phone' | 'last_sign_in_at'
   order?: 'asc' | 'desc'
 }
 
 export const USERS_PAGE_LIMIT = 50
-export type User = components['schemas']['UserBody']
+export type User = components['schemas']['UserBody'] & {
+  providers: readonly string[]
+}
 
-const getUsersSQL = ({
+export const getUsersSQL = ({
   page = 0,
   verified,
   keywords,
@@ -33,17 +37,21 @@ const getUsersSQL = ({
   keywords?: string
   providers?: string[]
   sort: string
-  order: string
+  order: 'asc' | 'desc'
 }) => {
   const offset = page * USERS_PAGE_LIMIT
   const hasValidKeywords = keywords && keywords !== ''
 
   const conditions: string[] = []
-  const baseQueryUsers = `select * from auth.users`
+  const baseQueryUsers = `
+  select *, coalesce((select array_agg(distinct i.provider) from auth.identities i where i.user_id = auth.users.id), '{}'::text[]) as providers from auth.users
+  `.trim()
 
   if (hasValidKeywords) {
+    // [Joshen] Escape single quotes properly
+    const formattedKeywords = keywords.replaceAll("'", "''")
     conditions.push(
-      `id::text ilike '%${keywords}%' or email ilike '%${keywords}%' or phone ilike '%${keywords}%'`
+      `id::text like '%${formattedKeywords}%' or email like '%${formattedKeywords}%' or phone like '%${formattedKeywords}%' or raw_user_meta_data->>'full_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'first_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'last_name' ilike '%${formattedKeywords}%' or raw_user_meta_data->>'display_name' ilike '%${formattedKeywords}%'`
     )
   }
 
@@ -73,7 +81,7 @@ const getUsersSQL = ({
   const sortOn = sort ?? 'created_at'
   const sortOrder = order ?? 'desc'
 
-  return `${baseQueryUsers}${conditions.length > 0 ? ` where ${combinedConditions}` : ''} order by "${sortOn}" ${sortOrder} limit ${USERS_PAGE_LIMIT} offset ${offset};`
+  return `${baseQueryUsers}${conditions.length > 0 ? ` where ${combinedConditions}` : ''} order by "${sortOn}" ${sortOrder} nulls last limit ${USERS_PAGE_LIMIT} offset ${offset};`
 }
 
 export type UsersData = { result: User[] }
@@ -82,8 +90,11 @@ export type UsersError = ExecuteSqlError
 export const useUsersInfiniteQuery = <TData = UsersData>(
   { projectRef, connectionString, keywords, filter, providers, sort, order }: UsersVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
-) =>
-  useInfiniteQuery<UsersData, UsersError, TData>(
+) => {
+  const project = useSelectedProject()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useInfiniteQuery<UsersData, UsersError, TData>(
     authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
     ({ signal, pageParam }) => {
       return executeSql(
@@ -104,15 +115,14 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
       )
     },
     {
-      staleTime: 0,
-      enabled: enabled && typeof projectRef !== 'undefined',
-
+      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
-        const hasNextPage = lastPage.result.length <= USERS_PAGE_LIMIT
+        const hasNextPage = lastPage.result.length >= USERS_PAGE_LIMIT
         if (!hasNextPage) return undefined
         return page
       },
       ...options,
     }
   )
+}

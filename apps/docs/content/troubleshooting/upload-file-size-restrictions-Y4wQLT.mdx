@@ -1,0 +1,42 @@
+---
+title = "Upload file size restrictions"
+github_url = "https://github.com/orgs/supabase/discussions/27431"
+date_created = "2024-06-20T23:15:48+00:00"
+topics = [ "storage" ]
+keywords = [ "upload", "file", "size", "restriction" ]
+database_id = "3b0aa0f2-9608-4691-94d6-4fca8a32130e"
+---
+
+You can view the max permissible upload size for your plan in the [docs](https://supabase.com/docs/guides/storage/uploads/file-limits).
+
+## There are two ways to control the max upload sizes:
+
+The first way is through the [global storage settings](https://supabase.com/dashboard/project/_/settings/storage):
+
+<img
+  width="920"
+  alt="Screenshot 2024-06-20 at 7 06 57 PM"
+  src="https://github.com/supabase/supabase/assets/91111415/c33acc4a-efd8-4746-ac98-ddc71e17f8f1"
+/>
+
+The second way is at the [bucket level](https://supabase.com/dashboard/project/_/storage/buckets/)
+
+1. Edit a bucket's configurations:
+
+   <img
+     width="355"
+     alt="Screenshot 2024-06-20 at 7 07 48 PM"
+     src="https://github.com/supabase/supabase/assets/91111415/51719d9f-3644-40ed-9aaa-8b21fff41634"
+   />
+
+2. Change the file upload restriction if set:
+   <img
+     width="340"
+     alt="Screenshot 2024-06-20 at 7 07 56 PM"
+     src="https://github.com/supabase/supabase/assets/91111415/917f3cf6-81c4-444f-9ac1-f26eec5eac0c"
+   />
+
+## Different upload methods impose file size restrictions:
+
+- [Standard uploads can only transfer up to 5GBs](https://supabase.com/docs/guides/storage/uploads/standard-uploads?queryGroups=language&language=js). However, for files above 6MB, the below methods are more performant and reliable
+- [Resumable](https://supabase.com/docs/guides/storage/uploads/resumable-uploads) and [S3](https://supabase.com/docs/guides/storage/uploads/resumable-uploads) uploads can support transfers up to 50GB in size.

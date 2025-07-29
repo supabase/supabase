@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Check, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -6,19 +7,19 @@ import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import CopyButton from 'components/ui/CopyButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Alert, Button, Input } from 'ui'
-import AuthorizedAppRow from './AuthorizedAppRow'
-import DeleteAppModal from './DeleteAppModal'
-import OAuthAppRow from './OAuthAppRow'
-import PublishAppModal from './PublishAppSidePanel'
-import RevokeAppModal from './RevokeAppModal'
-import { X } from 'lucide-react'
+import { Button, cn } from 'ui'
+import { AuthorizedAppRow } from './AuthorizedAppRow'
+import { DeleteAppModal } from './DeleteAppModal'
+import { OAuthAppRow } from './OAuthAppRow'
+import { PublishAppSidePanel } from './PublishAppSidePanel'
+import { RevokeAppModal } from './RevokeAppModal'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -45,7 +46,7 @@ const OAuthApps = () => {
   } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
 
   const sortedPublishedApps = publishedApps?.sort((a, b) => {
-    return Number(new Date(a.created_at)) - Number(new Date(b.created_at))
+    return Number(new Date(a.created_at ?? '')) - Number(new Date(b.created_at ?? ''))
   })
 
   const {
@@ -71,7 +72,7 @@ const OAuthApps = () => {
     <>
       <ScaffoldContainerLegacy>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
             <div>
               <p>Published Apps</p>
               <p className="text-foreground-light text-sm">
@@ -85,7 +86,9 @@ const OAuthApps = () => {
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to create apps',
+                  text: !canCreateOAuthApps
+                    ? 'You need additional permissions to create apps'
+                    : undefined,
                 },
               }}
             >
@@ -109,7 +112,13 @@ const OAuthApps = () => {
           )}
 
           {createdApp !== undefined && (
-            <Alert withIcon variant="success" title="Successfully published a new application!">
+            <div
+              className={cn(
+                'flex items-center justify-between p-4 px-6 border first:rounded-t last:rounded-b',
+                'bg-background-alternative',
+                'rounded'
+              )}
+            >
               <div className="absolute top-4 right-4">
                 <Button
                   type="text"
@@ -119,32 +128,31 @@ const OAuthApps = () => {
                 />
               </div>
               <div className="w-full space-y-4">
-                <p className="text-sm">
-                  Ensure that you store the client secret securely - you will not be able to see it
-                  again.
-                </p>
-                <div className="space-y-4">
-                  <Input
-                    copy
-                    readOnly
-                    size="small"
-                    label="Client ID"
-                    className="max-w-xl input-mono"
-                    value={createdApp.client_id}
-                    onChange={() => {}}
-                  />
-                  <Input
-                    copy
-                    readOnly
-                    size="small"
-                    label="Client secret"
-                    className="max-w-xl input-mono"
-                    value={createdApp.client_secret}
-                    onChange={() => {}}
-                  />
+                <div className="flex flex-col gap-0">
+                  <div className="flex items-center gap-2">
+                    <Check size={14} className="text-brand" strokeWidth={3} />
+                    <p className="text-sm">You've created your new OAuth application.</p>
+                  </div>
+                  <p className="text-sm text-foreground-light">
+                    Ensure that you store the client secret securely - you will not be able to see
+                    it again.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-foreground-light">Client ID</p>
+                    <p className="font-mono text-sm">{createdApp.client_id}</p>
+                    <CopyButton text={createdApp.client_id} type="default" iconOnly />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-foreground-light">Client Secret</p>
+                    <p className="font-mono text-sm">{createdApp.client_secret}</p>
+                    <CopyButton text={createdApp.client_secret} type="default" iconOnly />
+                  </div>
                 </div>
               </div>
-            </Alert>
+            </div>
           )}
 
           {isSuccessPublishedApps && (
@@ -159,7 +167,6 @@ const OAuthApps = () => {
                     <Table.th key="icon" className="w-[30px]"></Table.th>,
                     <Table.th key="name">Name</Table.th>,
                     <Table.th key="client-id">Client ID</Table.th>,
-                    <Table.th key="client-secret">Client Secret</Table.th>,
                     <Table.th key="created-at">Created at</Table.th>,
                     <Table.th key="delete-action"></Table.th>,
                   ]}
@@ -211,6 +218,8 @@ const OAuthApps = () => {
                     head={[
                       <Table.th key="icon" className="w-[30px]"></Table.th>,
                       <Table.th key="name">Name</Table.th>,
+                      <Table.th key="created-by">Created by</Table.th>,
+                      <Table.th key="app-id">App ID</Table.th>,
                       <Table.th key="authorized-at">Authorized at</Table.th>,
                       <Table.th key="delete-action"></Table.th>,
                     ]}
@@ -231,7 +240,7 @@ const OAuthApps = () => {
         </div>
       </ScaffoldContainerLegacy>
 
-      <PublishAppModal
+      <PublishAppSidePanel
         visible={showPublishModal}
         selectedApp={selectedAppToUpdate}
         onClose={() => {

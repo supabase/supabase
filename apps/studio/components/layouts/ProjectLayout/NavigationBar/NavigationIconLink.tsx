@@ -1,13 +1,17 @@
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { AnchorHTMLAttributes, forwardRef } from 'react'
-import { cn } from 'ui'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import {
+  AnchorHTMLAttributes,
+  cloneElement,
+  ComponentPropsWithoutRef,
+  forwardRef,
+  isValidElement,
+} from 'react'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Route } from 'components/ui/ui.types'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
@@ -16,22 +20,23 @@ interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorEleme
 
 const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonProps>(
   ({ route, isActive = false, onClick = noop, ...props }, ref) => {
-    const snap = useAppStateSnapshot()
-
-    const [allowNavPanelToExpand] = useLocalStorageQuery(
+    const [storedAllowNavPanel] = useLocalStorageQuery(
       LOCAL_STORAGE_KEYS.EXPAND_NAVIGATION_PANEL,
       true
     )
+    // Don't allow the nav panel to expand in playwright tests
+    const allowNavPanelToExpand = process.env.NEXT_PUBLIC_NODE_ENV !== 'test' && storedAllowNavPanel
+
     const iconClasses = [
-      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
+      'absolute left-0 top-0 flex rounded h-10 w-10 items-center justify-center text-foreground-lighter', // Layout
       'group-hover/item:text-foreground-light',
-      isActive && '!text-foreground',
-      'transition-colors',
+      isActive ? '!text-foreground [&_svg]:stroke-[1.5]' : '[&_svg]:stroke-[1]',
+      'transition-all',
     ]
 
     const classes = [
       'relative',
-      'h-10 w-10 group-data-[state=expanded]:w-full',
+      'h-10 w-full md:w-10 md:group-data-[state=expanded]:w-full',
       'transition-all duration-200',
       'flex items-center rounded',
       'group-data-[state=collapsed]:justify-center',
@@ -41,8 +46,18 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       `${isActive && '!bg-selection shadow-sm'}`,
     ]
 
+    const LinkComponent = forwardRef<HTMLAnchorElement, ComponentPropsWithoutRef<typeof Link>>(
+      function LinkComponent(props, ref) {
+        if (route.linkElement && isValidElement(route.linkElement)) {
+          return cloneElement<any>(route.linkElement, { ...props, ref })
+        }
+
+        return <Link ref={ref} {...props} />
+      }
+    )
+
     const linkContent = (
-      <Link
+      <LinkComponent
         role="button"
         aria-current={isActive}
         ref={ref}
@@ -60,30 +75,29 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
           {route.icon}
         </span>
         <span
-          aria-hidden={snap.navigationPanelOpen || undefined}
           className={cn(
             'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',
             'group-aria-current/item:text-foreground',
-            'absolute left-7 group-data-[state=expanded]:left-12',
-            'opacity-0 group-data-[state=expanded]:opacity-100',
+            'absolute left-10 md:left-7 md:group-data-[state=expanded]:left-12',
+            'opacity-100 md:opacity-0 md:group-data-[state=expanded]:opacity-100',
             `${isActive && 'text-foreground hover:text-foreground'}`,
             'transition-all'
           )}
         >
           {route.label}
         </span>
-      </Link>
+      </LinkComponent>
     )
 
     if (!allowNavPanelToExpand) {
       return (
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>{linkContent}</TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="right">
+        <Tooltip>
+          <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
+          <TooltipContent side="right">
             <span>{route.label}</span>
-          </TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+          </TooltipContent>
+        </Tooltip>
       )
     }
 

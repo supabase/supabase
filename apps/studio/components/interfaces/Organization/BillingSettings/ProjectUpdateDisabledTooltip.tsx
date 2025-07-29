@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react'
-import { TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export interface ProjectUpdateDisabledTooltipProps {
   projectUpdateDisabled: boolean
@@ -16,19 +16,19 @@ const ProjectUpdateDisabledTooltip = ({
   const showTooltip = projectUpdateDisabled || projectNotActive
 
   return (
-    <Tooltip_Shadcn_>
-      <TooltipTrigger_Shadcn_ asChild>{children}</TooltipTrigger_Shadcn_>
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
       {showTooltip && (
-        <TooltipContent_Shadcn_ side="bottom" className="w-72 text-center">
+        <TooltipContent side="bottom" className="w-72 text-center">
           {projectUpdateDisabled
             ? tooltip ||
               'Subscription changes are currently disabled. Our engineers are working on a fix.'
             : projectNotActive
               ? 'Unable to update subscription as project is currently not active'
               : ''}
-        </TooltipContent_Shadcn_>
+        </TooltipContent>
       )}
-    </Tooltip_Shadcn_>
+    </Tooltip>
   )
 }
 

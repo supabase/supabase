@@ -6,21 +6,21 @@ const pricingMetricBytes = [
   PricingMetric.STORAGE_SIZE,
 ]
 
+const pricingMetricNotHrs = [
+  PricingMetric.FUNCTION_INVOCATIONS,
+  PricingMetric.LOG_DRAIN_EVENTS,
+  PricingMetric.MONTHLY_ACTIVE_USERS,
+  PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
+  PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS,
+  PricingMetric.REALTIME_MESSAGE_COUNT,
+  PricingMetric.REALTIME_PEAK_CONNECTIONS,
+  PricingMetric.STORAGE_IMAGES_TRANSFORMED,
+]
+
 export const formatUsage = (
   pricingMetric: PricingMetric,
   allocation: { usage: number; hours?: number }
 ) => {
-  if (allocation.hours) {
-    return (
-      allocation.usage.toLocaleString() +
-      ' (' +
-      Math.round(allocation.usage / allocation.hours).toLocaleString() +
-      'x' +
-      allocation.hours.toLocaleString() +
-      ' hours)'
-    )
-  }
-
   if (pricingMetricBytes.includes(pricingMetric)) {
     const formattedUsage = +(allocation.usage / 1e9).toFixed(2).toLocaleString()
 
@@ -30,6 +30,17 @@ export const formatUsage = (
     } else {
       return formattedUsage
     }
+  }
+
+  if (allocation.hours && !pricingMetricNotHrs.includes(pricingMetric)) {
+    return (
+      allocation.usage.toLocaleString() +
+      ' (' +
+      Math.round(allocation.usage / allocation.hours).toLocaleString() +
+      'x' +
+      allocation.hours.toLocaleString() +
+      ' hours)'
+    )
   } else {
     return allocation.usage.toLocaleString()
   }
@@ -46,6 +57,9 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
       PricingMetric.PITR_7,
       PricingMetric.PITR_14,
       PricingMetric.PITR_28,
+      PricingMetric.LOG_DRAIN,
+      PricingMetric.AUTH_MFA_PHONE,
+      PricingMetric.AUTH_MFA_WEB_AUTHN,
     ].includes(pricingMetric)
   ) {
     return 'Hours'

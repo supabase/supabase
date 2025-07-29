@@ -7,9 +7,10 @@ import { subscriptionKeys } from './keys'
 import type { AddonVariantId, ProjectAddonType } from './types'
 
 export type ProjectAddonUpdateVariables = {
-  projectRef: string
+  projectRef?: string
   variant: AddonVariantId
   type: ProjectAddonType
+  suppressToast?: boolean
 }
 
 export async function updateSubscriptionAddon({
@@ -46,7 +47,7 @@ export const useProjectAddonUpdateMutation = ({
 }: Omit<
   UseMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
   'mutationFn'
-> = {}) => {
+> & { suppressToast?: boolean } = {}) => {
   const queryClient = useQueryClient()
 
   return useMutation<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>(

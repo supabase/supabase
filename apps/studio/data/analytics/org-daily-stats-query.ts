@@ -1,8 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
 import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
@@ -13,6 +12,7 @@ export enum EgressType {
   REALTIME = 'egress_realtime',
   FUNCTIONS = 'egress_functions',
   SUPAVISOR = 'egress_supavisor',
+  LOGDRAIN = 'egress_logdrain',
   UNIFIED = 'egress',
 }
 
@@ -40,6 +40,8 @@ export enum PricingMetric {
   DISK_THROUGHPUT_GP3 = 'DISK_THROUGHPUT_GP3',
   LOG_DRAIN = 'LOG_DRAIN',
   LOG_DRAIN_EVENTS = 'LOG_DRAIN_EVENTS',
+  AUTH_MFA_PHONE = 'AUTH_MFA_PHONE',
+  AUTH_MFA_WEB_AUTHN = 'AUTH_MFA_WEB_AUTHN',
 }
 
 export enum ComputeUsageMetric {
@@ -54,12 +56,20 @@ export enum ComputeUsageMetric {
   COMPUTE_HOURS_8XL = 'COMPUTE_HOURS_8XL',
   COMPUTE_HOURS_12XL = 'COMPUTE_HOURS_12XL',
   COMPUTE_HOURS_16XL = 'COMPUTE_HOURS_16XL',
+  COMPUTE_HOURS_24XL = 'COMPUTE_HOURS_24XL',
+  COMPUTE_HOURS_24XL_OPTIMIZED_CPU = 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU',
+  COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY = 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY',
+  COMPUTE_HOURS_24XL_HIGH_MEMORY = 'COMPUTE_HOURS_24XL_HIGH_MEMORY',
+  COMPUTE_HOURS_48XL = 'COMPUTE_HOURS_48XL',
+  COMPUTE_HOURS_48XL_OPTIMIZED_CPU = 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU',
+  COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY = 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY',
+  COMPUTE_HOURS_48XL_HIGH_MEMORY = 'COMPUTE_HOURS_48XL_HIGH_MEMORY',
 }
 
 export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) => {
   switch (computeUsageMetric) {
     case 'COMPUTE_HOURS_BRANCH':
-      return 'Branches'
+      return 'Branching'
     case 'COMPUTE_HOURS_XS':
       return 'Micro'
     case 'COMPUTE_HOURS_SM':
@@ -80,6 +90,22 @@ export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) 
       return '12XL'
     case 'COMPUTE_HOURS_16XL':
       return '16XL'
+    case 'COMPUTE_HOURS_24XL':
+      return '24XL'
+    case 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU':
+      return '24XL - Optimized CPU'
+    case 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY':
+      return '24XL - Optimized Memory'
+    case 'COMPUTE_HOURS_24XL_HIGH_MEMORY':
+      return '24XL - High Memory'
+    case 'COMPUTE_HOURS_48XL':
+      return '48XL'
+    case 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU':
+      return '48XL - Optimized CPU'
+    case 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY':
+      return '48XL - Optimized Memory'
+    case 'COMPUTE_HOURS_48XL_HIGH_MEMORY':
+      return '48XL - High Memory'
   }
 }
 
@@ -105,16 +131,23 @@ export async function getOrgDailyStats(
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('Start date is required')
 
-  let endpoint = `${API_URL}/organizations/${orgSlug}/daily-stats?metric=${metric}&startDate=${encodeURIComponent(
-    startDate
-  )}&endDate=${encodeURIComponent(endDate)}`
+  const { data, error } = await get('/platform/organizations/{slug}/daily-stats', {
+    params: {
+      path: { slug: orgSlug },
+      query: {
+        metric,
+        startDate,
+        endDate,
+        interval,
+        projectRef,
+      },
+    },
+    signal,
+  })
 
-  if (interval) endpoint += `&interval=${interval}`
-  if (projectRef) endpoint += `&projectRef=${projectRef}`
+  if (error) handleError(error)
 
-  const data = await get(endpoint, { signal })
-  if (data.error) throw data.error
-  return data as AnalyticsData
+  return data as unknown as AnalyticsData
 }
 
 export type OrgDailyStatsData = Awaited<ReturnType<typeof getOrgDailyStats>>

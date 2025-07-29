@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import type { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
+import { type ReadonlyRecursive } from '~/types/utils'
 
 const projectKeys = {
   list: () => ['all-projects'] as const,
@@ -25,4 +26,10 @@ export function useProjectsQuery<TData = ProjectsData>({
     enabled,
     ...options,
   })
+}
+
+export function isProjectPaused(
+  project: ReadonlyRecursive<ProjectsData[number]> | null
+): boolean | undefined {
+  return !project ? undefined : project.status === 'INACTIVE'
 }

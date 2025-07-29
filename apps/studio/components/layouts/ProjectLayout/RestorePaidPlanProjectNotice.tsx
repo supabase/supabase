@@ -21,7 +21,7 @@ export const RestorePaidPlanProjectNotice = () => {
       <AlertDescription_Shadcn_ className="mt-3">
         <Button asChild type="default" icon={<ExternalLink />}>
           <a
-            href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+            href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
             target="_blank"
             rel="noreferrer"
           >

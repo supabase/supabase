@@ -1,3 +1,7 @@
+import { Lightbulb } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
+import { formatSql } from 'lib/formatSql'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -6,14 +10,11 @@ import {
   CodeBlock,
   cn,
 } from 'ui'
+import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { format } from 'sql-formatter'
-import { useEffect, useState } from 'react'
-import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
-import { Lightbulb } from 'lucide-react'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
@@ -33,15 +34,8 @@ export const QueryDetail = ({
 
   useEffect(() => {
     if (selectedRow !== undefined) {
-      try {
-        const formattedQuery = format(selectedRow['query'], {
-          language: 'postgresql',
-          keywordCase: 'lower',
-        })
-        setQuery(formattedQuery)
-      } catch (err) {
-        setQuery(selectedRow['query'])
-      }
+      const formattedQuery = formatSql(selectedRow['query'])
+      setQuery(formattedQuery)
     }
   }, [selectedRow])
 

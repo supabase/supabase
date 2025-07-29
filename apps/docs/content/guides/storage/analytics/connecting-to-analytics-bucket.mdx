@@ -1,0 +1,187 @@
+---
+title: 'Connecting to Analytics Buckets'
+---
+
+<Admonition type="caution">
+
+This feature is in **Private Alpha**. API stability and backward compatibility are not guaranteed at this stage. Reach out from this [Form](https://forms.supabase.com/analytics-buckets) to request access
+
+</Admonition>
+
+When interacting with Analytics Buckets, you authenticate against two main services - the Iceberg REST Catalog and the S3-Compatible Storage Endpoint.
+
+The **Iceberg REST Catalog** acts as the central management system for Iceberg tables. It allows Iceberg clients, such as PyIceberg and Apache Spark, to perform metadata operations including:
+
+- Creating and managing tables and namespaces
+- Tracking schemas and handling schema evolution
+- Managing partitions and snapshots
+- Ensuring transactional consistency and isolation
+
+The REST Catalog itself does not store the actual data. Instead, it stores metadata describing the structure, schema, and partitioning strategy of Iceberg tables.
+
+Actual data storage and retrieval operations occur through the separate S3-compatible endpoint, optimized for reading and writing large analytical datasets stored in Parquet files.
+
+## Authentication
+
+To connect to an Analytics Bucket, you will need
+
+- An Iceberg client (Spark, PyIceberg, etc) which supports the REST Catalog interface.
+- S3 credentials to authenticate your Iceberg client with the underlying S3 Bucket.
+  To create S3 Credentials go to [**Project Settings > Storage**](https://supabase.com/dashboard/project/_/settings/storage), for more information, see the [S3 Authentication Guide](https://supabase.com/docs/guides/storage/s3/authentication). We will support other authentication methods in the future.
+
+- The project reference and Service key for your Supabase project.
+  You can find your Service key in the Supabase Dashboard under [**Project Settings > API**.](https://supabase.com/dashboard/project/_/settings/api-keys)
+
+You will now have an **Access Key** and a **Secret Key** that you can use to authenticate your Iceberg client.
+
+## Connecting via PyIceberg
+
+PyIceberg is a Python client for Apache Iceberg, facilitating interaction with Iceberg Buckets.
+
+**Installation**
+
+```bash
+pip install pyiceberg pyarrow
+```
+
+Here's a comprehensive example using PyIceberg with clearly separated configuration:
+
+```python
+from pyiceberg.catalog import load_catalog
+import pyarrow as pa
+import datetime
+
+# Supabase project ref
+PROJECT_REF = "<your-supabase-project-ref>"
+
+# Configuration for Iceberg REST Catalog
+WAREHOUSE = "your-analytics-bucket-name"
+TOKEN = "SERVICE_KEY"
+
+# Configuration for S3-Compatible Storage
+S3_ACCESS_KEY = "KEY"
+S3_SECRET_KEY = "SECRET"
+S3_REGION = "PROJECT_REGION"
+
+S3_ENDPOINT = f"https://{PROJECT_REF}.supabase.co/storage/v1/s3"
+CATALOG_URI = f"https://{PROJECT_REF}.supabase.co/storage/v1/iceberg"
+
+# Load the Iceberg catalog
+catalog = load_catalog(
+    "analytics-bucket",
+    type="rest",
+    warehouse=WAREHOUSE,
+    uri=CATALOG_URI,
+    token=TOKEN,
+    **{
+        "py-io-impl": "pyiceberg.io.pyarrow.PyArrowFileIO",
+        "s3.endpoint": S3_ENDPOINT,
+        "s3.access-key-id": S3_ACCESS_KEY,
+        "s3.secret-access-key": S3_SECRET_KEY,
+        "s3.region": S3_REGION,
+        "s3.force-virtual-addressing": False,
+    },
+)
+
+# Create namespace if it doesn't exist
+catalog.create_namespace_if_not_exists("default")
+
+# Define schema for your Iceberg table
+schema = pa.schema([
+    pa.field("event_id", pa.int64()),
+    pa.field("event_name", pa.string()),
+    pa.field("event_timestamp", pa.timestamp("ms")),
+])
+
+# Create table (if it doesn't exist already)
+table = catalog.create_table_if_not_exists(("default", "events"), schema=schema)
+
+# Generate and insert sample data
+current_time = datetime.datetime.now()
+data = pa.table({
+    "event_id": [1, 2, 3],
+    "event_name": ["login", "logout", "purchase"],
+    "event_timestamp": [current_time, current_time, current_time],
+})
+
+# Append data to the Iceberg table
+table.append(data)
+
+# Scan table and print data as pandas DataFrame
+df = table.scan().to_pandas()
+print(df)
+```
+
+## Connecting via Apache Spark
+
+Apache Spark allows distributed analytical queries against Iceberg Buckets.
+
+```python
+from pyspark.sql import SparkSession
+
+# Supabase project ref
+PROJECT_REF = "<your-supabase-ref>"
+
+# Configuration for Iceberg REST Catalog
+WAREHOUSE = "your-analytics-bucket-name"
+TOKEN = "SERVICE_KEY"
+
+# Configuration for S3-Compatible Storage
+S3_ACCESS_KEY = "KEY"
+S3_SECRET_KEY = "SECRET"
+S3_REGION = "PROJECT_REGION"
+
+S3_ENDPOINT = f"https://{PROJECT_REF}.supabase.co/storage/v1/s3"
+CATALOG_URI = f"https://{PROJECT_REF}.supabase.co/storage/v1/iceberg"
+
+# Initialize Spark session with Iceberg configuration
+spark = SparkSession.builder \
+    .master("local[*]") \
+    .appName("SupabaseIceberg") \
+    .config("spark.driver.host", "127.0.0.1") \
+    .config("spark.driver.bindAddress", "127.0.0.1") \
+    .config('spark.jars.packages', 'org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.6.1,org.apache.iceberg:iceberg-aws-bundle:1.6.1') \
+    .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
+    .config("spark.sql.catalog.my_catalog", "org.apache.iceberg.spark.SparkCatalog") \
+    .config("spark.sql.catalog.my_catalog.type", "rest") \
+    .config("spark.sql.catalog.my_catalog.uri", CATALOG_URI) \
+    .config("spark.sql.catalog.my_catalog.warehouse", WAREHOUSE) \
+    .config("spark.sql.catalog.my_catalog.token", TOKEN) \
+    .config("spark.sql.catalog.my_catalog.s3.endpoint", S3_ENDPOINT) \
+    .config("spark.sql.catalog.my_catalog.s3.path-style-access", "true") \
+    .config("spark.sql.catalog.my_catalog.s3.access-key-id", S3_ACCESS_KEY) \
+    .config("spark.sql.catalog.my_catalog.s3.secret-access-key", S3_SECRET_KEY) \
+    .config("spark.sql.catalog.my_catalog.s3.remote-signing-enabled", "false") \
+    .config("spark.sql.defaultCatalog", "my_catalog") \
+    .getOrCreate()
+
+# SQL Operations
+spark.sql("CREATE NAMESPACE IF NOT EXISTS analytics")
+
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS analytics.users (
+        user_id BIGINT,
+        username STRING
+    )
+    USING iceberg
+""")
+
+spark.sql("""
+    INSERT INTO analytics.users (user_id, username)
+    VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie')
+""")
+
+result_df = spark.sql("SELECT * FROM analytics.users")
+result_df.show()
+```
+
+## Connecting to the Iceberg REST Catalog directly
+
+To authenticate with the Iceberg REST Catalog directly, you need to provide a valid Supabase **Service key** as a Bearer token.
+
+```
+curl \
+  --request GET -sL \
+  --url 'https://<your-supabase-project>.supabase.co/storage/v1/iceberg/v1/config?warehouse=<bucket-name>' \
+  --header 'Authorization: Bearer <your-service-key>'
+```

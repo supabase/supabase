@@ -104,7 +104,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
           <div className="flex justify-between items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
-                href="https://supabase.com/docs/guides/cli/local-development#database-migrations"
+                href="https://supabase.com/docs/guides/deployment/database-migrations"
                 target="_blank"
                 rel="noreferrer"
               >

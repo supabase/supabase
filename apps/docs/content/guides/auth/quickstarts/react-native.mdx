@@ -18,7 +18,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-     ```sql SQL_EDITOR
+     ```sql name=SQL_EDITOR
       select * from auth.users;
       ````
 
@@ -36,7 +36,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npx create-expo-app -t expo-template-blank-typescript my-app
       ```
 
@@ -53,7 +53,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       cd my-app && npx expo install @supabase/supabase-js @react-native-async-storage/async-storage @rneui/themed react-native-url-polyfill
       ```
 
@@ -70,21 +70,22 @@ hideToc: true
     <StepHikeCompact.Code>
 
 
-      ```ts lib/supabase.ts
-      import { AppState } from 'react-native'
+      ```ts name=lib/supabase.ts
+      import { AppState, Platform } from 'react-native'
       import 'react-native-url-polyfill/auto'
       import AsyncStorage from '@react-native-async-storage/async-storage'
-      import { createClient } from '@supabase/supabase-js'
+      import { createClient, processLock } from '@supabase/supabase-js'
 
       const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
       const supabaseAnonKey = YOUR_REACT_NATIVE_SUPABASE_ANON_KEY
 
       export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
-          storage: AsyncStorage,
+          ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: false,
+          lock: processLock,
         },
       })
 
@@ -93,13 +94,15 @@ hideToc: true
       // to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
       // `SIGNED_OUT` event if the user's session is terminated. This should
       // only be registered once.
-      AppState.addEventListener('change', (state) => {
-        if (state === 'active') {
-          supabase.auth.startAutoRefresh()
-        } else {
-          supabase.auth.stopAutoRefresh()
-        }
-      })
+      if (Platform.OS !== "web") {
+        AppState.addEventListener('change', (state) => {
+          if (state === 'active') {
+            supabase.auth.startAutoRefresh()
+          } else {
+            supabase.auth.stopAutoRefresh()
+          }
+        })
+      }
       ```
 
     </StepHikeCompact.Code>
@@ -115,7 +118,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```tsx components/Auth.tsx
+      ```tsx name=components/Auth.tsx
       import React, { useState } from 'react'
       import { Alert, StyleSheet, View } from 'react-native'
       import { supabase } from '../lib/supabase'
@@ -214,12 +217,11 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```tsx App.tsx
+      ```tsx name=App.tsx
       import 'react-native-url-polyfill/auto'
       import { useState, useEffect } from 'react'
       import { supabase } from './lib/supabase'
       import Auth from './components/Auth'
-      import Account from './components/Account'
       import { View, Text } from 'react-native'
       import { Session } from '@supabase/supabase-js'
 
@@ -258,7 +260,7 @@ hideToc: true
 
     <StepHikeCompact.Code>
 
-      ```bash Terminal
+      ```bash name=Terminal
       npm start
       ```
 

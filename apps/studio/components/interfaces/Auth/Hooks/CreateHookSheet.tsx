@@ -16,7 +16,6 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { AuthConfigResponse } from 'data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   FormControl_Shadcn_,
@@ -39,6 +38,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { HOOKS_DEFINITIONS, HOOK_DEFINITION_TITLE, Hook } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import { DocsButton } from 'components/ui/DocsButton'
 
 interface CreateHookSheetProps {
   visible: boolean
@@ -116,12 +116,16 @@ export const CreateHookSheet = ({
 }: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
-  const httpsAuthHooksEnabled = useFlag('httpsAuthHooksEnabled')
 
   const definition = useMemo(
     () => HOOKS_DEFINITIONS.find((d) => d.title === title) || HOOKS_DEFINITIONS[0],
     [title]
   )
+
+  const supportedReturnTypes =
+    definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
+      ? ['json', 'jsonb', 'void']
+      : ['json', 'jsonb']
 
   const hook: Hook = useMemo(() => {
     return {
@@ -237,7 +241,7 @@ export const CreateHookSheet = ({
 
         form.reset({
           hookType: definition.title,
-          enabled: authConfig?.[definition.enabledKey] || false,
+          enabled: authConfig?.[definition.enabledKey] || true,
           selectedType: values.type,
           httpsValues: {
             url: (values.type === 'https' && values.url) || '',
@@ -286,22 +290,24 @@ export const CreateHookSheet = ({
               {isCreating ? `Add ${title}` : `Update ${title}`}
             </SheetTitle>
           </div>
+          <DocsButton href={'https://supabase.com/docs/guides/auth/auth-hooks/' + hook.docSlug} />
         </SheetHeader>
         <Separator />
-        <SheetSection className="overflow-auto flex-grow">
+        <SheetSection className="overflow-auto flex-grow px-0">
           <Form_Shadcn_ {...form}>
             <form
               id={FORM_ID}
-              className="space-y-6 w-full py-8 flex-1"
+              className="space-y-6 w-full py-5 flex-1"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <FormField_Shadcn_
                 key="enabled"
-                control={form.control}
                 name="enabled"
+                control={form.control}
                 render={({ field }) => (
                   <FormItemLayout
                     layout="flex"
+                    className="px-5"
                     label={`Enable ${values.hookType}`}
                     description={
                       values.hookType === 'Send SMS hook'
@@ -320,40 +326,38 @@ export const CreateHookSheet = ({
                 )}
               />
               <Separator />
-              {httpsAuthHooksEnabled && (
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="selectedType"
-                  render={({ field }) => (
-                    <FormItemLayout label="Hook type">
-                      <FormControl_Shadcn_>
-                        <RadioGroupStacked
-                          value={field.value}
-                          onValueChange={(value) => field.onChange(value)}
-                        >
-                          <RadioGroupStackedItem
-                            value="postgres"
-                            id="postgres"
-                            key="postgres"
-                            label="Postgres"
-                            description="Used to call a Postgres function."
-                          />
-                          <RadioGroupStackedItem
-                            value="https"
-                            id="https"
-                            key="https"
-                            label="HTTPS"
-                            description="Used to call any HTTPS endpoint."
-                          />
-                        </RadioGroupStacked>
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
+              <FormField_Shadcn_
+                control={form.control}
+                name="selectedType"
+                render={({ field }) => (
+                  <FormItemLayout label="Hook type" className="px-5">
+                    <FormControl_Shadcn_>
+                      <RadioGroupStacked
+                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                      >
+                        <RadioGroupStackedItem
+                          value="postgres"
+                          id="postgres"
+                          key="postgres"
+                          label="Postgres"
+                          description="Used to call a Postgres function."
+                        />
+                        <RadioGroupStackedItem
+                          value="https"
+                          id="https"
+                          key="https"
+                          label="HTTPS"
+                          description="Used to call any HTTPS endpoint."
+                        />
+                      </RadioGroupStacked>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
               {values.selectedType === 'postgres' ? (
                 <>
-                  <div className="grid grid-cols-2 gap-8">
+                  <div className="grid grid-cols-2 gap-8 px-5">
                     <FormField_Shadcn_
                       key="postgresValues.schema"
                       control={form.control}
@@ -361,10 +365,11 @@ export const CreateHookSheet = ({
                       render={({ field }) => (
                         <FormItemLayout
                           label="Postgres Schema"
-                          description="Postgres schema where the function is defined."
+                          description="Postgres schema where the function is defined"
                         >
                           <FormControl_Shadcn_>
                             <SchemaSelector
+                              portal={false}
                               size="small"
                               showError={false}
                               selectedSchemaName={field.value}
@@ -381,8 +386,8 @@ export const CreateHookSheet = ({
                       name="postgresValues.functionName"
                       render={({ field }) => (
                         <FormItemLayout
-                          label="Function name"
-                          description="Postgres function which will be called by Supabase Auth each time the hook is triggered."
+                          label="Postgres function"
+                          description="This function will be called by Supabase Auth each time the hook is triggered"
                         >
                           <FormControl_Shadcn_>
                             <FunctionSelector
@@ -392,7 +397,7 @@ export const CreateHookSheet = ({
                               onChange={field.onChange}
                               disabled={field.disabled}
                               filterFunction={(func) => {
-                                if (func.return_type === 'json' || func.return_type === 'jsonb') {
+                                if (supportedReturnTypes.includes(func.return_type)) {
                                   const { value } = convertArgumentTypes(func.argument_types)
                                   if (value.length !== 1) return false
                                   return value[0].type === 'json' || value[0].type === 'jsonb'
@@ -403,7 +408,11 @@ export const CreateHookSheet = ({
                                 <span>
                                   No function with a single JSON/B argument
                                   <br />
-                                  and JSON/B return type found in this schema.
+                                  and JSON/B
+                                  {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
+                                    ? ' or void'
+                                    : ''}{' '}
+                                  return type found in this schema.
                                 </span>
                               }
                             />
@@ -413,8 +422,8 @@ export const CreateHookSheet = ({
                     />
                   </div>
                   <div className="h-72 w-full gap-3 flex flex-col">
-                    <p className="text-sm text-foreground-light">
-                      The following statements will be executed on the function:
+                    <p className="text-sm text-foreground-light px-5">
+                      The following statements will be executed on the selected function:
                     </p>
                     <CodeEditor
                       id="postgres-hook-editor"
@@ -425,7 +434,7 @@ export const CreateHookSheet = ({
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 px-5">
                   <FormField_Shadcn_
                     key="httpsValues.url"
                     control={form.control}

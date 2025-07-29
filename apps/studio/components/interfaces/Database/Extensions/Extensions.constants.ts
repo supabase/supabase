@@ -19,3 +19,7 @@ export const HIDDEN_EXTENSIONS = [
 export const SEARCH_TERMS: Record<string, string[]> = {
   vector: ['pgvector', 'pg_vector'],
 }
+
+export const EXTENSION_DISABLE_WARNINGS: Record<string, string> = {
+  pg_cron: 'Disabling this extension will delete all scheduled jobs. This cannot be undone.',
+}
