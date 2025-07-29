@@ -1,4 +1,3 @@
-import { useConstant } from 'common'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { partition } from 'lodash'
@@ -401,9 +400,7 @@ export const TabsStateContext = createContext<TabsState>(createTabsState(''))
 
 export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
   const { data: project } = useSelectedProjectQuery()
-
-  const initState = useConstant(() => createTabsState(project?.ref ?? ''))
-  const [state, setState] = useState(initState)
+  const [state, setState] = useState(createTabsState(project?.ref ?? ''))
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !!project?.ref) {
