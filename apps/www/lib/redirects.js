@@ -1542,6 +1542,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/local-quickstart',
+    destination: '/docs/guides/functions/quickstart',
+  },
+  {
+    permanent: true,
     source: '/projects',
     destination: 'https://supabase.com/dashboard/projects',
   },
@@ -1985,6 +1990,11 @@ module.exports = [
     permanent: true,
     source: '/contact/enterprise',
     destination: 'https://forms.supabase.com/enterprise',
+  },
+  {
+    permanent: true,
+    source: '/enterprise',
+    destination: '/solutions/enterprise',
   },
   {
     permanent: true,

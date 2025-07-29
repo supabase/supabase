@@ -3,7 +3,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, useSnapshot } from 'valtio'
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
@@ -14,13 +14,13 @@ import {
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
-} from 'components/to-be-cleaned/Storage/Storage.constants'
+} from 'components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
   StorageItem,
   StorageItemMetadata,
   StorageItemWithColumn,
-} from 'components/to-be-cleaned/Storage/Storage.types'
+} from 'components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
   downloadFile,
@@ -28,13 +28,13 @@ import {
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
-} from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
-import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+} from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
+import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
-import type { Project } from 'data/projects/project-detail-query'
 import { getQueryClient } from 'data/query-client'
 import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
 import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
@@ -208,12 +208,6 @@ function createStorageExplorerState({
       localStorage.setItem(localStorageKey, JSON.stringify({ view, sortBy, sortByOrder }))
     },
 
-    openBucket: async (bucket: Bucket) => {
-      const { id, name } = bucket
-      state.setSelectedBucket(bucket)
-      await state.fetchFolderContents({ folderId: id, folderName: name, index: -1 })
-    },
-
     // Functions that manage the UI of the Storage Explorer
 
     getLatestColumnIndex: () => {
@@ -223,6 +217,17 @@ function createStorageExplorerState({
     setColumnIsLoadingMore: (index: number, isLoadingMoreItems: boolean = true) => {
       state.columns = state.columns.map((col, idx) => {
         return idx === index ? { ...col, isLoadingMoreItems } : col
+      })
+    },
+
+    openBucket: async (bucket: Bucket) => {
+      const { id, name } = bucket
+      state.setSelectedBucket(bucket)
+      await state.fetchFolderContents({
+        bucketId: bucket.id,
+        folderId: id,
+        folderName: name,
+        index: -1,
       })
     },
 
@@ -305,11 +310,13 @@ function createStorageExplorerState({
     },
 
     fetchFolderContents: async ({
+      bucketId,
       folderId,
       folderName,
       index,
       searchString,
     }: {
+      bucketId: string
       folderId: string | null
       folderName: string
       index: number
@@ -340,8 +347,8 @@ function createStorageExplorerState({
       try {
         const data = await listBucketObjects(
           {
+            bucketId,
             projectRef: state.projectRef,
-            bucketId: state.selectedBucket.id,
             path: prefix,
             options,
           },
@@ -911,6 +918,20 @@ function createStorageExplorerState({
       columnIndex: number
       isDrop?: boolean
     }) => {
+      if (!state.serviceKey) {
+        toast(
+          <p>
+            Uploading files to Storage through the dashboard is currently unavailable with the new
+            API keys. Please re-enable{' '}
+            <InlineLink href={`/project/${state.projectRef}/settings/api-keys`}>
+              legacy JWT keys
+            </InlineLink>{' '}
+            if you'd like to upload files to Storage through the dashboard.
+          </p>
+        )
+        return
+      }
+
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
         .getQueryCache()
@@ -1109,6 +1130,7 @@ function createStorageExplorerState({
               headers: {
                 authorization: `Bearer ${state.serviceKey}`,
                 'x-source': 'supabase-dashboard',
+                ...(state.serviceKey.includes('secret') ? { apikey: state.serviceKey } : {}),
               },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
@@ -1716,8 +1738,10 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
   const stateRef = useLatest(state)
 
+  const { data: apiKeys } = useAPIKeysQuery({ projectRef: project?.ref, reveal: true })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
-  const { serviceKey } = getAPIKeys(settings)
+
+  const { serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
@@ -1728,13 +1752,12 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   // So the useEffect here is to make sure that the project ref is loaded into the state properly
   // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
-    const snap = snapshot(stateRef.current)
     const hasDataReady = !!project?.ref
-    const isDifferentProject = snap.projectRef !== project?.ref
+    const serviceApiKey = serviceKey?.api_key ?? 'unknown'
 
-    if (!isPaused && hasDataReady && isDifferentProject && serviceKey) {
+    if (!isPaused && hasDataReady) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-      const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
+      const supabaseClient = createClient(clientEndpoint, serviceApiKey, {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
@@ -1754,11 +1777,19 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
           projectRef: project?.ref ?? '',
           supabaseClient,
           resumableUploadUrl,
-          serviceKey: serviceKey.api_key,
+          serviceKey: serviceApiKey,
         })
       )
     }
-  }, [project?.ref, stateRef, serviceKey, isPaused])
+  }, [
+    project?.ref,
+    stateRef,
+    serviceKey?.api_key,
+    isPaused,
+    resumableUploadUrl,
+    protocol,
+    endpoint,
+  ])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>

@@ -119,7 +119,7 @@ export const UsersV2 = () => {
     }
   )
 
-  const { data: countData } = useUsersCountQuery({
+  const { data: countData, refetch: refetchCount } = useUsersCountQuery({
     projectRef,
     connectionString: project?.connectionString,
     keywords: filterKeywords,
@@ -211,6 +211,7 @@ export const UsersV2 = () => {
       if (userIds.includes(selectedUser)) setSelectedUser(undefined)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
+    } finally {
       setIsDeletingUsers(false)
     }
   }
@@ -436,7 +437,10 @@ export const UsersV2 = () => {
                   icon={<RefreshCw />}
                   type="default"
                   loading={isRefetching && !isFetchingNextPage}
-                  onClick={() => refetch()}
+                  onClick={() => {
+                    refetch()
+                    refetchCount()
+                  }}
                 >
                   Refresh
                 </Button>
@@ -583,7 +587,10 @@ export const UsersV2 = () => {
         visible={!!selectedUserToDelete}
         selectedUser={selectedUserToDelete}
         onClose={() => setSelectedUserToDelete(undefined)}
-        onDeleteSuccess={() => setSelectedUserToDelete(undefined)}
+        onDeleteSuccess={() => {
+          if (selectedUserToDelete?.id === selectedUser) setSelectedUser(undefined)
+          setSelectedUserToDelete(undefined)
+        }}
       />
     </>
   )

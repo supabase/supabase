@@ -51,11 +51,8 @@ const getInitialState = () => {
       activeDocsSection: ['introduction'],
       docsLanguage: 'js',
       showProjectApiDocs: false,
-      showEnableBranchingModal: false,
-      showFeaturePreviewModal: false,
-      selectedFeaturePreview: '',
+      showCreateBranchModal: false,
       showAiSettingsModal: false,
-      showGenerateSqlModal: false,
       showConnectDialog: false,
       ongoingQueriesPanelOpen: false,
       mobileMenuOpen: false,
@@ -82,11 +79,8 @@ const getInitialState = () => {
     activeDocsSection: ['introduction'],
     docsLanguage: 'js',
     showProjectApiDocs: false,
-    showEnableBranchingModal: false,
-    showFeaturePreviewModal: false,
-    selectedFeaturePreview: '',
+    showCreateBranchModal: false,
     showAiSettingsModal: false,
-    showGenerateSqlModal: false,
     showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
@@ -134,29 +128,14 @@ export const appState = proxy({
     appState.isMfaEnforced = value
   },
 
-  showEnableBranchingModal: false,
-  setShowEnableBranchingModal: (value: boolean) => {
-    appState.showEnableBranchingModal = value
-  },
-
-  showFeaturePreviewModal: false,
-  setShowFeaturePreviewModal: (value: boolean) => {
-    appState.showFeaturePreviewModal = value
-  },
-
-  selectedFeaturePreview: '',
-  setSelectedFeaturePreview: (value: string) => {
-    appState.selectedFeaturePreview = value
+  showCreateBranchModal: false,
+  setShowCreateBranchModal: (value: boolean) => {
+    appState.showCreateBranchModal = value
   },
 
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
-  },
-
-  showGenerateSqlModal: false,
-  setShowGenerateSqlModal: (value: boolean) => {
-    appState.showGenerateSqlModal = value
   },
 
   showSidebar: true,

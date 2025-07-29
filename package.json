@@ -16,14 +16,14 @@
     "dev": "turbo run dev --parallel",
     "dev:cms": "turbo run dev --filter=cms --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
-    "dev:studio-local": "pnpm run --dir tests/studio-tests codegen:setup",
+    "dev:studio-local": "pnpm setup:cli && NODE_ENV=test pnpm --prefix ./apps/studio dev",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "test:prettier": "prettier -c '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
-    "format": "prettier --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "test:prettier": "prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
@@ -42,6 +42,7 @@
 
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
+    "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
     "knip": "pnpx knip@~5.50.0"
@@ -65,16 +66,18 @@
   },
   "pnpm": {
     "overrides": {
-      "@supabase/supabase-js>@supabase/auth-js": "2.71.0-rc.4",
-      "vinxi>esbuild": "0.25.2",
-      "@tanstack/directive-functions-plugin>vite": "6.2.6",
-      "@tanstack/react-start-plugin>vite": "6.2.6"
+      "@supabase/supabase-js>@supabase/auth-js": "catalog:",
+      "@tanstack/directive-functions-plugin>vite": "catalog:",
+      "@tanstack/react-start-plugin>vite": "catalog:",
+      "esbuild": "^0.25.2",
+      "payload>image-size": "1.2.1",
+      "@redocly/respect-core>form-data": "^4.0.4"
     },
     "neverBuiltDependencies": ["libpg-query"]
   },
   "engines": {
     "pnpm": ">=9",
-    "node": ">=20"
+    "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@9.15.5"

@@ -1,5 +1,6 @@
 import { BASE_PATH } from 'lib/constants'
-import type { WrapperMeta } from './Wrappers.types'
+import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
+import type { ServerOption, WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',
@@ -13,6 +14,7 @@ export const WRAPPER_HANDLERS = {
   COGNITO: 'cognito_fdw_handler',
   MSSQL: 'mssql_fdw_handler',
   REDIS: 'redis_fdw_handler',
+  ICEBERG: 'iceberg_fdw_handler',
   PADDLE: 'wasm_fdw_handler',
   SNOWFLAKE: 'wasm_fdw_handler',
   CAL: 'wasm_fdw_handler',
@@ -23,6 +25,16 @@ export const WRAPPER_HANDLERS = {
   CLOUDFLARE_D1: 'wasm_fdw_handler',
   HUBSPOT: 'wasm_fdw_handler',
   ORB: 'wasm_fdw_handler',
+}
+
+const SUPABASE_TARGET_SCHEMA_OPTION: ServerOption = {
+  name: 'supabase_target_schema',
+  label: 'Target Schema',
+  required: false,
+  encrypted: false,
+  secureEntry: false,
+  readOnly: true,
+  hidden: true,
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -53,6 +65,7 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
     },
     tables: [
@@ -1181,6 +1194,16 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
     ],
+    canTargetSchema: true,
+    sourceSchemaOption: {
+      name: 'source_schema',
+      label: 'Source Schema',
+      required: true,
+      encrypted: false,
+      secureEntry: false,
+      readOnly: true,
+      defaultValue: 'stripe',
+    },
   },
   {
     name: 'firebase_wrapper',
@@ -1763,7 +1786,18 @@ export const WRAPPERS: WrapperMeta[] = [
           encrypted: false,
           secureEntry: false,
         },
+        SUPABASE_TARGET_SCHEMA_OPTION,
       ],
+    },
+    canTargetSchema: true,
+    sourceSchemaOption: {
+      name: 'source_schema',
+      label: 'Source Schema',
+      required: true,
+      encrypted: false,
+      secureEntry: false,
+      readOnly: true,
+      defaultValue: 'cognito',
     },
     tables: [
       {
@@ -2130,6 +2164,92 @@ export const WRAPPERS: WrapperMeta[] = [
         ],
       },
     ],
+  },
+  {
+    name: 'iceberg_wrapper',
+    handlerName: WRAPPER_HANDLERS.ICEBERG,
+    validatorName: 'iceberg_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/iceberg-icon.svg`,
+    description: 'Iceberg is a data warehouse',
+    extensionName: 'icebergFdw',
+    label: 'Iceberg',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/iceberg',
+    minimumExtensionVersion: '0.5.3',
+    createComponent: CreateIcebergWrapperSheet,
+    server: {
+      // The fields are intentionally not required. The required flag is enforced in the create iceberg wrapper sheet.
+      // In the edit wrapper sheet, all fields are shown and not required.
+      options: [
+        {
+          name: 'vault_aws_access_key_id',
+          label: 'AWS Access Key ID',
+          required: false,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'vault_aws_secret_access_key',
+          label: 'AWS Secret Access Key',
+          required: false,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'region_name',
+          label: 'Region Name',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'vault_aws_s3table_bucket_arn',
+          label: 'AWS S3 Table Bucket ARN',
+          required: false,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'vault_token',
+          label: 'Token',
+          required: false,
+          encrypted: true,
+          secureEntry: true,
+        },
+        {
+          name: 'warehouse',
+          label: 'Warehouse',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 's3.endpoint',
+          label: 'S3 Endpoint',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+        },
+        {
+          name: 'catalog_uri',
+          label: 'Catalog URI',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+        },
+        SUPABASE_TARGET_SCHEMA_OPTION,
+      ],
+    },
+    canTargetSchema: true,
+    sourceSchemaOption: {
+      name: 'source_schema',
+      label: 'Namespace',
+      description: 'It should match the namespace of the Iceberg catalog.',
+      required: true,
+      encrypted: false,
+      secureEntry: false,
+      defaultValue: '',
+    },
+    tables: [],
   },
   {
     name: 'cal_wrapper',

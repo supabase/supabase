@@ -96,7 +96,7 @@
     "style-dictionary": "^3.7.1",
     "tsconfig": "workspace:*",
     "typescript": "~5.5.0",
-    "vite": "^6.2.6",
+    "vite": "catalog:",
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
