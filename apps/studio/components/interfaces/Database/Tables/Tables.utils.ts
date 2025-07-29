@@ -2,17 +2,6 @@ import { PostgresMaterializedView, PostgresTable, PostgresView } from '@supabase
 import { PostgresForeignTable } from '@supabase/postgres-meta/dist/lib/types'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
-type Entity = {
-  type: ENTITY_TYPE
-  id: number
-  name: string
-  comment: string | null
-  rows: number | undefined
-  size: string | undefined
-  columns: unknown[]
-  schema: string
-}
-
 // [Joshen] We just need name, description, rows, size, and the number of columns
 // Just missing partitioned tables as missing pg-meta support
 export const formatAllEntities = ({
@@ -25,8 +14,8 @@ export const formatAllEntities = ({
   views?: PostgresView[]
   materializedViews?: PostgresMaterializedView[]
   foreignTables?: PostgresForeignTable[]
-}): Entity[] => {
-  const formattedTables: Entity[] = tables.map((x) => {
+}) => {
+  const formattedTables = tables.map((x) => {
     return {
       ...x,
       type: ENTITY_TYPE.TABLE as const,
@@ -36,7 +25,7 @@ export const formatAllEntities = ({
     }
   })
 
-  const formattedViews: Entity[] = views.map((x) => {
+  const formattedViews = views.map((x) => {
     return {
       type: ENTITY_TYPE.VIEW as const,
       id: x.id,
@@ -49,7 +38,7 @@ export const formatAllEntities = ({
     }
   })
 
-  const formattedMaterializedViews: Entity[] = materializedViews.map((x) => {
+  const formattedMaterializedViews = materializedViews.map((x) => {
     return {
       type: ENTITY_TYPE.MATERIALIZED_VIEW as const,
       id: x.id,
@@ -62,7 +51,7 @@ export const formatAllEntities = ({
     }
   })
 
-  const formattedForeignTables: Entity[] = foreignTables.map((x) => {
+  const formattedForeignTables = foreignTables.map((x) => {
     return {
       type: ENTITY_TYPE.FOREIGN_TABLE as const,
       id: x.id,
