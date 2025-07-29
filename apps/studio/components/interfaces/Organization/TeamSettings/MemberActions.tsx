@@ -190,21 +190,38 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             <>
               {isPendingInviteAcceptance ? (
                 <>
-                  {canRevokeInvite && (
+                  {canRevokeInvite ? (
                     <DropdownMenuItem onClick={() => handleRevokeInvitation(member)}>
                       <div className="flex flex-col">
                         <p>Cancel invitation</p>
                         <p className="text-foreground-lighter">Revoke this invitation.</p>
                       </div>
                     </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem disabled>
+                      <div className="flex flex-col">
+                        <p>Cancel invitation</p>
+                        <p className="text-foreground-lighter">Additional permissions required</p>
+                      </div>
+                    </DropdownMenuItem>
                   )}
-                  {canResendInvite && (
+                  {canResendInvite ? (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => handleResendInvite(member)}>
                         <div className="flex flex-col">
                           <p>Resend invitation</p>
                           <p className="text-foreground-lighter">Invites expire after 24hrs.</p>
+                        </div>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem disabled>
+                        <div className="flex flex-col">
+                          <p>Resend invitation</p>
+                          <p className="text-foreground-lighter">Additional permissions required</p>
                         </div>
                       </DropdownMenuItem>
                     </>
