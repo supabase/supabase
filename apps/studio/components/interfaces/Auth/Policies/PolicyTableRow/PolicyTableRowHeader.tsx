@@ -55,10 +55,6 @@ const PolicyTableRowHeader = ({
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
-  const handleTestItemClick = (operation: string) => {
-    router.push(`/project/${ref}/editor/${table.id}?impersonate=true&as=${operation}`)
-  }
-
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
       <div className="flex gap-x-4 text-left">
