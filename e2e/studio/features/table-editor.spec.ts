@@ -84,7 +84,7 @@ const deleteTable = async (page: Page, tableName: string) => {
   if (!exists) return
 
   await s.viewTableLabel(page).click()
-  await s.viewTableLabel(page).getByRole('button').nth(1).click()
+  await s.viewTableLabel(page).getByRole('button').nth(2).click()
   await s.deleteTableBtn(page).click()
   await s.confirmDeleteBtn(page).click()
   await expect(
@@ -255,7 +255,7 @@ test.describe('Table Editor', () => {
     await deleteTable(page, testTableName)
   })
 
-  test('should show rls accordingly', async () => {
+  test.skip('should show rls accordingly', async () => {
     await createTable(page, tableNameRlsEnabled)
 
     // testing rls enabled

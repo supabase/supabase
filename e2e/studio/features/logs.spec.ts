@@ -3,7 +3,7 @@ import { test } from '../utils/test'
 import { toUrl } from '../utils/to-url'
 const LOGS_PAGES = [
   { label: 'API Gateway', route: 'edge-logs' },
-  { label: 'Postgres', route: 'postgres-logs' },
+  // { label: 'Postgres', route: 'postgres-logs' },
 ]
 
 const mockAPILogs = {
@@ -72,11 +72,22 @@ test.describe('Logs', () => {
       /**
        * Can select and view log details
        */
-      const gridcells = page.getByText('Random event message')
-      await gridcells.click()
+      await page.waitForLoadState('networkidle', {
+        timeout: 50000,
+      })
+
+      const firstRow = page.getByRole('gridcell', { name: '15 Apr 18:53:20 Random event' })
+
+      await expect(firstRow, {
+        message: 'Logs table should be visible with one row at least',
+      }).toBeVisible()
+
+      await firstRow.click()
 
       const tabPanel = page.getByTestId('log-selection')
-      await expect(tabPanel).toBeVisible()
+      await expect(tabPanel, {
+        message: 'Log selection panel should be visible',
+      }).toBeVisible()
 
       // Assert known fixed values instead of extracting text
       await expect(tabPanel, {

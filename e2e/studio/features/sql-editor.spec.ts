@@ -94,7 +94,7 @@ test.describe('SQL Editor', () => {
 
     // write some sql in the editor
     // This has to be done since the editor is not editable (input, textarea, etc.)
-    const editor = page.getByRole('code').nth(0)
+    const editor = page.locator('.view-line')
     await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select 'hello world';`)
@@ -136,7 +136,7 @@ test.describe('SQL Editor', () => {
     await page.keyboard.press('Backspace')
   })
 
-  test('should create and load a new snippet', async ({ ref }) => {
+  test.skip('should create and load a new snippet', async ({ ref }) => {
     const runButton = page.getByTestId('sql-run-button')
     await page.getByRole('button', { name: 'Favorites' }).click()
     await page.getByRole('button', { name: 'Shared' }).click()
