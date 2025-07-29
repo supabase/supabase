@@ -1,4 +1,3 @@
-import { noop } from 'lodash'
 import { Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
@@ -14,11 +13,7 @@ import NewDestinationPanel from './DestinationPanel'
 import { DestinationRow } from './DestinationRow'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 
-interface DestinationsProps {
-  onSelectPipeline?: (pipelineId: number, destinationName: string) => void
-}
-
-export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => {
+export const Destinations = () => {
   const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [filterString, setFilterString] = useState<string>('')
   const { ref: projectRef } = useParams()
@@ -122,7 +117,6 @@ export const Destinations = ({ onSelectPipeline = noop }: DestinationsProps) => 
                   isLoading={isPipelinesLoading}
                   isError={isPipelinesError}
                   isSuccess={isPipelinesSuccess}
-                  onSelectPipeline={onSelectPipeline}
                 />
               )
             })}

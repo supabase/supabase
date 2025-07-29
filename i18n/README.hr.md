@@ -7,69 +7,68 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) යනු විවෘත පරිශීලක Firebase වෙනුවට ආදේශකයකි.අපි Firebase වල ඇති පහසුකම් enterprise-grade විවෘත පරිශීලක මෘදුකාංග භාවිතා කරමින් නිපදවනු ලබයි.
+[Supabase](https://supabase.com) je open source alternativa Firebaseu. Izgrađujemo funkcionalnosti Firebasea koristeći enterprise-grade open source alate.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentication and Authorization. [Docs](https://supabase.com/docs/guides/auth)
-- [x] Auto-generated APIs.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
-  - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
-- [x] Functions.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
-- [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
-- [x] Dashboard
+- [x] Hostana Postgres baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database)
+- [x] Autentifikacija i autorizacija. [Dokumentacija](https://supabase.com/docs/guides/auth)
+- [x] Automatski generirani API-ji.
+  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumentacija](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Pretplate u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/api#realtime-api-overview)
+- [x] Funkcije.
+  - [x] Funkcije baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database/functions)
+  - [x] Edge funkcije [Dokumentacija](https://supabase.com/docs/guides/functions)
+- [x] Pohranjivanje datoteka. [Dokumentacija](https://supabase.com/docs/guides/storage)
+- [x] Panel
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-ප්‍රධාන යාවත්කාල කිරීම් පිළිබඳ දැනුම් දීම සඳහා "releases" පිළිබඳව අවධානයෙන් සිටින්න.
+Pratite "izdanja" ovog repozitorija da bi bili obaviješteni o većim ažuriranjima.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
-## ප්‍රලේඛනය
+## Dokumentacija
 
-සම්පූර්ණ විස්තරය කියවන්න ,මෙතනින් [supabase.com/docs](https://supabase.com/docs)
+Za cjelovitu dokumentaciju, posjetite [supabase.com/docs](https://supabase.com/docs)
 
-දායක වන ආකාරය බැලීමට, ආරම්භ කිරීම වෙත [පිවිසෙන්න](./DEVELOPERS.md)
+Za informacije kako doprinijeti razvoju, posjetite [Početak rada](./DEVELOPERS.md)
 
-## Community එක හා සහයෝගය ගැනීමට
+## Zajednica & Podrška
 
-- [Community Forum](https://github.com/supabase/supabase/discussions). වඩාත්ම සුදුසු: දේවල් සෑදීමට උදව් ගැනීම.database best practices පිළිබඳ සාකච්ඡා කිරීමට.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). වඩාත්ම සුදුසු: Supabase භාවිතා කිරීමේදී ඔබට හමුවන වැරදී හා ප්‍රශ්න.
-- [Email Support](https://supabase.com/docs/support#business-support). වඩාත්ම සුදුසු: database හා infrastructure පිළිබඳ ඔබේ ඇති ප්‍රශ්න.
-- [Discord](https://discord.supabase.com). වඩාත්ම සුදුසු: ඔබගේ applications බෙදාගැනීම සහ community සමඟ රැඳී සිටීම.
+- [Forum zajednice](https://github.com/supabase/supabase/discussions). Najbolje služi za: pomoć pri izgradnji, diskusiji o najboljoj praksi oko baza podataka.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Najbolje služi za: bugove i greške na koje ste naišli koristeći Supabase.
+- [Email potpora](https://supabase.com/docs/support#business-support). Najbolje služi za: probleme oko vaše baze podataka ili oko infrastrukture.
+- [Discord](https://discord.supabase.com). Najbolje služi za: pokazati vaše aplikacije i druženje sa ostatkom zajednice.
 
-## කොහොමද මෙය වැඩකරන්නෙ
+## Kako funkcionira
 
-Supabase යනු විවෘත පරිශීලක උපාංග කිහිපයක එකතුවකි.අප Firebase වල ඇති පහසුකම් enterprise-grade, විවෘත පරිශීලක උපාංග භාවිතා කරමින් නිපදවයි.උපාංග හා communities ඇත්නම්,ඒවා MIT,Apache 2, හෝ ඒ ආකාරයේ open license නම් අප ඒවා භාවිතා කර සහයෝගය දක්වනවා.එවැනි උපාංග නොමැතිනම්,අප ඒවා විවෘත පරිශීලක විදියට නිපදවනවා.Supabase යනු 1-ට-1 Firebase වලට සමාන දෙයක් නොවේ.අපේ අරමුණ developers ලට Firebase වැනි අත්දැකීමක් විවෘත පරිශීලක උපාංග මඟින් ලබාදීමයි.
+Supabase je kombinacija alata otvorenog koda. Izgrađujemo funkcionalnosti Firebasea koristeći enterprise-grade open source alate. Ako postoje alati i zajednice, sa MIT, Apache 2, ili ekvivalentnim otvorenim licencama, koristit ćemo i podržati taj alat. Ako alat ne postoji, mi ga izgrađujemo i otvaramo taj kod javno. Supabase nije preslika Firebasea. Naš cilj je razvijateljima dati osjećaj kao da koriste Firebase ali sa alatima otvorenog koda.
 
-**Architecture**
+**Arhitektura**
 
-Supabase යනු [hosted platform](https://supabase.com/dashboard). ඔබට කිසිවක් ස්ථාපනය නොකර ලියාපදිංචි වී Supabase භාවිතා කිරීම ආරම්භ කළ හැකිය.
-ඔබට [self-host](https://supabase.com/docs/guides/hosting/overview) සහ [develop locally](https://supabase.com/docs/guides/local-development) කළ හැකිය.
+Supabase je [hostana platforma](https://supabase.com/dashboard). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
+Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hosting/overview) i [razvijati lokalno](https://supabase.com/docs/guides/local-development).
 
-![Architecture](apps/docs/public/img/supabase-architecture.svg)
+![Arhitektura](apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) යනු අවුරුදු 30 වඩා කාලයක් ක්‍රියාත්මක වෙමින් පවතින object-relational database system එකක් වන අතර එය විශ්වාසනීයත්වයට,ක්‍රියාකාරීත්වයට හා feature robustness බවට කීර්තියක් අත්පත්කරගෙන සිටියි
-- [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
-- [PostgREST](http://postgrest.org/) යනු PostgreSQL database කෙලින්ම RESTful API එකක් බවට පරිවර්තනය කරන web server එකකි.
-- [GoTrue](https://github.com/netlify/gotrue) JWT tokens භාවිත කරන්නන්ව හැසිරවීමට JWT ආශ්‍රිත APi එකකි.
-- [Storage](https://github.com/supabase/storage-api) S3 වල ගබඩා කර ඇති files හසුරවන්න RESTful interface එකක් ලබාදීම, Postgres භාවිත කරමින් අවසරයන් හැසිරවීමට
-- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
-- [postgres-meta](https://github.com/supabase/postgres-meta) Postgres හැසිරවීමට RESTful API එකක් ලබාදෙන අතර table වල දත්ත ලබාගැනීමට,roles add කිරීමට හා queries run කිරීම කර දෙයි
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- [Postgres](https://www.postgresql.org/) je objektno-relacijska baza podataka koja je aktivno u razvoju preko 30 godina i na glasu je kao jako pouzdana, robusna i performantna.
+- [Realtime](https://github.com/supabase/realtime) je Elixir server koji vam dopušta da prisluškujete unose, ažuriranja i brisanja u PostgreSQL bazi koristeći websockete. Realtime prati Postgres-ovu funkcionalnost repliciranja i osluškuje promjene u bazi podataka, te iste upakira u JSON, na kraju emitira taj JSON preko websocketa do autoriziranih klijenata.
+- [PostgREST](http://postgrest.org/) je web server koji pretvara vašu PostgreSQL bazu podataka u RESTful API.
+- [GoTrue](https://github.com/supabase/gotrue) je API koji koristi JWT za upravaljanje korisnika i izdavanje JWT tokena.
+- [Storage](https://github.com/supabase/storage-api) pruža RESTful sučelje za upravljanje datoteka spremljenih u S3, koristeći Postgres za upravljanje dozvola.
+- [pg_graphql](http://github.com/supabase/pg_graphql/) je PostgreSQL ekstenzija koja pruža Graphql API.
+- [postgres-meta](https://github.com/supabase/postgres-meta) je RESTful API za upravljanje vaše Postgres baze podatake, dopuštajući vam da dohvatite tablice, dodate uloge, i izvršite upite prema bazi, itd.
+- [Kong](https://github.com/Kong/kong) je cloud-native API gateway.
 
-#### Client libraries
+#### Klijentske knjižnice
 
-Client libraries සඳහා අපගේ ප්‍රවේශය modular වේ. සෑම sub-library තනි බාහිර පද්ධතියක් සඳහා ස්වාධීනව ක්‍රියාත්මක කිරීමකි. අපි දැනට පවතින මෙවලම් සඳහා සහය දක්වන ක්‍රමවලින් එකකි.
+Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samostalna implementacija za svaki vanjski sistem. Ovo je jedan od načina kako podržavamo postojeće alate.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Language</th>
-    <th>Client</th>
-    <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
+    <th>Jezik</th>
+    <th>Klijent</th>
+    <th colspan="5">Feature-Clients (upakirani u Supabase klijent)</th>
   </tr>
   <!-- notranslate -->
   <tr>
@@ -93,7 +92,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
   </tr>
   END ROW -->
   <!-- /notranslate -->
-  <th colspan="7">⚡️ Official ⚡️</th>
+  <th colspan="7">⚡️ Službeno ⚡️</th>
   <!-- notranslate -->
   <tr>
     <td>JavaScript (TypeScript)</td>
@@ -132,7 +131,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
     <td><a href="https://github.com/supabase/functions-py" target="_blank" rel="noopener noreferrer">functions-py</a></td>
   </tr>
   <!-- /notranslate -->
-  <th colspan="7">💚 Community 💚</th>
+  <th colspan="7">💚 Zajednica 💚</th>
   <!-- notranslate -->
   <tr>
     <td>C#</td>
@@ -203,7 +202,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
-## Badges
+## Značke
 
 ![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
 
@@ -239,51 +238,52 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
 </a>
 ```
 
-## Translations
+## Prijevodi
 
-- [Arabic | العربية](/i18n/README.ar.md)
-- [Albanian / Shqip](/i18n/README.sq.md)
-- [Bangla / বাংলা](/i18n/README.bn.md)
-- [Bulgarian / Български](/i18n/README.bg.md)
-- [Catalan / Català](/i18n/README.ca.md)
-- [Czech / čeština](/i18n/README.cs.md)
-- [Danish / Dansk](/i18n/README.da.md)
-- [Dutch / Nederlands](/i18n/README.nl.md)
-- [English](https://github.com/supabase/supabase)
-- [Estonian / eesti keel](/i18n/README.et.md)
-- [Finnish / Suomalainen](/i18n/README.fi.md)
-- [French / Français](/i18n/README.fr.md)
-- [German / Deutsch](/i18n/README.de.md)
-- [Greek / Ελληνικά](/i18n/README.el.md)
-- [Gujarati / ગુજરાતી](/i18n/README.gu.md)
-- [Hebrew / עברית](/i18n/README.he.md)
-- [Hindi / हिंदी](/i18n/README.hi.md)
-- [Hungarian / Magyar](/i18n/README.hu.md)
-- [Nepali / नेपाली](/i18n/README.ne.md)
-- [Indonesian / Bahasa Indonesia](/i18n/README.id.md)
-- [Italiano / Italian](/i18n/README.it.md)
-- [Japanese / 日本語](/i18n/README.jp.md)
-- [Korean / 한국어](/i18n/README.ko.md)
-- [Lithuanian / lietuvių](/i18n/README.lt.md)
-- [Latvian / latviski](/i18n/README.lv.md)
-- [Malay / Bahasa Malaysia](/i18n/README.ms.md)
-- [Norwegian (Bokmål) / Norsk (Bokmål)](/i18n/README.nb.md)
-- [Persian / فارسی](/i18n/README.fa.md)
-- [Polish / Polski](/i18n/README.pl.md)
-- [Portuguese / Português](/i18n/README.pt.md)
-- [Portuguese (Brazilian) / Português Brasileiro](/i18n/README.pt-br.md)
-- [Romanian / Română](/i18n/README.ro.md)
-- [Russian / Pусский](/i18n/README.ru.md)
-- [Serbian / Srpski](/i18n/README.sr.md)
-- [Sinhala / සිංහල](/i18n/README.si.md)
-- [Slovak / slovenský](/i18n/README.sk.md)
-- [Slovenian / Slovenščina](/i18n/README.sl.md)
-- [Spanish / Español](/i18n/README.es.md)
-- [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
-- [Swedish / Svenska](/i18n/README.sv.md)
-- [Thai / ไทย](/i18n/README.th.md)
-- [Traditional Chinese / 繁體中文](/i18n/README.zh-tw.md)
-- [Turkish / Türkçe](/i18n/README.tr.md)
-- [Ukrainian / Українська](/i18n/README.uk.md)
-- [Vietnamese / Tiếng Việt](/i18n/README.vi-vn.md)
-- [List of translations](/i18n/languages.md) <!--- Keep only this -->
+- [Arapski | العربية](/i18n/README.ar.md)
+- [Albanski / Shqip](/i18n/README.sq.md)
+- [Bengalski / বাংলা](/i18n/README.bn.md)
+- [Bugarski / Български](/i18n/README.bg.md)
+- [Katalonski / Català](/i18n/README.ca.md)
+- [Hrvatski](/i18n/README.ca.md)
+- [Češki / čeština](/i18n/README.cs.md)
+- [Danski / Dansk](/i18n/README.da.md)
+- [Nizozemski / Nederlands](/i18n/README.nl.md)
+- [Engleski](https://github.com/supabase/supabase)
+- [Estonski / eesti keel](/i18n/README.et.md)
+- [Finski / Suomalainen](/i18n/README.fi.md)
+- [Francuski / Français](/i18n/README.fr.md)
+- [Njemački / Deutsch](/i18n/README.de.md)
+- [Grčki / Ελληνικά](/i18n/README.el.md)
+- [Gudžaratski / ગુજરાતી](/i18n/README.gu.md)
+- [Hebrejski / עברית](/i18n/README.he.md)
+- [Hindski / हिंदी](/i18n/README.hi.md)
+- [Mađarski / Magyar](/i18n/README.hu.md)
+- [Nepalski / नेपाली](/i18n/README.ne.md)
+- [Indonezijski / Bahasa Indonezija](/i18n/README.id.md)
+- [Talijanski / Italian](/i18n/README.it.md)
+- [Japanski / 日本語](/i18n/README.jp.md)
+- [korejski / 한국어](/i18n/README.ko.md)
+- [Litavski / lietuvių](/i18n/README.lt.md)
+- [Latvijski / latviski](/i18n/README.lv.md)
+- [Malajski / Bahasa Malaysia](/i18n/README.ms.md)
+- [Norveški (Bokmål) / Norsk (Bokmål)](/i18n/README.nb.md)
+- [Perzijski / فارسی](/i18n/README.fa.md)
+- [Poljski / Polski](/i18n/README.pl.md)
+- [Portugalski / Português](/i18n/README.pt.md)
+- [Portugalski (Brazilski) / Português Brasileiro](/i18n/README.pt-br.md)
+- [Rumunjski / Română](/i18n/README.ro.md)
+- [Ruski / Pусский](/i18n/README.ru.md)
+- [Srpski / Srpski](/i18n/README.sr.md)
+- [Singalski / සිංහල](/i18n/README.si.md)
+- [Slovački / slovenský](/i18n/README.sk.md)
+- [Slovenski / Slovenščina](/i18n/README.sl.md)
+- [Španjolski / Español](/i18n/README.es.md)
+- [Pojednostavljeni kineski / 简体中文](/i18n/README.zh-cn.md)
+- [Švedski / Svenska](/i18n/README.sv.md)
+- [Tajski / ไทย](/i18n/README.th.md)
+- [Tradicionalni kineski / 繁體中文](/i18n/README.zh-tw.md)
+- [Turski / Türkçe](/i18n/README.tr.md)
+- [Ukrajinski / Українська](/i18n/README.uk.md)
+- [Vijetnamski / Tiếng Việt](/i18n/README.vi-vn.md)
+- [Popis prijevoda](/i18n/languages.md) <!--- Keep only this -->

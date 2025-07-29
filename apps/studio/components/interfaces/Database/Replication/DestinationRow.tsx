@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -6,23 +7,21 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
 import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { ReplicationPipelinesData } from 'data/replication/pipelines-query'
+import { Pipeline } from 'data/replication/pipelines-query'
 import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from 'state/replication-pipeline-request-status'
 import { ResponseError } from 'types'
+import { Button } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import DeleteDestination from './DeleteDestination'
 import DestinationPanel from './DestinationPanel'
 import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
+import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
 import { RowMenu } from './RowMenu'
-
-export type Pipeline = ReplicationPipelinesData['pipelines'][0]
-
-const refreshFrequencyMs: number = 2000
 
 interface DestinationRowProps {
   sourceId: number | undefined
@@ -34,7 +33,6 @@ interface DestinationRowProps {
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
-  onSelectPipeline?: (pipelineId: number, destinationName: string) => void
 }
 
 export const DestinationRow = ({
@@ -47,7 +45,6 @@ export const DestinationRow = ({
   isLoading: isPipelineLoading,
   isError: isPipelineError,
   isSuccess: isPipelineSuccess,
-  onSelectPipeline,
 }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
@@ -64,7 +61,7 @@ export const DestinationRow = ({
       projectRef,
       pipelineId: pipeline?.id,
     },
-    { refetchInterval: refreshFrequencyMs }
+    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
   const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
@@ -107,12 +104,7 @@ export const DestinationRow = ({
         <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
       )}
       {isPipelineSuccess && (
-        <Table.tr
-          className="hover:!bg-surface-200 transition"
-          onClick={() => {
-            if (pipeline) onSelectPipeline?.(pipeline.id, destinationName)
-          }}
-        >
+        <Table.tr>
           <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : destinationName}</Table.td>
           <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
           <Table.td>
@@ -138,6 +130,11 @@ export const DestinationRow = ({
           </Table.td>
           <Table.td>
             <div className="flex items-center justify-end gap-x-2">
+              <Button asChild type="default">
+                <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
+                  View status
+                </Link>
+              </Button>
               <RowMenu
                 pipeline={pipeline}
                 pipelineStatus={pipelineStatusData?.status}
