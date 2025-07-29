@@ -75,6 +75,23 @@ function StateOfStartupsPage() {
       {/* <NextSeo {...pageData.seo} /> */}
       <DefaultLayout className="!bg-alternative overflow-hidden sm:!overflow-visible">
         <Hero {...pageData.heroSection} />
+        <SectionContainer>
+          <ol className="flex flex-col divide-y divide-dashed bg-surface-100 border border-default rounded-md px-6 py-2 mb-12">
+            {pageData.pageChapters.map((chapter, chapterIndex) => (
+              <li key={chapterIndex + 1}>
+                <Link
+                  href={`#chapter-${chapterIndex + 1}`}
+                  className="py-4 text-foreground text-xl text-balance leading-relaxed text-sm flex flex-row gap-6"
+                >
+                  <span className="text-muted font-mono uppercase ">
+                    {`${chapterIndex + 1}`} / {pageData.pageChapters.length}
+                  </span>{' '}
+                  {chapter.title}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </SectionContainer>
 
         {pageData.pageChapters.map((chapter, chapterIndex) => (
           <SurveyChapter

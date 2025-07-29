@@ -16,7 +16,10 @@ export function SurveyChapter({
   totalChapters,
 }: SurveyChapterProps) {
   return (
-    <SectionContainer className="flex flex-col gap-12 border-t border-default pt-12">
+    <SectionContainer
+      id={`chapter-${number}`}
+      className="flex flex-col gap-12 border-t border-default pt-12"
+    >
       <header className="flex flex-col gap-2">
         <aside className="text-brand font-mono uppercase tracking-widest text-sm">
           {number}

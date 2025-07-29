@@ -1,5 +1,4 @@
 // import SectionContainer from '~/components/Layouts/SectionContainer'
-import { SurveyStatWrapper } from './SurveyStatWrapper'
 import { SurveyStatCard } from './SurveyStatCard'
 import { SurveyPullQuote } from './SurveyPullQuote'
 import { SurveyWordCloud } from './SurveyWordCloud'
