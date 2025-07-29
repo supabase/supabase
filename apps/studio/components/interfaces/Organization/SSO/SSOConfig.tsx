@@ -5,6 +5,7 @@ import z from 'zod'
 
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSSOConfigCreateMutation } from 'data/sso/sso-config-create-mutation'
 import { useSSOConfigUpdateMutation } from 'data/sso/sso-config-update-mutation'
@@ -173,25 +174,28 @@ export const SSOConfig = () => {
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 <CardContent className="py-8">
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="enabled"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        label="Enable Single Sign-On"
-                        description="Enable and configure SSO for your application."
-                        layout="flex"
-                      >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            size="large"
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
+                  <div className="flex items-start justify-between">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="enabled"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          label="Enable Single Sign-On"
+                          description="Enable and configure SSO for your application."
+                          layout="flex"
+                        >
+                          <FormControl_Shadcn_>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              size="large"
+                            />
+                          </FormControl_Shadcn_>
+                        </FormItemLayout>
+                      )}
+                    />
+                    <DocsButton href={'https://supabase.com/docs/guides/platform/sso'} />
+                  </div>
                 </CardContent>
 
                 {(isSSOEnabled || ssoConfig) && (
