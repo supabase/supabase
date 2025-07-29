@@ -195,8 +195,8 @@ const Usage = () => {
             title="Usage filtered by project"
             description={
               <div>
-                You are currently viewing usage for the "
-                {selectedProject?.name || selectedProjectRef}" project. Supabase uses{' '}
+                You are currently viewing usage for the
+                {selectedProject?.name || selectedProjectRef} project. Supabase uses{' '}
                 <Link
                   href="/docs/guides/platform/billing-on-supabase#organization-based-billing"
                   target="_blank"
