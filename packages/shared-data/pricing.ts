@@ -590,7 +590,7 @@ export const pricing: Pricing = {
           free: false,
           pro: false,
           team: [
-            '$60 per drain per month',
+            '$0.0822 per drain, per hour',
             '+ $0.20 per million events',
             '+ $0.09 per GB bandwidth',
           ],
