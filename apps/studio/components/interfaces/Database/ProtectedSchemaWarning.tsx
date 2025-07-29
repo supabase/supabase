@@ -57,7 +57,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
   )
 }
 
-const ProtectedSchemaWarning = ({
+export const ProtectedSchemaWarning = ({
   size = 'md',
   schema,
   entity,
