@@ -76,7 +76,7 @@ test.describe('Logs', () => {
         timeout: 50000,
       })
 
-      const firstRow = page.getByRole('gridcell', { name: '15 Apr 18:53:20 Random event' })
+      const firstRow = page.getByRole('gridcell', { name: /Random event/ })
 
       await expect(firstRow, {
         message: 'Logs table should be visible with one row at least',
