@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
@@ -23,11 +24,9 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -198,7 +197,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                     tooltip={{
                       content: {
                         side: 'left',
-                        text: 'Additional permissions required',
+                        text: 'Additional permissions required to cancel invitation',
                       },
                     }}
                   >
@@ -212,7 +211,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                     tooltip={{
                       content: {
                         side: 'left',
-                        text: 'Additional permissions required',
+                        text: 'Additional permissions required to resend invitation',
                       },
                     }}
                   >
@@ -228,7 +227,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                     tooltip={{
                       content: {
                         side: 'left',
-                        text: 'Additional permissions required',
+                        text: 'Additional permissions required to remove member',
                       },
                     }}
                   >
