@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,6 +12,7 @@ import { ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { InlineLink } from 'components/ui/InlineLink'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
 import {
@@ -50,7 +52,20 @@ export const RealtimeSettings = () => {
     projectRef,
   })
 
+  const { data: policies } = useDatabasePoliciesQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+    schema: 'realtime',
+  })
+
   const isUsageBillingEnabled = organization?.usage_billing_enabled
+
+  // Check if RLS policies exist for realtime.messages table
+  const realtimeMessagesPolicies = policies?.filter(
+    (policy) => policy.schema === 'realtime' && policy.table === 'messages'
+  )
+  const hasRealtimeMessagesPolicies =
+    realtimeMessagesPolicies && realtimeMessagesPolicies.length > 0
 
   const { mutate: updateRealtimeConfig, isLoading: isUpdatingConfig } =
     useRealtimeConfigurationUpdateMutation({
@@ -82,6 +97,9 @@ export const RealtimeSettings = () => {
       allow_public: !REALTIME_DEFAULT_CONFIG.private_only,
     },
   })
+
+  const { allow_public } = form.watch()
+  const isSettingToPrivate = !data?.private_only && !allow_public
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (data) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -132,6 +150,30 @@ export const RealtimeSettings = () => {
                             />
                           </FormControl_Shadcn_>
                         </FormItemLayout>
+
+                        {!hasRealtimeMessagesPolicies && !allow_public && (
+                          <Admonition
+                            showIcon={false}
+                            type="warning"
+                            title="No Realtime RLS policies found"
+                            description={
+                              <>
+                                <p className="prose max-w-full text-sm">
+                                  Private mode is {isSettingToPrivate ? 'being ' : ''}
+                                  enabled, but no RLS policies exists on the{' '}
+                                  <code className="text-xs">realtime.messages</code> table. No
+                                  messages will be received by users.
+                                </p>
+
+                                <Button asChild type="default" className="mt-2">
+                                  <Link href={`/project/${projectRef}/realtime/policies`}>
+                                    Create policy
+                                  </Link>
+                                </Button>
+                              </>
+                            }
+                          />
+                        )}
                       </FormSectionContent>
                     </FormSection>
                   )}

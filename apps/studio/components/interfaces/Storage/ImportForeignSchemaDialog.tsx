@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { snakeCase } from 'lodash'
+import { snakeCase, uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -7,41 +7,30 @@ import z from 'zod'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import SchemaSelector from 'components/ui/SchemaSelector'
+import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import {
-  Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Modal,
-} from 'ui'
+import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
+import { getFDWs } from 'data/fdw/fdws-query'
+import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import type { WrapperMeta } from '../Integrations/Wrappers/Wrappers.types'
+import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
 import SchemaEditor from '../TableGridEditor/SidePanelEditor/SchemaEditor'
+import { getDecryptedParameters } from './ImportForeignSchemaDialog.utils'
 
 export interface ImportForeignSchemaDialogProps {
   bucketName: string
   namespace: string
-  excludedSchemas: string[]
-  wrapperValues: Record<string, string>
+  wrapperMeta: WrapperMeta
   visible: boolean
   onClose: () => void
 }
 
-const FormSchema = z.object({
-  bucketName: z.string().trim(),
-  sourceNamespace: z.string().trim(),
-  targetSchema: z.string().trim(),
-})
-
-export type ImportForeignSchemaForm = z.infer<typeof FormSchema>
-
 export const ImportForeignSchemaDialog = ({
   bucketName,
   namespace,
-  excludedSchemas,
-  wrapperValues,
+  wrapperMeta,
   visible,
   onClose,
 }: ImportForeignSchemaDialogProps) => {
@@ -50,14 +39,34 @@ export const ImportForeignSchemaDialog = ({
   const [loading, setLoading] = useState(false)
   const [createSchemaSheetOpen, setCreateSchemaSheetOpen] = useState(false)
 
-  const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({
+  const { mutateAsync: importForeignSchema } = useFDWImportForeignSchemaMutation({})
+  const { mutateAsync: updateFDW } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully connected ${bucketName} to the database.`)
       onClose()
     },
   })
 
-  const form = useForm<ImportForeignSchemaForm>({
+  const { data: schemas } = useSchemasQuery({ projectRef: project?.ref! })
+
+  const FormSchema = z.object({
+    bucketName: z.string().trim(),
+    sourceNamespace: z.string().trim(),
+    targetSchema: z
+      .string()
+      .trim()
+      .min(1, 'Schema name is required')
+      .refine(
+        (val) => {
+          return !schemas?.find((s) => s.name === val)
+        },
+        {
+          message: 'This schema already exists. Please specify a unique schema name.',
+        }
+      ),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       bucketName,
@@ -66,17 +75,66 @@ export const ImportForeignSchemaDialog = ({
     },
   })
 
-  const onSubmit: SubmitHandler<ImportForeignSchemaForm> = async (values) => {
+  const { mutateAsync: createSchema } = useSchemaCreateMutation()
+
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    const serverName = `${snakeCase(values.bucketName)}_fdw_server`
+
     if (!ref) return console.error('Project ref is required')
     setLoading(true)
 
     try {
+      await createSchema({
+        projectRef: ref,
+        connectionString: project?.connectionString,
+        name: values.targetSchema,
+      })
+
       await importForeignSchema({
         projectRef: ref,
         connectionString: project?.connectionString,
-        serverName: `${snakeCase(values.bucketName)}_fdw_server`,
+        serverName: serverName,
         sourceSchema: values.sourceNamespace,
         targetSchema: values.targetSchema,
+      })
+
+      const FDWs = await getFDWs({ projectRef: ref, connectionString: project?.connectionString })
+      const wrapper = FDWs.find((fdw) => fdw.server_name === serverName)
+      if (!wrapper) {
+        throw new Error(`Foreign data wrapper with server name ${serverName} not found`)
+      }
+
+      const serverOptions = await getDecryptedParameters({
+        ref: project?.ref,
+        connectionString: project?.connectionString ?? undefined,
+        serverName,
+      })
+
+      const formValues: Record<string, string> = {
+        wrapper_name: wrapper.name,
+        server_name: wrapper.server_name,
+        ...serverOptions,
+      }
+
+      const targetSchemas = (formValues['supabase_target_schema'] || '')
+        .split(',')
+        .map((s) => s.trim())
+
+      const wrapperTables = formatWrapperTables(wrapper, wrapperMeta)
+
+      await updateFDW({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        wrapper: wrapper,
+        wrapperMeta: wrapperMeta,
+        formState: {
+          ...formValues,
+          server_name: serverName,
+          supabase_target_schema: uniq([...targetSchemas, values.targetSchema])
+            .filter(Boolean)
+            .join(','),
+        },
+        tables: wrapperTables,
       })
     } catch (error: any) {
       // error will be handled by the mutation onError callback
@@ -112,33 +170,14 @@ export const ImportForeignSchemaDialog = ({
           <Modal.Content className="flex flex-col gap-y-4">
             <FormField_Shadcn_
               control={form.control}
-              name="sourceNamespace"
-              render={({ field }) => (
-                <FormItemLayout label="Namespace" layout="vertical">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} placeholder="Enter namespace name" disabled />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-
-            <FormField_Shadcn_
-              control={form.control}
               name="targetSchema"
               render={({ field }) => (
                 <FormItemLayout
                   label="Target Schema"
-                  description="Select the database schema where the Iceberg data will be accessible. Each schema can only be connected to one namespace."
+                  description="Enter a schema name under which the Iceberg data will be accessible. The schema will be created."
                   layout="vertical"
                 >
-                  <SchemaSelector
-                    portal={false}
-                    size="small"
-                    selectedSchemaName={field.value}
-                    excludedSchemas={excludedSchemas}
-                    onSelectSchema={(schema) => field.onChange(schema)}
-                    onSelectCreateSchema={() => setCreateSchemaSheetOpen(true)}
-                  />
+                  <Input_Shadcn_ {...field} placeholder="Enter schema name" />
                 </FormItemLayout>
               )}
             />

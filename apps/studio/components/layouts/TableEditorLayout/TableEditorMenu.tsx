@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { ExportDialog } from 'components/grid/components/header/ExportDialog'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import AlertError from 'components/ui/AlertError'
@@ -52,6 +53,7 @@ const TableEditorMenu = () => {
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
+  const [tableToExport, setTableToExport] = useState<{ name: string; schema: string }>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
@@ -281,6 +283,11 @@ const TableEditorMenu = () => {
                       projectRef: project?.ref!,
                       id: Number(id),
                       isLocked,
+                      onExportCLI: () => {
+                        const entity = entityTypes?.find((x) => x.id === id)
+                        if (!entity) return
+                        setTableToExport({ name: entity.name, schema: entity.schema })
+                      },
                     }}
                     getItemSize={() => 28}
                     hasNextPage={hasNextPage}
@@ -294,6 +301,13 @@ const TableEditorMenu = () => {
         </div>
       </div>
 
+      <ExportDialog
+        table={tableToExport}
+        open={!!tableToExport}
+        onOpenChange={(open) => {
+          if (!open) setTableToExport(undefined)
+        }}
+      />
       <ProtectedSchemaModal visible={showModal} onClose={() => setShowModal(false)} />
     </>
   )

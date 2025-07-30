@@ -51,6 +51,7 @@ export interface EntityListItemProps {
   projectRef: string
   isLocked: boolean
   isActive?: boolean
+  onExportCLI: () => void
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -64,6 +65,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   item: entity,
   isLocked,
   isActive: _isActive,
+  onExportCLI,
 }) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
@@ -385,6 +387,16 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                         }}
                       >
                         <span>Export table as SQL</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-table-cli"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onExportCLI()
+                        }}
+                      >
+                        <span>Export table via CLI</span>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
