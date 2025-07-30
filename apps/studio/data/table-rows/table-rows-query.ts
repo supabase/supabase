@@ -162,7 +162,7 @@ export const fetchAllTableRows = async ({
   return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
-export type TableRows = { rows: SupaRow[] }
+export type TableRows = { rows: SupaRow[]; query: string }
 
 export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
   queryClient: QueryClient
@@ -199,10 +199,8 @@ export async function getTableRows(
 
   const table = parseSupaTable(entity)
 
-  const sql = wrapWithRoleImpersonation(
-    getTableRowsSql({ table: entity, filters, sorts, limit, page }),
-    roleImpersonationState
-  )
+  const query = getTableRowsSql({ table: entity, filters, sorts, limit, page })
+  const sql = wrapWithRoleImpersonation(query, roleImpersonationState)
 
   try {
     const { result } = await executeSql(
@@ -220,7 +218,10 @@ export async function getTableRows(
       return { idx: index, ...x }
     }) as SupaRow[]
 
-    return { rows }
+    const baseQueryMatch = query.match(/^\s*with\s+_base_query\s+as\s+\(([\s\S]+?)\)\s*select/i)
+    const baseQuery = baseQueryMatch?.[1]?.trim() ?? query
+
+    return { rows, query: baseQuery }
   } catch (error) {
     throw new Error(
       `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
