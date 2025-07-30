@@ -18,7 +18,7 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -43,7 +43,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
 
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
@@ -186,7 +186,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               icon={<MoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-52">
+          <DropdownMenuContent side="bottom" align="end" className="w-40">
             <>
               {isPendingInviteAcceptance ? (
                 <>
@@ -231,7 +231,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
-                    <Trash size={16} />
+                    <Trash size={12} />
                     <p>Remove member</p>
                   </DropdownMenuItemTooltip>
                 )
