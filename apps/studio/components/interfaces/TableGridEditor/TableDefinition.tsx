@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useMemo, useRef } from 'react'
 
 import { useParams } from 'common'
-import Footer from 'components/grid/components/footer/Footer'
+import { Footer } from 'components/grid/components/footer/Footer'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'

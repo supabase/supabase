@@ -14,7 +14,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 import { Shortcuts } from './components/common/Shortcuts'
-import Footer from './components/footer/Footer'
+import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
