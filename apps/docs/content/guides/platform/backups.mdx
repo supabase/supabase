@@ -234,11 +234,12 @@ Common examples of check constraints that can result in such failures are:
 - validating against the current time, e.g. that the row being inserted references a future event
 - validating the contents of a row against the contents of another table
 
-#### Views that reference themselves
+#### Views that Reference Themselves
 
 Views that directly or indirectly reference themselves can cause **cyclic dependency errors** during a logical backup restore. These views are also **invalid and unusable** , any query against them will result in an error at runtime.
 
 **Example:**
+
 ```
 -- Direct self-reference
 CREATE VIEW my_view AS
