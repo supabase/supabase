@@ -206,26 +206,6 @@ const GridHeaderActions = ({ table, isRefetching, view, setView }: GridHeaderAct
               </TooltipContent>
             </Tooltip>
           )}
-          <ToggleGroup
-            type="single"
-            value={view}
-            onValueChange={(value) => {
-              if (value) {
-                setView?.(value as 'list' | 'definition')
-              }
-            }}
-          >
-            <ToggleGroupItem className="h-7 w-7 p-0" value="list" aria-label="List view">
-              <List size={14} />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              className="h-7 w-7 p-0"
-              value="definition"
-              aria-label="Definition view"
-            >
-              <Code size={14} />
-            </ToggleGroupItem>
-          </ToggleGroup>
           {isTable && !isLocked ? (
             table.rls_enabled ? (
               <>

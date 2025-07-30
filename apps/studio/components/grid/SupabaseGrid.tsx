@@ -102,41 +102,18 @@ export const SupabaseGrid = ({
 
         {children || (
           <>
-            {view === 'list' ? (
-              <Grid
-                ref={gridRef}
-                {...gridProps}
-                rows={rows}
-                error={error}
-                isLoading={isLoading}
-                isSuccess={isSuccess}
-                isError={isError}
-                filters={filters}
-                onApplyFilters={onApplyFilters}
-              />
-            ) : (
-              <div className="h-full w-full border-t overflow-hidden">
-                <Editor
-                  className={cn('monaco-editor', (isLoading || isRefetching) && 'opacity-50')}
-                  theme={resolvedTheme?.includes('dark') ? 'vs-dark' : 'vs'}
-                  defaultLanguage="pgsql"
-                  value={formattedQuery}
-                  path={''}
-                  options={{
-                    domReadOnly: true,
-                    readOnly: true,
-                    padding: {
-                      top: 16,
-                    },
-                    tabSize: 2,
-                    fontSize: 13,
-                    minimap: { enabled: false },
-                    wordWrap: 'on',
-                  }}
-                />
-              </div>
-            )}
-            <Footer isRefetching={isRefetching} />
+            <Grid
+              ref={gridRef}
+              {...gridProps}
+              rows={rows}
+              error={error}
+              isLoading={isLoading}
+              isSuccess={isSuccess}
+              isError={isError}
+              filters={filters}
+              onApplyFilters={onApplyFilters}
+            />
+            <Footer />
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}
