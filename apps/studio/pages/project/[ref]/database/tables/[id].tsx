@@ -109,10 +109,12 @@ const DatabaseTables: NextPageWithLayout = () => {
               <Skeleton className="w-full h-12" />
             </div>
           ) : (
-            selectedTable && (
+            project?.ref !== undefined &&
+            selectedTable !== undefined &&
+            isTableLike(selectedTable) && (
               <TableEditorTableStateContextProvider
                 key={`table-editor-table-${selectedTable.id}`}
-                projectRef={project?.ref}
+                projectRef={project.ref}
                 table={selectedTable}
               >
                 {view === 'list' ? (
@@ -145,14 +147,8 @@ const DatabaseTables: NextPageWithLayout = () => {
                   </div>
                 )}
 
-                {project?.ref !== undefined &&
-                  selectedTable !== undefined &&
-                  isTableLike(selectedTable) && (
-                    <>
-                      <DeleteConfirmationDialogs selectedTable={selectedTable} />
-                      <SidePanelEditor includeColumns selectedTable={selectedTable} />
-                    </>
-                  )}
+                <DeleteConfirmationDialogs selectedTable={selectedTable} />
+                <SidePanelEditor includeColumns selectedTable={selectedTable} />
               </TableEditorTableStateContextProvider>
             )
           )}
