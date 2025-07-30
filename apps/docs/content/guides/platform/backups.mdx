@@ -239,7 +239,7 @@ Common examples of check constraints that can result in such failures are:
 Views that directly or indirectly reference themselves can cause **cyclic dependency errors** during a logical backup restore. These views are also **invalid and unusable** , any query against them will result in an error at runtime.
 
 **Example:**
-```sql
+```
 -- Direct self-reference
 CREATE VIEW my_view AS
   SELECT * FROM my_view;
@@ -247,5 +247,8 @@ CREATE VIEW my_view AS
 -- Indirect circular reference
 CREATE VIEW v1 AS SELECT * FROM v2;
 CREATE VIEW v2 AS SELECT * FROM v1;
+```
+
+-- Drop the ofending view
 
 Postgres documentation [views](https://www.postgresql.org/docs/current/sql-createview.html)
