@@ -1,5 +1,9 @@
 import Editor from '@monaco-editor/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Code, List, Plus } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { useMemo, useState } from 'react'
+
 import { useParams } from 'common'
 import { ColumnList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
@@ -15,13 +19,10 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { formatSql } from 'lib/formatSql'
-import { Code, List, Plus } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
-import { ToggleGroup, ToggleGroupItem, Skeleton } from 'ui'
+import { Skeleton, ToggleGroup, ToggleGroupItem, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
@@ -37,6 +38,7 @@ const DatabaseTables: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
     id,
   })
+  const isTableEntity = isTableLike(selectedTable)
 
   const { data: definition } = useTableDefinitionQuery(
     {
@@ -45,7 +47,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       connectionString: project?.connectionString,
     },
     {
-      enabled: isTableLike(selectedTable),
+      enabled: isTableEntity,
     }
   )
 
@@ -66,39 +68,57 @@ const DatabaseTables: NextPageWithLayout = () => {
         },
       ]}
       primaryActions={
-        <ButtonTooltip
-          icon={<Plus />}
-          disabled={!canUpdateColumns}
-          onClick={() => snap.onAddColumn()}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canUpdateColumns
-                ? 'You need additional permissions to create columns'
-                : undefined,
-            },
-          }}
-        >
-          New column
-        </ButtonTooltip>
+        isTableEntity && (
+          <ButtonTooltip
+            icon={<Plus />}
+            disabled={!canUpdateColumns}
+            onClick={() => snap.onAddColumn()}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateColumns
+                  ? 'You need additional permissions to create columns'
+                  : undefined,
+              },
+            }}
+          >
+            New column
+          </ButtonTooltip>
+        )
       }
       secondaryActions={
-        <ToggleGroup
-          type="single"
-          value={view}
-          onValueChange={(value) => {
-            if (value) {
-              setView(value as 'list' | 'definition')
-            }
-          }}
-        >
-          <ToggleGroupItem className="h-7 w-7 p-0" value="list" aria-label="List view">
-            <List size={14} />
-          </ToggleGroupItem>
-          <ToggleGroupItem className="h-7 w-7 p-0" value="definition" aria-label="Definition view">
-            <Code size={14} />
-          </ToggleGroupItem>
-        </ToggleGroup>
+        isTableEntity && (
+          <ToggleGroup
+            type="single"
+            value={view}
+            onValueChange={(value) => {
+              if (value) {
+                setView(value as 'list' | 'definition')
+              }
+            }}
+          >
+            <ToggleGroupItem className="h-7 w-7 p-0" value="list" aria-label="List view">
+              <Tooltip>
+                <TooltipTrigger>
+                  <List size={14} />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">View columns</TooltipContent>
+              </Tooltip>
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              className="h-7 w-7 p-0"
+              value="definition"
+              aria-label="Definition view"
+            >
+              <Tooltip>
+                <TooltipTrigger>
+                  <Code size={14} />
+                </TooltipTrigger>
+                <TooltipContent side="bottom">View table definition</TooltipContent>
+              </Tooltip>
+            </ToggleGroupItem>
+          </ToggleGroup>
+        )
       }
     >
       <ScaffoldSection isFullWidth>
@@ -110,8 +130,7 @@ const DatabaseTables: NextPageWithLayout = () => {
             </div>
           ) : (
             project?.ref !== undefined &&
-            selectedTable !== undefined &&
-            isTableLike(selectedTable) && (
+            selectedTable !== undefined && (
               <TableEditorTableStateContextProvider
                 key={`table-editor-table-${selectedTable.id}`}
                 projectRef={project.ref}
@@ -135,9 +154,7 @@ const DatabaseTables: NextPageWithLayout = () => {
                       options={{
                         domReadOnly: true,
                         readOnly: true,
-                        padding: {
-                          top: 16,
-                        },
+                        padding: { top: 16 },
                         tabSize: 2,
                         fontSize: 13,
                         minimap: { enabled: false },
@@ -147,8 +164,12 @@ const DatabaseTables: NextPageWithLayout = () => {
                   </div>
                 )}
 
-                <DeleteConfirmationDialogs selectedTable={selectedTable} />
-                <SidePanelEditor includeColumns selectedTable={selectedTable} />
+                {isTableEntity && (
+                  <>
+                    <DeleteConfirmationDialogs selectedTable={selectedTable} />
+                    <SidePanelEditor includeColumns selectedTable={selectedTable} />
+                  </>
+                )}
               </TableEditorTableStateContextProvider>
             )
           )}

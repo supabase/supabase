@@ -20,12 +20,10 @@ import Header, { HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { GridProps } from './types'
 
-import Editor from '@monaco-editor/react'
 import { formatSql } from 'lib/formatSql'
 import { useTheme } from 'next-themes'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
-import { cn } from 'ui'
 
 export const SupabaseGrid = ({
   customHeader,
