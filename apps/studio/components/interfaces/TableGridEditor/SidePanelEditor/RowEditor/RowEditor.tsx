@@ -21,6 +21,7 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { TransactionBanner } from 'components/layouts/TransactionBanner'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -167,6 +168,7 @@ const RowEditor = ({
       }`}
       onCancel={closePanel}
     >
+      <TransactionBanner sticky />
       <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
           <div className="flex flex-grow flex-col">

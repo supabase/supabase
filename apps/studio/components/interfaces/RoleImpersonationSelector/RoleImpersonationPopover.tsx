@@ -16,6 +16,8 @@ export interface RoleImpersonationPopoverProps {
   disabled?: boolean
   disabledTooltip?: ReactNode
   disallowAuthenticatedOption?: boolean
+  initialOpen?: boolean
+  initialSelectedOption?: 'authenticated' | 'anon' | 'service_role'
 }
 
 const RoleImpersonationPopover = ({
@@ -24,6 +26,8 @@ const RoleImpersonationPopover = ({
   variant = 'regular',
   align = 'end',
   disallowAuthenticatedOption = false,
+  initialOpen = false,
+  initialSelectedOption,
 
   // [Joshen] We can clean these up once the API keys fix is done
   disabled = false,
@@ -31,7 +35,7 @@ const RoleImpersonationPopover = ({
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(initialOpen)
 
   const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
 
@@ -53,7 +57,7 @@ const RoleImpersonationPopover = ({
           }}
         >
           <div className="flex items-center gap-1">
-            <span className="text-foreground-muted">Role</span>
+            <span className="text-foreground-lighter">Role</span>
             <span>{currentRole}</span>
             {state.role?.type === 'postgrest' && state.role.role === 'authenticated' && (
               <>
@@ -62,7 +66,7 @@ const RoleImpersonationPopover = ({
                 ) : state.role.userType === 'external' && state.role.externalAuth ? (
                   <ExternalAuthButtonSection sub={state.role.externalAuth.sub} />
                 ) : null}
-                <span className="text-xs text-foreground-lighter font-light">
+                <span className="text-xs text-foreground-light font-light">
                   {state.role.aal === 'aal2' ? 'AAL2' : 'AAL1'}
                 </span>
               </>
@@ -80,6 +84,7 @@ const RoleImpersonationPopover = ({
         <RoleImpersonationSelector
           serviceRoleLabel={serviceRoleLabel}
           disallowAuthenticatedOption={disallowAuthenticatedOption}
+          initialSelectedOption={initialSelectedOption}
         />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>

@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { wrapWithTransaction } from 'lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
@@ -17,6 +18,7 @@ export type TableRowUpdateVariables = {
   enumArrayColumns: string[]
   returning?: boolean
   roleImpersonationState?: RoleImpersonationState
+  isTestMode?: boolean
 }
 
 export function getTableRowUpdateSql({
@@ -45,11 +47,16 @@ export async function updateTableRow({
   enumArrayColumns,
   returning,
   roleImpersonationState,
+  isTestMode,
 }: TableRowUpdateVariables) {
-  const sql = wrapWithRoleImpersonation(
+  let sql = wrapWithRoleImpersonation(
     getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns, returning }),
     roleImpersonationState
   )
+
+  if (isTestMode) {
+    sql = wrapWithTransaction(sql)
+  }
 
   const { result } = await executeSql({
     projectRef,

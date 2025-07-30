@@ -163,6 +163,11 @@ export const createTableEditorState = () => {
     },
 
     /* Misc */
+    isTestMode: false,
+    setIsTestMode: (isTestMode: boolean) => {
+      state.isTestMode = isTestMode
+    },
+
     onExpandJSONEditor: (jsonValue: EditValue) => {
       state.ui = {
         open: 'side-panel',

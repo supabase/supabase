@@ -13,11 +13,13 @@ import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-muta
 import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Dictionary } from 'types'
 
 export function useOnRowsChange(rows: SupaRow[]) {
   const { project } = useProjectContext()
   const snap = useTableEditorTableStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
   const queryClient = useQueryClient()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
@@ -130,8 +132,16 @@ export function useOnRowsChange(rows: SupaRow[]) {
         payload: updatedData,
         enumArrayColumns,
         roleImpersonationState: getImpersonatedRoleState(),
+        isTestMode: tableEditorSnap.isTestMode,
       })
     },
-    [getImpersonatedRoleState, mutateUpdateTableRow, project, rows, snap.originalTable]
+    [
+      getImpersonatedRoleState,
+      mutateUpdateTableRow,
+      project,
+      rows,
+      snap.originalTable,
+      tableEditorSnap.isTestMode,
+    ]
   )
 }

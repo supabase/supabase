@@ -8,6 +8,8 @@ import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
+import { TransactionBanner } from '../TransactionBanner'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -21,6 +23,7 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   const pathname = usePathname()
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
 
   const hasNoOpenTabs =
     editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
@@ -29,7 +32,13 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
 
   return (
     <ProjectLayoutWithAuth resizableSidebar title={title} product={product} {...props}>
-      <div className="flex flex-col h-full">
+      <div
+        className={cn(
+          'flex flex-col h-full',
+          tableEditorSnap.isTestMode && 'border-2 border-t-0 border-warning'
+        )}
+      >
+        <TransactionBanner />
         <div
           className={cn(
             'h-10 flex items-center',

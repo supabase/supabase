@@ -31,6 +31,10 @@ export const AddColumn: CalculatedColumn<any, any> = {
 const AddColumnHeader = () => {
   const tableEditorSnap = useTableEditorStateSnapshot()
 
+  if (tableEditorSnap.isTestMode) {
+    return null
+  }
+
   return (
     <div className="flex h-full w-full py-1.5 flex items-center">
       <Button block type="text" onClick={tableEditorSnap.onAddColumn} icon={<Plus />} />

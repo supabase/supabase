@@ -1,13 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { AiIconAnimation, Badge } from 'ui'
+import { AiIconAnimation, Badge, Button } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: {
@@ -33,7 +36,9 @@ const PolicyTableRowHeader = ({
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
+  const router = useRouter()
   const aiSnap = useAiAssistantStateSnapshot()
+  const enableTestMode = useFlag('enableTestMode')
 
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
@@ -90,6 +95,13 @@ const PolicyTableRowHeader = ({
               >
                 {table.rls_enabled ? 'Disable RLS' : 'Enable RLS'}
               </ButtonTooltip>
+            )}
+            {enableTestMode && (
+              <Button asChild type="default">
+                <Link href={`/project/${ref}/editor/${table.id}?impersonate=true&isTestMode=true`}>
+                  Test
+                </Link>
+              </Button>
             )}
             <ButtonTooltip
               type="default"

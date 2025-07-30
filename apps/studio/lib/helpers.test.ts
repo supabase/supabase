@@ -22,6 +22,7 @@ import {
   timeout,
   tryParseInt,
   tryParseJson,
+  wrapWithTransaction,
 } from './helpers'
 
 import { copyToClipboard } from 'ui'
@@ -492,5 +493,13 @@ describe('tablesToSQL', () => {
 
     expect(result).toContain('-- WARNING: This schema is for context only')
     expect(result).not.toContain('CREATE TABLE')
+  })
+})
+
+describe('wrapWithTransaction', () => {
+  it('should wrap SQL with begin and rollback statements', () => {
+    const sql = 'DELETE FROM users WHERE id = 1;'
+    const wrapped = wrapWithTransaction(sql)
+    expect(wrapped).toBe(`begin;${sql}rollback;`)
   })
 })

@@ -27,6 +27,7 @@ const DeleteConfirmationDialogs = ({
 }: DeleteConfirmationDialogsProps) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
   const { filters, onApplyFilters } = useTableFilter()
 
   const removeDeletedColumnFromFiltersAndSorts = ({
@@ -74,7 +75,11 @@ const DeleteConfirmationDialogs = ({
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
       }
-      toast.success(`Successfully deleted selected row(s)`)
+      if (tableEditorSnap.isTestMode) {
+        toast.success(`Successfully deleted selected row(s) and rolled back`)
+      } else {
+        toast.success(`Successfully deleted selected row(s)`)
+      }
     },
     onSettled: () => {
       snap.closeConfirmationDialog()
@@ -86,7 +91,11 @@ const DeleteConfirmationDialogs = ({
       if (snap.confirmationDialog?.type === 'row') {
         snap.confirmationDialog.callback?.()
       }
-      toast.success(`Successfully deleted selected rows`)
+      if (tableEditorSnap.isTestMode) {
+        toast.success(`Successfully deleted selected rows and rolled back`)
+      } else {
+        toast.success(`Successfully deleted selected rows`)
+      }
     },
     onError: (error) => {
       toast.error(`Failed to delete rows: ${error.message}`)
@@ -166,9 +175,11 @@ const DeleteConfirmationDialogs = ({
 
     if (snap.confirmationDialog.allRowsSelected) {
       if (filters.length === 0) {
-        if (getImpersonatedRoleState().role !== undefined) {
+        if (getImpersonatedRoleState().role !== undefined || tableEditorSnap.isTestMode) {
           snap.closeConfirmationDialog()
-          return toast.error('Table truncation is not supported when impersonating a role')
+          return toast.error(
+            'Table truncation is not supported when impersonating a role or in test mode'
+          )
         }
 
         truncateRows({
@@ -183,6 +194,7 @@ const DeleteConfirmationDialogs = ({
           table: selectedTable,
           filters,
           roleImpersonationState: getImpersonatedRoleState(),
+          isTestMode: tableEditorSnap.isTestMode,
         })
       }
     } else {
@@ -192,6 +204,7 @@ const DeleteConfirmationDialogs = ({
         table: selectedTable,
         rows: selectedRowsToDelete as SupaRow[],
         roleImpersonationState: getImpersonatedRoleState(),
+        isTestMode: tableEditorSnap.isTestMode,
       })
     }
   }
