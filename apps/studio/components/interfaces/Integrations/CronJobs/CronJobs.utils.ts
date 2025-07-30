@@ -125,7 +125,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
   }
 
   const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(.+/g
-  if (command.toLocaleLowerCase().match(regexDBFunction)) {
+  if (command.match(regexDBFunction)) {
     const [schemaName, functionName] = command
       .replace('SELECT ', '')
       .replace(/\(.*\)/, '')
