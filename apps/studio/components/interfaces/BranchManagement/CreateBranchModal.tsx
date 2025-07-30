@@ -42,13 +42,16 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_ as Label,
+  Switch,
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export const CreateBranchModal = () => {
+  const allowDataBranching = useFlag('allowDataBranching')
   const { ref } = useParams()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -141,6 +144,7 @@ export const CreateBranchModal = () => {
           (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
           'Git branch name is required when GitHub is connected'
         ),
+      withData: z.boolean().default(false).optional(),
     })
     .superRefine(async (val, ctx) => {
       if (val.gitBranchName && val.gitBranchName.length > 0 && githubConnection?.repository.id) {
@@ -164,7 +168,7 @@ export const CreateBranchModal = () => {
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
-    defaultValues: { branchName: '', gitBranchName: '' },
+    defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
   const canSubmit = !isCreating && !isChecking
@@ -182,7 +186,9 @@ export const CreateBranchModal = () => {
     createBranch({
       projectRef,
       branchName: data.branchName,
+      is_default: false,
       ...(data.gitBranchName ? { gitBranch: data.gitBranchName } : {}),
+      ...(allowDataBranching ? { withData: data.withData } : {}),
     })
   }
 
@@ -294,6 +300,7 @@ export const CreateBranchModal = () => {
                   )}
                 />
               )}
+
               {isLoadingConnections && <GenericSkeletonLoader />}
               {isErrorConnections && (
                 <AlertError
@@ -314,7 +321,7 @@ export const CreateBranchModal = () => {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-foreground-light">
+                        <p className="text-sm text-foreground-lighter">
                           Keep this preview branch in sync with a chosen GitHub branch
                         </p>
                       </div>
@@ -324,6 +331,23 @@ export const CreateBranchModal = () => {
                     </div>
                   )}
                 </>
+              )}
+              {allowDataBranching && (
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="withData"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Include data"
+                      layout="flex-row-reverse"
+                      description="Clone production data into this branch"
+                    >
+                      <FormControl_Shadcn_>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
               )}
             </DialogSection>
 

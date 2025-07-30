@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
@@ -27,7 +26,7 @@ interface SecretRowProps {
   onSelectRemove: (secret: VaultSecret) => void
 }
 
-const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
+const SecretRow = ({ secret, onSelectRemove }: SecretRowProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const [modal, setModal] = useState<string | null>(null)
@@ -46,15 +45,8 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
       enabled: !!(ref! && secret.id) && revealSecret,
     }
   )
-  const renderModal = () => {
-    const onClose = () => setModal(null)
-    switch (modal) {
-      case `edit`:
-        return <EditSecretModal secret={secret} onClose={onClose} />
-      default:
-        return null
-    }
-  }
+
+  const onCloseModal = () => setModal(null)
 
   return (
     <div className="px-6 py-4 flex items-center space-x-4">
@@ -105,23 +97,31 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  title="Manage Secret"
-                  type="text"
-                  className="px-1"
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end" className="w-32">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuItem
+                  className="space-x-2"
                   disabled={!canManageSecrets}
-                  icon={<MoreVertical />}
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end" className="w-32">
-                <DropdownMenuItem className="space-x-2" onClick={() => setModal(`edit`)}>
+                  onClick={() => setModal(`edit`)}
+                >
                   <Edit3 size="14" />
                   <p>Edit</p>
                 </DropdownMenuItem>
+              </TooltipTrigger>
+              {!canManageSecrets && (
+                <TooltipContent side="bottom">
+                  You need additional permissions to edit secrets
+                </TooltipContent>
+              )}
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <DropdownMenuItem
                   className="space-x-2"
                   disabled={!canManageSecrets}
@@ -130,16 +130,17 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
                   <Trash stroke="red" size="14" />
                   <p className="text-foreground-light">Delete</p>
                 </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </TooltipTrigger>
-          {!canManageSecrets && (
-            <TooltipContent side="bottom">
-              You need additional permissions to manage secrets
-            </TooltipContent>
-          )}
-        </Tooltip>
-        {renderModal()}
+              </TooltipTrigger>
+              {!canManageSecrets && (
+                <TooltipContent side="bottom">
+                  You need additional permissions to delete secrets
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <EditSecretModal visible={modal === `edit`} secret={secret} onClose={onCloseModal} />
       </div>
     </div>
   )

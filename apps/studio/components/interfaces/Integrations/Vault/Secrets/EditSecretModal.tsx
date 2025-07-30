@@ -1,5 +1,5 @@
 import { isEmpty } from 'lodash'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -27,7 +27,8 @@ import { EyeOff, Eye } from 'lucide-react'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface EditSecretModalProps {
-  secret: VaultSecret | undefined
+  visible: boolean
+  secret: VaultSecret
   onClose: () => void
 }
 
@@ -37,37 +38,29 @@ const SecretSchema = z.object({
   secret: z.string().min(1, 'Please enter your secret value'),
 })
 
-const EditSecretModal = ({ secret, onClose }: EditSecretModalProps) => {
+const formId = 'edit-vault-secret-form'
+
+const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => {
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
-  const formId = 'edit-vault-secret-form'
   const { data, isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
     {
-      projectRef: project?.ref!,
-      id: secret?.id!,
+      projectRef: project?.ref,
+      id: secret.id,
       connectionString: project?.connectionString,
     },
-    { enabled: secret !== undefined && !!(project?.ref && secret?.id) }
+    { enabled: !!project?.ref }
   )
+  const values = {
+    name: secret.name ?? '',
+    description: secret.description ?? '',
+    secret: secret.decryptedSecret ?? data ?? '',
+  }
   const form = useForm<z.infer<typeof SecretSchema>>({
     resolver: zodResolver(SecretSchema),
-    defaultValues: {
-      name: secret?.name ?? '',
-      description: secret?.description ?? '',
-      secret: secret?.decryptedSecret ?? data ?? '',
-    },
-    values: {
-      name: secret?.name ?? '',
-      description: secret?.description ?? '',
-      secret: secret?.decryptedSecret ?? data ?? '',
-    },
+    defaultValues: values,
+    values,
   })
-
-  useEffect(() => {
-    if (secret !== undefined) {
-      setShowSecretValue(false)
-    }
-  }, [secret])
 
   const { mutate: updateSecret, isLoading: isSubmitting } = useVaultSecretUpdateMutation()
 
@@ -77,10 +70,10 @@ const EditSecretModal = ({ secret, onClose }: EditSecretModalProps) => {
     const payload: Partial<VaultSecret> = {
       secret: values.secret,
     }
-    if (values.name !== secret?.name) payload.name = values.name
-    if (values.description !== secret?.description) payload.description = values.description
+    if (values.name !== secret.name) payload.name = values.name
+    if (values.description !== secret.description) payload.description = values.description
 
-    if (!isEmpty(payload) && secret) {
+    if (!isEmpty(payload)) {
       updateSecret(
         {
           projectRef: project.ref,
@@ -103,7 +96,7 @@ const EditSecretModal = ({ secret, onClose }: EditSecretModalProps) => {
 
   return (
     <Dialog
-      open
+      open={visible}
       onOpenChange={(open) => {
         if (!open) {
           form.reset()

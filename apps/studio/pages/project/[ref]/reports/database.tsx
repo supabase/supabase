@@ -1,46 +1,46 @@
-import { useEffect, useState } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { useParams } from 'common'
 
+import ReportChart from 'components/interfaces/Reports/ReportChart'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DiskSizeConfigurationModal from 'components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ReportsLayout from 'components/layouts/ReportsLayout/ReportsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ChartHandler from 'components/ui/Charts/ChartHandler'
+import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
+import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import ComposedChartHandler from 'components/ui/Charts/ComposedChartHandler'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import GrafanaPromoBanner from 'components/ui/GrafanaPromoBanner'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import ReportChart from 'components/interfaces/Reports/ReportChart'
 
-import { analyticsKeys } from 'data/analytics/keys'
-import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useDatabaseReport } from 'data/reports/database-report-query'
-import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
 import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { analyticsKeys } from 'data/analytics/keys'
+import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
+import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { getReportAttributes, getReportAttributesV2 } from 'data/reports/database-charts'
+import { useDatabaseReport } from 'data/reports/database-report-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useReportDateRange } from 'hooks/misc/useReportDateRange'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { formatBytes } from 'lib/helpers'
 
-import type { NextPageWithLayout } from 'types'
 import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -288,8 +288,6 @@ const DatabaseUsage = () => {
                     startDate={selectedDateRange?.period_start?.date}
                     endDate={selectedDateRange?.period_end?.date}
                     updateDateRange={updateDateRange}
-                    orgPlanId={orgPlan?.id}
-                    availableIn={chart.availableIn}
                   />
                 )
               ))}

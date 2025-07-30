@@ -11,10 +11,7 @@ import z from 'zod'
 import { useParams } from 'common'
 import { useIcebergWrapperExtension } from 'components/interfaces/Storage/AnalyticBucketDetails/useIcebergWrapper'
 import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
 import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
@@ -42,6 +39,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -80,7 +78,10 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
   const { mutate: sendEvent } = useSendEventMutation()
   const router = useRouter()
 
-  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation()
+  const { mutateAsync: createBucket, isLoading: isCreating } = useBucketCreateMutation({
+    // [Joshen] Silencing the error here as it's being handled in onSubmit
+    onError: () => {},
+  })
   const { mutateAsync: createIcebergWrapper, isLoading: isCreatingIcebergWrapper } =
     useIcebergWrapperCreateMutation()
 
@@ -150,9 +151,8 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
       toast.success(`Successfully created bucket ${values.name}`)
       router.push(`/project/${ref}/storage/buckets/${values.name}`)
       onClose()
-    } catch (error) {
-      console.error(error)
-      toast.error('Failed to create bucket')
+    } catch (error: any) {
+      toast.error(`Failed to create bucket: ${error.message}`)
     }
   }
 
@@ -235,20 +235,16 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                                 </p>
                               </div>
                             </div>
-                            {icebergCatalogEnabled ? null : (
+                            {!icebergCatalogEnabled && (
                               <div className="w-full flex gap-x-2 py-2 items-center">
                                 <WarningIcon />
-                                <span className="text-xs text-left">
-                                  This feature is currently in alpha and not yet enabled for your
-                                  project. Sign up{' '}
-                                  <a
-                                    className="underline"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    href="https://forms.supabase.com/analytics-buckets"
-                                  >
+                                <span className="text-xs text-left text-foreground-lighter">
+                                  This is currently in alpha and not enabled for your project. Sign
+                                  up{' '}
+                                  <InlineLink href="https://forms.supabase.com/analytics-buckets">
                                     here
-                                  </a>
+                                  </InlineLink>
+                                  .
                                 </span>
                               </div>
                             )}

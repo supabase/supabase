@@ -544,6 +544,6 @@
     "vitest": "^3.0.5"
   },
   "peerDependencies": {
-    "next": "*"
+    "next": "catalog:"
   }
 }
