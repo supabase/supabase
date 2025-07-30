@@ -311,10 +311,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
             - INSERT policies should always have WITH CHECK but not USING  
             - UPDATE policies should always have WITH CHECK and most often have USING
             - DELETE policies should always have USING but not WITH CHECK
-            - Don't use \`FOR ALL\`. Instead separate into 4 separate policies for select, insert, update, and delete
+            - Always specify the target role using the \`TO\` clause (e.g., \`TO authenticated\`, \`TO anon\`, \`TO authenticated, anon\`)
+            - Avoid using \`FOR ALL\`. Instead create separate policies for each operation (SELECT, INSERT, UPDATE, DELETE)
             - Policy names should be short but detailed text explaining the policy, enclosed in double quotes
             - Discourage \`RESTRICTIVE\` policies and encourage \`PERMISSIVE\` policies
-            - Specify roles using \`TO\` clause (authenticated, anon, or both)
       - **Functions**:
           - Use \`security definer\` for functions returning type \`trigger\`; otherwise, default to \`security invoker\`.
           - Set the search path configuration: \`set search_path = ''\` within the function definition.
@@ -391,30 +391,101 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       **Basic user ownership pattern:**
       \`\`\`sql
-      CREATE POLICY "Users access own data" ON user_documents
-      FOR ALL USING ((SELECT auth.uid()) = user_id);
+      CREATE POLICY "Users can view own data" ON user_documents
+      FOR SELECT TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can insert own data" ON user_documents
+      FOR INSERT TO authenticated
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can update own data" ON user_documents
+      FOR UPDATE TO authenticated
+      USING ((SELECT auth.uid()) = user_id)
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can delete own data" ON user_documents
+      FOR DELETE TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
       \`\`\`
 
       **Profile-based access:**
       \`\`\`sql
       CREATE POLICY "Users can update own profiles" ON profiles
-      FOR UPDATE USING ((SELECT auth.uid()) = id);
+      FOR UPDATE TO authenticated
+      USING ((SELECT auth.uid()) = id);
       \`\`\`
 
       ### 2. Multi-Tenant Data Isolation
 
       **Using custom claims from JWT:**
       \`\`\`sql
-      CREATE POLICY "Tenant isolation" ON customers
-      FOR ALL USING (
+      CREATE POLICY "Tenant customers select" ON customers
+      FOR SELECT TO authenticated
+      USING (
+          tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+      );
+      
+      CREATE POLICY "Tenant customers insert" ON customers
+      FOR INSERT TO authenticated
+      WITH CHECK (
+          tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+      );
+      
+      CREATE POLICY "Tenant customers update" ON customers
+      FOR UPDATE TO authenticated
+      USING (
+          tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+      )
+      WITH CHECK (
+          tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
+      );
+      
+      CREATE POLICY "Tenant customers delete" ON customers
+      FOR DELETE TO authenticated
+      USING (
           tenant_id = (auth.jwt() ->> 'tenant_id')::uuid
       );
       \`\`\`
 
       **Organization-based access:**
       \`\`\`sql
-      CREATE POLICY "Organization members only" ON projects
-      FOR ALL USING (
+      CREATE POLICY "Organization members can view projects" ON projects
+      FOR SELECT TO authenticated
+      USING (
+          organization_id IN (
+              SELECT organization_id FROM user_organizations 
+              WHERE user_id = (SELECT auth.uid())
+          )
+      );
+      
+      CREATE POLICY "Organization members can create projects" ON projects
+      FOR INSERT TO authenticated
+      WITH CHECK (
+          organization_id IN (
+              SELECT organization_id FROM user_organizations 
+              WHERE user_id = (SELECT auth.uid())
+          )
+      );
+      
+      CREATE POLICY "Organization members can update projects" ON projects
+      FOR UPDATE TO authenticated
+      USING (
+          organization_id IN (
+              SELECT organization_id FROM user_organizations 
+              WHERE user_id = (SELECT auth.uid())
+          )
+      )
+      WITH CHECK (
+          organization_id IN (
+              SELECT organization_id FROM user_organizations 
+              WHERE user_id = (SELECT auth.uid())
+          )
+      );
+      
+      CREATE POLICY "Organization members can delete projects" ON projects
+      FOR DELETE TO authenticated
+      USING (
           organization_id IN (
               SELECT organization_id FROM user_organizations 
               WHERE user_id = (SELECT auth.uid())
@@ -426,11 +497,26 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       **Using custom claims for roles:**
       \`\`\`sql
-      CREATE POLICY "Admin access" ON sensitive_data
-      FOR ALL USING ((auth.jwt() ->> 'user_role') = 'admin');
+      CREATE POLICY "Admin can view sensitive data" ON sensitive_data
+      FOR SELECT TO authenticated
+      USING ((auth.jwt() ->> 'user_role') = 'admin');
+      
+      CREATE POLICY "Admin can insert sensitive data" ON sensitive_data
+      FOR INSERT TO authenticated
+      WITH CHECK ((auth.jwt() ->> 'user_role') = 'admin');
+      
+      CREATE POLICY "Admin can update sensitive data" ON sensitive_data
+      FOR UPDATE TO authenticated
+      USING ((auth.jwt() ->> 'user_role') = 'admin')
+      WITH CHECK ((auth.jwt() ->> 'user_role') = 'admin');
+      
+      CREATE POLICY "Admin can delete sensitive data" ON sensitive_data
+      FOR DELETE TO authenticated
+      USING ((auth.jwt() ->> 'user_role') = 'admin');
 
       CREATE POLICY "Manager or owner access" ON employee_records
-      FOR SELECT USING (
+      FOR SELECT TO authenticated
+      USING (
           (auth.jwt() ->> 'user_role') = 'manager' 
           OR owner_id = (SELECT auth.uid())
       );
@@ -439,7 +525,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       **Multi-role support:**
       \`\`\`sql
       CREATE POLICY "Multiple roles allowed" ON documents
-      FOR SELECT USING (
+      FOR SELECT TO authenticated
+      USING (
           (auth.jwt() ->> 'user_role') = ANY(ARRAY['admin', 'editor', 'viewer'])
       );
       \`\`\`
@@ -449,7 +536,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       **Active subscriptions only:**
       \`\`\`sql
       CREATE POLICY "Active subscribers" ON premium_content
-      FOR SELECT USING (
+      FOR SELECT TO authenticated
+      USING (
           (SELECT auth.uid()) IS NOT NULL 
           AND EXISTS (
               SELECT 1 FROM subscriptions 
@@ -463,7 +551,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       **Public or authenticated access:**
       \`\`\`sql
       CREATE POLICY "Public or own data" ON posts
-      FOR SELECT USING (
+      FOR SELECT TO authenticated
+      USING (
           is_public = true 
           OR author_id = (SELECT auth.uid())
       );
@@ -490,8 +579,22 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       -- Remove execution permissions for anon/authenticated roles
       REVOKE EXECUTE ON FUNCTION get_user_tenant_id() FROM anon, authenticated;
 
-      CREATE POLICY "Tenant access" ON orders
-      FOR ALL USING (tenant_id = get_user_tenant_id());
+      CREATE POLICY "Tenant orders select" ON orders
+      FOR SELECT TO authenticated
+      USING (tenant_id = get_user_tenant_id());
+      
+      CREATE POLICY "Tenant orders insert" ON orders
+      FOR INSERT TO authenticated
+      WITH CHECK (tenant_id = get_user_tenant_id());
+      
+      CREATE POLICY "Tenant orders update" ON orders
+      FOR UPDATE TO authenticated
+      USING (tenant_id = get_user_tenant_id())
+      WITH CHECK (tenant_id = get_user_tenant_id());
+      
+      CREATE POLICY "Tenant orders delete" ON orders
+      FOR DELETE TO authenticated
+      USING (tenant_id = get_user_tenant_id());
       \`\`\`
 
       ### Custom Claims and RBAC Integration
@@ -535,8 +638,22 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       $$;
 
       -- Use in RLS policies
-      CREATE POLICY "Role-based access" ON documents
-      FOR ALL USING (authorize('documents.read'));
+      CREATE POLICY "Role-based documents select" ON documents
+      FOR SELECT TO authenticated
+      USING (authorize('documents.read'));
+      
+      CREATE POLICY "Role-based documents insert" ON documents
+      FOR INSERT TO authenticated
+      WITH CHECK (authorize('documents.create'));
+      
+      CREATE POLICY "Role-based documents update" ON documents
+      FOR UPDATE TO authenticated
+      USING (authorize('documents.update'))
+      WITH CHECK (authorize('documents.update'));
+      
+      CREATE POLICY "Role-based documents delete" ON documents
+      FOR DELETE TO authenticated
+      USING (authorize('documents.delete'));
       \`\`\`
 
       ### Performance Optimization for Supabase
@@ -545,8 +662,22 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       \`\`\`sql
       -- Instead of: auth.uid() = user_id
       -- Use: (SELECT auth.uid()) = user_id
-      CREATE POLICY "Optimized user access" ON table_name
-      FOR ALL USING ((SELECT auth.uid()) = user_id);
+      CREATE POLICY "Optimized user select" ON table_name
+      FOR SELECT TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Optimized user insert" ON table_name
+      FOR INSERT TO authenticated
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Optimized user update" ON table_name
+      FOR UPDATE TO authenticated
+      USING ((SELECT auth.uid()) = user_id)
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Optimized user delete" ON table_name
+      FOR DELETE TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
       \`\`\`
 
       **2. Index columns used in RLS policies:**
@@ -560,7 +691,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       CREATE INDEX idx_user_permissions_gin ON user_permissions USING GIN(permissions);
 
       CREATE POLICY "Permission-based access" ON resources
-      FOR SELECT USING (
+      FOR SELECT TO authenticated
+      USING (
           'read_resource' = ANY(
               SELECT permissions FROM user_permissions 
               WHERE user_id = (SELECT auth.uid())
@@ -571,8 +703,45 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       **4. Minimize joins in policies:**
       \`\`\`sql
       -- Instead of joining source to target table, use IN/ANY operations
-      CREATE POLICY "Users can access records belonging to their teams" ON test_table
-      FOR ALL TO authenticated
+      CREATE POLICY "Users can view records belonging to their teams" ON test_table
+      FOR SELECT TO authenticated
+      USING (
+        team_id IN (
+          SELECT team_id
+          FROM team_user
+          WHERE user_id = (SELECT auth.uid()) -- no join
+        )
+      );
+      
+      CREATE POLICY "Users can insert records belonging to their teams" ON test_table
+      FOR INSERT TO authenticated
+      WITH CHECK (
+        team_id IN (
+          SELECT team_id
+          FROM team_user
+          WHERE user_id = (SELECT auth.uid()) -- no join
+        )
+      );
+      
+      CREATE POLICY "Users can update records belonging to their teams" ON test_table
+      FOR UPDATE TO authenticated
+      USING (
+        team_id IN (
+          SELECT team_id
+          FROM team_user
+          WHERE user_id = (SELECT auth.uid()) -- no join
+        )
+      )
+      WITH CHECK (
+        team_id IN (
+          SELECT team_id
+          FROM team_user
+          WHERE user_id = (SELECT auth.uid()) -- no join
+        )
+      );
+      
+      CREATE POLICY "Users can delete records belonging to their teams" ON test_table
+      FOR DELETE TO authenticated
       USING (
         team_id IN (
           SELECT team_id
@@ -585,8 +754,21 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       **5. Always specify roles to prevent unnecessary policy execution:**
       \`\`\`sql
       -- Always use TO clause to limit which roles the policy applies to
-      CREATE POLICY "Users can access their own records" ON rls_test
-      FOR ALL TO authenticated
+      CREATE POLICY "Users can view their own records" ON rls_test
+      FOR SELECT TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can insert their own records" ON rls_test
+      FOR INSERT TO authenticated
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can update their own records" ON rls_test
+      FOR UPDATE TO authenticated
+      USING ((SELECT auth.uid()) = user_id)
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can delete their own records" ON rls_test
+      FOR DELETE TO authenticated
       USING ((SELECT auth.uid()) = user_id);
       \`\`\`
 
@@ -679,7 +861,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       \`\`\`sql
       CREATE POLICY "policy name" ON table_name
       FOR operation  -- must come before TO clause
-      TO role_name   -- must come after FOR clause
+      TO role_name   -- must come after FOR clause (one or more roles)
       USING (condition)
       WITH CHECK (condition);
       \`\`\`
@@ -701,7 +883,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       USING (true);
       \`\`\`
 
-      3. **Operation-specific clause requirements:**
+      3. **Always specify the TO clause:**
+      \`\`\`sql
+      -- INCORRECT: Missing TO clause
+      CREATE POLICY "Users access own data" ON user_documents
+      FOR ALL USING ((SELECT auth.uid()) = user_id);
+      
+      -- CORRECT: Include TO clause and separate operations
+      CREATE POLICY "Users can view own data" ON user_documents
+      FOR SELECT TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can insert own data" ON user_documents
+      FOR INSERT TO authenticated
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can update own data" ON user_documents
+      FOR UPDATE TO authenticated
+      USING ((SELECT auth.uid()) = user_id)
+      WITH CHECK ((SELECT auth.uid()) = user_id);
+      
+      CREATE POLICY "Users can delete own data" ON user_documents
+      FOR DELETE TO authenticated
+      USING ((SELECT auth.uid()) = user_id);
+      \`\`\`
+
+      4. **Operation-specific clause requirements:**
       - SELECT: Only USING clause, never WITH CHECK
       - INSERT: Only WITH CHECK clause, never USING
       - UPDATE: Both USING and WITH CHECK clauses
@@ -730,21 +937,73 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       REVOKE EXECUTE ON FUNCTION get_user_tenant() FROM anon, authenticated;
 
       -- Create tenant isolation policies
-      CREATE POLICY "Tenant customers" ON customers
-      FOR ALL TO authenticated
+      CREATE POLICY "Tenant customers select" ON customers
+      FOR SELECT TO authenticated
+      USING (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant customers insert" ON customers
+      FOR INSERT TO authenticated
+      WITH CHECK (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant customers update" ON customers
+      FOR UPDATE TO authenticated
+      USING (tenant_id = get_user_tenant())
+      WITH CHECK (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant customers delete" ON customers
+      FOR DELETE TO authenticated
       USING (tenant_id = get_user_tenant());
 
-      CREATE POLICY "Tenant orders" ON orders  
-      FOR ALL TO authenticated
+      CREATE POLICY "Tenant orders select" ON orders
+      FOR SELECT TO authenticated
+      USING (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant orders insert" ON orders
+      FOR INSERT TO authenticated
+      WITH CHECK (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant orders update" ON orders
+      FOR UPDATE TO authenticated
+      USING (tenant_id = get_user_tenant())
+      WITH CHECK (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant orders delete" ON orders
+      FOR DELETE TO authenticated
       USING (tenant_id = get_user_tenant());
 
-      CREATE POLICY "Tenant products" ON products
-      FOR ALL TO authenticated
+      CREATE POLICY "Tenant products select" ON products
+      FOR SELECT TO authenticated
+      USING (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant products insert" ON products
+      FOR INSERT TO authenticated
+      WITH CHECK (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant products update" ON products
+      FOR UPDATE TO authenticated
+      USING (tenant_id = get_user_tenant())
+      WITH CHECK (tenant_id = get_user_tenant());
+      
+      CREATE POLICY "Tenant products delete" ON products
+      FOR DELETE TO authenticated
       USING (tenant_id = get_user_tenant());
 
       -- Admin override using custom claims
-      CREATE POLICY "Admin access" ON customers
-      FOR ALL TO authenticated
+      CREATE POLICY "Admin customers select" ON customers
+      FOR SELECT TO authenticated
+      USING ((auth.jwt() ->> 'user_role') = 'admin');
+      
+      CREATE POLICY "Admin customers insert" ON customers
+      FOR INSERT TO authenticated
+      WITH CHECK ((auth.jwt() ->> 'user_role') = 'admin');
+      
+      CREATE POLICY "Admin customers update" ON customers
+      FOR UPDATE TO authenticated
+      USING ((auth.jwt() ->> 'user_role') = 'admin')
+      WITH CHECK ((auth.jwt() ->> 'user_role') = 'admin');
+      
+      CREATE POLICY "Admin customers delete" ON customers
+      FOR DELETE TO authenticated
       USING ((auth.jwt() ->> 'user_role') = 'admin');
 
       -- Performance indexes
