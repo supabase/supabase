@@ -44,12 +44,11 @@ import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 
 export interface GridHeaderActionsProps {
   table: Entity
+  // [Joshen] Leaving isRefetching here as we plan to shift the refresh button to the header eventually
   isRefetching?: boolean
-  view?: 'list' | 'definition'
-  setView?: (view: 'list' | 'definition') => void
 }
 
-const GridHeaderActions = ({ table, isRefetching, view, setView }: GridHeaderActionsProps) => {
+const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const { data: org } = useSelectedOrganizationQuery()

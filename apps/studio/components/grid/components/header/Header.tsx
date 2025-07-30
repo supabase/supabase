@@ -56,11 +56,9 @@ export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
 export interface HeaderProps {
   customHeader?: ReactNode
   isRefetching: boolean
-  view?: 'list' | 'definition'
-  setView?: (view: 'list' | 'definition') => void
 }
 
-const Header = ({ customHeader, isRefetching, view, setView }: HeaderProps) => {
+export const Header = ({ customHeader, isRefetching }: HeaderProps) => {
   const snap = useTableEditorTableStateSnapshot()
 
   return (
@@ -73,18 +71,11 @@ const Header = ({ customHeader, isRefetching, view, setView }: HeaderProps) => {
         ) : (
           <DefaultHeader />
         )}
-        <GridHeaderActions
-          table={snap.originalTable}
-          isRefetching={isRefetching}
-          view={view}
-          setView={setView}
-        />
+        <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
       </div>
     </div>
   )
 }
-
-export default Header
 
 const DefaultHeader = () => {
   const { ref: projectRef } = useParams()

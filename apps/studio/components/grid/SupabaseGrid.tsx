@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -16,12 +16,10 @@ import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
-import Header, { HeaderProps } from './components/header/Header'
+import { Header, HeaderProps } from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { GridProps } from './types'
 
-import { formatSql } from 'lib/formatSql'
-import { useTheme } from 'next-themes'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 
@@ -38,14 +36,12 @@ export const SupabaseGrid = ({
   const tableId = _id ? Number(_id) : undefined
 
   const { project } = useProjectContext()
-  const { resolvedTheme } = useTheme()
 
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
   const [mounted, setMounted] = useState(false)
-  const [view, setView] = useState<'list' | 'definition'>('list')
 
   const { filters, onApplyFilters } = useTableFilter()
   const { sorts, onApplySorts } = useTableSort()
@@ -85,18 +81,11 @@ export const SupabaseGrid = ({
   }, [])
 
   const rows = data?.rows ?? EMPTY_ARR
-  const query = data?.query ?? ''
-  const formattedQuery = useMemo(() => (query ? formatSql(query) : ''), [query])
 
   return (
     <DndProvider backend={HTML5Backend} context={window}>
       <div className="sb-grid h-full flex flex-col">
-        <Header
-          customHeader={customHeader}
-          isRefetching={isRefetching}
-          view={view}
-          setView={setView}
-        />
+        <Header customHeader={customHeader} isRefetching={isRefetching} />
 
         {children || (
           <>

@@ -162,7 +162,7 @@ export const fetchAllTableRows = async ({
   return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
-export type TableRows = { rows: SupaRow[]; query: string }
+export type TableRows = { rows: SupaRow[] }
 
 export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
   queryClient: QueryClient
@@ -218,10 +218,7 @@ export async function getTableRows(
       return { idx: index, ...x }
     }) as SupaRow[]
 
-    const baseQueryMatch = query.match(/^\s*with\s+_base_query\s+as\s+\(([\s\S]+?)\)\s*select/i)
-    const baseQuery = baseQueryMatch?.[1]?.trim() ?? query
-
-    return { rows, query: baseQuery }
+    return { rows }
   } catch (error) {
     throw new Error(
       `Error fetching table rows: ${error instanceof Error ? error.message : 'Unknown error'}`
