@@ -19,6 +19,7 @@ export default defineConfig({
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
   retries: IS_CI ? 3 : 0,
+  maxFailures: IS_CI ? 1 : undefined,
   use: {
     baseURL: env.STUDIO_URL,
     screenshot: 'off',
