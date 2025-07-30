@@ -1395,6 +1395,33 @@ export interface BranchReviewWithAssistantClickedEvent {
 }
 
 /**
+ * User clicked on a DPA PDF link to open it.
+ *
+ * @group Events
+ * @source www, studio
+ */
+export interface DpaPdfOpenedEvent {
+  action: 'dpa_pdf_opened'
+  properties: {
+    /**
+     * The source of the click, e.g. www, studio
+     */
+    source: 'www' | 'studio'
+  }
+}
+
+/**
+ * User clicked the Request DPA button to open the confirmation modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface DpaRequestButtonClickedEvent {
+  action: 'dpa_request_button_clicked'
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1484,3 +1511,5 @@ export type TelemetryEvent =
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | DpaPdfOpenedEvent
+  | DpaRequestButtonClickedEvent
