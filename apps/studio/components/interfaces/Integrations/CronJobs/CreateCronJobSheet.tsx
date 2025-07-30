@@ -16,7 +16,7 @@ import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   Form_Shadcn_,
@@ -199,7 +199,7 @@ export const CreateCronJobSheet = ({
   onClose,
 }: CreateCronJobSheetProps) => {
   const { project } = useProjectContext()
-  const org = useSelectedOrganization()
+  const { data: org } = useSelectedOrganizationQuery()
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -208,6 +208,13 @@ export const CreateCronJobSheet = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const pgNetExtension = (data ?? []).find((ext) => ext.name === 'pg_net')
+  const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
@@ -219,22 +226,21 @@ export const CreateCronJobSheet = ({
 
   const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '', project?.ref!)
 
+  // [Joshen] Keeping the var name here generic, in case there's other cases that might fail parsing
+  const unableToParseCronJob =
+    cronJobValues.type === 'http_request' && cronJobValues.endpoint === ''
+
   const form = useForm<CreateCronJobForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
       schedule: selectedCronJob?.schedule || '*/5 * * * *',
       supportsSeconds,
-      values: cronJobValues,
+      values: { ...cronJobValues, type: unableToParseCronJob ? 'sql_snippet' : cronJobValues.type },
     },
   })
 
   const isEdited = form.formState.isDirty
-
-  // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
-  if (!isEdited && isClosing) {
-    onClose()
-  }
 
   const onClosePanel = () => {
     if (isEdited) {
@@ -269,6 +275,18 @@ export const CreateCronJobSheet = ({
     ],
   })
 
+  useEffect(() => {
+    // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
+    if (isClosing && !isEdited) onClose()
+  }, [isClosing, isEdited, onClose])
+
+  useEffect(() => {
+    if (cronType === 'sql_snippet' && unableToParseCronJob && selectedCronJob?.command) {
+      form.setValue('values.snippet', selectedCronJob.command)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdited, cronType])
+
   // update the snippet field when the user changes the any values in the form
   useEffect(() => {
     const command = buildCommand({
@@ -286,6 +304,7 @@ export const CreateCronJobSheet = ({
     if (command) {
       form.setValue('values.snippet', command)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     edgeFunctionName,
     endpoint,
@@ -361,14 +380,6 @@ export const CreateCronJobSheet = ({
       }
     )
   }
-
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const pgNetExtension = (data ?? []).find((ext) => ext.name === 'pg_net')
-  const pgNetExtensionInstalled = pgNetExtension?.installed_version != undefined
 
   return (
     <>

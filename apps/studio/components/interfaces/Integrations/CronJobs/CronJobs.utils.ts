@@ -44,8 +44,9 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     .replaceAll(/\n/g, ' ')
     .replaceAll(/\s+/g, ' ')
     .trim()
+    .toLocaleLowerCase()
 
-  if (command.toLocaleLowerCase().startsWith('select net.')) {
+  if (command.startsWith('select net.')) {
     const methodMatch = command.match(/select net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
@@ -73,7 +74,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       }
     } else {
       const headersStringMatch = command.match(/headers:='([^']*)'/i)
-      const headersString = headersStringMatch?.[1] || ''
+      const headersString = headersStringMatch?.[1] || '{}'
       try {
         const parsedHeaders = JSON.parse(headersString)
         headersObjs = Object.entries(parsedHeaders).map(([name, value]) => ({
