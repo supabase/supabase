@@ -223,8 +223,6 @@ const ProjectLinks = () => {
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { securityLints, errorLints } = useLints()
 
-  const showWarehouse = useFlag('warehouse')
-
   const activeRoute = router.pathname.split('/')[3]
 
   const {
@@ -310,14 +308,11 @@ const ProjectLinks = () => {
               </div>
             )
           } else if (route.key === 'logs') {
-            // TODO: Undo this when warehouse flag is removed
-            const label = showWarehouse ? 'Logs & Analytics' : route.label
-            const newRoute = { ...route, label }
             return (
               <SideBarNavLink
                 key={`other-routes-${i}`}
-                route={newRoute}
-                active={activeRoute === newRoute.key}
+                route={route}
+                active={activeRoute === route.key}
               />
             )
           } else {

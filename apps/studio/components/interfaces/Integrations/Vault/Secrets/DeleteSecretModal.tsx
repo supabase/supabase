@@ -15,15 +15,16 @@ import {
 } from 'ui'
 
 interface DeleteSecretModalProps {
-  secret: VaultSecret | undefined
+  visible: boolean
+  secret: VaultSecret
   onClose: () => void
 }
 
-const DeleteSecretModal = ({ secret, onClose }: DeleteSecretModalProps) => {
+const DeleteSecretModal = ({ visible, secret, onClose }: DeleteSecretModalProps) => {
   const { project } = useProjectContext()
   const { mutate: deleteSecret, isLoading } = useVaultSecretDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully deleted secret ${secret?.name}`)
+      toast.success(`Successfully deleted secret ${secret.name}`)
       onClose()
     },
     onError: (error) => {
@@ -33,17 +34,16 @@ const DeleteSecretModal = ({ secret, onClose }: DeleteSecretModalProps) => {
 
   const onConfirmDeleteSecret = () => {
     if (!project) return console.error('Project is required')
-    if (!secret) return
 
     deleteSecret({
       projectRef: project.ref,
-      connectionString: project?.connectionString,
+      connectionString: project.connectionString,
       id: secret.id,
     })
   }
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open={visible} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Confirm to delete secret</DialogTitle>
@@ -54,9 +54,9 @@ const DeleteSecretModal = ({ secret, onClose }: DeleteSecretModalProps) => {
             The following secret will be permanently removed and cannot be recovered. Are you sure?
           </p>
           <div className="space-y-1">
-            <p className="text-sm">{secret?.description}</p>
+            <p className="text-sm">{secret.description}</p>
             <p className="text-sm text-foreground-light">
-              ID: <span className="font-mono">{secret?.id}</span>
+              ID: <span className="font-mono">{secret.id}</span>
             </p>
           </div>
         </DialogSection>

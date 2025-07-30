@@ -1,21 +1,12 @@
+import { useState } from 'react'
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { screen, waitFor, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { render } from 'tests/helpers'
-import EditSecretModal from '../EditSecretModal'
 import { addAPIMock } from 'tests/lib/msw'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import { Edit3, MoreVertical } from 'lucide-react'
-import { useState } from 'react'
-import { VaultSecret } from 'types/ui'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import EditSecretModal from '../EditSecretModal'
 
 const secret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
@@ -27,39 +18,20 @@ const secret = {
 }
 
 const Page = ({ onClose }: { onClose: () => void }) => {
-  const [modal, setModal] = useState<string | null>(null)
-  const [selectedSecretToEdit, setSelectedSecretToEdit] = useState<VaultSecret>()
-  const renderModal = () => {
-    switch (modal) {
-      case `edit`:
-        return (
-          <EditSecretModal
-            secret={secret}
-            onClose={() => {
-              setModal(null)
-              onClose()
-            }}
-          />
-        )
-      default:
-        return null
-    }
-  }
+  const [open, setOpen] = useState(false)
+
   return (
     <ProjectContextProvider projectRef="default">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end" className="w-32">
-          <DropdownMenuItem className="space-x-2" onClick={() => setModal(`edit`)}>
-            <Edit3 size="14" />
-            <p>Edit</p>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <button onClick={() => setOpen(true)}>Open</button>
 
-      {renderModal()}
+      <EditSecretModal
+        visible={open}
+        secret={secret}
+        onClose={() => {
+          setOpen(false)
+          onClose()
+        }}
+      />
     </ProjectContextProvider>
   )
 }
@@ -100,10 +72,8 @@ describe(`EditSecretModal`, () => {
     const onClose = vi.fn()
     render(<Page onClose={onClose} />)
 
-    const menuTrigger = screen.getByRole(`button`, { name: `Manage Secret` })
-    await userEvent.click(menuTrigger)
-    const editOption = await screen.findByRole(`menuitem`, { name: `Edit` })
-    await userEvent.click(editOption)
+    const openButton = screen.getByRole(`button`, { name: `Open` })
+    await userEvent.click(openButton)
 
     await waitFor(() => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()

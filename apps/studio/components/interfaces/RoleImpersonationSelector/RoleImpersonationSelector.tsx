@@ -131,9 +131,7 @@ const RoleImpersonationSelector = ({
       {selectedOption === 'authenticated' && (
         <>
           <DropdownMenuSeparator />
-          <div className={cn('py-5', padded && 'px-5')}>
-            <UserImpersonationSelector />
-          </div>
+          <UserImpersonationSelector />
         </>
       )}
     </>

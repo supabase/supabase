@@ -58,94 +58,92 @@ export const SecretsManagement = () => {
   )
 
   return (
-    <>
-      <div className="space-y-4 p-4 md:p-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-          <div className="flex flex-col md:flex-row md:items-center gap-2">
-            <Input
-              className="md:w-52"
-              size="tiny"
-              placeholder="Search by name or key ID"
-              value={searchValue}
-              onChange={(event) => setSearchValue(event.target.value)}
-              icon={<Search strokeWidth={2} size={16} />}
-              actions={
-                searchValue.length > 0
-                  ? [
-                      <Button
-                        key="clear"
-                        size="tiny"
-                        type="text"
-                        icon={<X />}
-                        className="px-1"
-                        onClick={() => setSearchValue('')}
-                      />,
-                    ]
-                  : []
-              }
-            />
-            <Select_Shadcn_ value={selectedSort} onValueChange={setSelectedSort}>
-              <SelectTrigger_Shadcn_ size="tiny" className="md:w-44">
-                <SelectValue_Shadcn_ asChild>
-                  <>Sort by {selectedSort}</>
-                </SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectItem_Shadcn_ value="updated_at" className="text-xs">
-                  Updated at
-                </SelectItem_Shadcn_>
-                <SelectItem_Shadcn_ value="name" className="text-xs">
-                  Name
-                </SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </div>
-          <div className="flex items-center gap-x-2">
-            <DocsButton href="https://supabase.com/docs/guides/database/vault" />
-            <AddNewSecretModal disabled={!canManageSecrets} />
-          </div>
+    <div className="space-y-4 p-4 md:p-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div className="flex flex-col md:flex-row md:items-center gap-2">
+          <Input
+            className="md:w-52"
+            size="tiny"
+            placeholder="Search by name or key ID"
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            icon={<Search strokeWidth={2} size={16} />}
+            actions={
+              searchValue.length > 0
+                ? [
+                    <Button
+                      key="clear"
+                      size="tiny"
+                      type="text"
+                      icon={<X />}
+                      className="px-1"
+                      onClick={() => setSearchValue('')}
+                    />,
+                  ]
+                : []
+            }
+          />
+          <Select_Shadcn_ value={selectedSort} onValueChange={setSelectedSort}>
+            <SelectTrigger_Shadcn_ size="tiny" className="md:w-44">
+              <SelectValue_Shadcn_ asChild>
+                <>Sort by {selectedSort}</>
+              </SelectValue_Shadcn_>
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectItem_Shadcn_ value="updated_at" className="text-xs">
+                Updated at
+              </SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="name" className="text-xs">
+                Name
+              </SelectItem_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
         </div>
-
-        {/* Table of secrets */}
-        <div className="border border-default rounded">
-          {isLoading ? (
-            <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <Loader className="animate-spin text-foreground-light" size={16} strokeWidth={1.5} />
-              <p className="text-sm text-foreground">Loading secrets from the Vault</p>
-            </div>
-          ) : (
-            <>
-              {secrets.map((secret, idx) => {
-                return (
-                  <Fragment key={`secret-${idx}`}>
-                    <SecretRow secret={secret} />
-                    {idx !== secrets.length - 1 && <Separator />}
-                  </Fragment>
-                )
-              })}
-              {secrets.length === 0 && (
-                <>
-                  {searchValue.length === 0 ? (
-                    <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
-                      <p className="text-sm text-foreground">No secrets added yet</p>
-                      <p className="text-sm text-foreground-light">
-                        The Vault allows you to store sensitive information like API keys
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="px-6 py-4 space-y-1">
-                      <p className="text-sm text-foreground">No results found</p>
-                      <p className="text-sm text-foreground-light">
-                        Your search for "{searchValue}" did not return any results
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </>
-          )}
+        <div className="flex items-center gap-x-2">
+          <DocsButton href="https://supabase.com/docs/guides/database/vault" />
+          <AddNewSecretModal disabled={!canManageSecrets} />
         </div>
       </div>
-    </>
+
+      {/* Table of secrets */}
+      <div className="border border-default rounded">
+        {isLoading ? (
+          <div className="px-6 py-6 space-x-2 flex items-center justify-center">
+            <Loader className="animate-spin text-foreground-light" size={16} strokeWidth={1.5} />
+            <p className="text-sm text-foreground">Loading secrets from the Vault</p>
+          </div>
+        ) : (
+          <>
+            {secrets.map((secret, idx) => {
+              return (
+                <Fragment key={`secret-${idx}`}>
+                  <SecretRow secret={secret} />
+                  {idx !== secrets.length - 1 && <Separator />}
+                </Fragment>
+              )
+            })}
+            {secrets.length === 0 && (
+              <>
+                {searchValue.length === 0 ? (
+                  <div className="px-6 py-6 space-y-1 flex flex-col items-center justify-center">
+                    <p className="text-sm text-foreground">No secrets added yet</p>
+                    <p className="text-sm text-foreground-light">
+                      The Vault allows you to store sensitive information like API keys
+                    </p>
+                  </div>
+                ) : (
+                  <div className="px-6 py-4 space-y-1">
+                    <p className="text-sm text-foreground">No results found</p>
+                    <p className="text-sm text-foreground-light">
+                      Your search for "{searchValue}" did not return any results
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   )
 }

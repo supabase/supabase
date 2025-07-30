@@ -1,20 +1,11 @@
+import { useState } from 'react'
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { screen, waitFor, fireEvent } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { render } from 'tests/helpers'
-import DeleteSecretModal from '../DeleteSecretModal'
 import { addAPIMock } from 'tests/lib/msw'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import { Trash, MoreVertical } from 'lucide-react'
-import { useState } from 'react'
 import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import DeleteSecretModal from '../DeleteSecretModal'
 
 const secret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
@@ -26,43 +17,23 @@ const secret = {
 }
 
 const Page = ({ onClose }: { onClose: () => void }) => {
-  const [modal, setModal] = useState<string | null>(null)
-  const renderModal = () => {
-    switch (modal) {
-      case `delete`:
-        return (
-          <DeleteSecretModal
-            secret={secret}
-            onClose={() => {
-              setModal(null)
-              onClose()
-            }}
-          />
-        )
-      default:
-        return null
-    }
-  }
+  const [open, setOpen] = useState(false)
+
   return (
     <ProjectContextProvider projectRef="default">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end" className="w-32">
-          <DropdownMenuItem className="space-x-2" onClick={() => setModal(`delete`)}>
-            <Trash stroke="red" size="14" />
-            <p className="text-foreground-light">Delete</p>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <button onClick={() => setOpen(true)}>Open</button>
 
-      {renderModal()}
+      <DeleteSecretModal
+        visible={open}
+        secret={secret}
+        onClose={() => {
+          setOpen(false)
+          onClose()
+        }}
+      />
     </ProjectContextProvider>
   )
 }
-
-mockAnimationsApi()
 
 describe(`EditSecretModal`, () => {
   beforeEach(() => {
@@ -98,10 +69,8 @@ describe(`EditSecretModal`, () => {
     const onClose = vi.fn()
     render(<Page onClose={onClose} />)
 
-    const menuTrigger = screen.getByRole(`button`, { name: `Manage Secret` })
-    await userEvent.click(menuTrigger)
-    const deleteOption = await screen.findByRole(`menuitem`, { name: `Delete` })
-    await userEvent.click(deleteOption)
+    const openButton = screen.getByRole(`button`, { name: `Open` })
+    await userEvent.click(openButton)
 
     await waitFor(() => {
       expect(screen.getByRole(`dialog`)).toBeInTheDocument()
