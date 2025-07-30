@@ -123,13 +123,14 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(.+/g
+  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*[;]*\s*\(.+/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
       .replace('SELECT ', '')
       .replace(/\(.*\)/, '')
       .trim()
       .split('.')
+      .map(part => part.replace(/;+$/, '').trim()) // Remove trailing semicolons and whitespace from each part
 
     return {
       type: 'sql_function',

@@ -40,6 +40,66 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return a sql function command when the command is SELECT public.trigger_subscription_alert()', () => {
+    const command = 'SELECT public.trigger_subscription_alert()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'trigger_subscription_alert',
+      snippet: command,
+    })
+  })
+
+  it('should correctly reconstruct command when editing a sql function', () => {
+    // Simulate the bug: original command with proper syntax
+    const originalCommand = '$$SELECT public.trigger_subscription_alert()$$'
+    
+    // Parse the command (this is what happens when opening edit dialog)
+    const parsed = parseCronJobCommand(originalCommand, 'random_project_ref')
+    
+    // The parsed result should maintain the correct function name
+    expect(parsed).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'trigger_subscription_alert',
+      snippet: originalCommand,
+    })
+    
+    // When the command is reconstructed (this happens during save), it should be correct
+    const reconstructed = `SELECT ${parsed.schema}.${parsed.functionName}()`
+    expect(reconstructed).toBe('SELECT public.trigger_subscription_alert()')
+  })
+
+  it('should handle malformed commands with semicolons before parentheses', () => {
+    // Test the exact bug reported: semicolon inserted before parentheses
+    const malformedCommand = 'SELECT public.trigger_subscription_alert;()'
+    const result = parseCronJobCommand(malformedCommand, 'random_project_ref')
+    
+    // Should correctly parse as sql_function despite the semicolon
+    expect(result).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'trigger_subscription_alert',
+      snippet: malformedCommand,
+    })
+  })
+
+  it('should handle various semicolon corruption patterns', () => {
+    // Test multiple semicolons
+    const multiSemicolonCommand = 'SELECT public.my_function;;()'
+    const result1 = parseCronJobCommand(multiSemicolonCommand, 'random_project_ref')
+    expect(result1.type).toBe('sql_function')
+    expect(result1.functionName).toBe('my_function')
+    
+    // Test semicolon with spaces
+    const spacedSemicolonCommand = 'SELECT public.my_function ; ()'
+    const result2 = parseCronJobCommand(spacedSemicolonCommand, 'random_project_ref')
+    expect(result2.type).toBe('sql_function')
+    expect(result2.functionName).toBe('my_function')
+  })
+
+
+
   it('should return a edge function config when the command posts to its own supabase.co project', () => {
     const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), body:='', timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
