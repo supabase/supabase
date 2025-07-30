@@ -27,6 +27,7 @@ import { EyeOff, Eye } from 'lucide-react'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface EditSecretModalProps {
+  visible: boolean
   secret: VaultSecret | undefined
   onClose: () => void
 }
@@ -37,7 +38,7 @@ const SecretSchema = z.object({
   secret: z.string().min(1, 'Please enter your secret value'),
 })
 
-const EditSecretModal = ({ secret, onClose }: EditSecretModalProps) => {
+const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => {
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
   const formId = 'edit-vault-secret-form'
@@ -103,7 +104,7 @@ const EditSecretModal = ({ secret, onClose }: EditSecretModalProps) => {
 
   return (
     <Dialog
-      open
+      open={visible}
       onOpenChange={(open) => {
         if (!open) {
           form.reset()
