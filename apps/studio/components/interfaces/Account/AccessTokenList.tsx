@@ -68,7 +68,6 @@ const AccessTokenList = () => {
                             type="default"
                             title="Manage access"
                             onClick={() => {
-                              console.log('Manage access clicked for token:', x)
                               setIsPanelOpen(true)
                               setToken(x)
                             }}
