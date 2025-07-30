@@ -8,11 +8,11 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { UpdateTokensPanel } from './UpdateTokensPanel/UpdateTokensPanel'
 
 const AccessTokenList = () => {
   const { data: tokens, isLoading } = useAccessTokensQuery()
@@ -24,6 +24,7 @@ const AccessTokenList = () => {
   })
 
   const [isOpen, setIsOpen] = useState(false)
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [token, setToken] = useState<AccessToken | undefined>(undefined)
 
   const onDeleteToken = async (tokenId: number) => deleteToken({ id: tokenId })
@@ -65,7 +66,9 @@ const AccessTokenList = () => {
                             type="default"
                             title="Manage access"
                             onClick={() => {
-                              console.log('Open try here...')
+                              console.log('Manage access clicked for token:', x)
+                              setIsPanelOpen(true)
+                              setToken(x)
                             }}
                           >
                             Manage access
@@ -104,6 +107,15 @@ const AccessTokenList = () => {
           }
         />
       </div>
+
+      <UpdateTokensPanel
+        visible={isPanelOpen}
+        token={token}
+        onClose={() => {
+          setIsPanelOpen(false)
+        }}
+      />
+
       <ConfirmationModal
         visible={isOpen}
         variant={'destructive'}
