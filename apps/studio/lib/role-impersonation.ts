@@ -117,26 +117,13 @@ function getCustomRoleImpersonationSql(roleName: string) {
   `.trim()
 }
 
-export type RoleImpersonationState = Pick<
-  ValtioRoleImpersonationState,
-  'role' | 'claims' | 'hasTransaction'
->
+export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
 
-export function wrapWithRoleImpersonation(
-  sql: string,
-  state?: RoleImpersonationState,
-  isMutation: boolean = false
-) {
-  const { role, claims, hasTransaction } = state ?? {
-    role: undefined,
-    claims: undefined,
-    hasTransaction: false,
-  }
-
-  const shouldTransaction = isMutation && hasTransaction
+export function wrapWithRoleImpersonation(sql: string, state?: RoleImpersonationState) {
+  const { role, claims } = state ?? { role: undefined, claims: undefined }
 
   if (role === undefined) {
-    return shouldTransaction ? wrapWithTransaction(sql) : sql
+    return sql
   }
 
   const impersonationSql =
@@ -146,20 +133,15 @@ export function wrapWithRoleImpersonation(
         : ''
       : getCustomRoleImpersonationSql(role.role)
 
-  const sqlWithImpersonation = `
+  return /* SQL */ `
     ${impersonationSql}
+
     -- If the users sql returns no rows, pg-meta will
     -- fallback to returning the result of the impersonation sql.
     select 1 as "${ROLE_IMPERSONATION_NO_RESULTS}";
 
     ${sql}
   `.trim()
-
-  return shouldTransaction ? wrapWithTransaction(sqlWithImpersonation) : sqlWithImpersonation
-}
-
-function wrapWithTransaction(sql: string) {
-  return `begin;${sql}rollback;`
 }
 
 function encodeText(data: string) {

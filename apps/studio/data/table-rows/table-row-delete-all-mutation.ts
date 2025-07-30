@@ -10,6 +10,7 @@ import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import { wrapWithTransaction } from 'lib/helpers'
 
 export type TableRowDeleteAllVariables = {
   projectRef: string
@@ -17,6 +18,7 @@ export type TableRowDeleteAllVariables = {
   table: Entity
   filters: Filter[]
   roleImpersonationState?: RoleImpersonationState
+  isTestMode?: boolean
 }
 
 export function getTableRowDeleteAllSql({
@@ -41,12 +43,16 @@ export async function deleteAllTableRow({
   table,
   filters,
   roleImpersonationState,
+  isTestMode,
 }: TableRowDeleteAllVariables) {
-  const sql = wrapWithRoleImpersonation(
+  let sql = wrapWithRoleImpersonation(
     getTableRowDeleteAllSql({ table, filters }),
-    roleImpersonationState,
-    true
+    roleImpersonationState
   )
+
+  if (isTestMode) {
+    sql = wrapWithTransaction(sql)
+  }
 
   const { result } = await executeSql({
     projectRef,

@@ -1,11 +1,10 @@
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { AlertTriangle } from 'lucide-react'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button } from 'ui'
 
 export const TransactionBanner = ({ sticky = false }: { sticky?: boolean }) => {
-  const { hasTransaction, setHasTransaction } = useRoleImpersonationStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
 
-  if (!hasTransaction) {
+  if (!tableEditorSnap.isTestMode) {
     return null
   }
 
@@ -15,14 +14,14 @@ export const TransactionBanner = ({ sticky = false }: { sticky?: boolean }) => {
         sticky ? 'sticky top-0 z-10' : ''
       }`}
     >
-      <p className="text-xs">
+      <p className="text-xs flex-1">
         You are in test mode. Any data changes you make will be rolled back.
       </p>
       <Button
         type="text"
         size="tiny"
         className="bg-warning-400 text-xs"
-        onClick={() => setHasTransaction(false)}
+        onClick={() => tableEditorSnap.setIsTestMode(false)}
       >
         Switch off test mode
       </Button>

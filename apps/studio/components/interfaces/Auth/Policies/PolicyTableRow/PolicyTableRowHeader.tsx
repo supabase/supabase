@@ -106,9 +106,7 @@ const PolicyTableRowHeader = ({
             )}
             {enableTestMode && (
               <Button asChild type="default">
-                <Link
-                  href={`/project/${ref}/editor/${table.id}?impersonate=true&hasTransaction=true`}
-                >
+                <Link href={`/project/${ref}/editor/${table.id}?impersonate=true&isTestMode=true`}>
                   Test
                 </Link>
               </Button>

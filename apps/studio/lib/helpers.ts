@@ -326,3 +326,7 @@ export const formatCurrency = (amount: number | undefined | null): string | null
     return currencyFormatterDefault.format(amount)
   }
 }
+
+export const wrapWithTransaction = (sql: string) => {
+  return `begin;${sql}rollback;`
+}

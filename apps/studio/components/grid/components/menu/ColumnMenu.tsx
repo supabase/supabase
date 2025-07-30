@@ -1,7 +1,7 @@
 import type { Sort } from 'components/grid/types'
 import { ArrowDown, ArrowUp, ChevronDown, Edit, Lock, Trash, Unlock } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
-
+import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
@@ -27,7 +27,6 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const { sorts, addOrUpdateSort, removeSort } = useTableSort()
-
   const columnKey = column.key
   const columnName = column.name as string
 
@@ -93,7 +92,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
           <ArrowDown size={14} strokeWidth={currentSort && !currentSort.ascending ? 3 : 1.5} />
           <span>Sort Descending</span>
         </DropdownMenuItem>
-        {snap.editable && (
+        {snap.editable && !tableEditorSnap.isTestMode && (
           <>
             <DropdownMenuSeparator />
             <Tooltip>
@@ -129,7 +128,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             </>
           )}
         </DropdownMenuItem>
-        {snap.editable && (
+        {snap.editable && !tableEditorSnap.isTestMode && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="space-x-2" onClick={onDeleteColumn}>

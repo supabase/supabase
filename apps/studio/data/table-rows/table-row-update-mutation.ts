@@ -7,6 +7,7 @@ import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impe
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
+import { wrapWithTransaction } from 'lib/helpers'
 
 export type TableRowUpdateVariables = {
   projectRef: string
@@ -17,6 +18,7 @@ export type TableRowUpdateVariables = {
   enumArrayColumns: string[]
   returning?: boolean
   roleImpersonationState?: RoleImpersonationState
+  isTestMode?: boolean
 }
 
 export function getTableRowUpdateSql({
@@ -45,12 +47,18 @@ export async function updateTableRow({
   enumArrayColumns,
   returning,
   roleImpersonationState,
+  isTestMode,
 }: TableRowUpdateVariables) {
-  const sql = wrapWithRoleImpersonation(
+  let sql = wrapWithRoleImpersonation(
     getTableRowUpdateSql({ table, configuration, payload, enumArrayColumns, returning }),
-    roleImpersonationState,
-    true
+    roleImpersonationState
   )
+
+  if (isTestMode) {
+    sql = wrapWithTransaction(sql)
+  }
+
+  console.log('sql', sql)
 
   const { result } = await executeSql({
     projectRef,

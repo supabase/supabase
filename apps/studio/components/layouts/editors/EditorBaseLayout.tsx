@@ -9,7 +9,7 @@ import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
 import { TransactionBanner } from '../TransactionBanner'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -23,7 +23,7 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   const pathname = usePathname()
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
-  const { hasTransaction } = useRoleImpersonationStateSnapshot()
+  const tableEditorSnap = useTableEditorStateSnapshot()
 
   const hasNoOpenTabs =
     editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
@@ -35,7 +35,7 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
       <div
         className={cn(
           'flex flex-col h-full',
-          hasTransaction && 'border-2 border-t-0 border-warning'
+          tableEditorSnap.isTestMode && 'border-2 border-t-0 border-warning'
         )}
       >
         <TransactionBanner />

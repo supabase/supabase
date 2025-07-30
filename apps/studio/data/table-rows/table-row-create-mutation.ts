@@ -7,6 +7,7 @@ import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impe
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
+import { wrapWithTransaction } from 'lib/helpers'
 
 export type TableRowCreateVariables = {
   projectRef: string
@@ -16,6 +17,7 @@ export type TableRowCreateVariables = {
   enumArrayColumns: string[]
   returning?: boolean
   roleImpersonationState?: RoleImpersonationState
+  isTestMode?: boolean
 }
 
 export function getTableRowCreateSql({
@@ -38,12 +40,16 @@ export async function createTableRow({
   enumArrayColumns,
   returning,
   roleImpersonationState,
+  isTestMode,
 }: TableRowCreateVariables) {
-  const sql = wrapWithRoleImpersonation(
+  let sql = wrapWithRoleImpersonation(
     getTableRowCreateSql({ table, payload, enumArrayColumns, returning }),
-    roleImpersonationState,
-    true
+    roleImpersonationState
   )
+
+  if (isTestMode) {
+    sql = wrapWithTransaction(sql)
+  }
 
   const { result } = await executeSql({
     projectRef,

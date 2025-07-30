@@ -26,8 +26,8 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   Label_Shadcn_ as Label,
@@ -46,7 +46,6 @@ import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import ViewEntityAutofixSecurityModal from './ViewEntityAutofixSecurityModal'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export interface GridHeaderActionsProps {
   table: Entity
@@ -57,15 +56,13 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const router = useRouter()
-  const { hasTransaction, setHasTransaction } = useRoleImpersonationStateSnapshot()
-  const enableTestMode = useFlag('enableTestMode')
+  const tableEditorSnap = useTableEditorStateSnapshot()
 
   useEffect(() => {
-    const { impersonate } = router.query
-    if (impersonate === 'true') {
-      setHasTransaction(true)
+    if (router.query.isTestMode === 'true') {
+      tableEditorSnap.setIsTestMode(true)
     }
-  }, [router.query.impersonate])
+  }, [router.query.isTestMode])
 
   // need project lints to get security status for views
   const { data: lints = [] } = useProjectLintsQuery({ projectRef: project?.ref })
@@ -203,7 +200,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   return (
     <div className="sb-grid-header__inner">
       {showHeaderActions && (
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-2 px-1">
           {isReadOnly && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -475,18 +472,6 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
               router.query.impersonate === 'true' ? 'authenticated' : undefined
             }
           />
-          {enableTestMode && (
-            <div className="flex items-center gap-x-2 mx-2">
-              <Label htmlFor="transaction-mode-switch" className="text-foreground-lighter text-xs">
-                Test mode
-              </Label>
-              <Switch
-                id="transaction-mode-switch"
-                checked={hasTransaction}
-                onCheckedChange={setHasTransaction}
-              />
-            </div>
-          )}
         </div>
       )}
       <ConfirmationModal

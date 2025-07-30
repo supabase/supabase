@@ -145,7 +145,7 @@ const DefaultHeader = () => {
                           </DropdownMenuItem>,
                         ]
                       : []),
-                    ...(onAddColumn !== undefined
+                    ...(onAddColumn !== undefined && !tableEditorSnap.isTestMode
                       ? [
                           <DropdownMenuItem
                             key="add-column"
@@ -171,7 +171,7 @@ const DefaultHeader = () => {
                           </DropdownMenuItem>,
                         ]
                       : []),
-                    ...(onImportData !== undefined
+                    ...(onImportData !== undefined && !tableEditorSnap.isTestMode
                       ? [
                           <DropdownMenuItem
                             key="import-data"

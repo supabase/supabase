@@ -22,7 +22,6 @@ export function createRoleImpersonationState(
     projectRef,
     role: undefined as ImpersonationRole | undefined,
     claims: undefined as ReturnType<typeof getPostgrestClaims> | undefined,
-    hasTransaction: false,
 
     setRole: async (
       role: ImpersonationRole | undefined,
@@ -46,9 +45,6 @@ export function createRoleImpersonationState(
       if (claims) {
         roleImpersonationState.claims = claims
       }
-    },
-    setHasTransaction: (hasTransaction: boolean) => {
-      roleImpersonationState.hasTransaction = hasTransaction
     },
   })
 
