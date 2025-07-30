@@ -76,13 +76,13 @@ test.describe('Logs', () => {
         timeout: 50000,
       })
 
-      const firstRow = page.getByRole('gridcell', { name: /Random event/ })
+      const firstRow = page.getByRole('row', { name: /Random event/ })
 
       await expect(firstRow, {
         message: 'Logs table should be visible with one row at least',
       }).toBeVisible()
 
-      await firstRow.click()
+      await firstRow.click({ force: true })
 
       const tabPanel = page.getByTestId('log-selection')
       await expect(tabPanel, {

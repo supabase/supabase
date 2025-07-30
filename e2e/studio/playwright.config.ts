@@ -23,9 +23,9 @@ export default defineConfig({
   use: {
     baseURL: env.STUDIO_URL,
     screenshot: 'off',
-    video: 'retain-on-failure',
-    headless: IS_CI,
-    trace: 'retain-on-failure',
+    video: IS_CI ? 'retain-on-failure' : 'on',
+    headless: true,
+    trace: IS_CI ? 'retain-on-failure' : 'on',
   },
   projects: [
     {

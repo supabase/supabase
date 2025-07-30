@@ -119,7 +119,7 @@ test.describe('SQL Editor', () => {
 
     // write some sql in the editor
     // This has to be done since the editor is not editable (input, textarea, etc.)
-    const editor = page.getByRole('code').nth(0)
+    const editor = page.locator('.view-line')
     await editor.click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`delete table 'test';`)
@@ -144,7 +144,7 @@ test.describe('SQL Editor', () => {
     // write some sql in the editor
     await page.getByTestId('sql-editor-new-query-button').click()
     await page.getByRole('menuitem', { name: 'Create a new snippet' }).click()
-    const editor = page.getByRole('code').nth(0)
+    const editor = page.locator('.view-line')
     await editor.click()
     await page.keyboard.type(`select 'hello world';`)
     await expect(page.getByText("select 'hello world';")).toBeVisible()
