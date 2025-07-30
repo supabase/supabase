@@ -11,6 +11,7 @@ export type BranchCreateVariables = {
   branchName: string
   gitBranch?: string
   region?: string
+  withData?: boolean
 }
 
 export async function createBranch({
@@ -19,6 +20,7 @@ export async function createBranch({
   branchName,
   gitBranch,
   region,
+  withData,
 }: BranchCreateVariables) {
   const { data, error } = await post('/v1/projects/{ref}/branches', {
     params: {
@@ -29,6 +31,7 @@ export async function createBranch({
       branch_name: branchName,
       git_branch: gitBranch,
       region: region,
+      with_data: withData,
     },
   })
 

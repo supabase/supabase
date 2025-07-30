@@ -1,8 +1,8 @@
 import { numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { formatBytes } from 'lib/helpers'
 import { Organization } from 'types'
 import { Project } from '../projects/project-detail-query'
-import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 
 export const getReportAttributes = (org: Organization, project: Project): ReportAttributes[] => {
   const computeSize = project?.infra_compute_size || 'medium'
@@ -34,7 +34,7 @@ export const getReportAttributes = (org: Organization, project: Project): Report
     },
     {
       id: 'avg_cpu_usage',
-      label: 'CPU usage',
+      label: 'Average CPU usage',
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
@@ -53,6 +53,30 @@ export const getReportAttributes = (org: Organization, project: Project): Report
           label: 'Average CPU usage',
           format: '%',
           tooltip: 'Average CPU usage',
+        },
+      ],
+    },
+    {
+      id: 'max_cpu_usage',
+      label: 'Max CPU usage',
+      syncId: 'database-reports',
+      format: '%',
+      valuePrecision: 2,
+      availableIn: ['free', 'pro'],
+      hide: false,
+      showTooltip: false,
+      showLegend: false,
+      showMaxValue: false,
+      showGrid: false,
+      hideChartType: false,
+      defaultChartStyle: 'bar',
+      attributes: [
+        {
+          attribute: 'max_cpu_usage',
+          provider: 'infra-monitoring',
+          label: 'Max CPU usage',
+          format: '%',
+          tooltip: 'Max CPU usage',
         },
       ],
     },

@@ -9,13 +9,9 @@ import {
   useFeaturePreviewModal,
   useUnifiedLogsPreview,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
-import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
-import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
@@ -27,14 +23,7 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Separator,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -90,27 +79,17 @@ export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
 
-  const warehouseEnabled = useFlag('warehouse')
   const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
   const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
-  const [createCollectionOpen, setCreateCollectionOpen] = useState(false)
-  const canCreateCollection = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
-
-  const { data: tenantData } = useWarehouseTenantQuery({ projectRef: ref })
 
   const {
     projectAuthAll: authEnabled,
     projectStorageAll: storageEnabled,
     realtimeAll: realtimeEnabled,
   } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
-
-  const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
-    { projectRef: ref },
-    { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
-  )
 
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
   const isFreePlan = !isOrgPlanLoading && orgPlan?.id === 'free'
@@ -223,25 +202,24 @@ export function LogsSidebarMenuV2() {
   const filteredOperationalLogs = OPERATIONAL_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())
   })
-  const filteredWarehouse = whCollections?.filter((collection) => {
-    return collection.name.toLowerCase().includes(searchText.toLowerCase())
-  })
 
   return (
     <div className="pb-12 relative">
-      <FeaturePreviewSidebarPanel
-        className="mx-4 mt-4"
-        illustration={<Badge variant="default">Coming soon</Badge>}
-        title="New logs"
-        description="Get early access"
-        actions={
-          <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-            <Button type="default" size="tiny">
-              Early access
-            </Button>
-          </Link>
-        }
-      />
+      {IS_PLATFORM && (
+        <FeaturePreviewSidebarPanel
+          className="mx-4 mt-4"
+          illustration={<Badge variant="default">Coming soon</Badge>}
+          title="New logs"
+          description="Get early access"
+          actions={
+            <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
+              <Button type="default" size="tiny">
+                Early access
+              </Button>
+            </Link>
+          }
+        />
+      )}
       {isUnifiedLogsPreviewAvailable && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
@@ -283,56 +261,11 @@ export function LogsSidebarMenuV2() {
           ></InnerSideBarFilterSearchInput>
         </InnerSideBarFilters>
 
-        {warehouseEnabled ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                icon={<Plus className="text-foreground" />}
-                className="w-[26px]"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem className="gap-x-2" asChild>
-                <Link href={`/project/${ref}/logs/explorer`}>
-                  <FilePlus size={14} />
-                  Create query
-                </Link>
-              </DropdownMenuItem>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuItem className="gap-x-2" asChild>
-                    <button
-                      onClick={() => setCreateCollectionOpen(true)}
-                      className="w-full flex items-center text-xs px-2 py-1"
-                      disabled={!canCreateCollection}
-                    >
-                      <Plus size={14} />
-                      Create collection
-                    </button>
-                  </DropdownMenuItem>
-                </TooltipTrigger>
-                {!canCreateCollection && (
-                  <TooltipContent>
-                    You need additional permissions to create a collection
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Button
-            type="default"
-            icon={<Plus className="text-foreground" />}
-            className="w-[26px]"
-            onClick={() => router.push(`/project/${ref}/logs/explorer`)}
-          />
-        )}
-
-        <CreateWarehouseCollectionModal
-          open={createCollectionOpen}
-          onOpenChange={setCreateCollectionOpen}
+        <Button
+          type="default"
+          icon={<Plus className="text-foreground" />}
+          className="w-[26px]"
+          onClick={() => router.push(`/project/${ref}/logs/explorer`)}
         />
       </div>
       <div className="px-2">
@@ -359,17 +292,6 @@ export function LogsSidebarMenuV2() {
             />
           )
         })}
-        {whCollectionsLoading && warehouseEnabled ? (
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        ) : filteredWarehouse?.length ? (
-          <div>
-            {filteredWarehouse.map((collection) => (
-              <WarehouseMenuItem item={collection} key={collection.token}></WarehouseMenuItem>
-            ))}
-          </div>
-        ) : null}
       </SidebarCollapsible>
       {OPERATIONAL_COLLECTIONS.length > 0 && (
         <>
