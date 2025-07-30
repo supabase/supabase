@@ -35,6 +35,7 @@ const schema = object({
   DISABLE_SIGNUP: boolean().required(),
   EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
   SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
+  MAILER_AUTOCONFIRM: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
 })
 
@@ -52,6 +53,7 @@ const BasicAuthSettingsForm = () => {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
       SECURITY_MANUAL_LINKING_ENABLED: false,
+      MAILER_AUTOCONFIRM: true,
       SITE_URL: '',
     },
   })
@@ -62,6 +64,7 @@ const BasicAuthSettingsForm = () => {
         DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
         EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED,
         SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
+        MAILER_AUTOCONFIRM: authConfig.MAILER_AUTOCONFIRM || true,
         SITE_URL: authConfig.SITE_URL,
       })
     }
@@ -154,6 +157,27 @@ const BasicAuthSettingsForm = () => {
                         for your project
                       </>
                     }
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!canUpdateConfig}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </CardContent>
+            <CardContent>
+              <FormField_Shadcn_
+                control={form.control}
+                name="MAILER_AUTOCONFIRM"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Confirm email"
+                    description="Users will need to confirm their email address before signing in for the first time"
                   >
                     <FormControl_Shadcn_>
                       <Switch
