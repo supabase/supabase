@@ -1,11 +1,17 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { Trash } from 'lucide-react'
+import { Trash, MoreVertical } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
 import Table from 'components/to-be-cleaned/Table'
-import { Button } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const AccessTokenList = () => {
@@ -64,16 +70,30 @@ const AccessTokenList = () => {
                           >
                             Manage access
                           </Button>
-                          <Button
-                            type="default"
-                            title="Delete token"
-                            className="px-1"
-                            onClick={() => {
-                              setToken(x)
-                              setIsOpen(true)
-                            }}
-                            icon={<Trash />}
-                          />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                type="text"
+                                title="More options"
+                                className="px-1.5"
+                                disabled={isLoading}
+                                loading={isLoading}
+                                icon={<MoreVertical />}
+                              />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side="bottom" align="end" className="w-40">
+                              <DropdownMenuItem
+                                className="gap-x-2"
+                                onClick={() => {
+                                  setToken(x)
+                                  setIsOpen(true)
+                                }}
+                              >
+                                <Trash size={12} />
+                                <p>Delete token</p>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </Table.td>
                     </Table.tr>
