@@ -13,7 +13,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -149,6 +149,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     }
   }, [visible, func])
 
+  const { data: protectedSchemas } = useProtectedSchemas()
+
   return (
     <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
       <SheetContent
@@ -205,7 +207,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         <SchemaSelector
                           portal={false}
                           selectedSchemaName={field.value}
-                          excludedSchemas={PROTECTED_SCHEMAS}
+                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />

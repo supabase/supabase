@@ -1,5 +1,8 @@
-import { ReplicationComingSoon } from 'components/interfaces/Database/Replication/ComingSoon'
-import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
+import { useRouter } from 'next/router'
+import { useContext, useEffect } from 'react'
+
+import { FeatureFlagContext, useParams } from 'common'
+import { ReplicationPipelineStatus } from 'components/interfaces/Database/Replication/ReplicationPipelineStatus'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -9,32 +12,30 @@ import { PipelineRequestStatusProvider } from 'state/replication-pipeline-reques
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { ref } = useParams()
+  const { hasLoaded } = useContext(FeatureFlagContext)
   const enablePgReplicate = useFlag('enablePgReplicate')
+
+  useEffect(() => {
+    if (hasLoaded && !enablePgReplicate) {
+      router.replace(`/project/${ref}/database/replication}`)
+    }
+  }, [router, hasLoaded, ref, enablePgReplicate])
 
   return (
     <>
-      {enablePgReplicate ? (
+      {enablePgReplicate && (
         <PipelineRequestStatusProvider>
           <ScaffoldContainer>
             <ScaffoldSection>
               <div className="col-span-12">
                 <FormHeader title="Replication" />
-                <Destinations />
+                <ReplicationPipelineStatus />
               </div>
             </ScaffoldSection>
           </ScaffoldContainer>
         </PipelineRequestStatusProvider>
-      ) : (
-        <>
-          <ScaffoldContainer>
-            <ScaffoldSection>
-              <div className="col-span-12">
-                <FormHeader title="Replication" description="Send data to other destinations" />
-              </div>
-            </ScaffoldSection>
-          </ScaffoldContainer>
-          <ReplicationComingSoon />
-        </>
       )}
     </>
   )

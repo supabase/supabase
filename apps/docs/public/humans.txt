@@ -41,6 +41,7 @@ Divit D
 Eduardo Gurgel
 Egor Romanov
 Eleftheria Trivyzaki
+Emmett Folger
 Etienne Stalmans
 Fabrizio Fenoglio
 Felipe Stival
@@ -84,6 +85,7 @@ Manan Gupta
 Margarita Sandomirskaia
 Mark Burggraf
 Monica Khoury
+Mykhailo Mischa Lieibenson
 Nyannyacha
 Oli R
 Pamela Chia

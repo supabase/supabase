@@ -1,6 +1,6 @@
 import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { noop } from 'lodash'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 
@@ -16,10 +16,10 @@ import { useDatabaseFunctionsQuery } from 'data/database-functions/database-func
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { AiIconAnimation, Input } from 'ui'
-import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
+import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
 interface FunctionsListProps {
@@ -60,11 +60,8 @@ const FunctionsList = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
-  )
-  const foundSchema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === foundSchema?.id)
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const {
     data: functions,
@@ -126,7 +123,7 @@ const FunctionsList = ({
             </div>
 
             <div className="flex items-center gap-x-2">
-              {!isLocked && (
+              {!isSchemaLocked && (
                 <>
                   <ButtonTooltip
                     disabled={!canCreateFunctions}
@@ -169,7 +166,7 @@ const FunctionsList = ({
             </div>
           </div>
 
-          {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
+          {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
 
           <Table
             className="table-fixed overflow-x-auto"
@@ -192,7 +189,7 @@ const FunctionsList = ({
               <FunctionList
                 schema={selectedSchema}
                 filterString={filterString}
-                isLocked={isLocked}
+                isLocked={isSchemaLocked}
                 editFunction={editFunction}
                 deleteFunction={deleteFunction}
               />
