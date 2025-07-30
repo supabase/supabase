@@ -1,14 +1,17 @@
 import { type PostgresColumn } from '@supabase/postgres-meta'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useRef } from 'react'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { type SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
+import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
 import {
   cn,
@@ -34,9 +37,6 @@ import {
   useSetCommandMenuSize,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
-import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useEffect, useRef } from 'react'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -295,19 +295,20 @@ export function useQueryTableCommands(options?: CommandOptions) {
 function TableSelector() {
   const router = useRouter()
   const project = useSelectedProject()
+  const { data: protectedSchemas } = useProtectedSchemas()
   const {
-    data: tables,
+    data: tablesData,
     isLoading,
     isError,
     isSuccess,
-  } = useTablesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      includeColumns: true,
-    },
-    { select: excludeSupabaseControlledSchemas }
-  )
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    includeColumns: true,
+  })
+  const tables = useMemo(() => {
+    return tablesData?.filter((table) => !protectedSchemas.find((s) => s.name === table.schema))
+  }, [tablesData, protectedSchemas])
 
   return (
     <CommandWrapper>
@@ -358,10 +359,6 @@ from ${formatTableIdentifier(table)}
 -- limit
 ;
   `.trim()
-}
-
-function excludeSupabaseControlledSchemas(tables: TablesData) {
-  return tables.filter((table) => !PROTECTED_SCHEMAS.includes(table.schema))
 }
 
 // Not a perfectly spec-compliant regex , since Postgres also allows non-Latin
