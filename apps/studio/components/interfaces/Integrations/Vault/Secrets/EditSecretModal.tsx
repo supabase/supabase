@@ -49,7 +49,7 @@ const EditSecretModal = ({ visible, secret, onClose }: EditSecretModalProps) => 
       id: secret.id,
       connectionString: project?.connectionString,
     },
-    { enabled: !!(project?.ref && secret?.id) }
+    { enabled: !!project?.ref }
   )
   const values = {
     name: secret.name ?? '',
