@@ -1,24 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import {
-  AiIconAnimation,
-  Badge,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { AiIconAnimation, Badge, Button } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: {

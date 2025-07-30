@@ -3,11 +3,11 @@ import { toast } from 'sonner'
 
 import { Query } from '@supabase/pg-meta/src/query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { wrapWithTransaction } from 'lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
 import { tableRowKeys } from './keys'
-import { wrapWithTransaction } from 'lib/helpers'
 
 export type TableRowUpdateVariables = {
   projectRef: string
@@ -57,8 +57,6 @@ export async function updateTableRow({
   if (isTestMode) {
     sql = wrapWithTransaction(sql)
   }
-
-  console.log('sql', sql)
 
   const { result } = await executeSql({
     projectRef,
