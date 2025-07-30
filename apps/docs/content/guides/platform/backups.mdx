@@ -131,6 +131,14 @@ If you enable PITR, Daily Backups will no longer be taken. PITR provides a finer
 
 </Admonition>
 
+When you disable PITR, all new backups will still be taken as physical backups only. Physical backups can still be used for restoration, but they are not available for direct download. If you need to download a backup after PITR is disabled, you’ll need to take a manual [logical backup using the Supabase CLI or pg_dump](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore#backup-database-using-the-cli).
+
+<Admonition type="note">
+
+If PITR has been disabled, logical backups remain available until they pass the backup retention period for your plan. After that window passes, only physical backups will be shown.
+
+</Admonition>
+
 ### Backup process [#pitr-backup-process]
 
 As discussed [here](https://supabase.com/blog/postgresql-physical-logical-backups), PITR is made possible by a combination of taking physical backups of a project, as well as archiving [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html) files. Physical backups provide a snapshot of the underlying directory of the database, while WAL files contain records of every change made in the database.
