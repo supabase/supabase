@@ -54,16 +54,27 @@ const AccessTokenList = () => {
                         <p>{new Date(x.created_at).toLocaleString()}</p>
                       </Table.td>
                       <Table.td>
-                        <Button
-                          type="default"
-                          title="Delete token"
-                          className="px-1"
-                          onClick={() => {
-                            setToken(x)
-                            setIsOpen(true)
-                          }}
-                          icon={<Trash />}
-                        />
+                        <div className="flex items-center justify-end gap-x-2">
+                          <Button
+                            type="default"
+                            title="Manage access"
+                            onClick={() => {
+                              console.log('Open try here...')
+                            }}
+                          >
+                            Manage access
+                          </Button>
+                          <Button
+                            type="default"
+                            title="Delete token"
+                            className="px-1"
+                            onClick={() => {
+                              setToken(x)
+                              setIsOpen(true)
+                            }}
+                            icon={<Trash />}
+                          />
+                        </div>
                       </Table.td>
                     </Table.tr>
                   )
