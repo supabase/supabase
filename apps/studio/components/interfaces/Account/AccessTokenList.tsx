@@ -56,7 +56,9 @@ const AccessTokenList = () => {
                       <Table.td>
                         <span className="font-mono">{x.token_alias}</span>
                       </Table.td>
-                      <Table.td>{x.name}</Table.td>
+                      <Table.td>
+                        <p className="truncate max-w-[16ch]">{x.name}</p>
+                      </Table.td>
                       <Table.td>
                         <p>{new Date(x.created_at).toLocaleString()}</p>
                       </Table.td>
