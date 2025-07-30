@@ -226,17 +226,13 @@ export const CreateCronJobSheet = ({
 
   const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '', project?.ref!)
 
-  // [Joshen] Keeping the var name here generic, in case there's other cases that might fail parsing
-  const unableToParseCronJob =
-    cronJobValues.type === 'http_request' && cronJobValues.endpoint === ''
-
   const form = useForm<CreateCronJobForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
       schedule: selectedCronJob?.schedule || '*/5 * * * *',
       supportsSeconds,
-      values: { ...cronJobValues, type: unableToParseCronJob ? 'sql_snippet' : cronJobValues.type },
+      values: cronJobValues,
     },
   })
 
@@ -279,13 +275,6 @@ export const CreateCronJobSheet = ({
     // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
     if (isClosing && !isEdited) onClose()
   }, [isClosing, isEdited, onClose])
-
-  useEffect(() => {
-    if (cronType === 'sql_snippet' && unableToParseCronJob && selectedCronJob?.command) {
-      form.setValue('values.snippet', selectedCronJob.command)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEdited, cronType])
 
   // update the snippet field when the user changes the any values in the form
   useEffect(() => {

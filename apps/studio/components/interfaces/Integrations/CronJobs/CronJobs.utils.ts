@@ -44,9 +44,8 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     .replaceAll(/\n/g, ' ')
     .replaceAll(/\s+/g, ' ')
     .trim()
-    .toLocaleLowerCase()
 
-  if (command.startsWith('select net.')) {
+  if (command.toLocaleLowerCase().startsWith('select net.')) {
     const methodMatch = command.match(/select net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
@@ -113,19 +112,21 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
       }
     }
 
-    return {
-      type: 'http_request',
-      method: method === 'http_get' ? 'GET' : 'POST',
-      endpoint: url,
-      httpHeaders: headersObjs,
-      httpBody: body,
-      timeoutMs: Number(timeout ?? 1000),
-      snippet: originalCommand,
+    if (url !== '') {
+      return {
+        type: 'http_request',
+        method: method === 'http_get' ? 'GET' : 'POST',
+        endpoint: url,
+        httpHeaders: headersObjs,
+        httpBody: body,
+        timeoutMs: Number(timeout ?? 1000),
+        snippet: originalCommand,
+      }
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(.+/g
-  if (command.match(regexDBFunction)) {
+  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
+  if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
       .replace('SELECT ', '')
       .replace(/\(.*\)/, '')
