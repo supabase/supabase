@@ -79,10 +79,8 @@ export const S3Connection = () => {
     defaultValues: { s3ConnectionEnabled: false },
   })
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
-  const s3connectionUrl = getConnectionURL(projectRef ?? '', protocol, endpoint)
+  const s3connectionUrl = getConnectionURL(projectRef ?? '', settings)
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
