@@ -1422,6 +1422,36 @@ export interface DpaRequestButtonClickedEvent {
 }
 
 /**
+ * User clicked a document view/download button to access a document.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface DocumentViewButtonClickedEvent {
+  action: 'document_view_button_clicked'
+  properties: {
+    /**
+     * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
+     */
+    documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the Request HIPAA button to open the HIPAA request form.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/org/{slug}/documents
+ */
+export interface HipaaRequestButtonClickedEvent {
+  action: 'hipaa_request_button_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -1513,3 +1543,5 @@ export type TelemetryEvent =
   | BranchReviewWithAssistantClickedEvent
   | DpaPdfOpenedEvent
   | DpaRequestButtonClickedEvent
+  | DocumentViewButtonClickedEvent
+  | HipaaRequestButtonClickedEvent

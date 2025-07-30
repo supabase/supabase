@@ -11,6 +11,7 @@ import {
 } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { getDocument } from 'data/documents/document-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -19,6 +20,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 const SOC2 = () => {
   const organization = useSelectedOrganization()
   const slug = organization?.slug
+  const { mutate: sendEvent } = useSendEventMutation()
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -58,7 +60,18 @@ const SOC2 = () => {
                 <Button type="default">Upgrade to Team</Button>
               </Link>
             ) : (
-              <Button type="default" icon={<Download />} onClick={() => setIsOpen(true)}>
+              <Button 
+                type="default" 
+                icon={<Download />} 
+                onClick={() => {
+                  sendEvent({
+                    action: 'document_view_button_clicked',
+                    properties: { documentName: 'SOC2' },
+                    groups: { organization: organization?.slug ?? 'Unknown' },
+                  })
+                  setIsOpen(true)
+                }}
+              >
                 Download SOC2 Type 2 Report
               </Button>
             )}
