@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
-import { ColumnList } from 'components/interfaces/Database'
+import { ColumnList } from 'components/interfaces/Database/Tables/ColumnList'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
@@ -91,11 +91,7 @@ const DatabaseTables: NextPageWithLayout = () => {
           <ToggleGroup
             type="single"
             value={view}
-            onValueChange={(value) => {
-              if (value) {
-                setView(value as 'list' | 'definition')
-              }
-            }}
+            onValueChange={(value) => setView(value as 'list' | 'definition')}
           >
             <ToggleGroupItem className="h-7 w-7 p-0" value="list" aria-label="List view">
               <Tooltip>

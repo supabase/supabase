@@ -35,7 +35,7 @@ interface ColumnListProps {
   showControls?: boolean
 }
 
-const ColumnList = ({
+export const ColumnList = ({
   onAddColumn = noop,
   onEditColumn = noop,
   onDeleteColumn = noop,
@@ -215,5 +215,3 @@ const ColumnList = ({
     </div>
   )
 }
-
-export default ColumnList

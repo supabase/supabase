@@ -1,4 +1,3 @@
-export { default as ColumnList } from './Tables/ColumnList'
 export { default as TableList } from './Tables/TableList'
 
 export { default as RolesList } from './Roles/RolesList'
