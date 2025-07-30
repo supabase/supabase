@@ -4450,12 +4450,12 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
+      folder_id?: string | null
       id?: string
       name: string
       owner_id?: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
@@ -5656,7 +5656,7 @@ export interface components {
       owner_id: number
       project_id: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
@@ -5675,7 +5675,7 @@ export interface components {
           owner_id: number
           project_id: number
           /** @enum {string} */
-          type: 'sql' | 'report' | 'log_sql'
+          type: 'sql' | 'report' | 'log_sql' | 'test'
           updated_at: string
           /** @enum {string} */
           visibility: 'user' | 'project' | 'org' | 'public'
@@ -5709,7 +5709,7 @@ export interface components {
         owner_id: number
         project_id: number
         /** @enum {string} */
-        type: 'sql' | 'report' | 'log_sql'
+        type: 'sql' | 'report' | 'log_sql' | 'test'
         updated_at: string
         updated_by: {
           id: number
@@ -8767,13 +8767,13 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: (null | (string | null)) | null
+      folder_id?: string | null
       id: string
       name: string
       owner_id: number
       project_id?: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
@@ -8838,7 +8838,7 @@ export interface components {
       owner_id: number
       project_id: number
       /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql' | 'test'
       updated_at: string
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
@@ -16650,7 +16650,7 @@ export interface operations {
         name?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'test'
         visibility?: string
       }
       header?: never
@@ -16802,7 +16802,7 @@ export interface operations {
     parameters: {
       query?: {
         name?: string
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'test'
       }
       header?: never
       path: {
@@ -16844,7 +16844,7 @@ export interface operations {
         name?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        type?: 'sql' | 'report' | 'log_sql'
+        type?: 'sql' | 'report' | 'log_sql' | 'test'
         visibility?: string
       }
       header?: never
