@@ -172,27 +172,6 @@ const BasicAuthSettingsForm = () => {
             <CardContent>
               <FormField_Shadcn_
                 control={form.control}
-                name="MAILER_AUTOCONFIRM"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Confirm email"
-                    description="Users will need to confirm their email address before signing in for the first time"
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={!canUpdateConfig}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </CardContent>
-            <CardContent>
-              <FormField_Shadcn_
-                control={form.control}
                 name="EXTERNAL_ANONYMOUS_USERS_ENABLED"
                 render={({ field }) => (
                   <FormItemLayout
@@ -273,6 +252,27 @@ const BasicAuthSettingsForm = () => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
+            </CardContent>
+            <CardContent>
+              <FormField_Shadcn_
+                control={form.control}
+                name="MAILER_AUTOCONFIRM"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex-row-reverse"
+                    label="Confirm email"
+                    description="Users will need to confirm their email address before signing in for the first time"
+                  >
+                    <FormControl_Shadcn_>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!canUpdateConfig}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
             </CardContent>
             <CardFooter className="justify-end space-x-2">
               {form.formState.isDirty && (
