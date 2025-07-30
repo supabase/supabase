@@ -84,7 +84,10 @@ const deleteTable = async (page: Page, tableName: string) => {
   if (!exists) return
 
   await s.viewTableLabel(page).click()
-  await s.viewTableLabel(page).getByRole('button').nth(2).click()
+  await s
+    .viewTableLabel(page)
+    .getByRole('button', { name: `Actions for ${tableName}` })
+    .click()
   await s.deleteTableBtn(page).click()
   await s.confirmDeleteBtn(page).click()
   await expect(
@@ -270,6 +273,8 @@ test.describe('Table Editor', () => {
     await s2.rlsConfirmBtn(page).click()
     await s2.saveBtn(page).click()
 
+    await page.waitForLoadState('networkidle')
+
     await expect(
       page.getByText(`Table ${tableNameRlsDisabled} is good to go!`),
       'Success toast should be visible after Rls disabled table is created.'
@@ -332,6 +337,8 @@ test.describe('Table Editor', () => {
     await page.getByPlaceholder('Search types...').fill(ENUM_NAME)
     await page.getByRole('option', { name: ENUM_NAME }).click()
     await s.saveBtn(page).click()
+
+    await page.waitForLoadState('networkidle')
 
     await expect(
       page.getByText(`Table ${tableNameEnum} is good to go!`),
