@@ -10,6 +10,7 @@ import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -19,12 +20,9 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
@@ -70,9 +68,13 @@ export const ColumnList = ({
 
   return (
     <div className="space-y-4">
+      {/* 
+        [Joshen] We can probably remove this if we don't think we need this, this component is
+        only being used by one component, which is passing showControls as false
+      */}
       {showControls && (
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-x-4">
             <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
               <Link href={`/project/${ref}/database/tables`} />
             </Button>
@@ -166,41 +168,41 @@ export const ColumnList = ({
                             <Button type="default" className="px-1" icon={<MoreVertical />} />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-32">
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <DropdownMenuItem
-                                  disabled={!canUpdateColumns}
-                                  onClick={() => onEditColumn(x)}
-                                  className="space-x-2"
-                                >
-                                  <Edit size={12} />
-                                  <p>Edit column</p>
-                                </DropdownMenuItem>
-                              </TooltipTrigger>
-                              {!canUpdateColumns && (
-                                <TooltipContent side="bottom">
-                                  Additional permissions required to edit column
-                                </TooltipContent>
-                              )}
-                            </Tooltip>
+                            <DropdownMenuItemTooltip
+                              disabled={!canUpdateColumns}
+                              onClick={() => onEditColumn(x)}
+                              className="space-x-2"
+                              tooltip={{
+                                content: {
+                                  side: 'left',
+                                  text: !canUpdateColumns
+                                    ? 'Additional permissions required to edit column'
+                                    : undefined,
+                                },
+                              }}
+                            >
+                              <Edit size={12} />
+                              <p>Edit column</p>
+                            </DropdownMenuItemTooltip>
 
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <DropdownMenuItem
-                                  disabled={!canUpdateColumns || isLocked}
-                                  onClick={() => onDeleteColumn(x)}
-                                  className="space-x-2"
-                                >
-                                  <Trash stroke="red" size={12} />
-                                  <p>Delete column</p>
-                                </DropdownMenuItem>
-                              </TooltipTrigger>
-                              {!canUpdateColumns && (
-                                <TooltipContent side="bottom">
-                                  Additional permissions required to delete column
-                                </TooltipContent>
-                              )}
-                            </Tooltip>
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItemTooltip
+                              disabled={!canUpdateColumns || isLocked}
+                              onClick={() => onDeleteColumn(x)}
+                              className="space-x-2"
+                              tooltip={{
+                                content: {
+                                  side: 'left',
+                                  text: !canUpdateColumns
+                                    ? 'Additional permissions required to delete column'
+                                    : undefined,
+                                },
+                              }}
+                            >
+                              <Trash size={12} />
+                              <p>Delete column</p>
+                            </DropdownMenuItemTooltip>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       )}
