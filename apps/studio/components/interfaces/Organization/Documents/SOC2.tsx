@@ -60,9 +60,9 @@ const SOC2 = () => {
                 <Button type="default">Upgrade to Team</Button>
               </Link>
             ) : (
-              <Button 
-                type="default" 
-                icon={<Download />} 
+              <Button
+                type="default"
+                icon={<Download />}
                 onClick={() => {
                   sendEvent({
                     action: 'document_view_button_clicked',

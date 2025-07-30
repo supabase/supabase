@@ -34,9 +34,9 @@ const HIPAA = () => {
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <div className="flex items-center justify-center h-full">
-            <a 
-              href="https://forms.supabase.com/hipaa2" 
-              target="_blank" 
+            <a
+              href="https://forms.supabase.com/hipaa2"
+              target="_blank"
               rel="noreferrer noopener"
               onClick={() =>
                 sendEvent({
