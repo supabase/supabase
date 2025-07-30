@@ -3,7 +3,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, useSnapshot } from 'valtio'
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
@@ -14,13 +14,13 @@ import {
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
-} from 'components/to-be-cleaned/Storage/Storage.constants'
+} from 'components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
   StorageItem,
   StorageItemMetadata,
   StorageItemWithColumn,
-} from 'components/to-be-cleaned/Storage/Storage.types'
+} from 'components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
   downloadFile,
@@ -28,8 +28,8 @@ import {
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
-} from 'components/to-be-cleaned/Storage/StorageExplorer/StorageExplorer.utils'
-import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+} from 'components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { convertFromBytes } from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from 'components/ui/InlineLink'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { configKeys } from 'data/config/keys'
@@ -1744,6 +1744,7 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   const { serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
+  const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
 
   // [Joshen] JFYI opting with the useEffect here as the storage explorer state was being loaded
   // before the project details were ready, hence the store kept returning project ref as undefined
@@ -1751,21 +1752,12 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
   // So the useEffect here is to make sure that the project ref is loaded into the state properly
   // Although I'd be keen to re-investigate this to see if we can remove this
   useEffect(() => {
-    const snap = snapshot(stateRef.current)
     const hasDataReady = !!project?.ref
-    const resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}/storage/v1/upload/resumable`
+    const serviceApiKey = serviceKey?.api_key ?? 'unknown'
 
-    const isDifferentProject = snap.projectRef !== project?.ref
-    const isDifferentResumableUploadUrl = snap.resumableUploadUrl !== resumableUploadUrl
-
-    if (
-      !isPaused &&
-      hasDataReady &&
-      (isDifferentProject || isDifferentResumableUploadUrl) &&
-      serviceKey
-    ) {
+    if (!isPaused && hasDataReady) {
       const clientEndpoint = `${IS_PLATFORM ? 'https' : protocol}://${endpoint}`
-      const supabaseClient = createClient(clientEndpoint, serviceKey.api_key, {
+      const supabaseClient = createClient(clientEndpoint, serviceApiKey, {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
@@ -1785,11 +1777,19 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
           projectRef: project?.ref ?? '',
           supabaseClient,
           resumableUploadUrl,
-          serviceKey: serviceKey.api_key,
+          serviceKey: serviceApiKey,
         })
       )
     }
-  }, [project?.ref, stateRef, serviceKey, isPaused, protocol, endpoint])
+  }, [
+    project?.ref,
+    stateRef,
+    serviceKey?.api_key,
+    isPaused,
+    resumableUploadUrl,
+    protocol,
+    endpoint,
+  ])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>
