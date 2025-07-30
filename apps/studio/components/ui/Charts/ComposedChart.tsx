@@ -235,7 +235,10 @@ export default function ComposedChart({
           })
       : []
 
-  const stackedAttributes = chartData.filter((att) => !att.name.includes('max'))
+  const stackedAttributes = chartData.filter((att) => {
+    const attribute = attributes.find((attr) => attr.attribute === att.name)
+    return !attribute?.isMaxValue
+  })
   const isPercentage = format === '%'
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&

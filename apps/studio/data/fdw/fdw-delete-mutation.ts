@@ -73,7 +73,7 @@ export const getDeleteFDWSql = ({
   const deleteEncryptedSecretsSql = deleteEncryptedSecretsSqlArray.join('\n')
 
   const sql = /* SQL */ `
-    drop foreign data wrapper if exists ${wrapper.name} cascade;
+    drop foreign data wrapper if exists "${wrapper.name}" cascade;
 
     ${deleteEncryptedSecretsSql}
   `
