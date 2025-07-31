@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { TreeView } from 'ui'
 import {
@@ -11,16 +11,12 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { SQLEditorTreeViewItem } from './SQLEditorNavV2/SQLEditorTreeViewItem'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { partition } from 'lodash'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  useSelectedOrganization,
-  useSelectedOrganizationQuery,
-} from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
