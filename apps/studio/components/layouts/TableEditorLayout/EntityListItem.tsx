@@ -468,7 +468,7 @@ const EntityTooltipTrigger = ({
           <Unlock
             size={14}
             strokeWidth={2}
-            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
+            className={cn('min-w-4', isActive ? 'text-destructive-600' : 'text-destructive-500')}
           />
         </TooltipTrigger>
         <TooltipContent side="bottom">
