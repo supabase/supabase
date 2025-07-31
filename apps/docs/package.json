@@ -94,7 +94,6 @@
     "nuqs": "^1.19.1",
     "openai": "^4.20.1",
     "openapi-fetch": "0.12.4",
-    "pino": "^9.7.0",
     "react": "catalog:",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "catalog:",
