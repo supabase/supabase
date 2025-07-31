@@ -102,7 +102,7 @@ export const Message = function Message({
 
         {action}
 
-        <div className="flex gap-4 w-auto overflow-hidden">
+        <div className="flex gap-4 w-auto overflow-hidden group">
           {isUser && (
             <ProfileImage
               alt={profile?.username}
