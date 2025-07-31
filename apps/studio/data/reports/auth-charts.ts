@@ -76,6 +76,26 @@ export const getAuthReportAttributes = () => [
     ],
   },
   {
+    id: 'signins',
+    label: 'Sign Ins',
+    valuePrecision: 0,
+    hide: false,
+    showTooltip: true,
+    showLegend: false,
+    showMaxValue: false,
+    hideChartType: false,
+    defaultChartStyle: 'bar',
+    titleTooltip: 'The total number of successful sign ins.',
+    attributes: [
+      {
+        attribute: 'SignIns',
+        provider: 'logs',
+        label: 'Sign Ins',
+        enabled: true,
+      },
+    ],
+  },
+  {
     id: 'auth-errors',
     label: 'Auth Errors',
     valuePrecision: 0,
